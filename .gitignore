@@ -1,0 +1,40 @@
+# compiled objects
+*.o
+
+# compiled graphics
+*.1bpp
+*.2bpp
+*.pic
+
+# compiled roms
+*.gbc
+*.gb
+*.patch
+
+# rgbds extras
+*.map
+
+# tool binaries
+*.exe
+
+# precompiled python
+*.pyc
+*$py.class
+
+# save game files
+*.sgm
+*.sav
+*.rtc
+*.sn*
+*.sa*
+*.sg1
+
+# other files
+*.gfx
+*.dep
+*.obj
+*.bak
+tools/banks/*
+tools/map2png/tile_bins/*
+tools/map2png/secondary_tile_bins/*
+tools/map2png/temp.bin
