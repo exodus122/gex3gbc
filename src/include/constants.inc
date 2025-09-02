@@ -27,7 +27,7 @@ DEF Bank1c_Text               EQU $1c
 DEF Bank1d                    EQU $1d
 DEF Bank1e                    EQU $1e
 DEF Bank1f                    EQU $1f
-DEF Bank21                    EQU $21
+DEF Bank21                    EQU $21 ; map palette data
 DEF Bank22                    EQU $22
 DEF Bank23                    EQU $23
 DEF Bank24                    EQU $24
@@ -68,6 +68,8 @@ DEF Bank4c_Tileset            EQU $4c ; ChannelZ
 DEF Bank4d_Tileset            EQU $4d ; GexCave, AnimeChannel, GextremeSports
 DEF Bank4e_Tileset            EQU $4e ; GexCave
 DEF Bank4f_Tileset            EQU $4f ; WesternStation, WWGexWrestling, ChannelZ
+
+DEF Bank7f                    EQU $7f ; object palette data
 
 ; Inputs
 DEF Input_A        EQU $01

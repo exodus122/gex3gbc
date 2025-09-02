@@ -1071,16 +1071,16 @@ wDCE8:
 wDCE9:
     ds 1                                               ;; dce9
 
-wDCEA:
+wDCEA_BgPalettes:
     ds 32                                              ;; dcea
 
-wDD0A:
+wDD0A_BgPalettes:
     ds 32                                              ;; dd0a
 
-wDD2A:
+wDD2A_ObjectPalettes:
     ds 32                                              ;; dd2a
 
-wDD4A:
+wDD4A_ObjectPalettes:
     ds 32                                              ;; dd4a
 
 wDD6A:

@@ -188,50 +188,94 @@ SECTION "bank20", ROMX[$4000], BANK[$20]
 INCLUDE "bank21.asm"
 INCLUDE "bank22.asm"
 INCLUDE "bank23.asm"
-INCLUDE "bank24.asm"
-INCLUDE "bank25.asm"
-INCLUDE "bank26.asm"
-INCLUDE "bank27.asm"
-INCLUDE "bank28.asm"
+
+SECTION "bank24", ROMX[$4000], BANK[$24]
+INCBIN "../data/blockset_data/bank_024.bin"
+SECTION "bank25", ROMX[$4000], BANK[$25]
+INCBIN "../data/blockset_data/bank_025.bin"
+SECTION "bank26", ROMX[$4000], BANK[$26]
+INCBIN "../data/blockset_data/bank_026.bin"
+SECTION "bank27", ROMX[$4000], BANK[$27]
+INCBIN "../data/blockset_data/bank_027.bin"
+SECTION "bank28", ROMX[$4000], BANK[$28]
+INCBIN "../data/blockset_data/bank_028.bin"
+
 SECTION "bank29", ROMX[$4000], BANK[$29]
 SECTION "bank2A", ROMX[$4000], BANK[$2A]
 SECTION "bank2B", ROMX[$4000], BANK[$2B]
 SECTION "bank2C", ROMX[$4000], BANK[$2C]
 SECTION "bank2D", ROMX[$4000], BANK[$2D]
-INCLUDE "bank2E.asm"
-INCLUDE "bank2F.asm"
-INCLUDE "bank30.asm"
-INCLUDE "bank31.asm"
-INCLUDE "bank32.asm"
-INCLUDE "bank33.asm"
-INCLUDE "bank34.asm"
-INCLUDE "bank35.asm"
-INCLUDE "bank36.asm"
+
+SECTION "bank2e", ROMX[$4000], BANK[$2e]
+INCBIN "../data/map_blockset_override/bank_02e.bin"
+SECTION "bank2f", ROMX[$4000], BANK[$2f]
+INCBIN "../data/maps/bank_02f.bin"
+SECTION "bank30", ROMX[$4000], BANK[$30]
+INCBIN "../data/map_collision/bank_030.bin"
+SECTION "bank31", ROMX[$4000], BANK[$31]
+INCBIN "../data/map_blockset_override/bank_031.bin"
+SECTION "bank32", ROMX[$4000], BANK[$32]
+INCBIN "../data/maps/bank_032.bin"
+SECTION "bank33", ROMX[$4000], BANK[$33]
+INCBIN "../data/map_collision/bank_033.bin"
+SECTION "bank34", ROMX[$4000], BANK[$34]
+INCBIN "../data/map_blockset_override/bank_034.bin"
+SECTION "bank35", ROMX[$4000], BANK[$35]
+INCBIN "../data/maps/bank_035.bin"
+SECTION "bank36", ROMX[$4000], BANK[$36]
+INCBIN "../data/map_collision/bank_036.bin"
 SECTION "bank37", ROMX[$4000], BANK[$37]
-INCLUDE "bank38.asm"
-INCLUDE "bank39.asm"
-INCLUDE "bank3A.asm"
-INCLUDE "bank3B.asm"
-INCLUDE "bank3C.asm"
-SECTION "bank3D", ROMX[$4000], BANK[$3D]
-INCLUDE "bank3E.asm"
-INCLUDE "bank3F.asm"
-INCLUDE "bank40.asm"
-INCLUDE "bank41.asm"
-INCLUDE "bank42.asm"
-INCLUDE "bank43.asm"
-INCLUDE "bank44.asm"
-INCLUDE "bank45.asm"
-INCLUDE "bank46.asm"
-INCLUDE "bank47.asm"
-INCLUDE "bank48.asm"
-INCLUDE "bank49.asm"
-INCLUDE "bank4A.asm"
-INCLUDE "bank4B.asm"
-INCLUDE "bank4C.asm"
-INCLUDE "bank4D.asm"
-INCLUDE "bank4E.asm"
-INCLUDE "bank4F.asm"
+INCBIN "../data/map_blockset_override/bank_037.bin"
+SECTION "bank38", ROMX[$4000], BANK[$38]
+INCBIN "../data/maps/bank_038.bin"
+SECTION "bank39", ROMX[$4000], BANK[$39]
+INCBIN "../data/map_collision/bank_039.bin"
+SECTION "bank3a", ROMX[$4000], BANK[$3a]
+INCBIN "../data/map_blockset_override/bank_03a.bin"
+SECTION "bank3b", ROMX[$4000], BANK[$3b]
+INCBIN "../data/maps/bank_03b.bin"
+SECTION "bank3c", ROMX[$4000], BANK[$3c]
+INCBIN "../data/map_collision/bank_03c.bin"
+SECTION "bank3d", ROMX[$4000], BANK[$3d]
+INCBIN "../data/map_blockset_override/bank_03d.bin"
+SECTION "bank3e", ROMX[$4000], BANK[$3e]
+INCBIN "../data/maps/bank_03e.bin"
+SECTION "bank3f", ROMX[$4000], BANK[$3f]
+INCBIN "../data/map_collision/bank_03f.bin"
+
+SECTION "bank40", ROMX[$4000], BANK[$40]
+INCBIN "../.gfx/tilesets/tileset_040.bin"
+SECTION "bank41", ROMX[$4000], BANK[$41]
+INCBIN "../.gfx/tilesets/tileset_041.bin"
+SECTION "bank42", ROMX[$4000], BANK[$42]
+INCBIN "../.gfx/tilesets/tileset_042.bin"
+SECTION "bank43", ROMX[$4000], BANK[$43]
+INCBIN "../.gfx/tilesets/tileset_043.bin"
+SECTION "bank44", ROMX[$4000], BANK[$44]
+INCBIN "../.gfx/tilesets/tileset_044.bin"
+SECTION "bank45", ROMX[$4000], BANK[$45]
+INCBIN "../.gfx/tilesets/tileset_045.bin"
+SECTION "bank46", ROMX[$4000], BANK[$46]
+INCBIN "../.gfx/tilesets/tileset_046.bin"
+SECTION "bank47", ROMX[$4000], BANK[$47]
+INCBIN "../.gfx/tilesets/tileset_047.bin"
+SECTION "bank48", ROMX[$4000], BANK[$48]
+INCBIN "../.gfx/tilesets/tileset_048.bin"
+SECTION "bank49", ROMX[$4000], BANK[$49]
+INCBIN "../.gfx/tilesets/tileset_049.bin"
+SECTION "bank4a", ROMX[$4000], BANK[$4a]
+INCBIN "../.gfx/tilesets/tileset_04a.bin"
+SECTION "bank4b", ROMX[$4000], BANK[$4b]
+INCBIN "../.gfx/tilesets/tileset_04b.bin"
+SECTION "bank4c", ROMX[$4000], BANK[$4c]
+INCBIN "../.gfx/tilesets/tileset_04c.bin"
+SECTION "bank4d", ROMX[$4000], BANK[$4d]
+INCBIN "../.gfx/tilesets/tileset_04d.bin"
+SECTION "bank4e", ROMX[$4000], BANK[$4e]
+INCBIN "../.gfx/tilesets/tileset_04e.bin"
+SECTION "bank4f", ROMX[$4000], BANK[$4f]
+INCBIN "../.gfx/tilesets/tileset_04f.bin"
+
 SECTION "bank50", ROMX[$4000], BANK[$50]
 SECTION "bank51", ROMX[$4000], BANK[$51]
 SECTION "bank52", ROMX[$4000], BANK[$52]

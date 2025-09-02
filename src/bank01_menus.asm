@@ -502,7 +502,7 @@ data_01_43c3:
     jr   Z, .jr_01_43cf                                ;; 01:43ca $28 $03
     ld   HL, .data_01_43e0                             ;; 01:43cc $21 $e0 $43
 .jr_01_43cf:
-    ld   DE, wDD4A                                     ;; 01:43cf $11 $4a $dd
+    ld   DE, wDD4A_ObjectPalettes                                     ;; 01:43cf $11 $4a $dd
     ld   BC, $10                                       ;; 01:43d2 $01 $10 $00
     jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:43d5 $c3 $6e $07
 .data_01_43d8:
@@ -731,21 +731,21 @@ call_01_446b:
     ret  Z                                             ;; 01:4565 $c8
     ld   C, $09                                        ;; 01:4566 $0e $09
     jp   call_00_0a6a                                  ;; 01:4568 $c3 $6a $0a
-.data_01_456b:
+.data_01_456b: ; probably menutype jump table
     db   $8d, $45                                      ;; 01:456b ??
     dw   call_01_4599                                  ;; 01:456d pP
-    dw   data_01_45a5                                  ;; 01:456f pP
-    dw   data_01_466f                                  ;; 01:4571 pP
-    dw   data_01_4675                                  ;; 01:4573 pP
-    dw   data_01_467b                                  ;; 01:4575 pP
-    dw   data_01_46d4                                  ;; 01:4577 pP
-    dw   data_01_46f9                                  ;; 01:4579 pP
-    dw   data_01_470c                                  ;; 01:457b pP
-    dw   data_01_4760                                  ;; 01:457d pP
+    dw   call_01_45a5                                  ;; 01:456f pP
+    dw   call_01_466f                                  ;; 01:4571 pP
+    dw   call_01_4675                                  ;; 01:4573 pP
+    dw   call_01_467b                                  ;; 01:4575 pP
+    dw   call_01_46d4                                  ;; 01:4577 pP
+    dw   call_01_46f9                                  ;; 01:4579 pP
+    dw   call_01_470c                                  ;; 01:457b pP
+    dw   call_01_4760                                  ;; 01:457d pP
     db   $7b, $47                                      ;; 01:457f ??
-    dw   data_01_477c                                  ;; 01:4581 pP
-    dw   data_01_47aa                                  ;; 01:4583 pP
-    dw   data_01_47b1                                  ;; 01:4585 pP
+    dw   call_01_477c                                  ;; 01:4581 pP
+    dw   call_01_47aa                                  ;; 01:4583 pP
+    dw   call_01_47b1                                  ;; 01:4585 pP
     db   $0c, $48, $25, $48, $26, $48, $fa, $a7        ;; 01:4587 ????????
     db   $db, $11, $39, $6f, $cd, $77, $07, $c3        ;; 01:458f ????????
     db   $03, $4d                                      ;; 01:4597 ??
@@ -756,9 +756,9 @@ call_01_4599:
     call call_00_0777                                  ;; 01:459f $cd $77 $07
     jp   jp_01_4d03                                    ;; 01:45a2 $c3 $03 $4d
 
-data_01_45a5:
+call_01_45a5:
     ld   HL, .data_01_45ef                             ;; 01:45a5 $21 $ef $45
-    ld   DE, wDCEA                                     ;; 01:45a8 $11 $ea $dc
+    ld   DE, wDCEA_BgPalettes                                     ;; 01:45a8 $11 $ea $dc
     ld   BC, $80                                       ;; 01:45ab $01 $80 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:45ae $cd $6e $07
     ld   A, [wDB6C_CurrentLevelId]                                    ;; 01:45b1 $fa $6c $db
@@ -766,7 +766,7 @@ data_01_45a5:
     call call_00_0777                                  ;; 01:45b7 $cd $77 $07
     ld   DE, $330                                      ;; 01:45ba $11 $30 $03
     add  HL, DE                                        ;; 01:45bd $19
-    ld   DE, wDD0A                                     ;; 01:45be $11 $0a $dd
+    ld   DE, wDD0A_BgPalettes                                     ;; 01:45be $11 $0a $dd
     ld   BC, $20                                       ;; 01:45c1 $01 $20 $00
     ld   A, $1f                                        ;; 01:45c4 $3e $1f
     call call_00_075f                                  ;; 01:45c6 $cd $5f $07
@@ -794,6 +794,7 @@ data_01_45a5:
     db   $00, $40, $00, $00, $1f, $00, $ff, $03        ;; 01:4617 ........
     db   $00, $40, $00, $00, $60, $02, $9c, $03        ;; 01:461f ........
     db   $00, $40, $00, $00, $ff, $03, $e0, $03        ;; 01:4627 ........
+
     db   $00, $00, $80, $00, $20, $02, $20, $03        ;; 01:462f ........
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 01:4637 ........
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 01:463f ........
@@ -803,15 +804,15 @@ data_01_45a5:
     db   $00, $00, $00, $00, $20, $03, $bf, $0b        ;; 01:465f ........
     db   $00, $00, $1f, $00, $ff, $01, $7f, $03        ;; 01:4667 ........
 
-data_01_466f:
+call_01_466f:
     call call_01_4b22                                  ;; 01:466f $cd $22 $4b
     jp   call_01_4cfa                                  ;; 01:4672 $c3 $fa $4c
 
-data_01_4675:
+call_01_4675:
     call call_01_4b2a                                  ;; 01:4675 $cd $2a $4b
     jp   call_01_4cfa                                  ;; 01:4678 $c3 $fa $4c
 
-data_01_467b:
+call_01_467b:
     ld   HL, wDBA7                                     ;; 01:467b $21 $a7 $db
     ld   L, [HL]                                       ;; 01:467e $6e
     ld   H, $00                                        ;; 01:467f $26 $00
@@ -859,7 +860,7 @@ data_01_467b:
 .data_01_46d1:
     db   $01, $02, $04                                 ;; 01:46d1 ...
 
-data_01_46d4:
+call_01_46d4:
     call call_01_4599                                  ;; 01:46d4 $cd $99 $45
     xor  A, A                                          ;; 01:46d7 $af
     ld   [wDBBF], A                                    ;; 01:46d8 $ea $bf $db
@@ -875,7 +876,7 @@ data_01_46d4:
     ld   [wDBC7], A                                    ;; 01:46f3 $ea $c7 $db
     jp   call_01_4bb8                                  ;; 01:46f6 $c3 $b8 $4b
 
-data_01_46f9:
+call_01_46f9:
     xor  A, A                                          ;; 01:46f9 $af
     ld   [wDBE4], A                                    ;; 01:46fa $ea $e4 $db
     ld   [wDBE5], A                                    ;; 01:46fd $ea $e5 $db
@@ -885,7 +886,7 @@ data_01_46f9:
     ld   [wDBE3], A                                    ;; 01:4708 $ea $e3 $db
     ret                                                ;; 01:470b $c9
 
-data_01_470c:
+call_01_470c:
     ld   HL, wDADD                                     ;; 01:470c $21 $dd $da
     ld   [HL], $80                                     ;; 01:470f $36 $80
     call call_01_4722                                  ;; 01:4711 $cd $22 $47
@@ -936,7 +937,7 @@ call_01_4722:
     ld   A, [wDC4E]                                    ;; 01:475c $fa $4e $dc
     ret                                                ;; 01:475f $c9
 
-data_01_4760:
+call_01_4760:
     ld   A, [wDBA6]                                    ;; 01:4760 $fa $a6 $db
     and  A, A                                          ;; 01:4763 $a7
     jr   Z, .jr_01_476f                                ;; 01:4764 $28 $09
@@ -950,7 +951,7 @@ data_01_4760:
     jp   call_01_4c45                                  ;; 01:4778 $c3 $45 $4c
     db   $c9                                           ;; 01:477b ?
 
-data_01_477c:
+call_01_477c:
     ld   HL, wDBA7                                     ;; 01:477c $21 $a7 $db
     ld   L, [HL]                                       ;; 01:477f $6e
     ld   H, $00                                        ;; 01:4780 $26 $00
@@ -982,12 +983,12 @@ data_01_477c:
     ld   B, $04                                        ;; 01:47a5 $06 $04
     jp   jp_00_0bcf                                    ;; 01:47a7 $c3 $cf $0b
 
-data_01_47aa:
+call_01_47aa:
     ld   A, [wDBA7]                                    ;; 01:47aa $fa $a7 $db
     ld   [wDBDD], A                                    ;; 01:47ad $ea $dd $db
     ret                                                ;; 01:47b0 $c9
 
-data_01_47b1:
+call_01_47b1:
     ld   A, [wDBA7]                                    ;; 01:47b1 $fa $a7 $db
     ld   DE, .data_01_47c6                             ;; 01:47b4 $11 $c6 $47
     call call_00_0777                                  ;; 01:47b7 $cd $77 $07

@@ -546,14 +546,14 @@ call_00_0595:
     db   $04, $02, $12, $05, $03, $14, $17, $16        ;; 00:05a3 ..??????
     db   $16, $11, $11, $18                            ;; 00:05ab ????
 
-call_00_05af:
+call_00_05af_LoadMapPalettes:
     ld   A, [wDC13_UnkMapBank]                                    ;; 00:05af $fa $13 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:05b2 $cd $ee $0e
     ld   HL, wDC14_UnkMapBankOffset                                     ;; 00:05b5 $21 $14 $dc
     ld   A, [HL+]                                      ;; 00:05b8 $2a
     ld   H, [HL]                                       ;; 00:05b9 $66
     ld   L, A                                          ;; 00:05ba $6f
-    ld   DE, wDCEA                                     ;; 00:05bb $11 $ea $dc
+    ld   DE, wDCEA_BgPalettes                                     ;; 00:05bb $11 $ea $dc
     ld   BC, $40                                       ;; 00:05be $01 $40 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:05c1 $cd $6e $07
     jp   call_00_0f08_SwitchBank2                                  ;; 00:05c4 $c3 $08 $0f
@@ -1661,7 +1661,7 @@ call_00_0e81:
     jr   NZ, .jr_00_0e8f                               ;; 00:0e94 $20 $f9
     ret                                                ;; 00:0e96 $c9
 .jr_00_0e97:
-    ld   HL, wDCEA                                     ;; 00:0e97 $21 $ea $dc
+    ld   HL, wDCEA_BgPalettes                                     ;; 00:0e97 $21 $ea $dc
     ld   A, $80                                        ;; 00:0e9a $3e $80
     ldh  [rBCPS], A                                    ;; 00:0e9c $e0 $68
     ld   B, $08                                        ;; 00:0e9e $06 $08
@@ -1959,7 +1959,7 @@ call_00_1056_LoadMap:
     ld   C, $00                                        ;; 00:105f $0e $00
     ld   [wDAD6_ReturnBank], A                                    ;; 00:1061 $ea $d6 $da
     ld   A, $03                                        ;; 00:1064 $3e $03
-    ld   HL, entry_03_65c6                              ;; 00:1066 $21 $c6 $65
+    ld   HL, entry_03_65c6_LoadPalettes                              ;; 00:1066 $21 $c6 $65
     call call_00_0edd_CallAltBankFunc                                  ;; 00:1069 $cd $dd $0e
     ld   C, $03                                        ;; 00:106c $0e $03
     call call_00_0a6a                                  ;; 00:106e $cd $6a $0a
@@ -4834,7 +4834,7 @@ call_00_2c20:
     add  HL, HL                                        ;; 00:2c33 $29
     add  HL, HL                                        ;; 00:2c34 $29
     add  HL, HL                                        ;; 00:2c35 $29
-    ld   DE, wDD2A                                     ;; 00:2c36 $11 $2a $dd
+    ld   DE, wDD2A_ObjectPalettes                                     ;; 00:2c36 $11 $2a $dd
     add  HL, DE                                        ;; 00:2c39 $19
     ld   E, L                                          ;; 00:2c3a $5d
     ld   D, H                                          ;; 00:2c3b $54
@@ -4917,7 +4917,7 @@ call_00_2c89:
     and  A, A                                          ;; 00:2cbd $a7
     ret                                                ;; 00:2cbe $c9
 
-call_00_2cbf:
+call_00_2cbf_LoadObjectPalettes:
     ld   A, $7f                                        ;; 00:2cbf $3e $7f
     call call_00_0eee_SwitchBank                                  ;; 00:2cc1 $cd $ee $0e
     ld   HL, wDB6C_CurrentLevelId                                     ;; 00:2cc4 $21 $6c $db
@@ -4931,7 +4931,7 @@ call_00_2cbf:
     ld   A, [HL+]                                      ;; 00:2cd3 $2a
     ld   H, [HL]                                       ;; 00:2cd4 $66
     ld   L, A                                          ;; 00:2cd5 $6f
-    ld   DE, wDD2A                                     ;; 00:2cd6 $11 $2a $dd
+    ld   DE, wDD2A_ObjectPalettes                                     ;; 00:2cd6 $11 $2a $dd
     ld   BC, $10                                       ;; 00:2cd9 $01 $10 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:2cdc $cd $6e $07
     jp   call_00_0f08_SwitchBank2                                  ;; 00:2cdf $c3 $08 $0f

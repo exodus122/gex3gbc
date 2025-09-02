@@ -181,8 +181,17 @@ def extract_bank_11():
 
         addr = addr + sizes[i]
 
-extract_banks()
-extract_gex3_sprites_vertical()
-extract_bank_1f()
-extract_bank_06()
-extract_bank_11()
+def extract_tilesets():
+    os.system('mkdir -p banks/')
+    os.system('mkdir -p banks/tilesets/')
+    for b in range(0x40, 0x50):
+        bank = f"{b:0{3}x}"
+        bank_data = open('./banks/bank_'+bank+'.bin', 'rb').read()
+        os.system('rgbgfx --reverse 16 -o banks/bank_'+bank+'.bin banks/tilesets/tileset_'+bank+'.png')
+
+#extract_banks()
+#extract_gex3_sprites_vertical()
+#extract_bank_1f()
+#extract_bank_06()
+#extract_bank_11()
+extract_tilesets()
