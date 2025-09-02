@@ -51,7 +51,8 @@ image_06_67c6_bgmap_tile_ids:
 image_06_67c6_palette_ids:
     INCBIN "./gfx/menus/palette_ids/image_006_67c6_palette_ids.bin"
 
-INCLUDE "bank07.asm"
+SECTION "bank07", ROMX[$4000], BANK[$07]
+INCBIN "./gfx/bank_007.bin"
 
 SECTION "bank08", ROMX[$4000], BANK[$08]
 image_08_4000:
@@ -185,9 +186,13 @@ image_01f_09_palette.bin:
     INCBIN "../gfx/secondary_tilesets/palettes/image_01f_09_palette.bin"
 
 SECTION "bank20", ROMX[$4000], BANK[$20]
-INCLUDE "bank21.asm"
-INCLUDE "bank22.asm"
-INCLUDE "bank23.asm"
+
+SECTION "bank21", ROMX[$4000], BANK[$21]
+INCBIN "../data/bank_021.bin"
+SECTION "bank22", ROMX[$4000], BANK[$22]
+INCBIN "../data/bank_022.bin"
+SECTION "bank23", ROMX[$4000], BANK[$23]
+INCBIN "../data/bank_023.bin"
 
 SECTION "bank24", ROMX[$4000], BANK[$24]
 INCBIN "../data/blockset_data/bank_024.bin"
@@ -294,33 +299,64 @@ SECTION "bank5E", ROMX[$4000], BANK[$5E]
 SECTION "bank5F", ROMX[$4000], BANK[$5F]
 SECTION "bank60", ROMX[$4000], BANK[$60]
 SECTION "bank61", ROMX[$4000], BANK[$61]
-INCLUDE "bank62.asm"
-INCLUDE "bank63.asm"
-INCLUDE "bank64.asm"
-INCLUDE "bank65.asm"
-INCLUDE "bank66.asm"
-INCLUDE "bank67.asm"
-INCLUDE "bank68.asm"
-INCLUDE "bank69.asm"
-INCLUDE "bank6A.asm"
-INCLUDE "bank6B.asm"
-INCLUDE "bank6C.asm"
-INCLUDE "bank6D.asm"
-INCLUDE "bank6E.asm"
-INCLUDE "bank6F.asm"
-INCLUDE "bank70.asm"
-INCLUDE "bank71.asm"
-INCLUDE "bank72.asm"
-INCLUDE "bank73.asm"
-INCLUDE "bank74.asm"
-INCLUDE "bank75.asm"
-INCLUDE "bank76.asm"
-INCLUDE "bank77.asm"
-INCLUDE "bank78.asm"
-INCLUDE "bank79.asm"
-INCLUDE "bank7A.asm"
-INCLUDE "bank7B.asm"
-INCLUDE "bank7C.asm"
-INCLUDE "bank7D.asm"
-INCLUDE "bank7E.asm"
-INCLUDE "bank7F.asm"
+
+SECTION "bank62", ROMX[$4000], BANK[$62]
+INCBIN "../data/sprite_data/bank_062.bin"
+SECTION "bank63", ROMX[$4000], BANK[$63]
+INCBIN "../data/sprite_data/bank_063.bin"
+SECTION "bank64", ROMX[$4000], BANK[$64]
+INCBIN "../data/sprite_data/bank_064.bin"
+SECTION "bank65", ROMX[$4000], BANK[$65]
+INCBIN "../data/sprite_data/bank_065.bin"
+SECTION "bank66", ROMX[$4000], BANK[$66]
+INCBIN "../data/sprite_data/bank_066.bin"
+SECTION "bank67", ROMX[$4000], BANK[$67]
+INCBIN "../data/sprite_data/bank_067.bin"
+SECTION "bank68", ROMX[$4000], BANK[$68]
+INCBIN "../data/sprite_data/bank_068.bin"
+SECTION "bank69", ROMX[$4000], BANK[$69]
+INCBIN "../data/sprite_data/bank_069.bin"
+SECTION "bank6a", ROMX[$4000], BANK[$6a]
+INCBIN "../data/sprite_data/bank_06a.bin"
+SECTION "bank6b", ROMX[$4000], BANK[$6b]
+INCBIN "../data/sprite_data/bank_06b.bin"
+SECTION "bank6c", ROMX[$4000], BANK[$6c]
+INCBIN "../data/sprite_data/bank_06c.bin"
+SECTION "bank6d", ROMX[$4000], BANK[$6d]
+INCBIN "../data/sprite_data/bank_06d.bin"
+SECTION "bank6e", ROMX[$4000], BANK[$6e]
+INCBIN "../data/sprite_data/bank_06e.bin"
+SECTION "bank6f", ROMX[$4000], BANK[$6f]
+INCBIN "../data/sprite_data/bank_06f.bin"
+SECTION "bank70", ROMX[$4000], BANK[$70]
+INCBIN "../data/sprite_data/bank_070.bin"
+SECTION "bank71", ROMX[$4000], BANK[$71]
+INCBIN "../data/sprite_data/bank_071.bin"
+SECTION "bank72", ROMX[$4000], BANK[$72]
+INCBIN "../data/sprite_data/bank_072.bin"
+SECTION "bank73", ROMX[$4000], BANK[$73]
+INCBIN "../data/sprite_data/bank_073.bin"
+SECTION "bank74", ROMX[$4000], BANK[$74]
+INCBIN "../data/sprite_data/bank_074.bin"
+SECTION "bank75", ROMX[$4000], BANK[$75]
+INCBIN "../data/sprite_data/bank_075.bin"
+SECTION "bank76", ROMX[$4000], BANK[$76]
+INCBIN "../data/sprite_data/bank_076.bin"
+SECTION "bank77", ROMX[$4000], BANK[$77]
+INCBIN "../data/sprite_data/bank_077.bin"
+SECTION "bank78", ROMX[$4000], BANK[$78]
+INCBIN "../data/sprite_data/bank_078.bin"
+SECTION "bank79", ROMX[$4000], BANK[$79]
+INCBIN "../data/sprite_data/bank_079.bin"
+SECTION "bank7a", ROMX[$4000], BANK[$7a]
+INCBIN "../data/sprite_data/bank_07a.bin"
+SECTION "bank7b", ROMX[$4000], BANK[$7b]
+INCBIN "../data/sprite_data/bank_07b.bin"
+SECTION "bank7c", ROMX[$4000], BANK[$7c]
+INCBIN "../data/sprite_data/bank_07c.bin"
+SECTION "bank7d", ROMX[$4000], BANK[$7d]
+INCBIN "../data/sprite_data/bank_07d.bin"
+SECTION "bank7e", ROMX[$4000], BANK[$7e]
+INCBIN "../data/sprite_data/bank_07e.bin"
+SECTION "bank7f", ROMX[$4000], BANK[$7f]
+INCBIN "../data/sprite_data/bank_07f.bin"
