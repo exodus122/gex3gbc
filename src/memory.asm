@@ -12,7 +12,7 @@ wC980:
 wCD00:
     ds 512                                             ;; cd00
 
-wCF00: ; where block ids get written temporarily. also where override bits are set temporarily
+wCF00: ; where block ids from the map data get written temporarily. also where the extended map data is handled
     ds 64                                              ;; cf00
 
 wCF40:
@@ -624,7 +624,7 @@ wDC10_PlayerSpawnsBank:
 wDC11_PlayerSpawnsBankOffset:
     ds 1                                               ;; dc11
 
-wDC12_UnkMapBankOffset:
+wDC12_PlayerSpawnsBankOffset:
     ds 1                                               ;; dc12
 
 wDC13_BgPaletteBank:
@@ -648,7 +648,7 @@ wDC1A_CollectibleListBankOffset:
 wDC1C_CurrentMapWidthAndHeightInBlocks:
     ds 2                                               ;; dc1c
 
-wDC1E_CurrentLevelNumberFromMap:
+wDC1E_CurrentLevelNumberFromMap: ; not the map number. all maps in HolidayTV share the same level number for example
     ds 1                                               ;; dc1e
 
 wDC1F:

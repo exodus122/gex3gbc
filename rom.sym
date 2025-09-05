@@ -1673,7 +1673,7 @@
 00:dc0e wDC0E_MapCollisionBankOffset
 00:dc10 wDC10_PlayerSpawnsBank
 00:dc11 wDC11_PlayerSpawnsBankOffset
-00:dc12 wDC12_UnkMapBankOffset
+00:dc12 wDC12_PlayerSpawnsBankOffset
 00:dc13 wDC13_BgPaletteBank
 00:dc14 wDC14_BgPaletteBankOffset
 00:dc16 wDC16_ObjectListBank

@@ -2404,7 +2404,7 @@ call_00_11e5_LoadBgMapVertical:
     ld   A, [wDC11_PlayerSpawnsBankOffset]                                    ;; 00:1326 $fa $11 $dc
     add  A, C                                          ;; 00:1329 $81
     ld   C, A                                          ;; 00:132a $4f
-    ld   A, [wDC12_UnkMapBankOffset]                                    ;; 00:132b $fa $12 $dc
+    ld   A, [wDC12_PlayerSpawnsBankOffset]                                    ;; 00:132b $fa $12 $dc
     adc  A, B                                          ;; 00:132e $88
     ld   B, A                                          ;; 00:132f $47
     ld   A, $0b                                        ;; 00:1330 $3e $0b
@@ -2669,7 +2669,7 @@ call_00_1351_LoadBgMapHorizontal:
     ld   A, [wDC11_PlayerSpawnsBankOffset]                                    ;; 00:14b0 $fa $11 $dc
     add  A, C                                          ;; 00:14b3 $81
     ld   C, A                                          ;; 00:14b4 $4f
-    ld   A, [wDC12_UnkMapBankOffset]                                    ;; 00:14b5 $fa $12 $dc
+    ld   A, [wDC12_PlayerSpawnsBankOffset]                                    ;; 00:14b5 $fa $12 $dc
     adc  A, B                                          ;; 00:14b8 $88
     ld   B, A                                          ;; 00:14b9 $47
     ld   A, $0b                                        ;; 00:14ba $3e $0b
@@ -3224,7 +3224,7 @@ call_00_1a46_LoadBgMapInitial2:
     ld   A, [wDC11_PlayerSpawnsBankOffset]                                    ;; 00:1b8c $fa $11 $dc
     add  A, E                                          ;; 00:1b8f $83
     ld   E, A                                          ;; 00:1b90 $5f
-    ld   A, [wDC12_UnkMapBankOffset]                                    ;; 00:1b91 $fa $12 $dc
+    ld   A, [wDC12_PlayerSpawnsBankOffset]                                    ;; 00:1b91 $fa $12 $dc
     adc  A, D                                          ;; 00:1b94 $8a
     ld   D, A                                          ;; 00:1b95 $57
     ld   A, $0b                                        ;; 00:1b96 $3e $0b
