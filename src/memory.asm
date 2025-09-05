@@ -705,7 +705,7 @@ wDC2F:
 wDC31:
     ds 1                                               ;; dc31
 
-wDC32:
+wDC32_VRAMBank:
     ds 1                                               ;; dc32
 
 wDC33:

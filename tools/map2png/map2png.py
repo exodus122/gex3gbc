@@ -29,6 +29,11 @@ MAP_HEIGHT = 19 # height of map (in blocks)
 LEVEL_ID = 20 # I think this is level id?
 PADDING = 21 # I think this is always $00?
 
+level_names = ["GexCave", "HolidayTV", "MysteryTV", "TutTV", "WesternStation", "AnimeChannel", 
+               "SuperheroShow", "GextremeSports", "MarsupialMadness", "WWGexWrestling",
+               "LizardOfOz", "ChannelZ"]
+level_numbers = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
 # get level data pointers from bank03
 bank03_file = "../banks/bank_003.bin"
 bank03_data = open(bank03_file, "rb").read()
@@ -84,17 +89,73 @@ def get_next_offset(arr, entry):
     print(str(entry) + " not in " + str(arr))
     raise ValueError("Entry not found in array")
 
+def _x_flip_byte(byte_val):
+    """Reverses the order of bits in a single byte."""
+    # Convert integer to an 8-bit binary string (e.g., 0b10101011)
+    # [2:] slices off the '0b' prefix
+    # .zfill(8) pads with leading zeros to ensure it's 8 bits
+    binary_str = bin(byte_val)[2:].zfill(8)
+    
+    # Reverse the string and convert back to an integer
+    return int(binary_str[::-1], 2)
+
+def x_flip_tile(tile_data):
+    """
+    Flips a single Game Boy tile (16 bytes) horizontally.
+
+    Args:
+        tile_data: A bytes object of exactly 16 bytes.
+
+    Returns:
+        A new bytes object with the tile data flipped horizontally.
+    """
+    if len(tile_data) != 16:
+        raise ValueError("Tile data must be exactly 16 bytes.")
+
+    flipped_bytes = []
+    for byte_val in tile_data:
+        flipped_bytes.append(_x_flip_byte(byte_val))
+    
+    return bytes(flipped_bytes)
+
+def y_flip_tile(tile_data):
+    """
+    Flips a single Game Boy tile (16 bytes) vertically.
+
+    Args:
+        tile_data: A bytes object of exactly 16 bytes.
+
+    Returns:
+        A new bytes object with the tile data flipped vertically.
+    """
+    if len(tile_data) != 16:
+        raise ValueError("Tile data must be exactly 16 bytes.")
+
+    flipped_bytes = bytearray(16)
+    for i in range(8):
+        # A row is represented by two bytes.
+        row_start = i * 2
+        
+        # The new row position is the reversed position.
+        flipped_row_start = (7 - i) * 2
+        
+        # Copy the two bytes for the row to the new position.
+        flipped_bytes[flipped_row_start] = tile_data[row_start]
+        flipped_bytes[flipped_row_start + 1] = tile_data[row_start + 1]
+    
+    return bytes(flipped_bytes)
+
 for level_counter in range(0, len(level_data_pointers)):
     #print(bank03_data[p-0x4000:p-0x4000+0x1F])
     p = level_data_pointers[level_counter]
     level_data = struct.unpack("<BHBHBHBHBHBHBHBHBHBBBB", bank03_data[p-0x4000:p-0x4000+0x1F])
-    for d in level_data:
-        print(hex(d))
+    #for d in level_data:
+    #    print(hex(d))
 
-    level_name = "TEST"
-    channel_map_number = str(level_counter)
+    level_name = level_names[level_data[LEVEL_ID]]
+    level_numbers[level_data[LEVEL_ID]] += 1
+    channel_map_number = level_numbers[level_data[LEVEL_ID]]
 
-    tiles = []
     blocks = []
     
     
@@ -156,20 +217,77 @@ for level_counter in range(0, len(level_data_pointers)):
     end_addr = get_next_offset(sorted_blockset_offsets, [level_data[BLOCKSET_AND_PALETTE_IDS_BANK], level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]])
     blockset_data = open(blockset_file, "rb").read()[level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]-0x4000:end_addr-0x4000]
 
-    os.system('mkdir -p block_bins')
-    os.system('mkdir -p block_bins/'+level_name+channel_map_number)
-    count = 0
+    palette_file = "../banks/bank_0"+f"{level_data[BG_PALETTE_BANK]:x}"+".bin"
+    palette_data = open(palette_file, 'rb').read()[level_data[BG_PALETTE_BANK_OFFSET]-0x4000:level_data[BG_PALETTE_BANK_OFFSET]-0x4000+0x40]
+
+    os.system('mkdir -p tile_bins')
+    #os.system('mkdir -p block_images')
+    #os.system('mkdir -p block_images/'+level_name+channel_map_number)
+    #count = 0
     for i in range(0, len(blockset_data), 0x8):
         block_data = blockset_data[i:i + 0x8]
         if not block_data:
             break
         
-        out = open('./block_bins/'+level_name+channel_map_number+'/block_'+f"{count:0{2}x}"+'.bin', "wb")
-        out.write(tileset_data[block_data[0]*0x10:block_data[0]*0x10+0x10])
-        out.write(tileset_data[block_data[2]*0x10:block_data[2]*0x10+0x10])
-        out.write(tileset_data[block_data[1]*0x10:block_data[1]*0x10+0x10])
-        out.write(tileset_data[block_data[3]*0x10:block_data[3]*0x10+0x10])
-        out.close()
+        tiles = []
+
+        #out = open('./block_bins/'+level_name+channel_map_number+'/block_'+f"{count:0{2}x}"+'.bin', "wb")
+        for j in range(0, 4):
+            vram_offset = 0x0000
+            if block_data[j+4] & 0x08: # if alternate vram bank bit is set
+                vram_offset = 0x1000
+            tile_data = tileset_data[vram_offset+block_data[j]*0x10:vram_offset+block_data[j]*0x10+0x10]
+            if block_data[j+4] & 0x20:
+                tile_data = x_flip_tile(tile_data)
+            if block_data[j+4] & 0x40:
+                tile_data = y_flip_tile(tile_data)
+            out = open('./tile_bins/tile_'+f"{j:0{2}x}"+'.bin', "wb")
+            out.write(tile_data)
+            out.close()
+            
+            palette_index = block_data[j+4] & 0x7
+            temp_palette_data = palette_data[0x8*palette_index:0x8*palette_index+0x8]
+            f = open("./temp.bin", "wb")
+            f.write(temp_palette_data)
+            f.close()
+            os.system('rgbgfx --reverse 1 -p ./temp.bin --columns -o ./tile_bins/tile_'+f"{j:0{2}x}"+'.bin ./tile_bins/tile_'+f"{j:0{2}x}"+'.png')
+
+            tile_img = PIL.Image.open('./tile_bins/tile_'+f"{j:0{2}x}"+'.png')
+            tiles.append(tile_img)
+
+        block_img =  PIL.Image.new("RGB", (16, 16))
+        block_img.paste(tiles[0], (0, 0))
+        block_img.paste(tiles[1], (8, 0))
+        block_img.paste(tiles[2], (0, 8))
+        block_img.paste(tiles[3], (8, 8))
+        blocks.append(block_img)
+
+        #os.system('rm -r block_bins')
+
+        #out.write(tile1_data)
+
+        '''tile2_data = tileset_data[block_data[2]*0x10:block_data[2]*0x10+0x10]
+        if block_data[6] & 0x20:
+            tile2_data = x_flip_tile(tile2_data)
+        if block_data[6] & 0x40:
+            tile2_data = y_flip_tile(tile2_data)
+        #out.write(tile2_data)
+
+        tile3_data = tileset_data[block_data[1]*0x10:block_data[1]*0x10+0x10]
+        if block_data[5] & 0x20:
+            tile3_data = x_flip_tile(tile3_data)
+        if block_data[5] & 0x40:
+            tile3_data = y_flip_tile(tile3_data)
+        #out.write(tile3_data)
+
+        tile4_data = tileset_data[block_data[3]*0x10:block_data[3]*0x10+0x10]
+        if block_data[7] & 0x20:
+            tile4_data = x_flip_tile(tile4_data)
+        if block_data[7] & 0x40:
+            tile4_data = y_flip_tile(tile4_data)
+        #out.write(tile4_data)
+
+        #out.close()'''
         
         '''palette_index = palette_ids[count]
         #print(palette_index)
@@ -179,12 +297,12 @@ for level_counter in range(0, len(level_data_pointers)):
         f.close()'''
         
         # -p '+"./temp.bin"+'
-        os.system('rgbgfx --reverse 2  --columns -o ./block_bins/'+level_name+channel_map_number+'/block_'+f"{count:0{2}x}"+'.bin ./block_bins/'+level_name+channel_map_number+'/block_'+f"{count:0{2}x}"+'.png')
+        '''os.system('rgbgfx --reverse 2  --columns -o ./block_bins/'+level_name+channel_map_number+'/block_'+f"{count:0{2}x}"+'.bin ./block_bins/'+level_name+channel_map_number+'/block_'+f"{count:0{2}x}"+'.png')
         
         block_img = PIL.Image.open('./block_bins/'+level_name+channel_map_number+'/block_'+f"{count:0{2}x}"+'.png')
-        blocks.append(block_img)
+        blocks.append(block_img)'''
 
-        count = count + 1
+        #count = count + 1
 
     # create the level's blockset from the tileset
     '''blockset_file = "../banks/bank_0"+f"{level_data[BLOCKSET_AND_PALETTE_IDS_BANK]:x}"+".bin"
@@ -244,7 +362,8 @@ for level_counter in range(0, len(level_data_pointers)):
     #print(map_bank_data)
 
     os.system('mkdir -p map_images')
-        
+    os.system('mkdir -p map_images/'+level_name)
+
     map_image_path = "./map_images/"
     
     #blockset_img = PIL.Image.open(blockset_image_path)
@@ -271,8 +390,9 @@ for level_counter in range(0, len(level_data_pointers)):
             
             count = count+1
     
-    img.save(map_image_path+level_name+channel_map_number+"_map.png")
+    img.save(map_image_path+level_name+"/"+level_name+"_"+f"{channel_map_number:0{2}}"+"_map.png")
 
-    os.system('rm -r block_bins')
+    os.system('rm -r tile_bins')
+    print("completed: "+level_name+"/"+level_name+"_"+f"{channel_map_number:0{2}}"+"_map.png")
 
     #break # just do first one for testing

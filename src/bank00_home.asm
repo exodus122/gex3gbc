@@ -1490,7 +1490,7 @@ call_00_0c6a:
 .jp_00_0d14:
     ld   A, [wDC31]                                    ;; 00:0d14 $fa $31 $dc
     call call_00_0f25                                  ;; 00:0d17 $cd $25 $0f
-    ld   A, [wDC32]                                    ;; 00:0d1a $fa $32 $dc
+    ld   A, [wDC32_VRAMBank]                                    ;; 00:0d1a $fa $32 $dc
     ldh  [rVBK], A                                     ;; 00:0d1d $e0 $4f
     ld   A, [wDC2C]                                    ;; 00:0d1f $fa $2c $dc
     ldh  [rHDMA1], A                                   ;; 00:0d22 $e0 $51
