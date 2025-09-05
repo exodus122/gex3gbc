@@ -547,9 +547,9 @@ call_00_0595:
     db   $16, $11, $11, $18                            ;; 00:05ab ????
 
 call_00_05af_LoadMapPalettes:
-    ld   A, [wDC13_UnkMapBank]                                    ;; 00:05af $fa $13 $dc
+    ld   A, [wDC13_BgPaletteBank]                                    ;; 00:05af $fa $13 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:05b2 $cd $ee $0e
-    ld   HL, wDC14_UnkMapBankOffset                                     ;; 00:05b5 $21 $14 $dc
+    ld   HL, wDC14_BgPaletteBankOffset                                     ;; 00:05b5 $21 $14 $dc
     ld   A, [HL+]                                      ;; 00:05b8 $2a
     ld   H, [HL]                                       ;; 00:05b9 $66
     ld   L, A                                          ;; 00:05ba $6f
@@ -2267,7 +2267,7 @@ call_00_11e5_LoadBgMapVertical:
     dec  B                                             ;; 00:1259 $05
     jr   NZ, .jr_00_1253                               ;; 00:125a $20 $f7
     call call_00_0f08_SwitchBank2                                  ;; 00:125c $cd $08 $0f
-    ld   A, [wDC04_UnkMapBank]                                    ;; 00:125f $fa $04 $dc
+    ld   A, [wDC04_MapExtendedBank]                                    ;; 00:125f $fa $04 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:1262 $cd $ee $0e
     ld   HL, wDC28                                     ;; 00:1265 $21 $28 $dc
     ld   L, [HL]                                       ;; 00:1268 $6e
@@ -2275,7 +2275,7 @@ call_00_11e5_LoadBgMapVertical:
     ld   E, [HL]                                       ;; 00:126b $5e
     inc  H                                             ;; 00:126c $24
     ld   D, [HL]                                       ;; 00:126d $56
-    ld   HL, wDC05_UnkMapBankOffset                                     ;; 00:126e $21 $05 $dc
+    ld   HL, wDC05_MapExtendedBankOffset                                     ;; 00:126e $21 $05 $dc
     ld   A, [HL+]                                      ;; 00:1271 $2a
     add  A, E                                          ;; 00:1272 $83
     ld   E, A                                          ;; 00:1273 $5f
@@ -2392,7 +2392,7 @@ call_00_11e5_LoadBgMapVertical:
     dec  A                                             ;; 00:130f $3d
     jr   NZ, .jr_00_12ef                               ;; 00:1310 $20 $dd
     call call_00_0f08_SwitchBank2                                  ;; 00:1312 $cd $08 $0f
-    ld   A, [wDC10_UnkMapBank]                                    ;; 00:1315 $fa $10 $dc
+    ld   A, [wDC10_PlayerSpawnsBank]                                    ;; 00:1315 $fa $10 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:1318 $cd $ee $0e
     ld   HL, wDC22                                     ;; 00:131b $21 $22 $dc
     ld   A, [HL-]                                      ;; 00:131e $3a
@@ -2401,7 +2401,7 @@ call_00_11e5_LoadBgMapVertical:
     add  A, $c0                                        ;; 00:1322 $c6 $c0
     ld   D, A                                          ;; 00:1324 $57
     pop  BC                                            ;; 00:1325 $c1
-    ld   A, [wDC11_UnkMapBankOffset]                                    ;; 00:1326 $fa $11 $dc
+    ld   A, [wDC11_PlayerSpawnsBankOffset]                                    ;; 00:1326 $fa $11 $dc
     add  A, C                                          ;; 00:1329 $81
     ld   C, A                                          ;; 00:132a $4f
     ld   A, [wDC12_UnkMapBankOffset]                                    ;; 00:132b $fa $12 $dc
@@ -2524,7 +2524,7 @@ call_00_1351_LoadBgMapHorizontal:
     dec  A                                             ;; 00:13d4 $3d
     jr   NZ, .jr_00_13cb                               ;; 00:13d5 $20 $f4
     call call_00_0f08_SwitchBank2                                  ;; 00:13d7 $cd $08 $0f
-    ld   A, [wDC04_UnkMapBank]                                    ;; 00:13da $fa $04 $dc
+    ld   A, [wDC04_MapExtendedBank]                                    ;; 00:13da $fa $04 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:13dd $cd $ee $0e
     ld   HL, wDC28                                     ;; 00:13e0 $21 $28 $dc
     ld   L, [HL]                                       ;; 00:13e3 $6e
@@ -2532,7 +2532,7 @@ call_00_1351_LoadBgMapHorizontal:
     ld   E, [HL]                                       ;; 00:13e6 $5e
     inc  H                                             ;; 00:13e7 $24
     ld   D, [HL]                                       ;; 00:13e8 $56
-    ld   HL, wDC05_UnkMapBankOffset                                     ;; 00:13e9 $21 $05 $dc
+    ld   HL, wDC05_MapExtendedBankOffset                                     ;; 00:13e9 $21 $05 $dc
     ld   A, [HL+]                                      ;; 00:13ec $2a
     add  A, E                                          ;; 00:13ed $83
     ld   E, A                                          ;; 00:13ee $5f
@@ -2657,7 +2657,7 @@ call_00_1351_LoadBgMapHorizontal:
     dec  A                                             ;; 00:1499 $3d
     jr   NZ, .jr_00_1478                               ;; 00:149a $20 $dc
     call call_00_0f08_SwitchBank2                                  ;; 00:149c $cd $08 $0f
-    ld   A, [wDC10_UnkMapBank]                                    ;; 00:149f $fa $10 $dc
+    ld   A, [wDC10_PlayerSpawnsBank]                                    ;; 00:149f $fa $10 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:14a2 $cd $ee $0e
     ld   HL, wDC24                                     ;; 00:14a5 $21 $24 $dc
     ld   A, [HL-]                                      ;; 00:14a8 $3a
@@ -2666,7 +2666,7 @@ call_00_1351_LoadBgMapHorizontal:
     add  A, $c0                                        ;; 00:14ac $c6 $c0
     ld   D, A                                          ;; 00:14ae $57
     pop  BC                                            ;; 00:14af $c1
-    ld   A, [wDC11_UnkMapBankOffset]                                    ;; 00:14b0 $fa $11 $dc
+    ld   A, [wDC11_PlayerSpawnsBankOffset]                                    ;; 00:14b0 $fa $11 $dc
     add  A, C                                          ;; 00:14b3 $81
     ld   C, A                                          ;; 00:14b4 $4f
     ld   A, [wDC12_UnkMapBankOffset]                                    ;; 00:14b5 $fa $12 $dc
@@ -3088,7 +3088,7 @@ call_00_1a46_LoadBgMapInitial2:
     dec  B                                             ;; 00:1abc $05
     jr   NZ, .jr_00_1ab6                               ;; 00:1abd $20 $f7
     call call_00_0f08_SwitchBank2                                  ;; 00:1abf $cd $08 $0f
-    ld   A, [wDC04_UnkMapBank]                                    ;; 00:1ac2 $fa $04 $dc
+    ld   A, [wDC04_MapExtendedBank]                                    ;; 00:1ac2 $fa $04 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:1ac5 $cd $ee $0e
     ld   HL, wDC28                                     ;; 00:1ac8 $21 $28 $dc
     ld   L, [HL]                                       ;; 00:1acb $6e
@@ -3096,7 +3096,7 @@ call_00_1a46_LoadBgMapInitial2:
     ld   E, [HL]                                       ;; 00:1ace $5e
     inc  H                                             ;; 00:1acf $24
     ld   D, [HL]                                       ;; 00:1ad0 $56
-    ld   HL, wDC05_UnkMapBankOffset                                     ;; 00:1ad1 $21 $05 $dc
+    ld   HL, wDC05_MapExtendedBankOffset                                     ;; 00:1ad1 $21 $05 $dc
     ld   A, [HL+]                                      ;; 00:1ad4 $2a
     add  A, E                                          ;; 00:1ad5 $83
     ld   E, A                                          ;; 00:1ad6 $5f
@@ -3209,7 +3209,7 @@ call_00_1a46_LoadBgMapInitial2:
     dec  B                                             ;; 00:1b6f $05
     jr   NZ, .jr_00_1b69                               ;; 00:1b70 $20 $f7
     call call_00_0f08_SwitchBank2                                  ;; 00:1b72 $cd $08 $0f
-    ld   A, [wDC10_UnkMapBank]                                    ;; 00:1b75 $fa $10 $dc
+    ld   A, [wDC10_PlayerSpawnsBank]                                    ;; 00:1b75 $fa $10 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:1b78 $cd $ee $0e
     ld   HL, wDC22                                     ;; 00:1b7b $21 $22 $dc
     ld   A, [HL-]                                      ;; 00:1b7e $3a
@@ -3221,7 +3221,7 @@ call_00_1a46_LoadBgMapInitial2:
     ld   L, [HL]                                       ;; 00:1b88 $6e
     ld   H, $cf                                        ;; 00:1b89 $26 $cf
     pop  DE                                            ;; 00:1b8b $d1
-    ld   A, [wDC11_UnkMapBankOffset]                                    ;; 00:1b8c $fa $11 $dc
+    ld   A, [wDC11_PlayerSpawnsBankOffset]                                    ;; 00:1b8c $fa $11 $dc
     add  A, E                                          ;; 00:1b8f $83
     ld   E, A                                          ;; 00:1b90 $5f
     ld   A, [wDC12_UnkMapBankOffset]                                    ;; 00:1b91 $fa $12 $dc
@@ -3715,10 +3715,10 @@ call_00_21ef:
 
 call_00_21f6:
     push BC                                            ;; 00:21f6 $c5
-    ld   A, [wDC16_UnkMapBank]                                    ;; 00:21f7 $fa $16 $dc
+    ld   A, [wDC16_ObjectListBank]                                    ;; 00:21f7 $fa $16 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:21fa $cd $ee $0e
     pop  BC                                            ;; 00:21fd $c1
-    ld   HL, wDC17_UnkMapBankOffset                                     ;; 00:21fe $21 $17 $dc
+    ld   HL, wDC17_ObjectListBankOffset                                     ;; 00:21fe $21 $17 $dc
     ld   A, [HL+]                                      ;; 00:2201 $2a
     ld   H, [HL]                                       ;; 00:2202 $66
     ld   L, A                                          ;; 00:2203 $6f
@@ -3783,10 +3783,10 @@ call_00_21f6:
 
 jp_00_2260:
     push BC                                            ;; 00:2260 $c5
-    ld   A, [wDC16_UnkMapBank]                                    ;; 00:2261 $fa $16 $dc
+    ld   A, [wDC16_ObjectListBank]                                    ;; 00:2261 $fa $16 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:2264 $cd $ee $0e
     pop  BC                                            ;; 00:2267 $c1
-    ld   HL, wDC17_UnkMapBankOffset                                     ;; 00:2268 $21 $17 $dc
+    ld   HL, wDC17_ObjectListBankOffset                                     ;; 00:2268 $21 $17 $dc
     ld   A, [HL+]                                      ;; 00:226b $2a
     ld   H, [HL]                                       ;; 00:226c $66
     ld   L, A                                          ;; 00:226d $6f
@@ -3869,9 +3869,9 @@ call_00_22b1:
     db   $36, $00, $c9                                 ;; 00:230c ???
 
 call_00_230f:
-    ld   A, [wDC16_UnkMapBank]                                    ;; 00:230f $fa $16 $dc
+    ld   A, [wDC16_ObjectListBank]                                    ;; 00:230f $fa $16 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:2312 $cd $ee $0e
-    ld   HL, wDC17_UnkMapBankOffset                                     ;; 00:2315 $21 $17 $dc
+    ld   HL, wDC17_ObjectListBankOffset                                     ;; 00:2315 $21 $17 $dc
     ld   C, [HL]                                       ;; 00:2318 $4e
     inc  HL                                            ;; 00:2319 $23
     ld   B, [HL]                                       ;; 00:231a $46
@@ -5288,7 +5288,7 @@ call_00_2f00:
 call_00_2f85:
     xor  A, A                                          ;; 00:2f85 $af
     ld   [wDC68], A                                    ;; 00:2f86 $ea $68 $dc
-    ld   A, [wDC19_UnkMapBank]                                    ;; 00:2f89 $fa $19 $dc
+    ld   A, [wDC19_CollectibleListBank]                                    ;; 00:2f89 $fa $19 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:2f8c $cd $ee $0e
     ld   L, $00                                        ;; 00:2f8f $2e $00
 .jr_00_2f91:
@@ -5304,7 +5304,7 @@ call_00_2f85:
     dec  H                                             ;; 00:2f9e $25
     inc  L                                             ;; 00:2f9f $2c
     jr   NZ, .jr_00_2f91                               ;; 00:2fa0 $20 $ef
-    ld   HL, wDC1A_UnkMapBankOffset                                     ;; 00:2fa2 $21 $1a $dc
+    ld   HL, wDC1A_CollectibleListBankOffset                                     ;; 00:2fa2 $21 $1a $dc
     ld   A, [HL+]                                      ;; 00:2fa5 $2a
     ld   H, [HL]                                       ;; 00:2fa6 $66
     ld   L, A                                          ;; 00:2fa7 $6f
@@ -5369,10 +5369,10 @@ call_00_2f85:
     jp   call_00_0f08_SwitchBank2                                  ;; 00:2ff5 $c3 $08 $0f
 
 call_00_2ff8:
-    ld   A, [wDC16_UnkMapBank]                                    ;; 00:2ff8 $fa $16 $dc
+    ld   A, [wDC16_ObjectListBank]                                    ;; 00:2ff8 $fa $16 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:2ffb $cd $ee $0e
     call call_00_3252                                  ;; 00:2ffe $cd $52 $32
-    ld   HL, wDC17_UnkMapBankOffset                                     ;; 00:3001 $21 $17 $dc
+    ld   HL, wDC17_ObjectListBankOffset                                     ;; 00:3001 $21 $17 $dc
     ld   A, [HL+]                                      ;; 00:3004 $2a
     ld   H, [HL]                                       ;; 00:3005 $66
     ld   L, A                                          ;; 00:3006 $6f
@@ -5536,9 +5536,9 @@ call_00_31d9:
     add  HL, DE                                        ;; 00:31e2 $19
     bit  4, [HL]                                       ;; 00:31e3 $cb $66
     ret  Z                                             ;; 00:31e5 $c8
-    ld   A, [wDC16_UnkMapBank]                                    ;; 00:31e6 $fa $16 $dc
+    ld   A, [wDC16_ObjectListBank]                                    ;; 00:31e6 $fa $16 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:31e9 $cd $ee $0e
-    ld   HL, wDC17_UnkMapBankOffset                                     ;; 00:31ec $21 $17 $dc
+    ld   HL, wDC17_ObjectListBankOffset                                     ;; 00:31ec $21 $17 $dc
     ld   A, [HL+]                                      ;; 00:31ef $2a
     ld   H, [HL]                                       ;; 00:31f0 $66
     ld   L, A                                          ;; 00:31f1 $6f
@@ -5561,7 +5561,7 @@ call_00_31d9:
     jp   call_00_0f08_SwitchBank2                                  ;; 00:320a $c3 $08 $0f
 
 call_00_320d:
-    ld   A, [wDC16_UnkMapBank]                                    ;; 00:320d $fa $16 $dc
+    ld   A, [wDC16_ObjectListBank]                                    ;; 00:320d $fa $16 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:3210 $cd $ee $0e
     ld   HL, wDC1E_CurrentLevelNumberFromMap                                     ;; 00:3213 $21 $1e $dc
     ld   L, [HL]                                       ;; 00:3216 $6e
@@ -5569,7 +5569,7 @@ call_00_320d:
     ld   DE, wDC5C                                     ;; 00:3219 $11 $5c $dc
     add  HL, DE                                        ;; 00:321c $19
     ld   C, [HL]                                       ;; 00:321d $4e
-    ld   HL, wDC17_UnkMapBankOffset                                     ;; 00:321e $21 $17 $dc
+    ld   HL, wDC17_ObjectListBankOffset                                     ;; 00:321e $21 $17 $dc
     ld   A, [HL+]                                      ;; 00:3221 $2a
     ld   H, [HL]                                       ;; 00:3222 $66
     ld   L, A                                          ;; 00:3223 $6f
@@ -5736,7 +5736,7 @@ call_00_35e8:
     ret                                                ;; 00:35f9 $c9
 
 call_00_35fa:
-    ld   A, [wDC16_UnkMapBank]                                    ;; 00:35fa $fa $16 $dc
+    ld   A, [wDC16_ObjectListBank]                                    ;; 00:35fa $fa $16 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:35fd $cd $ee $0e
 .jr_00_3600:
     call call_00_3618                                  ;; 00:3600 $cd $18 $36
@@ -5746,7 +5746,7 @@ call_00_35fa:
     jp   call_00_0f08_SwitchBank2                                  ;; 00:3609 $c3 $08 $0f
 
 call_00_360c:
-    ld   A, [wDC16_UnkMapBank]                                    ;; 00:360c $fa $16 $dc
+    ld   A, [wDC16_ObjectListBank]                                    ;; 00:360c $fa $16 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:360f $cd $ee $0e
     call call_00_3618                                  ;; 00:3612 $cd $18 $36
     jp   call_00_0f08_SwitchBank2                                  ;; 00:3615 $c3 $08 $0f
@@ -5754,7 +5754,7 @@ call_00_360c:
 call_00_3618:
     call call_00_2afc                                  ;; 00:3618 $cd $fc $2a
     jr   NZ, .jr_00_3641                               ;; 00:361b $20 $24
-    ld   HL, wDC17_UnkMapBankOffset                                     ;; 00:361d $21 $17 $dc
+    ld   HL, wDC17_ObjectListBankOffset                                     ;; 00:361d $21 $17 $dc
     ld   A, [HL+]                                      ;; 00:3620 $2a
     ld   H, [HL]                                       ;; 00:3621 $66
     ld   L, A                                          ;; 00:3622 $6f
@@ -5784,7 +5784,7 @@ call_00_3618:
     rlca                                               ;; 00:3645 $07
     rlca                                               ;; 00:3646 $07
     ld   [wDAB9], A                                    ;; 00:3647 $ea $b9 $da
-    ld   HL, wDC17_UnkMapBankOffset                                     ;; 00:364a $21 $17 $dc
+    ld   HL, wDC17_ObjectListBankOffset                                     ;; 00:364a $21 $17 $dc
     ld   A, [HL+]                                      ;; 00:364d $2a
     ld   H, [HL]                                       ;; 00:364e $66
     ld   L, A                                          ;; 00:364f $6f
@@ -6019,7 +6019,7 @@ call_00_3618:
 
 call_00_3792:
     push BC                                            ;; 00:3792 $c5
-    ld   A, [wDC16_UnkMapBank]                                    ;; 00:3793 $fa $16 $dc
+    ld   A, [wDC16_ObjectListBank]                                    ;; 00:3793 $fa $16 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:3796 $cd $ee $0e
     pop  BC                                            ;; 00:3799 $c1
     call call_00_37a0                                  ;; 00:379a $cd $a0 $37

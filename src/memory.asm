@@ -588,10 +588,10 @@ wDC01_MapBank:
 wDC02_MapBankOffset:
     ds 2                                               ;; dc02
 
-wDC04_UnkMapBank:
+wDC04_MapExtendedBank:
     ds 1                                               ;; dc04
 
-wDC05_UnkMapBankOffset:
+wDC05_MapExtendedBankOffset:
     ds 2                                               ;; dc05
 
 wDC07_TilesetBank:
@@ -618,31 +618,31 @@ wDC0D_MapCollisionBank:
 wDC0E_MapCollisionBankOffset:
     ds 2                                               ;; dc0e
 
-wDC10_UnkMapBank:
+wDC10_PlayerSpawnsBank:
     ds 1                                               ;; dc10
 
-wDC11_UnkMapBankOffset:
+wDC11_PlayerSpawnsBankOffset:
     ds 1                                               ;; dc11
 
 wDC12_UnkMapBankOffset:
     ds 1                                               ;; dc12
 
-wDC13_UnkMapBank:
+wDC13_BgPaletteBank:
     ds 1                                               ;; dc13
 
-wDC14_UnkMapBankOffset:
+wDC14_BgPaletteBankOffset:
     ds 2                                               ;; dc14
 
-wDC16_UnkMapBank:
+wDC16_ObjectListBank:
     ds 1                                               ;; dc16
 
-wDC17_UnkMapBankOffset:
+wDC17_ObjectListBankOffset:
     ds 2                                               ;; dc17
 
-wDC19_UnkMapBank:
+wDC19_CollectibleListBank:
     ds 1                                               ;; dc19
 
-wDC1A_UnkMapBankOffset:
+wDC1A_CollectibleListBankOffset:
     ds 2                                               ;; dc1a
 
 wDC1C_CurrentMapWidthAndHeightInBlocks:

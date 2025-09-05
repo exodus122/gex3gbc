@@ -16,14 +16,14 @@ BLOCKSET_AND_PALETTE_IDS_BANK = 6
 BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET = 7
 BLOCK_COLLISION_BANK = 8
 BLOCK_COLLISION_BANK_OFFSET = 9
-UNK4_BANK = 10
-UNK4_BANK_OFFSET = 11
-UNK5_BANK = 12
-UNK5_BANK_OFFSET = 13
-UNK6_BANK = 14
-UNK6_BANK_OFFSET = 15
-UNK7_BANK = 16
-UNK7_BANK_OFFSET = 17
+PLAYER_SPAWNS_BANK = 10
+PLAYER_SPAWNS_BANK_OFFSET = 11
+BG_PALETTE_BANK = 12
+BG_PALETTE_BANK_OFFSET = 13
+OBJECT_SPAWN_LIST_BANK = 14
+OBJECT_SPAWN_LIST_BANK_OFFSET = 15
+COLLECTIBLE_LIST_BANK = 16
+COLLECTIBLE_LIST_BANK_OFFSET = 17
 MAP_WIDTH = 18 # width of map (in blocks)
 MAP_HEIGHT = 19 # height of map (in blocks)
 LEVEL_ID = 20 # I think this is level id?
@@ -101,7 +101,7 @@ for level_counter in range(0, len(level_data_pointers)):
 
     # create the level's blockset from the tileset
     blockset_file = "../banks/bank_0"+f"{level_data[BLOCKSET_AND_PALETTE_IDS_BANK]:x}"+".bin"
-    blockset_data = open(blockset_file, "rb").read()[level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]-0x4000:level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]-0x4000+0x1000]
+    blockset_data = open(blockset_file, "rb").read()[level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]-0x4000:]
     #print(blockset_data)
 
     os.system('mkdir -p blockset_images')

@@ -27,31 +27,33 @@ DEF Bank1c_Text               EQU $1c
 DEF Bank1d                    EQU $1d
 DEF Bank1e                    EQU $1e
 DEF Bank1f                    EQU $1f
-DEF Bank21                    EQU $21 ; map palette data
-DEF Bank22                    EQU $22
-DEF Bank23                    EQU $23
-DEF Bank24                    EQU $24
-DEF Bank25                    EQU $25
-DEF Bank26                    EQU $26
-DEF Bank27                    EQU $27
-DEF Bank28                    EQU $28
+DEF Bank20                    EQU $20 ; unused
+DEF Bank21_BgPalettesAndCollectibleLists EQU $21 ; bg palette data, and collectible lists for each map
+DEF Bank22_ObjectSpawnLists   EQU $22 ; object spawn lists for each map
+DEF Bank23_PlayerSpawns       EQU $23 ; where to spawn gex in each map
+DEF Bank24_BlocksetData       EQU $24
+DEF Bank25_BlocksetData       EQU $25
+DEF Bank26_BlocksetData       EQU $26
+DEF Bank27_BlocksetData       EQU $27
+DEF Bank28_BlocksetData       EQU $28
+DEF Bank2e_ExtendedMapData    EQU $2e
 DEF Bank2f_MapData            EQU $2f ; WesternStation, ChannelZ
-DEF Bank30                    EQU $30
-DEF Bank31                    EQU $31
+DEF Bank30_MapCollision       EQU $30
+DEF Bank31_ExtendedMapData    EQU $31
 DEF Bank32_MapData            EQU $32 ; MysteryTV, HolidayTV, TutTV, GextremeSports
-DEF Bank33                    EQU $33
-DEF Bank34                    EQU $34
+DEF Bank33_MapCollision       EQU $33
+DEF Bank34_ExtendedMapData    EQU $34
 DEF Bank35_MapData            EQU $35 ; HolidayTV, MarsupialMadness, WWGexWrestling
-DEF Bank36                    EQU $36
-DEF Bank37                    EQU $37
+DEF Bank36_MapCollision        EQU $36
+DEF Bank37_ExtendedMapData    EQU $37
 DEF Bank38_MapData            EQU $38 ; AnimeChannel, LizardOfOz
-DEF Bank39                    EQU $39
-DEF Bank3a                    EQU $3a
+DEF Bank39_MapCollision       EQU $39
+DEF Bank3a_ExtendedMapData    EQU $3a
 DEF Bank3b_MapData            EQU $3b ; SuperheroShow, GextremeSports
-DEF Bank3c                    EQU $3c
-DEF Bank3d                    EQU $3d
+DEF Bank3c_MapCollision       EQU $3c
+DEF Bank3d_ExtendedMapData    EQU $3d
 DEF Bank3e_MapData            EQU $3e ; GexCave, SuperheroShow
-DEF Bank3f                    EQU $3f
+DEF Bank3f_MapCollision       EQU $3f
 DEF Bank40_Tileset            EQU $40 ; AnimeChannel, MarsupialMadness
 DEF Bank41_Tileset            EQU $41 ; WesternStation, AnimeChannel, LizardOfOz
 DEF Bank42_Tileset            EQU $42 ; WesternStation
@@ -69,7 +71,7 @@ DEF Bank4d_Tileset            EQU $4d ; GexCave, AnimeChannel, GextremeSports
 DEF Bank4e_Tileset            EQU $4e ; GexCave
 DEF Bank4f_Tileset            EQU $4f ; WesternStation, WWGexWrestling, ChannelZ
 
-DEF Bank7f                    EQU $7f ; object palette data
+DEF Bank7f                    EQU $7f ; object sprite and palette data
 
 ; Inputs
 DEF Input_A        EQU $01
