@@ -143,8 +143,8 @@ sorted_tileset_offsets = sorted(tileset_offsets, key=lambda x: (x[0], x[1]))
 #for b in sorted_tileset_offsets:
 #    print(f"{b[0]:0{2}x}"+": "+f"{b[1]:0{4}x}")
 
-generate_regular_maps = True
-generate_collision_maps = False
+generate_regular_maps = False
+generate_collision_maps = True
 
 if generate_regular_maps:
     for level_counter in range(0, len(level_data_pointers)):
@@ -212,7 +212,6 @@ if generate_regular_maps:
             blocks.append(block_img)
 
         # build map from map data and blockset
-        map_file = "../banks/bank_0"+f"{level_data[MAP_BANK]:x}"+".bin"
         width = level_data[MAP_WIDTH]
         height = level_data[MAP_HEIGHT]
         offset = level_data[MAP_BANK_OFFSET]
@@ -222,6 +221,7 @@ if generate_regular_maps:
 
         map_image_path = "./map_images/"
 
+        map_file = "../banks/bank_0"+f"{level_data[MAP_BANK]:x}"+".bin"
         map_data = open(map_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
         
         extended_map_file = "../banks/bank_0"+f"{level_data[EXTENDED_MAP_BANK]:x}"+".bin"
@@ -232,7 +232,7 @@ if generate_regular_maps:
         draw = PIL.ImageDraw.Draw(img)
         for y in range(0, height):
             for x in range(0, width):
-                draw.rectangle(((x*16,y*16), ((x+1)*16,(y+1)*16)), map_data[count],3)
+                #draw.rectangle(((x*16,y*16), ((x+1)*16,(y+1)*16)), map_data[count],3)
                 
                 img.paste(blocks[map_data[count] + 0x100 * extended_map_data[count]], (x*16, y*16))
                 
@@ -249,7 +249,8 @@ if generate_collision_maps:
 
     # create collision tileset
     bg_collision_tiles = []
-    collision_tileset_data = bank03_data[0x0000:0x0400]
+    collision_tileset_data = bank03_data[0x0100:0x0400]
+    collision_tileset_flags = bank03_data[0x0000:0x0100]
     
     tileset_img = PIL.Image.new("RGB", (128, 128))
     draw2 = PIL.ImageDraw.Draw(tileset_img)
@@ -261,40 +262,45 @@ if generate_collision_maps:
             draw3 = PIL.ImageDraw.Draw(tile_img)
             
             color = "black"
-            '''flags = collision_tileset_data[0x800 + tile_counter]
-            if flags & 0x03 == 0x3: # wall and ceiling flag?
+            flags = collision_tileset_flags[tile_counter]
+            if flags & 0x03 == 0x3: # wall and ceiling flag
                 color = "red"
-            elif flags & 0x02 == 0x2: # ceiling flag?
+            elif flags & 0x02 == 0x2: # ceiling flag
                 color = "orange"
-            elif flags & 0x01 == 0x1: # wall flag?
-                color = "blue"'''
-            
-            row_count = 0
-            while row_count < 4:
-                data = collision_tileset_data[row_count*0x100 + tile_counter]
-                if data & 0x80:
-                    draw3.point((0,row_count), color)
-                if data & 0x40:
-                    draw3.point((1,row_count), color)
-                if data & 0x20:
-                    draw3.point((2,row_count), color)
-                if data & 0x10:
-                    draw3.point((3,row_count), color)
-                if data & 0x08:
-                    draw3.point((4,row_count), color)
-                if data & 0x04:
-                    draw3.point((5,row_count), color)
-                if data & 0x02:
-                    draw3.point((6,row_count), color)
-                if data & 0x01:
-                    draw3.point((7,row_count), color);
-                
-                row_count = row_count + 1
+            elif flags & 0x01 == 0x1: # wall flag
+                color = "blue"
+
+            if tile_counter < 0x60:
+                row_count = 0
+                while row_count < 8:
+                    data = collision_tileset_data[row_count + tile_counter*8]
+                    if data & 0x80:
+                        draw3.point((0,row_count), color)
+                    if data & 0x40:
+                        draw3.point((1,row_count), color)
+                    if data & 0x20:
+                        draw3.point((2,row_count), color)
+                    if data & 0x10:
+                        draw3.point((3,row_count), color)
+                    if data & 0x08:
+                        draw3.point((4,row_count), color)
+                    if data & 0x04:
+                        draw3.point((5,row_count), color)
+                    if data & 0x02:
+                        draw3.point((6,row_count), color)
+                    if data & 0x01:
+                        draw3.point((7,row_count), color);
+                    
+                    row_count = row_count + 1
             
             bg_collision_tiles.append(tile_img)
             tileset_img.paste(tile_img, (x*8, y*8))
+
+            if flags & 0x08 == 0x8: # kill tile flag, draw pink square
+                color = "pink"
+                draw2.rectangle(((x*8, y*8), ((x+1)*8, (y+1)*8)), "pink", "pink")
             
-            #draw2.rectangle(((x*8, y*8), ((x+1)*8, (y+1)*8)), None, "pink")
+            #draw2.rectangle(((x*8, y*8), ((x+1)*8, (y+1)*8)), "None", "pink")
             
             tile_counter = tile_counter + 1
     
@@ -311,7 +317,53 @@ if generate_collision_maps:
         level_numbers[level_data[LEVEL_ID]] += 1
         channel_map_number = level_numbers[level_data[LEVEL_ID]]
 
+        # create collision blockset
+        blockset_file = "../banks/bank_0"+f"{level_data[BLOCKSET_AND_PALETTE_IDS_BANK]:x}"+".bin"
+        end_addr = get_next_offset(sorted_blockset_offsets, [level_data[BLOCKSET_AND_PALETTE_IDS_BANK], level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]])
+        blockset_data = open(blockset_file, "rb").read()[level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]-0x4000:end_addr-0x4000]
+        
         blocks = []
 
-        # create collision blocks
+        for i in range(0, len(blockset_data), 0x8):
+            block_data = blockset_data[i:i + 0x8]
+            if not block_data:
+                break
 
+            #print(block_data)
+            
+            block_img =  PIL.Image.new("RGB", (16, 16))
+            block_img.paste(bg_collision_tiles[block_data[0]], (0, 0)) # NEEDS FIXING
+            block_img.paste(bg_collision_tiles[block_data[1]], (8, 0)) # NEEDS FIXING
+            block_img.paste(bg_collision_tiles[block_data[2]], (0, 8)) # NEEDS FIXING
+            block_img.paste(bg_collision_tiles[block_data[3]], (8, 8)) # NEEDS FIXING
+            blocks.append(block_img)
+
+        # build map from map data and blockset
+        width = level_data[MAP_WIDTH]
+        height = level_data[MAP_HEIGHT]
+        offset = level_data[MAP_BANK_OFFSET]
+
+        os.system('mkdir -p map_collision_images')
+        os.system('mkdir -p map_collision_images/'+level_name)
+
+        map_image_path = "./map_collision_images/"
+
+        map_collision_file = "../banks/bank_0"+f"{level_data[BLOCK_COLLISION_BANK]:x}"+".bin"
+        map_collision_data = open(map_collision_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
+
+        count = 0
+        img = PIL.Image.new("RGB", (16*width, 16*height))
+        draw = PIL.ImageDraw.Draw(img)
+        for y in range(0, height):
+            for x in range(0, width):
+                #draw.rectangle(((x*16,y*16), ((x+1)*16,(y+1)*16)), map_data[count],3)
+                
+                img.paste(blocks[map_collision_data[count]], (x*16, y*16))
+                
+                count = count+1
+        
+        img.save(map_image_path+level_name+"/"+level_name+"_"+f"{channel_map_number:0{2}}"+"_map.png")
+
+        print("completed: "+level_name+"/"+level_name+"_"+f"{channel_map_number:0{2}}"+"_map.png")
+
+        break # just do first one for testing

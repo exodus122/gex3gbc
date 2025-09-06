@@ -227,16 +227,16 @@ data_03_4580:
     db   $00, $00, $00, $00, $3e, $3f, $41, $7e        ;; 03:46d0 ........
     db   $3e, $40, $00, $00, $00, $00, $00, $00        ;; 03:46d8 ........
 
-entry_02_46e0:
-call_02_46e0:
+entry_02_46e0_UpdateBgCollision:
+call_02_46e0_UpdateBgCollision:
     ld   [wDAD6_ReturnBank], A                                    ;; 03:46e0 $ea $d6 $da
     ld   A, $02                                        ;; 03:46e3 $3e $02
     ld   HL, jr_03_5541                                ;; 03:46e5 $21 $41 $55
     call call_00_0edd_CallAltBankFunc                                  ;; 03:46e8 $cd $dd $0e
     bit  5, A                                          ;; 03:46eb $cb $6f
-    jp   NZ, .jp_03_4a3f                               ;; 03:46ed $c2 $3f $4a
+    jp   NZ, call_03_4a3f                               ;; 03:46ed $c2 $3f $4a
     bit  7, A                                          ;; 03:46f0 $cb $7f
-    jp   NZ, .jp_03_4ae4                               ;; 03:46f2 $c2 $e4 $4a
+    jp   NZ, call_03_4ae4                               ;; 03:46f2 $c2 $e4 $4a
     ld   HL, wDC1F                                     ;; 03:46f5 $21 $1f $dc
     ld   L, [HL]                                       ;; 03:46f8 $6e
     ld   H, $00                                        ;; 03:46f9 $26 $00
@@ -248,9 +248,10 @@ call_02_46e0:
     ld   L, A                                          ;; 03:4702 $6f
     jp   HL                                            ;; 03:4703 $e9
 .data_03_4704:
-    dw   .data_03_4708                                 ;; 03:4704 pP
-    db   $ad, $48                                      ;; 03:4706 ..
-.data_03_4708:
+    dw   call_03_4708_ProcessCollision                                 ;; 03:4704 pP
+    dw   call_03_48ad_ProcessClimbingCollision                                      ;; 03:4706 ..
+
+call_03_4708_ProcessCollision:
     ld   HL, wDABE                                     ;; 03:4708 $21 $be $da
     ld   A, [HL]                                       ;; 03:470b $7e
     ld   [HL], $00                                     ;; 03:470c $36 $00
@@ -515,6 +516,8 @@ call_02_46e0:
     ld   [wDC8C], A                                    ;; 03:48a1 $ea $8c $dc
     ret                                                ;; 03:48a4 $c9
     db   $80, $40, $20, $10, $08, $04, $02, $01        ;; 03:48a5 ........
+
+call_03_48ad_ProcessClimbingCollision:
     db   $21, $be, $da, $7e, $36, $00, $ea, $bd        ;; 03:48ad ........
     db   $da, $21, $be, $da, $cb, $fe, $fa, $86        ;; 03:48b5 ........
     db   $dc, $a7, $c8, $21, $89, $dc, $6e, $26        ;; 03:48bd ........
@@ -566,7 +569,7 @@ call_02_46e0:
     db   $02, $02, $00, $01, $00, $02, $ff, $01        ;; 03:4a2d ????????
     db   $fe, $02, $ff, $00, $fe, $00, $ff, $ff        ;; 03:4a35 ????????
     db   $fe, $fe                                      ;; 03:4a3d ??
-.jp_03_4a3f:
+call_03_4a3f:
     ld   HL, wDABE                                     ;; 03:4a3f $21 $be $da
     ld   A, [HL]                                       ;; 03:4a42 $7e
     ld   [HL], $00                                     ;; 03:4a43 $36 $00
@@ -637,7 +640,7 @@ call_02_46e0:
     db   $20, $f7, $00, $ff, $00, $10, $09, $00        ;; 03:4ad0 ????????
     db   $01, $00, $00, $01, $00, $05, $00, $80        ;; 03:4ad8 ????????
     db   $00, $10, $00, $01                            ;; 03:4ae0 ????
-.jp_03_4ae4:
+call_03_4ae4:
     ld   HL, wDABE                                     ;; 03:4ae4 $21 $be $da
     ld   A, [HL]                                       ;; 03:4ae7 $7e
     ld   [HL], $00                                     ;; 03:4ae8 $36 $00
@@ -3093,19 +3096,6 @@ call_03_6c89_CopyLevelData:
     db   $66, $73, $01, $74, $20, $74, $3f, $74        ;; 03:6d10 ????????
     db   $5e, $74
  
-    ; 0x0 is map bank (3e)
-    ; 0x3 is block override bank (3d)
-    ; 0x6 is tileset bank? (4e)
-    ; 0x9 is blockset and palette ids bank (28)
-    ; 0xc is collision bank (3f)
-    ; 0xf is ? bank? (23)
-    ; 0x12 is ? (21)
-    ; 0x15 is tileset bank? (22)
-    ; 0x18 is ? (21)
-    ; 0x1b is width of map (in blocks)
-    ; 0x1c is height of map (in blocks)
-    ; 0x1d is level number ?
-    ; 0x1e is ? (is it always 0?)
 .data_03_6d1a_LevelDataGexCave1:
     db   $3e                                           ;; 03:6d1a ??.
     dw   $702c                                         ;; 03:6d1b wW
@@ -3118,7 +3108,7 @@ call_03_6c89_CopyLevelData:
     db   $23                                           ;; 03:6d29 .
     dw   $4000                                         ;; 03:6d2a wW
     db   $21, $00, $40, $22                            ;; 03:6d2c ....
-    dw   data_03_4000                                  ;; 03:6d30 pP
+    dw   $4000                                  ;; 03:6d30 pP
     db   $21, $80, $4c, $1e, $11, $00, $00
 .data_03_6d39_LevelDataGexCave2:    
     db   $3e        ;; 03:6d39 ...p.ww.
@@ -3132,7 +3122,7 @@ call_03_6c89_CopyLevelData:
     db   $23                                           ;; 03:6d48 .
     dw   $4020                                         ;; 03:6d49 wW
     db   $21, $40, $40, $22                            ;; 03:6d4b ....
-    dw   data_03_4000                                  ;; 03:6d4f pP
+    dw   $4000                                  ;; 03:6d4f pP
     db   $21, $80, $4c, $1e, $11, $00, $00
 .data_03_6d58_LevelDataGexCave3:    
     db   $3e        ;; 03:6d58 ...p.ww.
