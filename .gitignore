@@ -37,4 +37,5 @@
 tools/banks/*
 tools/map2png/tile_bins/*
 tools/map2png/secondary_tile_bins/*
+tools/map2png/extracted_map_data/*
 tools/map2png/temp.bin

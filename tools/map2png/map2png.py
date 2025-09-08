@@ -85,14 +85,14 @@ TILESET_BANK = 4
 TILESET_BANK_OFFSET = 5
 BLOCKSET_AND_PALETTE_IDS_BANK = 6
 BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET = 7
-BLOCK_COLLISION_BANK = 8
-BLOCK_COLLISION_BANK_OFFSET = 9
+MAP_COLLISION_BANK = 8
+MAP_COLLISION_BANK_OFFSET = 9
 PLAYER_SPAWNS_BANK = 10
 PLAYER_SPAWNS_BANK_OFFSET = 11
 BG_PALETTE_BANK = 12
 BG_PALETTE_BANK_OFFSET = 13
-OBJECT_SPAWN_LIST_BANK = 14
-OBJECT_SPAWN_LIST_BANK_OFFSET = 15
+OBJECT_LIST_BANK = 14
+OBJECT_LIST_BANK_OFFSET = 15
 COLLECTIBLE_LIST_BANK = 16
 COLLECTIBLE_LIST_BANK_OFFSET = 17
 MAP_WIDTH = 18 # width of map (in blocks)
@@ -117,6 +117,9 @@ level_data_pointers = struct.unpack("<"+"H"*61, bank03_data[0x2ca0:0x2d1a])
 blockset_offsets = [] # list of banks and offsets in the blockset banks
 map_offsets = []
 tileset_offsets = []
+collectible_list_offsets = []
+object_list_offsets = []
+player_spawn_offsets = []
 
 for level_counter in range(0, len(level_data_pointers)):
     p = level_data_pointers[level_counter]
@@ -127,6 +130,12 @@ for level_counter in range(0, len(level_data_pointers)):
         map_offsets.append([level_data[MAP_BANK], level_data[MAP_BANK_OFFSET]])
     if [level_data[TILESET_BANK], level_data[TILESET_BANK_OFFSET]] not in tileset_offsets:
         tileset_offsets.append([level_data[TILESET_BANK], level_data[TILESET_BANK_OFFSET]])
+    if [level_data[COLLECTIBLE_LIST_BANK], level_data[COLLECTIBLE_LIST_BANK_OFFSET]] not in collectible_list_offsets:
+        collectible_list_offsets.append([level_data[COLLECTIBLE_LIST_BANK], level_data[COLLECTIBLE_LIST_BANK_OFFSET]])
+    if [level_data[OBJECT_LIST_BANK], level_data[OBJECT_LIST_BANK_OFFSET]] not in object_list_offsets:
+        object_list_offsets.append([level_data[OBJECT_LIST_BANK], level_data[OBJECT_LIST_BANK_OFFSET]])
+    if [level_data[PLAYER_SPAWNS_BANK], level_data[PLAYER_SPAWNS_BANK_OFFSET]] not in player_spawn_offsets:
+        player_spawn_offsets.append([level_data[PLAYER_SPAWNS_BANK], level_data[PLAYER_SPAWNS_BANK_OFFSET]])
 
 #print("Blockset Offsets:")
 sorted_blockset_offsets = sorted(blockset_offsets, key=lambda x: (x[0], x[1]))
@@ -143,10 +152,125 @@ sorted_tileset_offsets = sorted(tileset_offsets, key=lambda x: (x[0], x[1]))
 #for b in sorted_tileset_offsets:
 #    print(f"{b[0]:0{2}x}"+": "+f"{b[1]:0{4}x}")
 
-generate_regular_maps = False
-generate_collision_maps = True
+#print("\nCollectible List Offsets:")
+sorted_collectible_list_offsets = sorted(collectible_list_offsets, key=lambda x: (x[0], x[1]))
+#for b in collectible_list_offsets:
+#    print(f"{b[0]:0{2}x}"+": "+f"{b[1]:0{4}x}")
 
+#print("\nObject List Offsets:")
+sorted_object_list_offsets = sorted(object_list_offsets, key=lambda x: (x[0], x[1]))
+#for b in object_list_offsets:
+#    print(f"{b[0]:0{2}x}"+": "+f"{b[1]:0{4}x}")
+
+#print("\nPlayer Spawn Offsets:")
+sorted_player_spawn_offsets = sorted(player_spawn_offsets, key=lambda x: (x[0], x[1]))
+#for b in player_spawn_offsets:
+#    print(f"{b[0]:0{2}x}"+": "+f"{b[1]:0{4}x}")
+
+split_map_data = True
+generate_regular_maps = False
+generate_collision_maps = False
+
+# split the various map data banks into separate bins
+if split_map_data:
+    os.system('mkdir -p extracted_map_data')
+
+    maps = []
+    palettes = []
+
+    for level_counter in range(0, len(level_data_pointers)):
+        
+        ptr = level_data_pointers[level_counter]
+        level_data = struct.unpack("<BHBHBHBHBHBHBHBHBHBBBB", bank03_data[ptr-0x4000:ptr-0x4000+0x1F])
+
+        width = level_data[MAP_WIDTH]
+        height = level_data[MAP_HEIGHT]
+        offset = level_data[MAP_BANK_OFFSET]
+
+        map_file = "../banks/bank_0"+f"{level_data[MAP_BANK]:x}"+".bin"
+        map_data = open(map_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
+
+        palette_file = "../banks/bank_0"+f"{level_data[BG_PALETTE_BANK]:x}"+".bin"
+        palette_data = open(palette_file, 'rb').read()[level_data[BG_PALETTE_BANK_OFFSET]-0x4000:level_data[BG_PALETTE_BANK_OFFSET]-0x4000+0x40]
+
+        if map_data not in maps:
+            maps.append(map_data)
+
+            level_name = level_names[level_data[LEVEL_ID]]
+            level_numbers[level_data[LEVEL_ID]] += 1
+            channel_map_number = str(level_numbers[level_data[LEVEL_ID]])
+            
+            os.system('mkdir -p extracted_map_data/'+level_name)
+            os.system('mkdir -p extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number)
+
+            tileset_file = "../banks/bank_0"+f"{level_data[TILESET_BANK]:x}"+".bin"
+            end_addr = get_next_offset(sorted_tileset_offsets, [level_data[TILESET_BANK], level_data[TILESET_BANK_OFFSET]])
+            tileset_data = open(tileset_file, 'rb').read()[level_data[TILESET_BANK_OFFSET]-0x4000:end_addr-0x4000]
+            out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_tileset.bin', "wb")
+            out.write(tileset_data)
+            out.close()
+
+            blockset_file = "../banks/bank_0"+f"{level_data[BLOCKSET_AND_PALETTE_IDS_BANK]:x}"+".bin"
+            end_addr = get_next_offset(sorted_blockset_offsets, [level_data[BLOCKSET_AND_PALETTE_IDS_BANK], level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]])
+            blockset_data = open(blockset_file, "rb").read()[level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]-0x4000:end_addr-0x4000]
+            out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_blockset.bin', "wb")
+            out.write(blockset_data)
+            out.close()
+
+            out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'.bin', "wb")
+            out.write(map_data)
+            out.close()
+
+            extended_map_file = "../banks/bank_0"+f"{level_data[EXTENDED_MAP_BANK]:x}"+".bin"
+            extended_map_data = open(extended_map_file, "rb").read()[level_data[EXTENDED_MAP_BANK_OFFSET]-0x4000:offset-0x4000+width*height]
+            out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_extended.bin', "wb")
+            out.write(extended_map_data)
+            out.close()
+
+            map_collision_file = "../banks/bank_0"+f"{level_data[MAP_COLLISION_BANK]:x}"+".bin"
+            map_collision_data = open(map_collision_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
+            out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_collision.bin', "wb")
+            out.write(map_collision_data)
+            out.close()
+
+            collectible_list_file = "../banks/bank_0"+f"{level_data[COLLECTIBLE_LIST_BANK]:x}"+".bin"
+            end_addr = get_next_offset(sorted_collectible_list_offsets, [level_data[COLLECTIBLE_LIST_BANK], level_data[COLLECTIBLE_LIST_BANK_OFFSET]])
+            collectible_list_data = open(collectible_list_file, "rb").read()[level_data[COLLECTIBLE_LIST_BANK_OFFSET]-0x4000:end_addr-0x4000]
+            out = open('extracted_map_data/'+level_name+'/'+level_name+'_collectible_list.bin', "wb")
+            out.write(collectible_list_data)
+            out.close()
+
+            object_list_file = "../banks/bank_0"+f"{level_data[OBJECT_LIST_BANK]:x}"+".bin"
+            end_addr = get_next_offset(sorted_object_list_offsets, [level_data[OBJECT_LIST_BANK], level_data[OBJECT_LIST_BANK_OFFSET]])
+            object_list_data = open(object_list_file, "rb").read()[level_data[OBJECT_LIST_BANK_OFFSET]-0x4000:end_addr-0x4000]
+            out = open('extracted_map_data/'+level_name+'/'+level_name+'_object_list.bin', "wb")
+            out.write(object_list_data)
+            out.close()
+
+            player_spawn_list_file = "../banks/bank_0"+f"{level_data[PLAYER_SPAWNS_BANK]:x}"+".bin"
+            end_addr = get_next_offset(sorted_player_spawn_offsets, [level_data[PLAYER_SPAWNS_BANK], level_data[PLAYER_SPAWNS_BANK_OFFSET]])
+            player_spawn_list_data = open(player_spawn_list_file, "rb").read()[level_data[PLAYER_SPAWNS_BANK_OFFSET]-0x4000:end_addr-0x4000]
+            out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_player_spawns.bin', "wb")
+            out.write(player_spawn_list_data)
+            out.close()
+
+            out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_palette.bin', "wb")
+            out.write(palette_data)
+            out.close()
+            palettes.append(palette_data)
+        else: # there are more palettes than there are maps in HolidayTV and MysteryTV
+            if palette_data not in palettes:
+                palettes.append(palette_data)
+
+                out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'_palette_'+f"{level_data[BG_PALETTE_BANK_OFFSET]:x}"+'.bin', "wb")
+                out.write(palette_data)
+                out.close()
+
+# generate .png of each map
 if generate_regular_maps:
+
+    maps = []
+
     for level_counter in range(0, len(level_data_pointers)):
         
         ptr = level_data_pointers[level_counter]
@@ -154,97 +278,113 @@ if generate_regular_maps:
         #for d in level_data:
         #    print(hex(d))
 
-        level_name = level_names[level_data[LEVEL_ID]]
-        level_numbers[level_data[LEVEL_ID]] += 1
-        channel_map_number = level_numbers[level_data[LEVEL_ID]]
-
-        blocks = []
-        
-        # create the colored block images using the palette data, blockset_data and tileset_data
-        tileset_file = "../banks/bank_0"+f"{level_data[TILESET_BANK]:x}"+".bin"
-        end_addr = get_next_offset(sorted_tileset_offsets, [level_data[TILESET_BANK], level_data[TILESET_BANK_OFFSET]])
-        tileset_data = open(tileset_file, 'rb').read()[level_data[TILESET_BANK_OFFSET]-0x4000:end_addr-0x4000]
-
-        blockset_file = "../banks/bank_0"+f"{level_data[BLOCKSET_AND_PALETTE_IDS_BANK]:x}"+".bin"
-        end_addr = get_next_offset(sorted_blockset_offsets, [level_data[BLOCKSET_AND_PALETTE_IDS_BANK], level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]])
-        blockset_data = open(blockset_file, "rb").read()[level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]-0x4000:end_addr-0x4000]
-
-        palette_file = "../banks/bank_0"+f"{level_data[BG_PALETTE_BANK]:x}"+".bin"
-        palette_data = open(palette_file, 'rb').read()[level_data[BG_PALETTE_BANK_OFFSET]-0x4000:level_data[BG_PALETTE_BANK_OFFSET]-0x4000+0x40]
-
-        os.system('mkdir -p tile_bins')
-        
-        for i in range(0, len(blockset_data), 0x8):
-            block_data = blockset_data[i:i + 0x8]
-            if not block_data:
-                break
-            
-            tiles = []
-
-            for j in range(0, 4):
-                vram_offset = 0x0000
-                if block_data[j+4] & 0x08: # if alternate vram bank bit is set
-                    vram_offset = 0x1000
-                tile_data = tileset_data[vram_offset+block_data[j]*0x10:vram_offset+block_data[j]*0x10+0x10]
-                if block_data[j+4] & 0x20:
-                    tile_data = x_flip_tile(tile_data)
-                if block_data[j+4] & 0x40:
-                    tile_data = y_flip_tile(tile_data)
-                out = open('./tile_bins/tile_'+f"{j:0{2}x}"+'.bin', "wb")
-                out.write(tile_data)
-                out.close()
-                
-                palette_index = block_data[j+4] & 0x7
-                temp_palette_data = palette_data[0x8*palette_index:0x8*palette_index+0x8]
-                f = open("./temp.bin", "wb")
-                f.write(temp_palette_data)
-                f.close()
-                os.system('rgbgfx --reverse 1 -p ./temp.bin --columns -o ./tile_bins/tile_'+f"{j:0{2}x}"+'.bin ./tile_bins/tile_'+f"{j:0{2}x}"+'.png')
-
-                tile_img = PIL.Image.open('./tile_bins/tile_'+f"{j:0{2}x}"+'.png')
-                tiles.append(tile_img)
-
-            block_img =  PIL.Image.new("RGB", (16, 16))
-            block_img.paste(tiles[0], (0, 0))
-            block_img.paste(tiles[1], (8, 0))
-            block_img.paste(tiles[2], (0, 8))
-            block_img.paste(tiles[3], (8, 8))
-            blocks.append(block_img)
-
-        # build map from map data and blockset
+        # don't create duplicate map images
         width = level_data[MAP_WIDTH]
         height = level_data[MAP_HEIGHT]
         offset = level_data[MAP_BANK_OFFSET]
 
-        os.system('mkdir -p map_images')
-        os.system('mkdir -p map_images/'+level_name)
-
-        map_image_path = "./map_images/"
+        level_name = level_names[level_data[LEVEL_ID]]
 
         map_file = "../banks/bank_0"+f"{level_data[MAP_BANK]:x}"+".bin"
         map_data = open(map_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
-        
-        extended_map_file = "../banks/bank_0"+f"{level_data[EXTENDED_MAP_BANK]:x}"+".bin"
-        extended_map_data = open(extended_map_file, "rb").read()[level_data[EXTENDED_MAP_BANK_OFFSET]-0x4000:]
 
-        count = 0
-        img = PIL.Image.new("RGB", (16*width, 16*height))
-        draw = PIL.ImageDraw.Draw(img)
-        for y in range(0, height):
-            for x in range(0, width):
-                #draw.rectangle(((x*16,y*16), ((x+1)*16,(y+1)*16)), map_data[count],3)
+        palette_file = "../banks/bank_0"+f"{level_data[BG_PALETTE_BANK]:x}"+".bin"
+        palette_data = open(palette_file, 'rb').read()[level_data[BG_PALETTE_BANK_OFFSET]-0x4000:level_data[BG_PALETTE_BANK_OFFSET]-0x4000+0x40]
+
+        if [level_name, map_data, palette_data] not in maps:
+            maps.append([level_name, map_data, palette_data])
+            
+            level_numbers[level_data[LEVEL_ID]] += 1
+            channel_map_number = level_numbers[level_data[LEVEL_ID]]
+
+            blocks = []
+            
+            # create the colored block images using the palette data, blockset_data and tileset_data
+            tileset_file = "../banks/bank_0"+f"{level_data[TILESET_BANK]:x}"+".bin"
+            end_addr = get_next_offset(sorted_tileset_offsets, [level_data[TILESET_BANK], level_data[TILESET_BANK_OFFSET]])
+            tileset_data = open(tileset_file, 'rb').read()[level_data[TILESET_BANK_OFFSET]-0x4000:end_addr-0x4000]
+
+            blockset_file = "../banks/bank_0"+f"{level_data[BLOCKSET_AND_PALETTE_IDS_BANK]:x}"+".bin"
+            end_addr = get_next_offset(sorted_blockset_offsets, [level_data[BLOCKSET_AND_PALETTE_IDS_BANK], level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]])
+            blockset_data = open(blockset_file, "rb").read()[level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]-0x4000:end_addr-0x4000]
+
+            palette_file = "../banks/bank_0"+f"{level_data[BG_PALETTE_BANK]:x}"+".bin"
+            palette_data = open(palette_file, 'rb').read()[level_data[BG_PALETTE_BANK_OFFSET]-0x4000:level_data[BG_PALETTE_BANK_OFFSET]-0x4000+0x40]
+
+            os.system('mkdir -p tile_bins')
+            
+            for i in range(0, len(blockset_data), 0x8):
+                block_data = blockset_data[i:i + 0x8]
+                if not block_data:
+                    break
                 
-                img.paste(blocks[map_data[count] + 0x100 * extended_map_data[count]], (x*16, y*16))
-                
-                count = count+1
-        
-        img.save(map_image_path+level_name+"/"+level_name+"_"+f"{channel_map_number:0{2}}"+"_map.png")
+                tiles = []
 
-        os.system('rm -r tile_bins')
-        print("completed: "+level_name+"/"+level_name+"_"+f"{channel_map_number:0{2}}"+"_map.png")
+                for j in range(0, 4):
+                    vram_offset = 0x0000
+                    if block_data[j+4] & 0x08: # if alternate vram bank bit is set
+                        vram_offset = 0x1000
+                    tile_data = tileset_data[vram_offset+block_data[j]*0x10:vram_offset+block_data[j]*0x10+0x10]
+                    if block_data[j+4] & 0x20:
+                        tile_data = x_flip_tile(tile_data)
+                    if block_data[j+4] & 0x40:
+                        tile_data = y_flip_tile(tile_data)
+                    out = open('./tile_bins/tile_'+f"{j:0{2}x}"+'.bin', "wb")
+                    out.write(tile_data)
+                    out.close()
+                    
+                    palette_index = block_data[j+4] & 0x7
+                    temp_palette_data = palette_data[0x8*palette_index:0x8*palette_index+0x8]
+                    f = open("./temp.bin", "wb")
+                    f.write(temp_palette_data)
+                    f.close()
+                    os.system('rgbgfx --reverse 1 -p ./temp.bin --columns -o ./tile_bins/tile_'+f"{j:0{2}x}"+'.bin ./tile_bins/tile_'+f"{j:0{2}x}"+'.png')
 
-        #break # just do first one for testing
+                    tile_img = PIL.Image.open('./tile_bins/tile_'+f"{j:0{2}x}"+'.png')
+                    tiles.append(tile_img)
 
+                block_img =  PIL.Image.new("RGB", (16, 16))
+                block_img.paste(tiles[0], (0, 0))
+                block_img.paste(tiles[1], (8, 0))
+                block_img.paste(tiles[2], (0, 8))
+                block_img.paste(tiles[3], (8, 8))
+                blocks.append(block_img)
+
+            # build map from map data and blockset
+            width = level_data[MAP_WIDTH]
+            height = level_data[MAP_HEIGHT]
+            offset = level_data[MAP_BANK_OFFSET]
+
+            os.system('mkdir -p map_images')
+            os.system('mkdir -p map_images/'+level_name)
+
+            map_image_path = "./map_images/"
+
+            map_file = "../banks/bank_0"+f"{level_data[MAP_BANK]:x}"+".bin"
+            map_data = open(map_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
+            
+            extended_map_file = "../banks/bank_0"+f"{level_data[EXTENDED_MAP_BANK]:x}"+".bin"
+            extended_map_data = open(extended_map_file, "rb").read()[level_data[EXTENDED_MAP_BANK_OFFSET]-0x4000:]
+
+            count = 0
+            img = PIL.Image.new("RGB", (16*width, 16*height))
+            draw = PIL.ImageDraw.Draw(img)
+            for y in range(0, height):
+                for x in range(0, width):
+                    #draw.rectangle(((x*16,y*16), ((x+1)*16,(y+1)*16)), map_data[count],3)
+                    
+                    img.paste(blocks[map_data[count] + 0x100 * extended_map_data[count]], (x*16, y*16))
+                    
+                    count = count+1
+            
+            img.save(map_image_path+level_name+"/"+level_name+"_"+f"{channel_map_number:0{2}}"+"_map.png")
+
+            os.system('rm -r tile_bins')
+            print("completed: "+level_name+"/"+level_name+"_"+f"{channel_map_number:0{2}}"+"_map.png")
+
+            #break # just do first one for testing
+
+# generate .png of each collision map
 if generate_collision_maps:
 
     # create collision tileset
@@ -348,7 +488,7 @@ if generate_collision_maps:
 
         map_image_path = "./map_collision_images/"
 
-        map_collision_file = "../banks/bank_0"+f"{level_data[BLOCK_COLLISION_BANK]:x}"+".bin"
+        map_collision_file = "../banks/bank_0"+f"{level_data[MAP_COLLISION_BANK]:x}"+".bin"
         map_collision_data = open(map_collision_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
 
         count = 0
