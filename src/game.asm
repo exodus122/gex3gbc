@@ -189,24 +189,163 @@ SECTION "bank20", ROMX[$4000], BANK[$20]
 
 SECTION "bank21", ROMX[$4000], BANK[$21]
 INCBIN "data/bank_021_bg_palettes.bin"
-INCBIN "data/bank_021_collectible_lists.bin"
+GexCave_collectible_list.bin:
+    INCBIN "data/maps/GexCave/GexCave_collectible_list.bin"
+HolidayTV_collectible_list.bin:
+    INCBIN "data/maps/HolidayTV/HolidayTV_collectible_list.bin"
+MysteryTV_collectible_list.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_collectible_list.bin"
+TutTV_collectible_list.bin:
+    INCBIN "data/maps/TutTV/TutTV_collectible_list.bin"
+WesternStation_collectible_list.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_collectible_list.bin"
+AnimeChannel_collectible_list.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_collectible_list.bin"
+SuperheroShow_collectible_list.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_collectible_list.bin"
+GextremeSports_collectible_list.bin:
+    INCBIN "data/maps/GextremeSports/GextremeSports_collectible_list.bin"
+MarsupialMadness_collectible_list.bin:
+    INCBIN "data/maps/MarsupialMadness/MarsupialMadness_collectible_list.bin"
+WWGexWrestling_collectible_list.bin:
+    INCBIN "data/maps/WWGexWrestling/WWGexWrestling_collectible_list.bin"
+LizardOfOz_collectible_list.bin:
+    INCBIN "data/maps/LizardOfOz/LizardOfOz_collectible_list.bin"
+ChannelZ_collectible_list.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_collectible_list.bin"
 
 SECTION "bank22", ROMX[$4000], BANK[$22]
-INCBIN "data/bank_022_object_spawn_lists.bin"
+GexCave_object_list.bin:
+    INCBIN "data/maps/GexCave/GexCave_object_list.bin"
+HolidayTV_object_list.bin:
+    INCBIN "data/maps/HolidayTV/HolidayTV_object_list.bin"
+MysteryTV_object_list.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_object_list.bin"
+TutTV_object_list.bin:
+    INCBIN "data/maps/TutTV/TutTV_object_list.bin"
+WesternStation_object_list.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_object_list.bin"
+AnimeChannel_object_list.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_object_list.bin"
+SuperheroShow_object_list.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_object_list.bin"
+GextremeSports_object_list.bin:
+    INCBIN "data/maps/GextremeSports/GextremeSports_object_list.bin"
+MarsupialMadness_object_list.bin:
+    INCBIN "data/maps/MarsupialMadness/MarsupialMadness_object_list.bin"
+WWGexWrestling_object_list.bin:
+    INCBIN "data/maps/WWGexWrestling/WWGexWrestling_object_list.bin"
+LizardOfOz_object_list.bin:
+    INCBIN "data/maps/LizardOfOz/LizardOfOz_object_list.bin"
+ChannelZ_object_list.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_object_list.bin"
 
 SECTION "bank23", ROMX[$4000], BANK[$23]
 INCBIN "data/bank_023_player_spawns.bin"
 
 SECTION "bank24", ROMX[$4000], BANK[$24]
-INCBIN "data/blockset_data/bank_024.bin"
+MysteryTV_1_blockset.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_1/MysteryTV_1_blockset.bin"
+MysteryTV_2_blockset.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_2/MysteryTV_2_blockset.bin"
+MysteryTV_3_blockset.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_3/MysteryTV_3_blockset.bin"
+MysteryTV_4_blockset.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_4/MysteryTV_4_blockset.bin"
+MysteryTV_5_blockset.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_5/MysteryTV_5_blockset.bin"
+MysteryTV_6_blockset.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_6/MysteryTV_6_blockset.bin"
+HolidayTV_1_blockset.bin:
+    INCBIN "data/maps/HolidayTV/HolidayTV_1/HolidayTV_1_blockset.bin"
+HolidayTV_3_blockset.bin:
+    INCBIN "data/maps/HolidayTV/HolidayTV_3/HolidayTV_3_blockset.bin"
+TutTV_6_blockset.bin:
+    INCBIN "data/maps/TutTV/TutTV_6/TutTV_6_blockset.bin"
+
 SECTION "bank25", ROMX[$4000], BANK[$25]
-INCBIN "data/blockset_data/bank_025.bin"
+HolidayTV_2_blockset.bin:
+    INCBIN "data/maps/HolidayTV/HolidayTV_2/HolidayTV_2_blockset.bin"
+TutTV_1_blockset.bin:
+    INCBIN "data/maps/TutTV/TutTV_1/TutTV_1_blockset.bin"
+TutTV_2_blockset.bin:
+    INCBIN "data/maps/TutTV/TutTV_2/TutTV_2_blockset.bin"
+TutTV_3_blockset.bin:
+    INCBIN "data/maps/TutTV/TutTV_3/TutTV_3_blockset.bin"
+TutTV_4_blockset.bin:
+    INCBIN "data/maps/TutTV/TutTV_4/TutTV_4_blockset.bin"
+TutTV_5_blockset.bin:
+    INCBIN "data/maps/TutTV/TutTV_5/TutTV_5_blockset.bin"
+TutTV_7_blockset.bin:
+    INCBIN "data/maps/TutTV/TutTV_7/TutTV_7_blockset.bin"
+WesternStation_1_blockset.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_1/WesternStation_1_blockset.bin"
+WesternStation_2_blockset.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_2/WesternStation_2_blockset.bin"
+WesternStation_3_blockset.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_3/WesternStation_3_blockset.bin"
+WesternStation_4_blockset.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_4/WesternStation_4_blockset.bin"
+LizardOfOz_1_blockset.bin:
+    INCBIN "data/maps/LizardOfOz/LizardOfOz_1/LizardOfOz_1_blockset.bin"
+
 SECTION "bank26", ROMX[$4000], BANK[$26]
-INCBIN "data/blockset_data/bank_026.bin"
+AnimeChannel_1_blockset.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_1/AnimeChannel_1_blockset.bin"
+AnimeChannel_2_blockset.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_2/AnimeChannel_2_blockset.bin"
+AnimeChannel_3_blockset.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_3/AnimeChannel_3_blockset.bin"
+AnimeChannel_4_blockset.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_4/AnimeChannel_4_blockset.bin"
+AnimeChannel_5_blockset.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_5/AnimeChannel_5_blockset.bin"
+AnimeChannel_6_blockset.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_6/AnimeChannel_6_blockset.bin"
+SuperheroShow_1_blockset.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_1/SuperheroShow_1_blockset.bin"
+SuperheroShow_2_blockset.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_2/SuperheroShow_2_blockset.bin"
+SuperheroShow_3_blockset.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_3/SuperheroShow_3_blockset.bin"
+SuperheroShow_4_blockset.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_4/SuperheroShow_4_blockset.bin"
+SuperheroShow_5_blockset.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_5/SuperheroShow_5_blockset.bin"
+SuperheroShow_6_blockset.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_6/SuperheroShow_6_blockset.bin"
+
 SECTION "bank27", ROMX[$4000], BANK[$27]
-INCBIN "data/blockset_data/bank_027.bin"
+GextremeSports_1_blockset.bin:
+    INCBIN "data/maps/GextremeSports/GextremeSports_1/GextremeSports_1_blockset.bin"	
+MarsupialMadness_1_blockset.bin:
+    INCBIN "data/maps/MarsupialMadness/MarsupialMadness_1/MarsupialMadness_1_blockset.bin"
+ChannelZ_1_blockset.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_1/ChannelZ_1_blockset.bin"
+ChannelZ_2_blockset.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_2/ChannelZ_2_blockset.bin"
+ChannelZ_3_blockset.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_3/ChannelZ_3_blockset.bin"
+ChannelZ_4_blockset.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_4/ChannelZ_4_blockset.bin"
+ChannelZ_5_blockset.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_5/ChannelZ_5_blockset.bin"
+WesternStation_5_blockset.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_5/WesternStation_5_blockset.bin"
+
 SECTION "bank28", ROMX[$4000], BANK[$28]
-INCBIN "data/blockset_data/bank_028.bin"
+GexCave_1_blockset.bin:
+    INCBIN "data/maps/GexCave/GexCave_1/GexCave_1_blockset.bin"
+GexCave_2_blockset.bin:
+    INCBIN "data/maps/GexCave/GexCave_2/GexCave_2_blockset.bin"
+GexCave_3_blockset.bin:
+    INCBIN "data/maps/GexCave/GexCave_3/GexCave_3_blockset.bin"
+GexCave_4_blockset.bin:
+    INCBIN "data/maps/GexCave/GexCave_4/GexCave_4_blockset.bin"	
+WWGexWrestling_1_blockset.bin:
+    INCBIN "data/maps/WWGexWrestling/WWGexWrestling_1/WWGexWrestling_1_blockset.bin"
+WesternStation_6_blockset.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_6/WesternStation_6_blockset.bin"
 
 SECTION "bank29", ROMX[$4000], BANK[$29]
 SECTION "bank2A", ROMX[$4000], BANK[$2A]
@@ -215,41 +354,328 @@ SECTION "bank2C", ROMX[$4000], BANK[$2C]
 SECTION "bank2D", ROMX[$4000], BANK[$2D]
 
 SECTION "bank2e", ROMX[$4000], BANK[$2e]
-INCBIN "data/maps_extended/bank_02e.bin"
+ChannelZ_1_extended.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_1/ChannelZ_1_extended.bin"
+ChannelZ_2_extended.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_2/ChannelZ_2_extended.bin"
+ChannelZ_3_extended.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_3/ChannelZ_3_extended.bin"
+ChannelZ_4_extended.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_4/ChannelZ_4_extended.bin"
+ChannelZ_5_extended.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_5/ChannelZ_5_extended.bin"
+WesternStation_1_extended.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_1/WesternStation_1_extended.bin"
+junk_extended_data.bin:
+    INCBIN "data/maps/WesternStation/junk_extended_data.bin"
+WesternStation_2_extended.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_2/WesternStation_2_extended.bin"
+WesternStation_3_extended.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_3/WesternStation_3_extended.bin"
+WesternStation_4_extended.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_4/WesternStation_4_extended.bin"
+WesternStation_5_extended.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_5/WesternStation_5_extended.bin"
+WesternStation_6_extended.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_6/WesternStation_6_extended.bin"
+
 SECTION "bank2f", ROMX[$4000], BANK[$2f]
-INCBIN "data/maps/bank_02f.bin"
+ChannelZ_1_map.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_1/ChannelZ_1_map.bin"
+ChannelZ_2_map.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_2/ChannelZ_2_map.bin"
+ChannelZ_3_map.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_3/ChannelZ_3_map.bin"
+ChannelZ_4_map.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_4/ChannelZ_4_map.bin"
+ChannelZ_5_map.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_5/ChannelZ_5_map.bin"
+WesternStation_1_map.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_1/WesternStation_1_map.bin"
+junk_map_data.bin:
+    INCBIN "data/maps/WesternStation/junk_map_data.bin"
+WesternStation_2_map.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_2/WesternStation_2_map.bin"
+WesternStation_3_map.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_3/WesternStation_3_map.bin"
+WesternStation_4_map.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_4/WesternStation_4_map.bin"
+WesternStation_5_map.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_5/WesternStation_5_map.bin"
+WesternStation_6_map.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_6/WesternStation_6_map.bin"
+
 SECTION "bank30", ROMX[$4000], BANK[$30]
-INCBIN "data/map_collision/bank_030.bin"
+ChannelZ_1_collision.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_1/ChannelZ_1_collision.bin"
+ChannelZ_2_collision.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_2/ChannelZ_2_collision.bin"
+ChannelZ_3_collision.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_3/ChannelZ_3_collision.bin"
+ChannelZ_4_collision.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_4/ChannelZ_4_collision.bin"
+ChannelZ_5_collision.bin:
+    INCBIN "data/maps/ChannelZ/ChannelZ_5/ChannelZ_5_collision.bin"
+WesternStation_1_collision.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_1/WesternStation_1_collision.bin"
+junk_collision_data.bin:
+    INCBIN "data/maps/WesternStation/junk_collision_data.bin"
+WesternStation_2_collision.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_2/WesternStation_2_collision.bin"
+WesternStation_3_collision.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_3/WesternStation_3_collision.bin"
+WesternStation_4_collision.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_4/WesternStation_4_collision.bin"
+WesternStation_5_collision.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_5/WesternStation_5_collision.bin"
+WesternStation_6_collision.bin:
+    INCBIN "data/maps/WesternStation/WesternStation_6/WesternStation_6_collision.bin"
+
 SECTION "bank31", ROMX[$4000], BANK[$31]
-INCBIN "data/maps_extended/bank_031.bin"
+MysteryTV_1_extended.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_1/MysteryTV_1_extended.bin"
+MysteryTV_2_extended.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_2/MysteryTV_2_extended.bin"
+MysteryTV_3_extended.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_3/MysteryTV_3_extended.bin"
+MysteryTV_4_extended.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_4/MysteryTV_4_extended.bin"
+MysteryTV_5_extended.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_5/MysteryTV_5_extended.bin"
+MysteryTV_6_extended.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_6/MysteryTV_6_extended.bin"
+TutTV_1_extended.bin:
+    INCBIN "data/maps/TutTV/TutTV_1/TutTV_1_extended.bin"
+TutTV_2_extended.bin:
+    INCBIN "data/maps/TutTV/TutTV_2/TutTV_2_extended.bin"
+TutTV_3_extended.bin:
+    INCBIN "data/maps/TutTV/TutTV_3/TutTV_3_extended.bin"
+TutTV_4_extended.bin:
+    INCBIN "data/maps/TutTV/TutTV_4/TutTV_4_extended.bin"
+TutTV_5_extended.bin:
+    INCBIN "data/maps/TutTV/TutTV_5/TutTV_5_extended.bin"
+TutTV_6_extended.bin:
+    INCBIN "data/maps/TutTV/TutTV_6/TutTV_6_extended.bin"
+TutTV_7_extended.bin:
+    INCBIN "data/maps/TutTV/TutTV_7/TutTV_7_extended.bin"	
+HolidayTV_2_extended.bin:
+    INCBIN "data/maps/HolidayTV/HolidayTV_2/HolidayTV_2_extended.bin"
+
 SECTION "bank32", ROMX[$4000], BANK[$32]
-INCBIN "data/maps/bank_032.bin"
+MysteryTV_1_map.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_1/MysteryTV_1_map.bin"
+MysteryTV_2_map.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_2/MysteryTV_2_map.bin"
+MysteryTV_3_map.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_3/MysteryTV_3_map.bin"
+MysteryTV_4_map.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_4/MysteryTV_4_map.bin"
+MysteryTV_5_map.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_5/MysteryTV_5_map.bin"
+MysteryTV_6_map.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_6/MysteryTV_6_map.bin"
+TutTV_1_map.bin:
+    INCBIN "data/maps/TutTV/TutTV_1/TutTV_1_map.bin"
+TutTV_2_map.bin:
+    INCBIN "data/maps/TutTV/TutTV_2/TutTV_2_map.bin"
+TutTV_3_map.bin:
+    INCBIN "data/maps/TutTV/TutTV_3/TutTV_3_map.bin"
+TutTV_4_map.bin:
+    INCBIN "data/maps/TutTV/TutTV_4/TutTV_4_map.bin"
+TutTV_5_map.bin:
+    INCBIN "data/maps/TutTV/TutTV_5/TutTV_5_map.bin"
+TutTV_6_map.bin:
+    INCBIN "data/maps/TutTV/TutTV_6/TutTV_6_map.bin"
+TutTV_7_map.bin:
+    INCBIN "data/maps/TutTV/TutTV_7/TutTV_7_map.bin"	
+HolidayTV_2_map.bin:
+    INCBIN "data/maps/HolidayTV/HolidayTV_2/HolidayTV_2_map.bin"
+
 SECTION "bank33", ROMX[$4000], BANK[$33]
-INCBIN "data/map_collision/bank_033.bin"
+MysteryTV_1_collision.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_1/MysteryTV_1_collision.bin"
+MysteryTV_2_collision.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_2/MysteryTV_2_collision.bin"
+MysteryTV_3_collision.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_3/MysteryTV_3_collision.bin"
+MysteryTV_4_collision.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_4/MysteryTV_4_collision.bin"
+MysteryTV_5_collision.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_5/MysteryTV_5_collision.bin"
+MysteryTV_6_collision.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_6/MysteryTV_6_collision.bin"
+TutTV_1_collision.bin:
+    INCBIN "data/maps/TutTV/TutTV_1/TutTV_1_collision.bin"
+TutTV_2_collision.bin:
+    INCBIN "data/maps/TutTV/TutTV_2/TutTV_2_collision.bin"
+TutTV_3_collision.bin:
+    INCBIN "data/maps/TutTV/TutTV_3/TutTV_3_collision.bin"
+TutTV_4_collision.bin:
+    INCBIN "data/maps/TutTV/TutTV_4/TutTV_4_collision.bin"
+TutTV_5_collision.bin:
+    INCBIN "data/maps/TutTV/TutTV_5/TutTV_5_collision.bin"
+TutTV_6_collision.bin:
+    INCBIN "data/maps/TutTV/TutTV_6/TutTV_6_collision.bin"
+TutTV_7_collision.bin:
+    INCBIN "data/maps/TutTV/TutTV_7/TutTV_7_collision.bin"	
+HolidayTV_2_collision.bin:
+    INCBIN "data/maps/HolidayTV/HolidayTV_2/HolidayTV_2_collision.bin"
+
 SECTION "bank34", ROMX[$4000], BANK[$34]
-INCBIN "data/maps_extended/bank_034.bin"
+HolidayTV_1_extended.bin:
+    INCBIN "data/maps/HolidayTV/HolidayTV_1/HolidayTV_1_extended.bin"
+HolidayTV_3_extended.bin:
+    INCBIN "data/maps/HolidayTV/HolidayTV_3/HolidayTV_3_extended.bin"
+MarsupialMadness_1_extended.bin:
+    INCBIN "data/maps/MarsupialMadness/MarsupialMadness_1/MarsupialMadness_1_extended.bin"
+WWGexWrestling_1_extended.bin:
+    INCBIN "data/maps/WWGexWrestling/WWGexWrestling_1/WWGexWrestling_1_extended.bin"
+
 SECTION "bank35", ROMX[$4000], BANK[$35]
-INCBIN "data/maps/bank_035.bin"
+HolidayTV_1_map.bin:
+    INCBIN "data/maps/HolidayTV/HolidayTV_1/HolidayTV_1_map.bin"
+HolidayTV_3_map.bin:
+    INCBIN "data/maps/HolidayTV/HolidayTV_3/HolidayTV_3_map.bin"
+MarsupialMadness_1_map.bin:
+    INCBIN "data/maps/MarsupialMadness/MarsupialMadness_1/MarsupialMadness_1_map.bin"
+WWGexWrestling_1_map.bin:
+    INCBIN "data/maps/WWGexWrestling/WWGexWrestling_1/WWGexWrestling_1_map.bin"
+
 SECTION "bank36", ROMX[$4000], BANK[$36]
-INCBIN "data/map_collision/bank_036.bin"
+HolidayTV_1_collision.bin:
+    INCBIN "data/maps/HolidayTV/HolidayTV_1/HolidayTV_1_collision.bin"
+HolidayTV_3_collision.bin:
+    INCBIN "data/maps/HolidayTV/HolidayTV_3/HolidayTV_3_collision.bin"
+MarsupialMadness_1_collision.bin:
+    INCBIN "data/maps/MarsupialMadness/MarsupialMadness_1/MarsupialMadness_1_collision.bin"
+WWGexWrestling_1_collision.bin:
+    INCBIN "data/maps/WWGexWrestling/WWGexWrestling_1/WWGexWrestling_1_collision.bin"
+
 SECTION "bank37", ROMX[$4000], BANK[$37]
-INCBIN "data/maps_extended/bank_037.bin"
+AnimeChannel_1_extended.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_1/AnimeChannel_1_extended.bin"
+AnimeChannel_2_extended.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_2/AnimeChannel_2_extended.bin"
+AnimeChannel_3_extended.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_3/AnimeChannel_3_extended.bin"
+AnimeChannel_4_extended.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_4/AnimeChannel_4_extended.bin"
+AnimeChannel_5_extended.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_5/AnimeChannel_5_extended.bin"
+AnimeChannel_6_extended.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_6/AnimeChannel_6_extended.bin"
+LizardOfOz_1_extended.bin:
+    INCBIN "data/maps/LizardOfOz/LizardOfOz_1/LizardOfOz_1_extended.bin"
+
 SECTION "bank38", ROMX[$4000], BANK[$38]
-INCBIN "data/maps/bank_038.bin"
+AnimeChannel_1_map.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_1/AnimeChannel_1_map.bin"
+AnimeChannel_2_map.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_2/AnimeChannel_2_map.bin"
+AnimeChannel_3_map.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_3/AnimeChannel_3_map.bin"
+AnimeChannel_4_map.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_4/AnimeChannel_4_map.bin"
+AnimeChannel_5_map.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_5/AnimeChannel_5_map.bin"
+AnimeChannel_6_map.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_6/AnimeChannel_6_map.bin"
+LizardOfOz_1_map.bin:
+    INCBIN "data/maps/LizardOfOz/LizardOfOz_1/LizardOfOz_1_map.bin"
+
 SECTION "bank39", ROMX[$4000], BANK[$39]
-INCBIN "data/map_collision/bank_039.bin"
+AnimeChannel_1_collision.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_1/AnimeChannel_1_collision.bin"
+AnimeChannel_2_collision.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_2/AnimeChannel_2_collision.bin"
+AnimeChannel_3_collision.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_3/AnimeChannel_3_collision.bin"
+AnimeChannel_4_collision.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_4/AnimeChannel_4_collision.bin"
+AnimeChannel_5_collision.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_5/AnimeChannel_5_collision.bin"
+AnimeChannel_6_collision.bin:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_6/AnimeChannel_6_collision.bin"
+LizardOfOz_1_collision.bin:
+    INCBIN "data/maps/LizardOfOz/LizardOfOz_1/LizardOfOz_1_collision.bin"
+
 SECTION "bank3a", ROMX[$4000], BANK[$3a]
-INCBIN "data/maps_extended/bank_03a.bin"
+SuperheroShow_2_extended.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_2/SuperheroShow_2_extended.bin"
+GextremeSports_1_extended.bin:
+    INCBIN "data/maps/GextremeSports/GextremeSports_1/GextremeSports_1_extended.bin"
+
 SECTION "bank3b", ROMX[$4000], BANK[$3b]
-INCBIN "data/maps/bank_03b.bin"
+SuperheroShow_2_map.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_2/SuperheroShow_2_map.bin"
+GextremeSports_1_map.bin:
+    INCBIN "data/maps/GextremeSports/GextremeSports_1/GextremeSports_1_map.bin"
+
 SECTION "bank3c", ROMX[$4000], BANK[$3c]
-INCBIN "data/map_collision/bank_03c.bin"
+SuperheroShow_2_collision.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_2/SuperheroShow_2_collision.bin"
+GextremeSports_1_collision.bin:
+    INCBIN "data/maps/GextremeSports/GextremeSports_1/GextremeSports_1_collision.bin"
+
 SECTION "bank3d", ROMX[$4000], BANK[$3d]
-INCBIN "data/maps_extended/bank_03d.bin"
+SuperheroShow_1_extended.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_1/SuperheroShow_1_extended.bin"
+SuperheroShow_3_extended.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_3/SuperheroShow_3_extended.bin"
+SuperheroShow_4_extended.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_4/SuperheroShow_4_extended.bin"
+SuperheroShow_5_extended.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_5/SuperheroShow_5_extended.bin"
+SuperheroShow_6_extended.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_6/SuperheroShow_6_extended.bin"
+GexCave_1_extended.bin:
+    INCBIN "data/maps/GexCave/GexCave_1/GexCave_1_extended.bin"
+GexCave_2_extended.bin:
+    INCBIN "data/maps/GexCave/GexCave_2/GexCave_2_extended.bin"
+GexCave_3_extended.bin:
+    INCBIN "data/maps/GexCave/GexCave_3/GexCave_3_extended.bin"
+GexCave_4_extended.bin:
+    INCBIN "data/maps/GexCave/GexCave_4/GexCave_4_extended.bin"
+
 SECTION "bank3e", ROMX[$4000], BANK[$3e]
-INCBIN "data/maps/bank_03e.bin"
+SuperheroShow_1_map.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_1/SuperheroShow_1_map.bin"
+SuperheroShow_3_map.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_3/SuperheroShow_3_map.bin"
+SuperheroShow_4_map.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_4/SuperheroShow_4_map.bin"
+SuperheroShow_5_map.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_5/SuperheroShow_5_map.bin"
+SuperheroShow_6_map.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_6/SuperheroShow_6_map.bin"
+GexCave_1_map.bin:
+    INCBIN "data/maps/GexCave/GexCave_1/GexCave_1_map.bin"
+GexCave_2_map.bin:
+    INCBIN "data/maps/GexCave/GexCave_2/GexCave_2_map.bin"
+GexCave_3_map.bin:
+    INCBIN "data/maps/GexCave/GexCave_3/GexCave_3_map.bin"
+GexCave_4_map.bin:
+    INCBIN "data/maps/GexCave/GexCave_4/GexCave_4_map.bin"
+
 SECTION "bank3f", ROMX[$4000], BANK[$3f]
-INCBIN "data/map_collision/bank_03f.bin"
+SuperheroShow_1_collision.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_1/SuperheroShow_1_collision.bin"
+SuperheroShow_3_collision.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_3/SuperheroShow_3_collision.bin"
+SuperheroShow_4_collision.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_4/SuperheroShow_4_collision.bin"
+SuperheroShow_5_collision.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_5/SuperheroShow_5_collision.bin"
+SuperheroShow_6_collision.bin:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_6/SuperheroShow_6_collision.bin"
+GexCave_1_collision.bin:
+    INCBIN "data/maps/GexCave/GexCave_1/GexCave_1_collision.bin"
+GexCave_2_collision.bin:
+    INCBIN "data/maps/GexCave/GexCave_2/GexCave_2_collision.bin"
+GexCave_3_collision.bin:
+    INCBIN "data/maps/GexCave/GexCave_3/GexCave_3_collision.bin"
+GexCave_4_collision.bin:
+    INCBIN "data/maps/GexCave/GexCave_4/GexCave_4_collision.bin"
 
 SECTION "bank40", ROMX[$4000], BANK[$40]
 INCBIN ".gfx/tilesets/tileset_040.bin"

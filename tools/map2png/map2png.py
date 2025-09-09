@@ -216,10 +216,16 @@ if split_map_data:
             out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_blockset.bin', "wb")
             out.write(blockset_data)
             out.close()
+            out2 = open('extracted_map_data/blocksets.txt', "a")
+            out2.write(level_name+'_'+channel_map_number+'_blockset.bin:\n    INCBIN \"data/maps/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_blockset.bin\"\n')
+            out2.close()
 
-            out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'.bin', "wb")
+            out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_map.bin', "wb")
             out.write(map_data)
             out.close()
+            out2 = open('extracted_map_data/maps.txt', "a")
+            out2.write(level_name+'_'+channel_map_number+'_map.bin:\n    INCBIN \"data/maps/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_map.bin\"\n')
+            out2.close()
 
             extended_map_file = "../banks/bank_0"+f"{level_data[EXTENDED_MAP_BANK]:x}"+".bin"
             extended_map_data = open(extended_map_file, "rb").read()[level_data[EXTENDED_MAP_BANK_OFFSET]-0x4000:offset-0x4000+width*height]
