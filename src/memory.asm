@@ -22,9 +22,12 @@ wCF80:
     ds 64                                              ;; cf80
 
 wCFC0:
-    ds 320                                             ;; cfc0
+    ds 192                                            ;; cfc0
 
-wD100:
+wD080: ; Collectible Map numbers
+    ds 128
+
+wD100: ; Collectible X and Y coordinates. 128 bytes of X, then 128 bytes of Y. Y coords are set to FF when collected
     ds 256                                             ;; d100
 
 wD200:
@@ -42,6 +45,7 @@ wD578:
 wD579:
     ds 647                                             ;; d579
 
+; From D800 to D900 is the loaded objects space
 wD800:
     ds 1                                               ;; d800
 

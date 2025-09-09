@@ -83,18 +83,34 @@ DEF Input_Left     EQU $20
 DEF Input_Up       EQU $40
 DEF Input_Down     EQU $80
 
-; Levels
-DEF Level_GexCave                             EQU $00
-DEF Level_HolidayTV                           EQU $01
-DEF Level_MysteryTV                           EQU $02
-DEF Level_TutTV                               EQU $03
-DEF Level_WesternStation                      EQU $04
-DEF Level_AnimeChannel                        EQU $05
-DEF Level_SuperheroShow                       EQU $06
-DEF Level_GextremeSports                      EQU $07
-DEF Level_MarsupialMadness                    EQU $08
-DEF Level_WWGexWrestling                      EQU $09
-DEF Level_LizardOfOz                          EQU $0A
-DEF Level_ChannelZ                            EQU $0B
-DEF Level_GexCave2                            EQU $0C
-; every other value counts as gex cave
+; Maps
+DEF Map_GexCave1                             EQU $00
+DEF Map_HolidayTV1                           EQU $01
+DEF Map_MysteryTV1                           EQU $02
+DEF Map_TutTV1                               EQU $03
+DEF Map_WesternStation1                      EQU $04
+DEF Map_AnimeChannel1                        EQU $05
+DEF Map_SuperheroShow1                       EQU $06
+DEF Map_GextremeSports1                      EQU $07
+DEF Map_MarsupialMadness1                    EQU $08
+DEF Map_WWGexWrestling1                      EQU $09
+DEF Map_LizardOfOz1                          EQU $0A
+DEF Map_ChannelZ1                            EQU $0B
+DEF Map_GexCave2                             EQU $0C
+DEF Map_GexCave3                             EQU $0D
+DEF Map_GexCave4                             EQU $0E
+DEF Map_HolidayTV2                           EQU $0F
+DEF Map_HolidayTV3                           EQU $10
+DEF Map_HolidayTV4                           EQU $11
+DEF Map_MysteryTV2                           EQU $12
+DEF Map_MysteryTV3                           EQU $13
+DEF Map_MysteryTV4                           EQU $14
+DEF Map_MysteryTV5                           EQU $15
+DEF Map_MysteryTV6                           EQU $16
+DEF Map_MysteryTV7                           EQU $17
+DEF Map_MysteryTV8                           EQU $18
+DEF Map_MysteryTV9                           EQU $19
+DEF Map_MysteryTV10                          EQU $1A
+
+; Objects
+DEF Object_Gex                              EQU $00
