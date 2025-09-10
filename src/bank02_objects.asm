@@ -3426,6 +3426,7 @@ call_02_72ac:
     ld   [HL], C                                       ;; 02:72f7 $71
     jp   jp_02_72a1                                    ;; 02:72f8 $c3 $a1 $72
 
+entry_02_72fb:
 call_02_72fb:
     call call_00_10de                                  ;; 02:72fb $cd $de $10
     call call_02_7305                                  ;; 02:72fe $cd $05 $73

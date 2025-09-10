@@ -87,8 +87,8 @@ BLOCKSET_AND_PALETTE_IDS_BANK = 6
 BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET = 7
 MAP_COLLISION_BANK = 8
 MAP_COLLISION_BANK_OFFSET = 9
-PLAYER_SPAWNS_BANK = 10
-PLAYER_SPAWNS_BANK_OFFSET = 11
+COLLISION_BLOCKSET_BANK = 10
+COLLISION_BLOCKSET_BANK_OFFSET = 11
 BG_PALETTE_BANK = 12
 BG_PALETTE_BANK_OFFSET = 13
 OBJECT_LIST_BANK = 14
@@ -119,7 +119,7 @@ map_offsets = []
 tileset_offsets = []
 collectible_list_offsets = []
 object_list_offsets = []
-player_spawn_offsets = []
+collision_blockset_offsets = []
 
 for level_counter in range(0, len(level_data_pointers)):
     p = level_data_pointers[level_counter]
@@ -134,8 +134,8 @@ for level_counter in range(0, len(level_data_pointers)):
         collectible_list_offsets.append([level_data[COLLECTIBLE_LIST_BANK], level_data[COLLECTIBLE_LIST_BANK_OFFSET]])
     if [level_data[OBJECT_LIST_BANK], level_data[OBJECT_LIST_BANK_OFFSET]] not in object_list_offsets:
         object_list_offsets.append([level_data[OBJECT_LIST_BANK], level_data[OBJECT_LIST_BANK_OFFSET]])
-    if [level_data[PLAYER_SPAWNS_BANK], level_data[PLAYER_SPAWNS_BANK_OFFSET]] not in player_spawn_offsets:
-        player_spawn_offsets.append([level_data[PLAYER_SPAWNS_BANK], level_data[PLAYER_SPAWNS_BANK_OFFSET]])
+    if [level_data[COLLISION_BLOCKSET_BANK], level_data[COLLISION_BLOCKSET_BANK_OFFSET]] not in collision_blockset_offsets:
+        collision_blockset_offsets.append([level_data[COLLISION_BLOCKSET_BANK], level_data[COLLISION_BLOCKSET_BANK_OFFSET]])
 
 #print("Blockset Offsets:")
 sorted_blockset_offsets = sorted(blockset_offsets, key=lambda x: (x[0], x[1]))
@@ -163,14 +163,14 @@ sorted_object_list_offsets = sorted(object_list_offsets, key=lambda x: (x[0], x[
 #    print(f"{b[0]:0{2}x}"+": "+f"{b[1]:0{4}x}")
 
 #print("\nPlayer Spawn Offsets:")
-sorted_player_spawn_offsets = sorted(player_spawn_offsets, key=lambda x: (x[0], x[1]))
-#for b in player_spawn_offsets:
+sorted_collision_blockset_offsets = sorted(collision_blockset_offsets, key=lambda x: (x[0], x[1]))
+#for b in collision_blockset_offsets:
 #    print(f"{b[0]:0{2}x}"+": "+f"{b[1]:0{4}x}")
 
 split_map_data = False
-generate_regular_maps = True
+generate_regular_maps = False
 draw_collectibles = False
-generate_collision_maps = False
+generate_collision_maps = True
 
 if draw_collectibles:
     # set up collectible sprite
@@ -220,12 +220,12 @@ if split_map_data:
         palette_file = "../banks/bank_0"+f"{level_data[BG_PALETTE_BANK]:x}"+".bin"
         palette_data = open(palette_file, 'rb').read()[level_data[BG_PALETTE_BANK_OFFSET]-0x4000:level_data[BG_PALETTE_BANK_OFFSET]-0x4000+0x40]
 
+        level_name = level_names[level_data[LEVEL_ID]]
+        level_numbers[level_data[LEVEL_ID]] += 1
+        channel_map_number = str(level_numbers[level_data[LEVEL_ID]])
+
         if map_data not in maps:
             maps.append(map_data)
-
-            level_name = level_names[level_data[LEVEL_ID]]
-            level_numbers[level_data[LEVEL_ID]] += 1
-            channel_map_number = str(level_numbers[level_data[LEVEL_ID]])
             
             os.system('mkdir -p extracted_map_data/'+level_name)
             os.system('mkdir -p extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number)
@@ -280,11 +280,11 @@ if split_map_data:
             out.write(object_list_data)
             out.close()
 
-            player_spawn_list_file = "../banks/bank_0"+f"{level_data[PLAYER_SPAWNS_BANK]:x}"+".bin"
-            end_addr = get_next_offset(sorted_player_spawn_offsets, [level_data[PLAYER_SPAWNS_BANK], level_data[PLAYER_SPAWNS_BANK_OFFSET]])
-            player_spawn_list_data = open(player_spawn_list_file, "rb").read()[level_data[PLAYER_SPAWNS_BANK_OFFSET]-0x4000:end_addr-0x4000]
-            out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_player_spawns.bin', "wb")
-            out.write(player_spawn_list_data)
+            collision_blockset_file = "../banks/bank_0"+f"{level_data[COLLISION_BLOCKSET_BANK]:x}"+".bin"
+            end_addr = get_next_offset(sorted_collision_blockset_offsets, [level_data[COLLISION_BLOCKSET_BANK], level_data[COLLISION_BLOCKSET_BANK_OFFSET]])
+            collision_blockset_data = open(collision_blockset_file, "rb").read()[level_data[COLLISION_BLOCKSET_BANK_OFFSET]-0x4000:end_addr-0x4000]
+            out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_collision_blockset.bin', "wb")
+            out.write(collision_blockset_data)
             out.close()
 
             out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_palette.bin', "wb")
@@ -506,14 +506,14 @@ if generate_collision_maps:
         channel_map_number = level_numbers[level_data[LEVEL_ID]]
 
         # create collision blockset
-        blockset_file = "../banks/bank_0"+f"{level_data[BLOCKSET_AND_PALETTE_IDS_BANK]:x}"+".bin"
-        end_addr = get_next_offset(sorted_blockset_offsets, [level_data[BLOCKSET_AND_PALETTE_IDS_BANK], level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]])
-        blockset_data = open(blockset_file, "rb").read()[level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]-0x4000:end_addr-0x4000]
+        collision_blockset_file = "../banks/bank_0"+f"{level_data[COLLISION_BLOCKSET_BANK]:x}"+".bin"
+        end_addr = get_next_offset(sorted_collision_blockset_offsets, [level_data[COLLISION_BLOCKSET_BANK], level_data[COLLISION_BLOCKSET_BANK_OFFSET]])
+        collision_blockset_data = open(collision_blockset_file, "rb").read()[level_data[COLLISION_BLOCKSET_BANK_OFFSET]-0x4000:end_addr-0x4000]
         
         blocks = []
 
-        for i in range(0, len(blockset_data), 0x8):
-            block_data = blockset_data[i:i + 0x8]
+        for i in range(0, len(collision_blockset_data), 0x4):
+            block_data = collision_blockset_data[i:i + 0x4]
             if not block_data:
                 break
 
@@ -525,6 +525,7 @@ if generate_collision_maps:
             block_img.paste(bg_collision_tiles[block_data[2]], (0, 8)) # NEEDS FIXING
             block_img.paste(bg_collision_tiles[block_data[3]], (8, 8)) # NEEDS FIXING
             blocks.append(block_img)
+        #print(len(blocks))
 
         # build map from map data and blockset
         width = level_data[MAP_WIDTH]
@@ -546,6 +547,7 @@ if generate_collision_maps:
             for x in range(0, width):
                 #draw.rectangle(((x*16,y*16), ((x+1)*16,(y+1)*16)), map_data[count],3)
                 
+                #print(count)
                 img.paste(blocks[map_collision_data[count]], (x*16, y*16))
                 
                 count = count+1
@@ -554,4 +556,4 @@ if generate_collision_maps:
 
         print("completed: "+level_name+"/"+level_name+"_"+f"{channel_map_number:0{2}}"+"_map.png")
 
-        break # just do first one for testing
+        #break # just do first one for testing

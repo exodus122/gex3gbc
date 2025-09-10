@@ -1955,7 +1955,7 @@ call_00_0ff5:
 call_00_1056_LoadMap:
     call call_00_0e3b                                  ;; 00:1056 $cd $3b $0e
     call call_00_0e62                                  ;; 00:1059 $cd $62 $0e
-    call call_00_10c7                                  ;; 00:105c $cd $c7 $10
+    call call_00_10c7_InitRowOffsetTableForMap                                  ;; 00:105c $cd $c7 $10
     ld   C, $00                                        ;; 00:105f $0e $00
     ld   [wDAD6_ReturnBank], A                                    ;; 00:1061 $ea $d6 $da
     ld   A, $03                                        ;; 00:1064 $3e $03
@@ -1981,7 +1981,7 @@ call_00_1056_LoadMap:
     call call_00_1a22_LoadBgMapInitial                                  ;; 00:1096 $cd $22 $1a
     ld   A, $03                                        ;; 00:1099 $3e $03
     call call_00_0eee_SwitchBank                                  ;; 00:109b $cd $ee $0e
-    ld   HL, $4100                                     ;; 00:109e $21 $00 $41
+    ld   HL, data_03_4100_bg_collision_tileset                                     ;; 00:109e $21 $00 $41
     ld   DE, wC400                                     ;; 00:10a1 $11 $00 $c4
 .jr_00_10a4:
     push DE                                            ;; 00:10a4 $d5
@@ -1999,17 +1999,17 @@ call_00_1056_LoadMap:
     call call_00_0b92_UpdateVRAMTiles                                  ;; 00:10b4 $cd $92 $0b
     ld   [wDAD6_ReturnBank], A                                    ;; 00:10b7 $ea $d6 $da
     ld   A, $02                                        ;; 00:10ba $3e $02
-    ld   HL, $72fb                                     ;; 00:10bc $21 $fb $72
+    ld   HL, entry_02_72fb                                     ;; 00:10bc $21 $fb $72
     call call_00_0edd_CallAltBankFunc                                  ;; 00:10bf $cd $dd $0e
     xor  A, A                                          ;; 00:10c2 $af
     ld   [wDC20], A                                    ;; 00:10c3 $ea $20 $dc
     ret                                                ;; 00:10c6 $c9
 
-call_00_10c7:
+call_00_10c7_InitRowOffsetTableForMap:
     ld   HL, wDC1C_CurrentMapWidthAndHeightInBlocks                                     ;; 00:10c7 $21 $1c $dc
     ld   C, [HL]                                       ;; 00:10ca $4e
     ld   B, $00                                        ;; 00:10cb $06 $00
-    ld   DE, wCD00                                     ;; 00:10cd $11 $00 $cd
+    ld   DE, wCD00_RowOffsetTableForMap                                     ;; 00:10cd $11 $00 $cd
     ld   HL, $00                                       ;; 00:10d0 $21 $00 $00
 .jr_00_10d3:
     ld   A, L                                          ;; 00:10d3 $7d
@@ -2392,7 +2392,7 @@ call_00_11e5_LoadBgMapVertical:
     dec  A                                             ;; 00:130f $3d
     jr   NZ, .jr_00_12ef                               ;; 00:1310 $20 $dd
     call call_00_0f08_SwitchBank2                                  ;; 00:1312 $cd $08 $0f
-    ld   A, [wDC10_PlayerSpawnsBank]                                    ;; 00:1315 $fa $10 $dc
+    ld   A, [wDC10_CollisionBlockset]                                    ;; 00:1315 $fa $10 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:1318 $cd $ee $0e
     ld   HL, wDC22                                     ;; 00:131b $21 $22 $dc
     ld   A, [HL-]                                      ;; 00:131e $3a
@@ -2401,10 +2401,10 @@ call_00_11e5_LoadBgMapVertical:
     add  A, $c0                                        ;; 00:1322 $c6 $c0
     ld   D, A                                          ;; 00:1324 $57
     pop  BC                                            ;; 00:1325 $c1
-    ld   A, [wDC11_PlayerSpawnsBankOffset]                                    ;; 00:1326 $fa $11 $dc
+    ld   A, [wDC11_CollisionBlocksetOffset]                                    ;; 00:1326 $fa $11 $dc
     add  A, C                                          ;; 00:1329 $81
     ld   C, A                                          ;; 00:132a $4f
-    ld   A, [wDC12_PlayerSpawnsBankOffset]                                    ;; 00:132b $fa $12 $dc
+    ld   A, [wDC12_CollisionBlocksetOffset]                                    ;; 00:132b $fa $12 $dc
     adc  A, B                                          ;; 00:132e $88
     ld   B, A                                          ;; 00:132f $47
     ld   A, $0b                                        ;; 00:1330 $3e $0b
@@ -2657,7 +2657,7 @@ call_00_1351_LoadBgMapHorizontal:
     dec  A                                             ;; 00:1499 $3d
     jr   NZ, .jr_00_1478                               ;; 00:149a $20 $dc
     call call_00_0f08_SwitchBank2                                  ;; 00:149c $cd $08 $0f
-    ld   A, [wDC10_PlayerSpawnsBank]                                    ;; 00:149f $fa $10 $dc
+    ld   A, [wDC10_CollisionBlockset]                                    ;; 00:149f $fa $10 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:14a2 $cd $ee $0e
     ld   HL, wDC24                                     ;; 00:14a5 $21 $24 $dc
     ld   A, [HL-]                                      ;; 00:14a8 $3a
@@ -2666,10 +2666,10 @@ call_00_1351_LoadBgMapHorizontal:
     add  A, $c0                                        ;; 00:14ac $c6 $c0
     ld   D, A                                          ;; 00:14ae $57
     pop  BC                                            ;; 00:14af $c1
-    ld   A, [wDC11_PlayerSpawnsBankOffset]                                    ;; 00:14b0 $fa $11 $dc
+    ld   A, [wDC11_CollisionBlocksetOffset]                                    ;; 00:14b0 $fa $11 $dc
     add  A, C                                          ;; 00:14b3 $81
     ld   C, A                                          ;; 00:14b4 $4f
-    ld   A, [wDC12_PlayerSpawnsBankOffset]                                    ;; 00:14b5 $fa $12 $dc
+    ld   A, [wDC12_CollisionBlocksetOffset]                                    ;; 00:14b5 $fa $12 $dc
     adc  A, B                                          ;; 00:14b8 $88
     ld   B, A                                          ;; 00:14b9 $47
     ld   A, $0b                                        ;; 00:14ba $3e $0b
@@ -3209,7 +3209,7 @@ call_00_1a46_LoadBgMapInitial2:
     dec  B                                             ;; 00:1b6f $05
     jr   NZ, .jr_00_1b69                               ;; 00:1b70 $20 $f7
     call call_00_0f08_SwitchBank2                                  ;; 00:1b72 $cd $08 $0f
-    ld   A, [wDC10_PlayerSpawnsBank]                                    ;; 00:1b75 $fa $10 $dc
+    ld   A, [wDC10_CollisionBlockset]                                    ;; 00:1b75 $fa $10 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:1b78 $cd $ee $0e
     ld   HL, wDC22                                     ;; 00:1b7b $21 $22 $dc
     ld   A, [HL-]                                      ;; 00:1b7e $3a
@@ -3221,10 +3221,10 @@ call_00_1a46_LoadBgMapInitial2:
     ld   L, [HL]                                       ;; 00:1b88 $6e
     ld   H, $cf                                        ;; 00:1b89 $26 $cf
     pop  DE                                            ;; 00:1b8b $d1
-    ld   A, [wDC11_PlayerSpawnsBankOffset]                                    ;; 00:1b8c $fa $11 $dc
+    ld   A, [wDC11_CollisionBlocksetOffset]                                    ;; 00:1b8c $fa $11 $dc
     add  A, E                                          ;; 00:1b8f $83
     ld   E, A                                          ;; 00:1b90 $5f
-    ld   A, [wDC12_PlayerSpawnsBankOffset]                                    ;; 00:1b91 $fa $12 $dc
+    ld   A, [wDC12_CollisionBlocksetOffset]                                    ;; 00:1b91 $fa $12 $dc
     adc  A, D                                          ;; 00:1b94 $8a
     ld   D, A                                          ;; 00:1b95 $57
     ld   A, $0b                                        ;; 00:1b96 $3e $0b

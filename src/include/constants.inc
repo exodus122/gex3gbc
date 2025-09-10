@@ -30,7 +30,7 @@ DEF Bank1f                    EQU $1f
 DEF Bank20                    EQU $20 ; unused
 DEF Bank21_BgPalettesAndCollectibleLists EQU $21 ; bg palette data, and collectible lists for each map
 DEF Bank22_ObjectSpawnLists   EQU $22 ; object spawn lists for each map
-DEF Bank23_PlayerSpawns       EQU $23 ; where to spawn gex in each map
+DEF Bank23_CollisionBlocksets EQU $23
 DEF Bank24_BlocksetData       EQU $24
 DEF Bank25_BlocksetData       EQU $25
 DEF Bank26_BlocksetData       EQU $26

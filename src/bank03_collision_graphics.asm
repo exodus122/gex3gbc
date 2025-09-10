@@ -1,7 +1,8 @@
 SECTION "bank03", ROMX[$4000], BANK[$03]
 
-data_03_4000:
+data_03_4000_bg_collision_tileset_flags:
     INCBIN "data/bg_collision_tileset_flags.bin"       ; the flags determine which tiles are walls, ceilings, or kill tiles
+data_03_4100_bg_collision_tileset:
     INCBIN "data/bg_collision_tileset.bin"
 
 data_03_4400:

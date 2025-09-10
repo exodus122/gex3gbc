@@ -3,13 +3,14 @@ SECTION "wram0", WRAM0[$c000]
 wC000_BgMapTileIds:
     ds 1024                                            ;; c000
 
-wC400:
+wC400: ; C400-CC00 is a copy of 03:4100-03:48FF but in a different order
+; that is the collision tileset data, collectible sprites, and number sprites, and some code
     ds 1408                                            ;; c400
 
-wC980:
+wC980: ; this is a probably the start of the number sprites from bank 3
     ds 896                                             ;; c980
 
-wCD00:
+wCD00_RowOffsetTableForMap:
     ds 512                                             ;; cd00
 
 wCF00: ; where block ids from the map data get written temporarily. also where the extended map data is handled
@@ -622,13 +623,13 @@ wDC0D_MapCollisionBank:
 wDC0E_MapCollisionBankOffset:
     ds 2                                               ;; dc0e
 
-wDC10_PlayerSpawnsBank:
+wDC10_CollisionBlockset:
     ds 1                                               ;; dc10
 
-wDC11_PlayerSpawnsBankOffset:
+wDC11_CollisionBlocksetOffset:
     ds 1                                               ;; dc11
 
-wDC12_PlayerSpawnsBankOffset:
+wDC12_CollisionBlocksetOffset:
     ds 1                                               ;; dc12
 
 wDC13_BgPaletteBank:

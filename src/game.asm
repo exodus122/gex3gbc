@@ -241,7 +241,7 @@ ChannelZ_object_list.bin:
     INCBIN "data/maps/ChannelZ/ChannelZ_object_list.bin"
 
 SECTION "bank23", ROMX[$4000], BANK[$23]
-INCBIN "data/bank_023_player_spawns.bin"
+INCBIN "data/bank_023_collision_blocksets.bin"
 
 SECTION "bank24", ROMX[$4000], BANK[$24]
 MysteryTV_1_blockset.bin:
@@ -252,14 +252,14 @@ MysteryTV_3_blockset.bin:
     INCBIN "data/maps/MysteryTV/MysteryTV_3/MysteryTV_3_blockset.bin"
 MysteryTV_4_blockset.bin:
     INCBIN "data/maps/MysteryTV/MysteryTV_4/MysteryTV_4_blockset.bin"
-MysteryTV_5_blockset.bin:
-    INCBIN "data/maps/MysteryTV/MysteryTV_5/MysteryTV_5_blockset.bin"
-MysteryTV_6_blockset.bin:
-    INCBIN "data/maps/MysteryTV/MysteryTV_6/MysteryTV_6_blockset.bin"
+MysteryTV_7_blockset.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_7/MysteryTV_7_blockset.bin"
+MysteryTV_8_blockset.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_8/MysteryTV_8_blockset.bin"
 HolidayTV_1_blockset.bin:
     INCBIN "data/maps/HolidayTV/HolidayTV_1/HolidayTV_1_blockset.bin"
-HolidayTV_3_blockset.bin:
-    INCBIN "data/maps/HolidayTV/HolidayTV_3/HolidayTV_3_blockset.bin"
+HolidayTV_4_blockset.bin:
+    INCBIN "data/maps/HolidayTV/HolidayTV_4/HolidayTV_4_blockset.bin"
 TutTV_6_blockset.bin:
     INCBIN "data/maps/TutTV/TutTV_6/TutTV_6_blockset.bin"
 
@@ -440,10 +440,10 @@ MysteryTV_3_extended.bin:
     INCBIN "data/maps/MysteryTV/MysteryTV_3/MysteryTV_3_extended.bin"
 MysteryTV_4_extended.bin:
     INCBIN "data/maps/MysteryTV/MysteryTV_4/MysteryTV_4_extended.bin"
-MysteryTV_5_extended.bin:
-    INCBIN "data/maps/MysteryTV/MysteryTV_5/MysteryTV_5_extended.bin"
-MysteryTV_6_extended.bin:
-    INCBIN "data/maps/MysteryTV/MysteryTV_6/MysteryTV_6_extended.bin"
+MysteryTV_7_extended.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_7/MysteryTV_7_extended.bin"
+MysteryTV_8_extended.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_8/MysteryTV_8_extended.bin"
 TutTV_1_extended.bin:
     INCBIN "data/maps/TutTV/TutTV_1/TutTV_1_extended.bin"
 TutTV_2_extended.bin:
@@ -470,10 +470,10 @@ MysteryTV_3_map.bin:
     INCBIN "data/maps/MysteryTV/MysteryTV_3/MysteryTV_3_map.bin"
 MysteryTV_4_map.bin:
     INCBIN "data/maps/MysteryTV/MysteryTV_4/MysteryTV_4_map.bin"
-MysteryTV_5_map.bin:
-    INCBIN "data/maps/MysteryTV/MysteryTV_5/MysteryTV_5_map.bin"
-MysteryTV_6_map.bin:
-    INCBIN "data/maps/MysteryTV/MysteryTV_6/MysteryTV_6_map.bin"
+MysteryTV_7_map.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_7/MysteryTV_7_map.bin"
+MysteryTV_8_map.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_8/MysteryTV_8_map.bin"
 TutTV_1_map.bin:
     INCBIN "data/maps/TutTV/TutTV_1/TutTV_1_map.bin"
 TutTV_2_map.bin:
@@ -500,10 +500,10 @@ MysteryTV_3_collision.bin:
     INCBIN "data/maps/MysteryTV/MysteryTV_3/MysteryTV_3_collision.bin"
 MysteryTV_4_collision.bin:
     INCBIN "data/maps/MysteryTV/MysteryTV_4/MysteryTV_4_collision.bin"
-MysteryTV_5_collision.bin:
-    INCBIN "data/maps/MysteryTV/MysteryTV_5/MysteryTV_5_collision.bin"
-MysteryTV_6_collision.bin:
-    INCBIN "data/maps/MysteryTV/MysteryTV_6/MysteryTV_6_collision.bin"
+MysteryTV_7_collision.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_7/MysteryTV_7_collision.bin"
+MysteryTV_8_collision.bin:
+    INCBIN "data/maps/MysteryTV/MysteryTV_8/MysteryTV_8_collision.bin"
 TutTV_1_collision.bin:
     INCBIN "data/maps/TutTV/TutTV_1/TutTV_1_collision.bin"
 TutTV_2_collision.bin:
@@ -524,8 +524,8 @@ HolidayTV_2_collision.bin:
 SECTION "bank34", ROMX[$4000], BANK[$34]
 HolidayTV_1_extended.bin:
     INCBIN "data/maps/HolidayTV/HolidayTV_1/HolidayTV_1_extended.bin"
-HolidayTV_3_extended.bin:
-    INCBIN "data/maps/HolidayTV/HolidayTV_3/HolidayTV_3_extended.bin"
+HolidayTV_4_extended.bin:
+    INCBIN "data/maps/HolidayTV/HolidayTV_4/HolidayTV_4_extended.bin"
 MarsupialMadness_1_extended.bin:
     INCBIN "data/maps/MarsupialMadness/MarsupialMadness_1/MarsupialMadness_1_extended.bin"
 WWGexWrestling_1_extended.bin:
@@ -534,8 +534,8 @@ WWGexWrestling_1_extended.bin:
 SECTION "bank35", ROMX[$4000], BANK[$35]
 HolidayTV_1_map.bin:
     INCBIN "data/maps/HolidayTV/HolidayTV_1/HolidayTV_1_map.bin"
-HolidayTV_3_map.bin:
-    INCBIN "data/maps/HolidayTV/HolidayTV_3/HolidayTV_3_map.bin"
+HolidayTV_4_map.bin:
+    INCBIN "data/maps/HolidayTV/HolidayTV_4/HolidayTV_4_map.bin"
 MarsupialMadness_1_map.bin:
     INCBIN "data/maps/MarsupialMadness/MarsupialMadness_1/MarsupialMadness_1_map.bin"
 WWGexWrestling_1_map.bin:
@@ -544,8 +544,8 @@ WWGexWrestling_1_map.bin:
 SECTION "bank36", ROMX[$4000], BANK[$36]
 HolidayTV_1_collision.bin:
     INCBIN "data/maps/HolidayTV/HolidayTV_1/HolidayTV_1_collision.bin"
-HolidayTV_3_collision.bin:
-    INCBIN "data/maps/HolidayTV/HolidayTV_3/HolidayTV_3_collision.bin"
+HolidayTV_4_collision.bin:
+    INCBIN "data/maps/HolidayTV/HolidayTV_4/HolidayTV_4_collision.bin"
 MarsupialMadness_1_collision.bin:
     INCBIN "data/maps/MarsupialMadness/MarsupialMadness_1/MarsupialMadness_1_collision.bin"
 WWGexWrestling_1_collision.bin:
