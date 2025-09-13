@@ -137,7 +137,7 @@ entry:
     ld   [HL], D                                       ;; 00:0208 $72
     ld   [wDAD5], A                                    ;; 00:0209 $ea $d5 $da
     ld   [DE], A                                       ;; 00:020c $12
-    call call_00_0f25                                  ;; 00:020d $cd $25 $0f
+    call call_00_0f25_AltSwitchBank                                  ;; 00:020d $cd $25 $0f
     ld   HL, rKEY1                                     ;; 00:0210 $21 $4d $ff
     bit  7, [HL]                                       ;; 00:0213 $cb $7e
     jr   NZ, .jr_00_0224                               ;; 00:0215 $20 $0d
@@ -258,19 +258,19 @@ entry:
     jr   Z, .jr_00_0326                                ;; 00:0319 $28 $0b
     ld   [wDAD6_ReturnBank], A                                    ;; 00:031b $ea $d6 $da
     ld   A, $01                                        ;; 00:031e $3e $01
-    ld   HL, $435e                                     ;; 00:0320 $21 $5e $43
+    ld   HL, entry_01_435e                                     ;; 00:0320 $21 $5e $43
     call call_00_0edd_CallAltBankFunc                                  ;; 00:0323 $cd $dd $0e
 .jr_00_0326:
     ld   [wDAD6_ReturnBank], A                                    ;; 00:0326 $ea $d6 $da
     ld   A, $03                                        ;; 00:0329 $3e $03
-    ld   HL, call_03_6c89_CopyLevelData                              ;; 00:032b $21 $89 $6c
+    ld   HL, entry_03_6c89_CopyLevelData                              ;; 00:032b $21 $89 $6c
     call call_00_0edd_CallAltBankFunc                                  ;; 00:032e $cd $dd $0e
     ld   A, [wDC4F]                                    ;; 00:0331 $fa $4f $dc
     add  A, $04                                        ;; 00:0334 $c6 $04
     ld   [wDC50], A                                    ;; 00:0336 $ea $50 $dc
     ld   [wDAD6_ReturnBank], A                                    ;; 00:0339 $ea $d6 $da
     ld   A, $01                                        ;; 00:033c $3e $01
-    ld   HL, $432b                                     ;; 00:033e $21 $2b $43
+    ld   HL, entry_01_432b                                     ;; 00:033e $21 $2b $43
     call call_00_0edd_CallAltBankFunc                                  ;; 00:0341 $cd $dd $0e
     call call_00_0e3b                                  ;; 00:0344 $cd $3b $0e
     call call_00_2f85                                  ;; 00:0347 $cd $85 $2f
@@ -284,7 +284,7 @@ entry:
     ld   [wDB6C_CurrentLevelId], A                                    ;; 00:035a $ea $6c $db
     ld   [wDAD6_ReturnBank], A                                    ;; 00:035d $ea $d6 $da
     ld   A, $03                                        ;; 00:0360 $3e $03
-    ld   HL, call_03_6c89_CopyLevelData                              ;; 00:0362 $21 $89 $6c
+    ld   HL, entry_03_6c89_CopyLevelData                              ;; 00:0362 $21 $89 $6c
     call call_00_0edd_CallAltBankFunc                                  ;; 00:0365 $cd $dd $0e
     xor  A, A                                          ;; 00:0368 $af
     ld   [wDC51], A                                    ;; 00:0369 $ea $51 $dc
@@ -303,7 +303,7 @@ entry:
 .jp_00_038e:
     ld   [wDAD6_ReturnBank], A                                    ;; 00:038e $ea $d6 $da
     ld   A, $03                                        ;; 00:0391 $3e $03
-    ld   HL, call_03_6c89_CopyLevelData                              ;; 00:0393 $21 $89 $6c
+    ld   HL, entry_03_6c89_CopyLevelData                              ;; 00:0393 $21 $89 $6c
     call call_00_0edd_CallAltBankFunc                                  ;; 00:0396 $cd $dd $0e
     ld   A, [wDC1E_CurrentLevelNumberFromMap]                                    ;; 00:0399 $fa $1e $dc
     cp   A, $07                                        ;; 00:039c $fe $07
@@ -352,12 +352,12 @@ entry:
     call call_00_04fb                                  ;; 00:03f4 $cd $fb $04
     ld   [wDAD6_ReturnBank], A                                    ;; 00:03f7 $ea $d6 $da
     ld   A, $03                                        ;; 00:03fa $3e $03
-    ld   HL, $647c                                     ;; 00:03fc $21 $7c $64
+    ld   HL, entry_03_647c                                     ;; 00:03fc $21 $7c $64
     call call_00_0edd_CallAltBankFunc                                  ;; 00:03ff $cd $dd $0e
     call call_00_1056_LoadMap                                  ;; 00:0402 $cd $56 $10
     ld   [wDAD6_ReturnBank], A                                    ;; 00:0405 $ea $d6 $da
     ld   A, $02                                        ;; 00:0408 $3e $02
-    ld   HL, $708f                                     ;; 00:040a $21 $8f $70
+    ld   HL, entry_02_708f                                     ;; 00:040a $21 $8f $70
     call call_00_0edd_CallAltBankFunc                                  ;; 00:040d $cd $dd $0e
     call call_00_0513                                  ;; 00:0410 $cd $13 $05
     xor  A, A                                          ;; 00:0413 $af
@@ -372,11 +372,11 @@ entry:
     call call_00_1056_LoadMap                                  ;; 00:0427 $cd $56 $10
     ld   [wDAD6_ReturnBank], A                                    ;; 00:042a $ea $d6 $da
     ld   A, $02                                        ;; 00:042d $3e $02
-    ld   HL, $7142                                     ;; 00:042f $21 $42 $71
+    ld   HL, entry_02_7142                                     ;; 00:042f $21 $42 $71
     call call_00_0edd_CallAltBankFunc                                  ;; 00:0432 $cd $dd $0e
     ld   [wDAD6_ReturnBank], A                                    ;; 00:0435 $ea $d6 $da
     ld   A, $03                                        ;; 00:0438 $3e $03
-    ld   HL, $68d9                                     ;; 00:043a $21 $d9 $68
+    ld   HL, entry_03_68d9                                     ;; 00:043a $21 $d9 $68
     call call_00_0edd_CallAltBankFunc                                  ;; 00:043d $cd $dd $0e
     call call_00_0513                                  ;; 00:0440 $cd $13 $05
 .jp_00_0443:
@@ -402,7 +402,7 @@ entry:
     jp   NZ, .jp_00_0357                               ;; 00:0471 $c2 $57 $03
     ld   [wDAD6_ReturnBank], A                                    ;; 00:0474 $ea $d6 $da
     ld   A, $01                                        ;; 00:0477 $3e $01
-    ld   HL, $42fd                                     ;; 00:0479 $21 $fd $42
+    ld   HL, entry_01_42fd                                     ;; 00:0479 $21 $fd $42
     call call_00_0edd_CallAltBankFunc                                  ;; 00:047c $cd $dd $0e
     cp   A, $40                                        ;; 00:047f $fe $40
     jp   Z, .jp_00_02cc                                ;; 00:0481 $ca $cc $02
@@ -410,7 +410,7 @@ entry:
 .jr_00_0487:
     ld   [wDAD6_ReturnBank], A                                    ;; 00:0487 $ea $d6 $da
     ld   A, $02                                        ;; 00:048a $3e $02
-    ld   HL, $5541                                     ;; 00:048c $21 $41 $55
+    ld   HL, entry_02_5541                                     ;; 00:048c $21 $41 $55
     call call_00_0edd_CallAltBankFunc                                  ;; 00:048f $cd $dd $0e
     and  A, $08                                        ;; 00:0492 $e6 $08
     jr   NZ, .jr_00_04d8                               ;; 00:0494 $20 $42
@@ -422,7 +422,7 @@ entry:
     call call_00_0fd7                                  ;; 00:04a2 $cd $d7 $0f
     ld   [wDAD6_ReturnBank], A                                    ;; 00:04a5 $ea $d6 $da
     ld   A, $02                                        ;; 00:04a8 $3e $02
-    ld   HL, $7132                                     ;; 00:04aa $21 $32 $71
+    ld   HL, entry_02_7132                                     ;; 00:04aa $21 $32 $71
     call call_00_0edd_CallAltBankFunc                                  ;; 00:04ad $cd $dd $0e
     ld   A, [wDC1E_CurrentLevelNumberFromMap]                                    ;; 00:04b0 $fa $1e $dc
     and  A, A                                          ;; 00:04b3 $a7
@@ -480,7 +480,7 @@ call_00_0513:
     ld   HL, $403d                                     ;; 00:0523 $21 $3d $40
     add  HL, DE                                        ;; 00:0526 $19
     ld   A, [HL+]                                      ;; 00:0527 $2a
-    ld   [wDABF_CurrentGexSpriteBank], A                                    ;; 00:0528 $ea $bf $da
+    ld   [wDABF_UnkBank], A                                    ;; 00:0528 $ea $bf $da
     ld   A, [HL+]                                      ;; 00:052b $2a
     ld   H, [HL]                                       ;; 00:052c $66
     ld   L, A                                          ;; 00:052d $6f
@@ -496,11 +496,11 @@ call_00_0513:
     ld   H, [HL]                                       ;; 00:053a $66
     ld   L, A                                          ;; 00:053b $6f
     push HL                                            ;; 00:053c $e5
-    ld   A, [wDABF_CurrentGexSpriteBank]                                    ;; 00:053d $fa $bf $da
+    ld   A, [wDABF_UnkBank]                                    ;; 00:053d $fa $bf $da
     add  A, C                                          ;; 00:0540 $81
-    ld   [wDABF_CurrentGexSpriteBank], A                                    ;; 00:0541 $ea $bf $da
+    ld   [wDABF_UnkBank], A                                    ;; 00:0541 $ea $bf $da
     call call_00_0f08_SwitchBank2                                  ;; 00:0544 $cd $08 $0f
-    ld   A, [wDABF_CurrentGexSpriteBank]                                    ;; 00:0547 $fa $bf $da
+    ld   A, [wDABF_UnkBank]                                    ;; 00:0547 $fa $bf $da
     call call_00_0eee_SwitchBank                                  ;; 00:054a $cd $ee $0e
     pop  HL                                            ;; 00:054d $e1
     ld   A, [HL+]                                      ;; 00:054e $2a
@@ -529,7 +529,7 @@ call_00_0513:
     jr   NZ, .jr_00_056e                               ;; 00:0580 $20 $ec
     ld   [wDAD6_ReturnBank], A                                    ;; 00:0582 $ea $d6 $da
     ld   A, $03                                        ;; 00:0585 $3e $03
-    ld   HL, $5ec1                                     ;; 00:0587 $21 $c1 $5e
+    ld   HL, entry_03_5ec1                                     ;; 00:0587 $21 $c1 $5e
     call call_00_0edd_CallAltBankFunc                                  ;; 00:058a $cd $dd $0e
     ld   A, $01                                        ;; 00:058d $3e $01
     ld   [wDD6A], A                                    ;; 00:058f $ea $6a $dd
@@ -608,7 +608,7 @@ call_00_05fd:
     ld   A, $08                                        ;; 00:0616 $3e $08
     ld   [wDAD6_ReturnBank], A                                    ;; 00:0618 $ea $d6 $da
     ld   A, $02                                        ;; 00:061b $3e $02
-    ld   HL, $54f9                                     ;; 00:061d $21 $f9 $54
+    ld   HL, entry_02_54f9                                     ;; 00:061d $21 $f9 $54
     call call_00_0edd_CallAltBankFunc                                  ;; 00:0620 $cd $dd $0e
     ret                                                ;; 00:0623 $c9
     db   $21, $51, $dc, $4e, $77, $79, $fe, $03        ;; 00:0624 ????????
@@ -642,7 +642,7 @@ jp_00_0693:
 .jr_00_06ae:
     ld   [wDAD6_ReturnBank], A                                    ;; 00:06ae $ea $d6 $da
     ld   A, $02                                        ;; 00:06b1 $3e $02
-    ld   HL, $54f9                                     ;; 00:06b3 $21 $f9 $54
+    ld   HL, entry_02_54f9                                     ;; 00:06b3 $21 $f9 $54
     call call_00_0edd_CallAltBankFunc                                  ;; 00:06b6 $cd $dd $0e
     ret                                                ;; 00:06b9 $c9
 .jr_00_06ba:
@@ -658,7 +658,7 @@ jp_00_0693:
 .jr_00_06ce:
     ld   [wDAD6_ReturnBank], A                                    ;; 00:06ce $ea $d6 $da
     ld   A, $02                                        ;; 00:06d1 $3e $02
-    ld   HL, data_03_54f9                             ;; 00:06d3 $21 $f9 $54
+    ld   HL, entry_02_54f9                             ;; 00:06d3 $21 $f9 $54
     call call_00_0edd_CallAltBankFunc                                  ;; 00:06d6 $cd $dd $0e
     ret                                                ;; 00:06d9 $c9
 
@@ -666,7 +666,7 @@ jp_00_06da:
     ld   A, $1b                                        ;; 00:06da $3e $1b
     ld   [wDAD6_ReturnBank], A                                    ;; 00:06dc $ea $d6 $da
     ld   A, $02                                        ;; 00:06df $3e $02
-    ld   HL, call_02_54f9                              ;; 00:06e1 $21 $f9 $54
+    ld   HL, entry_02_54f9                              ;; 00:06e1 $21 $f9 $54
     call call_00_0edd_CallAltBankFunc                                  ;; 00:06e4 $cd $dd $0e
     ret                                                ;; 00:06e7 $c9
 
@@ -674,7 +674,7 @@ jp_00_06e8:
     ld   A, $13                                        ;; 00:06e8 $3e $13
     ld   [wDAD6_ReturnBank], A                                    ;; 00:06ea $ea $d6 $da
     ld   A, $02                                        ;; 00:06ed $3e $02
-    ld   HL, $54f9                                     ;; 00:06ef $21 $f9 $54
+    ld   HL, entry_02_54f9                                     ;; 00:06ef $21 $f9 $54
     call call_00_0edd_CallAltBankFunc                                  ;; 00:06f2 $cd $dd $0e
     ret                                                ;; 00:06f5 $c9
 
@@ -1057,7 +1057,7 @@ call_00_08f8:
     ld   [wDB65], A                                    ;; 00:095a $ea $65 $db
     ld   [wDAD6_ReturnBank], A                                    ;; 00:095d $ea $d6 $da
     ld   A, $03                                        ;; 00:0960 $3e $03
-    ld   HL, $59b6                                     ;; 00:0962 $21 $b6 $59
+    ld   HL, entry_03_59b6                                     ;; 00:0962 $21 $b6 $59
     call call_00_0edd_CallAltBankFunc                                  ;; 00:0965 $cd $dd $0e
     ld   [wDB63], A                                    ;; 00:0968 $ea $63 $db
     ld   HL, wDB66                                     ;; 00:096b $21 $66 $db
@@ -1083,7 +1083,7 @@ call_00_08f8:
     push AF                                            ;; 00:09a7 $f5
     ld   [wDAD6_ReturnBank], A                                    ;; 00:09a8 $ea $d6 $da
     ld   A, $03                                        ;; 00:09ab $3e $03
-    ld   HL, $59b6                                     ;; 00:09ad $21 $b6 $59
+    ld   HL, entry_03_59b6                                     ;; 00:09ad $21 $b6 $59
     call call_00_0edd_CallAltBankFunc                                  ;; 00:09b0 $cd $dd $0e
     ld   [wDB63], A                                    ;; 00:09b3 $ea $63 $db
     ld   L, A                                          ;; 00:09b6 $6f
@@ -1242,10 +1242,10 @@ jp_00_0b25:
     inc  [HL]                                          ;; 00:0b62 $34
     ld   A, [wDE60]                                    ;; 00:0b63 $fa $60 $de
     add  A, $04                                        ;; 00:0b66 $c6 $04
-    call call_00_0f25                                  ;; 00:0b68 $cd $25 $0f
+    call call_00_0f25_AltSwitchBank                                  ;; 00:0b68 $cd $25 $0f
     call call_04_4009                                  ;; 00:0b6b $cd $09 $40
     ld   A, [wDAD5]                                    ;; 00:0b6e $fa $d5 $da
-    call call_00_0f25                                  ;; 00:0b71 $cd $25 $0f
+    call call_00_0f25_AltSwitchBank                                  ;; 00:0b71 $cd $25 $0f
     ld   A, $01                                        ;; 00:0b74 $3e $01
     ld   [wDB6B], A                                    ;; 00:0b76 $ea $6b $db
     ldh  A, [rLY]                                      ;; 00:0b79 $f0 $44
@@ -1279,7 +1279,7 @@ call_00_0b92_UpdateVRAMTiles:
 
 call_00_0b9f:
     ld   A, $03                                        ;; 00:0b9f $3e $03
-    call call_00_0f25                                  ;; 00:0ba1 $cd $25 $0f
+    call call_00_0f25_AltSwitchBank                                  ;; 00:0ba1 $cd $25 $0f
     ld   HL, wDC20                                     ;; 00:0ba4 $21 $20 $dc
     bit  7, [HL]                                       ;; 00:0ba7 $cb $7e
     jr   Z, .jr_00_0bc6                                ;; 00:0ba9 $28 $1b
@@ -1414,8 +1414,8 @@ call_00_0c6a:
     res  7, [HL]                                       ;; 00:0c81 $cb $be
     ret                                                ;; 00:0c83 $c9
 .jr_00_0c84:
-    ld   A, [wDABF_CurrentGexSpriteBank]                                    ;; 00:0c84 $fa $bf $da
-    call call_00_0f25                                  ;; 00:0c87 $cd $25 $0f
+    ld   A, [wDABF_UnkBank]                                    ;; 00:0c84 $fa $bf $da
+    call call_00_0f25_AltSwitchBank                                  ;; 00:0c87 $cd $25 $0f
     ld   A, [wDAC1]                                    ;; 00:0c8a $fa $c1 $da
     ldh  [rHDMA1], A                                   ;; 00:0c8d $e0 $51
     ld   A, [wDAC0]                                    ;; 00:0c8f $fa $c0 $da
@@ -1438,7 +1438,7 @@ call_00_0c6a:
     or   A, $17                                        ;; 00:0cb0 $f6 $17
     ld   L, A                                          ;; 00:0cb2 $6f
     ld   A, [HL]                                       ;; 00:0cb3 $7e
-    call call_00_0f25                                  ;; 00:0cb4 $cd $25 $0f
+    call call_00_0f25_AltSwitchBank                                  ;; 00:0cb4 $cd $25 $0f
     ld   H, $d8                                        ;; 00:0cb7 $26 $d8
     ld   A, [wDB61]                                    ;; 00:0cb9 $fa $61 $db
     or   A, $05                                        ;; 00:0cbc $f6 $05
@@ -1489,7 +1489,7 @@ call_00_0c6a:
     ret                                                ;; 00:0d13 $c9
 .jp_00_0d14:
     ld   A, [wDC31]                                    ;; 00:0d14 $fa $31 $dc
-    call call_00_0f25                                  ;; 00:0d17 $cd $25 $0f
+    call call_00_0f25_AltSwitchBank                                  ;; 00:0d17 $cd $25 $0f
     ld   A, [wDC32_VRAMBank]                                    ;; 00:0d1a $fa $32 $dc
     ldh  [rVBK], A                                     ;; 00:0d1d $e0 $4f
     ld   A, [wDC2C]                                    ;; 00:0d1f $fa $2c $dc
@@ -1588,7 +1588,7 @@ call_00_0c6a:
     ld   B, [HL]                                       ;; 00:0e07 $46
     inc  HL                                            ;; 00:0e08 $23
     ld   A, [HL]                                       ;; 00:0e09 $7e
-    call call_00_0f25                                  ;; 00:0e0a $cd $25 $0f
+    call call_00_0f25_AltSwitchBank                                  ;; 00:0e0a $cd $25 $0f
     ld   HL, wDBF6                                     ;; 00:0e0d $21 $f6 $db
     ld   A, [HL+]                                      ;; 00:0e10 $2a
     ld   H, [HL]                                       ;; 00:0e11 $66
@@ -1628,7 +1628,7 @@ call_00_0e3b:
     ld   [wDD6B], A                                    ;; 00:0e51 $ea $6b $dd
     ld   [wDAD6_ReturnBank], A                                    ;; 00:0e54 $ea $d6 $da
     ld   A, $02                                        ;; 00:0e57 $3e $02
-    ld   HL, $7123                                     ;; 00:0e59 $21 $23 $71
+    ld   HL, entry_02_7123                                     ;; 00:0e59 $21 $23 $71
     call call_00_0edd_CallAltBankFunc                                  ;; 00:0e5c $cd $dd $0e
     jp   call_00_0b92_UpdateVRAMTiles                                  ;; 00:0e5f $c3 $92 $0b
 
@@ -1759,7 +1759,7 @@ call_00_0f22_CallFuncInHL:
     jp   HL                                            ;; 00:0f22 $e9
     db   $3e, $03                                      ;; 00:0f23 ??
 
-call_00_0f25:
+call_00_0f25_AltSwitchBank:
     ld   [MBC1RomBank], A                                    ;; 00:0f25 $ea $01 $20
     swap A                                             ;; 00:0f28 $cb $37
     rrca                                               ;; 00:0f2a $0f
@@ -1981,7 +1981,7 @@ call_00_1056_LoadMap:
     call call_00_1a22_LoadBgMapInitial                                  ;; 00:1096 $cd $22 $1a
     ld   A, $03                                        ;; 00:1099 $3e $03
     call call_00_0eee_SwitchBank                                  ;; 00:109b $cd $ee $0e
-    ld   HL, data_03_4100_bg_collision_tileset                                     ;; 00:109e $21 $00 $41
+    ld   HL, image_003_4100_bg_collision_tileset                                     ;; 00:109e $21 $00 $41
     ld   DE, wC400                                     ;; 00:10a1 $11 $00 $c4
 .jr_00_10a4:
     push DE                                            ;; 00:10a4 $d5
@@ -3471,17 +3471,17 @@ call_00_1ea0_UpdateMain:
     call call_00_04fb                                  ;; 00:1eea $cd $fb $04
     ld   [wDAD6_ReturnBank], A                                    ;; 00:1eed $ea $d6 $da
     ld   A, $03                                        ;; 00:1ef0 $3e $03
-    ld   HL, call_03_6c89_CopyLevelData                              ;; 00:1ef2 $21 $89 $6c
+    ld   HL, entry_03_6c89_CopyLevelData                              ;; 00:1ef2 $21 $89 $6c
     call call_00_0edd_CallAltBankFunc                                  ;; 00:1ef5 $cd $dd $0e
     ld   [wDAD6_ReturnBank], A                                    ;; 00:1ef8 $ea $d6 $da
     ld   A, $03                                        ;; 00:1efb $3e $03
-    ld   HL, $6203                                     ;; 00:1efd $21 $03 $62
+    ld   HL, entry_03_6203                                     ;; 00:1efd $21 $03 $62
     call call_00_0edd_CallAltBankFunc                                  ;; 00:1f00 $cd $dd $0e
     call call_00_10de                                  ;; 00:1f03 $cd $de $10
     call call_00_1056_LoadMap                                  ;; 00:1f06 $cd $56 $10
     ld   [wDAD6_ReturnBank], A                                    ;; 00:1f09 $ea $d6 $da
     ld   A, $02                                        ;; 00:1f0c $3e $02
-    ld   HL, $708f                                     ;; 00:1f0e $21 $8f $70
+    ld   HL, entry_02_708f                                     ;; 00:1f0e $21 $8f $70
     call call_00_0edd_CallAltBankFunc                                  ;; 00:1f11 $cd $dd $0e
     call call_00_0513                                  ;; 00:1f14 $cd $13 $05
     pop  HL                                            ;; 00:1f17 $e1
@@ -3582,7 +3582,7 @@ call_00_1ea0_UpdateMain:
     ld   [wDB6C_CurrentLevelId], A                                    ;; 00:1fb1 $ea $6c $db
     ld   [wDAD6_ReturnBank], A                                    ;; 00:1fb4 $ea $d6 $da
     ld   A, $03                                        ;; 00:1fb7 $3e $03
-    ld   HL, call_03_6c89_CopyLevelData                              ;; 00:1fb9 $21 $89 $6c
+    ld   HL, entry_03_6c89_CopyLevelData                              ;; 00:1fb9 $21 $89 $6c
     call call_00_0edd_CallAltBankFunc                                  ;; 00:1fbc $cd $dd $0e
     ret                                                ;; 00:1fbf $c9
     db   $ff, $ff, $ff, $ff, $00, $01, $02, $ff        ;; 00:1fc0 ...?www?
@@ -3821,7 +3821,7 @@ jp_00_2260:
     jp   call_00_0f08_SwitchBank2                                  ;; 00:2296 $c3 $08 $0f
 
 call_00_2299:
-    ld   A, [wDA00]                                    ;; 00:2299 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2299 $fa $00 $da
     rlca                                               ;; 00:229c $07
     rlca                                               ;; 00:229d $07
     rlca                                               ;; 00:229e $07
@@ -3839,7 +3839,7 @@ call_00_2299:
     ret                                                ;; 00:22b0 $c9
 
 call_00_22b1:
-    ld   A, [wDA00]                                    ;; 00:22b1 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:22b1 $fa $00 $da
     rlca                                               ;; 00:22b4 $07
     rlca                                               ;; 00:22b5 $07
     rlca                                               ;; 00:22b6 $07
@@ -3856,7 +3856,7 @@ call_00_22b1:
     ret  Z                                             ;; 00:22c7 $c8
     ld   [wDAD6_ReturnBank], A                                    ;; 00:22c8 $ea $d6 $da
     ld   A, $02                                        ;; 00:22cb $3e $02
-    ld   HL, call_02_72ac                              ;; 00:22cd $21 $ac $72
+    ld   HL, entry_02_72ac                              ;; 00:22cd $21 $ac $72
     call call_00_0edd_CallAltBankFunc                                  ;; 00:22d0 $cd $dd $0e
     ret                                                ;; 00:22d3 $c9
     db   $cd, $0f, $23, $06, $00, $21, $b1, $dc        ;; 00:22d4 ????????
@@ -3875,7 +3875,7 @@ call_00_230f:
     ld   C, [HL]                                       ;; 00:2318 $4e
     inc  HL                                            ;; 00:2319 $23
     ld   B, [HL]                                       ;; 00:231a $46
-    ld   A, [wDA00]                                    ;; 00:231b $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:231b $fa $00 $da
     rlca                                               ;; 00:231e $07
     rlca                                               ;; 00:231f $07
     rlca                                               ;; 00:2320 $07
@@ -3936,7 +3936,7 @@ call_00_230f:
 
 call_00_244a:
     ld   H, $d8                                        ;; 00:244a $26 $d8
-    ld   A, [wDA00]                                    ;; 00:244c $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:244c $fa $00 $da
     or   A, $1d                                        ;; 00:244f $f6 $1d
     ld   L, A                                          ;; 00:2451 $6f
     ld   A, [HL]                                       ;; 00:2452 $7e
@@ -3973,7 +3973,7 @@ call_00_244a:
 
 call_00_24c0:
     ld   H, $d8                                        ;; 00:24c0 $26 $d8
-    ld   A, [wDA00]                                    ;; 00:24c2 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:24c2 $fa $00 $da
     or   A, $1b                                        ;; 00:24c5 $f6 $1b
     ld   L, A                                          ;; 00:24c7 $6f
     ld   A, [HL+]                                      ;; 00:24c8 $2a
@@ -3992,7 +3992,7 @@ call_00_24c0:
     adc  A, $00                                        ;; 00:24dc $ce $00
     ld   B, A                                          ;; 00:24de $47
     ld   H, $d8                                        ;; 00:24df $26 $d8
-    ld   A, [wDA00]                                    ;; 00:24e1 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:24e1 $fa $00 $da
     or   A, $0e                                        ;; 00:24e4 $f6 $0e
     ld   L, A                                          ;; 00:24e6 $6f
     ld   A, [HL]                                       ;; 00:24e7 $7e
@@ -4005,7 +4005,7 @@ call_00_24c0:
 
 call_00_24ee:
     ld   H, $d8                                        ;; 00:24ee $26 $d8
-    ld   A, [wDA00]                                    ;; 00:24f0 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:24f0 $fa $00 $da
     or   A, $1d                                        ;; 00:24f3 $f6 $1d
     ld   L, A                                          ;; 00:24f5 $6f
     ld   A, [HL+]                                      ;; 00:24f6 $2a
@@ -4026,7 +4026,7 @@ call_00_24ee:
 
 jp_00_250d:
     ld   H, $d8                                        ;; 00:250d $26 $d8
-    ld   A, [wDA00]                                    ;; 00:250f $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:250f $fa $00 $da
     or   A, $10                                        ;; 00:2512 $f6 $10
     ld   L, A                                          ;; 00:2514 $6f
     ld   A, [HL]                                       ;; 00:2515 $7e
@@ -4039,7 +4039,7 @@ jp_00_250d:
 
 call_00_251c:
     call call_00_254a                                  ;; 00:251c $cd $4a $25
-    ld   A, [wDA00]                                    ;; 00:251f $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:251f $fa $00 $da
     rrca                                               ;; 00:2522 $0f
     and  A, $70                                        ;; 00:2523 $e6 $70
     ld   L, A                                          ;; 00:2525 $6f
@@ -4062,7 +4062,7 @@ call_00_251c:
     ret                                                ;; 00:253d $c9
 .jr_00_253e:
     ld   H, $d8                                        ;; 00:253e $26 $d8
-    ld   A, [wDA00]                                    ;; 00:2540 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2540 $fa $00 $da
     or   A, $0d                                        ;; 00:2543 $f6 $0d
     ld   L, A                                          ;; 00:2545 $6f
     ld   A, [HL]                                       ;; 00:2546 $7e
@@ -4072,12 +4072,12 @@ call_00_251c:
 
 call_00_254a:
     ld   H, $d8                                        ;; 00:254a $26 $d8
-    ld   A, [wDA00]                                    ;; 00:254c $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:254c $fa $00 $da
     or   A, $0d                                        ;; 00:254f $f6 $0d
     ld   L, A                                          ;; 00:2551 $6f
     ld   C, [HL]                                       ;; 00:2552 $4e
     ld   H, $d8                                        ;; 00:2553 $26 $d8
-    ld   A, [wDA00]                                    ;; 00:2555 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2555 $fa $00 $da
     or   A, $1b                                        ;; 00:2558 $f6 $1b
     ld   L, A                                          ;; 00:255a $6f
     ld   A, [HL+]                                      ;; 00:255b $2a
@@ -4116,7 +4116,7 @@ call_00_254a:
 
 call_00_2588:
     ld   H, $d8                                        ;; 00:2588 $26 $d8
-    ld   A, [wDA00]                                    ;; 00:258a $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:258a $fa $00 $da
     or   A, $1b                                        ;; 00:258d $f6 $1b
     ld   L, A                                          ;; 00:258f $6f
     ld   A, [HL]                                       ;; 00:2590 $7e
@@ -4184,7 +4184,7 @@ call_00_2588:
 
 call_00_2722:
     ld   HL, wD810                                     ;; 00:2722 $21 $10 $d8
-    ld   A, [wDA00]                                    ;; 00:2725 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2725 $fa $00 $da
     or   A, $10                                        ;; 00:2728 $f6 $10
     ld   C, A                                          ;; 00:272a $4f
     ld   B, $d8                                        ;; 00:272b $06 $d8
@@ -4231,7 +4231,7 @@ call_00_2722:
 call_00_2766:
     call call_00_27f3                                  ;; 00:2766 $cd $f3 $27
     ld   H, $d8                                        ;; 00:2769 $26 $d8
-    ld   A, [wDA00]                                    ;; 00:276b $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:276b $fa $00 $da
     or   A, $10                                        ;; 00:276e $f6 $10
     ld   L, A                                          ;; 00:2770 $6f
     ld   A, [HL+]                                      ;; 00:2771 $2a
@@ -4265,7 +4265,7 @@ call_00_2766:
     db   $22, $72, $c9                                 ;; 00:27f0 ???
 
 call_00_27f3:
-    ld   A, [wDA00]                                    ;; 00:27f3 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:27f3 $fa $00 $da
     rrca                                               ;; 00:27f6 $0f
     and  A, $70                                        ;; 00:27f7 $e6 $70
     ld   L, A                                          ;; 00:27f9 $6f
@@ -4287,7 +4287,7 @@ call_00_27f3:
     db   $56, $c9                                      ;; 00:2844 ??
 
 call_00_2846:
-    ld   A, [wDA00]                                    ;; 00:2846 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2846 $fa $00 $da
     rrca                                               ;; 00:2849 $0f
     and  A, $70                                        ;; 00:284a $e6 $70
     ld   L, A                                          ;; 00:284c $6f
@@ -4300,7 +4300,7 @@ call_00_2846:
     ret                                                ;; 00:2856 $c9
 
 call_00_2857:
-    ld   A, [wDA00]                                    ;; 00:2857 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2857 $fa $00 $da
     rrca                                               ;; 00:285a $0f
     and  A, $70                                        ;; 00:285b $e6 $70
     ld   L, A                                          ;; 00:285d $6f
@@ -4322,7 +4322,7 @@ call_00_288a:
 
 call_00_288c:
     ld   H, $d8                                        ;; 00:288c $26 $d8
-    ld   A, [wDA00]                                    ;; 00:288e $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:288e $fa $00 $da
     or   A, $14                                        ;; 00:2891 $f6 $14
     ld   L, A                                          ;; 00:2893 $6f
     ld   [HL], C                                       ;; 00:2894 $71
@@ -4333,7 +4333,7 @@ call_00_288c:
 
 call_00_28aa:
     ld   H, $d8                                        ;; 00:28aa $26 $d8
-    ld   A, [wDA00]                                    ;; 00:28ac $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:28ac $fa $00 $da
     or   A, $16                                        ;; 00:28af $f6 $16
     ld   L, A                                          ;; 00:28b1 $6f
     ld   [HL], C                                       ;; 00:28b2 $71
@@ -4343,7 +4343,7 @@ call_00_28aa:
 
 call_00_28be:
     ld   H, $d8                                        ;; 00:28be $26 $d8
-    ld   A, [wDA00]                                    ;; 00:28c0 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:28c0 $fa $00 $da
     or   A, $1b                                        ;; 00:28c3 $f6 $1b
     ld   L, A                                          ;; 00:28c5 $6f
     ld   A, [HL]                                       ;; 00:28c6 $7e
@@ -4351,7 +4351,7 @@ call_00_28be:
 
 call_00_28c8:
     ld   H, $d8                                        ;; 00:28c8 $26 $d8
-    ld   A, [wDA00]                                    ;; 00:28ca $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:28ca $fa $00 $da
     or   A, $1b                                        ;; 00:28cd $f6 $1b
     ld   L, A                                          ;; 00:28cf $6f
     ld   [HL], C                                       ;; 00:28d0 $71
@@ -4359,7 +4359,7 @@ call_00_28c8:
 
 call_00_28d2:
     ld   H, $d8                                        ;; 00:28d2 $26 $d8
-    ld   A, [wDA00]                                    ;; 00:28d4 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:28d4 $fa $00 $da
     or   A, $1d                                        ;; 00:28d7 $f6 $1d
     ld   L, A                                          ;; 00:28d9 $6f
     ld   A, [HL]                                       ;; 00:28da $7e
@@ -4367,7 +4367,7 @@ call_00_28d2:
 
 call_00_28dc:
     ld   H, $d8                                        ;; 00:28dc $26 $d8
-    ld   A, [wDA00]                                    ;; 00:28de $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:28de $fa $00 $da
     or   A, $1d                                        ;; 00:28e1 $f6 $1d
     ld   L, A                                          ;; 00:28e3 $6f
     ld   [HL], C                                       ;; 00:28e4 $71
@@ -4380,7 +4380,7 @@ call_00_28dc:
 
 call_00_290d:
     ld   H, $d8                                        ;; 00:290d $26 $d8
-    ld   A, [wDA00]                                    ;; 00:290f $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:290f $fa $00 $da
     or   A, $1a                                        ;; 00:2912 $f6 $1a
     ld   L, A                                          ;; 00:2914 $6f
     ld   [HL], C                                       ;; 00:2915 $71
@@ -4390,7 +4390,7 @@ call_00_290d:
 
 call_00_2922:
     ld   H, $d8                                        ;; 00:2922 $26 $d8
-    ld   A, [wDA00]                                    ;; 00:2924 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2924 $fa $00 $da
     or   A, $1a                                        ;; 00:2927 $f6 $1a
     ld   L, A                                          ;; 00:2929 $6f
     ld   A, [HL]                                       ;; 00:292a $7e
@@ -4402,7 +4402,7 @@ call_00_2922:
 
 call_00_2930:
     ld   H, $d8                                        ;; 00:2930 $26 $d8
-    ld   A, [wDA00]                                    ;; 00:2932 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2932 $fa $00 $da
     or   A, $00                                        ;; 00:2935 $f6 $00
     ld   L, A                                          ;; 00:2937 $6f
     ld   [HL], C                                       ;; 00:2938 $71
@@ -4412,7 +4412,7 @@ call_00_2930:
 
 call_00_2944:
     ld   H, $d8                                        ;; 00:2944 $26 $d8
-    ld   A, [wDA00]                                    ;; 00:2946 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2946 $fa $00 $da
     or   A, $12                                        ;; 00:2949 $f6 $12
     ld   L, A                                          ;; 00:294b $6f
     ld   [HL], C                                       ;; 00:294c $71
@@ -4420,7 +4420,7 @@ call_00_2944:
 
 call_00_294e:
     ld   H, $d8                                        ;; 00:294e $26 $d8
-    ld   A, [wDA00]                                    ;; 00:2950 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2950 $fa $00 $da
     or   A, $13                                        ;; 00:2953 $f6 $13
     ld   L, A                                          ;; 00:2955 $6f
     ld   [HL], C                                       ;; 00:2956 $71
@@ -4428,7 +4428,7 @@ call_00_294e:
 
 call_00_2958:
     ld   H, $d8                                        ;; 00:2958 $26 $d8
-    ld   A, [wDA00]                                    ;; 00:295a $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:295a $fa $00 $da
     or   A, $0d                                        ;; 00:295d $f6 $0d
     ld   L, A                                          ;; 00:295f $6f
     ld   [HL], C                                       ;; 00:2960 $71
@@ -4436,7 +4436,7 @@ call_00_2958:
 
 call_00_2962:
     ld   H, $d8                                        ;; 00:2962 $26 $d8
-    ld   A, [wDA00]                                    ;; 00:2964 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2964 $fa $00 $da
     or   A, $01                                        ;; 00:2967 $f6 $01
     ld   L, A                                          ;; 00:2969 $6f
     ld   A, [HL]                                       ;; 00:296a $7e
@@ -4446,7 +4446,7 @@ call_00_2962:
 
 call_00_2976:
     ld   H, $d8                                        ;; 00:2976 $26 $d8
-    ld   A, [wDA00]                                    ;; 00:2978 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2978 $fa $00 $da
     or   A, $0d                                        ;; 00:297b $f6 $0d
     ld   L, A                                          ;; 00:297d $6f
     ld   A, [HL]                                       ;; 00:297e $7e
@@ -4454,7 +4454,7 @@ call_00_2976:
 
 call_00_2980:
     ld   H, $d8                                        ;; 00:2980 $26 $d8
-    ld   A, [wDA00]                                    ;; 00:2982 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2982 $fa $00 $da
     or   A, $19                                        ;; 00:2985 $f6 $19
     ld   L, A                                          ;; 00:2987 $6f
     ld   [HL], C                                       ;; 00:2988 $71
@@ -4462,7 +4462,7 @@ call_00_2980:
 
 call_00_298a:
     ld   H, $d8                                        ;; 00:298a $26 $d8
-    ld   A, [wDA00]                                    ;; 00:298c $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:298c $fa $00 $da
     or   A, $19                                        ;; 00:298f $f6 $19
     ld   L, A                                          ;; 00:2991 $6f
     ld   A, [HL]                                       ;; 00:2992 $7e
@@ -4473,7 +4473,7 @@ call_00_298a:
 
 call_00_299f:
     ld   H, $d8                                        ;; 00:299f $26 $d8
-    ld   A, [wDA00]                                    ;; 00:29a1 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:29a1 $fa $00 $da
     or   A, $0d                                        ;; 00:29a4 $f6 $0d
     ld   L, A                                          ;; 00:29a6 $6f
     ld   A, [HL]                                       ;; 00:29a7 $7e
@@ -4506,7 +4506,7 @@ call_00_29ce:
 
 call_00_29f5:
     ld   H, $d8                                        ;; 00:29f5 $26 $d8
-    ld   A, [wDA00]                                    ;; 00:29f7 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:29f7 $fa $00 $da
     or   A, $05                                        ;; 00:29fa $f6 $05
     ld   L, A                                          ;; 00:29fc $6f
     ld   A, [HL]                                       ;; 00:29fd $7e
@@ -4515,7 +4515,7 @@ call_00_29f5:
     ret                                                ;; 00:2a02 $c9
 
 call_00_2a03:
-    ld   A, [wDA00]                                    ;; 00:2a03 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2a03 $fa $00 $da
     rlca                                               ;; 00:2a06 $07
     rlca                                               ;; 00:2a07 $07
     rlca                                               ;; 00:2a08 $07
@@ -4528,7 +4528,7 @@ call_00_2a03:
     ret                                                ;; 00:2a14 $c9
 
 call_00_2a15:
-    ld   A, [wDA00]                                    ;; 00:2a15 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2a15 $fa $00 $da
     rrca                                               ;; 00:2a18 $0f
     and  A, $70                                        ;; 00:2a19 $e6 $70
     ld   L, A                                          ;; 00:2a1b $6f
@@ -4556,7 +4556,7 @@ call_00_2a15:
     ld   A, [HL]                                       ;; 00:2a36 $7e
     sbc  A, B                                          ;; 00:2a37 $98
     ret  C                                             ;; 00:2a38 $d8
-    ld   A, [wDA00]                                    ;; 00:2a39 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2a39 $fa $00 $da
     rrca                                               ;; 00:2a3c $0f
     and  A, $70                                        ;; 00:2a3d $e6 $70
     ld   L, A                                          ;; 00:2a3f $6f
@@ -4587,7 +4587,7 @@ call_00_2a15:
 
 call_00_2a5d:
     ld   H, $d8                                        ;; 00:2a5d $26 $d8
-    ld   A, [wDA00]                                    ;; 00:2a5f $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2a5f $fa $00 $da
     or   A, $05                                        ;; 00:2a62 $f6 $05
     ld   L, A                                          ;; 00:2a64 $6f
     bit  2, [HL]                                       ;; 00:2a65 $cb $56
@@ -4596,7 +4596,7 @@ call_00_2a5d:
 call_00_2a68:
     ld   C, $00                                        ;; 00:2a68 $0e $00
     ld   H, $d8                                        ;; 00:2a6a $26 $d8
-    ld   A, [wDA00]                                    ;; 00:2a6c $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2a6c $fa $00 $da
     or   A, $0e                                        ;; 00:2a6f $f6 $0e
     ld   L, A                                          ;; 00:2a71 $6f
     ld   A, [wD80E]                                    ;; 00:2a72 $fa $0e $d8
@@ -4659,7 +4659,7 @@ call_00_2afc:
     ret                                                ;; 00:2b0f $c9
 
 call_00_2b10:
-    ld   A, [wDA00]                                    ;; 00:2b10 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2b10 $fa $00 $da
     rlca                                               ;; 00:2b13 $07
     rlca                                               ;; 00:2b14 $07
     rlca                                               ;; 00:2b15 $07
@@ -4694,26 +4694,26 @@ call_00_2b10:
     ret                                                ;; 00:2b3c $c9
 
 call_00_2b3d:
-    ld   A, [wDA00]                                    ;; 00:2b3d $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2b3d $fa $00 $da
     push AF                                            ;; 00:2b40 $f5
     ld   A, $20                                        ;; 00:2b41 $3e $20
 .jr_00_2b43:
-    ld   [wDA00], A                                    ;; 00:2b43 $ea $00 $da
+    ld   [wDA00_CurrentObjectAddr], A                                    ;; 00:2b43 $ea $00 $da
     or   A, $00                                        ;; 00:2b46 $f6 $00
     ld   L, A                                          ;; 00:2b48 $6f
     ld   H, $d8                                        ;; 00:2b49 $26 $d8
     ld   A, [HL]                                       ;; 00:2b4b $7e
     cp   A, $ff                                        ;; 00:2b4c $fe $ff
     call NZ, call_00_2b5d                              ;; 00:2b4e $c4 $5d $2b
-    ld   A, [wDA00]                                    ;; 00:2b51 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2b51 $fa $00 $da
     add  A, $20                                        ;; 00:2b54 $c6 $20
     jr   NZ, .jr_00_2b43                               ;; 00:2b56 $20 $eb
     pop  AF                                            ;; 00:2b58 $f1
-    ld   [wDA00], A                                    ;; 00:2b59 $ea $00 $da
+    ld   [wDA00_CurrentObjectAddr], A                                    ;; 00:2b59 $ea $00 $da
     ret                                                ;; 00:2b5c $c9
 
 call_00_2b5d:
-    ld   A, [wDA00]                                    ;; 00:2b5d $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2b5d $fa $00 $da
     or   A, $00                                        ;; 00:2b60 $f6 $00
     ld   L, A                                          ;; 00:2b62 $6f
     ld   H, $d8                                        ;; 00:2b63 $26 $d8
@@ -4738,7 +4738,7 @@ jp_00_2b7a:
 
 call_00_2b80:
     ld   H, $d8                                        ;; 00:2b80 $26 $d8
-    ld   A, [wDA00]                                    ;; 00:2b82 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2b82 $fa $00 $da
     or   A, $00                                        ;; 00:2b85 $f6 $00
     ld   L, A                                          ;; 00:2b87 $6f
     ld   [HL], $ff                                     ;; 00:2b88 $36 $ff
@@ -4751,7 +4751,7 @@ call_00_2b8b:
     jr   call_00_2ba9                                  ;; 00:2b92 $18 $15
 
 jp_00_2b94:
-    ld   A, [wDA00]                                    ;; 00:2b94 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2b94 $fa $00 $da
     rlca                                               ;; 00:2b97 $07
     rlca                                               ;; 00:2b98 $07
     rlca                                               ;; 00:2b99 $07
@@ -4766,7 +4766,7 @@ jp_00_2b94:
     ret                                                ;; 00:2ba8 $c9
 
 call_00_2ba9:
-    ld   A, [wDA00]                                    ;; 00:2ba9 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2ba9 $fa $00 $da
     rlca                                               ;; 00:2bac $07
     rlca                                               ;; 00:2bad $07
     rlca                                               ;; 00:2bae $07
@@ -4804,7 +4804,7 @@ jp_00_2bbe:
     xor  A, A                                          ;; 00:2bef $af
     ld   [wDAD6_ReturnBank], A                                    ;; 00:2bf0 $ea $d6 $da
     ld   A, $02                                        ;; 00:2bf3 $3e $02
-    ld   HL, call_02_72ac                              ;; 00:2bf5 $21 $ac $72
+    ld   HL, entry_02_72ac                              ;; 00:2bf5 $21 $ac $72
     call call_00_0edd_CallAltBankFunc                                  ;; 00:2bf8 $cd $dd $0e
     ld   HL, $2c01                                     ;; 00:2bfb $21 $01 $2c
     jp   call_00_2c20                                  ;; 00:2bfe $c3 $20 $2c
@@ -4820,7 +4820,7 @@ call_00_2c09:
 
 call_00_2c20:
     push HL                                            ;; 00:2c20 $e5
-    ld   A, [wDA00]                                    ;; 00:2c21 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2c21 $fa $00 $da
     rlca                                               ;; 00:2c24 $07
     rlca                                               ;; 00:2c25 $07
     rlca                                               ;; 00:2c26 $07
@@ -4847,7 +4847,7 @@ call_00_2c20:
     dw   $de49                                         ;; 00:2c51 pP
 
 call_00_2c53:
-    ld   A, [wDA00]                                    ;; 00:2c53 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2c53 $fa $00 $da
     rlca                                               ;; 00:2c56 $07
     rlca                                               ;; 00:2c57 $07
     rlca                                               ;; 00:2c58 $07
@@ -4954,7 +4954,7 @@ call_00_2ce2:
     ld   HL, $403d                                     ;; 00:2d01 $21 $3d $40
     add  HL, DE                                        ;; 00:2d04 $19
     ld   A, [HL+]                                      ;; 00:2d05 $2a
-    ld   [wDABF_CurrentGexSpriteBank], A                                    ;; 00:2d06 $ea $bf $da
+    ld   [wDABF_UnkBank], A                                    ;; 00:2d06 $ea $bf $da
     ld   A, [HL+]                                      ;; 00:2d09 $2a
     ld   H, [HL]                                       ;; 00:2d0a $66
     ld   L, A                                          ;; 00:2d0b $6f
@@ -4970,11 +4970,11 @@ call_00_2ce2:
     ld   H, [HL]                                       ;; 00:2d18 $66
     ld   L, A                                          ;; 00:2d19 $6f
     push HL                                            ;; 00:2d1a $e5
-    ld   A, [wDABF_CurrentGexSpriteBank]                                    ;; 00:2d1b $fa $bf $da
+    ld   A, [wDABF_UnkBank]                                    ;; 00:2d1b $fa $bf $da
     add  A, C                                          ;; 00:2d1e $81
-    ld   [wDABF_CurrentGexSpriteBank], A                                    ;; 00:2d1f $ea $bf $da
+    ld   [wDABF_UnkBank], A                                    ;; 00:2d1f $ea $bf $da
     call call_00_0f08_SwitchBank2                                  ;; 00:2d22 $cd $08 $0f
-    ld   A, [wDABF_CurrentGexSpriteBank]                                    ;; 00:2d25 $fa $bf $da
+    ld   A, [wDABF_UnkBank]                                    ;; 00:2d25 $fa $bf $da
     call call_00_0eee_SwitchBank                                  ;; 00:2d28 $cd $ee $0e
     pop  HL                                            ;; 00:2d2b $e1
     ld   A, [HL+]                                      ;; 00:2d2c $2a
@@ -5262,7 +5262,7 @@ call_00_2f00:
     push BC                                            ;; 00:2f02 $c5
     ld   [wDAD6_ReturnBank], A                                    ;; 00:2f03 $ea $d6 $da
     ld   A, $02                                        ;; 00:2f06 $3e $02
-    ld   HL, $5541                                     ;; 00:2f08 $21 $41 $55
+    ld   HL, entry_02_5541                                     ;; 00:2f08 $21 $41 $55
     call call_00_0edd_CallAltBankFunc                                  ;; 00:2f0b $cd $dd $0e
     pop  BC                                            ;; 00:2f0e $c1
     pop  DE                                            ;; 00:2f0f $d1
@@ -5511,7 +5511,7 @@ call_00_3180:
     push BC                                            ;; 00:31a4 $c5
     ld   [wDAD6_ReturnBank], A                                    ;; 00:31a5 $ea $d6 $da
     ld   A, $01                                        ;; 00:31a8 $3e $01
-    ld   HL, $4ab9                                     ;; 00:31aa $21 $b9 $4a
+    ld   HL, entry_01_4ab9                                     ;; 00:31aa $21 $b9 $4a
     call call_00_0edd_CallAltBankFunc                                  ;; 00:31ad $cd $dd $0e
     pop  BC                                            ;; 00:31b0 $c1
     ld   HL, $31cd                                     ;; 00:31b1 $21 $cd $31
@@ -5722,7 +5722,7 @@ call_00_3252:
     db   $01, $0a, $0a, $04, $02, $00, $ff, $81        ;; 00:35e0 ????????
 
 call_00_35e8:
-    ld   HL, wDA00                                     ;; 00:35e8 $21 $00 $da
+    ld   HL, wDA00_CurrentObjectAddr                                     ;; 00:35e8 $21 $00 $da
     ld   L, [HL]                                       ;; 00:35eb $6e
     ld   H, $d8                                        ;; 00:35ec $26 $d8
     ld   L, [HL]                                       ;; 00:35ee $6e
@@ -5779,7 +5779,7 @@ call_00_3618:
     inc  [HL]                                          ;; 00:363f $34
     ret                                                ;; 00:3640 $c9
 .jr_00_3641:
-    ld   [wDA00], A                                    ;; 00:3641 $ea $00 $da
+    ld   [wDA00_CurrentObjectAddr], A                                    ;; 00:3641 $ea $00 $da
     rlca                                               ;; 00:3644 $07
     rlca                                               ;; 00:3645 $07
     rlca                                               ;; 00:3646 $07
@@ -5882,7 +5882,7 @@ call_00_3618:
     ld   C, L                                          ;; 00:36d8 $4d
     ld   B, H                                          ;; 00:36d9 $44
     ld   H, $d8                                        ;; 00:36da $26 $d8
-    ld   A, [wDA00]                                    ;; 00:36dc $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:36dc $fa $00 $da
     or   A, $0e                                        ;; 00:36df $f6 $0e
     ld   L, A                                          ;; 00:36e1 $6f
     ld   A, [DE]                                       ;; 00:36e2 $1a
@@ -5945,7 +5945,7 @@ call_00_3618:
     ld   BC, $3258                                     ;; 00:3723 $01 $58 $32
     add  HL, BC                                        ;; 00:3726 $09
     ld   A, [HL+]                                      ;; 00:3727 $2a
-    ld   A, [wDA00]                                    ;; 00:3728 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:3728 $fa $00 $da
     or   A, $00                                        ;; 00:372b $f6 $00
     ld   E, A                                          ;; 00:372d $5f
     ld   D, $d8                                        ;; 00:372e $16 $d8
@@ -6009,11 +6009,11 @@ call_00_3618:
     and  A, $0f                                        ;; 00:3779 $e6 $0f
     ld   [wDAD6_ReturnBank], A                                    ;; 00:377b $ea $d6 $da
     ld   A, $02                                        ;; 00:377e $3e $02
-    ld   HL, $72ac                                     ;; 00:3780 $21 $ac $72
+    ld   HL, entry_02_72ac                                     ;; 00:3780 $21 $ac $72
     call call_00_0edd_CallAltBankFunc                                  ;; 00:3783 $cd $dd $0e
     ld   [wDAD6_ReturnBank], A                                    ;; 00:3786 $ea $d6 $da
     ld   A, $03                                        ;; 00:3789 $3e $03
-    ld   HL, $687c                                     ;; 00:378b $21 $7c $68
+    ld   HL, entry_03_687c                                     ;; 00:378b $21 $7c $68
     call call_00_0edd_CallAltBankFunc                                  ;; 00:378e $cd $dd $0e
     ret                                                ;; 00:3791 $c9
 
@@ -6031,10 +6031,10 @@ call_00_37a0:
     push DE                                            ;; 00:37a4 $d5
     ld   [wDAD6_ReturnBank], A                                    ;; 00:37a5 $ea $d6 $da
     ld   A, $03                                        ;; 00:37a8 $3e $03
-    ld   HL, $59c6                                     ;; 00:37aa $21 $c6 $59
+    ld   HL, entry_03_59c6                                     ;; 00:37aa $21 $c6 $59
     call call_00_0edd_CallAltBankFunc                                  ;; 00:37ad $cd $dd $0e
     ld   [wDCE9], A                                    ;; 00:37b0 $ea $e9 $dc
-    ld   A, [wDA00]                                    ;; 00:37b3 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:37b3 $fa $00 $da
     rlca                                               ;; 00:37b6 $07
     rlca                                               ;; 00:37b7 $07
     rlca                                               ;; 00:37b8 $07
@@ -6054,13 +6054,13 @@ call_00_37a0:
     ld   BC, $38b6                                     ;; 00:37cd $01 $b6 $38
     add  HL, BC                                        ;; 00:37d0 $09
     ld   A, [HL+]                                      ;; 00:37d1 $2a
-    ld   A, [wDA00]                                    ;; 00:37d2 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:37d2 $fa $00 $da
     push AF                                            ;; 00:37d5 $f5
     or   A, $0d                                        ;; 00:37d6 $f6 $0d
     ld   C, A                                          ;; 00:37d8 $4f
     ld   B, $d8                                        ;; 00:37d9 $06 $d8
     ld   A, D                                          ;; 00:37db $7a
-    ld   [wDA00], A                                    ;; 00:37dc $ea $00 $da
+    ld   [wDA00_CurrentObjectAddr], A                                    ;; 00:37dc $ea $00 $da
     or   A, $0d                                        ;; 00:37df $f6 $0d
     ld   E, A                                          ;; 00:37e1 $5f
     ld   D, B                                          ;; 00:37e2 $50
@@ -6166,14 +6166,14 @@ call_00_37a0:
     xor  A, A                                          ;; 00:3852 $af
     ld   [wDAD6_ReturnBank], A                                    ;; 00:3853 $ea $d6 $da
     ld   A, $02                                        ;; 00:3856 $3e $02
-    ld   HL, $72ac                                     ;; 00:3858 $21 $ac $72
+    ld   HL, entry_02_72ac                                     ;; 00:3858 $21 $ac $72
     call call_00_0edd_CallAltBankFunc                                  ;; 00:385b $cd $dd $0e
     ld   [wDAD6_ReturnBank], A                                    ;; 00:385e $ea $d6 $da
     ld   A, $03                                        ;; 00:3861 $3e $03
-    ld   HL, $687c                                     ;; 00:3863 $21 $7c $68
+    ld   HL, entry_03_687c                                     ;; 00:3863 $21 $7c $68
     call call_00_0edd_CallAltBankFunc                                  ;; 00:3866 $cd $dd $0e
     pop  AF                                            ;; 00:3869 $f1
-    ld   HL, wDA00                                     ;; 00:386a $21 $00 $da
+    ld   HL, wDA00_CurrentObjectAddr                                     ;; 00:386a $21 $00 $da
     ld   C, [HL]                                       ;; 00:386d $4e
     ld   [HL], A                                       ;; 00:386e $77
     rrca                                               ;; 00:386f $0f

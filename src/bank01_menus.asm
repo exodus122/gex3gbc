@@ -30,7 +30,7 @@ call_01_4000:
 .jr_01_4037:
     ld   [wDAD6_ReturnBank], A                                    ;; 01:4037 $ea $d6 $da
     ld   A, $03                                        ;; 01:403a $3e $03
-    ld   HL, call_03_6c89_CopyLevelData                              ;; 01:403c $21 $89 $6c
+    ld   HL, entry_03_6c89_CopyLevelData                              ;; 01:403c $21 $89 $6c
     call call_00_0edd_CallAltBankFunc                                  ;; 01:403f $cd $dd $0e
     xor  A, A                                          ;; 01:4042 $af
     ld   [wDBEB], A                                    ;; 01:4043 $ea $eb $db
@@ -73,7 +73,7 @@ call_01_4000:
     ld   [wDB6C_CurrentLevelId], A                                    ;; 01:409c $ea $6c $db
     ld   [wDAD6_ReturnBank], A                                    ;; 01:409f $ea $d6 $da
     ld   A, $03                                        ;; 01:40a2 $3e $03
-    ld   HL, call_03_6c89_CopyLevelData                              ;; 01:40a4 $21 $89 $6c
+    ld   HL, entry_03_6c89_CopyLevelData                              ;; 01:40a4 $21 $89 $6c
     call call_00_0edd_CallAltBankFunc                                  ;; 01:40a7 $cd $dd $0e
     jp   .jp_01_4285                                   ;; 01:40aa $c3 $85 $42
 .jr_01_40ad:
@@ -287,7 +287,7 @@ call_01_4000:
 .jr_01_4223:
     ld   [wDAD6_ReturnBank], A                                    ;; 01:4223 $ea $d6 $da
     ld   A, $03                                        ;; 01:4226 $3e $03
-    ld   HL, call_03_6c89_CopyLevelData                              ;; 01:4228 $21 $89 $6c
+    ld   HL, entry_03_6c89_CopyLevelData                              ;; 01:4228 $21 $89 $6c
     call call_00_0edd_CallAltBankFunc                                  ;; 01:422b $cd $dd $0e
     ld   HL, data_01_5692                              ;; 01:422e $21 $92 $56
     call call_01_4454                                  ;; 01:4231 $cd $54 $44
@@ -304,7 +304,7 @@ call_01_4000:
     ld   [wDB6C_CurrentLevelId], A                                    ;; 01:424d $ea $6c $db
     ld   [wDAD6_ReturnBank], A                                    ;; 01:4250 $ea $d6 $da
     ld   A, $03                                        ;; 01:4253 $3e $03
-    ld   HL, call_03_6c89_CopyLevelData                              ;; 01:4255 $21 $89 $6c
+    ld   HL, entry_03_6c89_CopyLevelData                              ;; 01:4255 $21 $89 $6c
     call call_00_0edd_CallAltBankFunc                                  ;; 01:4258 $cd $dd $0e
     ld   A, [wDB95]                                    ;; 01:425b $fa $95 $db
     and  A, A                                          ;; 01:425e $a7
@@ -395,6 +395,8 @@ call_01_4000:
     jr   Z, .jr_01_42e5                                ;; 01:42f6 $28 $ed
     ld   A, $01                                        ;; 01:42f8 $3e $01
     jp   call_00_0fd7                                  ;; 01:42fa $c3 $d7 $0f
+
+entry_01_42fd:
     ld   A, $15                                        ;; 01:42fd $3e $15
     call call_00_0fa2                                  ;; 01:42ff $cd $a2 $0f
     ld   A, $03                                        ;; 01:4302 $3e $03
@@ -416,6 +418,8 @@ call_01_4307:
     ld   A, $1a                                        ;; 01:4325 $3e $1a
     call call_01_4000                                  ;; 01:4327 $cd $00 $40
     ret                                                ;; 01:432a $c9
+
+entry_01_432b:
     ld   A, [wDB6C_CurrentLevelId]                                    ;; 01:432b $fa $6c $db
     and  A, A                                          ;; 01:432e $a7
     ret  Z                                             ;; 01:432f $c8
@@ -439,6 +443,8 @@ call_01_4307:
     ld   A, [wDBEC]                                    ;; 01:4357 $fa $ec $db
     ld   [wDC5A], A                                    ;; 01:435a $ea $5a $dc
     ret                                                ;; 01:435d $c9
+
+entry_01_435e:
     ld   HL, wDB6A                                     ;; 01:435e $21 $6a $db
     res  4, [HL]                                       ;; 01:4361 $cb $a6
     ld   A, [wDC1E_CurrentLevelNumberFromMap]                                    ;; 01:4363 $fa $1e $dc
@@ -547,7 +553,7 @@ call_01_43f0:
     ld   C, [HL]                                       ;; 01:4438 $4e
     ld   [wDAD6_ReturnBank], A                                    ;; 01:4439 $ea $d6 $da
     ld   A, $03                                        ;; 01:443c $3e $03
-    ld   HL, data_01_65c6                              ;; 01:443e $21 $c6 $65
+    ld   HL, entry_03_65c6_LoadPalettes                              ;; 01:443e $21 $c6 $65
     call call_00_0edd_CallAltBankFunc                                  ;; 01:4441 $cd $dd $0e
 .jr_01_4444:
     call call_01_43ba                                  ;; 01:4444 $cd $ba $43
@@ -906,9 +912,9 @@ call_01_4722:
     dw   data_01_4b0a                                  ;; 01:472e pP
     dw   data_01_4af9                                  ;; 01:4730 pP
     dw   .data_01_4744                                 ;; 01:4732 pP
-    dw   data_01_4ae7                                  ;; 01:4734 pP
+    dw   call_01_4ae7                                  ;; 01:4734 pP
     dw   .data_01_4748                                 ;; 01:4736 pP
-    dw   data_01_4ab9                                  ;; 01:4738 pP
+    dw   call_01_4ab9                                  ;; 01:4738 pP
     dw   .data_01_474c                                 ;; 01:473a pP
     dw   .data_01_4756                                 ;; 01:473c pP
     dw   .data_01_4759                                 ;; 01:473e pP
@@ -1411,7 +1417,8 @@ call_01_4a7f:
     ld   [wDBBE], A                                    ;; 01:4ab5 $ea $be $db
     ret                                                ;; 01:4ab8 $c9
 
-data_01_4ab9:
+entry_01_4ab9:
+call_01_4ab9:
     ld   HL, wDC5C                                     ;; 01:4ab9 $21 $5c $dc
     ld   B, $0c                                        ;; 01:4abc $06 $0c
     ld   C, $00                                        ;; 01:4abe $0e $00
@@ -1449,7 +1456,8 @@ data_01_4acf:
     ld   A, C                                          ;; 01:4ae5 $79
     ret                                                ;; 01:4ae6 $c9
 
-data_01_4ae7:
+entry_01_4ae7:
+call_01_4ae7:
     ld   HL, wDC5C                                     ;; 01:4ae7 $21 $5c $dc
     ld   B, $07                                        ;; 01:4aea $06 $07
     ld   C, $00                                        ;; 01:4aec $0e $00
@@ -3105,8 +3113,6 @@ data_01_64e9:
     db   $82, $00, $92, $00, $4c, $00, $3a, $00        ;; 01:65b1 ........
     db   $00, $00, $78, $00, $44, $00, $44, $00        ;; 01:65b9 ........
     db   $78, $00, $48, $00, $44                       ;; 01:65c1 .....
-
-data_01_65c6:
     db   $00, $42, $00, $00, $00, $3c, $00, $40        ;; 01:65c6 ........
     db   $00, $40, $00, $3c, $00, $02, $00, $02        ;; 01:65ce ........
     db   $00, $7c, $00, $00, $00, $fe, $00, $10        ;; 01:65d6 ........

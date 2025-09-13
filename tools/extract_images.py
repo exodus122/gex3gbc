@@ -189,9 +189,41 @@ def extract_tilesets():
         bank_data = open('./banks/bank_'+bank+'.bin', 'rb').read()
         os.system('rgbgfx --reverse 16 -o banks/bank_'+bank+'.bin banks/tilesets/tileset_'+bank+'.png')
 
+def extract_bank_03():
+    # extracts the two sets of sprites at the top of bank 03
+    bank = "003"
+    bank2 = "03"
+    os.system('mkdir -p banks/bank_'+bank+'/')
+
+    bgcollision_tileset_img_bin = open('./banks/bank_'+bank+'.bin', 'rb').read()[0x0100:0x0400]
+
+    out = open('./banks/bank_'+bank+'/image_'+bank+'_4100.bin', "wb")
+    out.write(bgcollision_tileset_img_bin)
+    out.close()
+    
+    os.system('rgbgfx --reverse 16 -d 1 -o banks/bank_'+bank+'/image_'+bank+'_4100.bin banks/bank_'+bank+'/image_'+bank+'_4100.png')
+
+
+    pawprint_img_bin = open('./banks/bank_'+bank+'.bin', 'rb').read()[0x400:0x580]
+
+    out = open('./banks/bank_'+bank+'/image_'+bank+'_4400.bin', "wb")
+    out.write(pawprint_img_bin)
+    out.close()
+    
+    os.system('rgbgfx --reverse 12 --columns -o banks/bank_'+bank+'/image_'+bank+'_4400.bin banks/bank_'+bank+'/image_'+bank+'_4400.png')
+
+    numbers_img_bin = open('./banks/bank_'+bank+'.bin', 'rb').read()[0x580:0x6E0]
+
+    out = open('./banks/bank_'+bank+'/image_'+bank+'_4580.bin', "wb")
+    out.write(numbers_img_bin)
+    out.close()
+    
+    os.system('rgbgfx --reverse 11 --columns -o banks/bank_'+bank+'/image_'+bank+'_4580.bin banks/bank_'+bank+'/image_'+bank+'_4580.png')
+
 #extract_banks()
 #extract_gex3_sprites_vertical()
 #extract_bank_1f()
 #extract_bank_06()
 #extract_bank_11()
-extract_tilesets()
+#extract_tilesets()
+extract_bank_03()

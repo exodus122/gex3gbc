@@ -107,7 +107,7 @@ wD9FE:
 wD9FF:
     ds 1                                               ;; d9ff
 
-wDA00:
+wDA00_CurrentObjectAddr:
     ds 1                                               ;; da00
 
 wDA01:
@@ -203,7 +203,7 @@ wDABD:
 wDABE:
     ds 1                                               ;; dabe
 
-wDABF_CurrentGexSpriteBank: ; best guess, but may not be accurate
+wDABF_UnkBank:
     ds 1                                               ;; dabf
 
 wDAC0:

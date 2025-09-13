@@ -3,13 +3,13 @@
 INCLUDE "include/hardware.inc"
 INCLUDE "include/macros.inc"
 INCLUDE "include/charmaps.inc"
-INCLUDE "include/constants.inc"
+INCLUDE "constants.inc"
 INCLUDE "memory.asm"
 
 INCLUDE "bank00_home.asm"
 INCLUDE "bank01_menus.asm"
 INCLUDE "bank02_objects.asm"
-INCLUDE "bank03_collision_graphics.asm"
+INCLUDE "bank03_misc.asm"
 INCLUDE "audio_engine/bank04_audio1.asm"
 INCLUDE "audio_engine/bank05_audio2.asm"
 

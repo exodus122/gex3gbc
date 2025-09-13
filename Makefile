@@ -29,6 +29,7 @@ $(ROM): $(patsubst src/game.asm,.obj/%.o,$(SRCS))
 
 .gfx/object_sprites/%.bin: rgbgfx += --columns
 .gfx/misc_sprites/%.bin: rgbgfx += --columns
+.gfx/collision_tileset/%.bin: rgbgfx += -d 1
 
 .gfx/%.bin: gfx/%.png
 	@mkdir -p $(dir .gfx/$*)
