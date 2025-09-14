@@ -80,11 +80,11 @@ def extract_bank_1f():
         i = i + 1
 
 def extract_object_sprites():
-    banks = ["008", "009", "00a", "00a", "00b", "00c", "00d", "00e", "00f", "010", "01d", "01e"]
-    banks2 = ["08", "09", "0a", "0a", "0b", "0c", "0d", "0e", "0f", "10", "1d", "1e"]
-    addrs = [0x4000, 0x4000, 0x4000, 0x6000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000]
-    sizes = [0x2b80, 0x3f00, 0x2000, 0x2000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x3f00, 0x4000]
-    widths = [0x74,  0xa8, 0x100, 0x100, 0x100, 0x100, 0x100, 0x100, 0x100, 0x80, 0xa8, 0x80]
+    banks = ["007", "007", "008", "009", "00a", "00a", "00b", "00c", "00d", "00e", "00f", "010", "01d", "01e"]
+    banks2 = ["07", "07", "08", "09", "0a", "0a", "0b", "0c", "0d", "0e", "0f", "10", "1d", "1e"]
+    addrs = [0x4000, 0x5B00, 0x4000, 0x4000, 0x4000, 0x6000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000]
+    sizes = [0x1B00, 0xA00, 0x2b80, 0x3f00, 0x2000, 0x2000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x3f00, 0x4000]
+    widths = [0x48, 0xA, 0x74,  0xa8, 0x100, 0x100, 0x100, 0x100, 0x100, 0x100, 0x100, 0x80, 0xa8, 0x80]
     
     for i in range(0, len(addrs)):
         bank = banks[i]
@@ -101,8 +101,11 @@ def extract_object_sprites():
         out.write(data)
         out.close()
         
-        os.system('rgbgfx --reverse '+str(width)+' --columns -o banks/bank_'+bank+'/image_'+bank+'_'+addr_str+'.bin banks/bank_'+bank+'/image_'+bank+'_'+addr_str+'.png')
-        
+        if i != 1:
+            os.system('rgbgfx --reverse '+str(width)+' --columns -o banks/bank_'+bank+'/image_'+bank+'_'+addr_str+'.bin banks/bank_'+bank+'/image_'+bank+'_'+addr_str+'.png')
+        else:
+            os.system('rgbgfx --reverse '+str(width)+' -o banks/bank_'+bank+'/image_'+bank+'_'+addr_str+'.bin banks/bank_'+bank+'/image_'+bank+'_'+addr_str+'.png')
+
         out2 = open('./banks/bank_'+bank+'/text.txt', "a")
         out2.write('data_'+bank2+'_'+addr_str+':\n    INCBIN \"./.gfx/object_sprites/image_'+bank+'_'+addr_str+'.bin\"\n')
         out2.close()
@@ -232,12 +235,11 @@ def extract_bank_01():
         out.close()
         os.system('rgbgfx --reverse '+str(widths[i])+' --columns -o banks/bank_'+bank+'/image_'+bank+'_'+addr_str+'.bin banks/bank_'+bank+'/image_'+bank+'_'+addr_str+'.png')
 
-
 #extract_banks()
-#extract_object_sprites()
+extract_object_sprites()
 #extract_bank_1f()
 #extract_bank_06()
 #extract_bank_11()
 #extract_tilesets()
 #extract_bank_03()
-extract_bank_01()
+#extract_bank_01()
