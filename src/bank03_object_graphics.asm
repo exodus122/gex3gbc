@@ -1,106 +1,3 @@
-SECTION "bank03", ROMX[$4000], BANK[$03]
-
-data_03_4000_bg_collision_tileset_flags:
-    INCBIN "data/bg_collision_tileset_flags.bin"       ; the flags determine which tiles are walls, ceilings, or ?
-image_003_4100_bg_collision_tileset:
-    INCBIN ".gfx/collision_tileset/image_003_4100.bin"
-
-image_003_4400:
-    INCBIN ".gfx/misc_sprites/image_003_4400.bin"
-
-image_003_4580:
-    INCBIN ".gfx/misc_sprites/image_003_4580.bin"
-
-INCLUDE "bank03_update_bg_collision.asm"
-
-entry_03_4bb6:
-call_03_4bb6:
-    ld   A, [wD810]                                    ;; 03:4bb6 $fa $10 $d8
-    sub  A, $10                                        ;; 03:4bb9 $d6 $10
-    and  A, $f8                                        ;; 03:4bbb $e6 $f8
-    ld   L, A                                          ;; 03:4bbd $6f
-    ld   H, $30                                        ;; 03:4bbe $26 $30
-    add  HL, HL                                        ;; 03:4bc0 $29
-    add  HL, HL                                        ;; 03:4bc1 $29
-    ld   A, [wD80E]                                    ;; 03:4bc2 $fa $0e $d8
-    rrca                                               ;; 03:4bc5 $0f
-    rrca                                               ;; 03:4bc6 $0f
-    rrca                                               ;; 03:4bc7 $0f
-    and  A, $1f                                        ;; 03:4bc8 $e6 $1f
-    or   A, L                                          ;; 03:4bca $b5
-    ld   L, A                                          ;; 03:4bcb $6f
-    ld   A, [HL]                                       ;; 03:4bcc $7e
-    ld   [wDC97], A                                    ;; 03:4bcd $ea $97 $dc
-    ld   DE, $40                                       ;; 03:4bd0 $11 $40 $00
-    add  HL, DE                                        ;; 03:4bd3 $19
-    res  2, H                                          ;; 03:4bd4 $cb $94
-    ld   A, [HL]                                       ;; 03:4bd6 $7e
-    ld   [wDC92], A                                    ;; 03:4bd7 $ea $92 $dc
-    ld   DE, $20                                       ;; 03:4bda $11 $20 $00
-    add  HL, DE                                        ;; 03:4bdd $19
-    res  2, H                                          ;; 03:4bde $cb $94
-    ld   A, [HL]                                       ;; 03:4be0 $7e
-    ld   [wDC93], A                                    ;; 03:4be1 $ea $93 $dc
-    add  HL, DE                                        ;; 03:4be4 $19
-    res  2, H                                          ;; 03:4be5 $cb $94
-    ld   A, [HL]                                       ;; 03:4be7 $7e
-    ld   [wDC95], A                                    ;; 03:4be8 $ea $95 $dc
-    ld   C, $09                                        ;; 03:4beb $0e $09
-    ld   A, [wD80D]                                    ;; 03:4bed $fa $0d $d8
-    cp   A, $00                                        ;; 03:4bf0 $fe $00
-    jr   Z, .jr_03_4bf6                                ;; 03:4bf2 $28 $02
-    ld   C, $f7                                        ;; 03:4bf4 $0e $f7
-.jr_03_4bf6:
-    ld   A, [wD810]                                    ;; 03:4bf6 $fa $10 $d8
-    sub  A, $08                                        ;; 03:4bf9 $d6 $08
-    and  A, $f8                                        ;; 03:4bfb $e6 $f8
-    ld   L, A                                          ;; 03:4bfd $6f
-    ld   H, $30                                        ;; 03:4bfe $26 $30
-    add  HL, HL                                        ;; 03:4c00 $29
-    add  HL, HL                                        ;; 03:4c01 $29
-    ld   A, [wD80E]                                    ;; 03:4c02 $fa $0e $d8
-    add  A, C                                          ;; 03:4c05 $81
-    rrca                                               ;; 03:4c06 $0f
-    rrca                                               ;; 03:4c07 $0f
-    rrca                                               ;; 03:4c08 $0f
-    and  A, $1f                                        ;; 03:4c09 $e6 $1f
-    or   A, L                                          ;; 03:4c0b $b5
-    ld   L, A                                          ;; 03:4c0c $6f
-    ld   A, [HL]                                       ;; 03:4c0d $7e
-    ld   [wDC94], A                                    ;; 03:4c0e $ea $94 $dc
-    ret                                                ;; 03:4c11 $c9
-
-call_03_4c12:
-    ld   A, [wD810]                                    ;; 03:4c12 $fa $10 $d8
-    add  A, B                                          ;; 03:4c15 $80
-    and  A, $f8                                        ;; 03:4c16 $e6 $f8
-    ld   L, A                                          ;; 03:4c18 $6f
-    ld   H, $30                                        ;; 03:4c19 $26 $30
-    add  HL, HL                                        ;; 03:4c1b $29
-    add  HL, HL                                        ;; 03:4c1c $29
-    ld   A, [wD80E]                                    ;; 03:4c1d $fa $0e $d8
-    add  A, C                                          ;; 03:4c20 $81
-    rrca                                               ;; 03:4c21 $0f
-    rrca                                               ;; 03:4c22 $0f
-    rrca                                               ;; 03:4c23 $0f
-    and  A, $1f                                        ;; 03:4c24 $e6 $1f
-    or   A, L                                          ;; 03:4c26 $b5
-    ld   L, A                                          ;; 03:4c27 $6f
-    ld   C, [HL]                                       ;; 03:4c28 $4e
-    ld   B, $40                                        ;; 03:4c29 $06 $40
-    ld   A, [BC]                                       ;; 03:4c2b $0a
-    ld   B, A                                          ;; 03:4c2c $47
-    ret                                                ;; 03:4c2d $c9
-
-entry_03_4c2e:
-    ld   BC, $00                                       ;; 03:4c2e $01 $00 $00
-    call call_03_4c12                                  ;; 03:4c31 $cd $12 $4c
-    ld   A, C                                          ;; 03:4c34 $79
-    cp   A, $3d                                        ;; 03:4c35 $fe $3d
-    ret                                                ;; 03:4c37 $c9
-
-INCLUDE "bank03_update_object_collision.asm"
-
 data_03_58d2:
     db   $03                                           ;; 03:58d2 ?
 data_03_58d3:
@@ -172,7 +69,7 @@ call_03_59d8:
     and  A, $40                                        ;; 03:59e7 $e6 $40
     ret                                                ;; 03:59e9 $c9
 
-data_03_59ea:
+data_03_59ea_SpriteData:
     db   $7a, $5a, $83, $5a, $7a, $5a, $83, $5a        ;; 03:59ea ????????
     db   $8c, $5a, $9d, $5a, $8c, $5a, $9d, $5a        ;; 03:59f2 ????????
     db   $ae, $5a, $c7, $5a, $ae, $5a, $c7, $5a        ;; 03:59fa ..??????
@@ -330,7 +227,7 @@ data_03_59ea:
     db   $fc, $1e, $08, $10, $04, $26, $08, $10        ;; 03:5eb2 ????????
     db   $0c, $2e, $08, $10, $14, $36, $08             ;; 03:5eba ???????
 
-entry_03_5ec1:
+entry_03_5ec1_UpdateObjectGraphics:
     ld   A, $08                                        ;; 03:5ec1 $3e $08
     ld   [wDC6F], A                                    ;; 03:5ec3 $ea $6f $dc
     ld   A, [wDC1F]                                    ;; 03:5ec6 $fa $1f $dc
@@ -352,7 +249,7 @@ entry_03_5ec1:
     cp   A, $ff                                        ;; 03:5ee3 $fe $ff
     jr   Z, .jr_03_5eed                                ;; 03:5ee5 $28 $06
     call call_03_59d8                                  ;; 03:5ee7 $cd $d8 $59
-    call NZ, call_03_5fc2                              ;; 03:5eea $c4 $c2 $5f
+    call NZ, call_03_5fc2_ObjectSpriteSetup                              ;; 03:5eea $c4 $c2 $5f
 .jr_03_5eed:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5eed $fa $00 $da
     add  A, $20                                        ;; 03:5ef0 $c6 $20
@@ -370,14 +267,14 @@ entry_03_5ec1:
     cp   A, $ff                                        ;; 03:5f06 $fe $ff
     jr   Z, .jr_03_5f10                                ;; 03:5f08 $28 $06
     call call_03_59d8                                  ;; 03:5f0a $cd $d8 $59
-    call Z, call_03_5fc2                               ;; 03:5f0d $cc $c2 $5f
+    call Z, call_03_5fc2_ObjectSpriteSetup                               ;; 03:5f0d $cc $c2 $5f
 .jr_03_5f10:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5f10 $fa $00 $da
     add  A, $20                                        ;; 03:5f13 $c6 $20
     jr   NZ, .jr_03_5efd                               ;; 03:5f15 $20 $e6
 .jp_03_5f17:
-    call call_03_615d                                  ;; 03:5f17 $cd $5d $61
-    call call_03_6148                                  ;; 03:5f1a $cd $48 $61
+    call call_03_615d_CollectibleSpriteSetup                                  ;; 03:5f17 $cd $5d $61
+    call call_03_6148_ClearUnusedSpriteSlots                                  ;; 03:5f1a $cd $48 $61
     ld   A, $20                                        ;; 03:5f1d $3e $20
 .jr_03_5f1f:
     ld   [wDA00_CurrentObjectAddr], A                                    ;; 03:5f1f $ea $00 $da
@@ -475,7 +372,7 @@ entry_03_5ec1:
     ld   H, $d8                                        ;; 03:5fa8 $26 $d8
     ld   A, [HL]                                       ;; 03:5faa $7e
     cp   A, $ff                                        ;; 03:5fab $fe $ff
-    call NZ, call_03_5fc2                              ;; 03:5fad $c4 $c2 $5f
+    call NZ, call_03_5fc2_ObjectSpriteSetup                              ;; 03:5fad $c4 $c2 $5f
     jr   .jr_03_5fb9                                   ;; 03:5fb0 $18 $07
 .jr_03_5fb2:
     ld   A, [wDCA7]                                    ;; 03:5fb2 $fa $a7 $dc
@@ -489,7 +386,7 @@ entry_03_5ec1:
     jr   NZ, .jr_03_5f9c                               ;; 03:5fbd $20 $dd
     jp   .jp_03_5f17                                   ;; 03:5fbf $c3 $17 $5f
 
-call_03_5fc2:
+call_03_5fc2_ObjectSpriteSetup:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5fc2 $fa $00 $da
     rlca                                               ;; 03:5fc5 $07
     rlca                                               ;; 03:5fc6 $07
@@ -644,7 +541,7 @@ call_03_5fc2:
     ld   HL, wDAB6                                     ;; 03:60af $21 $b6 $da
     res  5, [HL]                                       ;; 03:60b2 $cb $ae
 .jr_03_60b4:
-    ld   DE, data_03_59ea                              ;; 03:60b4 $11 $ea $59
+    ld   DE, data_03_59ea_SpriteData                              ;; 03:60b4 $11 $ea $59
     call call_00_0777                                  ;; 03:60b7 $cd $77 $07
     ld   A, [wDC6F]                                    ;; 03:60ba $fa $6f $dc
     ld   E, A                                          ;; 03:60bd $5f
@@ -744,7 +641,7 @@ call_03_5fc2:
 .data_03_6140:
     db   $34, $36, $38, $3a, $3a, $3a, $3a, $3a        ;; 03:6140 ........
 
-call_03_6148:
+call_03_6148_ClearUnusedSpriteSlots:
     ld   A, $9f                                        ;; 03:6148 $3e $9f
     ld   HL, wDC6F                                     ;; 03:614a $21 $6f $dc
     ld   L, [HL]                                       ;; 03:614d $6e
@@ -760,7 +657,7 @@ call_03_6148:
     jr   NC, .jr_03_6157                               ;; 03:615a $30 $fb
     ret                                                ;; 03:615c $c9
 
-call_03_615d:
+call_03_615d_CollectibleSpriteSetup:
     ld   A, [wDBF9_XPositionInMap]                                    ;; 03:615d $fa $f9 $db
     and  A, $0f                                        ;; 03:6160 $e6 $0f
     ld   B, A                                          ;; 03:6162 $47
@@ -810,7 +707,7 @@ call_03_615d:
     swap A                                             ;; 03:61a9 $cb $37
     add  A, [HL]                                       ;; 03:61ab $86
     ld   B, A                                          ;; 03:61ac $47
-    call call_03_61db                                  ;; 03:61ad $cd $db $61
+    call call_03_61db_LoadCollectibleSprite                                  ;; 03:61ad $cd $db $61
     ld   A, [wDCA7]                                    ;; 03:61b0 $fa $a7 $dc
     and  A, A                                          ;; 03:61b3 $a7
     jr   Z, .jr_03_61d4                                ;; 03:61b4 $28 $1e
@@ -838,7 +735,7 @@ call_03_615d:
     jr   NZ, .jr_03_6188                               ;; 03:61d8 $20 $ae
     ret                                                ;; 03:61da $c9
 
-call_03_61db:
+call_03_61db_LoadCollectibleSprite:
     ld   A, [wDC6F]                                    ;; 03:61db $fa $6f $dc
     cp   A, $9c                                        ;; 03:61de $fe $9c
     ret  NC                                            ;; 03:61e0 $d0
@@ -866,7 +763,4 @@ call_03_61db:
     ld   A, L                                          ;; 03:61fe $7d
     ld   [wDC6F], A                                    ;; 03:61ff $ea $6f $dc
     ret                                                ;; 03:6202 $c9
-
-INCLUDE "bank03_load_map_data.asm"
-
-INCLUDE "bank03_graphics.asm"
+    

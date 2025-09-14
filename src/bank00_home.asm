@@ -529,7 +529,7 @@ call_00_0513:
     jr   NZ, .jr_00_056e                               ;; 00:0580 $20 $ec
     ld   [wDAD6_ReturnBank], A                                    ;; 00:0582 $ea $d6 $da
     ld   A, $03                                        ;; 00:0585 $3e $03
-    ld   HL, entry_03_5ec1                                     ;; 00:0587 $21 $c1 $5e
+    ld   HL, entry_03_5ec1_UpdateObjectGraphics                                     ;; 00:0587 $21 $c1 $5e
     call call_00_0edd_CallAltBankFunc                                  ;; 00:058a $cd $dd $0e
     ld   A, $01                                        ;; 00:058d $3e $01
     ld   [wDD6A], A                                    ;; 00:058f $ea $6a $dd

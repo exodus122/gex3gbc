@@ -8,8 +8,24 @@ INCLUDE "memory.asm"
 
 INCLUDE "bank00_home.asm"
 INCLUDE "bank01_menus.asm"
-INCLUDE "bank02_objects.asm"
-INCLUDE "bank03_misc.asm"
+INCLUDE "bank02_update_objects.asm"
+
+SECTION "bank03", ROMX[$4000], BANK[$03]
+data_03_4000_bg_collision_tileset_flags:
+    INCBIN "data/bg_collision_tileset_flags.bin"       ; the flags determine which tiles are walls, ceilings, or ?
+image_003_4100_bg_collision_tileset:
+    INCBIN ".gfx/collision_tileset/image_003_4100.bin"
+image_003_4400:
+    INCBIN ".gfx/misc_sprites/image_003_4400.bin"
+image_003_4580:
+    INCBIN ".gfx/misc_sprites/image_003_4580.bin"
+INCLUDE "bank03_bg_collision.asm"
+INCLUDE "bank03_bg_graphics.asm"
+INCLUDE "bank03_object_collision.asm"
+INCLUDE "bank03_object_graphics.asm"
+INCLUDE "bank03_load_map_data.asm"
+INCLUDE "bank03_update_vram.asm"
+
 INCLUDE "audio_engine/bank04_audio1.asm"
 INCLUDE "audio_engine/bank05_audio2.asm"
 

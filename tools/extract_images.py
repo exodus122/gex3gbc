@@ -235,11 +235,31 @@ def extract_bank_01():
         out.close()
         os.system('rgbgfx --reverse '+str(widths[i])+' --columns -o banks/bank_'+bank+'/image_'+bank+'_'+addr_str+'.bin banks/bank_'+bank+'/image_'+bank+'_'+addr_str+'.png')
 
+def extract_gex_sprites():
+    banks2 = ["62", "63", "6b"]
+    ends = [0x7740, 0x7fb0, 0x4530]
+
+    for i in range(0, len(banks2)):
+        bank = "0"+banks2[i]
+        os.system('mkdir -p banks/bank_'+bank+'/')
+
+        addr = int.from_bytes(open('./banks/bank_'+bank+'.bin', 'rb').read()[0x0003:0x0005], byteorder='little')
+        addr_str = f"{addr:0{4}x}"
+
+        img_bin = open('./banks/bank_'+bank+'.bin', 'rb').read()[addr-0x4000:ends[i]-0x4000]
+        out = open('./banks/bank_'+bank+'/image_'+banks2[i]+'_'+addr_str+'.bin', "wb")
+        out.write(img_bin)
+        out.close()
+        os.system('rgbgfx --reverse '+str(int((ends[i]-addr)/0x20))+' --columns -o banks/bank_'+bank+'/image_'+banks2[i]+'_'+addr_str+'.bin banks/bank_'+bank+'/image_'+banks2[i]+'_'+addr_str+'.png')
+
+    
+
 #extract_banks()
-extract_object_sprites()
+#extract_object_sprites()
 #extract_bank_1f()
 #extract_bank_06()
 #extract_bank_11()
 #extract_tilesets()
 #extract_bank_03()
 #extract_bank_01()
+extract_gex_sprites()
