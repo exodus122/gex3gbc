@@ -262,4 +262,4 @@ def extract_gex_sprites():
 #extract_tilesets()
 #extract_bank_03()
 #extract_bank_01()
-extract_gex_sprites()
+#extract_gex_sprites()

@@ -3,6 +3,7 @@ import PIL.ImageDraw # type: ignore
 import numpy # type: ignore
 import struct
 import os
+import math
 from enum import Enum
 
 def get_next_offset(arr, entry):
@@ -75,6 +76,18 @@ def y_flip_tile(tile_data):
         flipped_bytes[flipped_row_start + 1] = tile_data[row_start + 1]
     
     return bytes(flipped_bytes)
+
+def remove_trailing_zeros(my_bytes):
+    pattern = b'\x00' * 16
+    pattern_len = len(pattern)
+
+    # Loop while the bytes object ends with the pattern
+    while my_bytes.endswith(pattern):
+        # Reassign the variable to a new slice of the bytes object,
+        # cutting off the pattern from the end
+        my_bytes = my_bytes[:-pattern_len]
+
+    return my_bytes
 
 # enum for level_data
 MAP_BANK = 0
@@ -167,10 +180,10 @@ sorted_collision_blockset_offsets = sorted(collision_blockset_offsets, key=lambd
 #for b in collision_blockset_offsets:
 #    print(f"{b[0]:0{2}x}"+": "+f"{b[1]:0{4}x}")
 
-split_map_data = False
+split_map_data = True
 generate_regular_maps = False
 draw_collectibles = False
-generate_collision_maps = True
+generate_collision_maps = False
 
 if draw_collectibles:
     # set up collectible sprite
@@ -224,22 +237,31 @@ if split_map_data:
         level_numbers[level_data[LEVEL_ID]] += 1
         channel_map_number = str(level_numbers[level_data[LEVEL_ID]])
 
+        print(level_name+str(level_numbers[level_data[LEVEL_ID]]))
         if map_data not in maps:
             maps.append(map_data)
             
             os.system('mkdir -p extracted_map_data/'+level_name)
             os.system('mkdir -p extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number)
 
+            # tileset
             tileset_file = "../banks/bank_0"+f"{level_data[TILESET_BANK]:x}"+".bin"
             end_addr = get_next_offset(sorted_tileset_offsets, [level_data[TILESET_BANK], level_data[TILESET_BANK_OFFSET]])
             tileset_data = open(tileset_file, 'rb').read()[level_data[TILESET_BANK_OFFSET]-0x4000:end_addr-0x4000]
+            tileset_data = remove_trailing_zeros(tileset_data)
             out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_tileset.bin', "wb")
             out.write(tileset_data)
             out.close()
+            num_tiles = int(len(tileset_data) / 0x10)
+            adjusted_size = (math.ceil(num_tiles / 16) * 16)
+            adjusted_size = adjusted_size - num_tiles
+            os.system('rgbgfx --reverse 16 -x '+str(adjusted_size)+' -o extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_tileset.bin extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_tileset.png')
 
+            # blockset
             blockset_file = "../banks/bank_0"+f"{level_data[BLOCKSET_AND_PALETTE_IDS_BANK]:x}"+".bin"
             end_addr = get_next_offset(sorted_blockset_offsets, [level_data[BLOCKSET_AND_PALETTE_IDS_BANK], level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]])
             blockset_data = open(blockset_file, "rb").read()[level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]-0x4000:end_addr-0x4000]
+            blockset_data = remove_trailing_zeros(blockset_data)
             out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_blockset.bin', "wb")
             out.write(blockset_data)
             out.close()
@@ -247,6 +269,7 @@ if split_map_data:
             out2.write(level_name+'_'+channel_map_number+'_blockset.bin:\n    INCBIN \"data/maps/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_blockset.bin\"\n')
             out2.close()
 
+            # map
             out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_map.bin', "wb")
             out.write(map_data)
             out.close()
@@ -254,39 +277,48 @@ if split_map_data:
             out2.write(level_name+'_'+channel_map_number+'_map.bin:\n    INCBIN \"data/maps/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_map.bin\"\n')
             out2.close()
 
+            # extended map
             extended_map_file = "../banks/bank_0"+f"{level_data[EXTENDED_MAP_BANK]:x}"+".bin"
             extended_map_data = open(extended_map_file, "rb").read()[level_data[EXTENDED_MAP_BANK_OFFSET]-0x4000:offset-0x4000+width*height]
             out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_extended.bin', "wb")
             out.write(extended_map_data)
             out.close()
 
+            # map collision
             map_collision_file = "../banks/bank_0"+f"{level_data[MAP_COLLISION_BANK]:x}"+".bin"
             map_collision_data = open(map_collision_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
             out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_collision.bin', "wb")
             out.write(map_collision_data)
             out.close()
 
+            # collectible list
             collectible_list_file = "../banks/bank_0"+f"{level_data[COLLECTIBLE_LIST_BANK]:x}"+".bin"
             end_addr = get_next_offset(sorted_collectible_list_offsets, [level_data[COLLECTIBLE_LIST_BANK], level_data[COLLECTIBLE_LIST_BANK_OFFSET]])
             collectible_list_data = open(collectible_list_file, "rb").read()[level_data[COLLECTIBLE_LIST_BANK_OFFSET]-0x4000:end_addr-0x4000]
+            collectible_list_data = remove_trailing_zeros(collectible_list_data)
             out = open('extracted_map_data/'+level_name+'/'+level_name+'_collectible_list.bin', "wb")
             out.write(collectible_list_data)
             out.close()
 
+            # object list
             object_list_file = "../banks/bank_0"+f"{level_data[OBJECT_LIST_BANK]:x}"+".bin"
             end_addr = get_next_offset(sorted_object_list_offsets, [level_data[OBJECT_LIST_BANK], level_data[OBJECT_LIST_BANK_OFFSET]])
             object_list_data = open(object_list_file, "rb").read()[level_data[OBJECT_LIST_BANK_OFFSET]-0x4000:end_addr-0x4000]
+            object_list_data = remove_trailing_zeros(object_list_data)
             out = open('extracted_map_data/'+level_name+'/'+level_name+'_object_list.bin', "wb")
             out.write(object_list_data)
             out.close()
 
+            # collision blockset
             collision_blockset_file = "../banks/bank_0"+f"{level_data[COLLISION_BLOCKSET_BANK]:x}"+".bin"
             end_addr = get_next_offset(sorted_collision_blockset_offsets, [level_data[COLLISION_BLOCKSET_BANK], level_data[COLLISION_BLOCKSET_BANK_OFFSET]])
             collision_blockset_data = open(collision_blockset_file, "rb").read()[level_data[COLLISION_BLOCKSET_BANK_OFFSET]-0x4000:end_addr-0x4000]
+            collision_blockset_data = remove_trailing_zeros(collision_blockset_data)
             out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_collision_blockset.bin', "wb")
             out.write(collision_blockset_data)
             out.close()
 
+            # palette
             out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_palette.bin', "wb")
             out.write(palette_data)
             out.close()

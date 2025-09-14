@@ -18,7 +18,7 @@ call_01_4000:
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4019 $cd $6e $07
     ld   A, [wDB6C_CurrentLevelId]                                    ;; 01:401c $fa $6c $db
     ld   [wDBE8], A                                    ;; 01:401f $ea $e8 $db
-    ld   A, [wDC1E_CurrentLevelNumberFromMap]                                    ;; 01:4022 $fa $1e $dc
+    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 01:4022 $fa $1e $dc
     ld   [wDB6C_CurrentLevelId], A                                    ;; 01:4025 $ea $6c $db
     cp   A, $07                                        ;; 01:4028 $fe $07
     jr   C, .jr_01_4037                                ;; 01:402a $38 $0b
@@ -347,7 +347,7 @@ call_01_4000:
     ld   A, $01                                        ;; 01:42a4 $3e $01
     jp   call_01_4000                                  ;; 01:42a6 $c3 $00 $40
 .jr_01_42a9:
-    ld   A, [wDC1E_CurrentLevelNumberFromMap]                                    ;; 01:42a9 $fa $1e $dc
+    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 01:42a9 $fa $1e $dc
     and  A, A                                          ;; 01:42ac $a7
     ld   A, $0c                                        ;; 01:42ad $3e $0c
     jp   Z, .jp_01_4005                                ;; 01:42af $ca $05 $40
@@ -447,7 +447,7 @@ entry_01_432b:
 entry_01_435e:
     ld   HL, wDB6A                                     ;; 01:435e $21 $6a $db
     res  4, [HL]                                       ;; 01:4361 $cb $a6
-    ld   A, [wDC1E_CurrentLevelNumberFromMap]                                    ;; 01:4363 $fa $1e $dc
+    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 01:4363 $fa $1e $dc
     ld   [wDB6C_CurrentLevelId], A                                    ;; 01:4366 $ea $6c $db
     and  A, A                                          ;; 01:4369 $a7
     jr   Z, .jr_01_43b3                                ;; 01:436a $28 $47
@@ -775,7 +775,7 @@ call_01_45a5:
     ld   DE, wDD0A_BgPalettes                                     ;; 01:45be $11 $0a $dd
     ld   BC, $20                                       ;; 01:45c1 $01 $20 $00
     ld   A, $1f                                        ;; 01:45c4 $3e $1f
-    call call_00_075f                                  ;; 01:45c6 $cd $5f $07
+    call call_00_075f_SwitchBankAndCopyBCBytesFromHLToDE                                  ;; 01:45c6 $cd $5f $07
     ld   A, [wDB6C_CurrentLevelId]                                    ;; 01:45c9 $fa $6c $db
     ld   DE, $b01                                      ;; 01:45cc $11 $01 $0b
     call call_00_0777                                  ;; 01:45cf $cd $77 $07
@@ -790,7 +790,7 @@ call_01_45a5:
     pop  HL                                            ;; 01:45e6 $e1
     ld   DE, $c010                                     ;; 01:45e7 $11 $10 $c0 ; wC000_BgMapTileIds
     ld   A, $1f                                        ;; 01:45ea $3e $1f
-    jp   call_00_075f                                  ;; 01:45ec $c3 $5f $07
+    jp   call_00_075f_SwitchBankAndCopyBCBytesFromHLToDE                                  ;; 01:45ec $c3 $5f $07
 .data_01_45ef:
     db   $00, $00, $00, $40, $ff, $03, $ff, $7f        ;; 01:45ef ........
     db   $00, $40, $ff, $03, $73, $02, $29, $01        ;; 01:45f7 ........
@@ -927,7 +927,7 @@ call_01_4722:
     ld   A, [wDCAF]                                    ;; 01:4748 $fa $af $dc
     ret                                                ;; 01:474b $c9
 .data_01_474c:
-    ld   A, [wDC1E_CurrentLevelNumberFromMap]                                    ;; 01:474c $fa $1e $dc
+    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 01:474c $fa $1e $dc
     and  A, A                                          ;; 01:474f $a7
     ld   A, $01                                        ;; 01:4750 $3e $01
     ret  Z                                             ;; 01:4752 $c8
@@ -1438,7 +1438,7 @@ call_01_4ab9:
     ret                                                ;; 01:4ace $c9
 
 data_01_4acf:
-    ld   HL, wDC1E_CurrentLevelNumberFromMap                                     ;; 01:4acf $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 01:4acf $21 $1e $dc
     ld   L, [HL]                                       ;; 01:4ad2 $6e
     ld   H, $00                                        ;; 01:4ad3 $26 $00
     ld   DE, wDC5C                                     ;; 01:4ad5 $11 $5c $dc
@@ -1473,7 +1473,7 @@ call_01_4ae7:
     ret                                                ;; 01:4af8 $c9
 
 data_01_4af9:
-    ld   HL, wDC1E_CurrentLevelNumberFromMap                                     ;; 01:4af9 $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 01:4af9 $21 $1e $dc
     ld   L, [HL]                                       ;; 01:4afc $6e
     ld   H, $00                                        ;; 01:4afd $26 $00
     ld   DE, wDC5C                                     ;; 01:4aff $11 $5c $dc
@@ -1485,7 +1485,7 @@ data_01_4af9:
     ret                                                ;; 01:4b09 $c9
 
 data_01_4b0a:
-    ld   HL, wDC1E_CurrentLevelNumberFromMap                                     ;; 01:4b0a $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 01:4b0a $21 $1e $dc
     ld   L, [HL]                                       ;; 01:4b0d $6e
     ld   H, $00                                        ;; 01:4b0e $26 $00
     ld   DE, wDC5C                                     ;; 01:4b10 $11 $5c $dc

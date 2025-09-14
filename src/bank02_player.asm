@@ -1115,7 +1115,7 @@ call_02_5374:
     ret  NC                                            ;; 02:5382 $d0
     sub  A, $3e                                        ;; 02:5383 $d6 $3e
     ld   C, A                                          ;; 02:5385 $4f
-    ld   HL, wDC1E_CurrentLevelNumberFromMap                                     ;; 02:5386 $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 02:5386 $21 $1e $dc
     ld   L, [HL]                                       ;; 02:5389 $6e
     ld   H, $00                                        ;; 02:538a $26 $00
     add  HL, HL                                        ;; 02:538c $29

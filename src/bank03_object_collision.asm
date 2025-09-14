@@ -120,7 +120,7 @@ call_03_4c38_UpdateObjectCollision:
 .data_03_4d9b:
     call call_03_550e                                  ;; 03:4d9b $cd $0e $55
     ret  NC                                            ;; 03:4d9e $d0
-    ld   HL, wDC1E_CurrentLevelNumberFromMap                                     ;; 03:4d9f $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 03:4d9f $21 $1e $dc
     ld   L, [HL]                                       ;; 03:4da2 $6e
     ld   H, $00                                        ;; 03:4da3 $26 $00
     ld   DE, wDC5C                                     ;; 03:4da5 $11 $5c $dc
@@ -144,7 +144,7 @@ call_03_4c38_UpdateObjectCollision:
     ld   HL, .data_03_4e00                             ;; 03:4dcb $21 $00 $4e
     add  HL, BC                                        ;; 03:4dce $09
     ld   C, [HL]                                       ;; 03:4dcf $4e
-    ld   HL, wDC1E_CurrentLevelNumberFromMap                                     ;; 03:4dd0 $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 03:4dd0 $21 $1e $dc
     ld   L, [HL]                                       ;; 03:4dd3 $6e
     ld   H, $00                                        ;; 03:4dd4 $26 $00
     ld   DE, wDC5C                                     ;; 03:4dd6 $11 $5c $dc

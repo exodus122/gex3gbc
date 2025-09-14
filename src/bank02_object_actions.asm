@@ -103,7 +103,7 @@ data_02_5a1c:
 .jr_02_5a45:
     call call_02_54f9                                  ;; 02:5a45 $cd $f9 $54
     call call_00_230f                                  ;; 02:5a48 $cd $0f $23
-    ld   A, [wDC1E_CurrentLevelNumberFromMap]                                    ;; 02:5a4b $fa $1e $dc
+    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 02:5a4b $fa $1e $dc
     and  A, A                                          ;; 02:5a4e $a7
     jr   Z, .jr_02_5a6a                                ;; 02:5a4f $28 $19
     push BC                                            ;; 02:5a51 $c5
@@ -111,7 +111,7 @@ data_02_5a1c:
     ld   HL, .data_02_5a71                             ;; 02:5a54 $21 $71 $5a
     add  HL, BC                                        ;; 02:5a57 $09
     ld   C, [HL]                                       ;; 02:5a58 $4e
-    ld   HL, wDC1E_CurrentLevelNumberFromMap                                     ;; 02:5a59 $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 02:5a59 $21 $1e $dc
     ld   L, [HL]                                       ;; 02:5a5c $6e
     ld   H, $00                                        ;; 02:5a5d $26 $00
     ld   DE, wDC5C                                     ;; 02:5a5f $11 $5c $dc
@@ -135,7 +135,7 @@ call_02_5a75:
     db   $00, $00, $00, $00, $73, $4e, $e0, $03        ;; 02:5a7b ........
 
 jr_02_5a83:
-    ld   A, [wDC1E_CurrentLevelNumberFromMap]                                    ;; 02:5a83 $fa $1e $dc
+    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 02:5a83 $fa $1e $dc
     and  A, A                                          ;; 02:5a86 $a7
     ret  NZ                                            ;; 02:5a87 $c0
     call call_00_230f                                  ;; 02:5a88 $cd $0f $23
@@ -196,7 +196,7 @@ data_02_5ae4:
     db   $b1, $22                                      ;; 02:5af6 ??
 
 jr_02_5af8:
-    ld   A, [wDC1E_CurrentLevelNumberFromMap]                                    ;; 02:5af8 $fa $1e $dc
+    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 02:5af8 $fa $1e $dc
     and  A, A                                          ;; 02:5afb $a7
     ret  NZ                                            ;; 02:5afc $c0
     call call_00_230f                                  ;; 02:5afd $cd $0f $23
@@ -296,7 +296,7 @@ entry_02_5bb3:
     db   $c9                                           ;; 02:5bd3 ?
 
 data_02_5bd4:
-    ld   A, [wDC1E_CurrentLevelNumberFromMap]                                    ;; 02:5bd4 $fa $1e $dc
+    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 02:5bd4 $fa $1e $dc
     and  A, A                                          ;; 02:5bd7 $a7
     jr   Z, .jr_02_5be4                                ;; 02:5bd8 $28 $0a
     ld   A, [wDCD2]                                    ;; 02:5bda $fa $d2 $dc
@@ -857,8 +857,6 @@ data_02_5eb8:
     db   $02, $cd, $99, $22, $3e, $01, $c3, $ac        ;; 02:6554 ????????
     db   $72, $cd, $5d, $2a, $c8, $cd, $ce, $1b        ;; 02:655c ????????
     db   $0e, $00, $c3                                 ;; 02:6564 ???
-
-data_02_6567:
     db   $99, $22, $cd, $d4, $22, $c8, $0e, $02        ;; 02:6567 ????????
     db   $cd, $99, $22, $3e, $01, $c3, $ac, $72        ;; 02:656f ????????
     db   $cd, $17, $29, $34, $21, $71, $dc, $a6        ;; 02:6577 ????????

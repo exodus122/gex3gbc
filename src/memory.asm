@@ -203,7 +203,7 @@ wDABD:
 wDABE:
     ds 1                                               ;; dabe
 
-wDABF_UnkBank:
+wDABF_GexSpriteBank:
     ds 1                                               ;; dabf
 
 wDAC0:
@@ -653,7 +653,7 @@ wDC1A_CollectibleListBankOffset:
 wDC1C_CurrentMapWidthAndHeightInBlocks:
     ds 2                                               ;; dc1c
 
-wDC1E_CurrentLevelNumberFromMap: ; not the map number. all maps in HolidayTV share the same level number for example
+wDC1E_CurrentLevelNumber: ; all maps in the same level share the same value here
     ds 1                                               ;; dc1e
 
 wDC1F:
@@ -1109,6 +1109,7 @@ wDE5F:
 wDE60:
     ds 160                                             ;; de60
 
+; Start of Audio wRAM section
 wDF00:
     ds 1                                               ;; df00
 
