@@ -108,8 +108,8 @@ OBJECT_LIST_BANK = 14
 OBJECT_LIST_BANK_OFFSET = 15
 COLLECTIBLE_LIST_BANK = 16
 COLLECTIBLE_LIST_BANK_OFFSET = 17
-MAP_WIDTH = 18 # width of map (in blocks)
-MAP_HEIGHT = 19 # height of map (in blocks)
+MAP_WIDTH = 18 # width of map (in blocks. each block is 4 tiles)
+MAP_HEIGHT = 19 # height of map (in blocks. each block is 4 tiles)
 LEVEL_ID = 20
 PADDING = 21 # always $00
 
@@ -180,12 +180,12 @@ sorted_collision_blockset_offsets = sorted(collision_blockset_offsets, key=lambd
 #for b in collision_blockset_offsets:
 #    print(f"{b[0]:0{2}x}"+": "+f"{b[1]:0{4}x}")
 
-split_map_data = True
-generate_regular_maps = False
-draw_collectibles = False
+split_map_data = False
+generate_regular_maps = True
+draw_objects_and_collectibles = True
 generate_collision_maps = False
 
-if draw_collectibles:
+if draw_objects_and_collectibles:
     # set up collectible sprite
     collectible_sprite_path = "../banks/bank_00a.bin"
     collectible_sprite = open(collectible_sprite_path, "rb").read()[0xBA0:0xBE0]
@@ -418,6 +418,8 @@ if generate_regular_maps:
         os.system('mkdir -p map_images/'+level_name)
         os.system('mkdir -p map_images/with_collectibles')
         os.system('mkdir -p map_images/with_collectibles/'+level_name)
+        os.system('mkdir -p map_images/with_objects')
+        os.system('mkdir -p map_images/with_objects/'+level_name)
 
         map_image_path = "./map_images/"
 
@@ -438,7 +440,23 @@ if generate_regular_maps:
                 
                 count = count+1
 
-        if draw_collectibles:
+        if draw_objects_and_collectibles:
+
+            object_list_file = "../banks/bank_0"+f"{level_data[OBJECT_LIST_BANK]:x}"+".bin"
+            end_addr = get_next_offset(sorted_object_list_offsets, [level_data[OBJECT_LIST_BANK], level_data[OBJECT_LIST_BANK_OFFSET]])
+            object_list_data = open(object_list_file, "rb").read()[level_data[OBJECT_LIST_BANK_OFFSET]-0x4000:end_addr-0x4000]
+            object_list_data = remove_trailing_zeros(object_list_data)
+            for i in range(0, len(object_list_data)-1, 0x10):
+                try:
+                    objectId, x, y, unk05, unk06, unk07, unk08, un09, unk0a, unk0b, unk0c, unk0d, unk0e, map_ = struct.unpack('<BHHBBBBBBBBBBB',object_list_data[i:i+0x10])
+
+                    if map_ == level_counter:
+                        draw.rectangle(((x-8,y-8), (x+8,y+8)), "white","white")
+                        draw.text((x-5, y-5), f"{objectId:0{2}X}", "black")
+                        #img.paste(collectible_sprite, (x, y), collectible_sprite)
+                except:
+                    continue
+
             collectible_list_file = "../banks/bank_0"+f"{level_data[COLLECTIBLE_LIST_BANK]:x}"+".bin"
             end_addr = get_next_offset(sorted_collectible_list_offsets, [level_data[COLLECTIBLE_LIST_BANK], level_data[COLLECTIBLE_LIST_BANK_OFFSET]])
             collectible_list_data = open(collectible_list_file, "rb").read()[level_data[COLLECTIBLE_LIST_BANK_OFFSET]-0x4000:end_addr-0x4000] 
@@ -452,10 +470,10 @@ if generate_regular_maps:
                 if map_ == level_counter:
                     img.paste(collectible_sprite, (x*16, y*16), collectible_sprite)
                     #print(f"x={x}, y={y}, map={map_}")
-        
+
         output_path = map_image_path+level_name+"/"+level_name+"_"+f"{channel_map_number:0{2}}"+"_map.png"
-        if draw_collectibles:
-            output_path = map_image_path+"with_collectibles/"+level_name+"/"+level_name+"_"+f"{channel_map_number:0{2}}"+"_map.png"
+        if draw_objects_and_collectibles:
+            output_path = map_image_path+"with_objects/"+level_name+"/"+level_name+"_"+f"{channel_map_number:0{2}}"+"_map.png"
         img.save(output_path)
 
         os.system('rm -r tile_bins')
