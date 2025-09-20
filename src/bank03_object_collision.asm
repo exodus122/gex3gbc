@@ -63,7 +63,7 @@ call_03_4c38_UpdateObjectCollision:
     call call_03_550e                                  ;; 03:4ce1 $cd $0e $55
     ret  NC                                            ;; 03:4ce4 $d0
     cp   A, $00                                        ;; 03:4ce5 $fe $00
-    jp   NZ, jp_03_5671                                ;; 03:4ce7 $c2 $71 $56
+    jp   NZ, call_03_5671                                ;; 03:4ce7 $c2 $71 $56
 .jp_03_4cea:
     ld   A, [wD801_PlayerObject_ActionId]                                    ;; 03:4cea $fa $01 $d8
     cp   A, $09                                        ;; 03:4ced $fe $09
@@ -128,14 +128,14 @@ call_03_4c38_UpdateObjectCollision:
     set  4, [HL]                                       ;; 03:4da9 $cb $e6
     ld   A, $02                                        ;; 03:4dab $3e $02
     call call_00_0ff5                                  ;; 03:4dad $cd $f5 $0f
-    jp   jp_03_5671                                    ;; 03:4db0 $c3 $71 $56
+    jp   call_03_5671                                    ;; 03:4db0 $c3 $71 $56
 .data_03_4db3:
     call call_03_550e                                  ;; 03:4db3 $cd $0e $55
     ret  NC                                            ;; 03:4db6 $d0
     call call_00_0723                                  ;; 03:4db7 $cd $23 $07
     ld   A, $02                                        ;; 03:4dba $3e $02
     call call_00_0ff5                                  ;; 03:4dbc $cd $f5 $0f
-    jp   jp_03_5671                                    ;; 03:4dbf $c3 $71 $56
+    jp   call_03_5671                                    ;; 03:4dbf $c3 $71 $56
 .data_03_4dc2:
     call call_03_550e                                  ;; 03:4dc2 $cd $0e $55
     ret  NC                                            ;; 03:4dc5 $d0
@@ -169,7 +169,7 @@ call_03_4c38_UpdateObjectCollision:
 .jr_03_4df8:
     ld   A, $02                                        ;; 03:4df8 $3e $02
     call call_00_0ff5                                  ;; 03:4dfa $cd $f5 $0f
-    jp   jp_03_5671                                    ;; 03:4dfd $c3 $71 $56
+    jp   call_03_5671                                    ;; 03:4dfd $c3 $71 $56
 .data_03_4e00:
     db   $00, $20, $40, $80, $cd, $0e, $55, $d0        ;; 03:4e00 ?...????
     db   $cd, $3a, $29, $d6, $04, $6f, $26, $00        ;; 03:4e08 ????????
@@ -687,7 +687,8 @@ data_03_55ff:
     db   $00, $02, $01, $00, $00, $00, $03, $01        ;; 03:5667 ????????
     db   $01, $01                                      ;; 03:566f ??
 
-jp_03_5671:
+entry_03_5671:
+call_03_5671:
     ld   H, $d8                                        ;; 03:5671 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5673 $fa $00 $da
     or   A, $15                                        ;; 03:5676 $f6 $15
@@ -781,7 +782,7 @@ jp_03_57e6:
     ld   [HL], $00                                     ;; 03:57f5 $36 $00
     ret                                                ;; 03:57f7 $c9
 
-jp_03_57f8:
+call_03_57f8:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:57f8 $fa $00 $da
     ld   HL, wDC7B                                     ;; 03:57fb $21 $7b $dc
     cp   A, [HL]                                       ;; 03:57fe $be
@@ -799,13 +800,13 @@ jp_03_57f8:
 data_03_581a:
     ld   A, [wD801_PlayerObject_ActionId]                                    ;; 03:581a $fa $01 $d8
     cp   A, $1a                                        ;; 03:581d $fe $1a
-    jp   Z, jp_03_57f8                                 ;; 03:581f $ca $f8 $57
+    jp   Z, call_03_57f8                                 ;; 03:581f $ca $f8 $57
     cp   A, $2e                                        ;; 03:5822 $fe $2e
-    jp   Z, jp_03_57f8                                 ;; 03:5824 $ca $f8 $57
+    jp   Z, call_03_57f8                                 ;; 03:5824 $ca $f8 $57
     cp   A, $3b                                        ;; 03:5827 $fe $3b
-    jp   Z, jp_03_57f8                                 ;; 03:5829 $ca $f8 $57
+    jp   Z, call_03_57f8                                 ;; 03:5829 $ca $f8 $57
     cp   A, $1b                                        ;; 03:582c $fe $1b
-    jp   Z, jp_03_57f8                                 ;; 03:582e $ca $f8 $57
+    jp   Z, call_03_57f8                                 ;; 03:582e $ca $f8 $57
     ld   H, $d8                                        ;; 03:5831 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5833 $fa $00 $da
     or   A, $12                                        ;; 03:5836 $f6 $12
@@ -828,11 +829,11 @@ data_03_581a:
     ld   E, A                                          ;; 03:584d $5f
     ld   A, $00                                        ;; 03:584e $3e $00
     adc  A, D                                          ;; 03:5850 $8a
-    jr   NZ, jp_03_57f8                                ;; 03:5851 $20 $a5
+    jr   NZ, call_03_57f8                                ;; 03:5851 $20 $a5
     ld   A, C                                          ;; 03:5853 $79
     add  A, A                                          ;; 03:5854 $87
     cp   A, E                                          ;; 03:5855 $bb
-    jr   C, jp_03_57f8                                 ;; 03:5856 $38 $a0
+    jr   C, call_03_57f8                                 ;; 03:5856 $38 $a0
     inc  L                                             ;; 03:5858 $2c
     ld   A, [HL+]                                      ;; 03:5859 $2a
     sub  A, B                                          ;; 03:585a $90
@@ -865,11 +866,11 @@ data_03_581a:
     ld   A, B                                          ;; 03:5880 $78
     sbc  A, D                                          ;; 03:5881 $9a
     ld   B, A                                          ;; 03:5882 $47
-    jp   C, jp_03_57f8                                 ;; 03:5883 $da $f8 $57
-    jp   NZ, jp_03_57f8                                ;; 03:5886 $c2 $f8 $57
+    jp   C, call_03_57f8                                 ;; 03:5883 $da $f8 $57
+    jp   NZ, call_03_57f8                                ;; 03:5886 $c2 $f8 $57
     ld   A, C                                          ;; 03:5889 $79
     cp   A, $10                                        ;; 03:588a $fe $10
-    jp   NC, jp_03_57f8                                ;; 03:588c $d2 $f8 $57
+    jp   NC, call_03_57f8                                ;; 03:588c $d2 $f8 $57
     ld   A, [wDC8C]                                    ;; 03:588f $fa $8c $dc
     sra  A                                             ;; 03:5892 $cb $2f
     sra  A                                             ;; 03:5894 $cb $2f
@@ -881,7 +882,7 @@ data_03_581a:
     jp   NZ, jp_03_57e6                                ;; 03:589e $c2 $e6 $57
     cp   A, $02                                        ;; 03:58a1 $fe $02
     jp   C, jp_03_57e6                                 ;; 03:58a3 $da $e6 $57
-    jp   jp_03_57f8                                    ;; 03:58a6 $c3 $f8 $57
+    jp   call_03_57f8                                    ;; 03:58a6 $c3 $f8 $57
     db   $26, $d8, $fa, $00, $da, $f6, $1b, $6f        ;; 03:58a9 ????????
     db   $46, $2d, $2d, $cb, $7e, $28, $03, $af        ;; 03:58b1 ????????
     db   $90, $47, $fa, $84, $dc, $57, $fa, $85        ;; 03:58b9 ????????

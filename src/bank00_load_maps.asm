@@ -27,7 +27,7 @@ call_00_1056_LoadMap:
     call call_00_1a22_LoadBgMapInitial                                  ;; 00:1096 $cd $22 $1a
     ld   A, $03                                        ;; 00:1099 $3e $03
     call call_00_0eee_SwitchBank                                  ;; 00:109b $cd $ee $0e
-    ld   HL, image_003_4100_bg_collision_tileset                                     ;; 00:109e $21 $00 $41
+    ld   HL, image_003_4100_collision_tileset                                     ;; 00:109e $21 $00 $41
     ld   DE, wC400                                     ;; 00:10a1 $11 $00 $c4
 .jr_00_10a4:
     push DE                                            ;; 00:10a4 $d5

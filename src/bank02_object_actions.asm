@@ -179,7 +179,7 @@ call_02_59aa:
     call call_00_29f5
     ld   c,$78
     call nz,call_00_290d_ObjectSetTimer1A
-    call label59D2
+    call .label59D2
     call call_00_2b10
     ret  nz
     call call_00_230f
@@ -194,19 +194,19 @@ call_02_59aa:
     call call_00_2299
     ld   a,$04
     jp   entry_02_72ac
-label59D2:
+.label59D2:
     call call_00_293a_ObjectGetId
     sub  a,$09
     ld   l,a
     ld   h,$00
     add  hl,hl
-    ld   de,$59E3
+    ld   de,.data_02_59e3
     add  hl,de
     ld   b,[hl]
     inc  hl
     ld   c,[hl]
     ret  
-
+.data_02_59e3:
     db   $00, $04, $01, $05        ;; 02:59df ????????
     db   $02, $06, $03, $07, $04, $08
     
@@ -565,18 +565,46 @@ data_02_5c82:
     jp   NZ, call_02_72ac                              ;; 02:5c9d $c2 $ac $72
     ld   A, $06                                        ;; 02:5ca0 $3e $06
     jp   call_02_72ac                                  ;; 02:5ca2 $c3 $ac $72
-    db   $cd, $f5, $29, $3e, $19, $c4, $f5, $0f        ;; 02:5ca5 ????????
-    db   $fa, $71, $dc, $e6, $0f, $fe, $0c, $21        ;; 02:5cad ????????
-    db   $c8, $5c, $da, $20, $2c, $21, $c0, $5c        ;; 02:5cb5 ????????
-    db   $c3, $20, $2c, $00, $00, $00, $00, $1f        ;; 02:5cbd ????????
-    db   $00, $ff, $7f, $00, $00, $84, $10, $08        ;; 02:5cc5 ????????
-    db   $21, $8c, $31, $cd, $f5, $29, $28, $1b        ;; 02:5ccd ????????
-    db   $3e, $1a, $cd, $f5, $0f, $cd, $02, $5d        ;; 02:5cd5 ????????
-    db   $cd, $76, $29, $0e, $f2, $cb, $6f, $20        ;; 02:5cdd ????????
-    db   $02, $0e, $0e, $cd, $c8, $28, $0e, $05        ;; 02:5ce5 ????????
-    db   $cd, $dc, $28, $cd, $c0, $24, $cd, $ee        ;; 02:5ced ????????
-    db   $24, $cd, $5d, $2a, $c8, $0e, $03, $cd        ;; 02:5cf5 ????????
-    db   $ef, $21, $c3, $7a, $2b                       ;; 02:5cfd ?????
+
+call_02_5ca5:
+    call call_00_29f5
+    ld   a,$19
+    call nz,call_00_0ff5
+    ld   a,[wDC71]
+    and  a,$0F
+    cp   a,$0C
+    ld   hl,.data_02_5cc8
+    jp   c,call_00_2c20
+    ld   hl,.data_02_5cc0
+    jp   call_00_2c20
+.data_02_5cc0:
+    db   $00, $00, $00, $00, $1f, $00, $ff, $7f
+.data_02_5cc8:
+    db   $00, $00, $84, $10, $08, $21, $8c, $31
+    
+call_02_5cd0:
+    call call_00_29f5
+    jr   z,label5CF0
+    ld   a,$1A
+    call call_00_0ff5
+    call call_02_5d02
+    call call_00_2976_ObjectGetFacingDirection
+    ld   c,$F2
+    bit  5,a
+    jr   nz,label5CE8
+    ld   c,$0E
+label5CE8:
+    call call_00_28c8_ObjectSet1B
+    ld   c,$05
+    call call_00_28dc_ObjectSet1D
+label5CF0:
+    call call_00_24c0
+    call call_00_24ee
+    call call_00_2a5d
+    ret  z
+    ld   c,$03
+    call call_00_21ef
+    jp   jp_00_2b7a
 
 call_02_5d02:
     ld   HL, .data_02_5d08                             ;; 02:5d02 $21 $08 $5d
@@ -981,7 +1009,7 @@ call_02_5F9B:
     
 call_02_60c7:
     call call_00_29f5
-    jr   z,label60F2
+    jr   z,.label60F2
     ld   a,[wDCD3]
     add  a
     add  a
@@ -994,26 +1022,24 @@ call_02_60c7:
     ld   l,a
     ld   h,$00
     add  hl,hl
-    ld   de,$60FF
+    ld   de,.data_02_60ff
     add  hl,de
     ld   c,[hl]
     push hl
     call call_00_28c8_ObjectSet1B
     pop  hl
-label60E8:
     inc  hl
     ld   c,[hl]
     call call_00_28dc_ObjectSet1D
     ld   c,$5A
     call call_00_290d_ObjectSetTimer1A
-label60F2:
+.label60F2:
     call call_00_24c0
     call call_00_24ee
     call call_00_2922_ObjectTimer1ACountdown
-label60FB:
     jp   z,jp_00_2b7a
     ret  
-    
+.data_02_60ff:
     db   $e0, $20, $00, $20, $20        ;; 02:60fc ????????
     db   $20, $00, $20, $e0, $00, $e0, $20, $00        ;; 02:6104 ????????
     db   $20, $20, $20, $00, $20, $e0, $20, $e0        ;; 02:610c ????????
@@ -1093,9 +1119,9 @@ call_02_61b2:
     jp   call_00_2766
 
 call_02_61b8:
-    ld   hl,$61BE
+    ld   hl,.data_02_61be
     jp   call_00_2c20
-
+.data_02_61be:
     db   $00, $00, $ff, $7f, $b5, $56, $ad, $35
 
 call_02_61c6:
@@ -1303,9 +1329,9 @@ call_00_634c:
     jp   entry_02_72ac
 
 call_00_6361:
-    ld   de,$6367
+    ld   de,.data_02_6367
     jp   call_00_2a98
-    
+.data_02_6367:    
     db   $c0, $01, $20, $70, $00        ;; 02:6364 ????????
     db   $10, $36, $20, $20, $02, $c0, $01, $20        ;; 02:636c ????????
     db   $70, $00, $10, $36, $e0, $20, $02, $90        ;; 02:6374 ????????
@@ -1341,7 +1367,7 @@ call_00_63c0:
     call call_00_0ff5
     ld   [wDAD6_ReturnBank],a
     ld   a,$03
-    ld   hl,$57F8
+    ld   hl,entry_03_57f8
     call call_00_0edd_CallAltBankFunc
     jp   jp_00_2b7a
 
@@ -1418,27 +1444,29 @@ call_00_6459:
     call call_00_296c_ObjectGet9
     ld   l,a
     ld   h,$00
-    ld   de,$6467
+    ld   de,.data_02_6467
     add  hl,de
     ld   c,[hl]
     jp   call_00_294e_ObjectSet13
-    
+.data_02_6467:
     db   $10, $0e, $0c, $0a, $08        ;; 02:6464 ????????
     db   $06, $04, $02
 
 call_00_646f:
     ld   [wDAD6_ReturnBank],a
     ld   a,$03
-    ld   hl,$57F8
+    ld   hl,entry_03_57f8
     call call_00_0edd_CallAltBankFunc
     ret  
     call call_00_296c_ObjectGet9
     ld   l,a
     ld   h,$00
-    ld   de,$6489
+    ld   de,call_02_6489
     add  hl,de
     ld   c,[hl]
     jp   call_00_294e_ObjectSet13
+
+call_02_6489:
     ld   [bc],a
     inc  b
     ld   b,$08
@@ -1569,7 +1597,7 @@ label6589:
     ret  c
     ld   [wDAD6_ReturnBank],a
     ld   a,$03
-    ld   hl,$57F8
+    ld   hl,entry_03_57f8
     call call_00_0edd_CallAltBankFunc
     ld   a,$01
     jp   entry_02_72ac
@@ -1661,7 +1689,7 @@ label666B:
     ld   [hl],a
     ld   l,a
     ld   h,$00
-    ld   de,$667E
+    ld   de,call_02_667e
     add  hl,de
     ld   a,[hl]
     push af
@@ -1669,6 +1697,8 @@ label666B:
     call z,call_00_242d
     pop  af
     jp   entry_02_72ac
+
+call_02_667e:
     ld   bc,$0606
     ld   bc,$0104
     inc  b
@@ -1834,7 +1864,7 @@ label67DF:
     ret  nz
     call call_00_22d4
     ld   c,a
-    ld   hl,$686A
+    ld   hl,data_02_686a
 label67EE:
     push hl
     ldi  a,[hl]
@@ -1875,7 +1905,7 @@ label6810:
     jr   c,label6847
     or   c
     jr   nz,label6842
-    call $688E
+    call call_02_688E
     ld   l,c
     ld   h,$00
     add  hl,hl
@@ -1918,16 +1948,36 @@ label684A:
     or   e
     jp   z,jp_00_250d
     ret  
-    
+data_02_686a:    
     db   $00, $a0, $01, $98, $02        ;; 02:6867 ????????
     db   $01, $a0, $01, $58, $01, $01, $40, $03        ;; 02:686f ????????
     db   $d8, $01, $01, $c0, $05, $58, $02, $02        ;; 02:6877 ????????
     db   $a0, $01, $08, $01, $02, $40, $03, $58        ;; 02:687f ????????
-    db   $01, $02, $c0, $05, $d8, $01, $ff, $21        ;; 02:6887 ????????
-    db   $a9, $68, $16, $d8, $fa, $00, $da, $f6        ;; 02:688f ????????
-    db   $0e, $5f, $0e, $ff, $0c, $1a, $96, $47        ;; 02:6897 ????????
-    db   $13, $23, $1a, $9e, $1b, $23, $b0, $20        ;; 02:689f ????????
-    db   $f3, $c9, $a0, $01, $40, $03, $c0, $05        ;; 02:68a7 ????????
+    db   $01, $02, $c0, $05, $d8, $01, $ff
+    
+call_02_688E:
+    ld   hl,.data_02_68A9
+    ld   d,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   e,a
+    ld   c,$FF
+.label689B:
+    inc  c
+    ld   a,[de]
+    sub  [hl]
+    ld   b,a
+    inc  de
+    inc  hl
+    ld   a,[de]
+    sbc  [hl]
+    dec  de
+    inc  hl
+    or   b
+    jr   nz,.label689B
+    ret  
+.data_02_68A9:   
+    db   $a0, $01, $40, $03, $c0, $05        ;; 02:68a7 ????????
 
 call_02_68af:
     jp   call_00_233e
@@ -1935,7 +1985,7 @@ call_02_68af:
 call_02_68b2:
     call call_00_29f5
     ret  z
-    ld   hl,$68E5
+    ld   hl,.data_02_68e5
     call call_00_2c20
     call call_00_2826_ObjectSetXPosition
     ld   a,[wDC71]
@@ -1954,7 +2004,7 @@ call_02_68b2:
     ld   c,$00
     call call_00_28dc_ObjectSet1D
     ret  
-    
+.data_02_68e5:    
     db   $00, $00, $00, $00, $ff, $03, $ff, $7f
 
 call_02_68ed:
@@ -1968,7 +2018,7 @@ label68F6:
     jp   z,entry_02_72ac
     ld   l,[hl]
     ld   h,$00
-    ld   de,$6924
+    ld   de,.data_02_6924
     add  hl,de
     ld   c,[hl]
     call call_00_28dc_ObjectSet1D
@@ -1979,20 +2029,22 @@ label68F6:
     and  a,$03
     ld   l,a
     ld   h,$00
-    ld   de,$6920
+    ld   de,.data_02_6920
     add  hl,de
     ld   c,[hl]
     jp   call_00_28c8_ObjectSet1B
-    
-    db   $08, $f8, $04, $fc, $00, $20, $28, $30
+.data_02_6920:
+    db   $08, $f8, $04, $fc
+.data_02_6924:
+    db   $00, $20, $28, $30
 
 call_02_6928:
     call call_00_29f5
     ld   bc,$0008
     call nz,jp_00_250d
-    ld   hl,$6937
+    ld   hl,.data_02_6937
     jp   call_00_2c20
-
+.data_02_6937:
     db   $00, $00, $1b, $00, $5f, $02, $1f, $1b        ;; 02:6937 ????????
 
 call_02_693f:
@@ -2012,7 +2064,7 @@ call_02_6947:
     call entry_02_72ac
     ld   [wDAD6_ReturnBank],a
     ld   a,$03
-    ld   hl,$5671
+    ld   hl,entry_03_5671
     call call_00_0edd_CallAltBankFunc
     ret  
 
@@ -2041,20 +2093,20 @@ call_02_6971:
 
 call_02_69af:
     call call_00_29f5
-    jr   z,label69CB
+    jr   z,.label69CB
     ld   hl,wDCCE
     ld   a,[hl]
     inc  [hl]
     and  a,$07
     ld   l,a
     ld   h,$00
-    ld   de,$69FC
+    ld   de,.data_02_69fc
     add  hl,de
     ld   c,[hl]
     call call_00_28c8_ObjectSet1B
     ld   c,$20
     call call_00_28dc_ObjectSet1D
-label69CB:
+.label69CB:
     call call_00_244a
     ld   de,$0068
     ld   h,$D8
@@ -2079,7 +2131,7 @@ label69CB:
     call call_00_0ff5
     ld   a,$02
     jp   entry_02_72ac
-    
+.data_02_69fc:    
     db   $10, $f0, $08, $f8, $10, $f0, $04, $fc
     
 call_02_6A04:
@@ -2093,32 +2145,32 @@ call_02_6A04:
 
 call_02_6A13:
     call call_00_29f5
-    jr   z,label6A38
+    jr   z,.label6A38
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$0E
     ld   l,a
     ld   a,[hl]
-    ld   hl,$6A40
+    ld   hl,.data_02_6a40
     ld   b,$05
-label6A26:
+.label6A26:
     cp   [hl]
-    jr   c,label6A2E
+    jr   c,.label6A2E
     inc  hl
     inc  hl
     dec  b
-    jr   nz,label6A26
-label6A2E:
+    jr   nz,.label6A26
+.label6A2E:
     inc  hl
     ld   c,[hl]
     call call_00_28c8_ObjectSet1B
     ld   c,$D8
     call call_00_28dc_ObjectSet1D
-label6A38:
+.label6A38:
     call call_00_24c0
     call call_00_24ee
     jr   call_02_6A04
-
+.data_02_6a40:
     db   $17, $26, $35, $17, $44, $0f, $62        ;; 02:6a3f ????????
     db   $00, $71, $f9, $8f, $ea
     
@@ -2126,7 +2178,7 @@ call_02_6A4c:
     call call_00_29f5
     ld   a,$19
     call nz,call_00_0ff5
-    ld   hl,$6A89
+    ld   hl,.data_02_6a89
     call call_00_2c20
     call call_00_2a5d
     jp   nz,jp_00_2b7a
@@ -2154,7 +2206,7 @@ call_02_6A4c:
     ld   a,$01
     ld   [wDCD0],a
     ret  
-    
+.data_02_6a89:
     db   $00, $00, $1b, $00, $5f, $02, $1f, $1b
     
 call_02_6A91:
@@ -2340,7 +2392,7 @@ label6BDC:
 
     ld   [wDAD6_ReturnBank],a
     ld   a,$03
-    ld   hl,$57F8
+    ld   hl,entry_03_57f8
     call call_00_0edd_CallAltBankFunc
     call call_00_244a
     call call_00_2780
@@ -2514,7 +2566,7 @@ label6CF5:
     jr   z,label6D5C
     ld   c,$78
     call call_00_290d_ObjectSetTimer1A
-    label6D5C:
+label6D5C:
     call call_00_2922_ObjectTimer1ACountdown
     ret  nz
     ld   a,$01
@@ -2531,7 +2583,7 @@ label6CF5:
     call z,entry_02_72ac
     ld   a,$02
     ld   [wDCDA],a
-    label6D82:
+label6D82:
     jp   call_00_233e
     call call_00_233e
     ld   c,$69
@@ -2551,15 +2603,17 @@ label6CF5:
     bit  7,[hl]
     jr   z,label6DA7
     ld   [hl],$02
-    label6DA7:
+label6DA7:
     ld   l,[hl]
     ld   h,$00
-    ld   de,$6DB7
+    ld   de,call_02_6db7
     add  hl,de
     ld   c,[hl]
     call call_00_290d_ObjectSetTimer1A
     ld   a,$03
     jp   entry_02_72ac
+
+call_02_6db7:
     ld   c,c
     add  hl,sp
     add  hl,hl
@@ -2573,13 +2627,13 @@ label6CF5:
     ld   [wDCD1],a
     ld   a,$02
     jp   entry_02_72ac
-    label6DD2:
+label6DD2:
     and  a,$07
     ld   a,$04
     jp   z,entry_02_72ac
     ret  
 
-
+call_02_6dda:
     jp   call_00_233e
     call call_00_233e
     call call_00_29f5
@@ -2605,17 +2659,17 @@ label6CF5:
     ld   a,$08
     jp   entry_02_72ac
     call call_00_29f5
-    jr   z,label6E27
+    jr   z,.label6E27
     ld   a,$1A
     call call_00_0ff5
-    ld   hl,$6E3C
+    ld   hl,.data_6e3c
     call call_00_2c20
     call call_00_288c_ObjectUnkAndSet14
     call call_00_2b8b
     call call_00_2c67_Particle_InitBurst
     ld   c,$3C
     call call_00_290d_ObjectSetTimer1A
-    label6E27:
+.label6E27:
     call call_00_2c89_Particle_UpdateBurst
     ret  nz
     call call_00_2922_ObjectTimer1ACountdown
@@ -2625,7 +2679,7 @@ label6CF5:
     ld   hl,wDB6A
     set  4,[hl]
     jp   jp_00_2b7a
-    
+.data_6e3c:
     db   $00, $00, $08, $02, $04, $01, $ff, $7f
     
     call call_00_29f5
@@ -2874,8 +2928,10 @@ label7002:
     ld   a,$02
     jp   nc,entry_02_72ac
     ret  
+
+call_02_702e:
     call call_00_29f5
-    jr   z,label7056
+    jr   z,.label7056
     ld   hl,wDCDA
     ld   a,[hl]
     inc  [hl]
@@ -2884,7 +2940,7 @@ label7002:
     ld   l,a
     ld   h,$00
     add  hl,hl
-    ld   de,$707F
+    ld   de,.data_02_707f
     add  hl,de
     pop  af
     ld   c,[hl]
@@ -2892,15 +2948,15 @@ label7002:
     push bc
     ld   c,[hl]
     and  a,$01
-    jr   z,label704F
+    jr   z,.label704F
     xor  a
     sub  [hl]
     ld   c,a
-label704F:
+.label704F:
     call call_00_28c8_ObjectSet1B
     pop  bc
     call call_00_28dc_ObjectSet1D
-label7056:
+.label7056:
     call call_00_24c0
     call call_00_244a
     call call_00_28f1_ObjectCheckIf1DIsZero
@@ -2923,6 +2979,6 @@ label7056:
     call call_00_0ff5
     ld   a,$01
     jp   entry_02_72ac
-
+.data_02_707f:
     db   $30, $28, $30, $28, $20, $30, $20, $30        ;; 02:707f ????????
     db   $40, $10, $40, $10, $50, $08, $50, $08        ;; 02:7087 ????????

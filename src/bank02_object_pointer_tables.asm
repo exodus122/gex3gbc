@@ -199,7 +199,10 @@ data_02_4000:
     dw   data_02_76d9                                  ;; 02:436e pP
     dw   data_02_5c82                                  ;; 02:4370 pP
     dw   data_02_76df                                  ;; 02:4372 pP
-    db   $a5, $5c, $e5, $76, $d0, $5c, $f2, $76        ;; 02:4374 ????????
+    dw   call_02_5ca5
+    db   $e5, $76
+    dw   call_02_5cd0
+    db   $f2, $76        ;; 02:4374 ????????
     dw   data_02_5d10                                  ;; 02:437c pP
     dw   data_02_7701                                  ;; 02:437e pP
     dw   data_02_5d80                                  ;; 02:4380 pP
