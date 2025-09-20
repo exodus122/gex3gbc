@@ -250,7 +250,7 @@ wDADB:
 wDADC:
     ds 1                                               ;; dadc
 
-wDADD:
+wDADD: ; text buffer
     ds 1                                               ;; dadd
 
 wDADE:
@@ -941,10 +941,25 @@ wDC97:
     ds 1                                               ;; dc97
 
 wDC98:
-    ds 5                                               ;; dc98
+    ds 3                                               ;; dc98
+
+wDC9B:
+    ds 1                                               ;; dc9b
+
+wDC9C:
+    ds 1                                               ;; dc9c
 
 wDC9D:
-    ds 4                                               ;; dc9d
+    ds 1                                               ;; dc9d
+
+wDC9E:
+    ds 1                                               ;; dc9e
+
+wDC9F:
+    ds 1                                               ;; dc9f
+
+wDCA0:
+    ds 1                                               ;; dca0
 
 wDCA1:
     ds 1                                               ;; dca1
@@ -956,7 +971,13 @@ wDCA3:
     ds 1                                               ;; dca3
 
 wDCA4:
-    ds 3                                               ;; dca4
+    ds 1                                               ;; dca4
+
+wDCA5:
+    ds 1                                               ;; dca5
+
+wDCA6:
+    ds 1                                               ;; dca6
 
 wDCA7:
     ds 1                                               ;; dca7

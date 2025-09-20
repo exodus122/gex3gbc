@@ -748,7 +748,7 @@ call_01_446b:
     dw   call_01_46f9                                  ;; 01:4579 pP
     dw   call_01_470c                                  ;; 01:457b pP
     dw   call_01_4760                                  ;; 01:457d pP
-    db   $7b, $47                                      ;; 01:457f ??
+    dw   call_01_477b                                      ;; 01:457f ??
     dw   call_01_477c                                  ;; 01:4581 pP
     dw   call_01_47aa                                  ;; 01:4583 pP
     dw   call_01_47b1                                  ;; 01:4585 pP
@@ -908,38 +908,38 @@ call_01_4722:
     call call_00_0777                                  ;; 01:4728 $cd $77 $07
     jp   HL                                            ;; 01:472b $e9
 .data_01_472c:
-    dw   data_01_4acf                                  ;; 01:472c pP
-    dw   data_01_4b0a                                  ;; 01:472e pP
-    dw   data_01_4af9                                  ;; 01:4730 pP
-    dw   .data_01_4744                                 ;; 01:4732 pP
+    dw   call_01_4acf                                  ;; 01:472c pP
+    dw   call_01_4b0a                                  ;; 01:472e pP
+    dw   call_01_4af9                                  ;; 01:4730 pP
+    dw   .call_01_4744                                 ;; 01:4732 pP
     dw   call_01_4ae7                                  ;; 01:4734 pP
-    dw   .data_01_4748                                 ;; 01:4736 pP
+    dw   .call_01_4748                                 ;; 01:4736 pP
     dw   call_01_4ab9                                  ;; 01:4738 pP
-    dw   .data_01_474c                                 ;; 01:473a pP
-    dw   .data_01_4756                                 ;; 01:473c pP
-    dw   .data_01_4759                                 ;; 01:473e pP
-    dw   .data_01_475c                                 ;; 01:4740 pP
-    db   $34, $2f                                      ;; 01:4742 ??
-.data_01_4744:
+    dw   .call_01_474c                                 ;; 01:473a pP
+    dw   .call_01_4756                                 ;; 01:473c pP
+    dw   .call_01_4759                                 ;; 01:473e pP
+    dw   .call_01_475c                                 ;; 01:4740 pP
+    dw   call_00_2f34                                      ;; 01:4742 ??
+.call_01_4744:
     ld   A, [wDC68]                                    ;; 01:4744 $fa $68 $dc
     ret                                                ;; 01:4747 $c9
-.data_01_4748:
+.call_01_4748:
     ld   A, [wDCAF]                                    ;; 01:4748 $fa $af $dc
     ret                                                ;; 01:474b $c9
-.data_01_474c:
+.call_01_474c:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 01:474c $fa $1e $dc
     and  A, A                                          ;; 01:474f $a7
     ld   A, $01                                        ;; 01:4750 $3e $01
     ret  Z                                             ;; 01:4752 $c8
     ld   A, $04                                        ;; 01:4753 $3e $04
     ret                                                ;; 01:4755 $c9
-.data_01_4756:
+.call_01_4756:
     ld   A, $03                                        ;; 01:4756 $3e $03
     ret                                                ;; 01:4758 $c9
-.data_01_4759:
+.call_01_4759:
     ld   A, $01                                        ;; 01:4759 $3e $01
     ret                                                ;; 01:475b $c9
-.data_01_475c:
+.call_01_475c:
     ld   A, [wDC4E]                                    ;; 01:475c $fa $4e $dc
     ret                                                ;; 01:475f $c9
 
@@ -955,7 +955,9 @@ call_01_4760:
     ld   DE, data_01_5b61                              ;; 01:4772 $11 $61 $5b
     call call_00_0777                                  ;; 01:4775 $cd $77 $07
     jp   call_01_4c45                                  ;; 01:4778 $c3 $45 $4c
-    db   $c9                                           ;; 01:477b ?
+
+call_01_477b:
+    ret                                           ;; 01:477b ?
 
 call_01_477c:
     ld   HL, wDBA7                                     ;; 01:477c $21 $a7 $db
@@ -1437,7 +1439,7 @@ call_01_4ab9:
     ld   A, C                                          ;; 01:4acd $79
     ret                                                ;; 01:4ace $c9
 
-data_01_4acf:
+call_01_4acf:
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 01:4acf $21 $1e $dc
     ld   L, [HL]                                       ;; 01:4ad2 $6e
     ld   H, $00                                        ;; 01:4ad3 $26 $00
@@ -1472,7 +1474,7 @@ call_01_4ae7:
     ld   A, C                                          ;; 01:4af7 $79
     ret                                                ;; 01:4af8 $c9
 
-data_01_4af9:
+call_01_4af9:
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 01:4af9 $21 $1e $dc
     ld   L, [HL]                                       ;; 01:4afc $6e
     ld   H, $00                                        ;; 01:4afd $26 $00
@@ -1484,7 +1486,7 @@ data_01_4af9:
     ld   A, $01                                        ;; 01:4b07 $3e $01
     ret                                                ;; 01:4b09 $c9
 
-data_01_4b0a:
+call_01_4b0a:
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 01:4b0a $21 $1e $dc
     ld   L, [HL]                                       ;; 01:4b0d $6e
     ld   H, $00                                        ;; 01:4b0e $26 $00

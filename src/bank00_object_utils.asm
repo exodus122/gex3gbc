@@ -1,3 +1,42 @@
+call_00_2260:
+    push BC                                            ;; 00:2260 $c5
+    ld   A, [wDC16_ObjectListBank]                                    ;; 00:2261 $fa $16 $dc
+    call call_00_0eee_SwitchBank                                  ;; 00:2264 $cd $ee $0e
+    pop  BC                                            ;; 00:2267 $c1
+    ld   HL, wDC17_ObjectListBankOffset                                     ;; 00:2268 $21 $17 $dc
+    ld   A, [HL+]                                      ;; 00:226b $2a
+    ld   H, [HL]                                       ;; 00:226c $66
+    ld   L, A                                          ;; 00:226d $6f
+    ld   B, $01                                        ;; 00:226e $06 $01
+.jr_00_2270:
+    push HL                                            ;; 00:2270 $e5
+    ld   A, [HL]                                       ;; 00:2271 $7e
+    cp   A, $12                                        ;; 00:2272 $fe $12
+    jr   NZ, .jr_00_227e                               ;; 00:2274 $20 $08
+    ld   DE, $0d                                       ;; 00:2276 $11 $0d $00
+    add  HL, DE                                        ;; 00:2279 $19
+    ld   A, [HL]                                       ;; 00:227a $7e
+    cp   A, C                                          ;; 00:227b $b9
+    jr   Z, .jr_00_228c                                ;; 00:227c $28 $0e
+.jr_00_227e:
+    inc  B                                             ;; 00:227e $04
+    pop  HL                                            ;; 00:227f $e1
+    ld   DE, $10                                       ;; 00:2280 $11 $10 $00
+    add  HL, DE                                        ;; 00:2283 $19
+    ld   A, [HL]                                       ;; 00:2284 $7e
+    cp   A, $ff                                        ;; 00:2285 $fe $ff
+    jr   NZ, .jr_00_2270                               ;; 00:2287 $20 $e7
+    jp   call_00_0f08_SwitchBank2                                  ;; 00:2289 $c3 $08 $0f
+.jr_00_228c:
+    pop  HL                                            ;; 00:228c $e1
+    ld   E, B                                          ;; 00:228d $58
+    ld   D, $d7                                        ;; 00:228e $16 $d7
+    ld   A, [DE]                                       ;; 00:2290 $1a
+    and  A, $f0                                        ;; 00:2291 $e6 $f0
+    or   A, $04                                        ;; 00:2293 $f6 $04
+    ld   [DE], A                                       ;; 00:2295 $12
+    jp   call_00_0f08_SwitchBank2                                  ;; 00:2296 $c3 $08 $0f
+
 call_00_2299:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2299 $fa $00 $da
     rlca                                               ;; 00:229c $07
@@ -175,7 +214,7 @@ call_00_233e:
     adc  a,$00
     ld   d,a
     push de
-    call call_00_2835
+    call call_00_2835_GetDA24
     pop  hl
     add  hl,de
     push hl
@@ -185,7 +224,7 @@ call_00_233e:
     adc  a,$00
     ld   b,a
     push bc
-    call call_00_27f3
+    call call_00_27f3_GetDA26
     pop  hl
     add  hl,de
     push hl
@@ -317,7 +356,7 @@ label248A:
     ld   a,[hl]
     adc  b
     ld   [hl],a
-    call call_00_27f3
+    call call_00_27f3_GetDA26
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$10
@@ -595,7 +634,7 @@ call_00_2613:
     ld   a,[hl]
     cp   c
     ret  
-    call call_00_2857
+    call call_00_2857_GetDA1E
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$0E
@@ -605,7 +644,7 @@ call_00_2613:
     ldd  a,[hl]
     sbc  d
     jr   c,label2639
-    call call_00_2846
+    call call_00_2846_GetDA1C
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$0E
@@ -632,7 +671,7 @@ call_00_2645:
     bit  $7,a
     jr   nz,label265B
     ld   b,$00
-    call call_00_2846
+    call call_00_2846_GetDA1C
     call call_00_2678
     ld   a,c
     sub  e
@@ -647,7 +686,7 @@ label265B:
     sub  c
     ld   c,a
     ld   b,$FF
-    call call_00_2857
+    call call_00_2857_GetDA1E
     call call_00_2678
     ld   a,e
     sub  c
@@ -683,7 +722,7 @@ call_00_2678:
     bit  $7,a
     jr   nz,label269D
     ld   b,$00
-    call call_00_2804
+    call call_00_2804_GetDA20
     call call_00_26BA
     ld   a,c
     sub  e
@@ -698,7 +737,7 @@ label269D:
     sub  c
     ld   c,a
     ld   b,$FF
-    call call_00_2815
+    call call_00_2815_GetDA22
     call call_00_26BA
     ld   a,e
     sub  c
@@ -820,13 +859,13 @@ call_00_2722:
     add  A, A                                          ;; 00:2742 $87
     cp   A, E                                          ;; 00:2743 $bb
     jr   C, .jr_00_2764                                ;; 00:2744 $38 $1e
-    call call_00_2857                                  ;; 00:2746 $cd $57 $28
+    call call_00_2857_GetDA1E                                  ;; 00:2746 $cd $57 $28
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2749 $fa $0e $d8
     sub  A, E                                          ;; 00:274c $93
     ld   A, [wD80F_PlayerXPosition]                                    ;; 00:274d $fa $0f $d8
     sbc  A, D                                          ;; 00:2750 $9a
     jr   C, .jr_00_2764                                ;; 00:2751 $38 $11
-    call call_00_2846                                  ;; 00:2753 $cd $46 $28
+    call call_00_2846_GetDA1C                                  ;; 00:2753 $cd $46 $28
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2756 $fa $0e $d8
     sub  A, E                                          ;; 00:2759 $93
     ld   A, [wD80F_PlayerXPosition]                                    ;; 00:275a $fa $0f $d8
@@ -840,7 +879,7 @@ call_00_2722:
     ret                                                ;; 00:2765 $c9
 
 call_00_2766:
-    call call_00_27f3                                  ;; 00:2766 $cd $f3 $27
+    call call_00_27f3_GetDA26                                  ;; 00:2766 $cd $f3 $27
     ld   H, $d8                                        ;; 00:2769 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:276b $fa $00 $da
     or   A, $10                                        ;; 00:276e $f6 $10
@@ -880,7 +919,7 @@ call_00_2780:
     ret  
 
 call_00_2799:
-    call call_00_2835
+    call call_00_2835_GetDA24
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$0E
@@ -902,7 +941,7 @@ label27B3:
     srl  d
     rr   e
     push de
-    call call_00_27f3
+    call call_00_27f3_GetDA26
     pop  hl
     add  hl,de
     ld   d,$D8
@@ -933,8 +972,8 @@ call_00_27cb:
     ld   [hl],a
     ret  
 
-call_00_27e4:
-    call call_00_27f3
+call_00_27e4_ObjectSetYPosition:
+    call call_00_27f3_GetDA26
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$10
@@ -944,7 +983,7 @@ call_00_27e4:
     ld   [hl],d
     ret  
 
-call_00_27f3:
+call_00_27f3_GetDA26:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:27f3 $fa $00 $da
     rrca                                               ;; 00:27f6 $0f
     and  A, $70                                        ;; 00:27f7 $e6 $70
@@ -957,7 +996,7 @@ call_00_27f3:
     ld   D, [HL]                                       ;; 00:2802 $56
     ret                                                ;; 00:2803 $c9
 
-call_00_2804:
+call_00_2804_GetDA20:
     ld   a,[wDA00_CurrentObjectAddr]
     rrca 
     and  a,$70
@@ -970,7 +1009,7 @@ call_00_2804:
     ld   d,[hl]
     ret  
 
-call_00_2815:
+call_00_2815_GetDA22:
     ld   a,[wDA00_CurrentObjectAddr]
     rrca 
     and  a,$70
@@ -983,8 +1022,8 @@ call_00_2815:
     ld   d,[hl]
     ret  
 
-call_00_2826:
-    call call_00_2835
+call_00_2826_ObjectSetXPosition:
+    call call_00_2835_GetDA24
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$0E
@@ -994,7 +1033,7 @@ call_00_2826:
     ld   [hl],d
     ret  
 
-call_00_2835:
+call_00_2835_GetDA24:
     ld   a,[wDA00_CurrentObjectAddr]
     rrca 
     and  a,$70
@@ -1007,7 +1046,7 @@ call_00_2835:
     ld   d,[hl]
     ret  
 
-call_00_2846:
+call_00_2846_GetDA1C:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2846 $fa $00 $da
     rrca                                               ;; 00:2849 $0f
     and  A, $70                                        ;; 00:284a $e6 $70
@@ -1020,7 +1059,7 @@ call_00_2846:
     ld   D, [HL]                                       ;; 00:2855 $56
     ret                                                ;; 00:2856 $c9
 
-call_00_2857:
+call_00_2857_GetDA1E:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2857 $fa $00 $da
     rrca                                               ;; 00:285a $0f
     and  A, $70                                        ;; 00:285b $e6 $70
@@ -1033,7 +1072,7 @@ call_00_2857:
     ld   D, [HL]                                       ;; 00:2866 $56
     ret                                                ;; 00:2867 $c9
 
-call_00_2868:
+call_00_2868_SetDA1C:
     ld   a,[wDA00_CurrentObjectAddr]
     rrca 
     and  a,$70
@@ -1046,7 +1085,7 @@ call_00_2868:
     ld   [hl],d
     ret  
 
-call_00_2879:
+call_00_2879_SetDA1E:
     ld   a,[wDA00_CurrentObjectAddr]
     rrca 
     and  a,$70
