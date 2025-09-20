@@ -1,7 +1,12 @@
 data_02_582e:
     ret                                                ;; 02:582e $c9
-    db   $cd, $8a, $28, $cd, $8b, $2b, $cd, $5d        ;; 02:582f ????????
-    db   $2a, $c2, $be, $2b, $c9                       ;; 02:5837 ?????
+
+data_02_582f:
+    call call_00_288c_ObjectUnkAndSet14
+    call call_00_2b8b
+    call call_00_2a5d
+    jp   nz,jp_00_2bbe
+    ret  
 
 data_02_583c:
     call call_00_29f5                                  ;; 02:583c $cd $f5 $29
@@ -17,36 +22,137 @@ data_02_583c:
     ret                                                ;; 02:5856 $c9
 .data_02_5857:
     db   $00, $00, $08, $02, $04, $01, $ff, $7f        ;; 02:5857 ........
-    db   $cd, $f5, $29, $28, $0a, $0e, $80, $cd        ;; 02:585f ????????
-    db   $80, $29, $0e, $f0, $cd, $0d, $29, $cd        ;; 02:5867 ????????
-    db   $8a, $29, $cb, $7e, $28, $17, $0e, $00        ;; 02:586f ????????
-    db   $cd, $c8, $28, $cd, $22, $29, $c0, $cd        ;; 02:5877 ????????
-    db   $8a, $29, $e6, $7f, $ee, $40, $77, $cd        ;; 02:587f ????????
-    db   $0f, $23, $c3, $0d, $29, $0e, $01, $cd        ;; 02:5887 ????????
-    db   $c8, $28, $cd, $8a, $29, $01, $01, $00        ;; 02:588f ????????
-    db   $cb, $76, $20, $03, $01, $ff, $ff, $26        ;; 02:5897 ????????
-    db   $d8, $fa, $00, $da, $f6, $0e, $6f, $79        ;; 02:589f ????????
-    db   $86, $22, $78, $8e, $77, $cd, $c9, $26        ;; 02:58a7 ????????
-    db   $cd, $22, $29, $c0, $cd, $8a, $29, $cb        ;; 02:58af ????????
-    db   $fe, $0e, $78, $c3, $0d, $29, $cd, $f5        ;; 02:58b7 ????????
-    db   $29, $28, $0a, $0e, $80, $cd, $80, $29        ;; 02:58bf ????????
-    db   $0e, $f0, $cd, $0d, $29, $cd, $8a, $29        ;; 02:58c7 ????????
-    db   $cb, $7e, $28, $17, $0e, $00, $cd, $dc        ;; 02:58cf ????????
-    db   $28, $cd, $22, $29, $c0, $cd, $8a, $29        ;; 02:58d7 ????????
-    db   $e6, $7f, $ee, $40, $77, $cd, $0f, $23        ;; 02:58df ????????
-    db   $c3, $0d, $29, $0e, $01, $cd, $dc, $28        ;; 02:58e7 ????????
-    db   $cd, $8a, $29, $01, $01, $00, $cb, $76        ;; 02:58ef ????????
-    db   $20, $03, $01, $ff, $ff, $26, $d8, $fa        ;; 02:58f7 ????????
-    db   $00, $da, $f6, $10, $6f, $79, $86, $22        ;; 02:58ff ????????
-    db   $78, $8e, $77, $cd, $22, $29, $c0, $cd        ;; 02:5907 ????????
-    db   $8a, $29, $cb, $fe, $0e, $78, $c3, $0d        ;; 02:590f ????????
-    db   $29, $fa, $71, $dc, $0f, $e6, $0f, $6f        ;; 02:5917 ????????
-    db   $26, $00, $29, $29, $01, $4f, $59, $09        ;; 02:591f ????????
-    db   $4d, $44, $cd, $35, $28, $26, $d8, $fa        ;; 02:5927 ????????
-    db   $00, $da, $f6, $0e, $6f, $0a, $83, $22        ;; 02:592f ????????
-    db   $03, $0a, $8a, $77, $03, $cd, $f3, $27        ;; 02:5937 ????????
-    db   $26, $d8, $fa, $00, $da, $f6, $10, $6f        ;; 02:593f ????????
-    db   $0a, $83, $22, $03, $0a, $8a, $77, $c9        ;; 02:5947 ????????
+
+call_02_585f:   
+    call call_00_29f5
+    jr   z,label586E
+    ld   c,$80
+    call call_00_2980_ObjectSet19
+    ld   c,$F0
+    call call_00_290d_ObjectSetTimer1A
+label586E:
+    call call_00_298a_ObjectGet19
+    bit  7,[hl]
+    jr   z,label588C
+    ld   c,$00
+    call call_00_28c8_ObjectSet1B
+    call call_00_2922_ObjectTimer1ACountdown
+    ret  nz
+    call call_00_298a_ObjectGet19
+    and  a,$7F
+    xor  a,$40
+    ld   [hl],a
+    call call_00_230f
+    jp   call_00_290d_ObjectSetTimer1A
+label588C:
+    ld   c,$01
+    call call_00_28c8_ObjectSet1B
+    call call_00_298a_ObjectGet19
+    ld   bc,$0001
+    bit  6,[hl]
+    jr   nz,label589E
+    ld   bc,$FFFF
+label589E:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   l,a
+    ld   a,c
+    add  [hl]
+    ldi  [hl],a
+    ld   a,b
+    adc  [hl]
+    ld   [hl],a
+    call call_00_26c9
+    call call_00_2922_ObjectTimer1ACountdown
+    ret  nz
+    call call_00_298a_ObjectGet19
+    set  7,[hl]
+    ld   c,$78
+    jp   call_00_290d_ObjectSetTimer1A
+    call call_00_29f5
+    jr   z,label58CC
+    ld   c,$80
+    call call_00_2980_ObjectSet19
+    ld   c,$F0
+    call call_00_290d_ObjectSetTimer1A
+label58CC:
+    call call_00_298a_ObjectGet19
+    bit  7,[hl]
+    jr   z,label58EA
+    ld   c,$00
+    call call_00_28dc_ObjectSet1D
+    call call_00_2922_ObjectTimer1ACountdown
+    ret  nz
+    call call_00_298a_ObjectGet19
+    and  a,$7F
+    xor  a,$40
+    ld   [hl],a
+    call call_00_230f
+    jp   call_00_290d_ObjectSetTimer1A
+label58EA:
+    ld   c,$01
+    call call_00_28dc_ObjectSet1D
+    call call_00_298a_ObjectGet19
+    ld   bc,$0001
+    bit  6,[hl]
+    jr   nz,label58FC
+    ld   bc,$FFFF
+label58FC:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$10
+    ld   l,a
+    ld   a,c
+    add  [hl]
+    ldi  [hl],a
+    ld   a,b
+    adc  [hl]
+    ld   [hl],a
+    call call_00_2922_ObjectTimer1ACountdown
+    ret  nz
+    call call_00_298a_ObjectGet19
+    set  7,[hl]
+    ld   c,$78
+    jp   call_00_290d_ObjectSetTimer1A
+    ld   a,[wDC71]
+    rrca 
+    and  a,$0F
+    ld   l,a
+    ld   h,00
+    add  hl,hl
+    add  hl,hl
+    ld   bc,$594F
+    add  hl,bc
+    ld   c,l
+    ld   b,h
+    call call_00_2835_GetDA24
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   l,a
+    ld   a,[bc]
+    add  e
+    ldi  [hl],a
+    inc  bc
+    ld   a,[bc]
+    adc  d
+    ld   [hl],a
+    inc  bc
+    call call_00_27f3_GetDA26
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$10
+    ld   l,a
+    ld   a,[bc]
+    add  e
+    ldi  [hl],a
+    inc  bc
+    ld   a,[bc]
+    adc  d
+    ld   [hl],a
+    ret  
+
     db   $00, $00, $de, $ff, $fe, $ff, $dc, $ff        ;; 02:594f ????????
     db   $fc, $ff, $e0, $ff, $fc, $ff, $e0, $ff        ;; 02:5957 ????????
     db   $fa, $ff, $e2, $ff, $fc, $ff, $e4, $ff        ;; 02:595f ????????
@@ -55,21 +161,68 @@ data_02_583c:
     db   $fe, $ff, $de, $ff, $fc, $ff, $dc, $ff        ;; 02:5977 ????????
     db   $fa, $ff, $da, $ff, $fc, $ff, $d8, $ff        ;; 02:597f ????????
     db   $fe, $ff, $da, $ff, $00, $00, $dc, $ff        ;; 02:5987 ????????
-    db   $cd, $d2, $59, $c5, $cd, $10, $2b, $c1        ;; 02:598f ????????
-    db   $48, $cc, $92, $37, $3e, $03, $c3, $ac        ;; 02:5997 ????????
-    db   $72, $00, $04, $01, $05, $02, $06, $03        ;; 02:599f ????????
-    db   $07, $04, $08, $cd, $f5, $29, $0e, $78        ;; 02:59a7 ????????
-    db   $c4, $0d, $29, $cd, $d2, $59, $cd, $10        ;; 02:59af ????????
-    db   $2b, $c0, $cd, $0f, $23, $79, $a7, $c8        ;; 02:59b7 ????????
-    db   $cd, $22, $29, $c0, $0e, $01, $cd, $aa        ;; 02:59bf ????????
-    db   $28, $0e, $00, $cd, $99, $22, $3e, $04        ;; 02:59c7 ????????
-    db   $c3, $ac, $72, $cd, $3a, $29, $d6, $09        ;; 02:59cf ????????
-    db   $6f, $26, $00, $29, $11, $e3, $59, $19        ;; 02:59d7 ????????
-    db   $46, $23, $4e, $c9, $00, $04, $01, $05        ;; 02:59df ????????
-    db   $02, $06, $03, $07, $04, $08, $cd, $f5        ;; 02:59e7 ????????
-    db   $29, $28, $0e, $cd, $76, $29, $0e, $d0        ;; 02:59ef ????????
-    db   $e6, $20, $20, $02, $0e, $30, $cd, $c8        ;; 02:59f7 ????????
-    db   $28, $cd, $c0, $24, $c9                       ;; 02:59ff ?????
+
+call_02_598f:
+    call $59D2
+    push bc
+    call call_00_2b10
+    pop  bc
+    ld   c,b
+    call z,call_00_3792
+    ld   a,$03
+    jp   entry_02_72ac
+    
+    db   $00, $04, $01, $05, $02, $06, $03        ;; 02:599f ????????
+    db   $07, $04, $08
+
+call_02_59aa:
+    call call_00_29f5
+    ld   c,$78
+    call nz,call_00_290d_ObjectSetTimer1A
+    call label59D2
+    call call_00_2b10
+    ret  nz
+    call call_00_230f
+    ld   a,c
+    and  a
+    ret  z
+    call call_00_2922_ObjectTimer1ACountdown
+    ret  nz
+    ld   c,$01
+    call call_00_28aa_ObjectSet16
+    ld   c,$00
+    call call_00_2299
+    ld   a,$04
+    jp   entry_02_72ac
+label59D2:
+    call call_00_293a_ObjectGetId
+    sub  a,$09
+    ld   l,a
+    ld   h,$00
+    add  hl,hl
+    ld   de,$59E3
+    add  hl,de
+    ld   b,[hl]
+    inc  hl
+    ld   c,[hl]
+    ret  
+
+    db   $00, $04, $01, $05        ;; 02:59df ????????
+    db   $02, $06, $03, $07, $04, $08
+    
+call_02_59ed:
+    call call_00_29f5
+    jr   z,label5A00
+    call call_00_2976_ObjectGetFacingDirection
+    ld   c,$D0
+    and  a,$20
+    jr   nz,label59FD
+    ld   c,$30
+label59FD:
+    call call_00_28c8_ObjectSet1B
+label5A00:
+    call call_00_24c0
+    ret  
 
 data_02_5a04:
     call call_00_29f5                                  ;; 02:5a04 $cd $f5 $29
@@ -289,11 +442,23 @@ data_02_5b9a:
     ret                                                ;; 02:5bb2 $c9
 
 entry_02_5bb3:
-    db   $26, $d8, $fa, $00, $da, $f6, $0e, $6f        ;; 02:5bb3 ????????
-    db   $fa, $f9, $db, $c6, $50, $22, $fa, $fa        ;; 02:5bbb ????????
-    db   $db, $ce, $00, $22, $fa, $fb, $db, $c6        ;; 02:5bc3 ????????
-    db   $08, $22, $fa, $fc, $db, $ce, $00, $77        ;; 02:5bcb ????????
-    db   $c9                                           ;; 02:5bd3 ?
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   l,a
+    ld   a,[wDBF9_XPositionInMap]
+    add  a,$50
+    ldi  [hl],a
+    ld   a,[wDBFA_XPositionInMap]
+    adc  a,$00
+    ldi  [hl],a
+    ld   a,[wDBFB_YPositionInMap]
+    add  a,$08
+    ldi  [hl],a
+    ld   a,[wDBFC_YPositionInMap]
+    adc  a,$00
+    ld   [hl],a
+    ret  
 
 data_02_5bd4:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 02:5bd4 $fa $1e $dc
@@ -645,38 +810,142 @@ data_02_5eb8:
     ld   A, $00                                        ;; 02:5ec6 $3e $00
     jp   NC, call_02_72ac                              ;; 02:5ec8 $d2 $ac $72
     ret                                                ;; 02:5ecb $c9
-    db   $0e, $14, $cd, $c8, $28, $cd, $10, $24        ;; 02:5ecc ????????
-    db   $cd, $4a, $25, $c3, $17, $26, $c9, $c9        ;; 02:5ed4 ????????
-    db   $c9, $cd, $22, $27, $28, $0f, $cd, $68        ;; 02:5edc ????????
-    db   $2a, $cd, $76, $29, $21, $12, $da, $be        ;; 02:5ee4 ????????
-    db   $3e, $01, $ca, $ac, $72, $0e, $08, $cd        ;; 02:5eec ????????
-    db   $88, $25, $c3, $1c, $25, $0e, $20, $cd        ;; 02:5ef4 ????????
-    db   $88, $25, $c3, $1c, $25, $cd, $f5, $29        ;; 02:5efc ????????
-    db   $0e, $f0, $c4, $0d, $29, $cd, $22, $27        ;; 02:5f04 ????????
-    db   $28, $14, $cd, $68, $2a, $cd, $76, $29        ;; 02:5f0c ????????
-    db   $21, $12, $da, $be, $28, $08, $fa, $11        ;; 02:5f14 ????????
-    db   $da, $fe, $40, $dc, $10, $24, $0e, $06        ;; 02:5f1c ????????
-    db   $cd, $c8, $28, $cd, $1c, $25, $0e, $27        ;; 02:5f24 ????????
-    db   $cd, $10, $2b, $c0, $cd, $22, $29, $3e        ;; 02:5f2c ????????
-    db   $01, $ca, $ac, $72, $c9, $cd, $f5, $29        ;; 02:5f34 ????????
-    db   $0e, $06, $c4, $92, $37, $c9, $cd, $f5        ;; 02:5f3c ????????
-    db   $29, $0e, $30, $c4, $dc, $28, $cd, $4a        ;; 02:5f44 ????????
-    db   $24, $c3, $66, $27, $cd, $f5, $29, $28        ;; 02:5f4c ????????
-    db   $0a, $0e, $f0, $cd, $0d, $29, $0e, $0a        ;; 02:5f54 ????????
-    db   $cd, $c8, $28, $cd, $4a, $25, $cd, $22        ;; 02:5f5c ????????
-    db   $29, $ca, $80, $2b, $c9, $af, $ea, $d3        ;; 02:5f64 ????????
-    db   $dc, $ea, $d4, $dc, $cd, $9b, $5f, $3e        ;; 02:5f6c ????????
-    db   $01, $c3, $ac, $72, $cd, $f5, $29, $0e        ;; 02:5f74 ????????
-    db   $41, $c4, $0d, $29, $cd, $22, $29, $3e        ;; 02:5f7c ????????
-    db   $02, $ca, $ac, $72, $7e, $e6, $0f, $0e        ;; 02:5f84 ????????
-    db   $1b, $ca, $92, $37, $c9, $cd, $f5, $29        ;; 02:5f8c ????????
-    db   $c8, $21, $d3, $dc, $34, $cb, $9e, $21        ;; 02:5f94 ????????
-    db   $d3, $dc, $6e, $26, $00, $11, $bf, $5f        ;; 02:5f9c ????????
-    db   $19, $6e, $26, $00, $29, $29, $11, $c7        ;; 02:5fa4 ????????
-    db   $5f, $19, $16, $d8, $fa, $00, $da, $f6        ;; 02:5fac ????????
-    db   $0e, $5f, $06, $04, $2a, $12, $1c, $05        ;; 02:5fb4 ????????
-    db   $20, $fa, $c9, $04, $0e, $1d, $23, $34        ;; 02:5fbc ????????
-    db   $2a, $19, $0a, $27, $00, $13, $00, $33        ;; 02:5fc4 ????????
+
+call_02_5ecc:
+    ld   c,$14
+    call call_00_28c8_ObjectSet1B
+    call call_00_2410
+    call call_00_254a
+    jp   $2617
+    ret  
+
+call_02_5eda:
+    ret  
+
+call_02_5edb:
+    ret  
+
+call_02_5edc:
+    call call_00_2722
+    jr   z,label5EF1
+    call call_00_2a68
+    call call_00_2976_ObjectGetFacingDirection
+    ld   hl,wDA12
+    cp   [hl]
+    ld   a,$01
+    jp   z,entry_02_72ac
+label5EF1:
+    ld   c,$08
+    call call_00_2588
+    jp   call_00_251c
+    ld   c,$20
+    call call_00_2588
+    jp   call_00_251c
+
+call_02_5f01:
+    call call_00_29f5
+    ld   c,$F0
+    call nz,call_00_290d_ObjectSetTimer1A
+    call call_00_2722
+    jr   z,label5F22
+    call call_00_2a68
+    call call_00_2976_ObjectGetFacingDirection
+    ld   hl,wDA12
+    cp   [hl]
+    jr   z,label5F22
+    ld   a,[wDA11]
+    cp   a,$40
+    call c,call_00_2410
+label5F22:
+    ld   c,$06
+    call call_00_28c8_ObjectSet1B
+    call call_00_251c
+    ld   c,$27
+    call call_00_2b10
+    ret  nz
+    call call_00_2922_ObjectTimer1ACountdown
+    ld   a,$01
+    jp   z,entry_02_72ac
+    ret  
+
+call_02_5f39:
+    call call_00_29f5
+    ld   c,$06
+    call nz,call_00_3792
+    ret  
+
+call_02_5f42:
+    call call_00_29f5
+    ld   c,$30
+    call nz,call_00_28dc_ObjectSet1D
+    call call_00_244a
+    jp   call_00_2766
+    call call_00_29f5
+    jr   z,label5F5F
+    ld   c,$F0
+    call call_00_290d_ObjectSetTimer1A
+    ld   c,$0A
+    call call_00_28c8_ObjectSet1B
+label5F5F:
+    call call_00_254a
+    call call_00_2922_ObjectTimer1ACountdown
+    jp   z,call_00_2b80
+    ret  
+
+call_02_5f69:
+    xor  a
+    ld   [wDCD3],a
+    ld   [wDCD4],a
+    call call_02_5F9B
+    ld   a,$01
+    jp   entry_02_72ac
+    call call_00_29f5
+    ld   c,$41
+    call nz,call_00_290d_ObjectSetTimer1A
+    call call_00_2922_ObjectTimer1ACountdown
+    ld   a,$02
+    jp   z,entry_02_72ac
+    ld   a,[hl]
+    and  a,$0F
+    ld   c,$1B
+    jp   z,call_00_3792
+    ret  
+
+call_02_5f91:
+    call call_00_29f5
+    ret  z
+    ld   hl,wDCD3
+    inc  [hl]
+    res  3,[hl]
+call_02_5F9B:
+    ld   hl,wDCD3
+    ld   l,[hl]
+    ld   h,00
+    ld   de,.data_02_5fbf
+    add  hl,de
+    ld   l,[hl]
+    ld   h,00
+    add  hl,hl
+    add  hl,hl
+    ld   de,.data_02_5fc7
+    add  hl,de
+    ld   d,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   e,a
+    ld   b,$04
+.label5FB8:
+    ldi  a,[hl]
+    ld   [de],a
+    inc  e
+    dec  b
+    jr   nz,.label5FB8
+    ret  
+.data_02_5fbf:
+    db   $04, $0e, $1d, $23, $34        ;; 02:5fbc ????????
+    db   $2a, $19, $0a
+.data_02_5fc7:
+    db   $27, $00, $13, $00, $33        ;; 02:5fc4 ????????
     db   $00, $13, $00, $3f, $00, $13, $00, $4c        ;; 02:5fcc ????????
     db   $00, $13, $00, $58, $00, $13, $00, $64        ;; 02:5fd4 ????????
     db   $00, $13, $00, $71, $00, $13, $00, $7d        ;; 02:5fdc ????????
@@ -708,14 +977,44 @@ data_02_5eb8:
     db   $00, $5d, $00, $36, $00, $5d, $00, $48        ;; 02:60ac ????????
     db   $00, $5d, $00, $5b, $00, $5d, $00, $6e        ;; 02:60b4 ????????
     db   $00, $5d, $00, $80, $00, $5d, $00, $93        ;; 02:60bc ????????
-    db   $00, $5d, $00, $cd, $f5, $29, $28, $26        ;; 02:60c4 ????????
-    db   $fa, $d3, $dc, $87, $87, $4f, $21, $d4        ;; 02:60cc ????????
-    db   $dc, $7e, $34, $e6, $03, $b1, $6f, $26        ;; 02:60d4 ????????
-    db   $00, $29, $11, $ff, $60, $19, $4e, $e5        ;; 02:60dc ????????
-    db   $cd, $c8, $28, $e1, $23, $4e, $cd, $dc        ;; 02:60e4 ????????
-    db   $28, $0e, $5a, $cd, $0d, $29, $cd, $c0        ;; 02:60ec ????????
-    db   $24, $cd, $ee, $24, $cd, $22, $29, $ca        ;; 02:60f4 ????????
-    db   $7a, $2b, $c9, $e0, $20, $00, $20, $20        ;; 02:60fc ????????
+    db   $00, $5d, $00
+    
+call_02_60c7:
+    call call_00_29f5
+    jr   z,label60F2
+    ld   a,[wDCD3]
+    add  a
+    add  a
+    ld   c,a
+    ld   hl,wDCD4
+    ld   a,[hl]
+    inc  [hl]
+    and  a,$03
+    or   c
+    ld   l,a
+    ld   h,$00
+    add  hl,hl
+    ld   de,$60FF
+    add  hl,de
+    ld   c,[hl]
+    push hl
+    call call_00_28c8_ObjectSet1B
+    pop  hl
+label60E8:
+    inc  hl
+    ld   c,[hl]
+    call call_00_28dc_ObjectSet1D
+    ld   c,$5A
+    call call_00_290d_ObjectSetTimer1A
+label60F2:
+    call call_00_24c0
+    call call_00_24ee
+    call call_00_2922_ObjectTimer1ACountdown
+label60FB:
+    jp   z,jp_00_2b7a
+    ret  
+    
+    db   $e0, $20, $00, $20, $20        ;; 02:60fc ????????
     db   $20, $00, $20, $e0, $00, $e0, $20, $00        ;; 02:6104 ????????
     db   $20, $20, $20, $00, $20, $e0, $20, $e0        ;; 02:610c ????????
     db   $00, $e0, $e0, $e0, $e0, $20, $e0, $20        ;; 02:6114 ????????
@@ -723,237 +1022,904 @@ data_02_5eb8:
     db   $e0, $20, $e0, $00, $e0, $20, $e0, $20        ;; 02:6124 ????????
     db   $00, $20, $20, $20, $e0, $20, $00, $20        ;; 02:612c ????????
     db   $20, $00, $20, $e0, $20, $00, $20, $20        ;; 02:6134 ????????
-    db   $20, $20, $00, $0e, $04, $cd, $c8, $28        ;; 02:613c ????????
-    db   $cd, $1c, $25, $3e, $01, $c2, $ac, $72        ;; 02:6144 ????????
-    db   $c9, $cd, $f5, $29, $0e, $38, $c4, $dc        ;; 02:614c ????????
-    db   $28, $cd, $4a, $24, $cd, $d2, $28, $cb        ;; 02:6154 ????????
-    db   $7f, $3e, $02, $c2, $ac, $72, $c9, $cd        ;; 02:615c ????????
-    db   $4a, $24, $cd, $66, $27, $3e, $03, $d2        ;; 02:6164 ????????
-    db   $ac, $72, $c9, $cd, $f5, $29, $28, $2d        ;; 02:616c ????????
-    db   $3e, $19, $cd, $f5, $0f, $0e, $10, $cd        ;; 02:6174 ????????
-    db   $dc, $28, $26, $d8, $fa, $00, $da, $f6        ;; 02:617c ????????
-    db   $0e, $6f, $2a, $d6, $b0, $5f, $7e, $de        ;; 02:6184 ????????
-    db   $01, $57, $7b, $c6, $0c, $5f, $7a, $ce        ;; 02:618c ????????
-    db   $00, $20, $0a, $7b, $fe, $18, $30, $05        ;; 02:6194 ????????
-    db   $3e, $01, $ea, $dc, $dc, $cd, $4a, $24        ;; 02:619c ????????
-    db   $cd, $66, $27, $d8, $3e, $19, $cd, $f5        ;; 02:61a4 ????????
-    db   $0f, $3e, $04, $c3, $ac, $72, $cd, $4a        ;; 02:61ac ????????
-    db   $24, $c3, $66, $27, $21, $be, $61, $c3        ;; 02:61b4 ????????
-    db   $20, $2c, $00, $00, $ff, $7f, $b5, $56        ;; 02:61bc ????????
-    db   $ad, $35, $0e, $04, $cd, $c8, $28, $cd        ;; 02:61c4 ????????
-    db   $1c, $25, $cd, $68, $2a, $cd, $76, $29        ;; 02:61cc ????????
-    db   $21, $12, $da, $be, $c0, $fa, $11, $da        ;; 02:61d4 ????????
-    db   $fe, $30, $d0, $0e, $20, $cd, $c8, $28        ;; 02:61dc ????????
-    db   $0e, $30, $cd, $dc, $28, $3e, $01, $c3        ;; 02:61e4 ????????
-    db   $ac, $72, $cd, $1c, $25, $cd, $75, $24        ;; 02:61ec ????????
-    db   $0e, $00, $30, $13, $cd, $d2, $28, $cb        ;; 02:61f4 ????????
-    db   $7f, $20, $07, $0e, $02, $fe, $08, $38        ;; 02:61fc ????????
-    db   $06, $c9, $fe, $f8, $d0, $0e, $03, $cd        ;; 02:6204 ????????
-    db   $62, $29, $79, $be, $c2, $ac, $72, $c9        ;; 02:620c ????????
-    db   $cd, $f5, $29, $28, $20, $cd, $26, $28        ;; 02:6214 ????????
-    db   $cd, $e4, $27, $0e, $40, $cd, $80, $29        ;; 02:621c ????????
-    db   $0e, $00, $cd, $c8, $28, $0e, $00, $cd        ;; 02:6224 ????????
-    db   $58, $29, $01, $28, $00, $cd, $0d, $25        ;; 02:622c ????????
-    db   $0e, $28, $cd, $0d, $29, $fa, $71, $dc        ;; 02:6234 ????????
-    db   $e6, $03, $c0, $01, $ff, $ff, $cd, $0d        ;; 02:623c ????????
-    db   $25, $cd, $22, $29, $3e, $01, $ca, $ac        ;; 02:6244 ????????
-    db   $72, $c9, $fa, $71, $dc, $e6, $01, $0e        ;; 02:624c ????????
-    db   $00, $ca, $c8, $28, $0e, $01, $cd, $c8        ;; 02:6254 ????????
-    db   $28, $01, $01, $00, $cd, $df, $24, $cd        ;; 02:625c ????????
-    db   $c9, $26, $26, $d8, $fa, $00, $da, $f6        ;; 02:6264 ????????
-    db   $0e, $6f, $2a, $56, $5f, $21, $14, $da        ;; 02:626c ????????
-    db   $7b, $96, $23, $7a, $9e, $38, $0a, $21        ;; 02:6274 ????????
-    db   $16, $da, $7b, $96, $23, $7a, $9e, $38        ;; 02:627c ????????
-    db   $05, $3e, $00, $c3, $ac, $72, $cd, $17        ;; 02:6284 ????????
-    db   $26, $3e, $02, $d2, $ac, $72, $c9, $cd        ;; 02:628c ????????
-    db   $f5, $29, $28, $0f, $0e, $00, $cd, $c8        ;; 02:6294 ????????
-    db   $28, $0e, $00, $cd, $58, $29, $0e, $28        ;; 02:629c ????????
-    db   $cd, $0d, $29, $fa, $71, $dc, $e6, $03        ;; 02:62a4 ????????
-    db   $c0, $01, $01, $00, $cd, $0d, $25, $cd        ;; 02:62ac ????????
-    db   $22, $29, $3e, $00, $ca, $ac, $72, $c9        ;; 02:62b4 ????????
-    db   $cd, $f5, $29, $28, $0f, $0e, $08, $cd        ;; 02:62bc ????????
-    db   $44, $29, $cd, $3a, $29, $fe, $31, $0e        ;; 02:62c4 ????????
-    db   $20, $cc, $58, $29, $cd, $5d, $2a, $c8        ;; 02:62cc ????????
-    db   $cd, $68, $2a, $cd, $76, $29, $21, $12        ;; 02:62d4 ????????
-    db   $da, $be, $c0, $cd, $3a, $29, $0e, $32        ;; 02:62dc ????????
-    db   $fe, $30, $28, $02, $0e, $33, $cd, $10        ;; 02:62e4 ????????
-    db   $2b, $c0, $fa, $11, $da, $fe, $40, $3e        ;; 02:62ec ????????
-    db   $01, $da, $ac, $72, $c9, $cd, $5d, $2a        ;; 02:62f4 ????????
-    db   $c8, $0e, $10, $cd, $44, $29, $cd, $3a        ;; 02:62fc ????????
-    db   $29, $0e, $0e, $fe, $30, $28, $02, $0e        ;; 02:6304 ????????
-    db   $0f, $cd, $92, $37, $3e, $02, $c3, $ac        ;; 02:630c ????????
-    db   $72, $0e, $08, $c3, $44, $29, $cd, $f5        ;; 02:6314 ????????
-    db   $29, $28, $0a, $0e, $20, $cd, $c8, $28        ;; 02:631c ????????
-    db   $0e, $40, $cd, $0d, $29, $cd, $c0, $24        ;; 02:6324 ????????
-    db   $cd, $22, $29, $ca, $7a, $2b, $c9, $cd        ;; 02:632c ????????
-    db   $f5, $29, $28, $0a, $0e, $e0, $cd, $c8        ;; 02:6334 ????????
-    db   $28, $0e, $40, $cd, $0d, $29, $cd, $c0        ;; 02:633c ????????
-    db   $24, $cd, $22, $29, $ca, $7a, $2b, $c9        ;; 02:6344 ????????
-    db   $cd, $3a, $29, $fe, $36, $0e, $20, $cc        ;; 02:634c ????????
-    db   $58, $29, $cd, $26, $28, $cd, $e4, $27        ;; 02:6354 ????????
-    db   $3e, $01, $c3, $ac, $72, $11, $67, $63        ;; 02:635c ????????
-    db   $c3, $98, $2a, $c0, $01, $20, $70, $00        ;; 02:6364 ????????
+    db   $20, $20, $00
+
+call_02_613f:
+    ld   c,$04
+    call call_00_28c8_ObjectSet1B
+    call call_00_251c
+    ld   a,$01
+    jp   nz,entry_02_72ac
+    ret  
+
+call_02_614d:
+    call call_00_29f5
+    ld   c,$38
+    call nz,call_00_28dc_ObjectSet1D
+label6155:
+    call call_00_244a
+    call call_00_28d2_ObjectGet1D
+    bit  7,a
+    ld   a,$02
+    jp   nz,entry_02_72ac
+    ret  
+
+call_02_6163:
+    call call_00_244a
+    call call_00_2766
+    ld   a,$03
+    jp   nc,entry_02_72ac
+    ret  
+    
+call_02_616f:
+    call call_00_29f5
+    jr   z,label61A1
+    ld   a,$19
+    call call_00_0ff5
+    ld   c,$10
+    call call_00_28dc_ObjectSet1D
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   l,a
+    ldi  a,[hl]
+    sub  a,$B0
+    ld   e,a
+    ld   a,[hl]
+    sbc  a,$01
+    ld   d,a
+    ld   a,e
+    add  a,$0C
+    ld   e,a
+    ld   a,d
+    adc  a,$00
+    jr   nz,label61A1
+    ld   a,e
+    cp   a,$18
+    jr   nc,label61A1
+    ld   a,$01
+    ld   [wDCDC],a
+label61A1:
+    call call_00_244a
+    call call_00_2766
+    ret  c
+    ld   a,$19
+    call call_00_0ff5
+    ld   a,$04
+    jp   entry_02_72ac
+
+call_02_61b2:
+    call call_00_244a
+    jp   call_00_2766
+
+call_02_61b8:
+    ld   hl,$61BE
+    jp   call_00_2c20
+
+    db   $00, $00, $ff, $7f, $b5, $56, $ad, $35
+
+call_02_61c6:
+    ld   c,04
+    call call_00_28c8_ObjectSet1B
+    call call_00_251c
+    call call_00_2a68
+    call call_00_2976_ObjectGetFacingDirection
+    ld   hl,wDA12
+    cp   [hl]
+    ret  nz
+    ld   a,[wDA11]
+    cp   a,$30
+    ret  nc
+    ld   c,$20
+    call call_00_28c8_ObjectSet1B
+    ld   c,$30
+    call call_00_28dc_ObjectSet1D
+    ld   a,$01
+    jp   entry_02_72ac
+    call call_00_251c
+    call call_00_2475
+    ld   c,$00
+    jr   nc,label620B
+    call call_00_28d2_ObjectGet1D
+    bit  7,a
+    jr   nz,label6206
+    ld   c,$02
+    cp   a,$08
+    jr   c,label620B
+    ret  
+label6206:
+    cp   a,$F8
+    ret  nc
+    ld   c,$03
+label620B:
+    call call_00_2962_ObjectGetActionId
+    ld   a,c
+    cp   [hl]
+    jp   nz,entry_02_72ac
+    ret  
+    call call_00_29f5
+    jr   z,label6239
+    call call_00_2826_ObjectSetXPosition
+    call call_00_27e4_ObjectSetYPosition
+    ld   c,$40
+    call call_00_2980_ObjectSet19
+    ld   c,$00
+    call call_00_28c8_ObjectSet1B
+    ld   c,$00
+    call call_00_2958_ObjectSetFacingDirection
+    ld   bc,$0028
+    call jp_00_250d
+    ld   c,$28
+    call call_00_290d_ObjectSetTimer1A
+label6239:
+    ld   a,[wDC71]
+    and  a,$03
+    ret  nz
+    ld   bc,$FFFF
+    call jp_00_250d
+    call call_00_2922_ObjectTimer1ACountdown
+    ld   a,$01
+    jp   z,entry_02_72ac
+    ret  
+    ld   a,[wDC71]
+    and  a,$01
+    ld   c,$00
+    jp   z,call_00_28c8_ObjectSet1B
+    ld   c,$01
+    call call_00_28c8_ObjectSet1B
+    ld   bc,$0001
+    call $24DF
+    call call_00_26c9
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   l,a
+    ldi  a,[hl]
+    ld   d,[hl]
+    ld   e,a
+    ld   hl,wDA14
+    ld   a,e
+    sub  [hl]
+    inc  hl
+    ld   a,d
+    sbc  [hl]
+    jr   c,label6285
+    ld   hl,wDA16
+    ld   a,e
+    sub  [hl]
+    inc  hl
+    ld   a,d
+    sbc  [hl]
+    jr   c,label628A
+label6285:
+    ld   a,$00
+    jp   entry_02_72ac
+label628A:
+    call $2617
+    ld   a,$02
+    jp   nc,entry_02_72ac
+    ret  
+
+call_00_6293:
+    call call_00_29f5
+    jr   z,label62A7
+    ld   c,$00
+    call call_00_28c8_ObjectSet1B
+    ld   c,$00
+    call call_00_2958_ObjectSetFacingDirection
+    ld   c,$28
+    call call_00_290d_ObjectSetTimer1A
+label62A7:
+    ld   a,[wDC71]
+    and  a,$03
+    ret  nz
+    ld   bc,$0001
+    call jp_00_250d
+    call call_00_2922_ObjectTimer1ACountdown
+    ld   a,$00
+    jp   z,entry_02_72ac
+    ret  
+
+call_00_62bc:
+    call call_00_29f5
+    jr   z,label62D0
+    ld   c,$08
+    call call_00_2944_ObjectSet12
+    call call_00_293a_ObjectGetId
+    cp   a,$31
+    ld   c,$20
+    call z,call_00_2958_ObjectSetFacingDirection
+label62D0:
+    call call_00_2a5d
+    ret  z
+    call call_00_2a68
+    call call_00_2976_ObjectGetFacingDirection
+    ld   hl,wDA12
+    cp   [hl]
+    ret  nz
+    call call_00_293a_ObjectGetId
+    ld   c,$32
+    cp   a,$30
+    jr   z,label62EA
+    ld   c,$33
+label62EA:
+    call call_00_2b10
+    ret  nz
+    ld   a,[wDA11]
+    cp   a,$40
+    ld   a,$01
+    jp   c,entry_02_72ac
+    ret  
+
+call_00_62f9:
+    call call_00_2a5d
+    ret  z
+    ld   c,$10
+    call call_00_2944_ObjectSet12
+    call call_00_293a_ObjectGetId
+    ld   c,$0E
+    cp   a,$30
+    jr   z,label630D
+    ld   c,$0F
+label630D:
+    call call_00_3792
+    ld   a,$02
+    jp   entry_02_72ac
+    ld   c,$08
+    jp   call_00_2944_ObjectSet12
+    call call_00_29f5
+    jr   z,label6329
+    ld   c,$20
+    call call_00_28c8_ObjectSet1B
+    ld   c,$40
+    call call_00_290d_ObjectSetTimer1A
+label6329:
+    call call_00_24c0
+    call call_00_2922_ObjectTimer1ACountdown
+    jp   z,jp_00_2b7a
+    ret  
+
+call_00_6333:
+    call call_00_29f5
+    jr   z,label6342
+    ld   c,$E0
+    call call_00_28c8_ObjectSet1B
+    ld   c,$40
+    call call_00_290d_ObjectSetTimer1A
+label6342:
+    call call_00_24c0
+    call call_00_2922_ObjectTimer1ACountdown
+    jp   z,jp_00_2b7a
+    ret  
+
+call_00_634c:
+    call call_00_293a_ObjectGetId
+    cp   a,$36
+    ld   c,$20
+    call z,call_00_2958_ObjectSetFacingDirection
+    call call_00_2826_ObjectSetXPosition
+    call call_00_27e4_ObjectSetYPosition
+    ld   a,$01
+    jp   entry_02_72ac
+
+call_00_6361:
+    ld   de,$6367
+    jp   call_00_2a98
+    
+    db   $c0, $01, $20, $70, $00        ;; 02:6364 ????????
     db   $10, $36, $20, $20, $02, $c0, $01, $20        ;; 02:636c ????????
     db   $70, $00, $10, $36, $e0, $20, $02, $90        ;; 02:6374 ????????
     db   $01, $10, $68, $01, $10, $56, $20, $10        ;; 02:637c ????????
     db   $02, $90, $01, $10, $68, $01, $10, $56        ;; 02:6384 ????????
     db   $e0, $10, $02, $70, $02, $10, $60, $01        ;; 02:638c ????????
-    db   $20, $22, $e4, $20, $02, $cd, $c0, $24        ;; 02:6394 ????????
-    db   $cd, $ee, $24, $cd, $22, $29, $3e, $00        ;; 02:639c ????????
-    db   $ca, $ac, $72, $c9, $cd, $f5, $29, $28        ;; 02:63a4 ????????
-    db   $04, $af, $ea, $dc, $dc, $21, $dc, $dc        ;; 02:63ac ????????
-    db   $cb, $46, $c8, $36, $00, $cd, $62, $29        ;; 02:63b4 ????????
-    db   $3c, $c3, $ac, $72, $3e, $1a, $cd, $f5        ;; 02:63bc ????????
-    db   $0f, $ea, $d6, $da, $3e, $03, $21, $f8        ;; 02:63c4 ????????
-    db   $57, $cd, $dd, $0e, $c3, $7a, $2b, $cd        ;; 02:63cc ????????
-    db   $ef, $22, $0e, $02, $c3, $99, $22, $0e        ;; 02:63d4 ????????
-    db   $28, $cd, $c8, $28, $cd, $68, $2a, $fa        ;; 02:63dc ????????
-    db   $12, $da, $21, $0d, $d8, $be, $3e, $01        ;; 02:63e4 ????????
-    db   $ca, $ac, $72, $c9, $cd, $f5, $29, $28        ;; 02:63ec ????????
-    db   $08, $0e, $3c, $cd, $0d, $29, $cd, $10        ;; 02:63f4 ????????
-    db   $24, $cd, $22, $29, $3e, $02, $ca, $ac        ;; 02:63fc ????????
-    db   $72, $cd, $68, $2a, $fa, $12, $da, $21        ;; 02:6404 ????????
-    db   $0d, $d8, $be, $3e, $00, $c2, $ac, $72        ;; 02:640c ????????
-    db   $c9, $cd, $f5, $29, $0e, $20, $c4, $dc        ;; 02:6414 ????????
-    db   $28, $cd, $1c, $25, $cd, $4a, $24, $cd        ;; 02:641c ????????
-    db   $66, $27, $d8, $3e, $03, $cd, $ac, $72        ;; 02:6424 ????????
-    db   $18, $d7, $cd, $f5, $29, $28, $0a, $0e        ;; 02:642c ????????
-    db   $00, $cd, $0d, $29, $0e, $10, $cd, $4e        ;; 02:6434 ????????
-    db   $29, $cd, $17, $29, $20, $0e, $fa, $7b        ;; 02:643c ????????
-    db   $dc, $21, $00, $da, $be, $c0, $cd, $0f        ;; 02:6444 ????????
-    db   $23, $c3, $0d, $29, $cd, $22, $29, $3e        ;; 02:644c ????????
-    db   $01, $ca, $ac, $72, $c9, $cd, $6c, $29        ;; 02:6454 ????????
-    db   $6f, $26, $00, $11, $67, $64, $19, $4e        ;; 02:645c ????????
-    db   $c3, $4e, $29, $10, $0e, $0c, $0a, $08        ;; 02:6464 ????????
-    db   $06, $04, $02, $ea, $d6, $da, $3e, $03        ;; 02:646c ????????
-    db   $21, $f8, $57, $cd, $dd, $0e, $c9, $cd        ;; 02:6474 ????????
-    db   $6c, $29, $6f, $26, $00, $11, $89, $64        ;; 02:647c ????????
-    db   $19, $4e, $c3, $4e, $29, $02, $04, $06        ;; 02:6484 ????????
-    db   $08, $0a, $0c, $0e, $10, $cd, $22, $27        ;; 02:648c ????????
-    db   $28, $0a, $cd, $68, $2a, $fa, $11, $da        ;; 02:6494 ????????
-    db   $fe, $30, $38, $08, $0e, $04, $cd, $88        ;; 02:649c ????????
-    db   $25, $c3, $1c, $25, $fa, $12, $da, $ee        ;; 02:64a4 ????????
-    db   $20, $4f, $cd, $58, $29, $0e, $1e, $cd        ;; 02:64ac ????????
-    db   $88, $25, $cd, $1c, $25, $20, $0d, $fa        ;; 02:64b4 ????????
-    db   $11, $da, $fe, $20, $d0, $21, $12, $da        ;; 02:64bc ????????
-    db   $4e, $cd, $58, $29, $3e, $01, $c3, $ac        ;; 02:64c4 ????????
-    db   $72, $cd, $f5, $29, $0e, $20, $c4, $dc        ;; 02:64cc ????????
-    db   $28, $0e, $10, $cd, $88, $25, $cd, $1c        ;; 02:64d4 ????????
-    db   $25, $cd, $4a, $24, $cd, $66, $27, $3e        ;; 02:64dc ????????
-    db   $00, $d2, $ac, $72, $c9, $cd, $f5, $29        ;; 02:64e4 ????????
-    db   $28, $06, $cd, $26, $28, $cd, $e4, $27        ;; 02:64ec ????????
-    db   $cd, $68, $2a, $fa, $11, $da, $fe, $10        ;; 02:64f4 ????????
-    db   $3e, $01, $da, $ac, $72, $c9, $cd, $f5        ;; 02:64fc ????????
-    db   $29, $28, $16, $cd, $10, $24, $cd, $76        ;; 02:6504 ????????
-    db   $29, $0e, $10, $fe, $00, $28, $02, $0e        ;; 02:650c ????????
-    db   $f0, $cd, $c8, $28, $0e, $20, $cd, $dc        ;; 02:6514 ????????
-    db   $28, $cd, $c0, $24, $cd, $4a, $24, $cd        ;; 02:651c ????????
-    db   $f1, $28, $cb, $7f, $3e, $03, $c2, $ac        ;; 02:6524 ????????
-    db   $72, $c9, $cd, $c0, $24, $cd, $4a, $24        ;; 02:652c ????????
-    db   $cd, $80, $27, $3e, $00, $d2, $ac, $72        ;; 02:6534 ????????
-    db   $c9, $cd, $5d, $2a, $c8, $cd, $ce, $1b        ;; 02:653c ????????
-    db   $0e, $02, $c3, $99, $22, $0e, $00, $cd        ;; 02:6544 ????????
-    db   $99, $22, $3e, $03, $c3, $ac, $72, $0e        ;; 02:654c ????????
-    db   $02, $cd, $99, $22, $3e, $01, $c3, $ac        ;; 02:6554 ????????
-    db   $72, $cd, $5d, $2a, $c8, $cd, $ce, $1b        ;; 02:655c ????????
-    db   $0e, $00, $c3                                 ;; 02:6564 ???
-    db   $99, $22, $cd, $d4, $22, $c8, $0e, $02        ;; 02:6567 ????????
-    db   $cd, $99, $22, $3e, $01, $c3, $ac, $72        ;; 02:656f ????????
-    db   $cd, $17, $29, $34, $21, $71, $dc, $a6        ;; 02:6577 ????????
-    db   $e6, $1f, $28, $06, $cd, $76, $29, $ee        ;; 02:657f ????????
-    db   $20, $77, $cd, $d4, $22, $c0, $0e, $00        ;; 02:6587 ????????
-    db   $cd, $99, $22, $3e, $03, $c3, $ac, $72        ;; 02:658f ????????
-    db   $0e, $20, $cd, $58, $29, $c9, $cd, $d4        ;; 02:6597 ????????
-    db   $22, $fe, $02, $d8, $ea, $d6, $da, $3e        ;; 02:659f ????????
-    db   $03, $21, $f8, $57, $cd, $dd, $0e, $3e        ;; 02:65a7 ????????
-    db   $01, $c3, $ac, $72, $fa, $6c, $db, $fe        ;; 02:65af ????????
-    db   $2b, $c0, $cd, $d4, $22, $fe, $01, $c0        ;; 02:65b7 ????????
-    db   $0e, $00, $cd, $99, $22, $3e, $00, $c3        ;; 02:65bf ????????
-    db   $ac, $72, $cd, $d4, $22, $c8, $0e, $01        ;; 02:65c7 ????????
-    db   $cd, $99, $22, $3e, $01, $c3, $ac, $72        ;; 02:65cf ????????
-    db   $cd, $f5, $29, $0e, $00, $c4, $0d, $29        ;; 02:65d7 ????????
-    db   $fa, $7b, $dc, $a7, $28, $13, $21, $00        ;; 02:65df ????????
-    db   $da, $be, $28, $0d, $cd, $17, $29, $fe        ;; 02:65e7 ????????
-    db   $a8, $d0, $34, $01, $ff, $ff, $c3, $0d        ;; 02:65ef ????????
-    db   $25, $fa, $71, $dc, $e6, $03, $c0, $cd        ;; 02:65f7 ????????
-    db   $17, $29, $c8, $35, $01, $01, $00, $c3        ;; 02:65ff ????????
-    db   $0d, $25, $cd, $d4, $22, $c8, $0e, $01        ;; 02:6607 ????????
-    db   $cd, $99, $22, $3e, $01, $c3, $ac, $72        ;; 02:660f ????????
-    db   $cd, $d4, $22, $c0, $0e, $00, $cd, $99        ;; 02:6617 ????????
-    db   $22, $3e, $00, $c3, $ac, $72, $cd, $d4        ;; 02:661f ????????
-    db   $22, $c8, $0e, $01, $cd, $99, $22, $3e        ;; 02:6627 ????????
-    db   $01, $c3, $ac, $72, $cd, $d4, $22, $c0        ;; 02:662f ????????
-    db   $0e, $00, $cd, $99, $22, $3e, $00, $c3        ;; 02:6637 ????????
-    db   $ac, $72, $0e, $10, $cd, $c8, $28, $cd        ;; 02:663f ????????
-    db   $1c, $25, $cd, $22, $27, $c8, $cd, $10        ;; 02:6647 ????????
-    db   $24, $cd, $68, $2a, $fa, $11, $da, $fe        ;; 02:664f ????????
-    db   $18, $38, $08, $fe, $40, $3e, $04, $d2        ;; 02:6657 ????????
-    db   $ac, $72, $c9, $cd, $17, $29, $3c, $fe        ;; 02:665f ????????
-    db   $09, $38, $01, $af, $77, $6f, $26, $00        ;; 02:6667 ????????
-    db   $11, $7e, $66, $19, $7e, $f5, $fe, $04        ;; 02:666f ????????
-    db   $cc, $2d, $24, $f1, $c3, $ac, $72, $01        ;; 02:6677 ????????
-    db   $06, $06, $01, $04, $01, $04, $06, $04        ;; 02:667f ????????
-    db   $cd, $4a, $24, $c3, $66, $27, $cd, $4a        ;; 02:6687 ????????
-    db   $24, $cd, $66, $27, $d8, $cd, $5d, $2a        ;; 02:668f ????????
-    db   $3e, $04, $c2, $ac, $72, $c9, $cd, $f5        ;; 02:6697 ????????
-    db   $29, $28, $0a, $0e, $18, $cd, $c8, $28        ;; 02:669f ????????
-    db   $0e, $28, $cd, $dc, $28, $cd, $1c, $25        ;; 02:66a7 ????????
-    db   $cd, $4a, $24, $cd, $66, $27, $3e, $00        ;; 02:66af ????????
-    db   $d2, $ac, $72, $c9, $cd, $10, $24, $cd        ;; 02:66b7 ????????
-    db   $68, $2a, $fa, $11, $da, $fe, $38, $3e        ;; 02:66bf ????????
-    db   $01, $da, $ac, $72, $c9, $0e, $10, $cd        ;; 02:66c7 ????????
-    db   $c8, $28, $cd, $1c, $25, $c8, $cd, $76        ;; 02:66cf ????????
-    db   $29, $ee, $20, $77, $3e, $02, $c3, $ac        ;; 02:66d7 ????????
-    db   $72, $cd, $5d, $2a, $c8, $cd, $76, $29        ;; 02:66df ????????
-    db   $ee, $20, $77, $3e, $01, $c3, $ac, $72        ;; 02:66e7 ????????
-    db   $cd, $5d, $2a, $c2, $7a, $2b, $c9, $cd        ;; 02:66ef ????????
-    db   $68, $2a, $fa, $11, $da, $fe, $38, $38        ;; 02:66f7 ????????
-    db   $08, $0e, $06, $cd, $88, $25, $c3, $1c        ;; 02:66ff ????????
-    db   $25, $fa, $12, $da, $ee, $20, $4f, $cd        ;; 02:6707 ????????
-    db   $58, $29, $0e, $10, $cd, $88, $25, $cd        ;; 02:670f ????????
-    db   $1c, $25, $20, $0d, $fa, $11, $da, $fe        ;; 02:6717 ????????
-    db   $28, $d0, $21, $12, $da, $4e, $cd, $58        ;; 02:671f ????????
-    db   $29, $0e, $30, $cd, $dc, $28, $3e, $01        ;; 02:6727 ????????
-    db   $c3, $ac, $72, $0e, $02, $cd, $88, $25        ;; 02:672f ????????
-    db   $cd, $1c, $25, $cd, $4a, $24, $cd, $66        ;; 02:6737 ????????
-    db   $27, $3e, $00, $d2, $ac, $72, $c9, $cd        ;; 02:673f ????????
-    db   $f5, $29, $0e, $00, $c4, $0d, $29, $0e        ;; 02:6747 ????????
-    db   $04, $cd, $c8, $28, $cd, $1c, $25, $0e        ;; 02:674f ????????
-    db   $02, $c4, $0d, $29, $cd, $ac, $29, $c0        ;; 02:6757 ????????
-    db   $cd, $22, $29, $0e, $10, $c2, $92, $37        ;; 02:675f ????????
-    db   $c9, $cd, $8a, $29, $fe, $50, $28, $07        ;; 02:6767 ????????
-    db   $34, $01, $ff, $ff, $cd, $0d, $25, $cd        ;; 02:676f ????????
-    db   $f5, $29, $0e, $00, $c4, $0d, $29, $0e        ;; 02:6777 ????????
-    db   $10, $cd, $c8, $28, $cd, $1c, $25, $0e        ;; 02:677f ????????
-    db   $c1, $c4, $0d, $29, $cd, $ac, $29, $c0        ;; 02:6787 ????????
-    db   $cd, $22, $29, $c8, $e6, $3f, $0e, $10        ;; 02:678f ????????
-    db   $ca, $92, $37, $c9, $cd, $f5, $29, $28        ;; 02:6797 ????????
-    db   $13, $cd, $76, $29, $0e, $18, $fe, $00        ;; 02:679f ????????
-    db   $28, $02, $0e, $e8, $cd, $c8, $28, $0e        ;; 02:67a7 ????????
-    db   $b4, $cd, $0d, $29, $cd, $22, $29, $ca        ;; 02:67af ????????
-    db   $7a, $2b, $cd, $c0, $24, $cd, $4a, $24        ;; 02:67b7 ????????
-    db   $c3, $66, $27, $cd, $f5, $29, $28, $18        ;; 02:67bf ????????
-    db   $cd, $8e, $68, $69, $26, $00, $29, $11        ;; 02:67c7 ????????
-    db   $e2, $dc, $19, $16, $d8, $fa, $00, $da        ;; 02:67cf ????????
-    db   $f6, $10, $5f, $2a, $12, $1c, $7e, $12        ;; 02:67d7 ????????
-    db   $fa, $7b, $dc, $21, $00, $da, $be, $c0        ;; 02:67df ????????
-    db   $cd, $d4, $22, $4f, $21, $6a, $68, $e5        ;; 02:67e7 ????????
-    db   $2a, $b9, $20, $12, $16, $d8, $fa, $00        ;; 02:67ef ????????
-    db   $da, $f6, $0e, $5f, $1a, $96, $47, $13        ;; 02:67f7 ????????
-    db   $23, $1a, $9e, $b0, $28, $0b, $e1, $11        ;; 02:67ff ????????
-    db   $05, $00, $19, $7e, $fe, $ff, $20, $df        ;; 02:6807 ????????
-    db   $c9, $13, $23, $1a, $96, $4f, $13, $23        ;; 02:680f ????????
-    db   $1a, $9e, $e1, $38, $2b, $b1, $20, $23        ;; 02:6817 ????????
-    db   $cd, $8e, $68, $69, $26, $00, $29, $11        ;; 02:681f ????????
-    db   $e2, $dc, $19, $16, $d8, $fa, $00, $da        ;; 02:6827 ????????
-    db   $f6, $10, $5f, $1a, $22, $1c, $1a, $77        ;; 02:682f ????????
-    db   $fa, $01, $d8, $fe, $1e, $3e, $01, $ca        ;; 02:6837 ????????
-    db   $f9, $54, $c9, $01, $ff, $ff, $18, $03        ;; 02:683f ????????
-    db   $01, $01, $00, $3e, $1e, $21, $01, $d8        ;; 02:6847 ????????
-    db   $be, $c2, $f9, $54, $26, $d8, $fa, $00        ;; 02:684f ????????
-    db   $da, $f6, $0e, $6f, $fa, $0e, $d8, $96        ;; 02:6857 ????????
-    db   $5f, $23, $fa, $0f, $d8, $9e, $b3, $ca        ;; 02:685f ????????
-    db   $0d, $25, $c9, $00, $a0, $01, $98, $02        ;; 02:6867 ????????
+    db   $20, $22, $e4, $20, $02
+
+call_00_6399:
+    call call_00_24c0
+    call call_00_24ee
+    call call_00_2922_ObjectTimer1ACountdown
+    ld   a,$00
+    jp   z,entry_02_72ac
+    ret
+    
+call_00_63a8:
+    call call_00_29f5
+    jr   z,label63B1
+    xor  a
+    ld   [wDCDC],a
+label63B1:
+    ld   hl,wDCDC
+    bit  0,[hl]
+    ret  z
+    ld   [hl],$00
+    call call_00_2962_ObjectGetActionId
+    inc  a
+    jp   entry_02_72ac
+
+call_00_63c0:
+    ld   a,$1A
+    call call_00_0ff5
+    ld   [wDAD6_ReturnBank],a
+    ld   a,$03
+    ld   hl,$57F8
+    call call_00_0edd_CallAltBankFunc
+    jp   jp_00_2b7a
+
+call_00_63d3:
+    call call_00_22ef
+    ld   c,$02
+    jp   call_00_2299
+
+call_00_63db:
+    ld   c,$28
+    call call_00_28c8_ObjectSet1B
+    call call_00_2a68
+    ld   a,[wDA12]
+    ld   hl,wD80D_PlayerFacingDirection
+    cp   [hl]
+    ld   a,$01
+    jp   z,entry_02_72ac
+    ret  
+
+call_00_63f0:
+    call call_00_29f5
+    jr   z,label63FD
+    ld   c,$3C
+    call call_00_290d_ObjectSetTimer1A
+    call call_00_2410
+label63FD:
+    call call_00_2922_ObjectTimer1ACountdown
+    ld   a,$02
+    jp   z,entry_02_72ac
+label6405:
+    call call_00_2a68
+    ld   a,[wDA12]
+    ld   hl,wD80D_PlayerFacingDirection
+    cp   [hl]
+    ld   a,$00
+    jp   nz,entry_02_72ac
+    ret  
+
+call_00_6415:
+    call call_00_29f5
+    ld   c,$20
+    call nz,call_00_28dc_ObjectSet1D
+    call call_00_251c
+    call call_00_244a
+    call call_00_2766
+    ret  c
+    ld   a,$03
+    call entry_02_72ac
+    jr   label6405
+
+call_00_642e:
+    call call_00_29f5
+    jr   z,label643D
+    ld   c,$00
+    call call_00_290d_ObjectSetTimer1A
+    ld   c,$10
+    call call_00_294e_ObjectSet13
+label643D:
+    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    jr   nz,label6450
+    ld   a,[wDC7B]
+    ld   hl,wDA00_CurrentObjectAddr
+    cp   [hl]
+    ret  nz
+    call call_00_230f
+    jp   call_00_290d_ObjectSetTimer1A
+label6450:
+    call call_00_2922_ObjectTimer1ACountdown
+    ld   a,$01
+    jp   z,entry_02_72ac
+    ret  
+
+call_00_6459:
+    call call_00_296c_ObjectGet9
+    ld   l,a
+    ld   h,$00
+    ld   de,$6467
+    add  hl,de
+    ld   c,[hl]
+    jp   call_00_294e_ObjectSet13
+    
+    db   $10, $0e, $0c, $0a, $08        ;; 02:6464 ????????
+    db   $06, $04, $02
+
+call_00_646f:
+    ld   [wDAD6_ReturnBank],a
+    ld   a,$03
+    ld   hl,$57F8
+    call call_00_0edd_CallAltBankFunc
+    ret  
+    call call_00_296c_ObjectGet9
+    ld   l,a
+    ld   h,$00
+    ld   de,$6489
+    add  hl,de
+    ld   c,[hl]
+    jp   call_00_294e_ObjectSet13
+    ld   [bc],a
+    inc  b
+    ld   b,$08
+    ld   a,[bc]
+    inc  c
+    ld   c,$10
+    call call_00_2722
+    jr   z,label64A0
+    call call_00_2a68
+    ld   a,[wDA11]
+    cp   a,$30
+    jr   c,label64A8
+label64A0:
+    ld   c,$04
+    call call_00_2588
+    jp   call_00_251c
+label64A8:
+    ld   a,[wDA12]
+    xor  a,$20
+    ld   c,a
+    call call_00_2958_ObjectSetFacingDirection
+    ld   c,$1E
+    call call_00_2588
+    call call_00_251c
+    jr   nz,label64C8
+    ld   a,[wDA11]
+    cp   a,$20
+    ret  nc
+    ld   hl,wDA12
+    ld   c,[hl]
+    call call_00_2958_ObjectSetFacingDirection
+label64C8:
+    ld   a,$01
+    jp   entry_02_72ac
+    call call_00_29f5
+    ld   c,$20
+    call nz,call_00_28dc_ObjectSet1D
+    ld   c,$10
+    call call_00_2588
+    call call_00_251c
+    call call_00_244a
+    call call_00_2766
+    ld   a,$00
+    jp   nc,entry_02_72ac
+    ret  
+    call call_00_29f5
+    jr   z,label64F4
+    call call_00_2826_ObjectSetXPosition
+    call call_00_27e4_ObjectSetYPosition
+label64F4:
+    call call_00_2a68
+    ld   a,[wDA11]
+    cp   a,$10
+    ld   a,$01
+    jp   c,entry_02_72ac
+    ret  
+    call call_00_29f5
+    jr   z,label651D
+    call call_00_2410
+    call call_00_2976_ObjectGetFacingDirection
+    ld   c,$10
+    cp   a,$00
+    jr   z,label6515
+    ld   c,$F0
+label6515:
+    call call_00_28c8_ObjectSet1B
+    ld   c,$20
+    call call_00_28dc_ObjectSet1D
+label651D:
+    call call_00_24c0
+    call call_00_244a
+    call call_00_28f1_ObjectCheckIf1DIsZero
+    bit  7,a
+    ld   a,$03
+    jp   nz,entry_02_72ac
+    ret  
+    call call_00_24c0
+    call call_00_244a
+    call call_00_2780
+    ld   a,$00
+    jp   nc,entry_02_72ac
+    ret  
+    call call_00_2a5d
+    ret  z
+    call call_00_1bbc.jr_00_1bce
+    ld   c,$02
+    jp   call_00_2299
+    ld   c,$00
+    call call_00_2299
+    ld   a,$03
+    jp   entry_02_72ac
+    ld   c,$02
+    call call_00_2299
+    ld   a,$01
+    jp   entry_02_72ac
+    call call_00_2a5d
+    ret  z
+    call call_00_1bbc.jr_00_1bce
+    ld   c,$00
+    jp   call_00_2299
+    call call_00_22d4
+    ret  z
+    ld   c,$02
+    call call_00_2299
+    ld   a,$01
+    jp   entry_02_72ac
+    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    inc  [hl]
+    ld   hl,wDC71
+    and  [hl]
+    and  a,$1F
+    jr   z,label6589
+    call call_00_2976_ObjectGetFacingDirection
+    xor  a,$20
+    ld   [hl],a
+label6589:
+    call call_00_22d4
+    ret  nz
+    ld   c,$00
+    call call_00_2299
+    ld   a,$03
+    jp   entry_02_72ac
+    ld   c,$20
+    call call_00_2958_ObjectSetFacingDirection
+    ret  
+    call call_00_22d4
+    cp   a,$02
+    ret  c
+    ld   [wDAD6_ReturnBank],a
+    ld   a,$03
+    ld   hl,$57F8
+    call call_00_0edd_CallAltBankFunc
+    ld   a,$01
+    jp   entry_02_72ac
+    ld   a,[wDB6C_CurrentLevelId]
+    cp   a,$2B
+    ret  nz
+    call call_00_22d4
+    cp   a,$01
+    ret  nz
+    ld   c,$00
+    call call_00_2299
+    ld   a,$00
+    jp   entry_02_72ac
+    call call_00_22d4
+    ret  z
+    ld   c,$01
+    call call_00_2299
+    ld   a,$01
+    jp   entry_02_72ac
+    call call_00_29f5
+    ld   c,$00
+    call nz,call_00_290d_ObjectSetTimer1A
+    ld   a,[wDC7B]
+    and  a
+    jr   z,label65F8
+    ld   hl,wDA00_CurrentObjectAddr
+    cp   [hl]
+    jr   z,label65F8
+    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    cp   a,$A8
+    ret  nc
+    inc  [hl]
+    ld   bc,$FFFF
+    jp   jp_00_250d
+label65F8:
+    ld   a,[wDC71]
+    and  a,$03
+    ret  nz
+    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    ret  z
+    dec  [hl]
+    ld   bc,$0001
+    jp   jp_00_250d
+    call call_00_22d4
+    ret  z
+    ld   c,$01
+    call call_00_2299
+    ld   a,$01
+    jp   entry_02_72ac
+    call call_00_22d4
+    ret  nz
+    ld   c,$00
+    call call_00_2299
+    ld   a,$00
+    jp   entry_02_72ac
+    call call_00_22d4
+    ret  z
+    ld   c,$01
+    call call_00_2299
+    ld   a,$01
+    jp   entry_02_72ac
+    call call_00_22d4
+    ret  nz
+    ld   c,$00
+    call call_00_2299
+    ld   a,$00
+    jp   entry_02_72ac
+    ld   c,$10
+    call call_00_28c8_ObjectSet1B
+    call call_00_251c
+    call call_00_2722
+    ret  z
+    call call_00_2410
+    call call_00_2a68
+    ld   a,[wDA11]
+    cp   a,$18
+    jr   c,label6662
+    cp   a,$40
+    ld   a,$04
+    jp   nc,entry_02_72ac
+    ret  
+label6662:
+    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    inc  a
+    cp   a,$09
+    jr   c,label666B
+    xor  a
+label666B:
+    ld   [hl],a
+    ld   l,a
+    ld   h,$00
+    ld   de,$667E
+    add  hl,de
+    ld   a,[hl]
+    push af
+    cp   a,$04
+    call z,call_00_242d
+    pop  af
+    jp   entry_02_72ac
+    ld   bc,$0606
+    ld   bc,$0104
+    inc  b
+    ld   b,$04
+    call call_00_244a
+    jp   call_00_2766
+    call call_00_244a
+    call call_00_2766
+    ret  c
+    call call_00_2a5d
+    ld   a,$04
+    jp   nz,entry_02_72ac
+    ret  
+    call call_00_29f5
+    jr   z,label66AC
+    ld   c,$18
+    call call_00_28c8_ObjectSet1B
+    ld   c,$28
+    call call_00_28dc_ObjectSet1D
+label66AC:
+    call call_00_251c
+    call call_00_244a
+    call call_00_2766
+    ld   a,$00
+    jp   nc,entry_02_72ac
+    ret  
+    call call_00_2410
+    call call_00_2a68
+    ld   a,[wDA11]
+    cp   a,$38
+    ld   a,$01
+    jp   c,entry_02_72ac
+    ret  
+    ld   c,$10
+    call call_00_28c8_ObjectSet1B
+    call call_00_251c
+    ret  z
+    call call_00_2976_ObjectGetFacingDirection
+    xor  a,$20
+    ld   [hl],a
+    ld   a,$02
+    jp   entry_02_72ac
+    call call_00_2a5d
+    ret  z
+    call call_00_2976_ObjectGetFacingDirection
+    xor  a,$20
+    ld   [hl],a
+    ld   a,$01
+    jp   entry_02_72ac
+    call call_00_2a5d
+    jp   nz,jp_00_2b7a
+    ret  
+    call call_00_2a68
+    ld   a,[wDA11]
+    cp   a,$38
+    jr   c,label6708
+    ld   c,$06
+    call call_00_2588
+    jp   call_00_251c
+label6708:
+    ld   a,[wDA12]
+    xor  a,$20
+    ld   c,a
+    call call_00_2958_ObjectSetFacingDirection
+    ld   c,$10
+    call call_00_2588
+    call call_00_251c
+    jr   nz,label6728
+    ld   a,[wDA11]
+    cp   a,$28
+    ret  nc
+    ld   hl,wDA12
+    ld   c,[hl]
+    call call_00_2958_ObjectSetFacingDirection
+label6728:
+    ld   c,$30
+    call call_00_28dc_ObjectSet1D
+    ld   a,$01
+    jp   entry_02_72ac
+    ld   c,$02
+    call call_00_2588
+    call call_00_251c
+    call call_00_244a
+    call call_00_2766
+    ld   a,$00
+    jp   nc,entry_02_72ac
+    ret  
+    call call_00_29f5
+    ld   c,$00
+    call nz,call_00_290d_ObjectSetTimer1A
+    ld   c,$04
+    call call_00_28c8_ObjectSet1B
+    call call_00_251c
+    ld   c,$02
+    call nz,call_00_290d_ObjectSetTimer1A
+    call call_00_29ac
+    ret  nz
+    call call_00_2922_ObjectTimer1ACountdown
+    ld   c,$10
+    jp   nz,call_00_3792
+    ret  
+    call call_00_298a_ObjectGet19
+    cp   a,$50
+    jr   z,label6776
+    inc  [hl]
+    ld   bc,$FFFF
+    call jp_00_250d
+label6776:
+    call call_00_29f5
+    ld   c,$00
+    call nz,call_00_290d_ObjectSetTimer1A
+    ld   c,$10
+    call call_00_28c8_ObjectSet1B
+    call call_00_251c
+    ld   c,$C1
+    call nz,call_00_290d_ObjectSetTimer1A
+    call call_00_29ac
+    ret  nz
+    call call_00_2922_ObjectTimer1ACountdown
+    ret  z
+    and  a,$3F
+    ld   c,$10
+    jp   z,call_00_3792
+    ret  
+    call call_00_29f5
+    jr   z,label67B3
+    call call_00_2976_ObjectGetFacingDirection
+    ld   c,$18
+    cp   a,$00
+    jr   z,label67AB
+    ld   c,$E8
+label67AB:
+    call call_00_28c8_ObjectSet1B
+    ld   c,$B4
+    call call_00_290d_ObjectSetTimer1A
+label67B3:
+    call call_00_2922_ObjectTimer1ACountdown
+    jp   z,jp_00_2b7a
+    call call_00_24c0
+    call call_00_244a
+    jp   call_00_2766
+    call call_00_29f5
+    jr   z,label67DF
+    call $688E
+    ld   l,c
+    ld   h,$00
+    add  hl,hl
+    ld   de,wDCE2
+    add  hl,de
+    ld   d,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$10
+    ld   e,a
+    ldi  a,[hl]
+    ld   [de],a
+    inc  e
+    ld   a,[hl]
+    ld   [de],a
+label67DF:
+    ld   a,[wDC7B]
+    ld   hl,wDA00_CurrentObjectAddr
+    cp   [hl]
+    ret  nz
+    call call_00_22d4
+    ld   c,a
+    ld   hl,$686A
+label67EE:
+    push hl
+    ldi  a,[hl]
+    cp   c
+    jr   nz,label6805
+    ld   d,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   e,a
+    ld   a,[de]
+    sub  [hl]
+    ld   b,a
+    inc  de
+    inc  hl
+    ld   a,[de]
+    sbc  [hl]
+    or   b
+    jr   z,label6810
+label6805:
+    pop  hl
+    ld   de,$0005
+    add  hl,de
+    ld   a,[hl]
+    cp   a,$FF
+    jr   nz,label67EE
+    ret  
+label6810:
+    inc  de
+    inc  hl
+    ld   a,[de]
+    sub  [hl]
+    ld   c,a
+    inc  de
+    inc  hl
+    ld   a,[de]
+    sbc  [hl]
+    pop  hl
+    jr   c,label6847
+    or   c
+    jr   nz,label6842
+    call $688E
+    ld   l,c
+    ld   h,$00
+    add  hl,hl
+    ld   de,wDCE2
+    add  hl,de
+    ld   d,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$10
+    ld   e,a
+    ld   a,[de]
+    ldi  [hl],a
+    inc  e
+    ld   a,[de]
+    ld   [hl],a
+    ld   a,[wD801_PlayerObject_ActionId]
+    cp   a,$1E
+    ld   a,$01
+    jp   z,entry_02_54f9
+    ret  
+label6842:
+    ld   bc,$FFFF
+    jr   label684A
+label6847:
+    ld   bc,$0001
+label684A:
+    ld   a,$1E
+    ld   hl,wD801_PlayerObject_ActionId
+    cp   [hl]
+    jp   nz,entry_02_54f9
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   l,a
+    ld   a,[wD80E_PlayerXPosition]
+    sub  [hl]
+    ld   e,a
+    inc  hl
+    ld   a,[wD80F_PlayerXPosition]
+    sbc  [hl]
+    or   e
+    jp   z,jp_00_250d
+    ret  
+    
+    db   $00, $a0, $01, $98, $02        ;; 02:6867 ????????
     db   $01, $a0, $01, $58, $01, $01, $40, $03        ;; 02:686f ????????
     db   $d8, $01, $01, $c0, $05, $58, $02, $02        ;; 02:6877 ????????
     db   $a0, $01, $08, $01, $02, $40, $03, $58        ;; 02:687f ????????
@@ -962,255 +1928,1001 @@ data_02_5eb8:
     db   $0e, $5f, $0e, $ff, $0c, $1a, $96, $47        ;; 02:6897 ????????
     db   $13, $23, $1a, $9e, $1b, $23, $b0, $20        ;; 02:689f ????????
     db   $f3, $c9, $a0, $01, $40, $03, $c0, $05        ;; 02:68a7 ????????
-    db   $c3, $3e, $23, $cd, $f5, $29, $c8, $21        ;; 02:68af ????????
-    db   $e5, $68, $cd, $20, $2c, $cd, $26, $28        ;; 02:68b7 ????????
-    db   $fa, $71, $dc, $e6, $0f, $4f, $06, $00        ;; 02:68bf ????????
-    db   $cd, $df, $24, $cd, $e4, $27, $cd, $0f        ;; 02:68c7 ????????
-    db   $23, $06, $ff, $cd, $0d, $25, $0e, $04        ;; 02:68cf ????????
-    db   $cd, $0d, $29, $0e, $00, $cd, $c8, $28        ;; 02:68d7 ????????
-    db   $0e, $00, $cd, $dc, $28, $c9, $00, $00        ;; 02:68df ????????
-    db   $00, $00, $ff, $03, $ff, $7f, $cd, $c0        ;; 02:68e7 ????????
-    db   $24, $cd, $4a, $24, $cd, $66, $27, $d8        ;; 02:68ef ????????
-    db   $cd, $22, $29, $3e, $02, $ca, $ac, $72        ;; 02:68f7 ????????
-    db   $6e, $26, $00, $11, $24, $69, $19, $4e        ;; 02:68ff ????????
-    db   $cd, $dc, $28, $cd, $e6, $28, $c0, $fa        ;; 02:6907 ????????
-    db   $71, $dc, $cb, $37, $e6, $03, $6f, $26        ;; 02:690f ????????
-    db   $00, $11, $20, $69, $19, $4e, $c3, $c8        ;; 02:6917 ????????
-    db   $28, $08, $f8, $04, $fc, $00, $20, $28        ;; 02:691f ????????
-    db   $30, $cd, $f5, $29, $01, $08, $00, $c4        ;; 02:6927 ????????
-    db   $0d, $25, $21, $37, $69, $c3, $20, $2c        ;; 02:692f ????????
+
+call_02_68af:
+    jp   call_00_233e
+
+call_02_68b2:
+    call call_00_29f5
+    ret  z
+    ld   hl,$68E5
+    call call_00_2c20
+    call call_00_2826_ObjectSetXPosition
+    ld   a,[wDC71]
+    and  a,$0F
+    ld   c,a
+    ld   b,$00
+    call $24DF
+    call call_00_27e4_ObjectSetYPosition
+    call call_00_230f
+    ld   b,$FF
+    call jp_00_250d
+    ld   c,$04
+    call call_00_290d_ObjectSetTimer1A
+    ld   c,$00
+    call call_00_28c8_ObjectSet1B
+    ld   c,$00
+    call call_00_28dc_ObjectSet1D
+    ret  
+    
+    db   $00, $00, $00, $00, $ff, $03, $ff, $7f
+
+call_02_68ed:
+    call call_00_24c0
+    call call_00_244a
+    call call_00_2766
+label68F6:
+    ret  c
+    call call_00_2922_ObjectTimer1ACountdown
+    ld   a,$02
+    jp   z,entry_02_72ac
+    ld   l,[hl]
+    ld   h,$00
+    ld   de,$6924
+    add  hl,de
+    ld   c,[hl]
+    call call_00_28dc_ObjectSet1D
+    call call_00_28e6_ObjectCheckIf1BIsZero
+    ret  nz
+    ld   a,[wDC71]
+    swap a
+    and  a,$03
+    ld   l,a
+    ld   h,$00
+    ld   de,$6920
+    add  hl,de
+    ld   c,[hl]
+    jp   call_00_28c8_ObjectSet1B
+    
+    db   $08, $f8, $04, $fc, $00, $20, $28, $30
+
+call_02_6928:
+    call call_00_29f5
+    ld   bc,$0008
+    call nz,jp_00_250d
+    ld   hl,$6937
+    jp   call_00_2c20
+
     db   $00, $00, $1b, $00, $5f, $02, $1f, $1b        ;; 02:6937 ????????
-    db   $cd, $f5, $29, $0e, $15, $c4, $92, $37        ;; 02:693f ????????
-    db   $21, $d0, $dc, $7e, $a7, $c8, $36, $00        ;; 02:6947 ????????
-    db   $cd, $a0, $28, $a7, $c0, $3e, $04, $cd        ;; 02:694f ????????
-    db   $ac, $72, $ea, $d6, $da, $3e, $03, $21        ;; 02:6957 ????????
-    db   $71, $56, $cd, $dd, $0e, $c9, $cd, $5d        ;; 02:695f ????????
-    db   $2a, $c8, $0e, $01, $cd, $ef, $21, $c3        ;; 02:6967 ????????
-    db   $7a, $2b, $0e, $55, $cd, $b7, $29, $79        ;; 02:696f ????????
-    db   $fe, $02, $3e, $01, $c2, $ac, $72, $7d        ;; 02:6977 ????????
+
+call_02_693f:
+    call call_00_29f5
+    ld   c,$15
+    call nz,call_00_3792
+call_02_6947:
+    ld   hl,wDCD0
+    ld   a,[hl]
+    and  a
+    ret  z
+    ld   [hl],$00
+    call call_00_28a0_ObjectGet15
+    and  a
+    ret  nz
+    ld   a,$04
+    call entry_02_72ac
+    ld   [wDAD6_ReturnBank],a
+    ld   a,$03
+    ld   hl,$5671
+    call call_00_0edd_CallAltBankFunc
+    ret  
+
+call_02_6965:
+    call call_00_2a5d
+    ret  z
+    ld   c,$01
+    call call_00_21ef
+    jp   jp_00_2b7a
+
+call_02_6971:
+    ld   c,$55
+    call call_00_29b7
+    ld   a,c
+    cp   a,$02
+    ld   a,$01
+    jp   nz,entry_02_72ac
+    
+    db   $7d        ;; 02:6977 ????????
     db   $ee, $08, $6f, $6e, $26, $00, $29, $29        ;; 02:697f ????????
     db   $11, $9f, $69, $19, $16, $d8, $fa, $00        ;; 02:6987 ????????
     db   $da, $f6, $0e, $5f, $2a, $12, $1c, $2a        ;; 02:698f ????????
     db   $12, $1c, $2a, $12, $1c, $7e, $12, $c9        ;; 02:6997 ????????
     db   $50, $00, $1c, $00, $50, $00, $1c, $00        ;; 02:699f ????????
     db   $50, $00, $1c, $00, $50, $00, $19, $00        ;; 02:69a7 ????????
-    db   $cd, $f5, $29, $28, $17, $21, $ce, $dc        ;; 02:69af ????????
-    db   $7e, $34, $e6, $07, $6f, $26, $00, $11        ;; 02:69b7 ????????
-    db   $fc, $69, $19, $4e, $cd, $c8, $28, $0e        ;; 02:69bf ????????
-    db   $20, $cd, $dc, $28, $cd, $4a, $24, $11        ;; 02:69c7 ????????
-    db   $68, $00, $26, $d8, $fa, $00, $da, $f6        ;; 02:69cf ????????
-    db   $10, $6f, $2a, $93, $7e, $9a, $da, $c0        ;; 02:69d7 ????????
-    db   $24, $72, $2d, $73, $0e, $00, $cd, $c8        ;; 02:69df ????????
-    db   $28, $0e, $00, $cd, $dc, $28, $0e, $2d        ;; 02:69e7 ????????
-    db   $cd, $0d, $29, $3e, $1c, $cd, $f5, $0f        ;; 02:69ef ????????
-    db   $3e, $02, $c3, $ac, $72, $10, $f0, $08        ;; 02:69f7 ????????
-    db   $f8, $10, $f0, $04, $fc, $fa, $71, $dc        ;; 02:69ff ????????
-    db   $e6, $03, $c0, $cd, $22, $29, $3e, $04        ;; 02:6a07 ????????
-    db   $ca, $ac, $72, $c9, $cd, $f5, $29, $28        ;; 02:6a0f ????????
-    db   $20, $26, $d8, $fa, $00, $da, $f6, $0e        ;; 02:6a17 ????????
-    db   $6f, $7e, $21, $40, $6a, $06, $05, $be        ;; 02:6a1f ????????
-    db   $38, $05, $23, $23, $05, $20, $f8, $23        ;; 02:6a27 ????????
-    db   $4e, $cd, $c8, $28, $0e, $d8, $cd, $dc        ;; 02:6a2f ????????
-    db   $28, $cd, $c0, $24, $cd, $ee, $24, $18        ;; 02:6a37 ????????
-    db   $c4, $17, $26, $35, $17, $44, $0f, $62        ;; 02:6a3f ????????
-    db   $00, $71, $f9, $8f, $ea, $cd, $f5, $29        ;; 02:6a47 ????????
-    db   $3e, $19, $c4, $f5, $0f, $21, $89, $6a        ;; 02:6a4f ????????
-    db   $cd, $20, $2c, $cd, $5d, $2a, $c2, $7a        ;; 02:6a57 ????????
-    db   $2b, $0e, $55, $cd, $b7, $29, $79, $fe        ;; 02:6a5f ????????
-    db   $04, $d0, $26, $d8, $fa, $00, $da, $f6        ;; 02:6a67 ????????
-    db   $0e, $6f, $7e, $d6, $60, $c6, $0a, $fe        ;; 02:6a6f ????????
-    db   $14, $d0, $23, $23, $7e, $d6, $18, $c6        ;; 02:6a77 ????????
-    db   $0a, $fe, $14, $d0, $3e, $01, $ea, $d0        ;; 02:6a7f ????????
-    db   $dc, $c9, $00, $00, $1b, $00, $5f, $02        ;; 02:6a87 ????????
-    db   $1f, $1b, $cd, $f5, $29, $28, $0b, $01        ;; 02:6a8f ????????
-    db   $d0, $ff, $cd, $0d, $25, $0e, $28, $cd        ;; 02:6a97 ????????
-    db   $4e, $29, $cd, $d4, $22, $c8, $3e, $1a        ;; 02:6a9f ????????
-    db   $cd, $f5, $0f, $0e, $02, $cd, $99, $22        ;; 02:6aa7 ????????
-    db   $3e, $01, $c3, $ac, $72, $cd, $f5, $29        ;; 02:6aaf ????????
-    db   $0e, $10, $c4, $4e, $29, $cd, $4a, $24        ;; 02:6ab7 ????????
-    db   $cd, $66, $27, $d8, $3e, $19, $cd, $f5        ;; 02:6abf ????????
-    db   $0f, $3e, $02, $c3, $ac, $72, $cd, $f5        ;; 02:6ac7 ????????
-    db   $29, $c2, $10, $24, $c9, $cd, $f5, $29        ;; 02:6acf ????????
-    db   $0e, $14, $c2, $92, $37, $c9, $cd, $f5        ;; 02:6ad7 ????????
-    db   $29, $28, $13, $cd, $76, $29, $0e, $20        ;; 02:6adf ????????
-    db   $fe, $00, $28, $02, $0e, $e0, $cd, $c8        ;; 02:6ae7 ????????
-    db   $28, $0e, $78, $cd, $0d, $29, $cd, $22        ;; 02:6aef ????????
-    db   $29, $ca, $7a, $2b, $fe, $3c, $dc, $4a        ;; 02:6af7 ????????
-    db   $24, $c3, $c0, $24, $cd, $f5, $29, $28        ;; 02:6aff ????????
-    db   $06, $cd, $0f, $23, $cd, $0d, $29, $01        ;; 02:6b07 ????????
-    db   $02, $00, $cd, $0d, $25, $cd, $17, $29        ;; 02:6b0f ????????
-    db   $d6, $02, $77, $3e, $01, $ca, $ac, $72        ;; 02:6b17 ????????
-    db   $c9, $01, $ff, $ff, $cd, $0d, $25, $cd        ;; 02:6b1f ????????
-    db   $0f, $23, $cd, $17, $29, $3c, $77, $b9        ;; 02:6b27 ????????
-    db   $3e, $02, $ca, $ac, $72, $c9, $cd, $f5        ;; 02:6b2f ????????
-    db   $29, $28, $0d, $0e, $20, $cd, $c8, $28        ;; 02:6b37 ????????
-    db   $0e, $08, $cd, $0d, $29, $cd, $10, $24        ;; 02:6b3f ????????
-    db   $cd, $1c, $25, $cd, $22, $29, $3e, $00        ;; 02:6b47 ????????
-    db   $ca, $ac, $72, $c9, $0e, $02, $cd, $c8        ;; 02:6b4f ????????
-    db   $28, $cd, $1c, $25, $cd, $68, $2a, $fa        ;; 02:6b57 ????????
-    db   $11, $da, $fe, $28, $3e, $01, $da, $ac        ;; 02:6b5f ????????
-    db   $72, $c9, $cd, $22, $27, $28, $0a, $cd        ;; 02:6b67 ????????
-    db   $68, $2a, $fa, $11, $da, $fe, $0e, $38        ;; 02:6b6f ????????
-    db   $13, $0e, $08, $cd, $c8, $28, $cd, $1c        ;; 02:6b77 ????????
-    db   $25, $c8, $cd, $22, $29, $28, $05, $3e        ;; 02:6b7f ????????
-    db   $01, $c3, $ac, $72, $cd, $17, $29, $36        ;; 02:6b87 ????????
-    db   $03, $cd, $22, $27, $c4, $10, $24, $3e        ;; 02:6b8f ????????
-    db   $02, $c3, $ac, $72, $0e, $10, $cd, $c8        ;; 02:6b97 ????????
-    db   $28, $c3, $1c, $25, $cd, $f5, $29, $28        ;; 02:6b9f ????????
-    db   $0b, $0e, $04, $cd, $c8, $28, $cd, $0f        ;; 02:6ba7 ????????
-    db   $23, $cd, $0d, $29, $cd, $1c, $25, $01        ;; 02:6baf ????????
-    db   $02, $00, $cd, $0d, $25, $cd, $17, $29        ;; 02:6bb7 ????????
-    db   $d6, $02, $77, $3e, $01, $ca, $ac, $72        ;; 02:6bbf ????????
-    db   $c9, $cd, $17, $29, $fa, $71, $dc, $a6        ;; 02:6bc7 ????????
-    db   $e6, $3f, $20, $09, $cd, $76, $29, $ee        ;; 02:6bcf ????????
-    db   $20, $4f, $cd, $58, $29, $0e, $10, $cd        ;; 02:6bd7 ????????
-    db   $c8, $28, $cd, $1c, $25, $cd, $0f, $23        ;; 02:6bdf ????????
-    db   $cd, $17, $29, $b9, $3e, $00, $ca, $ac        ;; 02:6be7 ????????
-    db   $72, $cd, $17, $29, $3c, $77, $01, $ff        ;; 02:6bef ????????
-    db   $ff, $c3, $0d, $25, $fa, $7b, $dc, $21        ;; 02:6bf7 ????????
-    db   $00, $da, $be, $3e, $01, $ca, $ac, $72        ;; 02:6bff ????????
-    db   $c9, $ea, $d6, $da, $3e, $03, $21, $f8        ;; 02:6c07 ????????
-    db   $57, $cd, $dd, $0e, $cd, $4a, $24, $cd        ;; 02:6c0f ????????
-    db   $80, $27, $d2, $7a, $2b, $c9, $cd, $f5        ;; 02:6c17 ????????
-    db   $29, $0e, $20, $c4, $c8, $28, $fa, $71        ;; 02:6c1f ????????
-    db   $dc, $e6, $07, $0e, $10, $cc, $88, $25        ;; 02:6c27 ????????
-    db   $cd, $1c, $25, $cd, $22, $27, $c8, $cd        ;; 02:6c2f ????????
-    db   $68, $2a, $cd, $76, $29, $21, $12, $da        ;; 02:6c37 ????????
-    db   $be, $c0, $fa, $11, $da, $fe, $40, $3e        ;; 02:6c3f ????????
-    db   $02, $da, $ac, $72, $c9, $0e, $20, $cd        ;; 02:6c47 ????????
-    db   $dc, $28, $0e, $28, $cd, $88, $25, $cd        ;; 02:6c4f ????????
-    db   $1c, $25, $cd, $be, $28, $fe, $28, $3e        ;; 02:6c57 ????????
-    db   $03, $ca, $ac, $72, $c9, $cd, $1c, $25        ;; 02:6c5f ????????
-    db   $cd, $4a, $24, $cd, $66, $27, $3e, $00        ;; 02:6c67 ????????
-    db   $d2, $ac, $72, $c9, $cd, $f5, $29, $28        ;; 02:6c6f ????????
-    db   $0c, $cd, $66, $27, $0e, $00, $38, $02        ;; 02:6c77 ????????
-    db   $0e, $01, $cd, $80, $29, $cd, $8a, $29        ;; 02:6c7f ????????
-    db   $28, $23, $fa, $71, $dc, $e6, $07, $0e        ;; 02:6c87 ????????
-    db   $10, $cc, $88, $25, $cd, $1c, $25, $c8        ;; 02:6c8f ????????
-    db   $cd, $0f, $23, $06, $00, $21, $d5, $dc        ;; 02:6c97 ????????
-    db   $09, $7e, $a7, $3e, $00, $c2, $ac, $72        ;; 02:6c9f ????????
-    db   $3e, $05, $c3, $ac, $72, $cd, $1c, $25        ;; 02:6ca7 ????????
-    db   $cd, $4a, $24, $cd, $66, $27, $0e, $01        ;; 02:6caf ????????
-    db   $d4, $80, $29, $c9, $cd, $f5, $29, $28        ;; 02:6cb7 ????????
-    db   $06, $cd, $0f, $23, $cd, $58, $29, $cd        ;; 02:6cbf ????????
-    db   $f3, $27, $fa, $10, $d8, $93, $fa, $11        ;; 02:6cc7 ????????
-    db   $d8, $9a, $d8, $0e, $65, $cd, $10, $2b        ;; 02:6ccf ????????
-    db   $c0, $0e, $1c, $c3, $92, $37, $cd, $f5        ;; 02:6cd7 ????????
-    db   $29, $28, $13, $cd, $76, $29, $0e, $14        ;; 02:6cdf ????????
-    db   $fe, $00, $28, $02, $0e, $ec, $cd, $c8        ;; 02:6ce7 ????????
-    db   $28, $0e, $03, $cd, $0d, $29, $cd, $c0        ;; 02:6cef ????????
-    db   $24, $cd, $4a, $24, $cd, $f3, $27, $cd        ;; 02:6cf7 ????????
-    db   $17, $29, $6e, $26, $00, $29, $01, $31        ;; 02:6cff ????????
-    db   $6d, $09, $2a, $83, $5f, $7e, $8a, $57        ;; 02:6d07 ????????
-    db   $26, $d8, $fa, $00, $da, $f6, $10, $6f        ;; 02:6d0f ????????
-    db   $2a, $93, $7e, $9a, $d8, $72, $2d, $73        ;; 02:6d17 ????????
-    db   $3e, $19, $cd, $f5, $0f, $cd, $22, $29        ;; 02:6d1f ????????
-    db   $0e, $20, $c2, $dc, $28, $3e, $01, $c3        ;; 02:6d27 ????????
-    db   $ac, $72, $00, $00, $56, $00, $46, $00        ;; 02:6d2f ????????
-    db   $36, $00, $c9, $c9, $cd, $5d, $2a, $c8        ;; 02:6d37 ????????
-    db   $3e, $1a, $cd, $f5, $0f, $3e, $03, $c3        ;; 02:6d3f ????????
-    db   $ac, $72, $cd, $5d, $2a, $3e, $06, $c2        ;; 02:6d47 ????????
-    db   $ac, $72, $c9, $cd, $f5, $29, $28, $05        ;; 02:6d4f ????????
-    db   $0e, $78, $cd, $0d, $29, $cd, $22, $29        ;; 02:6d57 ????????
-    db   $c0, $3e, $01, $ea, $65, $dc, $21, $6a        ;; 02:6d5f ????????
-    db   $db, $cb, $e6, $c3, $7a, $2b, $cd, $f5        ;; 02:6d67 ????????
-    db   $29, $28, $10, $cd, $17, $29, $34, $fe        ;; 02:6d6f ????????
-    db   $0a, $3e, $02, $cc, $ac, $72, $3e, $02        ;; 02:6d77 ????????
-    db   $ea, $da, $dc, $c3, $3e, $23, $cd, $3e        ;; 02:6d7f ????????
-    db   $23, $0e, $69, $cd, $b7, $29, $79, $fe        ;; 02:6d87 ????????
-    db   $00, $c0, $0e, $68, $cd, $b7, $29, $0c        ;; 02:6d8f ????????
-    db   $c0, $fa, $d1, $dc, $a7, $c0, $21, $da        ;; 02:6d97 ????????
-    db   $dc, $35, $cb, $7e, $28, $02, $36, $02        ;; 02:6d9f ????????
-    db   $6e, $26, $00, $11, $b7, $6d, $19, $4e        ;; 02:6da7 ????????
-    db   $cd, $0d, $29, $3e, $03, $c3, $ac, $72        ;; 02:6daf ????????
-    db   $49, $39, $29, $cd, $3e, $23, $cd, $22        ;; 02:6db7 ????????
-    db   $29, $20, $10, $0e, $6a, $cd, $ce, $29        ;; 02:6dbf ????????
-    db   $c8, $3e, $01, $ea, $d1, $dc, $3e, $02        ;; 02:6dc7 ????????
-    db   $c3, $ac, $72, $e6, $07, $3e, $04, $ca        ;; 02:6dcf ????????
-    db   $ac, $72, $c9, $c3, $3e, $23, $cd, $3e        ;; 02:6dd7 ????????
-    db   $23, $cd, $f5, $29, $c8, $3e, $15, $cd        ;; 02:6ddf ????????
-    db   $f5, $0f, $0e, $18, $c3, $92, $37, $cd        ;; 02:6de7 ????????
-    db   $4a, $24, $11, $68, $00, $26, $d8, $fa        ;; 02:6def ????????
-    db   $00, $da, $f6, $10, $6f, $2a, $93, $7e        ;; 02:6df7 ????????
-    db   $9a, $d8, $72, $2d, $73, $3e, $08, $c3        ;; 02:6dff ????????
-    db   $ac, $72, $cd, $f5, $29, $28, $19, $3e        ;; 02:6e07 ????????
-    db   $1a, $cd, $f5, $0f, $21, $3c, $6e, $cd        ;; 02:6e0f ????????
-    db   $20, $2c, $cd, $8a, $28, $cd, $8b, $2b        ;; 02:6e17 ????????
-    db   $cd, $67, $2c, $0e, $3c, $cd, $0d, $29        ;; 02:6e1f ????????
-    db   $cd, $89, $2c, $c0, $cd, $22, $29, $c0        ;; 02:6e27 ????????
-    db   $3e, $01, $ea, $66, $dc, $21, $6a, $db        ;; 02:6e2f ????????
-    db   $cb, $e6, $c3, $7a, $2b, $00, $00, $08        ;; 02:6e37 ????????
-    db   $02, $04, $01, $ff, $7f, $cd, $f5, $29        ;; 02:6e3f ????????
-    db   $28, $0a, $0e, $00, $cd, $c8, $28, $0e        ;; 02:6e47 ????????
-    db   $10, $cd, $dc, $28, $cd, $68, $2a, $fa        ;; 02:6e4f ????????
-    db   $12, $da, $fe, $20, $28, $0a, $cd, $be        ;; 02:6e57 ????????
-    db   $28, $fe, $10, $28, $0b, $34, $18, $08        ;; 02:6e5f ????????
-    db   $cd, $be, $28, $fe, $f0, $28, $01, $35        ;; 02:6e67 ????????
-    db   $cd, $c0, $24, $cd, $4a, $24, $11, $88        ;; 02:6e6f ????????
-    db   $00, $26, $d8, $fa, $00, $da, $f6, $10        ;; 02:6e77 ????????
-    db   $6f, $2a, $93, $7e, $9a, $d2, $7a, $2b        ;; 02:6e7f ????????
-    db   $c9, $21, $d1, $dc, $cb, $46, $c8, $36        ;; 02:6e87 ????????
-    db   $00, $26, $d8, $fa, $00, $da, $f6, $0e        ;; 02:6e8f ????????
-    db   $6f, $11, $78, $00, $73, $2c, $72, $0e        ;; 02:6e97 ????????
-    db   $ff, $cd, $0d, $29, $3e, $01, $c3, $ac        ;; 02:6e9f ????????
-    db   $72, $cd, $f5, $29, $3e, $1b, $c4, $f5        ;; 02:6ea7 ????????
-    db   $0f, $cd, $22, $29, $3e, $04, $ca, $ac        ;; 02:6eaf ????????
-    db   $72, $c9, $cd, $f5, $29, $c8, $0e, $16        ;; 02:6eb7 ????????
-    db   $cd, $92, $37, $3e, $14, $c3, $f5, $0f        ;; 02:6ebf ????????
-    db   $cd, $f5, $29, $0e, $3c, $c4, $dc, $28        ;; 02:6ec7 ????????
-    db   $0e, $67, $cd, $ce, $29, $c0, $7d, $f6        ;; 02:6ecf ????????
-    db   $01, $6f, $7e, $fe, $06, $30, $1c, $cd        ;; 02:6ed7 ????????
-    db   $4a, $24, $cd, $f1, $28, $cb, $7e, $c8        ;; 02:6edf ????????
-    db   $11, $38, $00, $26, $d8, $fa, $00, $da        ;; 02:6ee7 ????????
-    db   $f6, $10, $6f, $2a, $93, $7e, $9a, $d8        ;; 02:6eef ????????
-    db   $72, $2d, $73, $3e, $19, $cd, $f5, $0f        ;; 02:6ef7 ????????
-    db   $0e, $17, $cd, $92, $37, $c3, $7a, $2b        ;; 02:6eff ????????
-    db   $cd, $5d, $2a, $c2, $7a, $2b, $c9, $c9        ;; 02:6f07 ????????
-    db   $cd, $f5, $29, $c8, $0e, $20, $cd, $c8        ;; 02:6f0f ????????
-    db   $28, $0e, $00, $cd, $dc, $28, $cd, $17        ;; 02:6f17 ????????
-    db   $29, $34, $fe, $0a, $3e, $02, $ca, $ac        ;; 02:6f1f ????????
-    db   $72, $c9, $cd, $1c, $25, $cd, $02, $70        ;; 02:6f27 ????????
-    db   $0e, $38, $d2, $dc, $28, $c9, $cd, $02        ;; 02:6f2f ????????
-    db   $70, $3e, $04, $d2, $ac, $72, $c9, $cd        ;; 02:6f37 ????????
-    db   $f5, $29, $0e, $00, $c4, $dc, $28, $cd        ;; 02:6f3f ????????
-    db   $d3, $6f, $d0, $0e, $00, $cd, $0d, $29        ;; 02:6f47 ????????
-    db   $3e, $06, $c3, $ac, $72, $cd, $f5, $29        ;; 02:6f4f ????????
-    db   $c8, $cd, $17, $29, $34, $fe, $0a, $3e        ;; 02:6f57 ????????
-    db   $08, $ca, $ac, $72, $c9, $cd, $f5, $29        ;; 02:6f5f ????????
-    db   $28, $0b, $cd, $26, $28, $cd, $e4, $27        ;; 02:6f67 ????????
-    db   $0e, $06, $cd, $0d, $29, $cd, $17, $29        ;; 02:6f6f ????????
-    db   $28, $1a, $fa, $71, $dc, $e6, $3f, $c0        ;; 02:6f77 ????????
-    db   $cd, $22, $29, $28, $0f, $fa, $da, $dc        ;; 02:6f7f ????????
-    db   $0e, $1d, $e6, $01, $ca, $92, $37, $0e        ;; 02:6f87 ????????
-    db   $1e, $c3, $92, $37, $0e, $71, $cd, $ce        ;; 02:6f8f ????????
-    db   $29, $3e, $00, $c2, $ac, $72, $c9, $c3        ;; 02:6f97 ????????
-    db   $d3, $6f, $cd, $02, $70, $3e, $0b, $d2        ;; 02:6f9f ????????
-    db   $ac, $72, $c9, $cd, $f5, $29, $28, $0f        ;; 02:6fa7 ????????
-    db   $3e, $1a, $cd, $f5, $0f, $0e, $b4, $cd        ;; 02:6faf ????????
-    db   $0d, $29, $0e, $30, $cd, $dc, $28, $cd        ;; 02:6fb7 ????????
-    db   $02, $70, $d8, $cd, $22, $29, $c0, $3e        ;; 02:6fbf ????????
-    db   $01, $ea, $67, $dc, $21, $6a, $db, $cb        ;; 02:6fc7 ????????
-    db   $e6, $c3, $7a, $2b, $cd, $f1, $28, $cb        ;; 02:6fcf ????????
-    db   $7f, $20, $06, $fe, $20, $3e, $20, $30        ;; 02:6fd7 ????????
-    db   $03, $7e, $c6, $04, $77, $cd, $4a, $24        ;; 02:6fdf ????????
-    db   $11, $24, $00, $26, $d8, $fa, $00, $da        ;; 02:6fe7 ????????
-    db   $f6, $10, $6f, $2a, $93, $7e, $9a, $d0        ;; 02:6fef ????????
-    db   $f5, $72, $2d, $73, $0e, $00, $cd, $dc        ;; 02:6ff7 ????????
-    db   $28, $f1, $c9, $cd, $4a, $24, $11, $58        ;; 02:6fff ????????
-    db   $00, $26, $d8, $fa, $00, $da, $f6, $10        ;; 02:7007 ????????
-    db   $6f, $2a, $93, $7e, $9a, $d8, $72, $2b        ;; 02:700f ????????
-    db   $73, $c9, $c9, $cd, $f5, $29, $3e, $13        ;; 02:7017 ????????
-    db   $c4, $f5, $0f, $cd, $4a, $24, $cd, $66        ;; 02:701f ????????
-    db   $27, $3e, $02, $d2, $ac, $72, $c9, $cd        ;; 02:7027 ????????
-    db   $f5, $29, $28, $23, $21, $da, $dc, $7e        ;; 02:702f ????????
-    db   $34, $e6, $07, $f5, $6f, $26, $00, $29        ;; 02:7037 ????????
-    db   $11, $7f, $70, $19, $f1, $4e, $23, $c5        ;; 02:703f ????????
-    db   $4e, $e6, $01, $28, $03, $af, $96, $4f        ;; 02:7047 ????????
-    db   $cd, $c8, $28, $c1, $cd, $dc, $28, $cd        ;; 02:704f ????????
-    db   $c0, $24, $cd, $4a, $24, $cd, $f1, $28        ;; 02:7057 ????????
-    db   $cb, $7f, $c8, $11, $70, $00, $26, $d8        ;; 02:705f ????????
-    db   $fa, $00, $da, $f6, $10, $6f, $2a, $93        ;; 02:7067 ????????
-    db   $7e, $9a, $d8, $72, $2b, $73, $3e, $19        ;; 02:706f ????????
-    db   $cd, $f5, $0f, $3e, $01, $c3, $ac, $72        ;; 02:7077 ????????
+
+call_02_69af:
+    call call_00_29f5
+    jr   z,label69CB
+    ld   hl,wDCCE
+    ld   a,[hl]
+    inc  [hl]
+    and  a,$07
+    ld   l,a
+    ld   h,$00
+    ld   de,$69FC
+    add  hl,de
+    ld   c,[hl]
+    call call_00_28c8_ObjectSet1B
+    ld   c,$20
+    call call_00_28dc_ObjectSet1D
+label69CB:
+    call call_00_244a
+    ld   de,$0068
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$10
+    ld   l,a
+    ldi  a,[hl]
+    sub  e
+    ld   a,[hl]
+    sbc  d
+    jp   c,call_00_24c0
+    ld   [hl],d
+    dec  l
+    ld   [hl],e
+    ld   c,$00
+    call call_00_28c8_ObjectSet1B
+    ld   c,$00
+    call call_00_28dc_ObjectSet1D
+    ld   c,$2D
+    call call_00_290d_ObjectSetTimer1A
+    ld   a,$1C
+    call call_00_0ff5
+    ld   a,$02
+    jp   entry_02_72ac
+    
+    db   $10, $f0, $08, $f8, $10, $f0, $04, $fc
+    
+call_02_6A04:
+    ld   a,[wDC71]
+    and  a,$03
+    ret  nz
+    call call_00_2922_ObjectTimer1ACountdown
+    ld   a,$04
+    jp   z,entry_02_72ac
+    ret  
+
+call_02_6A13:
+    call call_00_29f5
+    jr   z,label6A38
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   l,a
+    ld   a,[hl]
+    ld   hl,$6A40
+    ld   b,$05
+label6A26:
+    cp   [hl]
+    jr   c,label6A2E
+    inc  hl
+    inc  hl
+    dec  b
+    jr   nz,label6A26
+label6A2E:
+    inc  hl
+    ld   c,[hl]
+    call call_00_28c8_ObjectSet1B
+    ld   c,$D8
+    call call_00_28dc_ObjectSet1D
+label6A38:
+    call call_00_24c0
+    call call_00_24ee
+    jr   call_02_6A04
+
+    db   $17, $26, $35, $17, $44, $0f, $62        ;; 02:6a3f ????????
+    db   $00, $71, $f9, $8f, $ea
+    
+call_02_6A4c:
+    call call_00_29f5
+    ld   a,$19
+    call nz,call_00_0ff5
+    ld   hl,$6A89
+    call call_00_2c20
+    call call_00_2a5d
+    jp   nz,jp_00_2b7a
+    ld   c,$55
+    call call_00_29b7
+    ld   a,c
+    cp   a,$04
+    ret  nc
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   l,a
+    ld   a,[hl]
+    sub  a,$60
+    add  a,$0A
+    cp   a,$14
+    ret  nc
+    inc  hl
+    inc  hl
+    ld   a,[hl]
+    sub  a,$18
+    add  a,$0A
+    cp   a,$14
+    ret  nc
+    ld   a,$01
+    ld   [wDCD0],a
+    ret  
+    
+    db   $00, $00, $1b, $00, $5f, $02, $1f, $1b
+    
+call_02_6A91:
+    call call_00_29f5
+    jr   z,label6AA1
+    ld   bc,$FFD0
+    call jp_00_250d
+    ld   c,$28
+    call call_00_294e_ObjectSet13
+label6AA1:
+    call call_00_22d4
+    ret  z
+    ld   a,$1A
+    call call_00_0ff5
+    ld   c,$02
+    call call_00_2299
+    ld   a,$01
+    jp   entry_02_72ac
+    call call_00_29f5
+    ld   c,$10
+    call nz,call_00_294e_ObjectSet13
+    call call_00_244a
+    call call_00_2766
+    ret  c
+    ld   a,$19
+    call call_00_0ff5
+    ld   a,$02
+    jp   entry_02_72ac
+    call call_00_29f5
+    jp   nz,call_00_2410
+    ret  
+
+    
+    call call_00_29f5
+    ld   c,$14
+    jp   nz,call_00_3792
+    ret  
+
+
+    call call_00_29f5
+    jr   z,label6AF5
+    call call_00_2976_ObjectGetFacingDirection
+    ld   c,$20
+    cp   a,$00
+    jr   z,label6AED
+    ld   c,$E0
+label6AED:
+    call call_00_28c8_ObjectSet1B
+    ld   c,$78
+    call call_00_290d_ObjectSetTimer1A
+label6AF5:
+    call call_00_2922_ObjectTimer1ACountdown
+    jp   z,jp_00_2b7a
+    cp   a,$3C
+    call c,call_00_244a
+    jp   call_00_24c0
+    call call_00_29f5
+    jr   z,label6B0E
+    call call_00_230f
+    call call_00_290d_ObjectSetTimer1A
+label6B0E:
+    ld   bc,$0002
+    call jp_00_250d
+    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    sub  a,$02
+    ld   [hl],a
+    ld   a,$01
+    jp   z,entry_02_72ac
+    ret  
+
+
+    ld   bc,$FFFF
+    call jp_00_250d
+    call call_00_230f
+    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    inc  a
+    ld   [hl],a
+    cp   c
+    ld   a,$02
+    jp   z,entry_02_72ac
+    ret  
+
+
+    call call_00_29f5
+    jr   z,label6B47
+    ld   c,$20
+    call call_00_28c8_ObjectSet1B
+    ld   c,$08
+    call call_00_290d_ObjectSetTimer1A
+    call call_00_2410
+label6B47:
+    call call_00_251c
+    call call_00_2922_ObjectTimer1ACountdown
+    ld   a,$00
+    jp   z,entry_02_72ac
+    ret  
+
+
+    ld   c,$02
+    call call_00_28c8_ObjectSet1B
+    call call_00_251c
+    call call_00_2a68
+    ld   a,[wDA11]
+    cp   a,$28
+    ld   a,$01
+    jp   c,entry_02_72ac
+    ret  
+
+
+    call call_00_2722
+    jr   z,label6B78
+    call call_00_2a68
+    ld   a,[wDA11]
+    cp   a,$0E
+    jr   c,label6B8B
+label6B78:
+    ld   c,$08
+    call call_00_28c8_ObjectSet1B
+    call call_00_251c
+    ret  z
+    call call_00_2922_ObjectTimer1ACountdown
+    jr   z,label6B8B
+    ld   a,$01
+    jp   entry_02_72ac
+label6B8B:
+    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    ld   [hl],$03
+    call call_00_2722
+    call nz,call_00_2410
+    ld   a,$02
+    jp   entry_02_72ac
+    ld   c,$10
+    call call_00_28c8_ObjectSet1B
+    jp   call_00_251c
+    call call_00_29f5
+    jr   z,label6BB3
+    ld   c,$04
+    call call_00_28c8_ObjectSet1B
+    call call_00_230f
+    call call_00_290d_ObjectSetTimer1A
+label6BB3:
+    call call_00_251c
+    ld   bc,$0002
+    call jp_00_250d
+    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    sub  a,$02
+    ld   [hl],a
+    ld   a,$01
+    jp   z,entry_02_72ac
+    ret  
+
+
+    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    ld   a,[wDC71]
+    and  [hl]
+    and  a,$3F
+    jr   nz,label6BDC
+    call call_00_2976_ObjectGetFacingDirection
+    xor  a,$20
+    ld   c,a
+    call call_00_2958_ObjectSetFacingDirection
+label6BDC:
+    ld   c,$10
+    call call_00_28c8_ObjectSet1B
+    call call_00_251c
+    call call_00_230f
+    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    cp   c
+    ld   a,$00
+    jp   z,entry_02_72ac
+    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    inc  a
+    ld   [hl],a
+    ld   bc,$FFFF
+    jp   jp_00_250d
+    ld   a,[wDC7B]
+    ld   hl,wDA00_CurrentObjectAddr
+    cp   [hl]
+    ld   a,$01
+    jp   z,entry_02_72ac
+    ret  
+
+
+    ld   [wDAD6_ReturnBank],a
+    ld   a,$03
+    ld   hl,$57F8
+    call call_00_0edd_CallAltBankFunc
+    call call_00_244a
+    call call_00_2780
+    jp   nc,jp_00_2b7a
+    ret  
+
+
+    call call_00_29f5
+    ld   c,$20
+    call nz,call_00_28c8_ObjectSet1B
+    ld   a,[wDC71]
+    and  a,$07
+    ld   c,$10
+    call z,call_00_2588
+    call call_00_251c
+    call call_00_2722
+    ret  z
+    call call_00_2a68
+    call call_00_2976_ObjectGetFacingDirection
+    ld   hl,wDA12
+    cp   [hl]
+    ret  nz
+    ld   a,[wDA11]
+    cp   a,$40
+    ld   a,$02
+    jp   c,entry_02_72ac
+    ret  
+
+
+    ld   c,$20
+    call call_00_28dc_ObjectSet1D
+    ld   c,$28
+    call call_00_2588
+    call call_00_251c
+    call call_00_28be_ObjectGet1B
+    cp   a,$28
+    ld   a,$03
+    jp   z,entry_02_72ac
+    ret  
+
+
+    call call_00_251c
+    call call_00_244a
+    call call_00_2766
+    ld   a,$00
+    jp   nc,entry_02_72ac
+    ret  
+
+
+    call call_00_29f5
+    jr   z,label6C84
+    call call_00_2766
+    ld   c,$00
+    jr   c,label6C81
+    ld   c,$01
+label6C81:
+    call call_00_2980_ObjectSet19
+label6C84:
+    call call_00_298a_ObjectGet19
+    jr   z,label6CAC
+    ld   a,[wDC71]
+    and  a,$07
+    ld   c,$10
+    call z,call_00_2588
+    call call_00_251c
+    ret  z
+    call call_00_230f
+    ld   b,$00
+    ld   hl,wDCD5
+    add  hl,bc
+    ld   a,[hl]
+    and  a
+    ld   a,$00
+    jp   nz,entry_02_72ac
+    ld   a,$05
+    jp   entry_02_72ac
+label6CAC:
+    call call_00_251c
+    call call_00_244a
+    call call_00_2766
+    ld   c,$01
+    call nc,call_00_2980_ObjectSet19
+    ret 
+    
+    
+    call call_00_29f5
+    jr   z,label6CC6
+    call call_00_230f
+    call call_00_2958_ObjectSetFacingDirection
+label6CC6:
+    call call_00_27f3_GetDA26
+    ld   a,[wD810_PlayerYPosition]
+    sub  e
+    ld   a,[wD811_PlayerYPosition]
+    sbc  d
+    ret  c
+    ld   c,$65
+    call call_00_2b10
+    ret  nz
+    ld   c,$1C
+    jp   call_00_3792
+    call call_00_29f5
+    jr   z,label6CF5
+    call call_00_2976_ObjectGetFacingDirection
+    ld   c,$14
+    cp   a,$00
+    jr   z,label6CED
+    ld   c,$EC
+label6CED:
+    call call_00_28c8_ObjectSet1B
+    ld   c,$03
+    call call_00_290d_ObjectSetTimer1A
+label6CF5:
+    call call_00_24c0
+    call call_00_244a
+    call call_00_27f3_GetDA26
+    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    ld   l,[hl]
+    ld   h,00
+    add  hl,hl
+    ld   bc,$6D31
+    add  hl,bc
+    ldi  a,[hl]
+    add  e
+    ld   e,a
+    ld   a,[hl]
+    adc  d
+    ld   d,a
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$10
+    ld   l,a
+    ldi  a,[hl]
+    sub  e
+    ld   a,[hl]
+    sbc  d
+    ret  c
+    ld   [hl],d
+    dec  l
+    ld   [hl],e
+    ld   a,$19
+    call call_00_0ff5
+    call call_00_2922_ObjectTimer1ACountdown
+    ld   c,$20
+    jp   nz,call_00_28dc_ObjectSet1D
+    ld   a,$01
+    jp   entry_02_72ac
+    
+    db   $00, $00, $56, $00, $46, $00        ;; 02:6d2f ????????
+    db   $36, $00
+    
+    ret  
+
+
+    ret  
+
+
+    call call_00_2a5d
+    ret  z
+    ld   a,$1A
+    call call_00_0ff5
+    ld   a,$03
+    jp   entry_02_72ac
+    call call_00_2a5d
+    ld   a,$06
+    jp   nz,entry_02_72ac
+    ret  
+
+
+    call call_00_29f5
+    jr   z,label6D5C
+    ld   c,$78
+    call call_00_290d_ObjectSetTimer1A
+    label6D5C:
+    call call_00_2922_ObjectTimer1ACountdown
+    ret  nz
+    ld   a,$01
+    ld   [wDC65],a
+    ld   hl,wDB6A
+    set  4,[hl]
+    jp   jp_00_2b7a
+    call call_00_29f5
+    jr   z,label6D82
+    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    inc  [hl]
+    cp   a,$0A
+    ld   a,$02
+    call z,entry_02_72ac
+    ld   a,$02
+    ld   [wDCDA],a
+    label6D82:
+    jp   call_00_233e
+    call call_00_233e
+    ld   c,$69
+    call call_00_29b7
+    ld   a,c
+    cp   a,$00
+    ret  nz
+    ld   c,$68
+    call call_00_29b7
+    inc  c
+    ret  nz
+    ld   a,[wDCD1]
+    and  a
+    ret  nz
+    ld   hl,wDCDA
+    dec  [hl]
+    bit  7,[hl]
+    jr   z,label6DA7
+    ld   [hl],$02
+    label6DA7:
+    ld   l,[hl]
+    ld   h,$00
+    ld   de,$6DB7
+    add  hl,de
+    ld   c,[hl]
+    call call_00_290d_ObjectSetTimer1A
+    ld   a,$03
+    jp   entry_02_72ac
+    ld   c,c
+    add  hl,sp
+    add  hl,hl
+    call call_00_233e
+    call call_00_2922_ObjectTimer1ACountdown
+    jr   nz,label6DD2
+    ld   c,$6A
+    call call_00_29ce
+    ret  z
+    ld   a,$01
+    ld   [wDCD1],a
+    ld   a,$02
+    jp   entry_02_72ac
+    label6DD2:
+    and  a,$07
+    ld   a,$04
+    jp   z,entry_02_72ac
+    ret  
+
+
+    jp   call_00_233e
+    call call_00_233e
+    call call_00_29f5
+    ret  z
+    ld   a,$15
+    call call_00_0ff5
+    ld   c,$18
+    jp   call_00_3792
+    call call_00_244a
+    ld   de,$0068
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$10
+    ld   l,a
+    ldi  a,[hl]
+    sub  e
+    ld   a,[hl]
+    sbc  d
+    ret  c
+    ld   [hl],d
+    dec  l
+    ld   [hl],e
+    ld   a,$08
+    jp   entry_02_72ac
+    call call_00_29f5
+    jr   z,label6E27
+    ld   a,$1A
+    call call_00_0ff5
+    ld   hl,$6E3C
+    call call_00_2c20
+    call call_00_288c_ObjectUnkAndSet14
+    call call_00_2b8b
+    call call_00_2c67_Particle_InitBurst
+    ld   c,$3C
+    call call_00_290d_ObjectSetTimer1A
+    label6E27:
+    call call_00_2c89_Particle_UpdateBurst
+    ret  nz
+    call call_00_2922_ObjectTimer1ACountdown
+    ret  nz
+    ld   a,$01
+    ld   [wDC66],a
+    ld   hl,wDB6A
+    set  4,[hl]
+    jp   jp_00_2b7a
+    
+    db   $00, $00, $08, $02, $04, $01, $ff, $7f
+    
+    call call_00_29f5
+    jr   z,label6E53
+    ld   c,$00
+    call call_00_28c8_ObjectSet1B
+    ld   c,$10
+    call call_00_28dc_ObjectSet1D
+label6E53:
+    call call_00_2a68
+    ld   a,[wDA12]
+    cp   a,$20
+    jr   z,label6E67
+    call call_00_28be_ObjectGet1B
+    cp   a,$10
+    jr   z,label6E6F
+    inc  [hl]
+    jr   label6E6F
+label6E67:
+    call call_00_28be_ObjectGet1B
+    cp   a,$F0
+    jr   z,label6E6F
+    dec  [hl]
+label6E6F:
+    call call_00_24c0
+    call call_00_244a
+    ld   de,$0088
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$10
+    ld   l,a
+    ldi  a,[hl]
+    sub  e
+    ld   a,[hl]
+    sbc  d
+    jp   nc,jp_00_2b7a
+    ret  
+    ld   hl,wDCD1
+    bit  0,[hl]
+    ret  z
+    ld   [hl],$00
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   l,a
+    ld   de,$0078
+    ld   [hl],e
+    inc  l
+    ld   [hl],d
+    ld   c,$FF
+    call call_00_290d_ObjectSetTimer1A
+    ld   a,$01
+    jp   entry_02_72ac
+    call call_00_29f5
+    ld   a,$1B
+    call nz,call_00_0ff5
+    call call_00_2922_ObjectTimer1ACountdown
+    ld   a,$04
+    jp   z,entry_02_72ac
+    ret  
+    call call_00_29f5
+    ret  z
+    ld   c,$16
+    call call_00_3792
+    ld   a,$14
+    jp   call_00_0ff5
+    call call_00_29f5
+    ld   c,$3C
+    call nz,call_00_28dc_ObjectSet1D
+    ld   c,$67
+    call call_00_29ce
+    ret  nz
+    ld   a,l
+    or   a,$01
+    ld   l,a
+    ld   a,[hl]
+    cp   a,$06
+    jr   nc,label6EFA
+    call call_00_244a
+    call call_00_28f1_ObjectCheckIf1DIsZero
+    bit  7,[hl]
+    ret  z
+    ld   de,$0038
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$10
+    ld   l,a
+    ldi  a,[hl]
+    sub  e
+    ld   a,[hl]
+    sbc  d
+    ret  c
+    ld   [hl],d
+    dec  l
+    ld   [hl],e
+label6EFA:
+    ld   a,$19
+    call call_00_0ff5
+    ld   c,$17
+    call call_00_3792
+    jp   jp_00_2b7a
+    call call_00_2a5d
+    jp   nz,jp_00_2b7a
+    ret  
+    ret  
+    call call_00_29f5
+    ret  z
+    ld   c,$20
+    call call_00_28c8_ObjectSet1B
+    ld   c,$00
+    call call_00_28dc_ObjectSet1D
+    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    inc  [hl]
+    cp   a,$0A
+    ld   a,$02
+    jp   z,entry_02_72ac
+    ret  
+    call call_00_251c
+    call label7002
+    ld   c,$38
+    jp   nc,call_00_28dc_ObjectSet1D
+    ret  
+    call label7002
+    ld   a,$04
+    jp   nc,entry_02_72ac
+    ret  
+    call call_00_29f5
+    ld   c,$00
+    call nz,call_00_28dc_ObjectSet1D
+    call label6FD3
+    ret  nc
+    ld   c,$00
+    call call_00_290d_ObjectSetTimer1A
+    ld   a,$06
+    jp   entry_02_72ac
+    call call_00_29f5
+    ret  z
+    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    inc  [hl]
+    cp   a,$0A
+    ld   a,$08
+    jp   z,entry_02_72ac
+    ret  
+    call call_00_29f5
+    jr   z,label6F74
+    call call_00_2826_ObjectSetXPosition
+    call call_00_27e4_ObjectSetYPosition
+    ld   c,$06
+    call call_00_290d_ObjectSetTimer1A
+label6F74:
+    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    jr   z,label6F93
+    ld   a,[wDC71]
+    and  a,$3F
+    ret  nz
+    call call_00_2922_ObjectTimer1ACountdown
+    jr   z,label6F93
+    ld   a,[wDCDA]
+    ld   c,$1D
+    and  a,$01
+    jp   z,call_00_3792
+    ld   c,$1E
+    jp   call_00_3792
+label6F93:
+    ld   c,$71
+    call call_00_29ce
+    ld   a,$00
+    jp   nz,entry_02_72ac
+    ret  
+    jp   label6FD3
+    call label7002
+    ld   a,$0B
+    jp   nc,entry_02_72ac
+    ret  
+    call call_00_29f5
+    jr   z,label6FBE
+    ld   a,$1A
+    call call_00_0ff5
+    ld   c,$B4
+    call call_00_290d_ObjectSetTimer1A
+    ld   c,$30
+    call call_00_28dc_ObjectSet1D
+label6FBE:
+    call label7002
+    ret  c
+    call call_00_2922_ObjectTimer1ACountdown
+    ret  nz
+    ld   a,$01
+    ld   [wDC67],a
+    ld   hl,wDB6A
+    set  4,[hl]
+    jp   jp_00_2b7a
+label6FD3:
+    call call_00_28f1_ObjectCheckIf1DIsZero
+    bit  7,a
+    jr   nz,label6FE0
+    cp   a,$20
+    ld   a,$20
+    jr   nc,label6FE3
+label6FE0:
+    ld   a,[hl]
+    add  a,$04
+label6FE3:
+    ld   [hl],a
+    call call_00_244a
+    ld   de,$0024
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$10
+    ld   l,a
+    ldi  a,[hl]
+    sub  e
+    ld   a,[hl]
+    sbc  d
+    ret  nc
+    push af
+    ld   [hl],d
+    dec  l
+    ld   [hl],e
+    ld   c,$00
+    call call_00_28dc_ObjectSet1D
+    pop  af
+    ret  
+label7002:
+    call call_00_244a
+    ld   de,isrSerial
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$10
+    ld   l,a
+    ldi  a,[hl]
+    sub  e
+    ld   a,[hl]
+    sbc  d
+    ret  c
+    ld   [hl],d
+    dec  hl
+    ld   [hl],e
+    ret  
+    ret  
+    call call_00_29f5
+    ld   a,$13
+    call nz,call_00_0ff5
+    call call_00_244a
+    call call_00_2766
+    ld   a,$02
+    jp   nc,entry_02_72ac
+    ret  
+    call call_00_29f5
+    jr   z,label7056
+    ld   hl,wDCDA
+    ld   a,[hl]
+    inc  [hl]
+    and  a,$07
+    push af
+    ld   l,a
+    ld   h,$00
+    add  hl,hl
+    ld   de,$707F
+    add  hl,de
+    pop  af
+    ld   c,[hl]
+    inc  hl
+    push bc
+    ld   c,[hl]
+    and  a,$01
+    jr   z,label704F
+    xor  a
+    sub  [hl]
+    ld   c,a
+label704F:
+    call call_00_28c8_ObjectSet1B
+    pop  bc
+    call call_00_28dc_ObjectSet1D
+label7056:
+    call call_00_24c0
+    call call_00_244a
+    call call_00_28f1_ObjectCheckIf1DIsZero
+    bit  7,a
+    ret  z
+    ld   de,$0070
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$10
+    ld   l,a
+    ldi  a,[hl]
+    sub  e
+    ld   a,[hl]
+    sbc  d
+    ret  c
+    ld   [hl],d
+    dec  hl
+    ld   [hl],e
+    ld   a,$19
+    call call_00_0ff5
+    ld   a,$01
+    jp   entry_02_72ac
+
     db   $30, $28, $30, $28, $20, $30, $20, $30        ;; 02:707f ????????
     db   $40, $10, $40, $10, $50, $08, $50, $08        ;; 02:7087 ????????

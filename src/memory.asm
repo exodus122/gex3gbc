@@ -815,7 +815,16 @@ wDC5B:
     ds 1                                               ;; dc5b
 
 wDC5C:
-    ds 12                                              ;; dc5c
+    ds 9                                              ;; dc5c
+
+wDC65:
+    ds 1                                               ;; dc65
+
+wDC66:
+    ds 1                                               ;; dc66
+
+wDC67:
+    ds 1                                               ;; dc67
 
 wDC68:
     ds 1                                               ;; dc68
@@ -1058,7 +1067,13 @@ wDCD1:
     ds 1                                               ;; dcd1
 
 wDCD2:
-    ds 3                                               ;; dcd2
+    ds 1                                               ;; dcd2
+
+wDCD3:
+    ds 1                                               ;; dcd3
+
+wDCD4:
+    ds 1                                               ;; dcd4
 
 wDCD5:
     ds 1                                               ;; dcd5
@@ -1079,7 +1094,10 @@ wDCDA:
     ds 1                                               ;; dcda
 
 wDCDB:
-    ds 3                                               ;; dcdb
+    ds 1                                               ;; dcdb
+
+wDCDC:
+    ds 2                                               ;; dcdc
 
 wDCDE:
     ds 1                                               ;; dcde
