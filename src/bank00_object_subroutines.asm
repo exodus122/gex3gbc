@@ -37,14 +37,48 @@ call_00_22b1:
     ld   HL, entry_02_72ac                              ;; 00:22cd $21 $ac $72
     call call_00_0edd_CallAltBankFunc                                  ;; 00:22d0 $cd $dd $0e
     ret                                                ;; 00:22d3 $c9
-    db   $cd, $0f, $23, $06, $00, $21, $b1, $dc        ;; 00:22d4 ????????
-    db   $09, $7e, $a7, $c9, $cd, $0f, $23, $79        ;; 00:22dc ????????
-    db   $fe, $10, $d0, $06, $00, $21, $b1, $dc        ;; 00:22e4 ????????
-    db   $09, $34, $c9, $cd, $0f, $23, $79, $fe        ;; 00:22ec ????????
-    db   $10, $d0, $06, $00, $21, $b1, $dc, $09        ;; 00:22f4 ????????
-    db   $36, $01, $c9, $cd, $0f, $23, $79, $fe        ;; 00:22fc ????????
-    db   $10, $d0, $06, $00, $21, $b1, $dc, $09        ;; 00:2304 ????????
-    db   $36, $00, $c9                                 ;; 00:230c ???
+    
+call_00_22d4:
+    call call_00_230f
+    ld   b,$00
+    ld   hl,wDCB1
+    add  hl,bc
+    ld   a,[hl]
+    and  a
+    ret  
+
+call_00_22e0:
+    call call_00_230f
+    ld   a,c
+    cp   a,$10
+    ret  nc
+    ld   b,$00
+    ld   hl,wDCB1
+    add  hl,bc
+    inc  [hl]
+    ret  
+
+call_00_22ef:
+    call call_00_230f
+    ld   a,c
+    cp   a,$10
+    ret  nc
+    ld   b,$00
+    ld   hl,wDCB1
+    add  hl,bc
+    ld   [hl],$01
+    ret  
+
+call_00_22ff:
+    call call_00_230f
+    ld   a,c
+    cp   a,$10
+    ret  nc
+    ld   b,$00
+    ld   hl,wDCB1
+    add  hl,bc
+    ld   [hl],$00
+    ret  
 
 call_00_230f:
     ld   A, [wDC16_ObjectListBank]                                    ;; 00:230f $fa $16 $dc
@@ -77,21 +111,100 @@ call_00_230f:
     call call_00_0f08_SwitchBank2                                  ;; 00:2339 $cd $08 $0f
     pop  BC                                            ;; 00:233c $c1
     ret                                                ;; 00:233d $c9
-    db   $26, $d8, $fa, $00, $da, $f6, $1b, $6f        ;; 00:233e ????????
-    db   $34, $7e, $d6, $2e, $20, $06, $77, $2c        ;; 00:2346 ????????
-    db   $34, $cb, $96, $2d, $2c, $3a, $6e, $26        ;; 00:234e ????????
-    db   $00, $29, $11, $b4, $23, $19, $fe, $00        ;; 00:2356 ????????
-    db   $28, $21, $fe, $01, $28, $15, $fe, $02        ;; 00:235e ????????
-    db   $28, $07, $2a, $2f, $3c, $4f, $5e, $18        ;; 00:2366 ????????
-    db   $15, $2a, $2f, $3c, $5f, $7e, $2f, $3c        ;; 00:236e ????????
-    db   $4f, $18, $0b, $4e, $23, $7e, $2f, $3c        ;; 00:2376 ????????
-    db   $5f, $18, $03, $5e, $23, $4e, $7b, $fe        ;; 00:237e ????????
-    db   $80, $3e, $ff, $ce, $00, $57, $d5, $cd        ;; 00:2386 ????????
-    db   $35, $28, $e1, $19, $e5, $79, $fe, $80        ;; 00:238e ????????
-    db   $3e, $ff, $ce, $00, $47, $c5, $cd, $f3        ;; 00:2396 ????????
-    db   $27, $e1, $19, $e5, $c1, $d1, $26, $d8        ;; 00:239e ????????
-    db   $fa, $00, $da, $f6, $0e, $6f, $7b, $22        ;; 00:23a6 ????????
-    db   $7a, $22, $79, $22, $70, $c9, $00, $e0        ;; 00:23ae ????????
+
+call_00_233e:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$1B
+    ld   l,a
+    inc  [hl]
+    ld   a,[hl]
+    sub  a,$2E
+    jr   nz,.label2352
+    ld   [hl],a
+    inc  l
+    inc  [hl]
+    res  2,[hl]
+    dec  l
+.label2352:
+    inc  l
+    ldd  a,[hl]
+    ld   l,[hl]
+    ld   h,00
+    add  hl,hl
+    ld   de,.data_00_23B4
+    add  hl,de
+    cp   a,$00
+    jr   z,.label2381
+    cp   a,$01
+    jr   z,.label2379
+    cp   a,$02
+    jr   z,.label236F
+    ldi  a,[hl]
+    cpl  
+    inc  a
+    ld   c,a
+    ld   e,[hl]
+    jr   .label2384
+.label236F:
+    ldi  a,[hl]
+    cpl  
+    inc  a
+    ld   e,a
+    ld   a,[hl]
+    cpl  
+    inc  a
+    ld   c,a
+    jr   .label2384
+.label2379:
+    ld   c,[hl]
+    inc  hl
+    ld   a,[hl]
+    cpl  
+    inc  a
+    ld   e,a
+    jr   .label2384
+.label2381:
+    ld   e,[hl]
+    inc  hl
+    ld   c,[hl]
+.label2384:
+    ld   a,e
+    cp   a,$80
+    ld   a,$FF
+    adc  a,$00
+    ld   d,a
+    push de
+    call call_00_2835
+    pop  hl
+    add  hl,de
+    push hl
+    ld   a,c
+    cp   a,$80
+    ld   a,$FF
+    adc  a,$00
+    ld   b,a
+    push bc
+    call call_00_27f3
+    pop  hl
+    add  hl,de
+    push hl
+    pop  bc
+    pop  de
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   l,a
+    ld   a,e
+    ldi  [hl],a
+    ld   a,d
+    ldi  [hl],a
+    ld   a,c
+    ldi  [hl],a
+    ld   [hl],b
+    ret  
+.data_00_23B4:
+    db   $00, $e0        ;; 00:23ae ????????
     db   $01, $e0, $02, $e0, $03, $e0, $04, $e0        ;; 00:23b6 ????????
     db   $05, $e0, $06, $e1, $07, $e1, $08, $e1        ;; 00:23be ????????
     db   $09, $e1, $0a, $e2, $0b, $e2, $0c, $e2        ;; 00:23c6 ????????
@@ -103,14 +216,47 @@ call_00_230f:
     db   $1d, $f4, $1d, $f5, $1d, $f6, $1e, $f7        ;; 00:23f6 ????????
     db   $1e, $f8, $1e, $f9, $1e, $fa, $1f, $fb        ;; 00:23fe ????????
     db   $1f, $fc, $1f, $fd, $1f, $fe, $1f, $ff        ;; 00:2406 ????????
-    db   $1f, $00, $26, $d8, $fa, $00, $da, $f6        ;; 00:240e ????????
-    db   $0e, $6f, $0e, $20, $fa, $0e, $d8, $96        ;; 00:2416 ????????
-    db   $23, $fa, $0f, $d8, $9e, $38, $02, $0e        ;; 00:241e ????????
-    db   $00, $7d, $ee, $02, $6f, $71, $c9, $26        ;; 00:2426 ????????
-    db   $d8, $fa, $00, $da, $f6, $0e, $6f, $0e        ;; 00:242e ????????
-    db   $00, $fa, $0e, $d8, $96, $23, $fa, $0f        ;; 00:2436 ????????
-    db   $d8, $9e, $38, $02, $0e, $20, $7d, $ee        ;; 00:243e ????????
-    db   $02, $6f, $71, $c9                            ;; 00:2446 ????
+    db   $1f, $00
+
+call_00_2410:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   l,a
+    ld   c,$20
+    ld   a,[wD80E_PlayerXPosition]
+    sub  [hl]
+    inc  hl
+    ld   a,[wD80F_PlayerXPosition]
+    sbc  [hl]
+    jr   c,label2427
+    ld   c,$00
+label2427:
+    ld   a,l
+    xor  a,$02
+    ld   l,a
+    ld   [hl],c
+    ret  
+    
+call_00_242d:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   l,a
+    ld   c,$00
+    ld   a,[wD80E_PlayerXPosition]
+    sub  [hl]
+    inc  hl
+    ld   a,[wD80F_PlayerXPosition]
+    sbc  [hl]
+    jr   c,label2444
+    ld   c,$20
+label2444:
+    ld   a,l
+    xor  a,$02
+    ld   l,a
+    ld   [hl],c
+    ret  
 
 call_00_244a:
     ld   H, $d8                                        ;; 00:244a $26 $d8
@@ -138,16 +284,59 @@ call_00_244a:
     adc  A, $00                                        ;; 00:246f $ce $00
     ld   B, A                                          ;; 00:2471 $47
     jp   jp_00_250d                                    ;; 00:2472 $c3 $0d $25
-    db   $26, $d8, $fa, $00, $da, $f6, $1d, $6f        ;; 00:2475 ????????
-    db   $7e, $d6, $02, $cb, $7f, $28, $06, $fe        ;; 00:247d ????????
-    db   $c0, $30, $02, $3e, $c0, $77, $cb, $2f        ;; 00:2485 ????????
-    db   $cb, $2f, $cb, $2f, $cb, $2f, $4f, $fe        ;; 00:248d ????????
-    db   $80, $3e, $ff, $ce, $00, $47, $7d, $ee        ;; 00:2495 ????????
-    db   $0d, $6f, $7e, $81, $22, $7e, $88, $77        ;; 00:249d ????????
-    db   $cd, $f3, $27, $26, $d8, $fa, $00, $da        ;; 00:24a5 ????????
-    db   $f6, $10, $6f, $7b, $96, $23, $7a, $9e        ;; 00:24ad ????????
-    db   $d8, $72, $2d, $73, $7d, $ee, $0d, $6f        ;; 00:24b5 ????????
-    db   $af, $77, $c9                                 ;; 00:24bd ???
+
+call_00_2475:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$1D
+    ld   l,a
+    ld   a,[hl]
+    sub  a,$02
+    bit  $7,a
+    jr   z,label248A
+    cp   a,$C0
+    jr   nc,label248A
+    ld   a,$C0
+label248A:
+    ld   [hl],a
+    sra  a
+    sra  a
+    sra  a
+    sra  a
+    ld   c,a
+    cp   a,$80
+    ld   a,$FF
+    adc  a,$00
+    ld   b,a
+    ld   a,l
+    xor  a,$0D
+    ld   l,a
+    ld   a,[hl]
+    add  c
+    ldi  [hl],a
+    ld   a,[hl]
+    adc  b
+    ld   [hl],a
+    call call_00_27f3
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$10
+    ld   l,a
+    ld   a,e
+    sub  [hl]
+    inc  hl
+    ld   a,d
+    sbc  [hl]
+    ret  c
+    ld   [hl],d
+    dec  l
+    ld   [hl],e
+    ld   a,l
+    xor  a,$0D
+    ld   l,a
+    xor  a
+    ld   [hl],a
+    ret  
 
 call_00_24c0:
     ld   H, $d8                                        ;; 00:24c0 $26 $d8
@@ -311,55 +500,298 @@ call_00_2588:
     cp   A, C                                          ;; 00:259b $b9
     ret                                                ;; 00:259c $c9
 
-    db   $cd, $cb, $25, $fa, $00, $da, $0f, $e6        ;; 00:259d ????????
-    db   $70, $6f, $26, $00, $01, $20, $da, $09        ;; 00:25a5 ????????
-    db   $0e, $00, $2a, $93, $2a, $9a, $38, $0a        ;; 00:25ad ????????
-    db   $0e, $40, $2a, $93, $7e, $9a, $30, $02        ;; 00:25b5 ????????
-    db   $af, $c9, $26, $d8, $fa, $00, $da, $f6        ;; 00:25bd ????????
-    db   $0d, $6f, $7e, $71, $b9, $c9, $26, $d8        ;; 00:25c5 ????????
-    db   $fa, $00, $da, $f6, $0d, $6f, $4e, $7d        ;; 00:25cd ????????
-    db   $ee, $10, $6f, $2a, $cb, $71, $20, $02        ;; 00:25d5 ????????
-    db   $2f, $3c, $86, $4f, $e6, $0f, $77, $79        ;; 00:25dd ????????
-    db   $cb, $2f, $cb, $2f, $cb, $2f, $cb, $2f        ;; 00:25e5 ????????
-    db   $4f, $fe, $80, $3e, $ff, $ce, $00, $47        ;; 00:25ed ????????
-    db   $7d, $ee, $0e, $6f, $7e, $81, $22, $5f        ;; 00:25f5 ????????
-    db   $7e, $88, $77, $57, $c9, $26, $d8, $fa        ;; 00:25fd ????????
-    db   $00, $da, $f6, $1d, $6f, $7e, $b9, $c8        ;; 00:2605 ????????
-    db   $38, $04, $35, $7e, $b9, $c9, $34, $7e        ;; 00:260d ????????
-    db   $b9, $c9, $cd, $57, $28, $26, $d8, $fa        ;; 00:2615 ????????
-    db   $00, $da, $f6, $0e, $6f, $2a, $93, $3a        ;; 00:261d ????????
-    db   $9a, $38, $11, $cd, $46, $28, $26, $d8        ;; 00:2625 ????????
-    db   $fa, $00, $da, $f6, $0e, $6f, $2a, $93        ;; 00:262d ????????
-    db   $3a, $9a, $d8, $1b, $7b, $96, $73, $23        ;; 00:2635 ????????
-    db   $72, $21, $13, $da, $86, $77, $af, $c9        ;; 00:263d ????????
-    db   $cb, $7f, $20, $12, $06, $00, $cd, $46        ;; 00:2645 ????????
-    db   $28, $cd, $78, $26, $79, $93, $78, $9a        ;; 00:264d ????????
-    db   $38, $17, $4b, $42, $18, $13, $af, $91        ;; 00:2655 ????????
-    db   $4f, $06, $ff, $cd, $57, $28, $cd, $78        ;; 00:265d ????????
-    db   $26, $7b, $91, $7a, $98, $38, $02, $4b        ;; 00:2665 ????????
-    db   $42, $78, $32, $71, $79, $93, $4f, $78        ;; 00:266d ????????
-    db   $9a, $b1, $c9, $fa, $00, $da, $f6, $0e        ;; 00:2675 ????????
-    db   $6f, $26, $d8, $2a, $81, $4f, $7e, $88        ;; 00:267d ????????
-    db   $47, $c9, $cb, $7f, $20, $12, $06, $00        ;; 00:2685 ????????
-    db   $cd, $04, $28, $cd, $ba, $26, $79, $93        ;; 00:268d ????????
-    db   $78, $9a, $38, $17, $4b, $42, $18, $13        ;; 00:2695 ????????
-    db   $af, $91, $4f, $06, $ff, $cd, $15, $28        ;; 00:269d ????????
-    db   $cd, $ba, $26, $7b, $91, $7a, $98, $38        ;; 00:26a5 ????????
-    db   $02, $4b, $42, $78, $32, $71, $79, $93        ;; 00:26ad ????????
-    db   $4f, $78, $9a, $b1, $c9, $fa, $00, $da        ;; 00:26b5 ????????
-    db   $f6, $10, $6f, $26, $d8, $2a, $81, $4f        ;; 00:26bd ????????
-    db   $7e, $88, $47, $c9, $26, $d8, $fa, $00        ;; 00:26c5 ????????
-    db   $da, $f6, $1b, $6f, $4e, $ee, $02, $6f        ;; 00:26cd ????????
-    db   $46, $ee, $17, $6f, $2a, $5f, $56, $cb        ;; 00:26d5 ????????
-    db   $70, $20, $03, $af, $91, $4f, $7d, $e6        ;; 00:26dd ????????
-    db   $e0, $21, $7b, $dc, $be, $20, $05, $79        ;; 00:26e5 ????????
-    db   $ea, $85, $dc, $c9, $21, $7d, $dc, $be        ;; 00:26ed ????????
-    db   $c0, $26, $d8, $fa, $00, $da, $f6, $12        ;; 00:26f5 ????????
-    db   $6f, $fa, $0e, $d8, $93, $fa, $0f, $d8        ;; 00:26fd ????????
-    db   $9a, $38, $0c, $7b, $86, $ea, $0e, $d8        ;; 00:2705 ????????
-    db   $7a, $ce, $00, $ea, $0f, $d8, $c9, $4e        ;; 00:270d ????????
-    db   $0c, $7b, $91, $ea, $0e, $d8, $7a, $de        ;; 00:2715 ????????
-    db   $00, $ea, $0f, $d8, $c9                       ;; 00:271d ?????
+call_00_259d:
+    call call_00_25CB
+    ld   a,[wDA00_CurrentObjectAddr]
+    rrca 
+    and  a,$70
+    ld   l,a
+    ld   h,$00
+    ld   bc,wDA20
+    add  hl,bc
+    ld   c,$00
+    ldi  a,[hl]
+    sub  e
+    ldi  a,[hl]
+    sbc  d
+    jr   c,call_00_25BF
+    ld   c,$40
+    ldi  a,[hl]
+    sub  e
+    ld   a,[hl]
+    sbc  d
+    jr   nc,call_00_25BF
+    xor  a
+    ret  
+
+call_00_25BF:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0D
+    ld   l,a
+    ld   a,[hl]
+    ld   [hl],c
+    cp   c
+    ret  
+
+call_00_25CB:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0D
+    ld   l,a
+    ld   c,[hl]
+    ld   a,l
+    xor  a,$10
+    ld   l,a
+    ldi  a,[hl]
+    bit  6,c
+    jr   nz,label25DF
+    cpl  
+    inc  a
+label25DF:
+    add  [hl]
+    ld   c,a
+    and  a,$0F
+    ld   [hl],a
+    ld   a,c
+    sra  a
+    sra  a
+    sra  a
+    sra  a
+    ld   c,a
+    cp   a,$80
+    ld   a,$FF
+    adc  a,$00
+    ld   b,a
+    ld   a,l
+    xor  a,$0E
+    ld   l,a
+    ld   a,[hl]
+    add  c
+    ldi  [hl],a
+    ld   e,a
+    ld   a,[hl]
+    adc  b
+    ld   [hl],a
+    ld   d,a
+    ret  
+
+call_00_2602:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$1D
+    ld   l,a
+    ld   a,[hl]
+    cp   c
+    ret  z
+    jr   c,call_00_2613
+    dec  [hl]
+    ld   a,[hl]
+    cp   c
+    ret  
+
+call_00_2613:
+    inc  [hl]
+    ld   a,[hl]
+    cp   c
+    ret  
+    call call_00_2857
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   l,a
+    ldi  a,[hl]
+    sub  e
+    ldd  a,[hl]
+    sbc  d
+    jr   c,label2639
+    call call_00_2846
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   l,a
+    ldi  a,[hl]
+    sub  e
+    ldd  a,[hl]
+    sbc  d
+    ret  c
+    dec  de
+label2639:
+    ld   a,e
+    sub  [hl]
+    ld   [hl],e
+    inc  hl
+    ld   [hl],d
+    ld   hl,wDA13
+    add  [hl]
+    ld   [hl],a
+    xor  a
+    ret  
+
+call_00_2645:
+    bit  $7,a
+    jr   nz,label265B
+    ld   b,$00
+    call call_00_2846
+    call call_00_2678
+    ld   a,c
+    sub  e
+    ld   a,b
+    sbc  d
+    jr   c,label266E
+    ld   c,e
+    ld   b,d
+    jr   label266E
+label265B:
+    xor  a
+    sub  c
+    ld   c,a
+    ld   b,$FF
+    call call_00_2857
+    call call_00_2678
+    ld   a,e
+    sub  c
+    ld   a,d
+    sbc  b
+    jr   c,label266E
+    ld   c,e
+    ld   b,d
+label266E:
+    ld   a,b
+    ldd  [hl],a
+    ld   [hl],c
+    ld   a,c
+    sub  e
+    ld   c,a
+    ld   a,b
+    sbc  d
+    or   c
+    ret  
+
+call_00_2678:
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   l,a
+    ld   h,$D8
+    ldi  a,[hl]
+    add  c
+    ld   c,a
+    ld   a,[hl]
+    adc  b
+    ld   b,a
+    ret  
+    bit  $7,a
+    jr   nz,label269D
+    ld   b,$00
+    call call_00_2804
+    call call_00_26BA
+    ld   a,c
+    sub  e
+    ld   a,b
+    sbc  d
+    jr   c,label26B0
+    ld   c,e
+    ld   b,d
+    jr   label26B0
+label269D:
+    xor  a
+    sub  c
+    ld   c,a
+    ld   b,$FF
+    call call_00_2815
+    call call_00_26BA
+    ld   a,e
+    sub  c
+    ld   a,d
+    sbc  b
+    jr   c,label26B0
+    ld   c,e
+    ld   b,d
+label26B0:
+    ld   a,b
+    ldd  [hl],a
+    ld   [hl],c
+    ld   a,c
+    sub  e
+    ld   c,a
+    ld   a,b
+    sbc  d
+    or   c
+    ret  
+
+call_00_26BA:
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$10
+    ld   l,a
+    ld   h,$D8
+    ldi  a,[hl]
+    add  c
+    ld   c,a
+    ld   a,[hl]
+    adc  b
+    ld   b,a
+    ret  
+
+call_00_26c9:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$1B
+    ld   l,a
+    ld   c,[hl]
+    xor  a,$02
+    ld   l,a
+    ld   b,[hl]
+    xor  a,$17
+    ld   l,a
+    ldi  a,[hl]
+    ld   e,a
+    ld   d,[hl]
+    bit  $6,b
+    jr   nz,label26E3
+    xor  a
+    sub  c
+    ld   c,a
+    label26E3:
+    ld   a,l
+    and  a,$E0
+    ld   hl,wDC7B
+    cp   [hl]
+    jr   nz,call_00_26F1
+    ld   a,c
+    ld   [wDC85],a
+    ret  
+
+call_00_26F1:
+    ld   hl,wDC7D
+    cp   [hl]
+    ret  nz
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$12
+    ld   l,a
+    ld   a,[wD80E_PlayerXPosition]
+    sub  e
+    ld   a,[wD80F_PlayerXPosition]
+    sbc  d
+    jr   c,call_00_2714
+    ld   a,e
+    add  [hl]
+    ld   [wD80E_PlayerXPosition],a
+    ld   a,d
+    adc  a,$00
+    ld   [wD80F_PlayerXPosition],a
+    ret  
+
+call_00_2714:
+    ld   c,[hl]
+    inc  c
+    ld   a,e
+    sub  c
+    ld   [wD80E_PlayerXPosition],a
+    ld   a,d
+    sbc  a,$00
+    ld   [wD80F_PlayerXPosition],a
+    ret  
 
 call_00_2722:
     ld   HL, wD810_PlayerYPosition                                     ;; 00:2722 $21 $10 $d8
@@ -1030,19 +1462,83 @@ call_00_2a68:
     ld   [wDA12], A                                    ;; 00:2a94 $ea $12 $da
     ret                                                ;; 00:2a97 $c9
 
-    db   $d5, $cd, $0f, $23, $69, $26, $00, $29        ;; 00:2a98 ????????
-    db   $5d, $54, $29, $29, $19, $d1, $19, $fa        ;; 00:2aa0 ????????
-    db   $0e, $d8, $96, $5f, $23, $fa, $0f, $d8        ;; 00:2aa8 ????????
-    db   $9e, $57, $23, $7e, $83, $5f, $7a, $ce        ;; 00:2ab0 ????????
-    db   $00, $c0, $2a, $87, $57, $7b, $ba, $d0        ;; 00:2ab8 ????????
-    db   $fa, $10, $d8, $96, $5f, $23, $fa, $11        ;; 00:2ac0 ????????
-    db   $d8, $9e, $57, $23, $7e, $83, $5f, $7a        ;; 00:2ac8 ????????
-    db   $ce, $00, $c0, $2a, $87, $57, $7b, $ba        ;; 00:2ad0 ????????
-    db   $d0, $16, $d8, $fa, $00, $da, $f6, $1a        ;; 00:2ad8 ????????
-    db   $5f, $2a, $12, $13, $2a, $12, $13, $af        ;; 00:2ae0 ????????
-    db   $12, $13, $2a, $12, $13, $af, $12, $7e        ;; 00:2ae8 ????????
-    db   $ea, $d6, $da, $3e, $02, $21, $ac, $72        ;; 00:2af0 ????????
-    db   $cd, $dd, $0e, $c9                            ;; 00:2af8 ????
+call_00_2a98:
+    push de
+    call call_00_230f
+    ld   l,c
+    ld   h,$00
+    add  hl,hl
+    ld   e,l
+    ld   d,h
+    add  hl,hl
+    add  hl,hl
+    add  hl,de
+    pop  de
+    add  hl,de
+    ld   a,[wD80E_PlayerXPosition]
+    sub  [hl]
+    ld   e,a
+    inc  hl
+    ld   a,[wD80F_PlayerXPosition]
+    sbc  [hl]
+    ld   d,a
+    inc  hl
+    ld   a,[hl]
+    add  e
+    ld   e,a
+    ld   a,d
+    adc  a,$00
+    ret  nz
+    ldi  a,[hl]
+    add  a
+    ld   d,a
+    ld   a,e
+    cp   d
+    ret  nc
+    ld   a,[wD810_PlayerYPosition]
+    sub  [hl]
+    ld   e,a
+    inc  hl
+    ld   a,[wD811_PlayerYPosition]
+    sbc  [hl]
+    ld   d,a
+    inc  hl
+    ld   a,[hl]
+    add  e
+    ld   e,a
+    ld   a,d
+    adc  a,$00
+    ret  nz
+    ldi  a,[hl]
+    add  a
+    ld   d,a
+    ld   a,e
+    cp   d
+    ret  nc
+    ld   d,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$1A
+    ld   e,a
+    ldi  a,[hl]
+    ld   [de],a
+    inc  de
+    ldi  a,[hl]
+    ld   [de],a
+    inc  de
+    xor  a
+    ld   [de],a
+    inc  de
+    ldi  a,[hl]
+    ld   [de],a
+    inc  de
+    xor  a
+    ld   [de],a
+    ld   a,[hl]
+    ld   [wDAD6_ReturnBank],a
+    ld   a,02
+    ld   hl,entry_02_72ac
+    call call_00_0edd_CallAltBankFunc
+    ret  
 
 call_00_2afc:
     ld   H, $d8                                        ;; 00:2afc $26 $d8

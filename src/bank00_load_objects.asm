@@ -471,17 +471,61 @@ data_00_2f14:
     db   $fa, $02, $fc, $04, $fe, $02, $00, $04        ;; 00:2f1c ????????
     db   $00, $02, $fe, $00, $fe, $fe, $fc, $fc        ;; 00:2f24 ????????
     db   $fa, $fa, $fc, $f8, $fe, $fa, $00, $fc        ;; 00:2f2c ????????
-    db   $fa, $19, $dc, $cd, $ee, $0e, $21, $1a        ;; 00:2f34 ????????
-    db   $dc, $2a, $66, $6f, $23, $11, $03, $00        ;; 00:2f3c ????????
-    db   $0e, $ff, $7e, $19, $0c, $a7, $20, $fa        ;; 00:2f44 ????????
-    db   $c5, $cd, $08, $0f, $fa, $16, $dc, $cd        ;; 00:2f4c ????????
-    db   $ee, $0e, $21, $17, $dc, $2a, $66, $6f        ;; 00:2f54 ????????
-    db   $c1, $7e, $fe, $ff, $28, $1c, $e5, $6f        ;; 00:2f5c ????????
-    db   $26, $00, $29, $29, $29, $11, $5f, $32        ;; 00:2f64 ????????
-    db   $19, $7e, $fe, $ff, $28, $05, $cb, $77        ;; 00:2f6c ????????
-    db   $28, $01, $0c, $e1, $11, $10, $00, $19        ;; 00:2f74 ????????
-    db   $18, $df, $79, $f5, $cd, $08, $0f, $f1        ;; 00:2f7c ????????
-    db   $c9                                           ;; 00:2f84 ?
+
+call_00_2f34:
+    ld   a,[wDC19_CollectibleListBank]
+    call call_00_0eee_SwitchBank
+    ld   hl,wDC1A_CollectibleListBankOffset
+    ldi  a,[hl]
+    ld   h,[hl]
+    ld   l,a
+    inc  hl
+    ld   de,$0003
+    ld   c,$FF
+label2F46:
+    ld   a,[hl]
+    add  hl,de
+    inc  c
+    and  a
+    jr   nz,label2F46
+    push bc
+    call call_00_0f08_SwitchBank2
+    ld   a,[wDC16_ObjectListBank]
+    call call_00_0eee_SwitchBank
+    ld   hl,wDC17_ObjectListBankOffset
+    ldi  a,[hl]
+    ld   h,[hl]
+    ld   l,a
+    pop  bc
+label2F5D:
+    ld   a,[hl]
+    cp   a,$FF
+    jr   z,label2F7E
+    push hl
+    ld   l,a
+    ld   h,$00
+    add  hl,hl
+    add  hl,hl
+    add  hl,hl
+    ld   de,data_00_325F
+    add  hl,de
+    ld   a,[hl]
+    cp   a,$FF
+    jr   z,label2F77
+    bit  6,a
+    jr   z,label2F77
+    inc  c
+label2F77:
+    pop  hl
+    ld   de,$0010
+    add  hl,de
+    jr   label2F5D
+label2F7E:
+    ld   a,c
+    push af
+    call call_00_0f08_SwitchBank2
+    pop  af
+    ret  
 
 call_00_2f85_LoadCollectibleMapData:
     xor  A, A                                          ;; 00:2f85 $af
@@ -808,7 +852,9 @@ call_00_3252:
     ret                                                ;; 00:3257 $c9
 
 data_00_3258:
-    db   $00, $00, $00, $00, $00, $00, $00, $ff        ;; 00:3258 ????????
+    db   $00, $00, $00, $00, $00, $00, $00
+data_00_325F:    
+    db   $ff        ;; 00:3258 ????????
     db   $01, $0c, $0c, $07, $02, $00, $ff, $81        ;; 00:3260 ......??
     db   $01, $0c, $0c, $08, $02, $00, $ff, $81        ;; 00:3268 ......?.
     db   $01, $0c, $0c, $09, $02, $00, $ff, $81        ;; 00:3270 ......?.
@@ -932,7 +978,7 @@ call_00_35e8:
     add  HL, HL                                        ;; 00:35f1 $29
     add  HL, HL                                        ;; 00:35f2 $29
     add  HL, HL                                        ;; 00:35f3 $29
-    ld   DE, $325f                                     ;; 00:35f4 $11 $5f $32
+    ld   DE, data_00_325F                                     ;; 00:35f4 $11 $5f $32
     add  HL, DE                                        ;; 00:35f7 $19
     ld   A, [HL]                                       ;; 00:35f8 $7e
     ret                                                ;; 00:35f9 $c9
