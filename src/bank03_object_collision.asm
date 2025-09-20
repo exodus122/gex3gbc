@@ -65,7 +65,7 @@ call_03_4c38_UpdateObjectCollision:
     cp   A, $00                                        ;; 03:4ce5 $fe $00
     jp   NZ, jp_03_5671                                ;; 03:4ce7 $c2 $71 $56
 .jp_03_4cea:
-    ld   A, [wD801]                                    ;; 03:4cea $fa $01 $d8
+    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 03:4cea $fa $01 $d8
     cp   A, $09                                        ;; 03:4ced $fe $09
     jr   Z, .jr_03_4cfe                                ;; 03:4cef $28 $0d
     cp   A, $29                                        ;; 03:4cf1 $fe $29
@@ -79,10 +79,10 @@ call_03_4c38_UpdateObjectCollision:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:4d00 $fa $00 $da
     or   A, $0e                                        ;; 03:4d03 $f6 $0e
     ld   L, A                                          ;; 03:4d05 $6f
-    ld   A, [wD80E]                                    ;; 03:4d06 $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 03:4d06 $fa $0e $d8
     sub  A, [HL]                                       ;; 03:4d09 $96
     inc  HL                                            ;; 03:4d0a $23
-    ld   A, [wD80F]                                    ;; 03:4d0b $fa $0f $d8
+    ld   A, [wD80F_PlayerXPosition]                                    ;; 03:4d0b $fa $0f $d8
     sbc  A, [HL]                                       ;; 03:4d0e $9e
     ld   A, $ff                                        ;; 03:4d0f $3e $ff
     jr   C, .jr_03_4d15                                ;; 03:4d11 $38 $02
@@ -182,7 +182,7 @@ call_03_4c38_UpdateObjectCollision:
     db   $cd, $f5, $0f, $cd, $71, $56, $0e, $02        ;; 03:4e40 ????????
     db   $c3, $99, $22                                 ;; 03:4e48 ???
 .data_03_4e4b:
-    call call_00_2962                                  ;; 03:4e4b $cd $62 $29
+    call call_00_2962_ObjectGetActionId                                  ;; 03:4e4b $cd $62 $29
     cp   A, $02                                        ;; 03:4e4e $fe $02
     ret  NC                                            ;; 03:4e50 $d0
     call call_03_550e                                  ;; 03:4e51 $cd $0e $55
@@ -191,7 +191,7 @@ call_03_4c38_UpdateObjectCollision:
     ret  NZ                                            ;; 03:4e57 $c0
     ld   A, $19                                        ;; 03:4e58 $3e $19
     call call_00_0ff5                                  ;; 03:4e5a $cd $f5 $0f
-    call call_00_2962                                  ;; 03:4e5d $cd $62 $29
+    call call_00_2962_ObjectGetActionId                                  ;; 03:4e5d $cd $62 $29
     inc  A                                             ;; 03:4e60 $3c
     push AF                                            ;; 03:4e61 $f5
     push AF                                            ;; 03:4e62 $f5
@@ -214,17 +214,17 @@ call_03_4c38_UpdateObjectCollision:
     ld   A, [wDCC3]                                    ;; 03:4e83 $fa $c3 $dc
     jp   call_00_2c09                                  ;; 03:4e86 $c3 $09 $2c
 .data_03_4e89:
-    call call_00_28d2                                  ;; 03:4e89 $cd $d2 $28
+    call call_00_28d2_ObjectGet1D                                  ;; 03:4e89 $cd $d2 $28
     bit  7, A                                          ;; 03:4e8c $cb $7f
     ret  NZ                                            ;; 03:4e8e $c0
-    call call_00_2962                                  ;; 03:4e8f $cd $62 $29
+    call call_00_2962_ObjectGetActionId                                  ;; 03:4e8f $cd $62 $29
     cp   A, $05                                        ;; 03:4e92 $fe $05
     ret  NC                                            ;; 03:4e94 $d0
     call call_03_550e                                  ;; 03:4e95 $cd $0e $55
     ret  NC                                            ;; 03:4e98 $d0
     cp   A, $01                                        ;; 03:4e99 $fe $01
     jr   NZ, .jr_03_4eea                               ;; 03:4e9b $20 $4d
-    call call_00_28d2                                  ;; 03:4e9d $cd $d2 $28
+    call call_00_28d2_ObjectGet1D                                  ;; 03:4e9d $cd $d2 $28
     cpl                                                ;; 03:4ea0 $2f
     inc  A                                             ;; 03:4ea1 $3c
     ld   [HL], A                                       ;; 03:4ea2 $77
@@ -277,7 +277,7 @@ call_03_4c38_UpdateObjectCollision:
     inc  A                                             ;; 03:4ee4 $3c
 .jr_03_4ee5:
     ld   C, A                                          ;; 03:4ee5 $4f
-    call call_00_28c8                                  ;; 03:4ee6 $cd $c8 $28
+    call call_00_28c8_ObjectSet1B                                  ;; 03:4ee6 $cd $c8 $28
     ret                                                ;; 03:4ee9 $c9
 .jr_03_4eea:
     ld   A, $06                                        ;; 03:4eea $3e $06
@@ -312,7 +312,7 @@ call_03_4c38_UpdateObjectCollision:
     ret  Z                                             ;; 03:4f44 $c8
     dec  [HL]                                          ;; 03:4f45 $35
     ret  NZ                                            ;; 03:4f46 $c0
-    call call_00_288a                                  ;; 03:4f47 $cd $8a $28
+    call call_00_288c_ObjectUnkAndSet14                                  ;; 03:4f47 $cd $8a $28
     call call_00_2b8b                                  ;; 03:4f4a $cd $8b $2b
     ld   HL, wDCC8                                     ;; 03:4f4d $21 $c8 $dc
     inc  [HL]                                          ;; 03:4f50 $34
@@ -492,7 +492,7 @@ call_03_4c38_UpdateObjectCollision:
     ret  NC                                            ;; 03:5476 $d0
     cp   A, $01                                        ;; 03:5477 $fe $01
     ret  NZ                                            ;; 03:5479 $c0
-    call call_00_2962                                  ;; 03:547a $cd $62 $29
+    call call_00_2962_ObjectGetActionId                                  ;; 03:547a $cd $62 $29
     ld   A, $81                                        ;; 03:547d $3e $81
     ld   [wDCD2], A                                    ;; 03:547f $ea $d2 $dc
     ret                                                ;; 03:5482 $c9
@@ -533,11 +533,11 @@ call_03_550e:
     add  HL, DE                                        ;; 03:5529 $19
     ld   A, [HL]                                       ;; 03:552a $7e
     ld   [wDC58], A                                    ;; 03:552b $ea $58 $dc
-    ld   HL, wD810                                     ;; 03:552e $21 $10 $d8
+    ld   HL, wD810_PlayerYPosition                                     ;; 03:552e $21 $10 $d8
     ld   A, [HL+]                                      ;; 03:5531 $2a
     ld   H, [HL]                                       ;; 03:5532 $66
     ld   L, A                                          ;; 03:5533 $6f
-    ld   A, [wD801]                                    ;; 03:5534 $fa $01 $d8
+    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 03:5534 $fa $01 $d8
     ld   DE, $00                                       ;; 03:5537 $11 $00 $00
     cp   A, $05                                        ;; 03:553a $fe $05
     jr   NZ, jr_03_5541                                ;; 03:553c $20 $03
@@ -576,7 +576,7 @@ jr_03_5541:
     add  A, A                                          ;; 03:5569 $87
     cp   A, E                                          ;; 03:556a $bb
     jp   C, jp_03_55fd                                 ;; 03:556b $da $fd $55
-    ld   HL, wD80E                                     ;; 03:556e $21 $0e $d8
+    ld   HL, wD80E_PlayerXPosition                                     ;; 03:556e $21 $0e $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5571 $fa $00 $da
     or   A, $0e                                        ;; 03:5574 $f6 $0e
     ld   C, A                                          ;; 03:5576 $4f
@@ -614,7 +614,7 @@ jr_03_5541:
     add  A, $02                                        ;; 03:55a6 $c6 $02
     ret                                                ;; 03:55a8 $c9
 .jr_03_55a9:
-    ld   HL, wD80E                                     ;; 03:55a9 $21 $0e $d8
+    ld   HL, wD80E_PlayerXPosition                                     ;; 03:55a9 $21 $0e $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:55ac $fa $00 $da
     or   A, $0e                                        ;; 03:55af $f6 $0e
     ld   C, A                                          ;; 03:55b1 $4f
@@ -642,7 +642,7 @@ jr_03_5541:
     ld   A, [wDC58]                                    ;; 03:55cb $fa $58 $dc
     bit  2, A                                          ;; 03:55ce $cb $57
     jr   Z, .jr_03_55f3                                ;; 03:55d0 $28 $21
-    ld   A, [wD801]                                    ;; 03:55d2 $fa $01 $d8
+    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 03:55d2 $fa $01 $d8
     cp   A, $0e                                        ;; 03:55d5 $fe $0e
     jr   Z, .jr_03_55e5                                ;; 03:55d7 $28 $0c
     cp   A, $0f                                        ;; 03:55d9 $fe $0f
@@ -713,10 +713,10 @@ jp_03_5671:
     jr   Z, .jr_03_56a6                                ;; 03:5695 $28 $0f
     push AF                                            ;; 03:5697 $f5
     ld   C, $00                                        ;; 03:5698 $0e $00
-    call call_00_288c                                  ;; 03:569a $cd $8c $28
+    call call_00_288c_ObjectSet14                                  ;; 03:569a $cd $8c $28
     ld   C, $00                                        ;; 03:569d $0e $00
-    call call_00_2958                                  ;; 03:569f $cd $58 $29
-    call call_00_2c67                                  ;; 03:56a2 $cd $67 $2c
+    call call_00_2958_ObjectSetFacingDirection                                  ;; 03:569f $cd $58 $29
+    call call_00_2c67_Particle_InitBurst                                  ;; 03:56a2 $cd $67 $2c
     pop  AF                                            ;; 03:56a5 $f1
 .jr_03_56a6:
     and  A, $3f                                        ;; 03:56a6 $e6 $3f
@@ -797,7 +797,7 @@ jp_03_57f8:
     db   $02, $36, $00, $ea, $7d, $dc, $c9             ;; 03:5813 ???????
 
 data_03_581a:
-    ld   A, [wD801]                                    ;; 03:581a $fa $01 $d8
+    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 03:581a $fa $01 $d8
     cp   A, $1a                                        ;; 03:581d $fe $1a
     jp   Z, jp_03_57f8                                 ;; 03:581f $ca $f8 $57
     cp   A, $2e                                        ;; 03:5822 $fe $2e
@@ -816,11 +816,11 @@ data_03_581a:
     ld   A, L                                          ;; 03:583c $7d
     xor  A, $1d                                        ;; 03:583d $ee $1d
     ld   L, A                                          ;; 03:583f $6f
-    ld   A, [wD80E]                                    ;; 03:5840 $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 03:5840 $fa $0e $d8
     sub  A, [HL]                                       ;; 03:5843 $96
     ld   E, A                                          ;; 03:5844 $5f
     inc  HL                                            ;; 03:5845 $23
-    ld   A, [wD80F]                                    ;; 03:5846 $fa $0f $d8
+    ld   A, [wD80F_PlayerXPosition]                                    ;; 03:5846 $fa $0f $d8
     sbc  A, [HL]                                       ;; 03:5849 $9e
     ld   D, A                                          ;; 03:584a $57
     ld   A, E                                          ;; 03:584b $7b
@@ -847,10 +847,10 @@ data_03_581a:
     jr   Z, .jr_03_586b                                ;; 03:5868 $28 $01
     dec  D                                             ;; 03:586a $15
 .jr_03_586b:
-    ld   A, [wD810]                                    ;; 03:586b $fa $10 $d8
+    ld   A, [wD810_PlayerYPosition]                                    ;; 03:586b $fa $10 $d8
     add  A, E                                          ;; 03:586e $83
     ld   E, A                                          ;; 03:586f $5f
-    ld   A, [wD811]                                    ;; 03:5870 $fa $11 $d8
+    ld   A, [wD811_PlayerYPosition]                                    ;; 03:5870 $fa $11 $d8
     adc  A, D                                          ;; 03:5873 $8a
     ld   D, A                                          ;; 03:5874 $57
     ld   A, E                                          ;; 03:5875 $7b

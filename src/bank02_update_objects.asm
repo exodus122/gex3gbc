@@ -374,7 +374,7 @@ entry_02_708f:
     xor  A, A                                          ;; 02:709a $af
     ld   [wDA00_CurrentObjectAddr], A                                    ;; 02:709b $ea $00 $da
     ld   A, $00                                        ;; 02:709e $3e $00
-    ld   [wD800], A                                    ;; 02:70a0 $ea $00 $d8
+    ld   [wD800_PlayerObject_Id], A                                    ;; 02:70a0 $ea $00 $d8
     ld   A, [wDC78]                                    ;; 02:70a3 $fa $78 $dc
     call call_02_72ac                                  ;; 02:70a6 $cd $ac $72
     ld   A, $ff                                        ;; 02:70a9 $3e $ff
@@ -382,7 +382,7 @@ entry_02_708f:
     ld   A, $00                                        ;; 02:70ae $3e $00
     ld   [wDC7A], A                                    ;; 02:70b0 $ea $7a $dc
     ld   A, $00                                        ;; 02:70b3 $3e $00
-    ld   [wD80D], A                                    ;; 02:70b5 $ea $0d $d8
+    ld   [wD80D_PlayerFacingDirection], A                                    ;; 02:70b5 $ea $0d $d8
     xor  A, A                                          ;; 02:70b8 $af
     ld   [wDC86], A                                    ;; 02:70b9 $ea $86 $dc
     ld   [wDC87], A                                    ;; 02:70bc $ea $87 $dc
@@ -443,7 +443,7 @@ call_02_7123:
     ret                                                ;; 02:7131 $c9
 
 entry_02_7132:
-    ld   HL, wD800                                     ;; 02:7132 $21 $00 $d8
+    ld   HL, wD800_PlayerObject_Id                                     ;; 02:7132 $21 $00 $d8
     ld   DE, wDA09                                     ;; 02:7135 $11 $09 $da
 .jr_02_7138:
     ld   A, [HL]                                       ;; 02:7138 $7e
@@ -456,7 +456,7 @@ entry_02_7132:
     ret                                                ;; 02:7141 $c9
 
 entry_02_7142:
-    ld   HL, wD800                                     ;; 02:7142 $21 $00 $d8
+    ld   HL, wD800_PlayerObject_Id                                     ;; 02:7142 $21 $00 $d8
     ld   DE, wDA09                                     ;; 02:7145 $11 $09 $da
 .jr_02_7148:
     ld   A, [DE]                                       ;; 02:7148 $1a
@@ -492,7 +492,7 @@ call_02_7152_UpdateObjects:
 .jr_02_717f:
     ld   HL, wDC98                                     ;; 02:717f $21 $98 $dc
     ld   C, [HL]                                       ;; 02:7182 $4e
-    ld   A, [wD801]                                    ;; 02:7183 $fa $01 $d8
+    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 02:7183 $fa $01 $d8
     cp   A, $09                                        ;; 02:7186 $fe $09
     jr   Z, .jr_02_71a5                                ;; 02:7188 $28 $1b
     cp   A, $29                                        ;; 02:718a $fe $29
@@ -545,10 +545,10 @@ call_02_7152_UpdateObjects:
     ld   L, A                                          ;; 02:71d8 $6f
     ld   A, E                                          ;; 02:71d9 $7b
     sub  A, [HL]                                       ;; 02:71da $96
-    ld   [wD810], A                                    ;; 02:71db $ea $10 $d8
+    ld   [wD810_PlayerYPosition], A                                    ;; 02:71db $ea $10 $d8
     ld   A, D                                          ;; 02:71de $7a
     sbc  A, $00                                        ;; 02:71df $de $00
-    ld   [wD811], A                                    ;; 02:71e1 $ea $11 $d8
+    ld   [wD811_PlayerYPosition], A                                    ;; 02:71e1 $ea $11 $d8
 .jr_02_71e4:
     ld   A, [wDC7D]                                    ;; 02:71e4 $fa $7d $dc
     and  A, A                                          ;; 02:71e7 $a7
@@ -766,7 +766,7 @@ call_02_7305:
     srl  D                                             ;; 02:7313 $cb $3a
     rra                                                ;; 02:7315 $1f
     ld   E, A                                          ;; 02:7316 $5f
-    ld   HL, wDBFF                                     ;; 02:7317 $21 $ff $db
+    ld   HL, wDBFF_YPositionRelated                                     ;; 02:7317 $21 $ff $db
     ld   A, [HL]                                       ;; 02:731a $7e
     ld   [HL], E                                       ;; 02:731b $73
     sub  A, E                                          ;; 02:731c $93
@@ -803,7 +803,7 @@ call_02_7337:
     srl  D                                             ;; 02:7345 $cb $3a
     rra                                                ;; 02:7347 $1f
     ld   E, A                                          ;; 02:7348 $5f
-    ld   HL, wDBFD                                     ;; 02:7349 $21 $fd $db
+    ld   HL, wDBFD_XPositionRelated                                     ;; 02:7349 $21 $fd $db
     ld   A, [HL]                                       ;; 02:734c $7e
     ld   [HL], E                                       ;; 02:734d $73
     ld   C, A                                          ;; 02:734e $4f
@@ -821,7 +821,7 @@ call_02_7337:
     ld   A, [wDC2A]                                    ;; 02:735b $fa $2a $dc
     cp   A, $00                                        ;; 02:735e $fe $00
     jr   NZ, .jr_02_7373                               ;; 02:7360 $20 $11
-    ld   HL, wDBFD                                     ;; 02:7362 $21 $fd $db
+    ld   HL, wDBFD_XPositionRelated                                     ;; 02:7362 $21 $fd $db
     ld   A, [HL+]                                      ;; 02:7365 $2a
     or   A, [HL]                                       ;; 02:7366 $b6
     jr   NZ, .jr_02_7373                               ;; 02:7367 $20 $0a
@@ -845,7 +845,7 @@ call_02_7337:
     ld   A, C                                          ;; 02:7382 $79
     or   A, B                                          ;; 02:7383 $b0
     jr   NZ, .jr_02_7393                               ;; 02:7384 $20 $0d
-    ld   HL, wDBFD                                     ;; 02:7386 $21 $fd $db
+    ld   HL, wDBFD_XPositionRelated                                     ;; 02:7386 $21 $fd $db
     ld   A, [HL+]                                      ;; 02:7389 $2a
     sub  A, $ff                                        ;; 02:738a $d6 $ff
     ld   C, A                                          ;; 02:738c $4f

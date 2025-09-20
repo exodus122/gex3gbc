@@ -78,10 +78,10 @@ call_00_10de:
     ld   E, A                                          ;; 00:10e7 $5f
     ld   A, [HL+]                                      ;; 00:10e8 $2a
     ld   D, A                                          ;; 00:10e9 $57
-    ld   A, [wD80E]                                    ;; 00:10ea $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 00:10ea $fa $0e $d8
     sub  A, $50                                        ;; 00:10ed $d6 $50
     ld   C, A                                          ;; 00:10ef $4f
-    ld   A, [wD80F]                                    ;; 00:10f0 $fa $0f $d8
+    ld   A, [wD80F_PlayerXPosition]                                    ;; 00:10f0 $fa $0f $d8
     sbc  A, $00                                        ;; 00:10f3 $de $00
     ld   B, A                                          ;; 00:10f5 $47
     jr   C, .jr_00_1109                                ;; 00:10f6 $38 $11
@@ -114,7 +114,7 @@ call_00_10de:
     ld   A, E                                          ;; 00:1117 $7b
     ld   [wDBF9_XPositionInMap], A                                    ;; 00:1118 $ea $f9 $db
     ld   A, D                                          ;; 00:111b $7a
-    ld   [wDBFA], A                                    ;; 00:111c $ea $fa $db
+    ld   [wDBFA_XPositionInMap], A                                    ;; 00:111c $ea $fa $db
     ld   A, E                                          ;; 00:111f $7b
     sub  A, $10                                        ;; 00:1120 $d6 $10
     ld   E, A                                          ;; 00:1122 $5f
@@ -147,11 +147,11 @@ call_00_10de:
     ld   A, E                                          ;; 00:1152 $7b
     ld   [wDAAC], A                                    ;; 00:1153 $ea $ac $da
     ld   HL, wDCAC                                     ;; 00:1156 $21 $ac $dc
-    ld   A, [wD810]                                    ;; 00:1159 $fa $10 $d8
+    ld   A, [wD810_PlayerYPosition]                                    ;; 00:1159 $fa $10 $d8
     add  A, [HL]                                       ;; 00:115c $86
     ld   C, A                                          ;; 00:115d $4f
     inc  HL                                            ;; 00:115e $23
-    ld   A, [wD811]                                    ;; 00:115f $fa $11 $d8
+    ld   A, [wD811_PlayerYPosition]                                    ;; 00:115f $fa $11 $d8
     adc  A, [HL]                                       ;; 00:1162 $8e
     ld   B, A                                          ;; 00:1163 $47
     ld   HL, wDC38                                     ;; 00:1164 $21 $38 $dc
@@ -187,7 +187,7 @@ call_00_10de:
     ld   A, E                                          ;; 00:1188 $7b
     ld   [wDBFB_YPositionInMap], A                                    ;; 00:1189 $ea $fb $db
     ld   A, D                                          ;; 00:118c $7a
-    ld   [wDBFC], A                                    ;; 00:118d $ea $fc $db
+    ld   [wDBFC_YPositionInMap], A                                    ;; 00:118d $ea $fc $db
     ld   A, E                                          ;; 00:1190 $7b
     sub  A, $10                                        ;; 00:1191 $d6 $10
     ld   E, A                                          ;; 00:1193 $5f
@@ -877,11 +877,11 @@ call_00_1633:
     add  HL, DE                                        ;; 00:1669 $19
     ld   DE, $03                                       ;; 00:166a $11 $03 $00
     add  HL, DE                                        ;; 00:166d $19
-    ld   A, [wD810]                                    ;; 00:166e $fa $10 $d8
+    ld   A, [wD810_PlayerYPosition]                                    ;; 00:166e $fa $10 $d8
     sub  A, [HL]                                       ;; 00:1671 $96
     ld   E, A                                          ;; 00:1672 $5f
     inc  HL                                            ;; 00:1673 $23
-    ld   A, [wD811]                                    ;; 00:1674 $fa $11 $d8
+    ld   A, [wD811_PlayerYPosition]                                    ;; 00:1674 $fa $11 $d8
     sbc  A, [HL]                                       ;; 00:1677 $9e
     ld   D, A                                          ;; 00:1678 $57
     pop  HL                                            ;; 00:1679 $e1

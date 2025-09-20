@@ -397,11 +397,11 @@ jp_02_4db1:
     or   A, $0e                                        ;; 02:4db6 $f6 $0e
     ld   L, A                                          ;; 02:4db8 $6f
     ld   BC, $01                                       ;; 02:4db9 $01 $01 $00
-    ld   A, [wD80E]                                    ;; 02:4dbc $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 02:4dbc $fa $0e $d8
     sub  A, [HL]                                       ;; 02:4dbf $96
     ld   E, A                                          ;; 02:4dc0 $5f
     inc  HL                                            ;; 02:4dc1 $23
-    ld   A, [wD80F]                                    ;; 02:4dc2 $fa $0f $d8
+    ld   A, [wD80F_PlayerXPosition]                                    ;; 02:4dc2 $fa $0f $d8
     sbc  A, [HL]                                       ;; 02:4dc5 $9e
     jp   C, call_02_51f9                               ;; 02:4dc6 $da $f9 $51
     or   A, E                                          ;; 02:4dc9 $b3
@@ -533,12 +533,12 @@ call_02_4f32:
     jr   Z, .jr_02_4f71                                ;; 02:4f6d $28 $02
     set  1, C                                          ;; 02:4f6f $cb $c9
 .jr_02_4f71:
-    ld   A, [wD801]                                    ;; 02:4f71 $fa $01 $d8
+    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 02:4f71 $fa $01 $d8
     cp   A, $07                                        ;; 02:4f74 $fe $07
     jr   NZ, .jr_02_4f89                               ;; 02:4f76 $20 $11
     res  4, C                                          ;; 02:4f78 $cb $a1
     res  5, C                                          ;; 02:4f7a $cb $a9
-    ld   A, [wD80D]                                    ;; 02:4f7c $fa $0d $d8
+    ld   A, [wD80D_PlayerFacingDirection]                                    ;; 02:4f7c $fa $0d $d8
     and  A, $20                                        ;; 02:4f7f $e6 $20
     ld   A, $20                                        ;; 02:4f81 $3e $20
     jr   NZ, .jr_02_4f87                               ;; 02:4f83 $20 $02
@@ -581,7 +581,7 @@ call_02_4f32:
     ld   [HL], $ff                                     ;; 02:4fd5 $36 $ff
     cp   A, $ff                                        ;; 02:4fd7 $fe $ff
     call NZ, call_02_72ac                              ;; 02:4fd9 $c4 $ac $72
-    ld   HL, wD802                                     ;; 02:4fdc $21 $02 $d8
+    ld   HL, wD802_PlayerObject_ActionFunc                                     ;; 02:4fdc $21 $02 $d8
     ld   A, [HL+]                                      ;; 02:4fdf $2a
     ld   H, [HL]                                       ;; 02:4fe0 $66
     ld   L, A                                          ;; 02:4fe1 $6f
@@ -622,7 +622,7 @@ call_02_4ffb:
     db   $c9                                           ;; 02:5046 ?
 
 call_02_5047:
-    ld   HL, wD80E                                     ;; 02:5047 $21 $0e $d8
+    ld   HL, wD80E_PlayerXPosition                                     ;; 02:5047 $21 $0e $d8
     ld   A, [HL+]                                      ;; 02:504a $2a
     ld   E, A                                          ;; 02:504b $5f
     ld   D, [HL]                                       ;; 02:504c $56
@@ -639,7 +639,7 @@ call_02_5047:
     ld   A, E                                          ;; 02:5061 $7b
     ld   [HL+], A                                      ;; 02:5062 $22
     ld   [HL], D                                       ;; 02:5063 $72
-    ld   HL, wD810                                     ;; 02:5064 $21 $10 $d8
+    ld   HL, wD810_PlayerYPosition                                     ;; 02:5064 $21 $10 $d8
     ld   A, [HL+]                                      ;; 02:5067 $2a
     ld   E, A                                          ;; 02:5068 $5f
     ld   D, [HL]                                       ;; 02:5069 $56
@@ -658,7 +658,7 @@ call_02_5047:
     ret                                                ;; 02:5080 $c9
 
 call_02_5081:
-    ld   HL, wD801                                     ;; 02:5081 $21 $01 $d8
+    ld   HL, wD801_PlayerObject_ActionId                                     ;; 02:5081 $21 $01 $d8
     ld   L, [HL]                                       ;; 02:5084 $6e
     ld   H, $00                                        ;; 02:5085 $26 $00
     ld   DE, data_02_554d                              ;; 02:5087 $11 $4d $55
@@ -680,7 +680,7 @@ call_02_5081:
     jr   NZ, .jr_02_50ac                               ;; 02:50a8 $20 $02
     ld   C, $20                                        ;; 02:50aa $0e $20
 .jr_02_50ac:
-    ld   HL, wD80D                                     ;; 02:50ac $21 $0d $d8
+    ld   HL, wD80D_PlayerFacingDirection                                     ;; 02:50ac $21 $0d $d8
     ld   [HL], C                                       ;; 02:50af $71
 .jr_02_50b0:
     ld   A, [wDC81]                                    ;; 02:50b0 $fa $81 $dc
@@ -702,7 +702,7 @@ call_02_5081:
     jr   NZ, .jr_02_50d3                               ;; 02:50cf $20 $02
     ld   C, $20                                        ;; 02:50d1 $0e $20
 .jr_02_50d3:
-    ld   HL, wD80D                                     ;; 02:50d3 $21 $0d $d8
+    ld   HL, wD80D_PlayerFacingDirection                                     ;; 02:50d3 $21 $0d $d8
     ld   A, [HL]                                       ;; 02:50d6 $7e
     ld   [HL], C                                       ;; 02:50d7 $71
     cp   A, C                                          ;; 02:50d8 $b9
@@ -749,7 +749,7 @@ call_02_5100:
     call NZ, call_02_518a                              ;; 02:5128 $c4 $8a $51
     call call_02_553b                                  ;; 02:512b $cd $3b $55
     jr   Z, .jr_02_513a                                ;; 02:512e $28 $0a
-    ld   A, [wD801]                                    ;; 02:5130 $fa $01 $d8
+    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 02:5130 $fa $01 $d8
     cp   A, $19                                        ;; 02:5133 $fe $19
     jr   Z, .jr_02_513a                                ;; 02:5135 $28 $03
     cp   A, $1f                                        ;; 02:5137 $fe $1f
@@ -772,7 +772,7 @@ call_02_5100:
     ret                                                ;; 02:5158 $c9
 .jr_02_5159:
     ld   A, [wDC86]                                    ;; 02:5159 $fa $86 $dc
-    ld   HL, wD80D                                     ;; 02:515c $21 $0d $d8
+    ld   HL, wD80D_PlayerFacingDirection                                     ;; 02:515c $21 $0d $d8
     bit  5, [HL]                                       ;; 02:515f $cb $6e
     jr   Z, .jr_02_5165                                ;; 02:5161 $28 $02
     cpl                                                ;; 02:5163 $2f
@@ -815,7 +815,7 @@ call_02_5195:
     ld   A, [HL+]                                      ;; 02:5198 $2a
     ld   D, [HL]                                       ;; 02:5199 $56
     ld   E, A                                          ;; 02:519a $5f
-    ld   HL, wD80E                                     ;; 02:519b $21 $0e $d8
+    ld   HL, wD80E_PlayerXPosition                                     ;; 02:519b $21 $0e $d8
     ld   A, [HL+]                                      ;; 02:519e $2a
     sub  A, C                                          ;; 02:519f $91
     ld   C, A                                          ;; 02:51a0 $4f
@@ -835,7 +835,7 @@ call_02_5195:
     ld   E, C                                          ;; 02:51b4 $59
     ld   D, B                                          ;; 02:51b5 $50
 .jr_02_51b6:
-    ld   HL, wD80E                                     ;; 02:51b6 $21 $0e $d8
+    ld   HL, wD80E_PlayerXPosition                                     ;; 02:51b6 $21 $0e $d8
     ld   A, [wDC2A]                                    ;; 02:51b9 $fa $2a $dc
     cp   A, $00                                        ;; 02:51bc $fe $00
     jr   Z, .jr_02_51c4                                ;; 02:51be $28 $04
@@ -863,10 +863,10 @@ jr_02_51cb:
     ld   A, L                                          ;; 02:51d6 $7d
     xor  A, $1c                                        ;; 02:51d7 $ee $1c
     ld   L, A                                          ;; 02:51d9 $6f
-    ld   A, [wD80E]                                    ;; 02:51da $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 02:51da $fa $0e $d8
     sub  A, [HL]                                       ;; 02:51dd $96
     inc  HL                                            ;; 02:51de $23
-    ld   A, [wD80F]                                    ;; 02:51df $fa $0f $d8
+    ld   A, [wD80F_PlayerXPosition]                                    ;; 02:51df $fa $0f $d8
     sbc  A, [HL]                                       ;; 02:51e2 $9e
     jr   C, call_02_5195                               ;; 02:51e3 $38 $b0
     push HL                                            ;; 02:51e5 $e5
@@ -875,10 +875,10 @@ jr_02_51cb:
     pop  DE                                            ;; 02:51ea $d1
     pop  HL                                            ;; 02:51eb $e1
     dec  L                                             ;; 02:51ec $2d
-    ld   A, [wD80E]                                    ;; 02:51ed $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 02:51ed $fa $0e $d8
     sub  A, E                                          ;; 02:51f0 $93
     ld   [HL+], A                                      ;; 02:51f1 $22
-    ld   A, [wD80F]                                    ;; 02:51f2 $fa $0f $d8
+    ld   A, [wD80F_PlayerXPosition]                                    ;; 02:51f2 $fa $0f $d8
     sbc  A, $00                                        ;; 02:51f5 $de $00
     ld   [HL], A                                       ;; 02:51f7 $77
     ret                                                ;; 02:51f8 $c9
@@ -896,7 +896,7 @@ call_02_5204:
     ld   A, [HL+]                                      ;; 02:5207 $2a
     ld   D, [HL]                                       ;; 02:5208 $56
     ld   E, A                                          ;; 02:5209 $5f
-    ld   HL, wD80E                                     ;; 02:520a $21 $0e $d8
+    ld   HL, wD80E_PlayerXPosition                                     ;; 02:520a $21 $0e $d8
     ld   A, [HL+]                                      ;; 02:520d $2a
     add  A, C                                          ;; 02:520e $81
     ld   C, A                                          ;; 02:520f $4f
@@ -915,7 +915,7 @@ call_02_5204:
     ld   E, C                                          ;; 02:5221 $59
     ld   D, B                                          ;; 02:5222 $50
 .jr_02_5223:
-    ld   HL, wD80E                                     ;; 02:5223 $21 $0e $d8
+    ld   HL, wD80E_PlayerXPosition                                     ;; 02:5223 $21 $0e $d8
     ld   A, [wDC2A]                                    ;; 02:5226 $fa $2a $dc
     cp   A, $00                                        ;; 02:5229 $fe $00
     jr   Z, .jr_02_5231                                ;; 02:522b $28 $04
@@ -944,10 +944,10 @@ jr_02_5238:
     ld   A, L                                          ;; 02:5244 $7d
     xor  A, $1c                                        ;; 02:5245 $ee $1c
     ld   L, A                                          ;; 02:5247 $6f
-    ld   A, [wD80E]                                    ;; 02:5248 $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 02:5248 $fa $0e $d8
     sub  A, [HL]                                       ;; 02:524b $96
     inc  HL                                            ;; 02:524c $23
-    ld   A, [wD80F]                                    ;; 02:524d $fa $0f $d8
+    ld   A, [wD80F_PlayerXPosition]                                    ;; 02:524d $fa $0f $d8
     sbc  A, [HL]                                       ;; 02:5250 $9e
     jr   NC, call_02_5204                              ;; 02:5251 $30 $b1
     push HL                                            ;; 02:5253 $e5
@@ -956,10 +956,10 @@ jr_02_5238:
     pop  DE                                            ;; 02:5258 $d1
     pop  HL                                            ;; 02:5259 $e1
     dec  L                                             ;; 02:525a $2d
-    ld   A, [wD80E]                                    ;; 02:525b $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 02:525b $fa $0e $d8
     add  A, E                                          ;; 02:525e $83
     ld   [HL+], A                                      ;; 02:525f $22
-    ld   A, [wD80F]                                    ;; 02:5260 $fa $0f $d8
+    ld   A, [wD80F_PlayerXPosition]                                    ;; 02:5260 $fa $0f $d8
     adc  A, $00                                        ;; 02:5263 $ce $00
     ld   [HL], A                                       ;; 02:5265 $77
     ret                                                ;; 02:5266 $c9
@@ -1045,15 +1045,15 @@ call_02_5267:
     ld   HL, wDC8F                                     ;; 02:52fc $21 $8f $dc
     ld   C, [HL]                                       ;; 02:52ff $4e
     ld   [HL], $00                                     ;; 02:5300 $36 $00
-    ld   A, [wD801]                                    ;; 02:5302 $fa $01 $d8
+    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 02:5302 $fa $01 $d8
     cp   A, $1a                                        ;; 02:5305 $fe $1a
     ld   A, $0a                                        ;; 02:5307 $3e $0a
     jp   Z, call_02_54f9                               ;; 02:5309 $ca $f9 $54
-    ld   A, [wD801]                                    ;; 02:530c $fa $01 $d8
+    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 02:530c $fa $01 $d8
     cp   A, $2e                                        ;; 02:530f $fe $2e
     ld   A, $2a                                        ;; 02:5311 $3e $2a
     jp   Z, call_02_54f9                               ;; 02:5313 $ca $f9 $54
-    ld   A, [wD801]                                    ;; 02:5316 $fa $01 $d8
+    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 02:5316 $fa $01 $d8
     cp   A, $3b                                        ;; 02:5319 $fe $3b
     ld   A, $37                                        ;; 02:531b $3e $37
     jp   Z, call_02_54f9                               ;; 02:531d $ca $f9 $54
@@ -1160,7 +1160,7 @@ call_02_5374:
     db   $00, $ff, $00, $ff, $00, $ff, $00, $ff        ;; 02:53df ????????
 
 call_02_53e7:
-    ld   HL, wD810                                     ;; 02:53e7 $21 $10 $d8
+    ld   HL, wD810_PlayerYPosition                                     ;; 02:53e7 $21 $10 $d8
     ld   A, [HL]                                       ;; 02:53ea $7e
     add  A, C                                          ;; 02:53eb $81
     ld   [HL+], A                                      ;; 02:53ec $22
@@ -1169,7 +1169,7 @@ call_02_53e7:
     adc  A, B                                          ;; 02:53ef $88
     ld   [HL], A                                       ;; 02:53f0 $77
     ld   B, A                                          ;; 02:53f1 $47
-    ld   A, [wD801]                                    ;; 02:53f2 $fa $01 $d8
+    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 02:53f2 $fa $01 $d8
     cp   A, $1b                                        ;; 02:53f5 $fe $1b
     ret  Z                                             ;; 02:53f7 $c8
     bit  7, B                                          ;; 02:53f8 $cb $78
@@ -1189,23 +1189,23 @@ call_02_53e7:
     sbc  A, [HL]                                       ;; 02:540b $9e
     ret  C                                             ;; 02:540c $d8
     ld   A, [wDC42]                                    ;; 02:540d $fa $42 $dc
-    ld   [wD810], A                                    ;; 02:5410 $ea $10 $d8
+    ld   [wD810_PlayerYPosition], A                                    ;; 02:5410 $ea $10 $d8
     ld   A, [wDC43]                                    ;; 02:5413 $fa $43 $dc
-    ld   [wD811], A                                    ;; 02:5416 $ea $11 $d8
+    ld   [wD811_PlayerYPosition], A                                    ;; 02:5416 $ea $11 $d8
     ld   A, $01                                        ;; 02:5419 $3e $01
     ld   [wDC8A], A                                    ;; 02:541b $ea $8a $dc
     ret                                                ;; 02:541e $c9
 .jr_02_541f:
     ld   A, [wDC40]                                    ;; 02:541f $fa $40 $dc
-    ld   [wD810], A                                    ;; 02:5422 $ea $10 $d8
+    ld   [wD810_PlayerYPosition], A                                    ;; 02:5422 $ea $10 $d8
     ld   A, [wDC41]                                    ;; 02:5425 $fa $41 $dc
-    ld   [wD811], A                                    ;; 02:5428 $ea $11 $d8
+    ld   [wD811_PlayerYPosition], A                                    ;; 02:5428 $ea $11 $d8
     ld   A, $00                                        ;; 02:542b $3e $00
     ld   [wDC8A], A                                    ;; 02:542d $ea $8a $dc
     ret                                                ;; 02:5430 $c9
 
 call_02_5431:
-    ld   HL, wD801                                     ;; 02:5431 $21 $01 $d8
+    ld   HL, wD801_PlayerObject_ActionId                                     ;; 02:5431 $21 $01 $d8
     ld   L, [HL]                                       ;; 02:5434 $6e
     ld   H, $00                                        ;; 02:5435 $26 $00
     ld   DE, data_02_554d                              ;; 02:5437 $11 $4d $55
@@ -1228,7 +1228,7 @@ call_02_5431:
     call call_02_5374                                  ;; 02:545b $cd $74 $53
     call call_02_553b                                  ;; 02:545e $cd $3b $55
     jr   Z, .jr_02_5488                                ;; 02:5461 $28 $25
-    ld   A, [wD801]                                    ;; 02:5463 $fa $01 $d8
+    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 02:5463 $fa $01 $d8
     cp   A, $19                                        ;; 02:5466 $fe $19
     jr   Z, .jr_02_546e                                ;; 02:5468 $28 $04
     cp   A, $1f                                        ;; 02:546a $fe $1f
@@ -1246,7 +1246,7 @@ call_02_5431:
     call call_02_54f9                                  ;; 02:5483 $cd $f9 $54
     jr   .jr_02_54a7                                   ;; 02:5486 $18 $1f
 .jr_02_5488:
-    ld   A, [wD801]                                    ;; 02:5488 $fa $01 $d8
+    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 02:5488 $fa $01 $d8
     cp   A, $0f                                        ;; 02:548b $fe $0f
     jr   NZ, .jr_02_5496                               ;; 02:548d $20 $07
     ld   A, [wDC8C]                                    ;; 02:548f $fa $8c $dc
@@ -1264,7 +1264,7 @@ call_02_5431:
     ld   A, [wDC81]                                    ;; 02:54a7 $fa $81 $dc
     and  A, $40                                        ;; 02:54aa $e6 $40
     jr   Z, .jr_02_54d0                                ;; 02:54ac $28 $22
-    ld   A, [wD801]                                    ;; 02:54ae $fa $01 $d8
+    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 02:54ae $fa $01 $d8
     cp   A, $22                                        ;; 02:54b1 $fe $22
     jr   Z, .jr_02_54d0                                ;; 02:54b3 $28 $1b
     ld   [wDAD6_ReturnBank], A                                    ;; 02:54b5 $ea $d6 $da
@@ -1279,7 +1279,7 @@ call_02_5431:
     ld   A, $22                                        ;; 02:54cc $3e $22
     jr   call_02_54f9                                  ;; 02:54ce $18 $29
 .jr_02_54d0:
-    ld   HL, wD801                                     ;; 02:54d0 $21 $01 $d8
+    ld   HL, wD801_PlayerObject_ActionId                                     ;; 02:54d0 $21 $01 $d8
     ld   L, [HL]                                       ;; 02:54d3 $6e
     ld   H, $00                                        ;; 02:54d4 $26 $00
     add  HL, HL                                        ;; 02:54d6 $29
@@ -1323,7 +1323,7 @@ call_02_54f9:
     ld   L, A                                          ;; 02:5508 $6f
 .jr_02_5509:
     ld   A, L                                          ;; 02:5509 $7d
-    ld   HL, wD801                                     ;; 02:550a $21 $01 $d8
+    ld   HL, wD801_PlayerObject_ActionId                                     ;; 02:550a $21 $01 $d8
     cp   A, [HL]                                       ;; 02:550d $be
     ret  Z                                             ;; 02:550e $c8
     ld   L, A                                          ;; 02:550f $6f
@@ -1335,7 +1335,7 @@ call_02_54f9:
     ld   HL, wDC79                                     ;; 02:551a $21 $79 $dc
     bit  7, [HL]                                       ;; 02:551d $cb $7e
     jr   Z, .jr_02_5524                                ;; 02:551f $28 $03
-    ld   HL, wD801                                     ;; 02:5521 $21 $01 $d8
+    ld   HL, wD801_PlayerObject_ActionId                                     ;; 02:5521 $21 $01 $d8
 .jr_02_5524:
     ld   L, [HL]                                       ;; 02:5524 $6e
     ld   H, $00                                        ;; 02:5525 $26 $00
@@ -1358,7 +1358,7 @@ call_02_553b:
 
 entry_02_5541:
 call_02_5541:
-    ld   HL, wD801                                     ;; 02:5541 $21 $01 $d8
+    ld   HL, wD801_PlayerObject_ActionId                                     ;; 02:5541 $21 $01 $d8
     ld   L, [HL]                                       ;; 02:5544 $6e
     ld   H, $00                                        ;; 02:5545 $26 $00
     ld   DE, data_02_554d                              ;; 02:5547 $11 $4d $55

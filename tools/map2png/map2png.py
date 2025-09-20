@@ -4,7 +4,6 @@ import numpy # type: ignore
 import struct
 import os
 import math
-from enum import Enum
 
 def get_next_offset(arr, entry):
     for i, (a, b) in enumerate(arr):

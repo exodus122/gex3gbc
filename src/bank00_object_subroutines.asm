@@ -362,7 +362,7 @@ call_00_2588:
     db   $00, $ea, $0f, $d8, $c9                       ;; 00:271d ?????
 
 call_00_2722:
-    ld   HL, wD810                                     ;; 00:2722 $21 $10 $d8
+    ld   HL, wD810_PlayerYPosition                                     ;; 00:2722 $21 $10 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2725 $fa $00 $da
     or   A, $10                                        ;; 00:2728 $f6 $10
     ld   C, A                                          ;; 00:272a $4f
@@ -389,15 +389,15 @@ call_00_2722:
     cp   A, E                                          ;; 00:2743 $bb
     jr   C, .jr_00_2764                                ;; 00:2744 $38 $1e
     call call_00_2857                                  ;; 00:2746 $cd $57 $28
-    ld   A, [wD80E]                                    ;; 00:2749 $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2749 $fa $0e $d8
     sub  A, E                                          ;; 00:274c $93
-    ld   A, [wD80F]                                    ;; 00:274d $fa $0f $d8
+    ld   A, [wD80F_PlayerXPosition]                                    ;; 00:274d $fa $0f $d8
     sbc  A, D                                          ;; 00:2750 $9a
     jr   C, .jr_00_2764                                ;; 00:2751 $38 $11
     call call_00_2846                                  ;; 00:2753 $cd $46 $28
-    ld   A, [wD80E]                                    ;; 00:2756 $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2756 $fa $0e $d8
     sub  A, E                                          ;; 00:2759 $93
-    ld   A, [wD80F]                                    ;; 00:275a $fa $0f $d8
+    ld   A, [wD80F_PlayerXPosition]                                    ;; 00:275a $fa $0f $d8
     sbc  A, D                                          ;; 00:275d $9a
     jr   NC, .jr_00_2764                               ;; 00:275e $30 $04
     ld   A, $01                                        ;; 00:2760 $3e $01
@@ -427,21 +427,90 @@ call_00_2766:
     xor  A, A                                          ;; 00:277d $af
     ld   [HL], A                                       ;; 00:277e $77
     ret                                                ;; 00:277f $c9
-    db   $21, $fb, $db, $2a, $66, $6f, $11, $b0        ;; 00:2780 ????????
-    db   $00, $19, $5d, $54, $26, $d8, $fa, $00        ;; 00:2788 ????????
-    db   $da, $f6, $10, $6f, $2a, $93, $7e, $9a        ;; 00:2790 ????????
-    db   $c9, $cd, $35, $28, $26, $d8, $fa, $00        ;; 00:2798 ????????
-    db   $da, $f6, $0e, $6f, $2a, $93, $5f, $7e        ;; 00:27a0 ????????
-    db   $9a, $57, $30, $07, $af, $93, $5f, $3e        ;; 00:27a8 ????????
-    db   $00, $9a, $57, $cb, $3a, $cb, $1b, $d5        ;; 00:27b0 ????????
-    db   $cd, $f3, $27, $e1, $19, $16, $d8, $fa        ;; 00:27b8 ????????
-    db   $00, $da, $f6, $10, $5f, $7d, $12, $1c        ;; 00:27c0 ????????
-    db   $7c, $12, $c9, $26, $d8, $fa, $00, $da        ;; 00:27c8 ????????
-    db   $f6, $10, $6f, $fa, $fb, $db, $d6, $14        ;; 00:27d0 ????????
-    db   $22, $fa, $fc, $db, $de, $00, $77, $d0        ;; 00:27d8 ????????
-    db   $af, $32, $77, $c9, $cd, $f3, $27, $26        ;; 00:27e0 ????????
-    db   $d8, $fa, $00, $da, $f6, $10, $6f, $7b        ;; 00:27e8 ????????
-    db   $22, $72, $c9                                 ;; 00:27f0 ???
+
+call_00_2780:
+    ld   hl,wDBFB_YPositionInMap
+    ldi  a,[hl]
+    ld   h,[hl]
+    ld   l,a
+    ld   de,$00B0
+    add  hl,de
+    ld   e,l
+    ld   d,h
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$10
+    ld   l,a
+    ldi  a,[hl]
+    sub  e
+    ld   a,[hl]
+    sbc  d
+    ret  
+
+call_00_2799:
+    call call_00_2835
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   l,a
+    ldi  a,[hl]
+    sub  e
+    ld   e,a
+    ld   a,[hl]
+    sbc  d
+    ld   d,a
+    jr   nc,label27B3
+    xor  a
+    sub  e
+    ld   e,a
+    ld   a,$00
+    sbc  d
+    ld   d,a
+label27B3:
+    srl  d
+    rr   e
+    push de
+    call call_00_27f3
+    pop  hl
+    add  hl,de
+    ld   d,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$10
+    ld   e,a
+    ld   a,l
+    ld   [de],a
+    inc  e
+    ld   a,h
+    ld   [de],a
+    ret  
+
+call_00_27cb:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$10
+    ld   l,a
+    ld   a,[wDBFB_YPositionInMap]
+    sub  a,$14
+    ldi  [hl],a
+    ld   a,[wDBFC_YPositionInMap]
+    sbc  a,$00
+    ld   [hl],a
+    ret  nc
+    xor  a
+    ldd  [hl],a
+    ld   [hl],a
+    ret  
+
+call_00_27e4:
+    call call_00_27f3
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$10
+    ld   l,a
+    ld   a,e
+    ldi  [hl],a
+    ld   [hl],d
+    ret  
 
 call_00_27f3:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:27f3 $fa $00 $da
@@ -456,15 +525,55 @@ call_00_27f3:
     ld   D, [HL]                                       ;; 00:2802 $56
     ret                                                ;; 00:2803 $c9
 
-    db   $fa, $00, $da, $0f, $e6, $70, $6f, $26        ;; 00:2804 ????????
-    db   $00, $11, $20, $da, $19, $2a, $5f, $56        ;; 00:280c ????????
-    db   $c9, $fa, $00, $da, $0f, $e6, $70, $6f        ;; 00:2814 ????????
-    db   $26, $00, $11, $22, $da, $19, $2a, $5f        ;; 00:281c ????????
-    db   $56, $c9, $cd, $35, $28, $26, $d8, $fa        ;; 00:2824 ????????
-    db   $00, $da, $f6, $0e, $6f, $7b, $22, $72        ;; 00:282c ????????
-    db   $c9, $fa, $00, $da, $0f, $e6, $70, $6f        ;; 00:2834 ????????
-    db   $26, $00, $11, $24, $da, $19, $2a, $5f        ;; 00:283c ????????
-    db   $56, $c9                                      ;; 00:2844 ??
+call_00_2804:
+    ld   a,[wDA00_CurrentObjectAddr]
+    rrca 
+    and  a,$70
+    ld   l,a
+    ld   h,$00
+    ld   de,wDA20
+    add  hl,de
+    ldi  a,[hl]
+    ld   e,a
+    ld   d,[hl]
+    ret  
+
+call_00_2815:
+    ld   a,[wDA00_CurrentObjectAddr]
+    rrca 
+    and  a,$70
+    ld   l,a
+    ld   h,$00
+    ld   de,wDA22
+    add  hl,de
+    ldi  a,[hl]
+    ld   e,a
+    ld   d,[hl]
+    ret  
+
+call_00_2826:
+    call call_00_2835
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   l,a
+    ld   a,e
+    ldi  [hl],a
+    ld   [hl],d
+    ret  
+
+call_00_2835:
+    ld   a,[wDA00_CurrentObjectAddr]
+    rrca 
+    and  a,$70
+    ld   l,a
+    ld   h,$00
+    ld   de,wDA24
+    add  hl,de
+    ldi  a,[hl]
+    ld   e,a
+    ld   d,[hl]
+    ret  
 
 call_00_2846:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2846 $fa $00 $da
@@ -491,37 +600,77 @@ call_00_2857:
     ld   E, A                                          ;; 00:2865 $5f
     ld   D, [HL]                                       ;; 00:2866 $56
     ret                                                ;; 00:2867 $c9
-    db   $fa, $00, $da, $0f, $e6, $70, $6f, $26        ;; 00:2868 ????????
-    db   $00, $01, $1c, $da, $09, $7b, $22, $72        ;; 00:2870 ????????
-    db   $c9, $fa, $00, $da, $0f, $e6, $70, $6f        ;; 00:2878 ????????
-    db   $26, $00, $01, $1e, $da, $09, $7b, $22        ;; 00:2880 ????????
-    db   $72, $c9                                      ;; 00:2888 ??
 
-call_00_288a:
+call_00_2868:
+    ld   a,[wDA00_CurrentObjectAddr]
+    rrca 
+    and  a,$70
+    ld   l,a
+    ld   h,$00
+    ld   bc,wDA1C
+    add  hl,bc
+    ld   a,e
+    ldi  [hl],a
+    ld   [hl],d
+    ret  
+
+call_00_2879:
+    ld   a,[wDA00_CurrentObjectAddr]
+    rrca 
+    and  a,$70
+    ld   l,a
+    ld   h,$00
+    ld   bc,wDA1E
+    add  hl,bc
+    ld   a,e
+    ldi  [hl],a
+    ld   [hl],d
+    ret  
+
+call_00_288c_ObjectUnkAndSet14:
     ld   C, $00                                        ;; 00:288a $0e $00
 
-call_00_288c:
+call_00_288c_ObjectSet14:
     ld   H, $d8                                        ;; 00:288c $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:288e $fa $00 $da
     or   A, $14                                        ;; 00:2891 $f6 $14
     ld   L, A                                          ;; 00:2893 $6f
     ld   [HL], C                                       ;; 00:2894 $71
     ret                                                ;; 00:2895 $c9
-    db   $26, $d8, $fa, $00, $da, $f6, $15, $6f        ;; 00:2896 ????????
-    db   $71, $c9, $26, $d8, $fa, $00, $da, $f6        ;; 00:289e ????????
-    db   $15, $6f, $7e, $c9                            ;; 00:28a6 ????
 
-call_00_28aa:
+call_00_2896_ObjectSet15:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$15
+    ld   l,a
+    ld   [hl],c
+    ret  
+
+call_00_28a0_ObjectGet15:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$15
+    ld   l,a
+    ld   a,[hl]
+    ret  
+
+call_00_28aa_ObjectSet16:
     ld   H, $d8                                        ;; 00:28aa $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:28ac $fa $00 $da
     or   A, $16                                        ;; 00:28af $f6 $16
     ld   L, A                                          ;; 00:28b1 $6f
     ld   [HL], C                                       ;; 00:28b2 $71
     ret                                                ;; 00:28b3 $c9
-    db   $26, $d8, $fa, $00, $da, $f6, $16, $6f        ;; 00:28b4 ????????
-    db   $7e, $c9                                      ;; 00:28bc ??
 
-call_00_28be:
+call_00_28b4_ObjectGet16:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$16
+    ld   l,a
+    ld   a,[hl]
+    ret  
+
+call_00_28be_ObjectGet1B:
     ld   H, $d8                                        ;; 00:28be $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:28c0 $fa $00 $da
     or   A, $1b                                        ;; 00:28c3 $f6 $1b
@@ -529,7 +678,7 @@ call_00_28be:
     ld   A, [HL]                                       ;; 00:28c6 $7e
     ret                                                ;; 00:28c7 $c9
 
-call_00_28c8:
+call_00_28c8_ObjectSet1B:
     ld   H, $d8                                        ;; 00:28c8 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:28ca $fa $00 $da
     or   A, $1b                                        ;; 00:28cd $f6 $1b
@@ -537,7 +686,7 @@ call_00_28c8:
     ld   [HL], C                                       ;; 00:28d0 $71
     ret                                                ;; 00:28d1 $c9
 
-call_00_28d2:
+call_00_28d2_ObjectGet1D:
     ld   H, $d8                                        ;; 00:28d2 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:28d4 $fa $00 $da
     or   A, $1d                                        ;; 00:28d7 $f6 $1d
@@ -545,30 +694,63 @@ call_00_28d2:
     ld   A, [HL]                                       ;; 00:28da $7e
     ret                                                ;; 00:28db $c9
 
-call_00_28dc:
+call_00_28dc_ObjectSet1D:
     ld   H, $d8                                        ;; 00:28dc $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:28de $fa $00 $da
     or   A, $1d                                        ;; 00:28e1 $f6 $1d
     ld   L, A                                          ;; 00:28e3 $6f
     ld   [HL], C                                       ;; 00:28e4 $71
     ret                                                ;; 00:28e5 $c9
-    db   $26, $d8, $fa, $00, $da, $f6, $1b, $6f        ;; 00:28e6 ????????
-    db   $7e, $a7, $c9, $26, $d8, $fa, $00, $da        ;; 00:28ee ????????
-    db   $f6, $1d, $6f, $7e, $a7, $c9, $26, $d8        ;; 00:28f6 ????????
-    db   $fa, $00, $da, $f6, $19, $6f, $7e, $34        ;; 00:28fe ????????
-    db   $e6, $03, $6f, $26, $00, $19, $4e             ;; 00:2906 ???????
 
-call_00_290d:
+call_00_28e6_ObjectCheckIf1BIsZero:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$1B
+    ld   l,a
+    ld   a,[hl]
+    and  a
+    ret  
+
+call_00_28f1_ObjectCheckIf1DIsZero:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$1D
+    ld   l,a
+    ld   a,[hl]
+    and  a
+    ret  
+
+call_00_28fc_ObjectUpdate19:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$19
+    ld   l,a
+    ld   a,[hl]
+    inc  [hl]
+    and  a,$03
+    ld   l,a
+    ld   h,$00
+    add  hl,de
+    ld   c,[hl]
+
+call_00_290d_ObjectSetTimer1A:
     ld   H, $d8                                        ;; 00:290d $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:290f $fa $00 $da
     or   A, $1a                                        ;; 00:2912 $f6 $1a
     ld   L, A                                          ;; 00:2914 $6f
     ld   [HL], C                                       ;; 00:2915 $71
     ret                                                ;; 00:2916 $c9
-    db   $26, $d8, $fa, $00, $da, $f6, $1a, $6f        ;; 00:2917 ????????
-    db   $7e, $a7, $c9                                 ;; 00:291f ???
 
-call_00_2922:
+call_00_2917_ObjectCheckIfTimer1AIsZero:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$1A
+    ld   l,a
+    ld   a,[hl]
+    and  a
+    ret  
+
+call_00_2922_ObjectTimer1ACountdown:
     ld   H, $d8                                        ;; 00:2922 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2924 $fa $00 $da
     or   A, $1a                                        ;; 00:2927 $f6 $1a
@@ -580,17 +762,23 @@ call_00_2922:
     ld   A, [HL]                                       ;; 00:292e $7e
     ret                                                ;; 00:292f $c9
 
-call_00_2930:
+call_00_2930_ObjectSetId:
     ld   H, $d8                                        ;; 00:2930 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2932 $fa $00 $da
     or   A, $00                                        ;; 00:2935 $f6 $00
     ld   L, A                                          ;; 00:2937 $6f
     ld   [HL], C                                       ;; 00:2938 $71
     ret                                                ;; 00:2939 $c9
-    db   $26, $d8, $fa, $00, $da, $f6, $00, $6f        ;; 00:293a ????????
-    db   $7e, $c9                                      ;; 00:2942 ??
 
-call_00_2944:
+call_00_293a_ObjectGetId:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$00
+    ld   l,a
+    ld   a,[hl]
+    ret  
+
+call_00_2944_ObjectSet12:
     ld   H, $d8                                        ;; 00:2944 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2946 $fa $00 $da
     or   A, $12                                        ;; 00:2949 $f6 $12
@@ -598,7 +786,7 @@ call_00_2944:
     ld   [HL], C                                       ;; 00:294c $71
     ret                                                ;; 00:294d $c9
 
-call_00_294e:
+call_00_294e_ObjectSet13:
     ld   H, $d8                                        ;; 00:294e $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2950 $fa $00 $da
     or   A, $13                                        ;; 00:2953 $f6 $13
@@ -606,7 +794,7 @@ call_00_294e:
     ld   [HL], C                                       ;; 00:2956 $71
     ret                                                ;; 00:2957 $c9
 
-call_00_2958:
+call_00_2958_ObjectSetFacingDirection:
     ld   H, $d8                                        ;; 00:2958 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:295a $fa $00 $da
     or   A, $0d                                        ;; 00:295d $f6 $0d
@@ -614,17 +802,23 @@ call_00_2958:
     ld   [HL], C                                       ;; 00:2960 $71
     ret                                                ;; 00:2961 $c9
 
-call_00_2962:
+call_00_2962_ObjectGetActionId:
     ld   H, $d8                                        ;; 00:2962 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2964 $fa $00 $da
     or   A, $01                                        ;; 00:2967 $f6 $01
     ld   L, A                                          ;; 00:2969 $6f
     ld   A, [HL]                                       ;; 00:296a $7e
     ret                                                ;; 00:296b $c9
-    db   $26, $d8, $fa, $00, $da, $f6, $09, $6f        ;; 00:296c ????????
-    db   $7e, $c9                                      ;; 00:2974 ??
 
-call_00_2976:
+call_00_296c_ObjectGet9:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$09
+    ld   l,a
+    ld   a,[hl]
+    ret  
+
+call_00_2976_ObjectGetFacingDirection:
     ld   H, $d8                                        ;; 00:2976 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2978 $fa $00 $da
     or   A, $0d                                        ;; 00:297b $f6 $0d
@@ -632,7 +826,7 @@ call_00_2976:
     ld   A, [HL]                                       ;; 00:297e $7e
     ret                                                ;; 00:297f $c9
 
-call_00_2980:
+call_00_2980_ObjectSet19:
     ld   H, $d8                                        ;; 00:2980 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2982 $fa $00 $da
     or   A, $19                                        ;; 00:2985 $f6 $19
@@ -640,7 +834,7 @@ call_00_2980:
     ld   [HL], C                                       ;; 00:2988 $71
     ret                                                ;; 00:2989 $c9
 
-call_00_298a:
+call_00_298a_ObjectGet19:
     ld   H, $d8                                        ;; 00:298a $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:298c $fa $00 $da
     or   A, $19                                        ;; 00:298f $f6 $19
@@ -648,10 +842,16 @@ call_00_298a:
     ld   A, [HL]                                       ;; 00:2992 $7e
     and  A, A                                          ;; 00:2993 $a7
     ret                                                ;; 00:2994 $c9
-    db   $26, $d8, $fa, $00, $da, $f6, $01, $6f        ;; 00:2995 ????????
-    db   $7e, $c9                                      ;; 00:299d ??
 
-call_00_299f:
+call_00_2995_ObjectGetActionId:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$01
+    ld   l,a
+    ld   a,[hl]
+    ret  
+
+call_00_299f_ObjectFlipFacingDirection:
     ld   H, $d8                                        ;; 00:299f $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:29a1 $fa $00 $da
     or   A, $0d                                        ;; 00:29a4 $f6 $0d
@@ -660,11 +860,34 @@ call_00_299f:
     xor  A, $20                                        ;; 00:29a8 $ee $20
     ld   [HL], A                                       ;; 00:29aa $77
     ret                                                ;; 00:29ab $c9
-    db   $cd, $68, $2a, $cd, $76, $29, $21, $12        ;; 00:29ac ????????
-    db   $da, $be, $c9, $26, $d8, $2e, $40, $7e        ;; 00:29b4 ????????
-    db   $b9, $28, $09, $7d, $c6, $20, $6f, $20        ;; 00:29bc ????????
-    db   $f6, $0e, $ff, $c9, $7d, $f6, $01, $6f        ;; 00:29c4 ????????
-    db   $4e, $c9                                      ;; 00:29cc ??
+
+call_00_29ac:
+    call call_00_2a68
+    call call_00_2976_ObjectGetFacingDirection
+    ld   hl,wDA12
+    cp   [hl]
+    ret  
+
+call_00_29b7:
+    ld   h,$D8
+    ld   l,$40
+label29BB:
+    ld   a,[hl]
+    cp   c
+    jr   z,call_00_29C8
+    ld   a,l
+    add  a,$20
+    ld   l,a
+    jr   nz,label29BB
+    ld   c,$FF
+    ret  
+
+call_00_29C8:
+    ld   a,l
+    or   a,$01
+    ld   l,a
+    ld   c,[hl]
+    ret  
 
 call_00_29ce:
     ld   H, $d8                                        ;; 00:29ce $26 $d8
@@ -779,11 +1002,11 @@ call_00_2a68:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2a6c $fa $00 $da
     or   A, $0e                                        ;; 00:2a6f $f6 $0e
     ld   L, A                                          ;; 00:2a71 $6f
-    ld   A, [wD80E]                                    ;; 00:2a72 $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2a72 $fa $0e $d8
     sub  A, [HL]                                       ;; 00:2a75 $96
     ld   E, A                                          ;; 00:2a76 $5f
     inc  HL                                            ;; 00:2a77 $23
-    ld   A, [wD80F]                                    ;; 00:2a78 $fa $0f $d8
+    ld   A, [wD80F_PlayerXPosition]                                    ;; 00:2a78 $fa $0f $d8
     sbc  A, [HL]                                       ;; 00:2a7b $9e
     ld   D, A                                          ;; 00:2a7c $57
     jr   NC, .jr_00_2a88                               ;; 00:2a7d $30 $09
@@ -968,17 +1191,17 @@ jp_00_2bbe:
     bit  6, A                                          ;; 00:2bc5 $cb $77
     jr   Z, jp_00_2b7a                                 ;; 00:2bc7 $28 $b1
     ld   C, $02                                        ;; 00:2bc9 $0e $02
-    call call_00_2930                                  ;; 00:2bcb $cd $30 $29
+    call call_00_2930_ObjectSetId                                  ;; 00:2bcb $cd $30 $29
     ld   C, $08                                        ;; 00:2bce $0e $08
-    call call_00_288c                                  ;; 00:2bd0 $cd $8c $28
+    call call_00_288c_ObjectSet14                                  ;; 00:2bd0 $cd $8c $28
     ld   C, $12                                        ;; 00:2bd3 $0e $12
-    call call_00_2944                                  ;; 00:2bd5 $cd $44 $29
+    call call_00_2944_ObjectSet12                                  ;; 00:2bd5 $cd $44 $29
     ld   C, $12                                        ;; 00:2bd8 $0e $12
-    call call_00_294e                                  ;; 00:2bda $cd $4e $29
+    call call_00_294e_ObjectSet13                                  ;; 00:2bda $cd $4e $29
     ld   C, $00                                        ;; 00:2bdd $0e $00
-    call call_00_2958                                  ;; 00:2bdf $cd $58 $29
+    call call_00_2958_ObjectSetFacingDirection                                  ;; 00:2bdf $cd $58 $29
     ld   C, $01                                        ;; 00:2be2 $0e $01
-    call call_00_28aa                                  ;; 00:2be4 $cd $aa $28
+    call call_00_28aa_ObjectSet16                                  ;; 00:2be4 $cd $aa $28
     ld   C, $00                                        ;; 00:2be7 $0e $00
     call call_00_2299                                  ;; 00:2be9 $cd $99 $22
     call call_00_2ba9                                  ;; 00:2bec $cd $a9 $2b
@@ -995,9 +1218,19 @@ call_00_2c09:
     add  A, $06                                        ;; 00:2c09 $c6 $06
     ld   C, A                                          ;; 00:2c0b $4f
     jp   call_00_3792                                  ;; 00:2c0c $c3 $92 $37
-    db   $fa, $00, $da, $07, $07, $07, $e6, $07        ;; 00:2c0f ????????
-    db   $6f, $26, $00, $11, $ae, $da, $19, $71        ;; 00:2c17 ????????
-    db   $c9                                           ;; 00:2c1f ?
+
+call_00_2c0f:
+    ld   a,[wDA00_CurrentObjectAddr]
+    rlca 
+    rlca 
+    rlca 
+    and  a,$07
+    ld   l,a
+    ld   h,$00
+    ld   de,wDAAE_ObjectPaletteIds
+    add  hl,de
+    ld   [hl],c
+    ret  
 
 call_00_2c20:
     push HL                                            ;; 00:2c20 $e5
@@ -1008,7 +1241,7 @@ call_00_2c20:
     and  A, $07                                        ;; 00:2c27 $e6 $07
     ld   L, A                                          ;; 00:2c29 $6f
     ld   H, $00                                        ;; 00:2c2a $26 $00
-    ld   DE, wDAAE                                     ;; 00:2c2c $11 $ae $da
+    ld   DE, wDAAE_ObjectPaletteIds                                     ;; 00:2c2c $11 $ae $da
     add  HL, DE                                        ;; 00:2c2f $19
     ld   L, [HL]                                       ;; 00:2c30 $6e
     ld   H, $00                                        ;; 00:2c31 $26 $00
@@ -1022,12 +1255,14 @@ call_00_2c20:
     pop  HL                                            ;; 00:2c3c $e1
     ld   BC, $08                                       ;; 00:2c3d $01 $08 $00
     jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:2c40 $c3 $6e $07
-    db   $c4, $dd, $d7, $dd, $ea, $dd, $fd, $dd        ;; 00:2c43 ????????
-    db   $10, $de, $23, $de                            ;; 00:2c4b ????
-    dw   $de36                                         ;; 00:2c4f pP
-    dw   $de49                                         ;; 00:2c51 pP
 
-call_00_2c53:
+data_00_2c43_ParticleBufferPointerTable:
+    dw   wDDC4_ParticleSlot1Buffer, wDDD7_ParticleSlot2Buffer
+    dw   wDDEA_ParticleSlot3Buffer, wDDFD_ParticleSlot4Buffer        ;; 00:2c43 ????????
+    dw   wDE10_ParticleSlot5Buffer, wDE23_ParticleSlot6Buffer
+    dw   wDE36_ParticleSlot7Buffer, wDE49_ParticleSlot8Buffer                                         ;; 00:2c51 pP
+
+call_00_2c53_ParticleSlot_GetBufferPtr:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2c53 $fa $00 $da
     rlca                                               ;; 00:2c56 $07
     rlca                                               ;; 00:2c57 $07
@@ -1036,27 +1271,28 @@ call_00_2c53:
     ld   L, A                                          ;; 00:2c5b $6f
     ld   H, $00                                        ;; 00:2c5c $26 $00
     add  HL, HL                                        ;; 00:2c5e $29
-    ld   DE, $2c43                                     ;; 00:2c5f $11 $43 $2c
+    ld   DE, data_00_2c43_ParticleBufferPointerTable                                     ;; 00:2c5f $11 $43 $2c
     add  HL, DE                                        ;; 00:2c62 $19
     ld   E, [HL]                                       ;; 00:2c63 $5e
     inc  HL                                            ;; 00:2c64 $23
     ld   D, [HL]                                       ;; 00:2c65 $56
     ret                                                ;; 00:2c66 $c9
 
-call_00_2c67:
-    call call_00_2c53                                  ;; 00:2c67 $cd $53 $2c
+call_00_2c67_Particle_InitBurst:
+    call call_00_2c53_ParticleSlot_GetBufferPtr                                  ;; 00:2c67 $cd $53 $2c
     ld   A, $40                                        ;; 00:2c6a $3e $40
     ld   [DE], A                                       ;; 00:2c6c $12
     inc  DE                                            ;; 00:2c6d $13
-    ld   HL, $2c77                                     ;; 00:2c6e $21 $77 $2c
+    ld   HL, .data_00_2c77_Particle_DefaultBurstTemplate                                     ;; 00:2c6e $21 $77 $2c
     ld   BC, $12                                       ;; 00:2c71 $01 $12 $00
     jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:2c74 $c3 $6e $07
+.data_00_2c77_Particle_DefaultBurstTemplate:
     db   $0b, $00, $00, $f5, $00, $00, $10, $00        ;; 00:2c77 ........
     db   $00, $00, $00, $00, $0b, $00, $00, $0b        ;; 00:2c7f ........
     db   $00, $00                                      ;; 00:2c87 ..
 
-call_00_2c89:
-    call call_00_2c53                                  ;; 00:2c89 $cd $53 $2c
+call_00_2c89_Particle_UpdateBurst:
+    call call_00_2c53_ParticleSlot_GetBufferPtr                                  ;; 00:2c89 $cd $53 $2c
     ld   L, E                                          ;; 00:2c8c $6b
     ld   H, D                                          ;; 00:2c8d $62
     ld   A, [HL]                                       ;; 00:2c8e $7e

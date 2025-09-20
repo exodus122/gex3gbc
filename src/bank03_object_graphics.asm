@@ -394,7 +394,7 @@ call_03_5fc2_ObjectSpriteSetup:
     and  A, $07                                        ;; 03:5fc8 $e6 $07
     ld   L, A                                          ;; 03:5fca $6f
     ld   H, $00                                        ;; 03:5fcb $26 $00
-    ld   DE, wDAAE                                     ;; 03:5fcd $11 $ae $da
+    ld   DE, wDAAE_ObjectPaletteIds                                     ;; 03:5fcd $11 $ae $da
     add  HL, DE                                        ;; 03:5fd0 $19
     ld   E, [HL]                                       ;; 03:5fd1 $5e
     ld   H, $d8                                        ;; 03:5fd2 $26 $d8
@@ -578,7 +578,7 @@ call_03_5fc2_ObjectSpriteSetup:
     ld   [wDC6F], A                                    ;; 03:60e2 $ea $6f $dc
     ret                                                ;; 03:60e5 $c9
 .jp_03_60e6:
-    call call_00_2c53                                  ;; 03:60e6 $cd $53 $2c
+    call call_00_2c53_ParticleSlot_GetBufferPtr                                  ;; 03:60e6 $cd $53 $2c
     ld   L, E                                          ;; 03:60e9 $6b
     ld   H, D                                          ;; 03:60ea $62
     ld   A, [HL+]                                      ;; 03:60eb $2a

@@ -7,7 +7,7 @@ wC400: ; C400-CC00 is a copy of 03:4100-03:48FF but in a different order
 ; that is the collision tileset data, collectible sprites, and number sprites, and some code
     ds 1408                                            ;; c400
 
-wC980: ; this is a probably the start of the number sprites from bank 3
+wC980_NumbersSprites: ; this is the start of the number sprites from bank 3
     ds 896                                             ;; c980
 
 wCD00_RowOffsetTableForMap:
@@ -47,13 +47,13 @@ wD579:
     ds 647                                             ;; d579
 
 ; From D800 to D900 is the loaded objects space
-wD800:
+wD800_PlayerObject_Id:
     ds 1                                               ;; d800
 
-wD801:
+wD801_PlayerObject_ActionId:
     ds 1                                               ;; d801
 
-wD802:
+wD802_PlayerObject_ActionFunc:
     ds 3                                               ;; d802
 
 wD805:
@@ -65,19 +65,19 @@ wD809:
 wD80A:
     ds 3                                               ;; d80a
 
-wD80D:
+wD80D_PlayerFacingDirection:
     ds 1                                               ;; d80d
 
-wD80E:
+wD80E_PlayerXPosition:
     ds 1                                               ;; d80e
 
-wD80F:
+wD80F_PlayerXPosition:
     ds 1                                               ;; d80f
 
-wD810:
+wD810_PlayerYPosition:
     ds 1                                               ;; d810
 
-wD811:
+wD811_PlayerYPosition:
     ds 15                                              ;; d811
 
 wD820:
@@ -85,6 +85,8 @@ wD820:
 
 wD840:
     ds 192                                             ;; d840
+
+; End of Loaded Objects space
 
 wD900:
     ds 1                                               ;; d900
@@ -156,7 +158,10 @@ wDA1E:
     ds 2                                               ;; da1e
 
 wDA20:
-    ds 4                                               ;; da20
+    ds 2                                               ;; da20
+
+wDA22:
+    ds 2                                               ;; da22
 
 wDA24:
     ds 2                                               ;; da24
@@ -173,7 +178,7 @@ wDAAC:
 wDAAD:
     ds 1                                               ;; daad
 
-wDAAE:
+wDAAE_ObjectPaletteIds:
     ds 8                                               ;; daae
 
 wDAB6:
@@ -572,19 +577,19 @@ wDBF8:
 wDBF9_XPositionInMap:
     ds 1                                               ;; dbf9
 
-wDBFA:
+wDBFA_XPositionInMap:
     ds 1                                               ;; dbfa
 
 wDBFB_YPositionInMap:
     ds 1                                               ;; dbfb
 
-wDBFC:
+wDBFC_YPositionInMap:
     ds 1                                               ;; dbfc
 
-wDBFD:
+wDBFD_XPositionRelated:
     ds 2                                               ;; dbfd
 
-wDBFF:
+wDBFF_YPositionRelated:
     ds 2                                               ;; dbff
 
 wDC01_MapBank:
@@ -1092,7 +1097,24 @@ wDD6A:
     ds 1                                               ;; dd6a
 
 wDD6B:
-    ds 241                                             ;; dd6b
+    ds 89                                             ;; dd6b
+
+wDDC4_ParticleSlot1Buffer:
+    ds 19
+wDDD7_ParticleSlot2Buffer:
+    ds 19
+wDDEA_ParticleSlot3Buffer:
+    ds 19
+wDDFD_ParticleSlot4Buffer:
+    ds 19
+wDE10_ParticleSlot5Buffer:
+    ds 19
+wDE23_ParticleSlot6Buffer:
+    ds 19
+wDE36_ParticleSlot7Buffer:
+    ds 19
+wDE49_ParticleSlot8Buffer:
+    ds 19
 
 wDE5C:
     ds 1                                               ;; de5c

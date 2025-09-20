@@ -51,24 +51,24 @@ call_03_4708_ProcessSidescrollCollision:
     ld   E, A                                          ;; 03:473c $5f
     bit  7, E                                          ;; 03:473d $cb $7b
     jr   Z, .jr_03_474b                                ;; 03:473f $28 $0a
-    ld   A, [wD80E]                                    ;; 03:4741 $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 03:4741 $fa $0e $d8
     and  A, $07                                        ;; 03:4744 $e6 $07
     add  A, E                                          ;; 03:4746 $83
     ld   C, $ff                                        ;; 03:4747 $0e $ff
     jr   .jr_03_4753                                   ;; 03:4749 $18 $08
 .jr_03_474b:
-    ld   A, [wD80E]                                    ;; 03:474b $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 03:474b $fa $0e $d8
     and  A, $07                                        ;; 03:474e $e6 $07
     add  A, E                                          ;; 03:4750 $83
     ld   C, $01                                        ;; 03:4751 $0e $01
 .jr_03_4753:
     push DE                                            ;; 03:4753 $d5
     ld   A, E                                          ;; 03:4754 $7b
-    ld   HL, wD80E                                     ;; 03:4755 $21 $0e $d8
+    ld   HL, wD80E_PlayerXPosition                                     ;; 03:4755 $21 $0e $d8
     add  A, [HL]                                       ;; 03:4758 $86
     add  A, C                                          ;; 03:4759 $81
     ld   C, A                                          ;; 03:475a $4f
-    ld   A, [wD810]                                    ;; 03:475b $fa $10 $d8
+    ld   A, [wD810_PlayerYPosition]                                    ;; 03:475b $fa $10 $d8
     sub  A, $09                                        ;; 03:475e $d6 $09
     ld   HL, wDC8B                                     ;; 03:4760 $21 $8b $dc
     and  A, $f8                                        ;; 03:4763 $e6 $f8
@@ -103,7 +103,7 @@ call_03_4708_ProcessSidescrollCollision:
     pop  DE                                            ;; 03:4789 $d1
     bit  0, C                                          ;; 03:478a $cb $41
     jr   Z, .jr_03_47b0                                ;; 03:478c $28 $22
-    ld   HL, wD80E                                     ;; 03:478e $21 $0e $d8
+    ld   HL, wD80E_PlayerXPosition                                     ;; 03:478e $21 $0e $d8
     bit  7, E                                          ;; 03:4791 $cb $7b
     jr   NZ, .jr_03_479c                               ;; 03:4793 $20 $07
     ld   A, $07                                        ;; 03:4795 $3e $07
@@ -184,14 +184,14 @@ call_03_4708_ProcessSidescrollCollision:
     bit  7, A                                          ;; 03:4806 $cb $7f
     jr   Z, .jr_03_4876                                ;; 03:4808 $28 $6c
 .jr_03_480a:
-    ld   A, [wD801]                                    ;; 03:480a $fa $01 $d8
+    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 03:480a $fa $01 $d8
     cp   A, $1b                                        ;; 03:480d $fe $1b
     ld   A, $04                                        ;; 03:480f $3e $04
     jr   Z, .jr_03_486e                                ;; 03:4811 $28 $5b
     ld   B, $00                                        ;; 03:4813 $06 $00
     call call_03_4b37                                  ;; 03:4815 $cd $37 $4b
     ld   C, A                                          ;; 03:4818 $4f
-    ld   A, [wD810]                                    ;; 03:4819 $fa $10 $d8
+    ld   A, [wD810_PlayerYPosition]                                    ;; 03:4819 $fa $10 $d8
     add  A, $10                                        ;; 03:481c $c6 $10
     add  A, B                                          ;; 03:481e $80
     ld   B, A                                          ;; 03:481f $47
@@ -200,7 +200,7 @@ call_03_4708_ProcessSidescrollCollision:
     ld   H, $30                                        ;; 03:4823 $26 $30
     add  HL, HL                                        ;; 03:4825 $29
     add  HL, HL                                        ;; 03:4826 $29
-    ld   A, [wD80E]                                    ;; 03:4827 $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 03:4827 $fa $0e $d8
     add  A, C                                          ;; 03:482a $81
     ld   C, A                                          ;; 03:482b $4f
     rrca                                               ;; 03:482c $0f
@@ -264,14 +264,14 @@ call_03_4708_ProcessSidescrollCollision:
     and  A, $0f                                        ;; 03:487f $e6 $0f
     add  A, $11                                        ;; 03:4881 $c6 $11
     ld   B, A                                          ;; 03:4883 $47
-    ld   A, [wD810]                                    ;; 03:4884 $fa $10 $d8
+    ld   A, [wD810_PlayerYPosition]                                    ;; 03:4884 $fa $10 $d8
     sub  A, B                                          ;; 03:4887 $90
     and  A, $f8                                        ;; 03:4888 $e6 $f8
     ld   L, A                                          ;; 03:488a $6f
     ld   H, $30                                        ;; 03:488b $26 $30
     add  HL, HL                                        ;; 03:488d $29
     add  HL, HL                                        ;; 03:488e $29
-    ld   A, [wD80E]                                    ;; 03:488f $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 03:488f $fa $0e $d8
     add  A, C                                          ;; 03:4892 $81
     rrca                                               ;; 03:4893 $0f
     rrca                                               ;; 03:4894 $0f
@@ -490,7 +490,7 @@ call_03_4a3f:
     ld   [HL], $00                                     ;; 03:4a43 $36 $00
     ld   [wDABD], A                                    ;; 03:4a45 $ea $bd $da
     set  7, [HL]                                       ;; 03:4a48 $cb $fe
-    ld   A, [wD801]                                    ;; 03:4a4a $fa $01 $d8
+    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 03:4a4a $fa $01 $d8
     ld   L, $03                                        ;; 03:4a4d $2e $03
     cp   A, $1f                                        ;; 03:4a4f $fe $1f
     jr   Z, .jr_03_4a61                                ;; 03:4a51 $28 $0e
@@ -602,7 +602,7 @@ call_03_4ae4:
 
 call_03_4b37:
     ld   A, [wDC86]                                    ;; 03:4b37 $fa $86 $dc
-    ld   HL, wD80D                                     ;; 03:4b3a $21 $0d $d8
+    ld   HL, wD80D_PlayerFacingDirection                                     ;; 03:4b3a $21 $0d $d8
     bit  5, [HL]                                       ;; 03:4b3d $cb $6e
     jr   Z, .jr_03_4b43                                ;; 03:4b3f $28 $02
     cpl                                                ;; 03:4b41 $2f
@@ -615,7 +615,7 @@ call_03_4b37:
     ret                                                ;; 03:4b4b $c9
 
 call_03_4b4c:
-    ld   A, [wD810]                                    ;; 03:4b4c $fa $10 $d8
+    ld   A, [wD810_PlayerYPosition]                                    ;; 03:4b4c $fa $10 $d8
     add  A, $0f                                        ;; 03:4b4f $c6 $0f
     add  A, B                                          ;; 03:4b51 $80
     ld   B, A                                          ;; 03:4b52 $47
@@ -624,7 +624,7 @@ call_03_4b4c:
     ld   H, $30                                        ;; 03:4b56 $26 $30
     add  HL, HL                                        ;; 03:4b58 $29
     add  HL, HL                                        ;; 03:4b59 $29
-    ld   A, [wD80E]                                    ;; 03:4b5a $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 03:4b5a $fa $0e $d8
     add  A, C                                          ;; 03:4b5d $81
     ld   C, A                                          ;; 03:4b5e $4f
     rrca                                               ;; 03:4b5f $0f
@@ -651,7 +651,7 @@ call_03_4b4c:
     db   $80, $40, $20, $10, $08, $04, $02, $01        ;; 03:4b7a ????????
 
 call_03_4b82:
-    ld   a,[wD810]
+    ld   a,[wD810_PlayerYPosition]
     add  b
     ld   b,a
     and  a,$F8
@@ -659,7 +659,7 @@ call_03_4b82:
     ld   h,$30
     add  hl,hl
     add  hl,hl
-    ld   a,[wD80E]
+    ld   a,[wD80E_PlayerXPosition]
     add  c
     ld   c,a
     rrca 
@@ -687,14 +687,14 @@ call_03_4b82:
 
 entry_03_4bb6:
 call_03_4bb6:
-    ld   A, [wD810]                                    ;; 03:4bb6 $fa $10 $d8
+    ld   A, [wD810_PlayerYPosition]                                    ;; 03:4bb6 $fa $10 $d8
     sub  A, $10                                        ;; 03:4bb9 $d6 $10
     and  A, $f8                                        ;; 03:4bbb $e6 $f8
     ld   L, A                                          ;; 03:4bbd $6f
     ld   H, $30                                        ;; 03:4bbe $26 $30
     add  HL, HL                                        ;; 03:4bc0 $29
     add  HL, HL                                        ;; 03:4bc1 $29
-    ld   A, [wD80E]                                    ;; 03:4bc2 $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 03:4bc2 $fa $0e $d8
     rrca                                               ;; 03:4bc5 $0f
     rrca                                               ;; 03:4bc6 $0f
     rrca                                               ;; 03:4bc7 $0f
@@ -718,19 +718,19 @@ call_03_4bb6:
     ld   A, [HL]                                       ;; 03:4be7 $7e
     ld   [wDC95], A                                    ;; 03:4be8 $ea $95 $dc
     ld   C, $09                                        ;; 03:4beb $0e $09
-    ld   A, [wD80D]                                    ;; 03:4bed $fa $0d $d8
+    ld   A, [wD80D_PlayerFacingDirection]                                    ;; 03:4bed $fa $0d $d8
     cp   A, $00                                        ;; 03:4bf0 $fe $00
     jr   Z, .jr_03_4bf6                                ;; 03:4bf2 $28 $02
     ld   C, $f7                                        ;; 03:4bf4 $0e $f7
 .jr_03_4bf6:
-    ld   A, [wD810]                                    ;; 03:4bf6 $fa $10 $d8
+    ld   A, [wD810_PlayerYPosition]                                    ;; 03:4bf6 $fa $10 $d8
     sub  A, $08                                        ;; 03:4bf9 $d6 $08
     and  A, $f8                                        ;; 03:4bfb $e6 $f8
     ld   L, A                                          ;; 03:4bfd $6f
     ld   H, $30                                        ;; 03:4bfe $26 $30
     add  HL, HL                                        ;; 03:4c00 $29
     add  HL, HL                                        ;; 03:4c01 $29
-    ld   A, [wD80E]                                    ;; 03:4c02 $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 03:4c02 $fa $0e $d8
     add  A, C                                          ;; 03:4c05 $81
     rrca                                               ;; 03:4c06 $0f
     rrca                                               ;; 03:4c07 $0f
@@ -743,14 +743,14 @@ call_03_4bb6:
     ret                                                ;; 03:4c11 $c9
 
 call_03_4c12:
-    ld   A, [wD810]                                    ;; 03:4c12 $fa $10 $d8
+    ld   A, [wD810_PlayerYPosition]                                    ;; 03:4c12 $fa $10 $d8
     add  A, B                                          ;; 03:4c15 $80
     and  A, $f8                                        ;; 03:4c16 $e6 $f8
     ld   L, A                                          ;; 03:4c18 $6f
     ld   H, $30                                        ;; 03:4c19 $26 $30
     add  HL, HL                                        ;; 03:4c1b $29
     add  HL, HL                                        ;; 03:4c1c $29
-    ld   A, [wD80E]                                    ;; 03:4c1d $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 03:4c1d $fa $0e $d8
     add  A, C                                          ;; 03:4c20 $81
     rrca                                               ;; 03:4c21 $0f
     rrca                                               ;; 03:4c22 $0f

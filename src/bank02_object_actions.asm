@@ -8,11 +8,11 @@ data_02_583c:
     jr   Z, .jr_02_5850                                ;; 02:583f $28 $0f
     ld   HL, .data_02_5857                             ;; 02:5841 $21 $57 $58
     call call_00_2c20                                  ;; 02:5844 $cd $20 $2c
-    call call_00_288a                                  ;; 02:5847 $cd $8a $28
+    call call_00_288c_ObjectUnkAndSet14                                  ;; 02:5847 $cd $8a $28
     call call_00_2b8b                                  ;; 02:584a $cd $8b $2b
-    call call_00_2c67                                  ;; 02:584d $cd $67 $2c
+    call call_00_2c67_Particle_InitBurst                                  ;; 02:584d $cd $67 $2c
 .jr_02_5850:
-    call call_00_2c89                                  ;; 02:5850 $cd $89 $2c
+    call call_00_2c89_Particle_UpdateBurst                                  ;; 02:5850 $cd $89 $2c
     jp   Z, jp_00_2bbe                                 ;; 02:5853 $ca $be $2b
     ret                                                ;; 02:5856 $c9
 .data_02_5857:
@@ -165,7 +165,7 @@ jr_02_5a83:
     cp   A, [HL]                                       ;; 02:5ab7 $be
     jr   NC, .jr_02_5aca                               ;; 02:5ab8 $30 $10
 .jr_02_5aba:
-    call call_00_2962                                  ;; 02:5aba $cd $62 $29
+    call call_00_2962_ObjectGetActionId                                  ;; 02:5aba $cd $62 $29
     cp   A, $00                                        ;; 02:5abd $fe $00
     ret  Z                                             ;; 02:5abf $c8
     ld   C, $00                                        ;; 02:5ac0 $0e $00
@@ -173,7 +173,7 @@ jr_02_5a83:
     ld   A, $00                                        ;; 02:5ac5 $3e $00
     jp   call_02_72ac                                  ;; 02:5ac7 $c3 $ac $72
 .jr_02_5aca:
-    call call_00_2962                                  ;; 02:5aca $cd $62 $29
+    call call_00_2962_ObjectGetActionId                                  ;; 02:5aca $cd $62 $29
     cp   A, $01                                        ;; 02:5acd $fe $01
     ret  Z                                             ;; 02:5acf $c8
     ld   C, $01                                        ;; 02:5ad0 $0e $01
@@ -226,7 +226,7 @@ jr_02_5af8:
     cp   A, [HL]                                       ;; 02:5b2c $be
     jr   NC, .jr_02_5b6e                               ;; 02:5b2d $30 $3f
 .jr_02_5b2f:
-    call call_00_2962                                  ;; 02:5b2f $cd $62 $29
+    call call_00_2962_ObjectGetActionId                                  ;; 02:5b2f $cd $62 $29
     cp   A, $03                                        ;; 02:5b32 $fe $03
     jr   Z, .jr_02_5b40                                ;; 02:5b34 $28 $0a
     ld   C, $03                                        ;; 02:5b36 $0e $03
@@ -260,7 +260,7 @@ jr_02_5af8:
     ld   HL, .data_02_5b92                             ;; 02:5b68 $21 $92 $5b
     jp   call_00_2c20                                  ;; 02:5b6b $c3 $20 $2c
 .jr_02_5b6e:
-    call call_00_2962                                  ;; 02:5b6e $cd $62 $29
+    call call_00_2962_ObjectGetActionId                                  ;; 02:5b6e $cd $62 $29
     cp   A, $01                                        ;; 02:5b71 $fe $01
     ret  Z                                             ;; 02:5b73 $c8
     ld   C, $01                                        ;; 02:5b74 $0e $01
@@ -279,12 +279,12 @@ data_02_5b9a:
     call call_00_29f5                                  ;; 02:5b9a $cd $f5 $29
     jr   Z, .jr_02_5ba9                                ;; 02:5b9d $28 $0a
     ld   C, $30                                        ;; 02:5b9f $0e $30
-    call call_00_28dc                                  ;; 02:5ba1 $cd $dc $28
+    call call_00_28dc_ObjectSet1D                                  ;; 02:5ba1 $cd $dc $28
     ld   C, $3c                                        ;; 02:5ba4 $0e $3c
-    call call_00_290d                                  ;; 02:5ba6 $cd $0d $29
+    call call_00_290d_ObjectSetTimer1A                                  ;; 02:5ba6 $cd $0d $29
 .jr_02_5ba9:
     call call_00_244a                                  ;; 02:5ba9 $cd $4a $24
-    call call_00_2922                                  ;; 02:5bac $cd $22 $29
+    call call_00_2922_ObjectTimer1ACountdown                                  ;; 02:5bac $cd $22 $29
     jp   Z, call_00_2b80                               ;; 02:5baf $ca $80 $2b
     ret                                                ;; 02:5bb2 $c9
 
@@ -325,20 +325,20 @@ data_02_5bfa:
     call call_00_0ff5                                  ;; 02:5c01 $cd $f5 $0f
     ld   HL, .data_02_5c3b                             ;; 02:5c04 $21 $3b $5c
     call call_00_2c20                                  ;; 02:5c07 $cd $20 $2c
-    call call_00_288a                                  ;; 02:5c0a $cd $8a $28
+    call call_00_288c_ObjectUnkAndSet14                                  ;; 02:5c0a $cd $8a $28
     call call_00_2b8b                                  ;; 02:5c0d $cd $8b $2b
-    call call_00_2c67                                  ;; 02:5c10 $cd $67 $2c
+    call call_00_2c67_Particle_InitBurst                                  ;; 02:5c10 $cd $67 $2c
     ld   C, $3c                                        ;; 02:5c13 $0e $3c
-    call call_00_290d                                  ;; 02:5c15 $cd $0d $29
+    call call_00_290d_ObjectSetTimer1A                                  ;; 02:5c15 $cd $0d $29
     call call_00_230f                                  ;; 02:5c18 $cd $0f $23
     ld   B, $00                                        ;; 02:5c1b $06 $00
     ld   HL, wDC5C                                     ;; 02:5c1d $21 $5c $dc
     add  HL, BC                                        ;; 02:5c20 $09
     set  0, [HL]                                       ;; 02:5c21 $cb $c6
 .jr_02_5c23:
-    call call_00_2c89                                  ;; 02:5c23 $cd $89 $2c
+    call call_00_2c89_Particle_UpdateBurst                                  ;; 02:5c23 $cd $89 $2c
     ret  NZ                                            ;; 02:5c26 $c0
-    call call_00_2922                                  ;; 02:5c27 $cd $22 $29
+    call call_00_2922_ObjectTimer1ACountdown                                  ;; 02:5c27 $cd $22 $29
     ret  NZ                                            ;; 02:5c2a $c0
     call call_00_230f                                  ;; 02:5c2b $cd $0f $23
     inc  C                                             ;; 02:5c2e $0c
@@ -362,15 +362,15 @@ data_02_5c50:
     jr   Z, .jr_02_5c62                                ;; 02:5c53 $28 $0d
     call call_02_5d02                                  ;; 02:5c55 $cd $02 $5d
     ld   C, $20                                        ;; 02:5c58 $0e $20
-    call call_00_28c8                                  ;; 02:5c5a $cd $c8 $28
+    call call_00_28c8_ObjectSet1B                                  ;; 02:5c5a $cd $c8 $28
     ld   C, $28                                        ;; 02:5c5d $0e $28
-    call call_00_28dc                                  ;; 02:5c5f $cd $dc $28
+    call call_00_28dc_ObjectSet1D                                  ;; 02:5c5f $cd $dc $28
 .jr_02_5c62:
     call call_00_251c                                  ;; 02:5c62 $cd $1c $25
     call call_00_244a                                  ;; 02:5c65 $cd $4a $24
     call call_00_2766                                  ;; 02:5c68 $cd $66 $27
     ret  C                                             ;; 02:5c6b $d8
-    call call_00_299f                                  ;; 02:5c6c $cd $9f $29
+    call call_00_299f_ObjectFlipFacingDirection                                  ;; 02:5c6c $cd $9f $29
     ld   A, $02                                        ;; 02:5c6f $3e $02
     jp   call_02_72ac                                  ;; 02:5c71 $c3 $ac $72
 
@@ -424,11 +424,11 @@ data_02_5d10:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 02:5d12 $fa $00 $da
     or   A, $0e                                        ;; 02:5d15 $f6 $0e
     ld   L, A                                          ;; 02:5d17 $6f
-    ld   A, [wD80E]                                    ;; 02:5d18 $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 02:5d18 $fa $0e $d8
     sub  A, [HL]                                       ;; 02:5d1b $96
     ld   E, A                                          ;; 02:5d1c $5f
     inc  HL                                            ;; 02:5d1d $23
-    ld   A, [wD80F]                                    ;; 02:5d1e $fa $0f $d8
+    ld   A, [wD80F_PlayerXPosition]                                    ;; 02:5d1e $fa $0f $d8
     sbc  A, [HL]                                       ;; 02:5d21 $9e
     ld   D, A                                          ;; 02:5d22 $57
     push AF                                            ;; 02:5d23 $f5
@@ -462,9 +462,9 @@ data_02_5d10:
     inc  A                                             ;; 02:5d48 $3c
 .jr_02_5d49:
     ld   C, A                                          ;; 02:5d49 $4f
-    call call_00_28c8                                  ;; 02:5d4a $cd $c8 $28
+    call call_00_28c8_ObjectSet1B                                  ;; 02:5d4a $cd $c8 $28
     ld   C, $10                                        ;; 02:5d4d $0e $10
-    call call_00_28dc                                  ;; 02:5d4f $cd $dc $28
+    call call_00_28dc_ObjectSet1D                                  ;; 02:5d4f $cd $dc $28
     ld   A, $01                                        ;; 02:5d52 $3e $01
     jp   call_02_72ac                                  ;; 02:5d54 $c3 $ac $72
 .data_02_5d57:
@@ -478,7 +478,7 @@ data_02_5d10:
 data_02_5d80:
     call call_00_24c0                                  ;; 02:5d80 $cd $c0 $24
     call call_00_24ee                                  ;; 02:5d83 $cd $ee $24
-    call call_00_28d2                                  ;; 02:5d86 $cd $d2 $28
+    call call_00_28d2_ObjectGet1D                                  ;; 02:5d86 $cd $d2 $28
     ld   C, A                                          ;; 02:5d89 $4f
     ld   H, $d8                                        ;; 02:5d8a $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 02:5d8c $fa $00 $da
@@ -532,7 +532,7 @@ data_02_5dd7:
 data_02_5dde:
     call call_00_29f5                                  ;; 02:5dde $cd $f5 $29
     ld   C, $20                                        ;; 02:5de1 $0e $20
-    call NZ, call_00_28c8                              ;; 02:5de3 $c4 $c8 $28
+    call NZ, call_00_28c8_ObjectSet1B                              ;; 02:5de3 $c4 $c8 $28
     ld   A, [wDC71]                                    ;; 02:5de6 $fa $71 $dc
     and  A, $07                                        ;; 02:5de9 $e6 $07
     ld   C, $10                                        ;; 02:5deb $0e $10
@@ -541,7 +541,7 @@ data_02_5dde:
     call call_00_2722                                  ;; 02:5df3 $cd $22 $27
     ret  Z                                             ;; 02:5df6 $c8
     call call_00_2a68                                  ;; 02:5df7 $cd $68 $2a
-    call call_00_2976                                  ;; 02:5dfa $cd $76 $29
+    call call_00_2976_ObjectGetFacingDirection                                  ;; 02:5dfa $cd $76 $29
     ld   HL, wDA12                                     ;; 02:5dfd $21 $12 $da
     cp   A, [HL]                                       ;; 02:5e00 $be
     ret  NZ                                            ;; 02:5e01 $c0
@@ -553,11 +553,11 @@ data_02_5dde:
 
 data_02_5e0d:
     ld   C, $20                                        ;; 02:5e0d $0e $20
-    call call_00_28dc                                  ;; 02:5e0f $cd $dc $28
+    call call_00_28dc_ObjectSet1D                                  ;; 02:5e0f $cd $dc $28
     ld   C, $28                                        ;; 02:5e12 $0e $28
     call call_00_2588                                  ;; 02:5e14 $cd $88 $25
     call call_00_251c                                  ;; 02:5e17 $cd $1c $25
-    call call_00_28be                                  ;; 02:5e1a $cd $be $28
+    call call_00_28be_ObjectGet1B                                  ;; 02:5e1a $cd $be $28
     cp   A, $28                                        ;; 02:5e1d $fe $28
     ld   A, $03                                        ;; 02:5e1f $3e $03
     jp   Z, call_02_72ac                               ;; 02:5e21 $ca $ac $72
@@ -579,9 +579,9 @@ data_02_5e34:
     jr   C, .jr_02_5e42                                ;; 02:5e3e $38 $02
     ld   C, $01                                        ;; 02:5e40 $0e $01
 .jr_02_5e42:
-    call call_00_2980                                  ;; 02:5e42 $cd $80 $29
+    call call_00_2980_ObjectSet19                                  ;; 02:5e42 $cd $80 $29
 .jr_02_5e45:
-    call call_00_298a                                  ;; 02:5e45 $cd $8a $29
+    call call_00_298a_ObjectGet19                                  ;; 02:5e45 $cd $8a $29
     jr   Z, .jr_02_5e6d                                ;; 02:5e48 $28 $23
     ld   A, [wDC71]                                    ;; 02:5e4a $fa $71 $dc
     and  A, $07                                        ;; 02:5e4d $e6 $07
@@ -604,7 +604,7 @@ data_02_5e34:
     call call_00_244a                                  ;; 02:5e70 $cd $4a $24
     call call_00_2766                                  ;; 02:5e73 $cd $66 $27
     ld   C, $01                                        ;; 02:5e76 $0e $01
-    call NC, call_00_2980                              ;; 02:5e78 $d4 $80 $29
+    call NC, call_00_2980_ObjectSet19                              ;; 02:5e78 $d4 $80 $29
     ret                                                ;; 02:5e7b $c9
 
 data_02_5e7c:
@@ -619,7 +619,7 @@ data_02_5e7c:
     ld   A, [wDA12]                                    ;; 02:5e8e $fa $12 $da
     xor  A, $20                                        ;; 02:5e91 $ee $20
     ld   C, A                                          ;; 02:5e93 $4f
-    call call_00_2958                                  ;; 02:5e94 $cd $58 $29
+    call call_00_2958_ObjectSetFacingDirection                                  ;; 02:5e94 $cd $58 $29
     ld   C, $1e                                        ;; 02:5e97 $0e $1e
     call call_00_2588                                  ;; 02:5e99 $cd $88 $25
     call call_00_251c                                  ;; 02:5e9c $cd $1c $25
@@ -629,10 +629,10 @@ data_02_5e7c:
     ret  NC                                            ;; 02:5ea6 $d0
     ld   HL, wDA12                                     ;; 02:5ea7 $21 $12 $da
     ld   C, [HL]                                       ;; 02:5eaa $4e
-    call call_00_2958                                  ;; 02:5eab $cd $58 $29
+    call call_00_2958_ObjectSetFacingDirection                                  ;; 02:5eab $cd $58 $29
 .jr_02_5eae:
     ld   C, $30                                        ;; 02:5eae $0e $30
-    call call_00_28dc                                  ;; 02:5eb0 $cd $dc $28
+    call call_00_28dc_ObjectSet1D                                  ;; 02:5eb0 $cd $dc $28
     ld   A, $01                                        ;; 02:5eb3 $3e $01
     jp   call_02_72ac                                  ;; 02:5eb5 $c3 $ac $72
 

@@ -135,7 +135,7 @@ call_00_2cbf_LoadObjectPalettes:
 call_00_2ce2:
     ld   A, $01                                        ;; 00:2ce2 $3e $01
     ld   [wDAC2], A                                    ;; 00:2ce4 $ea $c2 $da
-    ld   A, [wD80D]                                    ;; 00:2ce7 $fa $0d $d8
+    ld   A, [wD80D_PlayerFacingDirection]                                    ;; 00:2ce7 $fa $0d $d8
     ld   HL, wDC7A                                     ;; 00:2cea $21 $7a $dc
     or   A, [HL]                                       ;; 00:2ced $b6
     ld   [wDC53], A                                    ;; 00:2cee $ea $53 $dc
@@ -193,14 +193,14 @@ call_00_2ce2:
     jp   NZ, .jp_00_2dac                               ;; 00:2d4e $c2 $ac $2d
     ld   A, [wDBF9_XPositionInMap]                                    ;; 00:2d51 $fa $f9 $db
     ld   C, A                                          ;; 00:2d54 $4f
-    ld   A, [wD80E]                                    ;; 00:2d55 $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2d55 $fa $0e $d8
     sub  A, C                                          ;; 00:2d58 $91
     add  A, $08                                        ;; 00:2d59 $c6 $08
     ld   [wDC90], A                                    ;; 00:2d5b $ea $90 $dc
     ld   C, A                                          ;; 00:2d5e $4f
     ld   A, [wDBFB_YPositionInMap]                                    ;; 00:2d5f $fa $fb $db
     ld   B, A                                          ;; 00:2d62 $47
-    ld   A, [wD810]                                    ;; 00:2d63 $fa $10 $d8
+    ld   A, [wD810_PlayerYPosition]                                    ;; 00:2d63 $fa $10 $d8
     sub  A, B                                          ;; 00:2d66 $90
     add  A, $10                                        ;; 00:2d67 $c6 $10
     ld   [wDC91], A                                    ;; 00:2d69 $ea $91 $dc
@@ -247,14 +247,14 @@ call_00_2ce2:
 .jp_00_2dac:
     ld   A, [wDBF9_XPositionInMap]                                    ;; 00:2dac $fa $f9 $db
     ld   C, A                                          ;; 00:2daf $4f
-    ld   A, [wD80E]                                    ;; 00:2db0 $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2db0 $fa $0e $d8
     sub  A, C                                          ;; 00:2db3 $91
     add  A, $08                                        ;; 00:2db4 $c6 $08
     ld   [wDC90], A                                    ;; 00:2db6 $ea $90 $dc
     ld   C, A                                          ;; 00:2db9 $4f
     ld   A, [wDBFB_YPositionInMap]                                    ;; 00:2dba $fa $fb $db
     ld   B, A                                          ;; 00:2dbd $47
-    ld   A, [wD810]                                    ;; 00:2dbe $fa $10 $d8
+    ld   A, [wD810_PlayerYPosition]                                    ;; 00:2dbe $fa $10 $d8
     sub  A, B                                          ;; 00:2dc1 $90
     add  A, $10                                        ;; 00:2dc2 $c6 $10
     ld   [wDC91], A                                    ;; 00:2dc4 $ea $91 $dc
@@ -306,14 +306,14 @@ call_00_2ce2:
     jp   NZ, .jp_00_2e6f                               ;; 00:2e0d $c2 $6f $2e
     ld   A, [wDBF9_XPositionInMap]                                    ;; 00:2e10 $fa $f9 $db
     ld   C, A                                          ;; 00:2e13 $4f
-    ld   A, [wD80E]                                    ;; 00:2e14 $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2e14 $fa $0e $d8
     sub  A, C                                          ;; 00:2e17 $91
     add  A, $08                                        ;; 00:2e18 $c6 $08
     ld   [wDC90], A                                    ;; 00:2e1a $ea $90 $dc
     ld   C, A                                          ;; 00:2e1d $4f
     ld   A, [wDBFB_YPositionInMap]                                    ;; 00:2e1e $fa $fb $db
     ld   B, A                                          ;; 00:2e21 $47
-    ld   A, [wD810]                                    ;; 00:2e22 $fa $10 $d8
+    ld   A, [wD810_PlayerYPosition]                                    ;; 00:2e22 $fa $10 $d8
     sub  A, B                                          ;; 00:2e25 $90
     add  A, $10                                        ;; 00:2e26 $c6 $10
     ld   [wDC91], A                                    ;; 00:2e28 $ea $91 $dc
@@ -363,14 +363,14 @@ call_00_2ce2:
 .jp_00_2e6f:
     ld   A, [wDBF9_XPositionInMap]                                    ;; 00:2e6f $fa $f9 $db
     ld   C, A                                          ;; 00:2e72 $4f
-    ld   A, [wD80E]                                    ;; 00:2e73 $fa $0e $d8
+    ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2e73 $fa $0e $d8
     sub  A, C                                          ;; 00:2e76 $91
     add  A, $08                                        ;; 00:2e77 $c6 $08
     ld   [wDC90], A                                    ;; 00:2e79 $ea $90 $dc
     ld   C, A                                          ;; 00:2e7c $4f
     ld   A, [wDBFB_YPositionInMap]                                    ;; 00:2e7d $fa $fb $db
     ld   B, A                                          ;; 00:2e80 $47
-    ld   A, [wD810]                                    ;; 00:2e81 $fa $10 $d8
+    ld   A, [wD810_PlayerYPosition]                                    ;; 00:2e81 $fa $10 $d8
     sub  A, B                                          ;; 00:2e84 $90
     add  A, $10                                        ;; 00:2e85 $c6 $10
     ld   [wDC91], A                                    ;; 00:2e87 $ea $91 $dc

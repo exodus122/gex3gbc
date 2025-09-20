@@ -624,7 +624,7 @@ call_01_446b:
     ld   [HL], A                                       ;; 01:44b4 $77
     ld   A, [wDBAA]                                    ;; 01:44b5 $fa $aa $db
     and  A, $01                                        ;; 01:44b8 $e6 $01
-    call NZ, call_01_499f                              ;; 01:44ba $c4 $9f $49
+    call NZ, call_01_499f_ZeroOutMemory                              ;; 01:44ba $c4 $9f $49
     ld   A, [wDBA8]                                    ;; 01:44bd $fa $a8 $db
     sub  A, $e0                                        ;; 01:44c0 $d6 $e0
     jr   C, .jr_01_44cd                                ;; 01:44c2 $38 $09
@@ -967,7 +967,7 @@ call_01_477c:
     add  HL, HL                                        ;; 01:4785 $29
     add  HL, HL                                        ;; 01:4786 $29
     add  HL, HL                                        ;; 01:4787 $29
-    ld   DE, wC980                                     ;; 01:4788 $11 $80 $c9
+    ld   DE, wC980_NumbersSprites                                     ;; 01:4788 $11 $80 $c9
     add  HL, DE                                        ;; 01:478b $19
     ld   E, L                                          ;; 01:478c $5d
     ld   D, H                                          ;; 01:478d $54
@@ -1213,7 +1213,7 @@ call_01_48cd:
     ld   [HL], A                                       ;; 01:499d $77
     ret                                                ;; 01:499e $c9
 
-call_01_499f:
+call_01_499f_ZeroOutMemory:
     call call_01_4ce5                                  ;; 01:499f $cd $e5 $4c
     ld   B, A                                          ;; 01:49a2 $47
     call call_01_4cd4                                  ;; 01:49a3 $cd $d4 $4c
