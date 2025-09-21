@@ -68,7 +68,7 @@ call_01_4000:
     bit  2, [HL]                                       ;; 01:4090 $cb $56
     jr   Z, .jr_01_40ad                                ;; 01:4092 $28 $19
     ld   A, $01                                        ;; 01:4094 $3e $01
-    call call_00_0fd7                                  ;; 01:4096 $cd $d7 $0f
+    call call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:4096 $cd $d7 $0f
     ld   A, [wDBE8]                                    ;; 01:4099 $fa $e8 $db
     ld   [wDB6C_CurrentLevelId], A                                    ;; 01:409c $ea $6c $db
     ld   [wDAD6_ReturnBank], A                                    ;; 01:409f $ea $d6 $da
@@ -89,7 +89,7 @@ call_01_4000:
     ld   A, [HL]                                       ;; 01:40c1 $7e
     and  A, $f0                                        ;; 01:40c2 $e6 $f0
     jr   Z, .jp_01_4078                                ;; 01:40c4 $28 $b2
-    call call_00_0f6e                                  ;; 01:40c6 $cd $6e $0f
+    call call_00_0f6e_CheckInputRight                                  ;; 01:40c6 $cd $6e $0f
     jr   Z, .jr_01_40d7                                ;; 01:40c9 $28 $0c
     ld   HL, wDBED                                     ;; 01:40cb $21 $ed $db
     inc  [HL]                                          ;; 01:40ce $34
@@ -99,7 +99,7 @@ call_01_4000:
     ld   [HL], A                                       ;; 01:40d4 $77
     jr   .jr_01_4109                                   ;; 01:40d5 $18 $32
 .jr_01_40d7:
-    call call_00_0f68                                  ;; 01:40d7 $cd $68 $0f
+    call call_00_0f68_CheckInputLeft                                  ;; 01:40d7 $cd $68 $0f
     jr   Z, .jr_01_40e8                                ;; 01:40da $28 $0c
     ld   HL, wDBED                                     ;; 01:40dc $21 $ed $db
     dec  [HL]                                          ;; 01:40df $35
@@ -108,7 +108,7 @@ call_01_4000:
     ld   [HL], $0f                                     ;; 01:40e4 $36 $0f
     jr   .jr_01_4109                                   ;; 01:40e6 $18 $21
 .jr_01_40e8:
-    call call_00_0f7a                                  ;; 01:40e8 $cd $7a $0f
+    call call_00_0f7a_CheckInputDown                                  ;; 01:40e8 $cd $7a $0f
     jr   Z, .jr_01_40f9                                ;; 01:40eb $28 $0c
     ld   HL, wDBEE                                     ;; 01:40ed $21 $ee $db
     inc  [HL]                                          ;; 01:40f0 $34
@@ -118,7 +118,7 @@ call_01_4000:
     ld   [HL], A                                       ;; 01:40f6 $77
     jr   .jr_01_4109                                   ;; 01:40f7 $18 $10
 .jr_01_40f9:
-    call call_00_0f74                                  ;; 01:40f9 $cd $74 $0f
+    call call_00_0f74_CheckInputUp                                  ;; 01:40f9 $cd $74 $0f
     jp   Z, .jp_01_4078                                ;; 01:40fc $ca $78 $40
     ld   HL, wDBEE                                     ;; 01:40ff $21 $ee $db
     dec  [HL]                                          ;; 01:4102 $35
@@ -127,7 +127,7 @@ call_01_4000:
     ld   [HL], $01                                     ;; 01:4107 $36 $01
 .jr_01_4109:
     ld   A, $01                                        ;; 01:4109 $3e $01
-    call call_00_0fd7                                  ;; 01:410b $cd $d7 $0f
+    call call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:410b $cd $d7 $0f
     jp   .jp_01_4070                                   ;; 01:410e $c3 $70 $40
 .jr_01_4111:
     ld   HL, wDBEE                                     ;; 01:4111 $21 $ee $db
@@ -171,7 +171,7 @@ call_01_4000:
     ld   [HL], A                                       ;; 01:4152 $77
 .jr_01_4153:
     ld   A, $01                                        ;; 01:4153 $3e $01
-    call call_00_0fd7                                  ;; 01:4155 $cd $d7 $0f
+    call call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:4155 $cd $d7 $0f
     jp   .jp_01_4070                                   ;; 01:4158 $c3 $70 $40
 .jp_01_415b:
     call call_01_505a                                  ;; 01:415b $cd $5a $50
@@ -181,7 +181,7 @@ call_01_4000:
     jr   Z, .jr_01_4167                                ;; 01:4163 $28 $02
     ld   A, $ff                                        ;; 01:4165 $3e $ff
 .jr_01_4167:
-    call call_00_0fd7                                  ;; 01:4167 $cd $d7 $0f
+    call call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:4167 $cd $d7 $0f
     ld   B, $3c                                        ;; 01:416a $06 $3c
 .jr_01_416c:
     push BC                                            ;; 01:416c $c5
@@ -196,7 +196,7 @@ call_01_4000:
     call call_01_4000                                  ;; 01:417a $cd $00 $40
     jp   .jp_01_42a1                                   ;; 01:417d $c3 $a1 $42
 .jp_01_4180:
-    call call_00_0f6e                                  ;; 01:4180 $cd $6e $0f
+    call call_00_0f6e_CheckInputRight                                  ;; 01:4180 $cd $6e $0f
     jr   Z, .jr_01_4191                                ;; 01:4183 $28 $0c
     ld   HL, wDBEB                                     ;; 01:4185 $21 $eb $db
     inc  [HL]                                          ;; 01:4188 $34
@@ -206,7 +206,7 @@ call_01_4000:
     ld   [HL], A                                       ;; 01:418e $77
     jr   .jr_01_41c3                                   ;; 01:418f $18 $32
 .jr_01_4191:
-    call call_00_0f68                                  ;; 01:4191 $cd $68 $0f
+    call call_00_0f68_CheckInputLeft                                  ;; 01:4191 $cd $68 $0f
     jr   Z, .jr_01_41a2                                ;; 01:4194 $28 $0c
     ld   HL, wDBEB                                     ;; 01:4196 $21 $eb $db
     dec  [HL]                                          ;; 01:4199 $35
@@ -215,7 +215,7 @@ call_01_4000:
     ld   [HL], $05                                     ;; 01:419e $36 $05
     jr   .jr_01_41c3                                   ;; 01:41a0 $18 $21
 .jr_01_41a2:
-    call call_00_0f7a                                  ;; 01:41a2 $cd $7a $0f
+    call call_00_0f7a_CheckInputDown                                  ;; 01:41a2 $cd $7a $0f
     jr   Z, .jr_01_41b3                                ;; 01:41a5 $28 $0c
     ld   HL, wDBEC                                     ;; 01:41a7 $21 $ec $db
     inc  [HL]                                          ;; 01:41aa $34
@@ -225,7 +225,7 @@ call_01_4000:
     ld   [HL], A                                       ;; 01:41b0 $77
     jr   .jr_01_41c3                                   ;; 01:41b1 $18 $10
 .jr_01_41b3:
-    call call_00_0f74                                  ;; 01:41b3 $cd $74 $0f
+    call call_00_0f74_CheckInputUp                                  ;; 01:41b3 $cd $74 $0f
     jp   Z, .jp_01_4078                                ;; 01:41b6 $ca $78 $40
     ld   HL, wDBEC                                     ;; 01:41b9 $21 $ec $db
     dec  [HL]                                          ;; 01:41bc $35
@@ -234,13 +234,13 @@ call_01_4000:
     ld   [HL], $02                                     ;; 01:41c1 $36 $02
 .jr_01_41c3:
     ld   A, $01                                        ;; 01:41c3 $3e $01
-    call call_00_0fd7                                  ;; 01:41c5 $cd $d7 $0f
+    call call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:41c5 $cd $d7 $0f
     jp   .jp_01_4070                                   ;; 01:41c8 $c3 $70 $40
 .jp_01_41cb:
     ld   A, [wDB95]                                    ;; 01:41cb $fa $95 $db
     and  A, A                                          ;; 01:41ce $a7
     jp   Z, .jp_01_41fc                                ;; 01:41cf $ca $fc $41
-    call call_00_0f74                                  ;; 01:41d2 $cd $74 $0f
+    call call_00_0f74_CheckInputUp                                  ;; 01:41d2 $cd $74 $0f
     jr   Z, .jr_01_41e1                                ;; 01:41d5 $28 $0a
     ld   HL, wDBEC                                     ;; 01:41d7 $21 $ec $db
     ld   A, [HL]                                       ;; 01:41da $7e
@@ -249,7 +249,7 @@ call_01_4000:
     dec  [HL]                                          ;; 01:41de $35
     jr   .jr_01_41f1                                   ;; 01:41df $18 $10
 .jr_01_41e1:
-    call call_00_0f7a                                  ;; 01:41e1 $cd $7a $0f
+    call call_00_0f7a_CheckInputDown                                  ;; 01:41e1 $cd $7a $0f
     jr   Z, .jp_01_41fc                                ;; 01:41e4 $28 $16
     ld   A, [wDB95]                                    ;; 01:41e6 $fa $95 $db
     dec  A                                             ;; 01:41e9 $3d
@@ -259,14 +259,14 @@ call_01_4000:
     inc  [HL]                                          ;; 01:41f0 $34
 .jr_01_41f1:
     ld   A, $01                                        ;; 01:41f1 $3e $01
-    call call_00_0fd7                                  ;; 01:41f3 $cd $d7 $0f
+    call call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:41f3 $cd $d7 $0f
     call call_01_43ba                                  ;; 01:41f6 $cd $ba $43
     jp   .jp_01_4070                                   ;; 01:41f9 $c3 $70 $40
 .jp_01_41fc:
     ld   A, [wDB94]                                    ;; 01:41fc $fa $94 $db
     and  A, $10                                        ;; 01:41ff $e6 $10
     jr   Z, .jr_01_423c                                ;; 01:4201 $28 $39
-    call call_00_0f6e                                  ;; 01:4203 $cd $6e $0f
+    call call_00_0f6e_CheckInputRight                                  ;; 01:4203 $cd $6e $0f
     jr   Z, .jr_01_4214                                ;; 01:4206 $28 $0c
     ld   HL, wDB6C_CurrentLevelId                                     ;; 01:4208 $21 $6c $db
     inc  [HL]                                          ;; 01:420b $34
@@ -277,7 +277,7 @@ call_01_4000:
 .jr_01_4212:
     jr   .jr_01_4223                                   ;; 01:4212 $18 $0f
 .jr_01_4214:
-    call call_00_0f68                                  ;; 01:4214 $cd $68 $0f
+    call call_00_0f68_CheckInputLeft                                  ;; 01:4214 $cd $68 $0f
     jr   Z, .jr_01_423c                                ;; 01:4217 $28 $23
     ld   HL, wDB6C_CurrentLevelId                                     ;; 01:4219 $21 $6c $db
     dec  [HL]                                          ;; 01:421c $35
@@ -292,14 +292,14 @@ call_01_4000:
     ld   HL, data_01_5692                              ;; 01:422e $21 $92 $56
     call call_01_4454                                  ;; 01:4231 $cd $54 $44
     ld   A, $01                                        ;; 01:4234 $3e $01
-    call call_00_0fd7                                  ;; 01:4236 $cd $d7 $0f
+    call call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:4236 $cd $d7 $0f
     jp   .jp_01_4070                                   ;; 01:4239 $c3 $70 $40
 .jr_01_423c:
-    call call_00_0f9c                                  ;; 01:423c $cd $9c $0f
+    call call_00_0f9c_CheckInputB                                  ;; 01:423c $cd $9c $0f
     jp   Z, .jp_01_4078                                ;; 01:423f $ca $78 $40
     ld   A, $01                                        ;; 01:4242 $3e $01
-    call call_00_0fd7                                  ;; 01:4244 $cd $d7 $0f
-    call call_00_0f5e                                  ;; 01:4247 $cd $5e $0f
+    call call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:4244 $cd $d7 $0f
+    call call_00_0f5e_WaitForInputClear                                  ;; 01:4247 $cd $5e $0f
     ld   A, [wDBE8]                                    ;; 01:424a $fa $e8 $db
     ld   [wDB6C_CurrentLevelId], A                                    ;; 01:424d $ea $6c $db
     ld   [wDAD6_ReturnBank], A                                    ;; 01:4250 $ea $d6 $da
@@ -330,7 +330,7 @@ call_01_4000:
     cp   A, $40                                        ;; 01:4282 $fe $40
     ret  Z                                             ;; 01:4284 $c8
 .jp_01_4285:
-    call call_00_0f5e                                  ;; 01:4285 $cd $5e $0f
+    call call_00_0f5e_WaitForInputClear                                  ;; 01:4285 $cd $5e $0f
     ld   A, [wDBE9]                                    ;; 01:4288 $fa $e9 $db
     and  A, A                                          ;; 01:428b $a7
     jp   NZ, call_01_4000                              ;; 01:428c $c2 $00 $40
@@ -374,7 +374,7 @@ call_01_4000:
 .jr_01_42d3:
     push BC                                            ;; 01:42d3 $c5
     call call_00_0b92_UpdateVRAMTiles                                  ;; 01:42d4 $cd $92 $0b
-    call call_00_0f9c                                  ;; 01:42d7 $cd $9c $0f
+    call call_00_0f9c_CheckInputB                                  ;; 01:42d7 $cd $9c $0f
     pop  BC                                            ;; 01:42da $c1
     ret  NZ                                            ;; 01:42db $c0
     dec  BC                                            ;; 01:42dc $0b
@@ -394,17 +394,17 @@ call_01_4000:
     and  A, A                                          ;; 01:42f5 $a7
     jr   Z, .jr_01_42e5                                ;; 01:42f6 $28 $ed
     ld   A, $01                                        ;; 01:42f8 $3e $01
-    jp   call_00_0fd7                                  ;; 01:42fa $c3 $d7 $0f
+    jp   call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:42fa $c3 $d7 $0f
 
 entry_01_42fd:
     ld   A, $15                                        ;; 01:42fd $3e $15
-    call call_00_0fa2                                  ;; 01:42ff $cd $a2 $0f
+    call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:42ff $cd $a2 $0f
     ld   A, $03                                        ;; 01:4302 $3e $03
     jp   call_01_4000                                  ;; 01:4304 $c3 $00 $40
 
 call_01_4307:
     ld   A, $19                                        ;; 01:4307 $3e $19
-    call call_00_0fa2                                  ;; 01:4309 $cd $a2 $0f
+    call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:4309 $cd $a2 $0f
     ld   A, $15                                        ;; 01:430c $3e $15
     call call_01_4000                                  ;; 01:430e $cd $00 $40
     ld   A, $16                                        ;; 01:4311 $3e $16
@@ -424,7 +424,7 @@ entry_01_432b:
     and  A, A                                          ;; 01:432e $a7
     ret  Z                                             ;; 01:432f $c8
     ld   A, $04                                        ;; 01:4330 $3e $04
-    call call_00_0fa2                                  ;; 01:4332 $cd $a2 $0f
+    call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:4332 $cd $a2 $0f
     ld   A, [wDB6C_CurrentLevelId]                                    ;; 01:4335 $fa $6c $db
     cp   A, $07                                        ;; 01:4338 $fe $07
     jr   C, .jr_01_434d                                ;; 01:433a $38 $11
@@ -458,13 +458,13 @@ entry_01_435e:
     jr   Z, .jr_01_4384                                ;; 01:4374 $28 $0e
     res  5, [HL]                                       ;; 01:4376 $cb $ae
     ld   A, $15                                        ;; 01:4378 $3e $15
-    call call_00_0fa2                                  ;; 01:437a $cd $a2 $0f
+    call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:437a $cd $a2 $0f
     ld   A, $0a                                        ;; 01:437d $3e $0a
     call call_01_4000                                  ;; 01:437f $cd $00 $40
     jr   .jr_01_43ae                                   ;; 01:4382 $18 $2a
 .jr_01_4384:
     ld   A, $13                                        ;; 01:4384 $3e $13
-    call call_00_0fa2                                  ;; 01:4386 $cd $a2 $0f
+    call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:4386 $cd $a2 $0f
     ld   A, $1b                                        ;; 01:4389 $3e $1b
     call call_01_4000                                  ;; 01:438b $cd $00 $40
     jr   .jr_01_43ae                                   ;; 01:438e $18 $1e
@@ -480,7 +480,7 @@ entry_01_435e:
     jr   .jr_01_43ae                                   ;; 01:43a2 $18 $0a
 .jr_01_43a4:
     ld   A, $13                                        ;; 01:43a4 $3e $13
-    call call_00_0fa2                                  ;; 01:43a6 $cd $a2 $0f
+    call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:43a6 $cd $a2 $0f
     ld   A, $09                                        ;; 01:43a9 $3e $09
     call call_01_4000                                  ;; 01:43ab $cd $00 $40
 .jr_01_43ae:
@@ -519,8 +519,8 @@ data_01_43c3:
 
 call_01_43f0:
     push HL                                            ;; 01:43f0 $e5
-    call call_00_0e3b                                  ;; 01:43f1 $cd $3b $0e
-    call call_00_0e62                                  ;; 01:43f4 $cd $62 $0e
+    call call_00_0e3b_ClearGameState                                  ;; 01:43f1 $cd $3b $0e
+    call call_00_0e62_ResetDD6AAndVRAM                                  ;; 01:43f4 $cd $62 $0e
     call call_01_4f27                                  ;; 01:43f7 $cd $27 $4f
     ld   A, $ff                                        ;; 01:43fa $3e $ff
     ld   [wDBC7], A                                    ;; 01:43fc $ea $c7 $db
@@ -558,7 +558,7 @@ call_01_43f0:
 .jr_01_4444:
     call call_01_43ba                                  ;; 01:4444 $cd $ba $43
     ld   A, $d3                                        ;; 01:4447 $3e $d3
-    call call_00_0e33                                  ;; 01:4449 $cd $33 $0e
+    call call_00_0e33_SetLCDControl                                  ;; 01:4449 $cd $33 $0e
     ld   A, $01                                        ;; 01:444c $3e $01
     ld   [wDD6A], A                                    ;; 01:444e $ea $6a $dd
     jp   call_00_0b92_UpdateVRAMTiles                                  ;; 01:4451 $c3 $92 $0b
@@ -630,7 +630,7 @@ call_01_446b:
     jr   C, .jr_01_44cd                                ;; 01:44c2 $38 $09
     ld   DE, .data_01_456b                             ;; 01:44c4 $11 $6b $45
     call call_00_0777                                  ;; 01:44c7 $cd $77 $07
-    call call_00_0f22_CallFuncInHL                                  ;; 01:44ca $cd $22 $0f
+    call call_00_0f22_JumpHL                                  ;; 01:44ca $cd $22 $0f
 .jr_01_44cd:
     ld   A, [wDBAA]                                    ;; 01:44cd $fa $aa $db
     and  A, $02                                        ;; 01:44d0 $e6 $02

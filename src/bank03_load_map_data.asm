@@ -163,7 +163,7 @@ entry_03_647c:
     ld   [wD811_PlayerYPosition], A                                    ;; 03:64c3 $ea $11 $d8
 .jr_03_64c6:
     call call_03_6203                                  ;; 03:64c6 $cd $03 $62
-    jp   call_00_10de                                  ;; 03:64c9 $c3 $de $10
+    jp   call_00_10de_UpdatePlayerMapWindow                                  ;; 03:64c9 $c3 $de $10
 .jr_03_64cc:
     ld   HL, wDC5B                                     ;; 03:64cc $21 $5b $dc
     ld   L, [HL]                                       ;; 03:64cf $6e

@@ -35,7 +35,7 @@ call_00_2260_FindAndFlagObjectType12:
     ld   A, [HL]                                       ;; 00:2284 $7e
     cp   A, $ff                                        ;; 00:2285 $fe $ff
     jr   NZ, .jr_00_2270                               ;; 00:2287 $20 $e7
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:2289 $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:2289 $c3 $08 $0f
 .jr_00_228c:
     pop  HL                                            ;; 00:228c $e1
     ld   E, B                                          ;; 00:228d $58
@@ -44,7 +44,7 @@ call_00_2260_FindAndFlagObjectType12:
     and  A, $f0                                        ;; 00:2291 $e6 $f0
     or   A, $04                                        ;; 00:2293 $f6 $04
     ld   [DE], A                                       ;; 00:2295 $12
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:2296 $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:2296 $c3 $08 $0f
 
 call_00_2299_SetObjectStatusLowNibble:
 ; Uses the current object’s ID (wDA00_CurrentObjectAddr) to compute a pointer 
@@ -186,7 +186,7 @@ call_00_230f_ResolveObjectListIndex:
     add  HL, DE                                        ;; 00:2336 $19
     ld   C, [HL]                                       ;; 00:2337 $4e
     push BC                                            ;; 00:2338 $c5
-    call call_00_0f08_SwitchBank2                                  ;; 00:2339 $cd $08 $0f
+    call call_00_0f08_RestoreBank                                  ;; 00:2339 $cd $08 $0f
     pop  BC                                            ;; 00:233c $c1
     ret                                                ;; 00:233d $c9
 

@@ -158,7 +158,7 @@ call_02_7152_UpdateObjects:
     ld   A, [HL+]                                      ;; 02:71b7 $2a
     ld   H, [HL]                                       ;; 02:71b8 $66
     ld   L, A                                          ;; 02:71b9 $6f
-    call call_00_0f22_CallFuncInHL                                  ;; 02:71ba $cd $22 $0f
+    call call_00_0f22_JumpHL                                  ;; 02:71ba $cd $22 $0f
     ld   A, [wDC7B]                                    ;; 02:71bd $fa $7b $dc
     and  A, A                                          ;; 02:71c0 $a7
     jr   Z, .jr_02_71e4                                ;; 02:71c1 $28 $21
@@ -193,7 +193,7 @@ call_02_7152_UpdateObjects:
     ld   A, [HL+]                                      ;; 02:71f2 $2a
     ld   H, [HL]                                       ;; 02:71f3 $66
     ld   L, A                                          ;; 02:71f4 $6f
-    call call_00_0f22_CallFuncInHL                                  ;; 02:71f5 $cd $22 $0f
+    call call_00_0f22_JumpHL                                  ;; 02:71f5 $cd $22 $0f
 .jr_02_71f8:
     ld   A, $00                                        ;; 02:71f8 $3e $00
     ld   [wDA00_CurrentObjectAddr], A                                    ;; 02:71fa $ea $00 $da
@@ -222,7 +222,7 @@ call_02_7152_UpdateObjects:
     ld   A, [HL+]                                      ;; 02:7226 $2a
     ld   H, [HL]                                       ;; 02:7227 $66
     ld   L, A                                          ;; 02:7228 $6f
-    call call_00_0f22_CallFuncInHL                                  ;; 02:7229 $cd $22 $0f
+    call call_00_0f22_JumpHL                                  ;; 02:7229 $cd $22 $0f
 .jr_02_722c:
     ld   H, $d8                                        ;; 02:722c $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 02:722e $fa $00 $da
@@ -382,7 +382,7 @@ call_02_72ac:
 
 entry_02_72fb:
 call_02_72fb:
-    call call_00_10de                                  ;; 02:72fb $cd $de $10
+    call call_00_10de_UpdatePlayerMapWindow                                  ;; 02:72fb $cd $de $10
     call call_02_7305                                  ;; 02:72fe $cd $05 $73
     call call_02_7337                                  ;; 02:7301 $cd $37 $73
     ret                                                ;; 02:7304 $c9

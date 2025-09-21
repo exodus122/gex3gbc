@@ -1,7 +1,7 @@
 call_00_21ef:
     push BC                                            ;; 00:21ef $c5
     ld   A, $1e                                        ;; 00:21f0 $3e $1e
-    call call_00_0ff5                                  ;; 00:21f2 $cd $f5 $0f
+    call call_00_0ff5_MaybeQueueBankChange                                  ;; 00:21f2 $cd $f5 $0f
     pop  BC                                            ;; 00:21f5 $c1
 
 call_00_21f6_FindAndMarkObjectInList:
@@ -27,7 +27,7 @@ call_00_21f6_FindAndMarkObjectInList:
     ld   L, A                                          ;; 00:2203 $6f
     ld   A, [HL]                                       ;; 00:2204 $7e
     cp   A, $ff                                        ;; 00:2205 $fe $ff
-    jp   Z, call_00_0f08_SwitchBank2                               ;; 00:2207 $ca $08 $0f
+    jp   Z, call_00_0f08_RestoreBank                               ;; 00:2207 $ca $08 $0f
     ld   B, $01                                        ;; 00:220a $06 $01
 .jr_00_220c:
     push HL                                            ;; 00:220c $e5
@@ -47,7 +47,7 @@ call_00_21f6_FindAndMarkObjectInList:
     ld   A, [HL]                                       ;; 00:2220 $7e
     cp   A, $ff                                        ;; 00:2221 $fe $ff
     jr   NZ, .jr_00_220c                               ;; 00:2223 $20 $e7
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:2225 $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:2225 $c3 $08 $0f
 .jr_00_2228:
     pop  HL                                            ;; 00:2228 $e1
     ld   E, B                                          ;; 00:2229 $58
@@ -81,7 +81,7 @@ call_00_21f6_FindAndMarkObjectInList:
     and  A, $f0                                        ;; 00:2255 $e6 $f0
     or   A, C                                          ;; 00:2257 $b1
     ld   [DE], A                                       ;; 00:2258 $12
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:2259 $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:2259 $c3 $08 $0f
     db   $00, $01, $02, $04                            ;; 00:225c ?...
 
 INCLUDE "bank00_object_utils.asm"
@@ -103,7 +103,7 @@ call_00_2cbf_LoadObjectPalettes:
     ld   DE, wDD2A_ObjectPalettes                                     ;; 00:2cd6 $11 $2a $dd
     ld   BC, $10                                       ;; 00:2cd9 $01 $10 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:2cdc $cd $6e $07
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:2cdf $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:2cdf $c3 $08 $0f
 
 call_00_2ce2_BuildGexSpriteDrawList:
 ; This is a complex sprite/OAM population routine. It:
@@ -155,7 +155,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     ld   A, [wDABF_GexSpriteBank]                                    ;; 00:2d1b $fa $bf $da
     add  A, C                                          ;; 00:2d1e $81
     ld   [wDABF_GexSpriteBank], A                                    ;; 00:2d1f $ea $bf $da
-    call call_00_0f08_SwitchBank2                                  ;; 00:2d22 $cd $08 $0f
+    call call_00_0f08_RestoreBank                                  ;; 00:2d22 $cd $08 $0f
     ld   A, [wDABF_GexSpriteBank]                                    ;; 00:2d25 $fa $bf $da
     call call_00_0eee_SwitchBank                                  ;; 00:2d28 $cd $ee $0e
     pop  HL                                            ;; 00:2d2b $e1
@@ -436,7 +436,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
 .jr_00_2ef9:
     ld   A, E                                          ;; 00:2ef9 $7b
     ld   [wDC6F], A                                    ;; 00:2efa $ea $6f $dc
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:2efd $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:2efd $c3 $08 $0f
 
 call_00_2f00_CallBank2_Helper_AndCheckBit8:
 ; Switch to Bank 2 and Run Entry
@@ -484,7 +484,7 @@ label2F46:
     and  a
     jr   nz,label2F46
     push bc
-    call call_00_0f08_SwitchBank2
+    call call_00_0f08_RestoreBank
     ld   a,[wDC16_ObjectListBank]
     call call_00_0eee_SwitchBank
     ld   hl,wDC17_ObjectListBankOffset
@@ -518,7 +518,7 @@ label2F77:
 label2F7E:
     ld   a,c
     push af
-    call call_00_0f08_SwitchBank2
+    call call_00_0f08_RestoreBank
     pop  af
     ret  
 
@@ -607,7 +607,7 @@ call_00_2f85_LoadAndSortCollectibleData:
     ld   [DE], A                                       ;; 00:2ff1 $12
     inc  E                                             ;; 00:2ff2 $1c
     jr   NZ, .jr_00_2fd4                               ;; 00:2ff3 $20 $df
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:2ff5 $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:2ff5 $c3 $08 $0f
 
 call_00_2ff8_InitLevelObjectsAndConfig:
 ; Initialize Level State
@@ -703,7 +703,7 @@ call_00_2ff8_InitLevelObjectsAndConfig:
     call call_00_31d9_CheckFlag4_ResetObjectType1                                  ;; 00:30ae $cd $d9 $31
     call call_00_320d_ApplyLevelMaskToType3Objects                                  ;; 00:30b1 $cd $0d $32
     call call_00_3252_ResetObjectCounter                                  ;; 00:30b4 $cd $52 $32
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:30b7 $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:30b7 $c3 $08 $0f
 .data_00_30ba:
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:30ba ........
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:30c2 ........
@@ -811,12 +811,12 @@ call_00_31d9_CheckFlag4_ResetObjectType1:
     ld   A, [HL]                                       ;; 00:31fe $7e
     cp   A, $ff                                        ;; 00:31ff $fe $ff
     jr   NZ, .jr_00_31f8                               ;; 00:3201 $20 $f5
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:3203 $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:3203 $c3 $08 $0f
 .jr_00_3206:
     ld   B, $d7                                        ;; 00:3206 $06 $d7
     xor  A, A                                          ;; 00:3208 $af
     ld   [BC], A                                       ;; 00:3209 $02
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:320a $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:320a $c3 $08 $0f
 
 call_00_320d_ApplyLevelMaskToType3Objects:
 ; Mask Object Flags by Level Setting
@@ -862,7 +862,7 @@ call_00_320d_ApplyLevelMaskToType3Objects:
     ld   A, [HL]                                       ;; 00:3246 $7e
     cp   A, $ff                                        ;; 00:3247 $fe $ff
     jr   NZ, .jr_00_3226                               ;; 00:3249 $20 $db
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:324b $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:324b $c3 $08 $0f
     db   $00, $20, $40, $80                            ;; 00:324e ?...
 
 call_00_3252_ResetObjectCounter:
@@ -1020,7 +1020,7 @@ call_00_35fa_WaitForLineThenSpawnObject:
     ldh  A, [rLY]                                      ;; 00:3603 $f0 $44
     cp   A, $80                                        ;; 00:3605 $fe $80
     jr   C, .jr_00_3600                                ;; 00:3607 $38 $f7
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:3609 $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:3609 $c3 $08 $0f
 
 call_00_360c_SpawnObjectOnceImmediate:
 ; Similar to 35FA but calls 3618 once without waiting for the scanline, then switches banks back.
@@ -1028,7 +1028,7 @@ call_00_360c_SpawnObjectOnceImmediate:
     ld   A, [wDC16_ObjectListBank]                                    ;; 00:360c $fa $16 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:360f $cd $ee $0e
     call call_00_3618_HandleObjectSpawn                                  ;; 00:3612 $cd $18 $36
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:3615 $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:3615 $c3 $08 $0f
 
 call_00_3618_HandleObjectSpawn:
 ; Finds a free object slot.
@@ -1314,7 +1314,7 @@ call_00_3792_PrepareRelativeObjectSpawn:
     call call_00_0eee_SwitchBank                                  ;; 00:3796 $cd $ee $0e
     pop  BC                                            ;; 00:3799 $c1
     call call_00_37a0_SpawnObjectRelative                                  ;; 00:379a $cd $a0 $37
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:379d $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:379d $c3 $08 $0f
 
 call_00_37a0_SpawnObjectRelative:
 ; Finds a free slot.

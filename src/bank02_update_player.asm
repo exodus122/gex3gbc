@@ -283,7 +283,7 @@ call_02_4f32:
     ld   A, [HL+]                                      ;; 02:4fdf $2a
     ld   H, [HL]                                       ;; 02:4fe0 $66
     ld   L, A                                          ;; 02:4fe1 $6f
-    call call_00_0f22_CallFuncInHL                                  ;; 02:4fe2 $cd $22 $0f
+    call call_00_0f22_JumpHL                                  ;; 02:4fe2 $cd $22 $0f
     ld   HL, wDCAC                                     ;; 02:4fe5 $21 $ac $dc
     ld   A, [HL]                                       ;; 02:4fe8 $7e
     and  A, A                                          ;; 02:4fe9 $a7
@@ -312,16 +312,16 @@ call_02_4ffb:
     ret                                                ;; 02:500d $c9
 
 call_02_500e:
-    call call_00_0f6e
+    call call_00_0f6e_CheckInputRight
     ld   bc,$0002
     call nz,call_02_5033
-    call call_00_0f68
+    call call_00_0f68_CheckInputLeft
     ld   bc,hFFFE
     call nz,call_02_5033
-    call call_00_0f7a
+    call call_00_0f7a_CheckInputDown
     ld   bc,$0002
     call nz,call_02_503d
-    call call_00_0f74
+    call call_00_0f74_CheckInputUp
     ld   bc,hFFFE
     call nz,call_02_503d
     ret  

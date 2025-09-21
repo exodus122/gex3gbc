@@ -111,7 +111,7 @@ call_00_0150_Init:
 .jr_00_01d2:
     ld   A, $00                                        ;; 00:01d2 $3e $00
     ldh  [rVBK], A                                     ;; 00:01d4 $e0 $4f
-    call call_00_0e81                                  ;; 00:01d6 $cd $81 $0e
+    call call_00_0e81_LoadPalettesToHardware                                  ;; 00:01d6 $cd $81 $0e
     ld   HL, $e29                                      ;; 00:01d9 $21 $29 $0e
     ld   DE, hFF80                                     ;; 00:01dc $11 $80 $ff
     ld   BC, $0a                                       ;; 00:01df $01 $0a $00
@@ -160,7 +160,7 @@ call_00_0150_Init:
     ld   A, $04                                        ;; 00:0234 $3e $04
     call call_00_0eee_SwitchBank                                  ;; 00:0236 $cd $ee $0e
     call entry_04_4000                                  ;; 00:0239 $cd $00 $40
-    call call_00_0f08_SwitchBank2                                  ;; 00:023c $cd $08 $0f
+    call call_00_0f08_RestoreBank                                  ;; 00:023c $cd $08 $0f
     xor  A, A                                          ;; 00:023f $af
     ld   [wDE60], A                                    ;; 00:0240 $ea $60 $de
     ld   [wDE5E], A                                    ;; 00:0243 $ea $5e $de
@@ -179,9 +179,9 @@ call_00_0150_Init:
     call call_00_0edd_CallAltBankFunc                                  ;; 00:0264 $cd $dd $0e
 .jp_00_0267:
     ld   A, $00                                        ;; 00:0267 $3e $00
-    call call_00_0fa2                                  ;; 00:0269 $cd $a2 $0f
+    call call_00_0fa2_UpdateTileBankForNewID                                  ;; 00:0269 $cd $a2 $0f
     ld   A, $00                                        ;; 00:026c $3e $00
-    call call_00_0fd7                                  ;; 00:026e $cd $d7 $0f
+    call call_00_0fd7_ProcessBankedTileLoad                                  ;; 00:026e $cd $d7 $0f
     ld   A, $11                                        ;; 00:0271 $3e $11
     ld   [wDAD6_ReturnBank], A                                    ;; 00:0273 $ea $d6 $da
     ld   A, $01                                        ;; 00:0276 $3e $01
@@ -209,7 +209,7 @@ call_00_0150_Init:
     call call_00_0edd_CallAltBankFunc                                  ;; 00:02af $cd $dd $0e
 .jp_00_02b2:
     ld   A, $01                                        ;; 00:02b2 $3e $01
-    call call_00_0fa2                                  ;; 00:02b4 $cd $a2 $0f
+    call call_00_0fa2_UpdateTileBankForNewID                                  ;; 00:02b4 $cd $a2 $0f
     ld   A, $00                                        ;; 00:02b7 $3e $00
     ld   [wDAD6_ReturnBank], A                                    ;; 00:02b9 $ea $d6 $da
     ld   A, $01                                        ;; 00:02bc $3e $01
@@ -242,8 +242,8 @@ call_00_0150_Init:
     ld   [wDC5B], A                                    ;; 00:02f1 $ea $5b $dc
     ld   [wDC69], A                                    ;; 00:02f4 $ea $69 $dc
     ld   [wDB6A], A                                    ;; 00:02f7 $ea $6a $db
-    call call_00_0e3b                                  ;; 00:02fa $cd $3b $0e
-    call call_00_0e62                                  ;; 00:02fd $cd $62 $0e
+    call call_00_0e3b_ClearGameState                                  ;; 00:02fa $cd $3b $0e
+    call call_00_0e62_ResetDD6AAndVRAM                                  ;; 00:02fd $cd $62 $0e
     ld   C, $00                                        ;; 00:0300 $0e $00
     call call_00_0a6a                                  ;; 00:0302 $cd $6a $0a
     ld   C, $01                                        ;; 00:0305 $0e $01
@@ -251,7 +251,7 @@ call_00_0150_Init:
     ld   C, $02                                        ;; 00:030a $0e $02
     call call_00_0a6a                                  ;; 00:030c $cd $6a $0a
     ld   A, $e7                                        ;; 00:030f $3e $e7
-    call call_00_0e33                                  ;; 00:0311 $cd $33 $0e
+    call call_00_0e33_SetLCDControl                                  ;; 00:0311 $cd $33 $0e
 .jp_00_0314:
     ld   A, [wDB6A]                                    ;; 00:0314 $fa $6a $db
     and  A, $10                                        ;; 00:0317 $e6 $10
@@ -272,11 +272,11 @@ call_00_0150_Init:
     ld   A, $01                                        ;; 00:033c $3e $01
     ld   HL, entry_01_432b                                     ;; 00:033e $21 $2b $43
     call call_00_0edd_CallAltBankFunc                                  ;; 00:0341 $cd $dd $0e
-    call call_00_0e3b                                  ;; 00:0344 $cd $3b $0e
+    call call_00_0e3b_ClearGameState                                  ;; 00:0344 $cd $3b $0e
     call call_00_2f85_LoadAndSortCollectibleData                                  ;; 00:0347 $cd $85 $2f
     call call_00_2ff8_InitLevelObjectsAndConfig                                  ;; 00:034a $cd $f8 $2f
     call call_00_0595                                  ;; 00:034d $cd $95 $05
-    call call_00_1ea0_UpdateMain                                  ;; 00:0350 $cd $a0 $1e
+    call call_00_1ea0_LoadAndRunLevelScript                                  ;; 00:0350 $cd $a0 $1e
     xor  A, A                                          ;; 00:0353 $af
     ld   [wDC69], A                                    ;; 00:0354 $ea $69 $dc
 .jp_00_0357:
@@ -297,7 +297,7 @@ call_00_0150_Init:
     ld   [wDC50], A                                    ;; 00:037d $ea $50 $dc
     ld   A, $00                                        ;; 00:0380 $3e $00
     ld   [wDC78], A                                    ;; 00:0382 $ea $78 $dc
-    call call_00_0e3b                                  ;; 00:0385 $cd $3b $0e
+    call call_00_0e3b_ClearGameState                                  ;; 00:0385 $cd $3b $0e
     call call_00_2f85_LoadAndSortCollectibleData                                  ;; 00:0388 $cd $85 $2f
     call call_00_2ff8_InitLevelObjectsAndConfig                                  ;; 00:038b $cd $f8 $2f
 .jp_00_038e:
@@ -354,7 +354,7 @@ call_00_0150_Init:
     ld   A, $03                                        ;; 00:03fa $3e $03
     ld   HL, entry_03_647c                                     ;; 00:03fc $21 $7c $64
     call call_00_0edd_CallAltBankFunc                                  ;; 00:03ff $cd $dd $0e
-    call call_00_1056_LoadMap                                  ;; 00:0402 $cd $56 $10
+    call call_00_1056_LoadFullMap                                  ;; 00:0402 $cd $56 $10
     ld   [wDAD6_ReturnBank], A                                    ;; 00:0405 $ea $d6 $da
     ld   A, $02                                        ;; 00:0408 $3e $02
     ld   HL, entry_02_708f                                     ;; 00:040a $21 $8f $70
@@ -369,7 +369,7 @@ call_00_0150_Init:
 .jp_00_0421:
     call call_00_0595                                  ;; 00:0421 $cd $95 $05
     call call_00_04fb                                  ;; 00:0424 $cd $fb $04
-    call call_00_1056_LoadMap                                  ;; 00:0427 $cd $56 $10
+    call call_00_1056_LoadFullMap                                  ;; 00:0427 $cd $56 $10
     ld   [wDAD6_ReturnBank], A                                    ;; 00:042a $ea $d6 $da
     ld   A, $02                                        ;; 00:042d $3e $02
     ld   HL, entry_02_7142                                     ;; 00:042f $21 $42 $71
@@ -414,12 +414,12 @@ call_00_0150_Init:
     call call_00_0edd_CallAltBankFunc                                  ;; 00:048f $cd $dd $0e
     and  A, $08                                        ;; 00:0492 $e6 $08
     jr   NZ, .jr_00_04d8                               ;; 00:0494 $20 $42
-    call call_00_0f80                                  ;; 00:0496 $cd $80 $0f
+    call call_00_0f80_CheckInputStart                                  ;; 00:0496 $cd $80 $0f
     jr   Z, .jr_00_04d8                                ;; 00:0499 $28 $3d
     ld   A, $00                                        ;; 00:049b $3e $00
-    call call_00_0fa2                                  ;; 00:049d $cd $a2 $0f
+    call call_00_0fa2_UpdateTileBankForNewID                                  ;; 00:049d $cd $a2 $0f
     ld   A, $00                                        ;; 00:04a0 $3e $00
-    call call_00_0fd7                                  ;; 00:04a2 $cd $d7 $0f
+    call call_00_0fd7_ProcessBankedTileLoad                                  ;; 00:04a2 $cd $d7 $0f
     ld   [wDAD6_ReturnBank], A                                    ;; 00:04a5 $ea $d6 $da
     ld   A, $02                                        ;; 00:04a8 $3e $02
     ld   HL, entry_02_7132                                     ;; 00:04aa $21 $32 $71
@@ -449,8 +449,8 @@ call_00_0150_Init:
     ld   A, $02                                        ;; 00:04e1 $3e $02
     ld   HL, entry_02_7152_UpdateObjects                                     ;; 00:04e3 $21 $52 $71
     call call_00_0edd_CallAltBankFunc                                  ;; 00:04e6 $cd $dd $0e
-    call call_00_11c8_LoadBgMap                                  ;; 00:04e9 $cd $c8 $11
-    call call_00_0fc8                                  ;; 00:04ec $cd $c8 $0f
+    call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:04e9 $cd $c8 $11
+    call call_00_0fc8_ProcessQueuedBankChange                                  ;; 00:04ec $cd $c8 $0f
     call call_00_150f                                  ;; 00:04ef $cd $0f $15
     call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:04f2 $cd $fa $35
     call call_00_08f8                                  ;; 00:04f5 $cd $f8 $08
@@ -462,10 +462,10 @@ call_00_04fb:
     ld   [wDE5F], A                                    ;; 00:04ff $ea $5f $de
     ld   A, $ff                                        ;; 00:0502 $3e $ff
     ld   [wDE5D], A                                    ;; 00:0504 $ea $5d $de
-    call call_00_0e3b                                  ;; 00:0507 $cd $3b $0e
-    call call_00_0e62                                  ;; 00:050a $cd $62 $0e
+    call call_00_0e3b_ClearGameState                                  ;; 00:0507 $cd $3b $0e
+    call call_00_0e62_ResetDD6AAndVRAM                                  ;; 00:050a $cd $62 $0e
     ld   A, $e7                                        ;; 00:050d $3e $e7
-    call call_00_0e33                                  ;; 00:050f $cd $33 $0e
+    call call_00_0e33_SetLCDControl                                  ;; 00:050f $cd $33 $0e
     ret                                                ;; 00:0512 $c9
 
 call_00_0513:
@@ -499,7 +499,7 @@ call_00_0513:
     ld   A, [wDABF_GexSpriteBank]                                    ;; 00:053d $fa $bf $da
     add  A, C                                          ;; 00:0540 $81
     ld   [wDABF_GexSpriteBank], A                                    ;; 00:0541 $ea $bf $da
-    call call_00_0f08_SwitchBank2                                  ;; 00:0544 $cd $08 $0f
+    call call_00_0f08_RestoreBank                                  ;; 00:0544 $cd $08 $0f
     ld   A, [wDABF_GexSpriteBank]                                    ;; 00:0547 $fa $bf $da
     call call_00_0eee_SwitchBank                                  ;; 00:054a $cd $ee $0e
     pop  HL                                            ;; 00:054d $e1
@@ -511,7 +511,7 @@ call_00_0513:
     ld   [wDAC0], A                                    ;; 00:0555 $ea $c0 $da
     ld   A, [HL+]                                      ;; 00:0558 $2a
     ld   [wDAC1], A                                    ;; 00:0559 $ea $c1 $da
-    call call_00_0f08_SwitchBank2                                  ;; 00:055c $cd $08 $0f
+    call call_00_0f08_RestoreBank                                  ;; 00:055c $cd $08 $0f
     ld   HL, wDB66                                     ;; 00:055f $21 $66 $db
     set  0, [HL]                                       ;; 00:0562 $cb $c6
     ld   A, $05                                        ;; 00:0564 $3e $05
@@ -542,7 +542,7 @@ call_00_0595:
     ld   DE, $5a3                                      ;; 00:059b $11 $a3 $05
     add  HL, DE                                        ;; 00:059e $19
     ld   A, [HL]                                       ;; 00:059f $7e
-    jp   call_00_0fa2                                  ;; 00:05a0 $c3 $a2 $0f
+    jp   call_00_0fa2_UpdateTileBankForNewID                                  ;; 00:05a0 $c3 $a2 $0f
     db   $04, $02, $12, $05, $03, $14, $17, $16        ;; 00:05a3 ..??????
     db   $16, $11, $11, $18                            ;; 00:05ab ????
 
@@ -556,7 +556,7 @@ call_00_05af_LoadMapPalettes:
     ld   DE, wDCEA_BgPalettes                                     ;; 00:05bb $11 $ea $dc
     ld   BC, $40                                       ;; 00:05be $01 $40 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:05c1 $cd $6e $07
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:05c4 $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:05c4 $c3 $08 $0f
 
 call_00_05c7:
     ld   A, [wDB6D]                                    ;; 00:05c7 $fa $6d $db
@@ -590,7 +590,7 @@ call_00_05c7:
     ret                                                ;; 00:05fc $c9
 
 call_00_05fd:
-    call call_00_0f8b                                  ;; 00:05fd $cd $8b $0f
+    call call_00_0f8b_CheckInputSelect                                  ;; 00:05fd $cd $8b $0f
     ret  Z                                             ;; 00:0600 $c8
     ld   A, [wDC51]                                    ;; 00:0601 $fa $51 $dc
     and  A, A                                          ;; 00:0604 $a7
@@ -686,7 +686,7 @@ call_00_06f6:
     ld   HL, wDB69                                     ;; 00:06ff $21 $69 $db
     set  1, [HL]                                       ;; 00:0702 $cb $ce
     ld   A, $0a                                        ;; 00:0704 $3e $0a
-    call call_00_0ff5                                  ;; 00:0706 $cd $f5 $0f
+    call call_00_0ff5_MaybeQueueBankChange                                  ;; 00:0706 $cd $f5 $0f
     ld   HL, wDC51                                     ;; 00:0709 $21 $51 $dc
     ld   A, [HL]                                       ;; 00:070c $7e
     and  A, A                                          ;; 00:070d $a7
@@ -708,7 +708,7 @@ call_00_0723:
     ld   HL, wDB69                                     ;; 00:0723 $21 $69 $db
     set  0, [HL]                                       ;; 00:0726 $cb $c6
     ld   A, $02                                        ;; 00:0728 $3e $02
-    call call_00_0ff5                                  ;; 00:072a $cd $f5 $0f
+    call call_00_0ff5_MaybeQueueBankChange                                  ;; 00:072a $cd $f5 $0f
     ld   HL, wDC68                                     ;; 00:072d $21 $68 $dc
     inc  [HL]                                          ;; 00:0730 $34
     ld   A, [HL]                                       ;; 00:0731 $7e
@@ -717,7 +717,7 @@ call_00_0723:
     cp   A, $64                                        ;; 00:0736 $fe $64
     ret  NZ                                            ;; 00:0738 $c0
     ld   A, $1e                                        ;; 00:0739 $3e $1e
-    call call_00_0ff5                                  ;; 00:073b $cd $f5 $0f
+    call call_00_0ff5_MaybeQueueBankChange                                  ;; 00:073b $cd $f5 $0f
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:073e $21 $1e $dc
     ld   L, [HL]                                       ;; 00:0741 $6e
     ld   H, $00                                        ;; 00:0742 $26 $00
@@ -750,7 +750,7 @@ call_00_075f_SwitchBankAndCopyBCBytesFromHLToDE:
     pop  DE                                            ;; 00:0766 $d1
     pop  HL                                            ;; 00:0767 $e1
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:0768 $cd $6e $07
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:076b $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:076b $c3 $08 $0f
 
 call_00_076e_CopyBCBytesFromHLToDE:
     ld   A, [HL+]                                      ;; 00:076e $2a
@@ -817,7 +817,7 @@ jp_00_0781:
     ld   DE, wD578                                     ;; 00:07cd $11 $78 $d5
     ld   BC, $168                                      ;; 00:07d0 $01 $68 $01
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:07d3 $cd $6e $07
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:07d6 $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:07d6 $c3 $08 $0f
 .jr_00_07d9:
     push HL                                            ;; 00:07d9 $e5
     ld   HL, wD400                                     ;; 00:07da $21 $00 $d4
@@ -842,7 +842,7 @@ jp_00_0781:
     ld   A, B                                          ;; 00:07f9 $78
     or   A, C                                          ;; 00:07fa $b1
     jr   NZ, .jr_00_07ed                               ;; 00:07fb $20 $f0
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:07fd $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:07fd $c3 $08 $0f
 
 call_00_0800:
     push HL                                            ;; 00:0800 $e5
@@ -876,7 +876,7 @@ call_00_0800:
     ld   H, A                                          ;; 00:082a $67
     dec  C                                             ;; 00:082b $0d
     jr   NZ, .jr_00_081b                               ;; 00:082c $20 $ed
-    call call_00_0f08_SwitchBank2                                  ;; 00:082e $cd $08 $0f
+    call call_00_0f08_RestoreBank                                  ;; 00:082e $cd $08 $0f
     pop  BC                                            ;; 00:0831 $c1
     pop  DE                                            ;; 00:0832 $d1
     pop  HL                                            ;; 00:0833 $e1
@@ -911,7 +911,7 @@ call_00_0835_LoadFromTextBank1C:
     ld   [wDBA7], A                                    ;; 00:085b $ea $a7 $db
     ld   A, H                                          ;; 00:085e $7c
     ld   [wDBA8], A                                    ;; 00:085f $ea $a8 $db
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:0862 $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:0862 $c3 $08 $0f
     db   $d5, $3e, $1c, $cd, $ee, $0e, $d1, $21        ;; 00:0865 ????????
     db   $f8, $db, $6e, $26, $00, $29, $19, $2a        ;; 00:086d ????????
     db   $66, $6f, $11, $dc, $da, $13, $1a, $fe        ;; 00:0875 ????????
@@ -976,7 +976,7 @@ jp_00_088a:
     ldh  [rHDMA5], A                                   ;; 00:08d4 $e0 $55
     dec  B                                             ;; 00:08d6 $05
     jr   NZ, .jr_00_08a3                               ;; 00:08d7 $20 $ca
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:08d9 $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:08d9 $c3 $08 $0f
     dw   wDBE4                                         ;; 00:08dc pP
     db   $08, $a0, $57, $80, $8f                       ;; 00:08de .....
     dw   wDBE5                                         ;; 00:08e3 pP
@@ -1225,9 +1225,9 @@ jp_00_0b25:
     ld   A, [HL+]                                      ;; 00:0b3a $2a
     ld   H, [HL]                                       ;; 00:0b3b $66
     ld   L, A                                          ;; 00:0b3c $6f
-    call call_00_0f22_CallFuncInHL                                  ;; 00:0b3d $cd $22 $0f
-    call call_00_0f31                                  ;; 00:0b40 $cd $31 $0f
-    call call_00_0e81                                  ;; 00:0b43 $cd $81 $0e
+    call call_00_0f22_JumpHL                                  ;; 00:0b3d $cd $22 $0f
+    call call_00_0f31_ReadJoypadInput                                  ;; 00:0b40 $cd $31 $0f
+    call call_00_0e81_LoadPalettesToHardware                                  ;; 00:0b43 $cd $81 $0e
     ld   A, [wDAD8]                                    ;; 00:0b46 $fa $d8 $da
     ldh  [rLCDC], A                                    ;; 00:0b49 $e0 $40
     ld   A, [wDAD9]                                    ;; 00:0b4b $fa $d9 $da
@@ -1608,15 +1608,32 @@ call_00_0c6a:
     ld   [wDBF7], A                                    ;; 00:0e21 $ea $f7 $db
     pop  HL                                            ;; 00:0e24 $e1
     jp   jp_00_0bcf                                    ;; 00:0e25 $c3 $cf $0b
-    db   $c9, $3e, $d9, $e0, $46, $3e, $28, $3d        ;; 00:0e28 ?.......
-    db   $20, $fd, $c9                                 ;; 00:0e30 ...
 
-call_00_0e33:
+call_00_0e28_Return:
+; Empty routine—just returns.
+    ret
+
+call_00_0e29_StartDMATransfer:
+; Initiates a sprite/OAM DMA transfer: writes $D9 to rDMA, 
+; delays $28 cycles, then returns.
+    ld   a,$D9
+    db   $e0, $46
+    ld   a,$28
+label0E2F:
+    dec  a
+    jr   nz,label0E2F
+    ret                             ;; 00:0e30 ...
+
+call_00_0e33_SetLCDControl:
+; Stores A into wDAD8 and rLCDC to change LCD control, 
+; then updates VRAM tiles (call_00_0b92_UpdateVRAMTiles).
     ld   [wDAD8], A                                    ;; 00:0e33 $ea $d8 $da
     ldh  [rLCDC], A                                    ;; 00:0e36 $e0 $40
     jp   call_00_0b92_UpdateVRAMTiles                                  ;; 00:0e38 $c3 $92 $0b
 
-call_00_0e3b:
+call_00_0e3b_ClearGameState:
+; Clears many RAM flags/variables (collision, timers, bank returns), 
+; calls a banked init function (entry_02_7123), then updates VRAM tiles.
     xor  A, A                                          ;; 00:0e3b $af
     ld   [wDC7E], A                                    ;; 00:0e3c $ea $7e $dc
     ld   [wDC20], A                                    ;; 00:0e3f $ea $20 $dc
@@ -1632,7 +1649,9 @@ call_00_0e3b:
     call call_00_0edd_CallAltBankFunc                                  ;; 00:0e5c $cd $dd $0e
     jp   call_00_0b92_UpdateVRAMTiles                                  ;; 00:0e5f $c3 $92 $0b
 
-call_00_0e62:
+call_00_0e62_ResetDD6AAndVRAM:
+; Resets palette/tile flags, clears a 0x9F-byte buffer at wD900, 
+; and updates VRAM tiles. Used for state resets.
     xor  A, A                                          ;; 00:0e62 $af
     ld   [wDD6A], A                                    ;; 00:0e63 $ea $6a $dd
     call call_00_0b92_UpdateVRAMTiles                                  ;; 00:0e66 $cd $92 $0b
@@ -1646,7 +1665,9 @@ call_00_0e62:
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:0e7b $cd $6e $07
     jp   call_00_0b92_UpdateVRAMTiles                                  ;; 00:0e7e $c3 $92 $0b
 
-call_00_0e81:
+call_00_0e81_LoadPalettesToHardware:
+; If wDD6A=0, fills BG/OBJ palettes with default gray values. 
+; Otherwise, copies palette data from wDCEA_BgPalettes into hardware registers rBCPD/rOCPD.
     ld   A, [wDD6A]                                    ;; 00:0e81 $fa $6a $dd
     and  A, A                                          ;; 00:0e84 $a7
     jr   NZ, .jr_00_0e97                               ;; 00:0e85 $20 $10
@@ -1709,17 +1730,22 @@ call_00_0e81:
     ret                                                ;; 00:0edc $c9
 
 call_00_0edd_CallAltBankFunc:
+; Switches to a new ROM bank (call_00_0eee_SwitchBank), 
+; calls the function at HL in that bank, then restores 
+; the previous bank (call_00_0f08_RestoreBank).
     push HL                                            ;; 00:0edd $e5
     call call_00_0eee_SwitchBank                                  ;; 00:0ede $cd $ee $0e
     pop  HL                                            ;; 00:0ee1 $e1
     ld   A, [wDAD6_ReturnBank]                                    ;; 00:0ee2 $fa $d6 $da
-    call call_00_0f22_CallFuncInHL                                  ;; 00:0ee5 $cd $22 $0f
+    call call_00_0f22_JumpHL                                  ;; 00:0ee5 $cd $22 $0f
     push AF                                            ;; 00:0ee8 $f5
-    call call_00_0f08_SwitchBank2                                  ;; 00:0ee9 $cd $08 $0f
+    call call_00_0f08_RestoreBank                                  ;; 00:0ee9 $cd $08 $0f
     pop  AF                                            ;; 00:0eec $f1
     ret                                                ;; 00:0eed $c9
 
 call_00_0eee_SwitchBank:
+; Core bank-switch: stores new bank in wDAD5 and MBC1RomBank, 
+; updates bookkeeping pointers (wDAD3), sets SRAM bank.
     ld   HL, wDAD3                                     ;; 00:0eee $21 $d3 $da
     ld   E, [HL]                                       ;; 00:0ef1 $5e
     inc  HL                                            ;; 00:0ef2 $23
@@ -1737,7 +1763,9 @@ call_00_0eee_SwitchBank:
     ld   [MBC1SRamBank], A                                    ;; 00:0f04 $ea $01 $40
     ret                                                ;; 00:0f07 $c9
 
-call_00_0f08_SwitchBank2:
+call_00_0f08_RestoreBank:
+; Restores the previously saved ROM bank by reading from 
+; wDAD3 bookkeeping pointers and writing to MBC1RomBank.
     ld   HL, wDAD3                                     ;; 00:0f08 $21 $d3 $da
     ld   E, [HL]                                       ;; 00:0f0b $5e
     inc  HL                                            ;; 00:0f0c $23
@@ -1755,11 +1783,14 @@ call_00_0f08_SwitchBank2:
     ld   [MBC1SRamBank], A                                    ;; 00:0f1e $ea $01 $40
     ret                                                ;; 00:0f21 $c9
 
-call_00_0f22_CallFuncInHL:
+call_00_0f22_JumpHL:
+; Jumps to the address in HL (tail-call helper).
     jp   HL                                            ;; 00:0f22 $e9
     db   $3e, $03                                      ;; 00:0f23 ??
 
 call_00_0f25_AltSwitchBank:
+; Lightweight bank switch: writes A directly to MBC1RomBank 
+; and SRAM bank. Used for quick bank changes.
     ld   [MBC1RomBank], A                                    ;; 00:0f25 $ea $01 $20
     swap A                                             ;; 00:0f28 $cb $37
     rrca                                               ;; 00:0f2a $0f
@@ -1767,7 +1798,9 @@ call_00_0f25_AltSwitchBank:
     ld   [MBC1SRamBank], A                                    ;; 00:0f2d $ea $01 $40
     ret                                                ;; 00:0f30 $c9
 
-call_00_0f31:
+call_00_0f31_ReadJoypadInput:
+; Performs joypad polling using hardware port $20: latches directions/buttons, 
+; masks and merges results, stores in wDAD7_CurrentInputs.
     ld   C, $00                                        ;; 00:0f31 $0e $00
     ld   A, $20                                        ;; 00:0f33 $3e $20
     ldh  [C], A                                        ;; 00:0f35 $e2
@@ -1805,34 +1838,36 @@ call_00_0f31:
     ld   [wDAD7_CurrentInputs], A                                    ;; 00:0f5a $ea $d7 $da
     ret                                                ;; 00:0f5d $c9
 
-call_00_0f5e:
+call_00_0f5e_WaitForInputClear:
+; Continuously updates VRAM tiles and loops until wDAD7_CurrentInputs 
+; becomes zero (no buttons pressed).
     call call_00_0b92_UpdateVRAMTiles                                  ;; 00:0f5e $cd $92 $0b
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:0f61 $fa $d7 $da
     and  A, A                                          ;; 00:0f64 $a7
-    jr   NZ, call_00_0f5e                              ;; 00:0f65 $20 $f7
+    jr   NZ, call_00_0f5e_WaitForInputClear                              ;; 00:0f65 $20 $f7
     ret                                                ;; 00:0f67 $c9
 
-call_00_0f68:
+call_00_0f68_CheckInputLeft:
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:0f68 $fa $d7 $da
     and  A, $20                                        ;; 00:0f6b $e6 $20
     ret                                                ;; 00:0f6d $c9
 
-call_00_0f6e:
+call_00_0f6e_CheckInputRight:
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:0f6e $fa $d7 $da
     and  A, $10                                        ;; 00:0f71 $e6 $10
     ret                                                ;; 00:0f73 $c9
 
-call_00_0f74:
+call_00_0f74_CheckInputUp:
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:0f74 $fa $d7 $da
     and  A, $40                                        ;; 00:0f77 $e6 $40
     ret                                                ;; 00:0f79 $c9
 
-call_00_0f7a:
+call_00_0f7a_CheckInputDown:
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:0f7a $fa $d7 $da
     and  A, $80                                        ;; 00:0f7d $e6 $80
     ret                                                ;; 00:0f7f $c9
 
-call_00_0f80:
+call_00_0f80_CheckInputStart:
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:0f80 $fa $d7 $da
     cp   A, $08                                        ;; 00:0f83 $fe $08
     jr   Z, .jr_00_0f89                                ;; 00:0f85 $28 $02
@@ -1842,7 +1877,13 @@ call_00_0f80:
     and  A, A                                          ;; 00:0f89 $a7
     ret                                                ;; 00:0f8a $c9
 
-call_00_0f8b:
+call_00_0f8b_CheckInputSelect:
+; Purpose: Tests if the current input state (wDAD7_CurrentInputs) equals $04. 
+; If so, returns A unchanged; otherwise clears A.
+; Usage: Likely a quick check for a specific button press (e.g., “Right” or a single button).
+; Behavior:
+; A == $04 → returns immediately.
+; Otherwise sets A=0 and returns.
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:0f8b $fa $d7 $da
     cp   A, $04                                        ;; 00:0f8e $fe $04
     jr   Z, .jr_00_0f94                                ;; 00:0f90 $28 $02
@@ -1851,14 +1892,23 @@ call_00_0f8b:
 .jr_00_0f94:
     and  A, A                                          ;; 00:0f94 $a7
     ret                                                ;; 00:0f95 $c9
-    db   $fa, $d7, $da, $e6, $01, $c9                  ;; 00:0f96 ??????
 
-call_00_0f9c:
+call_00_0f96_CheckInputA:
+    ld   a,[wDAD7_CurrentInputs]
+    and  a,$01
+    ret  
+
+call_00_0f9c_CheckInputB:
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:0f9c $fa $d7 $da
     and  A, $02                                        ;; 00:0f9f $e6 $02
     ret                                                ;; 00:0fa1 $c9
 
-call_00_0fa2:
+call_00_0fa2_UpdateTileBankForNewID:
+; Compares a new ID in A against $FF and the current ID at wDE5C.
+; If it changed, writes it, updates VRAM tiles (call_00_0b92_UpdateVRAMTiles), 
+; swaps nibbles to compute a bank index (wDE60), and calls two bank-switch helpers 
+; (call_00_0eee_SwitchBank and call_00_0f08_RestoreBank).
+; Usage: Manages background/tileset bank changes when a new tile set is requested.
     cp   A, $ff                                        ;; 00:0fa2 $fe $ff
     ret  Z                                             ;; 00:0fa4 $c8
     ld   HL, wDE5C                                     ;; 00:0fa5 $21 $5c $de
@@ -1875,19 +1925,25 @@ call_00_0fa2:
     ld   A, [wDE5C]                                    ;; 00:0fbd $fa $5c $de
     and  A, $0f                                        ;; 00:0fc0 $e6 $0f
     call call_04_4006                                  ;; 00:0fc2 $cd $06 $40
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:0fc5 $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:0fc5 $c3 $08 $0f
 
-call_00_0fc8:
+call_00_0fc8_ProcessQueuedBankChange:
+; Reads wDE5D (queued ID), clears it to $FF.
+; If valid, switches to bank $04, calls tile loading (call_04_4024) twice, 
+; updates wDE5F with a stored value, then switches back via call_00_0f08_RestoreBank.
+; Usage: Deferred processing of a requested bank/tile update after the previous one completed.
     ld   HL, wDE5D                                     ;; 00:0fc8 $21 $5d $de
     ld   A, [HL]                                       ;; 00:0fcb $7e
     ld   [HL], $ff                                     ;; 00:0fcc $36 $ff
     cp   A, $ff                                        ;; 00:0fce $fe $ff
-    jr   NZ, call_00_0fd7                              ;; 00:0fd0 $20 $05
+    jr   NZ, call_00_0fd7_ProcessBankedTileLoad                              ;; 00:0fd0 $20 $05
     xor  A, A                                          ;; 00:0fd2 $af
     ld   [wDE5E], A                                    ;; 00:0fd3 $ea $5e $de
     ret                                                ;; 00:0fd6 $c9
 
-call_00_0fd7:
+call_00_0fd7_ProcessBankedTileLoad:
+; If A≠$FF, switches to bank $04, calls tile loading in call_04_4024, 
+; saves/clears queued bank info (wDE5E/wDE5F), and restores previous bank.
     cp   A, $ff                                        ;; 00:0fd7 $fe $ff
     ret  Z                                             ;; 00:0fd9 $c8
     push AF                                            ;; 00:0fda $f5
@@ -1901,9 +1957,14 @@ call_00_0fd7:
     ld   A, [HL]                                       ;; 00:0fec $7e
     ld   [HL], $00                                     ;; 00:0fed $36 $00
     ld   [wDE5F], A                                    ;; 00:0fef $ea $5f $de
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:0ff2 $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:0ff2 $c3 $08 $0f
 
-call_00_0ff5:
+call_00_0ff5_MaybeQueueBankChange:
+; Uses A as an index into a small table at $1037 → gets a priority/weight in B.
+; Checks several flags in the wDF68…wDF71 range (likely “busy” or “VRAM locked” flags).
+; If resources are free, and if the new request’s priority is not lower than the 
+; currently queued one (wDE5F/wDE5E), stores the new ID (wDE5D) and priority (wDE5E).
+; Usage: Chooses whether to queue a new bank/tile update based on system state and priority.
     cp   A, $ff                                        ;; 00:0ff5 $fe $ff
     ret  Z                                             ;; 00:0ff7 $c8
     ld   C, A                                          ;; 00:0ff8 $4f
@@ -1954,7 +2015,11 @@ call_00_0ff5:
 
 INCLUDE "bank00_load_maps.asm"
 
-call_00_1bbc:
+call_00_1bbc_CheckPlayerLevelTriggers:
+; Using the current level number (wDC1E_CurrentLevelNumber) and position (wD80E/wD810), 
+; scans a table (.data_00_1c33) for proximity to trigger points. If within a bounding box, 
+; writes trigger data to wDCC1/wDCC2, sets wDC69, and marks wDB6A flag. 
+; Skips special levels $05 or $0B.
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:1bbc $fa $1e $dc
     cp   A, $05                                        ;; 00:1bbf $fe $05
     ret  Z                                             ;; 00:1bc1 $c8
@@ -2112,7 +2177,25 @@ call_00_1bbc:
     db   $ff, $38, $01, $80, $01, $ff, $02, $ff        ;; 00:1e93 ????????
     db   $38, $01, $80, $01, $ff                       ;; 00:1e9b ?????
 
-call_00_1ea0_UpdateMain:
+call_00_1ea0_LoadAndRunLevelScript:
+; Uses the current level number (wDC1E_CurrentLevelNumber) and sub-index (wDC5A) 
+; to select an entry from .data_00_1fc0.
+; Retrieves a pointer from .data_00_1ff0 to a level setup script (data_2014, 202a, 2040, …).
+; Temporarily stores the current level ID, loads a new one from the script, and swaps 
+; banks to copy in the proper level/map data (entry_03_6c89_CopyLevelData, entry_03_6203, etc.).
+; Sets the player’s starting X/Y positions and various working variables.
+
+; Enters a loop that:
+; Waits for input or script completion.
+; Updates VRAM tiles and background map.
+; Calls call_00_217f_ApplyPlayerMovementFlags (movement handler below) and updates objects (entry_02_7152_UpdateObjects).
+; Spawns any queued objects (call_00_35fa_WaitForLineThenSpawnObject).
+; Decrements timing counters until the script says to advance or exit.
+
+; After finishing, restores the previous level ID and player positions, 
+; then copies level data again for the new state.
+; Usage: Core routine for loading and running scripted level transitions—used for cutscenes, checkpoints, 
+; or changing areas while preserving player state.
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:1ea0 $21 $1e $dc
     ld   L, [HL]                                       ;; 00:1ea3 $6e
     ld   H, $00                                        ;; 00:1ea4 $26 $00
@@ -2173,8 +2256,8 @@ call_00_1ea0_UpdateMain:
     ld   A, $03                                        ;; 00:1efb $3e $03
     ld   HL, entry_03_6203                                     ;; 00:1efd $21 $03 $62
     call call_00_0edd_CallAltBankFunc                                  ;; 00:1f00 $cd $dd $0e
-    call call_00_10de                                  ;; 00:1f03 $cd $de $10
-    call call_00_1056_LoadMap                                  ;; 00:1f06 $cd $56 $10
+    call call_00_10de_UpdatePlayerMapWindow                                  ;; 00:1f03 $cd $de $10
+    call call_00_1056_LoadFullMap                                  ;; 00:1f06 $cd $56 $10
     ld   [wDAD6_ReturnBank], A                                    ;; 00:1f09 $ea $d6 $da
     ld   A, $02                                        ;; 00:1f0c $3e $02
     ld   HL, entry_02_708f                                     ;; 00:1f0e $21 $8f $70
@@ -2211,12 +2294,12 @@ call_00_1ea0_UpdateMain:
     jp   .jp_00_1f9f                                   ;; 00:1f3f $c3 $9f $1f
 .jr_00_1f42:
     call call_00_0b92_UpdateVRAMTiles                                  ;; 00:1f42 $cd $92 $0b
-    call call_00_217f                                  ;; 00:1f45 $cd $7f $21
+    call call_00_217f_ApplyPlayerMovementFlags                                  ;; 00:1f45 $cd $7f $21
     ld   [wDAD6_ReturnBank], A                                    ;; 00:1f48 $ea $d6 $da
     ld   A, $02                                        ;; 00:1f4b $3e $02
     ld   HL, entry_02_7152_UpdateObjects                                     ;; 00:1f4d $21 $52 $71
     call call_00_0edd_CallAltBankFunc                                  ;; 00:1f50 $cd $dd $0e
-    call call_00_11c8_LoadBgMap                                  ;; 00:1f53 $cd $c8 $11
+    call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:1f53 $cd $c8 $11
     call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:1f56 $cd $fa $35
     call call_00_08f8                                  ;; 00:1f59 $cd $f8 $08
     ld   HL, wDCDE                                     ;; 00:1f5c $21 $de $dc
@@ -2249,7 +2332,7 @@ call_00_1ea0_UpdateMain:
     ld   A, $02                                        ;; 00:1f81 $3e $02
     ld   HL, entry_02_7152_UpdateObjects                                     ;; 00:1f83 $21 $52 $71
     call call_00_0edd_CallAltBankFunc                                  ;; 00:1f86 $cd $dd $0e
-    call call_00_11c8_LoadBgMap                                  ;; 00:1f89 $cd $c8 $11
+    call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:1f89 $cd $c8 $11
     call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:1f8c $cd $fa $35
     call call_00_08f8                                  ;; 00:1f8f $cd $f8 $08
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:1f92 $fa $d7 $da
@@ -2346,7 +2429,16 @@ call_00_1ea0_UpdateMain:
     db   $00, $00, $00, $3c, $00, $10, $20, $02        ;; 00:2170 ????????
     db   $50, $40, $00, $00, $3c, $00, $ff             ;; 00:2178 ???????
 
-call_00_217f:
+call_00_217f_ApplyPlayerMovementFlags:
+; Reads wDC81 (movement/control flags).
+; Writes either $10 or $00 to wDCE0, mixes low bits into its second byte, then derives a movement step (C).
+; Checks bits in wDC81 to adjust player position:
+; Bit 4: move player right by C.
+; Bit 5: move player left by C.
+; Bit 7: move player down by C.
+; Bit 6: move player up by C.
+; Updates both low and high bytes of player X/Y position (wD80E–wD811) with proper carry/borrow handling.
+; Usage: Low-level player movement updater—applies directional flags and speed accumulation each frame.
     ld   A, [wDC81]                                    ;; 00:217f $fa $81 $dc
     and  A, A                                          ;; 00:2182 $a7
     jr   NZ, .jr_00_218c                               ;; 00:2183 $20 $07

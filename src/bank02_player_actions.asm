@@ -9,7 +9,7 @@ call_02_47b4:
     ld   A, $05                                        ;; 02:47c4 $3e $05
     ld   [wDCA4], A                                    ;; 02:47c6 $ea $a4 $dc
     ld   A, $0e                                        ;; 02:47c9 $3e $0e
-    jp   call_00_0ff5                                  ;; 02:47cb $c3 $f5 $0f
+    jp   call_00_0ff5_MaybeQueueBankChange                                  ;; 02:47cb $c3 $f5 $0f
 
 call_02_47ce:
     ld   HL, wD805                                     ;; 02:47ce $21 $05 $d8
@@ -26,7 +26,7 @@ call_02_47ce:
 .jr_02_47e9:
     ld   A, [wDC81]                                    ;; 02:47e9 $fa $81 $dc
     cp   A, $40                                        ;; 02:47ec $fe $40
-    call Z, call_00_1bbc                               ;; 02:47ee $cc $bc $1b
+    call Z, call_00_1bbc_CheckPlayerLevelTriggers                               ;; 02:47ee $cc $bc $1b
     call call_02_4f11                                  ;; 02:47f1 $cd $11 $4f
     ld   HL, wDC83                                     ;; 02:47f4 $21 $83 $dc
     dec  [HL]                                          ;; 02:47f7 $35
@@ -37,7 +37,7 @@ call_02_47ce:
 call_02_47fe:
     ld   A, [wDC81]                                    ;; 02:47fe $fa $81 $dc
     cp   A, $40                                        ;; 02:4801 $fe $40
-    call Z, call_00_1bbc                               ;; 02:4803 $cc $bc $1b
+    call Z, call_00_1bbc_CheckPlayerLevelTriggers                               ;; 02:4803 $cc $bc $1b
     call call_02_4f11                                  ;; 02:4806 $cd $11 $4f
     ret                                                ;; 02:4809 $c9
 
@@ -91,7 +91,7 @@ call_02_484d:
     ld   [wDC8E], A                                    ;; 02:4859 $ea $8e $dc
     call call_02_4e01                                  ;; 02:485c $cd $01 $4e
     ld   A, $0a                                        ;; 02:485f $3e $0a
-    call call_00_0ff5                                  ;; 02:4861 $cd $f5 $0f
+    call call_00_0ff5_MaybeQueueBankChange                                  ;; 02:4861 $cd $f5 $0f
 .jr_02_4864:
     ld   A, $3c                                        ;; 02:4864 $3e $3c
     ld   [wDC7E], A                                    ;; 02:4866 $ea $7e $dc
@@ -108,7 +108,7 @@ call_02_4873:
     xor  A, A                                          ;; 02:487a $af
     ld   [wDC87], A                                    ;; 02:487b $ea $87 $dc
     ld   A, $0d                                        ;; 02:487e $3e $0d
-    call call_00_0ff5                                  ;; 02:4880 $cd $f5 $0f
+    call call_00_0ff5_MaybeQueueBankChange                                  ;; 02:4880 $cd $f5 $0f
 .jr_02_4883:
     ld   A, $3c                                        ;; 02:4883 $3e $3c
     ld   [wDC7E], A                                    ;; 02:4885 $ea $7e $dc
@@ -131,7 +131,7 @@ call_02_48a1:
     ld   HL, wD805                                     ;; 02:48a1 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:48a4 $cb $66
     ld   A, $1d                                        ;; 02:48a6 $3e $1d
-    call NZ, call_00_0ff5                              ;; 02:48a8 $c4 $f5 $0f
+    call NZ, call_00_0ff5_MaybeQueueBankChange                              ;; 02:48a8 $c4 $f5 $0f
     ld   C, $11                                        ;; 02:48ab $0e $11
     jp   jp_02_4db1                                    ;; 02:48ad $c3 $b1 $4d
 
@@ -148,7 +148,7 @@ call_02_48bc:
     bit  4, [HL]                                       ;; 02:48bf $cb $66
     jr   Z, .jr_02_48d6                                ;; 02:48c1 $28 $13
     ld   A, $06                                        ;; 02:48c3 $3e $06
-    call call_00_0ff5                                  ;; 02:48c5 $cd $f5 $0f
+    call call_00_0ff5_MaybeQueueBankChange                                  ;; 02:48c5 $cd $f5 $0f
     ld   A, $2a                                        ;; 02:48c8 $3e $2a
     ld   [wDC8C], A                                    ;; 02:48ca $ea $8c $dc
     ld   [wDC8E], A                                    ;; 02:48cd $ea $8e $dc
@@ -170,7 +170,7 @@ call_02_48e8:
     jr   Z, .jr_02_4902                                ;; 02:48ed $28 $13
 .jr_02_48ef:
     ld   A, $07                                        ;; 02:48ef $3e $07
-    call call_00_0ff5                                  ;; 02:48f1 $cd $f5 $0f
+    call call_00_0ff5_MaybeQueueBankChange                                  ;; 02:48f1 $cd $f5 $0f
     ld   A, $3e                                        ;; 02:48f4 $3e $3e
     ld   [wDC8C], A                                    ;; 02:48f6 $ea $8c $dc
     ld   [wDC8E], A                                    ;; 02:48f9 $ea $8e $dc
@@ -190,7 +190,7 @@ call_02_4911:
     bit  4, [HL]                                       ;; 02:4914 $cb $66
     jr   Z, .jr_02_492a                                ;; 02:4916 $28 $12
     ld   A, $04                                        ;; 02:4918 $3e $04
-    call call_00_0ff5                                  ;; 02:491a $cd $f5 $0f
+    call call_00_0ff5_MaybeQueueBankChange                                  ;; 02:491a $cd $f5 $0f
     ld   HL, wDC80                                     ;; 02:491d $21 $80 $dc
     set  0, [HL]                                       ;; 02:4920 $cb $c6
     ld   A, $01                                        ;; 02:4922 $3e $01
@@ -242,7 +242,7 @@ call_02_497a:
     ld   HL, wD805                                     ;; 02:497a $21 $05 $d8
     bit  4, [HL]                                       ;; 02:497d $cb $66
     ld   A, $08                                        ;; 02:497f $3e $08
-    call NZ, call_00_0ff5                              ;; 02:4981 $c4 $f5 $0f
+    call NZ, call_00_0ff5_MaybeQueueBankChange                              ;; 02:4981 $c4 $f5 $0f
     xor  A, A                                          ;; 02:4984 $af
     ld   [wDC87], A                                    ;; 02:4985 $ea $87 $dc
     ret                                                ;; 02:4988 $c9
@@ -257,7 +257,7 @@ call_02_4989:
     call call_02_4e01
     call call_00_06f6
     ld   a,$0B
-    call call_00_0ff5
+    call call_00_0ff5_MaybeQueueBankChange
     ld   a,$14
     call entry_02_72ac
 
@@ -378,7 +378,7 @@ call_02_4a6e:
     bit  4,[hl]
     jr   z,label4A87
     ld   a,$04
-    call call_00_0ff5
+    call call_00_0ff5_MaybeQueueBankChange
     ld   hl,wDC80
     set  0,[hl]
     ld   a,$01
@@ -488,7 +488,7 @@ call_02_4adb:
     and  a,$01
     jr   z,.call_02_4B55
     ld   a,$04
-    call call_00_0ff5
+    call call_00_0ff5_MaybeQueueBankChange
     ld   hl,wDC80
     set  0,[hl]
     call call_02_4e01
@@ -567,7 +567,7 @@ call_02_4bb7:
 label4BDC:
     ld   a,[wDC81]
     bit  6,a
-    call nz,call_00_1bbc
+    call nz,call_00_1bbc_CheckPlayerLevelTriggers
     call call_02_4E0C
     ld   a,[wDCA5]
     and  a
@@ -613,7 +613,7 @@ call_02_4c2c:
     bit  4,[hl]
     jr   z,label4C46
     ld   a,$06
-    call call_00_0ff5
+    call call_00_0ff5_MaybeQueueBankChange
     ld   a,$2A
     ld   [wDC8C],a
     ld   [wDC8E],a
@@ -634,7 +634,7 @@ call_02_4c58:
     bit  4,[hl]
     jr   z,label4C72
     ld   a,$07
-    call call_00_0ff5
+    call call_00_0ff5_MaybeQueueBankChange
     ld   a,$3E
     ld   [wDC8C],a
     ld   [wDC8E],a
@@ -657,7 +657,7 @@ call_02_4c7a:
     ld   a,$0B
     ld   [wDCA4],a
     ld   a,$04
-    call call_00_0ff5
+    call call_00_0ff5_MaybeQueueBankChange
     ld   hl,wDC80
     set  0,[hl]
     ld   a,$01
@@ -689,7 +689,7 @@ call_02_4cbd:
     ld   [wDC8E],a
     call call_02_4e01
     ld   a,$0A
-    call call_00_0ff5
+    call call_00_0ff5_MaybeQueueBankChange
 label4CD4:
     ld   a,$3C
     ld   [wDC7E],a
@@ -701,7 +701,7 @@ label4CD4:
 
 call_02_4ce3:
     ld   a,$06
-    call call_00_0ff5
+    call call_00_0ff5_MaybeQueueBankChange
     call call_02_4e01
     ld   a,$31
     call entry_02_54f9
@@ -724,7 +724,7 @@ call_02_4d02:
 
 call_02_4d14:
     ld   a,$07
-    call call_00_0ff5
+    call call_00_0ff5_MaybeQueueBankChange
     call call_02_4e01
     ld   a,$33
     call entry_02_54f9
@@ -750,7 +750,7 @@ call_02_4d45:
     bit  4,[hl]
     jr   z,label4D5E
     ld   a,$04
-    call call_00_0ff5
+    call call_00_0ff5_MaybeQueueBankChange
     ld   hl,wDC80
     set  0,[hl]
     ld   a,$01
@@ -790,7 +790,7 @@ call_02_4d8b:
     ld   [wDC8E],a
     call call_02_4e01
     ld   a,$0A
-    call call_00_0ff5
+    call call_00_0ff5_MaybeQueueBankChange
 label4DA2:
     ld   a,$3C
     ld   [wDC7E],a

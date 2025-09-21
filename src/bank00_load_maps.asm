@@ -1,6 +1,10 @@
-call_00_1056_LoadMap:
-    call call_00_0e3b                                  ;; 00:1056 $cd $3b $0e
-    call call_00_0e62                                  ;; 00:1059 $cd $62 $0e
+call_00_1056_LoadFullMap:
+; Role: Orchestrates loading an entire level/map. Clears game state, resets VRAM/tables, 
+; loads palettes and background maps in several passes, copies collision tileset data to WRAM, 
+; updates VRAM tiles, calls external banked functions for map-specific assets, and finally resets status flags.
+; Why: It’s the master routine for initializing a new map and its supporting graphics/collision data.
+    call call_00_0e3b_ClearGameState                                  ;; 00:1056 $cd $3b $0e
+    call call_00_0e62_ResetDD6AAndVRAM                                  ;; 00:1059 $cd $62 $0e
     call call_00_10c7_InitRowOffsetTableForMap                                  ;; 00:105c $cd $c7 $10
     ld   C, $00                                        ;; 00:105f $0e $00
     ld   [wDAD6_ReturnBank], A                                    ;; 00:1061 $ea $d6 $da
@@ -41,7 +45,7 @@ call_00_1056_LoadMap:
     pop  DE                                            ;; 00:10ad $d1
     inc  E                                             ;; 00:10ae $1c
     jr   NZ, .jr_00_10a4                               ;; 00:10af $20 $f3
-    call call_00_0f08_SwitchBank2                                  ;; 00:10b1 $cd $08 $0f
+    call call_00_0f08_RestoreBank                                  ;; 00:10b1 $cd $08 $0f
     call call_00_0b92_UpdateVRAMTiles                                  ;; 00:10b4 $cd $92 $0b
     ld   [wDAD6_ReturnBank], A                                    ;; 00:10b7 $ea $d6 $da
     ld   A, $02                                        ;; 00:10ba $3e $02
@@ -52,6 +56,9 @@ call_00_1056_LoadMap:
     ret                                                ;; 00:10c6 $c9
 
 call_00_10c7_InitRowOffsetTableForMap:
+; Role: Builds a lookup table of row start addresses for a tilemap based on its width, 
+; so the engine can quickly convert (x,y) positions to memory offsets.
+; Why: This table accelerates map rendering and collision checks by precomputing row offsets.
     ld   HL, wDC1C_CurrentMapWidthAndHeightInBlocks                                     ;; 00:10c7 $21 $1c $dc
     ld   C, [HL]                                       ;; 00:10ca $4e
     ld   B, $00                                        ;; 00:10cb $06 $00
@@ -69,7 +76,11 @@ call_00_10c7_InitRowOffsetTableForMap:
     jr   NZ, .jr_00_10d3                               ;; 00:10db $20 $f6
     ret                                                ;; 00:10dd $c9
 
-call_00_10de:
+call_00_10de_UpdatePlayerMapWindow:
+; Role: Computes the player’s X/Y position within the map, clamps it against map bounds, 
+; and calculates visible window extents. Stores several intermediate values 
+; (e.g., wDA14–wDA1B, wDBF9–wDBFC) used for scrolling and collision.
+; Why: Prepares all map-relative coordinates for rendering and collision based on the player’s position.
     ld   A, [wDC29]                                    ;; 00:10de $fa $29 $dc
     and  A, A                                          ;; 00:10e1 $a7
     ret  NZ                                            ;; 00:10e2 $c0
@@ -221,13 +232,17 @@ call_00_10de:
     ld   [wDAAD], A                                    ;; 00:11c4 $ea $ad $da
     ret                                                ;; 00:11c7 $c9
 
-call_00_11c8_LoadBgMap:
+call_00_11c8_LoadBgMapDirtyRegions:
+; Role: Checks scroll flags in wDC20 to see whether vertical or horizontal 
+; background map sections need updating. Calls the appropriate vertical (11E5) 
+; or horizontal (1351) loader and sets a busy flag.
+; Why: Handles incremental background updates only where scrolling occurred.
     ld   HL, wDC20                                     ;; 00:11c8 $21 $20 $dc
     bit  7, [HL]                                       ;; 00:11cb $cb $7e
-    jr   NZ, call_00_11c8_LoadBgMap                              ;; 00:11cd $20 $f9
+    jr   NZ, call_00_11c8_LoadBgMapDirtyRegions                              ;; 00:11cd $20 $f9
     ld   A, [wDC20]                                    ;; 00:11cf $fa $20 $dc
     and  A, $03                                        ;; 00:11d2 $e6 $03
-    call NZ, call_00_11e5_LoadBgMapVertical                              ;; 00:11d4 $c4 $e5 $11
+    call NZ, call_00_11e5_LoadVerticalBgStrip                              ;; 00:11d4 $c4 $e5 $11
     ld   A, [wDC20]                                    ;; 00:11d7 $fa $20 $dc
     and  A, $0c                                        ;; 00:11da $e6 $0c
     call NZ, call_00_1351_LoadBgMapHorizontal                              ;; 00:11dc $c4 $51 $13
@@ -235,7 +250,11 @@ call_00_11c8_LoadBgMap:
     set  7, [HL]                                       ;; 00:11e2 $cb $fe
     ret                                                ;; 00:11e4 $c9
 
-call_00_11e5_LoadBgMapVertical:
+call_00_11e5_LoadVerticalBgStrip:
+; Role: Loads a vertical strip of background tiles into VRAM based on the player’s Y position. 
+; Switches between multiple banks to pull map, extended, and collision data, 
+; then assembles tiles and writes them to VRAM buffers.
+; Why: Updates the tilemap column(s) entering view when the camera scrolls vertically.
     ld   HL, wDBFB_YPositionInMap                                     ;; 00:11e5 $21 $fb $db
     ld   A, [HL+]                                      ;; 00:11e8 $2a
     ld   C, A                                          ;; 00:11e9 $4f
@@ -312,7 +331,7 @@ call_00_11e5_LoadBgMapVertical:
     inc  DE                                            ;; 00:1258 $13
     dec  B                                             ;; 00:1259 $05
     jr   NZ, .jr_00_1253                               ;; 00:125a $20 $f7
-    call call_00_0f08_SwitchBank2                                  ;; 00:125c $cd $08 $0f
+    call call_00_0f08_RestoreBank                                  ;; 00:125c $cd $08 $0f
     ld   A, [wDC04_MapExtendedBank]                                    ;; 00:125f $fa $04 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:1262 $cd $ee $0e
     ld   HL, wDC28                                     ;; 00:1265 $21 $28 $dc
@@ -347,7 +366,7 @@ call_00_11e5_LoadBgMapVertical:
     inc  DE                                            ;; 00:128e $13
     dec  B                                             ;; 00:128f $05
     jr   NZ, .jr_00_1289                               ;; 00:1290 $20 $f7
-    call call_00_0f08_SwitchBank2                                  ;; 00:1292 $cd $08 $0f
+    call call_00_0f08_RestoreBank                                  ;; 00:1292 $cd $08 $0f
     ld   A, [wDC0D_MapCollisionBank]                                    ;; 00:1295 $fa $0d $dc
     call call_00_0eee_SwitchBank                                  ;; 00:1298 $cd $ee $0e
     ld   HL, wDC28                                     ;; 00:129b $21 $28 $dc
@@ -391,7 +410,7 @@ call_00_11e5_LoadBgMapVertical:
     inc  DE                                            ;; 00:12cf $13
     dec  B                                             ;; 00:12d0 $05
     jr   NZ, .jr_00_12c2                               ;; 00:12d1 $20 $ef
-    call call_00_0f08_SwitchBank2                                  ;; 00:12d3 $cd $08 $0f
+    call call_00_0f08_RestoreBank                                  ;; 00:12d3 $cd $08 $0f
     ld   A, [wDC0A_BlocksetBank]                                    ;; 00:12d6 $fa $0a $dc
     call call_00_0eee_SwitchBank                                  ;; 00:12d9 $cd $ee $0e
     ld   HL, wDC25                                     ;; 00:12dc $21 $25 $dc
@@ -437,7 +456,7 @@ call_00_11e5_LoadBgMapVertical:
     pop  AF                                            ;; 00:130e $f1
     dec  A                                             ;; 00:130f $3d
     jr   NZ, .jr_00_12ef                               ;; 00:1310 $20 $dd
-    call call_00_0f08_SwitchBank2                                  ;; 00:1312 $cd $08 $0f
+    call call_00_0f08_RestoreBank                                  ;; 00:1312 $cd $08 $0f
     ld   A, [wDC10_CollisionBlockset]                                    ;; 00:1315 $fa $10 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:1318 $cd $ee $0e
     ld   HL, wDC22                                     ;; 00:131b $21 $22 $dc
@@ -479,7 +498,7 @@ call_00_11e5_LoadBgMapVertical:
     pop  AF                                            ;; 00:134a $f1
     dec  A                                             ;; 00:134b $3d
     jr   NZ, .jr_00_1332                               ;; 00:134c $20 $e4
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:134e $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:134e $c3 $08 $0f
 
 call_00_1351_LoadBgMapHorizontal:
     ld   HL, wDBF9_XPositionInMap                                     ;; 00:1351 $21 $f9 $db
@@ -569,7 +588,7 @@ call_00_1351_LoadBgMapHorizontal:
     pop  AF                                            ;; 00:13d3 $f1
     dec  A                                             ;; 00:13d4 $3d
     jr   NZ, .jr_00_13cb                               ;; 00:13d5 $20 $f4
-    call call_00_0f08_SwitchBank2                                  ;; 00:13d7 $cd $08 $0f
+    call call_00_0f08_RestoreBank                                  ;; 00:13d7 $cd $08 $0f
     ld   A, [wDC04_MapExtendedBank]                                    ;; 00:13da $fa $04 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:13dd $cd $ee $0e
     ld   HL, wDC28                                     ;; 00:13e0 $21 $28 $dc
@@ -610,7 +629,7 @@ call_00_1351_LoadBgMapHorizontal:
     pop  AF                                            ;; 00:1412 $f1
     dec  A                                             ;; 00:1413 $3d
     jr   NZ, .jr_00_140a                               ;; 00:1414 $20 $f4
-    call call_00_0f08_SwitchBank2                                  ;; 00:1416 $cd $08 $0f
+    call call_00_0f08_RestoreBank                                  ;; 00:1416 $cd $08 $0f
     ld   A, [wDC0D_MapCollisionBank]                                    ;; 00:1419 $fa $0d $dc
     call call_00_0eee_SwitchBank                                  ;; 00:141c $cd $ee $0e
     ld   HL, wDC28                                     ;; 00:141f $21 $28 $dc
@@ -655,7 +674,7 @@ call_00_1351_LoadBgMapHorizontal:
     pop  AF                                            ;; 00:1458 $f1
     dec  A                                             ;; 00:1459 $3d
     jr   NZ, .jr_00_1449                               ;; 00:145a $20 $ed
-    call call_00_0f08_SwitchBank2                                  ;; 00:145c $cd $08 $0f
+    call call_00_0f08_RestoreBank                                  ;; 00:145c $cd $08 $0f
     ld   A, [wDC0A_BlocksetBank]                                    ;; 00:145f $fa $0a $dc
     call call_00_0eee_SwitchBank                                  ;; 00:1462 $cd $ee $0e
     ld   HL, wDC26                                     ;; 00:1465 $21 $26 $dc
@@ -702,7 +721,7 @@ call_00_1351_LoadBgMapHorizontal:
     pop  AF                                            ;; 00:1498 $f1
     dec  A                                             ;; 00:1499 $3d
     jr   NZ, .jr_00_1478                               ;; 00:149a $20 $dc
-    call call_00_0f08_SwitchBank2                                  ;; 00:149c $cd $08 $0f
+    call call_00_0f08_RestoreBank                                  ;; 00:149c $cd $08 $0f
     ld   A, [wDC10_CollisionBlockset]                                    ;; 00:149f $fa $10 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:14a2 $cd $ee $0e
     ld   HL, wDC24                                     ;; 00:14a5 $21 $24 $dc
@@ -748,7 +767,7 @@ call_00_1351_LoadBgMapHorizontal:
     pop  AF                                            ;; 00:14db $f1
     dec  A                                             ;; 00:14dc $3d
     jr   NZ, .jr_00_14bc                               ;; 00:14dd $20 $dd
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:14df $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:14df $c3 $08 $0f
 
 call_00_14e2:
     push BC                                            ;; 00:14e2 $c5
@@ -1135,7 +1154,7 @@ call_00_1a46_LoadBgMapInitial2:
     inc  DE                                            ;; 00:1abb $13
     dec  B                                             ;; 00:1abc $05
     jr   NZ, .jr_00_1ab6                               ;; 00:1abd $20 $f7
-    call call_00_0f08_SwitchBank2                                  ;; 00:1abf $cd $08 $0f
+    call call_00_0f08_RestoreBank                                  ;; 00:1abf $cd $08 $0f
     ld   A, [wDC04_MapExtendedBank]                                    ;; 00:1ac2 $fa $04 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:1ac5 $cd $ee $0e
     ld   HL, wDC28                                     ;; 00:1ac8 $21 $28 $dc
@@ -1170,7 +1189,7 @@ call_00_1a46_LoadBgMapInitial2:
     inc  DE                                            ;; 00:1af1 $13
     dec  B                                             ;; 00:1af2 $05
     jr   NZ, .jr_00_1aec                               ;; 00:1af3 $20 $f7
-    call call_00_0f08_SwitchBank2                                  ;; 00:1af5 $cd $08 $0f
+    call call_00_0f08_RestoreBank                                  ;; 00:1af5 $cd $08 $0f
     ld   A, [wDC0A_BlocksetBank]                                    ;; 00:1af8 $fa $0a $dc
     call call_00_0eee_SwitchBank                                  ;; 00:1afb $cd $ee $0e
     ld   HL, wDC22                                     ;; 00:1afe $21 $22 $dc
@@ -1221,7 +1240,7 @@ call_00_1a46_LoadBgMapInitial2:
     pop  AF                                            ;; 00:1b39 $f1
     dec  A                                             ;; 00:1b3a $3d
     jr   NZ, .jr_00_1b1b                               ;; 00:1b3b $20 $de
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:1b3d $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:1b3d $c3 $08 $0f
 .jp_00_1b40:
     ld   A, [wDC0D_MapCollisionBank]                                    ;; 00:1b40 $fa $0d $dc
     call call_00_0eee_SwitchBank                                  ;; 00:1b43 $cd $ee $0e
@@ -1256,7 +1275,7 @@ call_00_1a46_LoadBgMapInitial2:
     inc  DE                                            ;; 00:1b6e $13
     dec  B                                             ;; 00:1b6f $05
     jr   NZ, .jr_00_1b69                               ;; 00:1b70 $20 $f7
-    call call_00_0f08_SwitchBank2                                  ;; 00:1b72 $cd $08 $0f
+    call call_00_0f08_RestoreBank                                  ;; 00:1b72 $cd $08 $0f
     ld   A, [wDC10_CollisionBlockset]                                    ;; 00:1b75 $fa $10 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:1b78 $cd $ee $0e
     ld   HL, wDC22                                     ;; 00:1b7b $21 $22 $dc
@@ -1305,4 +1324,4 @@ call_00_1a46_LoadBgMapInitial2:
     pop  AF                                            ;; 00:1bb5 $f1
     dec  A                                             ;; 00:1bb6 $3d
     jr   NZ, .jr_00_1b98                               ;; 00:1bb7 $20 $df
-    jp   call_00_0f08_SwitchBank2                                  ;; 00:1bb9 $c3 $08 $0f
+    jp   call_00_0f08_RestoreBank                                  ;; 00:1bb9 $c3 $08 $0f
