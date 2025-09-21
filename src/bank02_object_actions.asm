@@ -1,30 +1,30 @@
-data_02_582e:
+call_02_582e:
     ret                                                ;; 02:582e $c9
 
-data_02_582f:
+call_02_582f:
     call call_00_288c_Object_Clear14
-    call call_00_2b8b
-    call call_00_2a5d
-    jp   nz,call_00_2bbe
+    call call_00_2b8b_HandleObjectFlag6ClearOrInit
+    call call_00_2a5d_ObjectCheckFlag2
+    jp   nz,call_00_2bbe_InitializeNewObject
     ret  
 
-data_02_583c:
-    call call_00_29f5                                  ;; 02:583c $cd $f5 $29
+call_02_583c:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck                                  ;; 02:583c $cd $f5 $29
     jr   Z, .jr_02_5850                                ;; 02:583f $28 $0f
     ld   HL, .data_02_5857                             ;; 02:5841 $21 $57 $58
     call call_00_2c20_ObjectPalette_CopyToBuffer                                  ;; 02:5844 $cd $20 $2c
     call call_00_288c_Object_Clear14                                  ;; 02:5847 $cd $8a $28
-    call call_00_2b8b                                  ;; 02:584a $cd $8b $2b
+    call call_00_2b8b_HandleObjectFlag6ClearOrInit                                  ;; 02:584a $cd $8b $2b
     call call_00_2c67_Particle_InitBurst                                  ;; 02:584d $cd $67 $2c
 .jr_02_5850:
     call call_00_2c89_Particle_UpdateBurst                                  ;; 02:5850 $cd $89 $2c
-    jp   Z, call_00_2bbe                                 ;; 02:5853 $ca $be $2b
+    jp   Z, call_00_2bbe_InitializeNewObject                                 ;; 02:5853 $ca $be $2b
     ret                                                ;; 02:5856 $c9
 .data_02_5857:
     db   $00, $00, $08, $02, $04, $01, $ff, $7f        ;; 02:5857 ........
 
-call_02_585f:   
-    call call_00_29f5
+call_02_585f:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label586E
     ld   c,$80
     call call_00_2980_ObjectSet19
@@ -70,7 +70,9 @@ label589E:
     set  7,[hl]
     ld   c,$78
     jp   call_00_290d_ObjectSetTimer1A
-    call call_00_29f5
+
+call_02_58bd:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label58CC
     ld   c,$80
     call call_00_2980_ObjectSet19
@@ -115,6 +117,8 @@ label58FC:
     set  7,[hl]
     ld   c,$78
     jp   call_00_290d_ObjectSetTimer1A
+
+call_02_5918:
     ld   a,[wDC71]
     rrca 
     and  a,$0F
@@ -122,7 +126,7 @@ label58FC:
     ld   h,00
     add  hl,hl
     add  hl,hl
-    ld   bc,$594F
+    ld   bc,.data_02_594f
     add  hl,bc
     ld   c,l
     ld   b,h
@@ -152,7 +156,7 @@ label58FC:
     adc  d
     ld   [hl],a
     ret  
-
+.data_02_594f:
     db   $00, $00, $de, $ff, $fe, $ff, $dc, $ff        ;; 02:594f ????????
     db   $fc, $ff, $e0, $ff, $fc, $ff, $e0, $ff        ;; 02:5957 ????????
     db   $fa, $ff, $e2, $ff, $fc, $ff, $e4, $ff        ;; 02:595f ????????
@@ -163,12 +167,12 @@ label58FC:
     db   $fe, $ff, $da, $ff, $00, $00, $dc, $ff        ;; 02:5987 ????????
 
 call_02_598f:
-    call $59D2
+    call call_02_59D2
     push bc
-    call call_00_2b10
+    call call_00_2b10_VerifyObjectPairExists
     pop  bc
     ld   c,b
-    call z,call_00_3792
+    call z,call_00_3792_PrepareRelativeObjectSpawn
     ld   a,$03
     jp   entry_02_72ac
     
@@ -176,11 +180,11 @@ call_02_598f:
     db   $07, $04, $08
 
 call_02_59aa:
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$78
     call nz,call_00_290d_ObjectSetTimer1A
-    call .label59D2
-    call call_00_2b10
+    call call_02_59D2
+    call call_00_2b10_VerifyObjectPairExists
     ret  nz
     call call_00_230f_ResolveObjectListIndex
     ld   a,c
@@ -194,7 +198,8 @@ call_02_59aa:
     call call_00_2299_SetObjectStatusLowNibble
     ld   a,$04
     jp   entry_02_72ac
-.label59D2:
+
+call_02_59D2:
     call call_00_293a_ObjectGetId
     sub  a,$09
     ld   l,a
@@ -211,7 +216,7 @@ call_02_59aa:
     db   $02, $06, $03, $07, $04, $08
     
 call_02_59ed:
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label5A00
     call call_00_2976_ObjectGetFacingDirection
     ld   c,$D0
@@ -224,9 +229,9 @@ label5A00:
     call call_00_24c0_Object_IntegrateFractionalVelocity_X
     ret  
 
-data_02_5a04:
-    call call_00_29f5                                  ;; 02:5a04 $cd $f5 $29
-    jr   NZ, jr_02_5a83                                ;; 02:5a07 $20 $7a
+call_02_5a04:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck                                  ;; 02:5a04 $cd $f5 $29
+    jr   NZ, call_02_5a83                                ;; 02:5a07 $20 $7a
     ld   C, $00                                        ;; 02:5a09 $0e $00
     call call_00_22b1_HandleObjectStateChange                                  ;; 02:5a0b $cd $b1 $22
     ld   HL, .data_02_5a14                             ;; 02:5a0e $21 $14 $5a
@@ -234,9 +239,9 @@ data_02_5a04:
 .data_02_5a14:
     db   $00, $00, $00, $00, $73, $4e, $1f, $00        ;; 02:5a14 ........
 
-data_02_5a1c:
-    call call_00_29f5                                  ;; 02:5a1c $cd $f5 $29
-    jr   NZ, jr_02_5a83                                ;; 02:5a1f $20 $62
+call_02_5a1c:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck                                  ;; 02:5a1c $cd $f5 $29
+    jr   NZ, call_02_5a83                                ;; 02:5a1f $20 $62
     call call_02_5a75                                  ;; 02:5a21 $cd $75 $5a
     ld   A, [wDC7B]                                    ;; 02:5a24 $fa $7b $dc
     ld   HL, wDA00_CurrentObjectAddr                                     ;; 02:5a27 $21 $00 $da
@@ -287,7 +292,7 @@ call_02_5a75:
 .data_02_5a7b:
     db   $00, $00, $00, $00, $73, $4e, $e0, $03        ;; 02:5a7b ........
 
-jr_02_5a83:
+call_02_5a83:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 02:5a83 $fa $1e $dc
     and  A, A                                          ;; 02:5a86 $a7
     ret  NZ                                            ;; 02:5a87 $c0
@@ -334,21 +339,23 @@ jr_02_5a83:
     ld   A, $01                                        ;; 02:5ad5 $3e $01
     jp   call_02_72ac                                  ;; 02:5ad7 $c3 $ac $72
 
-data_02_5ada:
-    call call_00_29f5                                  ;; 02:5ada $cd $f5 $29
-    jr   NZ, jr_02_5af8                                ;; 02:5add $20 $19
+call_02_5ada:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck                                  ;; 02:5ada $cd $f5 $29
+    jr   NZ, call_02_5af8                                ;; 02:5add $20 $19
     ld   C, $00                                        ;; 02:5adf $0e $00
     jp   call_00_22b1_HandleObjectStateChange                                  ;; 02:5ae1 $c3 $b1 $22
 
-data_02_5ae4:
-    call call_00_29f5                                  ;; 02:5ae4 $cd $f5 $29
-    jr   NZ, jr_02_5af8                                ;; 02:5ae7 $20 $0f
+call_02_5ae4:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck                                  ;; 02:5ae4 $cd $f5 $29
+    jr   NZ, call_02_5af8                                ;; 02:5ae7 $20 $0f
     ld   C, $01                                        ;; 02:5ae9 $0e $01
-    jp   call_00_22b1_HandleObjectStateChange                                  ;; 02:5aeb $c3 $b1 $22
+    jp   call_00_22b1_HandleObjectStateChange         
+
+call_02_5aee:    ;; 02:5aeb $c3 $b1 $22
     db   $cd, $f5, $29, $20, $05, $0e, $02, $c3        ;; 02:5aee ????????
     db   $b1, $22                                      ;; 02:5af6 ??
 
-jr_02_5af8:
+call_02_5af8:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 02:5af8 $fa $1e $dc
     and  A, A                                          ;; 02:5afb $a7
     ret  NZ                                            ;; 02:5afc $c0
@@ -428,8 +435,8 @@ jr_02_5af8:
 .data_02_5b92:
     db   $00, $00, $00, $00, $1f, $00, $ff, $03        ;; 02:5b92 ........
 
-data_02_5b9a:
-    call call_00_29f5                                  ;; 02:5b9a $cd $f5 $29
+call_02_5b9a:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck                                  ;; 02:5b9a $cd $f5 $29
     jr   Z, .jr_02_5ba9                                ;; 02:5b9d $28 $0a
     ld   C, $30                                        ;; 02:5b9f $0e $30
     call call_00_28dc_ObjectSet1D                                  ;; 02:5ba1 $cd $dc $28
@@ -438,10 +445,11 @@ data_02_5b9a:
 .jr_02_5ba9:
     call call_00_244a_Object_ApplyClampedVerticalVelocity                                  ;; 02:5ba9 $cd $4a $24
     call call_00_2922_ObjectTimer1ACountdown                                  ;; 02:5bac $cd $22 $29
-    jp   Z, call_00_2b80                               ;; 02:5baf $ca $80 $2b
+    jp   Z, call_00_2b80_ClearObjectMemoryEntry                               ;; 02:5baf $ca $80 $2b
     ret                                                ;; 02:5bb2 $c9
 
 entry_02_5bb3:
+call_02_5bb3:
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$0E
@@ -460,7 +468,7 @@ entry_02_5bb3:
     ld   [hl],a
     ret  
 
-data_02_5bd4:
+call_02_5bd4:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 02:5bd4 $fa $1e $dc
     and  A, A                                          ;; 02:5bd7 $a7
     jr   Z, .jr_02_5be4                                ;; 02:5bd8 $28 $0a
@@ -476,22 +484,22 @@ data_02_5bd4:
     jp   Z, call_02_72ac                               ;; 02:5beb $ca $ac $72
     ret                                                ;; 02:5bee $c9
 
-data_02_5bef:
+call_02_5bef:
     ld   A, [wDCD2]                                    ;; 02:5bef $fa $d2 $dc
     cp   A, $81                                        ;; 02:5bf2 $fe $81
     ld   A, $02                                        ;; 02:5bf4 $3e $02
     jp   Z, call_02_72ac                               ;; 02:5bf6 $ca $ac $72
     ret                                                ;; 02:5bf9 $c9
 
-data_02_5bfa:
-    call call_00_29f5                                  ;; 02:5bfa $cd $f5 $29
+call_02_5bfa:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck                                  ;; 02:5bfa $cd $f5 $29
     jr   Z, .jr_02_5c23                                ;; 02:5bfd $28 $24
     ld   A, $1e                                        ;; 02:5bff $3e $1e
     call call_00_0ff5                                  ;; 02:5c01 $cd $f5 $0f
     ld   HL, .data_02_5c3b                             ;; 02:5c04 $21 $3b $5c
     call call_00_2c20_ObjectPalette_CopyToBuffer                                  ;; 02:5c07 $cd $20 $2c
     call call_00_288c_Object_Clear14                                  ;; 02:5c0a $cd $8a $28
-    call call_00_2b8b                                  ;; 02:5c0d $cd $8b $2b
+    call call_00_2b8b_HandleObjectFlag6ClearOrInit                                  ;; 02:5c0d $cd $8b $2b
     call call_00_2c67_Particle_InitBurst                                  ;; 02:5c10 $cd $67 $2c
     ld   C, $3c                                        ;; 02:5c13 $0e $3c
     call call_00_290d_ObjectSetTimer1A                                  ;; 02:5c15 $cd $0d $29
@@ -508,22 +516,22 @@ data_02_5bfa:
     call call_00_230f_ResolveObjectListIndex                                  ;; 02:5c2b $cd $0f $23
     inc  C                                             ;; 02:5c2e $0c
     dec  C                                             ;; 02:5c2f $0d
-    jp   Z, jp_00_2b7a                                 ;; 02:5c30 $ca $7a $2b
+    jp   Z, call_00_2b7a_ClearObjectThenJump                                 ;; 02:5c30 $ca $7a $2b
     ld   HL, wDB6A                                     ;; 02:5c33 $21 $6a $db
     set  4, [HL]                                       ;; 02:5c36 $cb $e6
-    jp   jp_00_2b7a                                    ;; 02:5c38 $c3 $7a $2b
+    jp   call_00_2b7a_ClearObjectThenJump                                    ;; 02:5c38 $c3 $7a $2b
 .data_02_5c3b:
     db   $00, $00, $08, $02, $04, $01, $ff, $7f        ;; 02:5c3b ........
 
-data_02_5c43:
+call_02_5c43:
     ld   A, $03                                        ;; 02:5c43 $3e $03
     ld   [wDCC4], A                                    ;; 02:5c45 $ea $c4 $dc
     call call_02_5d02                                  ;; 02:5c48 $cd $02 $5d
     ld   A, $01                                        ;; 02:5c4b $3e $01
     jp   call_02_72ac                                  ;; 02:5c4d $c3 $ac $72
 
-data_02_5c50:
-    call call_00_29f5                                  ;; 02:5c50 $cd $f5 $29
+call_02_5c50:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck                                  ;; 02:5c50 $cd $f5 $29
     jr   Z, .jr_02_5c62                                ;; 02:5c53 $28 $0d
     call call_02_5d02                                  ;; 02:5c55 $cd $02 $5d
     ld   C, $20                                        ;; 02:5c58 $0e $20
@@ -539,20 +547,20 @@ data_02_5c50:
     ld   A, $02                                        ;; 02:5c6f $3e $02
     jp   call_02_72ac                                  ;; 02:5c71 $c3 $ac $72
 
-data_02_5c74:
-    call call_00_2a5d                                  ;; 02:5c74 $cd $5d $2a
+call_02_5c74:
+    call call_00_2a5d_ObjectCheckFlag2                                  ;; 02:5c74 $cd $5d $2a
     ret  Z                                             ;; 02:5c77 $c8
     ld   C, $05                                        ;; 02:5c78 $0e $05
-    call call_00_3792                                  ;; 02:5c7a $cd $92 $37
+    call call_00_3792_PrepareRelativeObjectSpawn                                  ;; 02:5c7a $cd $92 $37
     ld   A, $03                                        ;; 02:5c7d $3e $03
     jp   call_02_72ac                                  ;; 02:5c7f $c3 $ac $72
 
-data_02_5c82:
+call_02_5c82:
     ld   A, [wDCDB]                                    ;; 02:5c82 $fa $db $dc
     and  A, A                                          ;; 02:5c85 $a7
     jr   NZ, .jr_02_5c93                               ;; 02:5c86 $20 $0b
     ld   C, $1f                                        ;; 02:5c88 $0e $1f
-    call call_00_2b10                                  ;; 02:5c8a $cd $10 $2b
+    call call_00_2b10_VerifyObjectPairExists                                  ;; 02:5c8a $cd $10 $2b
     ld   A, $01                                        ;; 02:5c8d $3e $01
     jp   Z, call_02_72ac                               ;; 02:5c8f $ca $ac $72
     ret                                                ;; 02:5c92 $c9
@@ -567,7 +575,7 @@ data_02_5c82:
     jp   call_02_72ac                                  ;; 02:5ca2 $c3 $ac $72
 
 call_02_5ca5:
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   a,$19
     call nz,call_00_0ff5
     ld   a,[wDC71]
@@ -583,7 +591,7 @@ call_02_5ca5:
     db   $00, $00, $84, $10, $08, $21, $8c, $31
     
 call_02_5cd0:
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label5CF0
     ld   a,$1A
     call call_00_0ff5
@@ -600,11 +608,11 @@ label5CE8:
 label5CF0:
     call call_00_24c0_Object_IntegrateFractionalVelocity_X
     call call_00_24ee_Object_IntegrateFractionalVelocity_Y
-    call call_00_2a5d
+    call call_00_2a5d_ObjectCheckFlag2
     ret  z
     ld   c,$03
     call call_00_21ef
-    jp   jp_00_2b7a
+    jp   call_00_2b7a_ClearObjectThenJump
 
 call_02_5d02:
     ld   HL, .data_02_5d08                             ;; 02:5d02 $21 $08 $5d
@@ -612,7 +620,7 @@ call_02_5d02:
 .data_02_5d08:
     db   $00, $00, $00, $00, $1f, $00, $ff, $7f        ;; 02:5d08 ........
 
-data_02_5d10:
+call_02_5d10:
     ld   H, $d8                                        ;; 02:5d10 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 02:5d12 $fa $00 $da
     or   A, $0e                                        ;; 02:5d15 $f6 $0e
@@ -668,7 +676,7 @@ data_02_5d10:
     db   $22, $23, $24, $25, $27, $28, $29, $2a        ;; 02:5d77 ???.????
     db   $2b                                           ;; 02:5d7f ?
 
-data_02_5d80:
+call_02_5d80:
     call call_00_24c0_Object_IntegrateFractionalVelocity_X                                  ;; 02:5d80 $cd $c0 $24
     call call_00_24ee_Object_IntegrateFractionalVelocity_Y                                  ;; 02:5d83 $cd $ee $24
     call call_00_28d2_ObjectGet1D                                  ;; 02:5d86 $cd $d2 $28
@@ -679,7 +687,7 @@ data_02_5d80:
     ld   L, A                                          ;; 02:5d91 $6f
     ld   A, [HL]                                       ;; 02:5d92 $7e
     sub  A, $88                                        ;; 02:5d93 $d6 $88
-    jp   NC, call_00_2b80                              ;; 02:5d95 $d2 $80 $2b
+    jp   NC, call_00_2b80_ClearObjectMemoryEntry                              ;; 02:5d95 $d2 $80 $2b
     bit  7, C                                          ;; 02:5d98 $cb $79
     jr   Z, .jr_02_5db5                                ;; 02:5d9a $28 $19
     ld   C, $01                                        ;; 02:5d9c $0e $01
@@ -717,13 +725,13 @@ data_02_5d80:
     ld   A, $05                                        ;; 02:5dd2 $3e $05
     jp   call_02_72ac                                  ;; 02:5dd4 $c3 $ac $72
 
-data_02_5dd7:
-    call call_00_2a5d                                  ;; 02:5dd7 $cd $5d $2a
-    jp   NZ, call_00_2b80                              ;; 02:5dda $c2 $80 $2b
+call_02_5dd7:
+    call call_00_2a5d_ObjectCheckFlag2                                  ;; 02:5dd7 $cd $5d $2a
+    jp   NZ, call_00_2b80_ClearObjectMemoryEntry                              ;; 02:5dda $c2 $80 $2b
     ret                                                ;; 02:5ddd $c9
 
-data_02_5dde:
-    call call_00_29f5                                  ;; 02:5dde $cd $f5 $29
+call_02_5dde:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck                                  ;; 02:5dde $cd $f5 $29
     ld   C, $20                                        ;; 02:5de1 $0e $20
     call NZ, call_00_28c8_ObjectSet1B                              ;; 02:5de3 $c4 $c8 $28
     ld   A, [wDC71]                                    ;; 02:5de6 $fa $71 $dc
@@ -733,7 +741,7 @@ data_02_5dde:
     call call_00_251c_Object_CheckRegionAndSetFlag                                  ;; 02:5df0 $cd $1c $25
     call call_00_2722_Player_IsWithinObjectYRange                                  ;; 02:5df3 $cd $22 $27
     ret  Z                                             ;; 02:5df6 $c8
-    call call_00_2a68                                  ;; 02:5df7 $cd $68 $2a
+    call call_00_2a68_ComputePlayerObjectXVector                                  ;; 02:5df7 $cd $68 $2a
     call call_00_2976_ObjectGetFacingDirection                                  ;; 02:5dfa $cd $76 $29
     ld   HL, wDA12                                     ;; 02:5dfd $21 $12 $da
     cp   A, [HL]                                       ;; 02:5e00 $be
@@ -744,7 +752,7 @@ data_02_5dde:
     jp   C, call_02_72ac                               ;; 02:5e09 $da $ac $72
     ret                                                ;; 02:5e0c $c9
 
-data_02_5e0d:
+call_02_5e0d:
     ld   C, $20                                        ;; 02:5e0d $0e $20
     call call_00_28dc_ObjectSet1D                                  ;; 02:5e0f $cd $dc $28
     ld   C, $28                                        ;; 02:5e12 $0e $28
@@ -756,7 +764,7 @@ data_02_5e0d:
     jp   Z, call_02_72ac                               ;; 02:5e21 $ca $ac $72
     ret                                                ;; 02:5e24 $c9
 
-data_02_5e25:
+call_02_5e25:
     call call_00_251c_Object_CheckRegionAndSetFlag                                  ;; 02:5e25 $cd $1c $25
     call call_00_244a_Object_ApplyClampedVerticalVelocity                                  ;; 02:5e28 $cd $4a $24
     call call_00_2766_Object_UpdatePositionFromVector                                  ;; 02:5e2b $cd $66 $27
@@ -764,8 +772,8 @@ data_02_5e25:
     jp   NC, call_02_72ac                              ;; 02:5e30 $d2 $ac $72
     ret                                                ;; 02:5e33 $c9
 
-data_02_5e34:
-    call call_00_29f5                                  ;; 02:5e34 $cd $f5 $29
+call_02_5e34:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck                                  ;; 02:5e34 $cd $f5 $29
     jr   Z, .jr_02_5e45                                ;; 02:5e37 $28 $0c
     call call_00_2766_Object_UpdatePositionFromVector                                  ;; 02:5e39 $cd $66 $27
     ld   C, $00                                        ;; 02:5e3c $0e $00
@@ -800,8 +808,8 @@ data_02_5e34:
     call NC, call_00_2980_ObjectSet19                              ;; 02:5e78 $d4 $80 $29
     ret                                                ;; 02:5e7b $c9
 
-data_02_5e7c:
-    call call_00_2a68                                  ;; 02:5e7c $cd $68 $2a
+call_02_5e7c:
+    call call_00_2a68_ComputePlayerObjectXVector                                  ;; 02:5e7c $cd $68 $2a
     ld   A, [wDA11]                                    ;; 02:5e7f $fa $11 $da
     cp   A, $30                                        ;; 02:5e82 $fe $30
     jr   C, .jr_02_5e8e                                ;; 02:5e84 $38 $08
@@ -829,7 +837,7 @@ data_02_5e7c:
     ld   A, $01                                        ;; 02:5eb3 $3e $01
     jp   call_02_72ac                                  ;; 02:5eb5 $c3 $ac $72
 
-data_02_5eb8:
+call_02_5eb8:
     ld   C, $10                                        ;; 02:5eb8 $0e $10
     call call_00_2588_Object_ApproachTargetValue_Byte                                  ;; 02:5eba $cd $88 $25
     call call_00_251c_Object_CheckRegionAndSetFlag                                  ;; 02:5ebd $cd $1c $25
@@ -844,8 +852,7 @@ call_02_5ecc:
     call call_00_28c8_ObjectSet1B
     call call_00_2410_SetDirectionFlag_PlayerLeft
     call call_00_254a_Object_UpdateDeltaAndAdvancePosition
-    jp   $2617
-    ret  
+    jp   call_00_2617_SnapPositionAndUpdateDelta
 
 call_02_5eda:
     ret  
@@ -854,9 +861,12 @@ call_02_5edb:
     ret  
 
 call_02_5edc:
+    ret  
+
+call_02_5edd:
     call call_00_2722_Player_IsWithinObjectYRange
     jr   z,label5EF1
-    call call_00_2a68
+    call call_00_2a68_ComputePlayerObjectXVector
     call call_00_2976_ObjectGetFacingDirection
     ld   hl,wDA12
     cp   [hl]
@@ -866,17 +876,19 @@ label5EF1:
     ld   c,$08
     call call_00_2588_Object_ApproachTargetValue_Byte
     jp   call_00_251c_Object_CheckRegionAndSetFlag
+
+call_02_5ef9:
     ld   c,$20
     call call_00_2588_Object_ApproachTargetValue_Byte
     jp   call_00_251c_Object_CheckRegionAndSetFlag
 
 call_02_5f01:
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$F0
     call nz,call_00_290d_ObjectSetTimer1A
     call call_00_2722_Player_IsWithinObjectYRange
     jr   z,label5F22
-    call call_00_2a68
+    call call_00_2a68_ComputePlayerObjectXVector
     call call_00_2976_ObjectGetFacingDirection
     ld   hl,wDA12
     cp   [hl]
@@ -889,7 +901,7 @@ label5F22:
     call call_00_28c8_ObjectSet1B
     call call_00_251c_Object_CheckRegionAndSetFlag
     ld   c,$27
-    call call_00_2b10
+    call call_00_2b10_VerifyObjectPairExists
     ret  nz
     call call_00_2922_ObjectTimer1ACountdown
     ld   a,$01
@@ -897,27 +909,29 @@ label5F22:
     ret  
 
 call_02_5f39:
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$06
-    call nz,call_00_3792
+    call nz,call_00_3792_PrepareRelativeObjectSpawn
     ret  
 
 call_02_5f42:
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$30
     call nz,call_00_28dc_ObjectSet1D
     call call_00_244a_Object_ApplyClampedVerticalVelocity
     jp   call_00_2766_Object_UpdatePositionFromVector
-    call call_00_29f5
-    jr   z,label5F5F
+
+call_02_5f50:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
+    jr   z,.label5F5F
     ld   c,$F0
     call call_00_290d_ObjectSetTimer1A
     ld   c,$0A
     call call_00_28c8_ObjectSet1B
-label5F5F:
+.label5F5F:
     call call_00_254a_Object_UpdateDeltaAndAdvancePosition
     call call_00_2922_ObjectTimer1ACountdown
-    jp   z,call_00_2b80
+    jp   z,call_00_2b80_ClearObjectMemoryEntry
     ret  
 
 call_02_5f69:
@@ -927,7 +941,9 @@ call_02_5f69:
     call call_02_5F9B
     ld   a,$01
     jp   entry_02_72ac
-    call call_00_29f5
+
+call_02_5f78:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$41
     call nz,call_00_290d_ObjectSetTimer1A
     call call_00_2922_ObjectTimer1ACountdown
@@ -936,11 +952,11 @@ call_02_5f69:
     ld   a,[hl]
     and  a,$0F
     ld   c,$1B
-    jp   z,call_00_3792
+    jp   z,call_00_3792_PrepareRelativeObjectSpawn
     ret  
 
 call_02_5f91:
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ret  z
     ld   hl,wDCD3
     inc  [hl]
@@ -1008,7 +1024,7 @@ call_02_5F9B:
     db   $00, $5d, $00
     
 call_02_60c7:
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,.label60F2
     ld   a,[wDCD3]
     add  a
@@ -1037,7 +1053,7 @@ call_02_60c7:
     call call_00_24c0_Object_IntegrateFractionalVelocity_X
     call call_00_24ee_Object_IntegrateFractionalVelocity_Y
     call call_00_2922_ObjectTimer1ACountdown
-    jp   z,jp_00_2b7a
+    jp   z,call_00_2b7a_ClearObjectThenJump
     ret  
 .data_02_60ff:
     db   $e0, $20, $00, $20, $20        ;; 02:60fc ????????
@@ -1059,7 +1075,7 @@ call_02_613f:
     ret  
 
 call_02_614d:
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$38
     call nz,call_00_28dc_ObjectSet1D
 label6155:
@@ -1078,8 +1094,8 @@ call_02_6163:
     ret  
     
 call_02_616f:
-    call call_00_29f5
-    jr   z,label61A1
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
+    jr   z,.label61A1
     ld   a,$19
     call call_00_0ff5
     ld   c,$10
@@ -1099,13 +1115,13 @@ call_02_616f:
     ld   e,a
     ld   a,d
     adc  a,$00
-    jr   nz,label61A1
+    jr   nz,.label61A1
     ld   a,e
     cp   a,$18
-    jr   nc,label61A1
+    jr   nc,.label61A1
     ld   a,$01
     ld   [wDCDC],a
-label61A1:
+.label61A1:
     call call_00_244a_Object_ApplyClampedVerticalVelocity
     call call_00_2766_Object_UpdatePositionFromVector
     ret  c
@@ -1128,7 +1144,7 @@ call_02_61c6:
     ld   c,04
     call call_00_28c8_ObjectSet1B
     call call_00_251c_Object_CheckRegionAndSetFlag
-    call call_00_2a68
+    call call_00_2a68_ComputePlayerObjectXVector
     call call_00_2976_ObjectGetFacingDirection
     ld   hl,wDA12
     cp   [hl]
@@ -1142,29 +1158,33 @@ call_02_61c6:
     call call_00_28dc_ObjectSet1D
     ld   a,$01
     jp   entry_02_72ac
+
+call_02_61ee:
     call call_00_251c_Object_CheckRegionAndSetFlag
     call call_00_2475_Object_MoveAndClampVerticalPosition
     ld   c,$00
-    jr   nc,label620B
+    jr   nc,.label620B
     call call_00_28d2_ObjectGet1D
     bit  7,a
-    jr   nz,label6206
+    jr   nz,.label6206
     ld   c,$02
     cp   a,$08
-    jr   c,label620B
+    jr   c,.label620B
     ret  
-label6206:
+.label6206:
     cp   a,$F8
     ret  nc
     ld   c,$03
-label620B:
+.label620B:
     call call_00_2962_ObjectGetActionId
     ld   a,c
     cp   [hl]
     jp   nz,entry_02_72ac
     ret  
-    call call_00_29f5
-    jr   z,label6239
+
+call_02_6214:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
+    jr   z,.label6239
     call call_00_2826_Object_SetXFromDA24
     call call_00_27e4_Object_SetYPosFromDA26
     ld   c,$40
@@ -1177,7 +1197,7 @@ label620B:
     call jp_00_250d
     ld   c,$28
     call call_00_290d_ObjectSetTimer1A
-label6239:
+.label6239:
     ld   a,[wDC71]
     and  a,$03
     ret  nz
@@ -1187,6 +1207,8 @@ label6239:
     ld   a,$01
     jp   z,entry_02_72ac
     ret  
+
+call_02_624e:
     ld   a,[wDC71]
     and  a,$01
     ld   c,$00
@@ -1209,33 +1231,33 @@ label6239:
     inc  hl
     ld   a,d
     sbc  [hl]
-    jr   c,label6285
+    jr   c,.label6285
     ld   hl,wDA16
     ld   a,e
     sub  [hl]
     inc  hl
     ld   a,d
     sbc  [hl]
-    jr   c,label628A
-label6285:
+    jr   c,.label628A
+.label6285:
     ld   a,$00
     jp   entry_02_72ac
-label628A:
-    call $2617
+.label628A:
+    call call_00_2617_SnapPositionAndUpdateDelta
     ld   a,$02
     jp   nc,entry_02_72ac
     ret  
 
-call_00_6293:
-    call call_00_29f5
-    jr   z,label62A7
+call_02_6293:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
+    jr   z,.label62A7
     ld   c,$00
     call call_00_28c8_ObjectSet1B
     ld   c,$00
     call call_00_2958_ObjectSetFacingDirection
     ld   c,$28
     call call_00_290d_ObjectSetTimer1A
-label62A7:
+.label62A7:
     ld   a,[wDC71]
     and  a,$03
     ret  nz
@@ -1246,19 +1268,19 @@ label62A7:
     jp   z,entry_02_72ac
     ret  
 
-call_00_62bc:
-    call call_00_29f5
-    jr   z,label62D0
+call_02_62bc:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
+    jr   z,.label62D0
     ld   c,$08
     call call_00_2944_ObjectSet12
     call call_00_293a_ObjectGetId
     cp   a,$31
     ld   c,$20
     call z,call_00_2958_ObjectSetFacingDirection
-label62D0:
-    call call_00_2a5d
+.label62D0:
+    call call_00_2a5d_ObjectCheckFlag2
     ret  z
-    call call_00_2a68
+    call call_00_2a68_ComputePlayerObjectXVector
     call call_00_2976_ObjectGetFacingDirection
     ld   hl,wDA12
     cp   [hl]
@@ -1266,10 +1288,10 @@ label62D0:
     call call_00_293a_ObjectGetId
     ld   c,$32
     cp   a,$30
-    jr   z,label62EA
+    jr   z,.label62EA
     ld   c,$33
-label62EA:
-    call call_00_2b10
+.label62EA:
+    call call_00_2b10_VerifyObjectPairExists
     ret  nz
     ld   a,[wDA11]
     cp   a,$40
@@ -1277,48 +1299,52 @@ label62EA:
     jp   c,entry_02_72ac
     ret  
 
-call_00_62f9:
-    call call_00_2a5d
+call_02_62f9:
+    call call_00_2a5d_ObjectCheckFlag2
     ret  z
     ld   c,$10
     call call_00_2944_ObjectSet12
     call call_00_293a_ObjectGetId
     ld   c,$0E
     cp   a,$30
-    jr   z,label630D
+    jr   z,.label630D
     ld   c,$0F
-label630D:
-    call call_00_3792
+.label630D:
+    call call_00_3792_PrepareRelativeObjectSpawn
     ld   a,$02
     jp   entry_02_72ac
+
+call_02_6315:
     ld   c,$08
     jp   call_00_2944_ObjectSet12
-    call call_00_29f5
-    jr   z,label6329
+
+call_02_631a:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
+    jr   z,.label6329
     ld   c,$20
     call call_00_28c8_ObjectSet1B
     ld   c,$40
     call call_00_290d_ObjectSetTimer1A
-label6329:
+.label6329:
     call call_00_24c0_Object_IntegrateFractionalVelocity_X
     call call_00_2922_ObjectTimer1ACountdown
-    jp   z,jp_00_2b7a
+    jp   z,call_00_2b7a_ClearObjectThenJump
     ret  
 
-call_00_6333:
-    call call_00_29f5
-    jr   z,label6342
+call_02_6333:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
+    jr   z,.label6342
     ld   c,$E0
     call call_00_28c8_ObjectSet1B
     ld   c,$40
     call call_00_290d_ObjectSetTimer1A
-label6342:
+.label6342:
     call call_00_24c0_Object_IntegrateFractionalVelocity_X
     call call_00_2922_ObjectTimer1ACountdown
-    jp   z,jp_00_2b7a
+    jp   z,call_00_2b7a_ClearObjectThenJump
     ret  
 
-call_00_634c:
+call_02_634c:
     call call_00_293a_ObjectGetId
     cp   a,$36
     ld   c,$20
@@ -1328,9 +1354,9 @@ call_00_634c:
     ld   a,$01
     jp   entry_02_72ac
 
-call_00_6361:
+call_02_6361:
     ld   de,.data_02_6367
-    jp   call_00_2a98
+    jp   call_00_2a98_HandlePlayerObjectInteraction
 .data_02_6367:    
     db   $c0, $01, $20, $70, $00        ;; 02:6364 ????????
     db   $10, $36, $20, $20, $02, $c0, $01, $20        ;; 02:636c ????????
@@ -1340,7 +1366,7 @@ call_00_6361:
     db   $e0, $10, $02, $70, $02, $10, $60, $01        ;; 02:638c ????????
     db   $20, $22, $e4, $20, $02
 
-call_00_6399:
+call_02_6399:
     call call_00_24c0_Object_IntegrateFractionalVelocity_X
     call call_00_24ee_Object_IntegrateFractionalVelocity_Y
     call call_00_2922_ObjectTimer1ACountdown
@@ -1348,12 +1374,12 @@ call_00_6399:
     jp   z,entry_02_72ac
     ret
     
-call_00_63a8:
-    call call_00_29f5
-    jr   z,label63B1
+call_02_63a8:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
+    jr   z,.label63B1
     xor  a
     ld   [wDCDC],a
-label63B1:
+.label63B1:
     ld   hl,wDCDC
     bit  0,[hl]
     ret  z
@@ -1362,24 +1388,24 @@ label63B1:
     inc  a
     jp   entry_02_72ac
 
-call_00_63c0:
+call_02_63c0:
     ld   a,$1A
     call call_00_0ff5
     ld   [wDAD6_ReturnBank],a
     ld   a,$03
     ld   hl,entry_03_57f8
     call call_00_0edd_CallAltBankFunc
-    jp   jp_00_2b7a
+    jp   call_00_2b7a_ClearObjectThenJump
 
-call_00_63d3:
+call_02_63d3:
     call call_00_22ef_SetObjectSlotActive
     ld   c,$02
     jp   call_00_2299_SetObjectStatusLowNibble
 
-call_00_63db:
+call_02_63db:
     ld   c,$28
     call call_00_28c8_ObjectSet1B
-    call call_00_2a68
+    call call_00_2a68_ComputePlayerObjectXVector
     ld   a,[wDA12]
     ld   hl,wD80D_PlayerFacingDirection
     cp   [hl]
@@ -1387,18 +1413,19 @@ call_00_63db:
     jp   z,entry_02_72ac
     ret  
 
-call_00_63f0:
-    call call_00_29f5
-    jr   z,label63FD
+call_02_63f0:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
+    jr   z,.label63FD
     ld   c,$3C
     call call_00_290d_ObjectSetTimer1A
     call call_00_2410_SetDirectionFlag_PlayerLeft
-label63FD:
+.label63FD:
     call call_00_2922_ObjectTimer1ACountdown
     ld   a,$02
     jp   z,entry_02_72ac
-label6405:
-    call call_00_2a68
+
+call_02_6405:
+    call call_00_2a68_ComputePlayerObjectXVector
     ld   a,[wDA12]
     ld   hl,wD80D_PlayerFacingDirection
     cp   [hl]
@@ -1406,8 +1433,8 @@ label6405:
     jp   nz,entry_02_72ac
     ret  
 
-call_00_6415:
-    call call_00_29f5
+call_02_6415:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$20
     call nz,call_00_28dc_ObjectSet1D
     call call_00_251c_Object_CheckRegionAndSetFlag
@@ -1416,31 +1443,31 @@ call_00_6415:
     ret  c
     ld   a,$03
     call entry_02_72ac
-    jr   label6405
+    jr   call_02_6405
 
-call_00_642e:
-    call call_00_29f5
-    jr   z,label643D
+call_02_642e:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
+    jr   z,.label643D
     ld   c,$00
     call call_00_290d_ObjectSetTimer1A
     ld   c,$10
     call call_00_294e_ObjectSet13
-label643D:
+.label643D:
     call call_00_2917_ObjectCheckIfTimer1AIsZero
-    jr   nz,label6450
+    jr   nz,.label6450
     ld   a,[wDC7B]
     ld   hl,wDA00_CurrentObjectAddr
     cp   [hl]
     ret  nz
     call call_00_230f_ResolveObjectListIndex
     jp   call_00_290d_ObjectSetTimer1A
-label6450:
+.label6450:
     call call_00_2922_ObjectTimer1ACountdown
     ld   a,$01
     jp   z,entry_02_72ac
     ret  
 
-call_00_6459:
+call_02_6459:
     call call_00_296c_ObjectGet9
     ld   l,a
     ld   h,$00
@@ -1452,12 +1479,14 @@ call_00_6459:
     db   $10, $0e, $0c, $0a, $08        ;; 02:6464 ????????
     db   $06, $04, $02
 
-call_00_646f:
+call_02_646f:
     ld   [wDAD6_ReturnBank],a
     ld   a,$03
     ld   hl,entry_03_57f8
     call call_00_0edd_CallAltBankFunc
     ret  
+
+call_02_647b:
     call call_00_296c_ObjectGet9
     ld   l,a
     ld   h,$00
@@ -1473,17 +1502,18 @@ call_02_6489:
     ld   a,[bc]
     inc  c
     ld   c,$10
+call_02_6491:
     call call_00_2722_Player_IsWithinObjectYRange
-    jr   z,label64A0
-    call call_00_2a68
+    jr   z,.label64A0
+    call call_00_2a68_ComputePlayerObjectXVector
     ld   a,[wDA11]
     cp   a,$30
-    jr   c,label64A8
-label64A0:
+    jr   c,.label64A8
+.label64A0:
     ld   c,$04
     call call_00_2588_Object_ApproachTargetValue_Byte
     jp   call_00_251c_Object_CheckRegionAndSetFlag
-label64A8:
+.label64A8:
     ld   a,[wDA12]
     xor  a,$20
     ld   c,a
@@ -1491,17 +1521,19 @@ label64A8:
     ld   c,$1E
     call call_00_2588_Object_ApproachTargetValue_Byte
     call call_00_251c_Object_CheckRegionAndSetFlag
-    jr   nz,label64C8
+    jr   nz,.label64C8
     ld   a,[wDA11]
     cp   a,$20
     ret  nc
     ld   hl,wDA12
     ld   c,[hl]
     call call_00_2958_ObjectSetFacingDirection
-label64C8:
+.label64C8:
     ld   a,$01
     jp   entry_02_72ac
-    call call_00_29f5
+
+call_02_64cd:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$20
     call nz,call_00_28dc_ObjectSet1D
     ld   c,$10
@@ -1512,30 +1544,34 @@ label64C8:
     ld   a,$00
     jp   nc,entry_02_72ac
     ret  
-    call call_00_29f5
-    jr   z,label64F4
+
+call_02_64e9:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
+    jr   z,.label64F4
     call call_00_2826_Object_SetXFromDA24
     call call_00_27e4_Object_SetYPosFromDA26
-label64F4:
-    call call_00_2a68
+.label64F4:
+    call call_00_2a68_ComputePlayerObjectXVector
     ld   a,[wDA11]
     cp   a,$10
     ld   a,$01
     jp   c,entry_02_72ac
     ret  
-    call call_00_29f5
-    jr   z,label651D
+
+call_02_6502:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
+    jr   z,.label651D
     call call_00_2410_SetDirectionFlag_PlayerLeft
     call call_00_2976_ObjectGetFacingDirection
     ld   c,$10
     cp   a,$00
-    jr   z,label6515
+    jr   z,.label6515
     ld   c,$F0
-label6515:
+.label6515:
     call call_00_28c8_ObjectSet1B
     ld   c,$20
     call call_00_28dc_ObjectSet1D
-label651D:
+.label651D:
     call call_00_24c0_Object_IntegrateFractionalVelocity_X
     call call_00_244a_Object_ApplyClampedVerticalVelocity
     call call_00_28f1_ObjectCheckIf1DIsZero
@@ -1543,17 +1579,23 @@ label651D:
     ld   a,$03
     jp   nz,entry_02_72ac
     ret  
+
+call_02_652e:
     call call_00_24c0_Object_IntegrateFractionalVelocity_X
     call call_00_244a_Object_ApplyClampedVerticalVelocity
     call call_00_2780_Object_ComputeMapYDelta
     ld   a,$00
     jp   nc,entry_02_72ac
     ret  
-    call call_00_2a5d
+
+call_02_653d:
+    call call_00_2a5d_ObjectCheckFlag2
     ret  z
     call call_00_1bbc.jr_00_1bce
     ld   c,$02
     jp   call_00_2299_SetObjectStatusLowNibble
+
+call_02_6549:
     ld   c,$00
     call call_00_2299_SetObjectStatusLowNibble
     ld   a,$03
@@ -1562,7 +1604,7 @@ label651D:
     call call_00_2299_SetObjectStatusLowNibble
     ld   a,$01
     jp   entry_02_72ac
-    call call_00_2a5d
+    call call_00_2a5d_ObjectCheckFlag2
     ret  z
     call call_00_1bbc.jr_00_1bce
     ld   c,$00
@@ -1578,11 +1620,11 @@ label651D:
     ld   hl,wDC71
     and  [hl]
     and  a,$1F
-    jr   z,label6589
+    jr   z,.label6589
     call call_00_2976_ObjectGetFacingDirection
     xor  a,$20
     ld   [hl],a
-label6589:
+.label6589:
     call call_00_22d4_CheckObjectSlotFlag
     ret  nz
     ld   c,$00
@@ -1617,22 +1659,22 @@ label6589:
     call call_00_2299_SetObjectStatusLowNibble
     ld   a,$01
     jp   entry_02_72ac
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$00
     call nz,call_00_290d_ObjectSetTimer1A
     ld   a,[wDC7B]
     and  a
-    jr   z,label65F8
+    jr   z,.label65F8
     ld   hl,wDA00_CurrentObjectAddr
     cp   [hl]
-    jr   z,label65F8
+    jr   z,.label65F8
     call call_00_2917_ObjectCheckIfTimer1AIsZero
     cp   a,$A8
     ret  nc
     inc  [hl]
     ld   bc,$FFFF
     jp   jp_00_250d
-label65F8:
+.label65F8:
     ld   a,[wDC71]
     and  a,$03
     ret  nz
@@ -1671,21 +1713,21 @@ label65F8:
     call call_00_2722_Player_IsWithinObjectYRange
     ret  z
     call call_00_2410_SetDirectionFlag_PlayerLeft
-    call call_00_2a68
+    call call_00_2a68_ComputePlayerObjectXVector
     ld   a,[wDA11]
     cp   a,$18
-    jr   c,label6662
+    jr   c,.label6662
     cp   a,$40
     ld   a,$04
     jp   nc,entry_02_72ac
     ret  
-label6662:
+.label6662:
     call call_00_2917_ObjectCheckIfTimer1AIsZero
     inc  a
     cp   a,$09
-    jr   c,label666B
+    jr   c,.label666B
     xor  a
-label666B:
+.label666B:
     ld   [hl],a
     ld   l,a
     ld   h,$00
@@ -1708,17 +1750,17 @@ call_02_667e:
     call call_00_244a_Object_ApplyClampedVerticalVelocity
     call call_00_2766_Object_UpdatePositionFromVector
     ret  c
-    call call_00_2a5d
+    call call_00_2a5d_ObjectCheckFlag2
     ld   a,$04
     jp   nz,entry_02_72ac
     ret  
-    call call_00_29f5
-    jr   z,label66AC
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
+    jr   z,.label66AC
     ld   c,$18
     call call_00_28c8_ObjectSet1B
     ld   c,$28
     call call_00_28dc_ObjectSet1D
-label66AC:
+.label66AC:
     call call_00_251c_Object_CheckRegionAndSetFlag
     call call_00_244a_Object_ApplyClampedVerticalVelocity
     call call_00_2766_Object_UpdatePositionFromVector
@@ -1726,7 +1768,7 @@ label66AC:
     jp   nc,entry_02_72ac
     ret  
     call call_00_2410_SetDirectionFlag_PlayerLeft
-    call call_00_2a68
+    call call_00_2a68_ComputePlayerObjectXVector
     ld   a,[wDA11]
     cp   a,$38
     ld   a,$01
@@ -1741,24 +1783,24 @@ label66AC:
     ld   [hl],a
     ld   a,$02
     jp   entry_02_72ac
-    call call_00_2a5d
+    call call_00_2a5d_ObjectCheckFlag2
     ret  z
     call call_00_2976_ObjectGetFacingDirection
     xor  a,$20
     ld   [hl],a
     ld   a,$01
     jp   entry_02_72ac
-    call call_00_2a5d
-    jp   nz,jp_00_2b7a
+    call call_00_2a5d_ObjectCheckFlag2
+    jp   nz,call_00_2b7a_ClearObjectThenJump
     ret  
-    call call_00_2a68
+    call call_00_2a68_ComputePlayerObjectXVector
     ld   a,[wDA11]
     cp   a,$38
-    jr   c,label6708
+    jr   c,.label6708
     ld   c,$06
     call call_00_2588_Object_ApproachTargetValue_Byte
     jp   call_00_251c_Object_CheckRegionAndSetFlag
-label6708:
+.label6708:
     ld   a,[wDA12]
     xor  a,$20
     ld   c,a
@@ -1766,14 +1808,14 @@ label6708:
     ld   c,$10
     call call_00_2588_Object_ApproachTargetValue_Byte
     call call_00_251c_Object_CheckRegionAndSetFlag
-    jr   nz,label6728
+    jr   nz,.label6728
     ld   a,[wDA11]
     cp   a,$28
     ret  nc
     ld   hl,wDA12
     ld   c,[hl]
     call call_00_2958_ObjectSetFacingDirection
-label6728:
+.label6728:
     ld   c,$30
     call call_00_28dc_ObjectSet1D
     ld   a,$01
@@ -1786,7 +1828,7 @@ label6728:
     ld   a,$00
     jp   nc,entry_02_72ac
     ret  
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$00
     call nz,call_00_290d_ObjectSetTimer1A
     ld   c,$04
@@ -1794,20 +1836,20 @@ label6728:
     call call_00_251c_Object_CheckRegionAndSetFlag
     ld   c,$02
     call nz,call_00_290d_ObjectSetTimer1A
-    call call_00_29ac
+    call call_00_29ac_ObjectFacingMatchesStoredDirection
     ret  nz
     call call_00_2922_ObjectTimer1ACountdown
     ld   c,$10
-    jp   nz,call_00_3792
+    jp   nz,call_00_3792_PrepareRelativeObjectSpawn
     ret  
     call call_00_298a_ObjectGet19
     cp   a,$50
-    jr   z,label6776
+    jr   z,.label6776
     inc  [hl]
     ld   bc,$FFFF
     call jp_00_250d
-label6776:
-    call call_00_29f5
+.label6776:
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$00
     call nz,call_00_290d_ObjectSetTimer1A
     ld   c,$10
@@ -1815,33 +1857,33 @@ label6776:
     call call_00_251c_Object_CheckRegionAndSetFlag
     ld   c,$C1
     call nz,call_00_290d_ObjectSetTimer1A
-    call call_00_29ac
+    call call_00_29ac_ObjectFacingMatchesStoredDirection
     ret  nz
     call call_00_2922_ObjectTimer1ACountdown
     ret  z
     and  a,$3F
     ld   c,$10
-    jp   z,call_00_3792
+    jp   z,call_00_3792_PrepareRelativeObjectSpawn
     ret  
-    call call_00_29f5
-    jr   z,label67B3
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
+    jr   z,.label67B3
     call call_00_2976_ObjectGetFacingDirection
     ld   c,$18
     cp   a,$00
-    jr   z,label67AB
+    jr   z,.label67AB
     ld   c,$E8
-label67AB:
+.label67AB:
     call call_00_28c8_ObjectSet1B
     ld   c,$B4
     call call_00_290d_ObjectSetTimer1A
-label67B3:
+.label67B3:
     call call_00_2922_ObjectTimer1ACountdown
-    jp   z,jp_00_2b7a
+    jp   z,call_00_2b7a_ClearObjectThenJump
     call call_00_24c0_Object_IntegrateFractionalVelocity_X
     call call_00_244a_Object_ApplyClampedVerticalVelocity
     jp   call_00_2766_Object_UpdatePositionFromVector
-    call call_00_29f5
-    jr   z,label67DF
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
+    jr   z,.label67DF
     call $688E
     ld   l,c
     ld   h,$00
@@ -1857,19 +1899,19 @@ label67B3:
     inc  e
     ld   a,[hl]
     ld   [de],a
-label67DF:
+.label67DF:
     ld   a,[wDC7B]
     ld   hl,wDA00_CurrentObjectAddr
     cp   [hl]
     ret  nz
     call call_00_22d4_CheckObjectSlotFlag
     ld   c,a
-    ld   hl,data_02_686a
-label67EE:
+    ld   hl,.data_02_686a
+.label67EE:
     push hl
     ldi  a,[hl]
     cp   c
-    jr   nz,label6805
+    jr   nz,.label6805
     ld   d,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$0E
@@ -1882,16 +1924,16 @@ label67EE:
     ld   a,[de]
     sbc  [hl]
     or   b
-    jr   z,label6810
-label6805:
+    jr   z,.label6810
+.label6805:
     pop  hl
     ld   de,$0005
     add  hl,de
     ld   a,[hl]
     cp   a,$FF
-    jr   nz,label67EE
+    jr   nz,.label67EE
     ret  
-label6810:
+.label6810:
     inc  de
     inc  hl
     ld   a,[de]
@@ -1902,9 +1944,9 @@ label6810:
     ld   a,[de]
     sbc  [hl]
     pop  hl
-    jr   c,label6847
+    jr   c,.label6847
     or   c
-    jr   nz,label6842
+    jr   nz,.label6842
     call call_02_688E
     ld   l,c
     ld   h,$00
@@ -1925,12 +1967,12 @@ label6810:
     ld   a,$01
     jp   z,entry_02_54f9
     ret  
-label6842:
+.label6842:
     ld   bc,$FFFF
-    jr   label684A
-label6847:
+    jr   .label684A
+.label6847:
     ld   bc,$0001
-label684A:
+.label684A:
     ld   a,$1E
     ld   hl,wD801_PlayerObject_ActionId
     cp   [hl]
@@ -1948,7 +1990,7 @@ label684A:
     or   e
     jp   z,jp_00_250d
     ret  
-data_02_686a:    
+.data_02_686a:    
     db   $00, $a0, $01, $98, $02        ;; 02:6867 ????????
     db   $01, $a0, $01, $58, $01, $01, $40, $03        ;; 02:686f ????????
     db   $d8, $01, $01, $c0, $05, $58, $02, $02        ;; 02:6877 ????????
@@ -1983,7 +2025,7 @@ call_02_68af:
     jp   call_00_233e_UpdateObjectMotionFromVectorTable
 
 call_02_68b2:
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ret  z
     ld   hl,.data_02_68e5
     call call_00_2c20_ObjectPalette_CopyToBuffer
@@ -2011,7 +2053,6 @@ call_02_68ed:
     call call_00_24c0_Object_IntegrateFractionalVelocity_X
     call call_00_244a_Object_ApplyClampedVerticalVelocity
     call call_00_2766_Object_UpdatePositionFromVector
-label68F6:
     ret  c
     call call_00_2922_ObjectTimer1ACountdown
     ld   a,$02
@@ -2039,7 +2080,7 @@ label68F6:
     db   $00, $20, $28, $30
 
 call_02_6928:
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   bc,$0008
     call nz,jp_00_250d
     ld   hl,.data_02_6937
@@ -2048,10 +2089,9 @@ call_02_6928:
     db   $00, $00, $1b, $00, $5f, $02, $1f, $1b        ;; 02:6937 ????????
 
 call_02_693f:
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$15
-    call nz,call_00_3792
-call_02_6947:
+    call nz,call_00_3792_PrepareRelativeObjectSpawn
     ld   hl,wDCD0
     ld   a,[hl]
     and  a
@@ -2069,15 +2109,15 @@ call_02_6947:
     ret  
 
 call_02_6965:
-    call call_00_2a5d
+    call call_00_2a5d_ObjectCheckFlag2
     ret  z
     ld   c,$01
     call call_00_21ef
-    jp   jp_00_2b7a
+    jp   call_00_2b7a_ClearObjectThenJump
 
 call_02_6971:
     ld   c,$55
-    call call_00_29b7
+    call call_00_29b7_FindObjectByID_C
     ld   a,c
     cp   a,$02
     ld   a,$01
@@ -2092,7 +2132,7 @@ call_02_6971:
     db   $50, $00, $1c, $00, $50, $00, $19, $00        ;; 02:69a7 ????????
 
 call_02_69af:
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,.label69CB
     ld   hl,wDCCE
     ld   a,[hl]
@@ -2144,7 +2184,7 @@ call_02_6A04:
     ret  
 
 call_02_6A13:
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,.label6A38
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
@@ -2175,15 +2215,15 @@ call_02_6A13:
     db   $00, $71, $f9, $8f, $ea
     
 call_02_6A4c:
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   a,$19
     call nz,call_00_0ff5
     ld   hl,.data_02_6a89
     call call_00_2c20_ObjectPalette_CopyToBuffer
-    call call_00_2a5d
-    jp   nz,jp_00_2b7a
+    call call_00_2a5d_ObjectCheckFlag2
+    jp   nz,call_00_2b7a_ClearObjectThenJump
     ld   c,$55
-    call call_00_29b7
+    call call_00_29b7_FindObjectByID_C
     ld   a,c
     cp   a,$04
     ret  nc
@@ -2210,7 +2250,7 @@ call_02_6A4c:
     db   $00, $00, $1b, $00, $5f, $02, $1f, $1b
     
 call_02_6A91:
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label6AA1
     ld   bc,$FFD0
     call jp_00_250d
@@ -2225,7 +2265,7 @@ label6AA1:
     call call_00_2299_SetObjectStatusLowNibble
     ld   a,$01
     jp   entry_02_72ac
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$10
     call nz,call_00_294e_ObjectSet13
     call call_00_244a_Object_ApplyClampedVerticalVelocity
@@ -2235,18 +2275,18 @@ label6AA1:
     call call_00_0ff5
     ld   a,$02
     jp   entry_02_72ac
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jp   nz,call_00_2410_SetDirectionFlag_PlayerLeft
     ret  
 
     
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$14
-    jp   nz,call_00_3792
+    jp   nz,call_00_3792_PrepareRelativeObjectSpawn
     ret  
 
 
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label6AF5
     call call_00_2976_ObjectGetFacingDirection
     ld   c,$20
@@ -2259,11 +2299,11 @@ label6AED:
     call call_00_290d_ObjectSetTimer1A
 label6AF5:
     call call_00_2922_ObjectTimer1ACountdown
-    jp   z,jp_00_2b7a
+    jp   z,call_00_2b7a_ClearObjectThenJump
     cp   a,$3C
     call c,call_00_244a_Object_ApplyClampedVerticalVelocity
     jp   call_00_24c0_Object_IntegrateFractionalVelocity_X
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label6B0E
     call call_00_230f_ResolveObjectListIndex
     call call_00_290d_ObjectSetTimer1A
@@ -2290,7 +2330,7 @@ label6B0E:
     ret  
 
 
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label6B47
     ld   c,$20
     call call_00_28c8_ObjectSet1B
@@ -2308,7 +2348,7 @@ label6B47:
     ld   c,$02
     call call_00_28c8_ObjectSet1B
     call call_00_251c_Object_CheckRegionAndSetFlag
-    call call_00_2a68
+    call call_00_2a68_ComputePlayerObjectXVector
     ld   a,[wDA11]
     cp   a,$28
     ld   a,$01
@@ -2318,7 +2358,7 @@ label6B47:
 
     call call_00_2722_Player_IsWithinObjectYRange
     jr   z,label6B78
-    call call_00_2a68
+    call call_00_2a68_ComputePlayerObjectXVector
     ld   a,[wDA11]
     cp   a,$0E
     jr   c,label6B8B
@@ -2341,7 +2381,7 @@ label6B8B:
     ld   c,$10
     call call_00_28c8_ObjectSet1B
     jp   call_00_251c_Object_CheckRegionAndSetFlag
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label6BB3
     ld   c,$04
     call call_00_28c8_ObjectSet1B
@@ -2396,11 +2436,11 @@ label6BDC:
     call call_00_0edd_CallAltBankFunc
     call call_00_244a_Object_ApplyClampedVerticalVelocity
     call call_00_2780_Object_ComputeMapYDelta
-    jp   nc,jp_00_2b7a
+    jp   nc,call_00_2b7a_ClearObjectThenJump
     ret  
 
 
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$20
     call nz,call_00_28c8_ObjectSet1B
     ld   a,[wDC71]
@@ -2410,7 +2450,7 @@ label6BDC:
     call call_00_251c_Object_CheckRegionAndSetFlag
     call call_00_2722_Player_IsWithinObjectYRange
     ret  z
-    call call_00_2a68
+    call call_00_2a68_ComputePlayerObjectXVector
     call call_00_2976_ObjectGetFacingDirection
     ld   hl,wDA12
     cp   [hl]
@@ -2442,7 +2482,7 @@ label6BDC:
     ret  
 
 
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label6C84
     call call_00_2766_Object_UpdatePositionFromVector
     ld   c,$00
@@ -2478,7 +2518,7 @@ label6CAC:
     ret 
     
     
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label6CC6
     call call_00_230f_ResolveObjectListIndex
     call call_00_2958_ObjectSetFacingDirection
@@ -2490,11 +2530,11 @@ label6CC6:
     sbc  d
     ret  c
     ld   c,$65
-    call call_00_2b10
+    call call_00_2b10_VerifyObjectPairExists
     ret  nz
     ld   c,$1C
-    jp   call_00_3792
-    call call_00_29f5
+    jp   call_00_3792_PrepareRelativeObjectSpawn
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label6CF5
     call call_00_2976_ObjectGetFacingDirection
     ld   c,$14
@@ -2550,19 +2590,19 @@ label6CF5:
     ret  
 
 
-    call call_00_2a5d
+    call call_00_2a5d_ObjectCheckFlag2
     ret  z
     ld   a,$1A
     call call_00_0ff5
     ld   a,$03
     jp   entry_02_72ac
-    call call_00_2a5d
+    call call_00_2a5d_ObjectCheckFlag2
     ld   a,$06
     jp   nz,entry_02_72ac
     ret  
 
 
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label6D5C
     ld   c,$78
     call call_00_290d_ObjectSetTimer1A
@@ -2573,8 +2613,8 @@ label6D5C:
     ld   [wDC65],a
     ld   hl,wDB6A
     set  4,[hl]
-    jp   jp_00_2b7a
-    call call_00_29f5
+    jp   call_00_2b7a_ClearObjectThenJump
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label6D82
     call call_00_2917_ObjectCheckIfTimer1AIsZero
     inc  [hl]
@@ -2587,12 +2627,12 @@ label6D82:
     jp   call_00_233e_UpdateObjectMotionFromVectorTable
     call call_00_233e_UpdateObjectMotionFromVectorTable
     ld   c,$69
-    call call_00_29b7
+    call call_00_29b7_FindObjectByID_C
     ld   a,c
     cp   a,$00
     ret  nz
     ld   c,$68
-    call call_00_29b7
+    call call_00_29b7_FindObjectByID_C
     inc  c
     ret  nz
     ld   a,[wDCD1]
@@ -2621,7 +2661,7 @@ call_02_6db7:
     call call_00_2922_ObjectTimer1ACountdown
     jr   nz,label6DD2
     ld   c,$6A
-    call call_00_29ce
+    call call_00_29ce_ObjectExistsCheck
     ret  z
     ld   a,$01
     ld   [wDCD1],a
@@ -2636,12 +2676,12 @@ label6DD2:
 call_02_6dda:
     jp   call_00_233e_UpdateObjectMotionFromVectorTable
     call call_00_233e_UpdateObjectMotionFromVectorTable
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ret  z
     ld   a,$15
     call call_00_0ff5
     ld   c,$18
-    jp   call_00_3792
+    jp   call_00_3792_PrepareRelativeObjectSpawn
     call call_00_244a_Object_ApplyClampedVerticalVelocity
     ld   de,$0068
     ld   h,$D8
@@ -2658,14 +2698,14 @@ call_02_6dda:
     ld   [hl],e
     ld   a,$08
     jp   entry_02_72ac
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,.label6E27
     ld   a,$1A
     call call_00_0ff5
     ld   hl,.data_6e3c
     call call_00_2c20_ObjectPalette_CopyToBuffer
     call call_00_288c_Object_Clear14
-    call call_00_2b8b
+    call call_00_2b8b_HandleObjectFlag6ClearOrInit
     call call_00_2c67_Particle_InitBurst
     ld   c,$3C
     call call_00_290d_ObjectSetTimer1A
@@ -2678,18 +2718,18 @@ call_02_6dda:
     ld   [wDC66],a
     ld   hl,wDB6A
     set  4,[hl]
-    jp   jp_00_2b7a
+    jp   call_00_2b7a_ClearObjectThenJump
 .data_6e3c:
     db   $00, $00, $08, $02, $04, $01, $ff, $7f
     
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label6E53
     ld   c,$00
     call call_00_28c8_ObjectSet1B
     ld   c,$10
     call call_00_28dc_ObjectSet1D
 label6E53:
-    call call_00_2a68
+    call call_00_2a68_ComputePlayerObjectXVector
     ld   a,[wDA12]
     cp   a,$20
     jr   z,label6E67
@@ -2715,7 +2755,7 @@ label6E6F:
     sub  e
     ld   a,[hl]
     sbc  d
-    jp   nc,jp_00_2b7a
+    jp   nc,call_00_2b7a_ClearObjectThenJump
     ret  
     ld   hl,wDCD1
     bit  0,[hl]
@@ -2733,24 +2773,24 @@ label6E6F:
     call call_00_290d_ObjectSetTimer1A
     ld   a,$01
     jp   entry_02_72ac
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   a,$1B
     call nz,call_00_0ff5
     call call_00_2922_ObjectTimer1ACountdown
     ld   a,$04
     jp   z,entry_02_72ac
     ret  
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ret  z
     ld   c,$16
-    call call_00_3792
+    call call_00_3792_PrepareRelativeObjectSpawn
     ld   a,$14
     jp   call_00_0ff5
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$3C
     call nz,call_00_28dc_ObjectSet1D
     ld   c,$67
-    call call_00_29ce
+    call call_00_29ce_ObjectExistsCheck
     ret  nz
     ld   a,l
     or   a,$01
@@ -2779,13 +2819,13 @@ label6EFA:
     ld   a,$19
     call call_00_0ff5
     ld   c,$17
-    call call_00_3792
-    jp   jp_00_2b7a
-    call call_00_2a5d
-    jp   nz,jp_00_2b7a
+    call call_00_3792_PrepareRelativeObjectSpawn
+    jp   call_00_2b7a_ClearObjectThenJump
+    call call_00_2a5d_ObjectCheckFlag2
+    jp   nz,call_00_2b7a_ClearObjectThenJump
     ret  
     ret  
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ret  z
     ld   c,$20
     call call_00_28c8_ObjectSet1B
@@ -2806,7 +2846,7 @@ label6EFA:
     ld   a,$04
     jp   nc,entry_02_72ac
     ret  
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$00
     call nz,call_00_28dc_ObjectSet1D
     call label6FD3
@@ -2815,7 +2855,7 @@ label6EFA:
     call call_00_290d_ObjectSetTimer1A
     ld   a,$06
     jp   entry_02_72ac
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ret  z
     call call_00_2917_ObjectCheckIfTimer1AIsZero
     inc  [hl]
@@ -2823,7 +2863,7 @@ label6EFA:
     ld   a,$08
     jp   z,entry_02_72ac
     ret  
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label6F74
     call call_00_2826_Object_SetXFromDA24
     call call_00_27e4_Object_SetYPosFromDA26
@@ -2840,12 +2880,12 @@ label6F74:
     ld   a,[wDCDA]
     ld   c,$1D
     and  a,$01
-    jp   z,call_00_3792
+    jp   z,call_00_3792_PrepareRelativeObjectSpawn
     ld   c,$1E
-    jp   call_00_3792
+    jp   call_00_3792_PrepareRelativeObjectSpawn
 label6F93:
     ld   c,$71
-    call call_00_29ce
+    call call_00_29ce_ObjectExistsCheck
     ld   a,$00
     jp   nz,entry_02_72ac
     ret  
@@ -2854,7 +2894,7 @@ label6F93:
     ld   a,$0B
     jp   nc,entry_02_72ac
     ret  
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label6FBE
     ld   a,$1A
     call call_00_0ff5
@@ -2871,7 +2911,7 @@ label6FBE:
     ld   [wDC67],a
     ld   hl,wDB6A
     set  4,[hl]
-    jp   jp_00_2b7a
+    jp   call_00_2b7a_ClearObjectThenJump
 label6FD3:
     call call_00_28f1_ObjectCheckIf1DIsZero
     bit  7,a
@@ -2920,7 +2960,7 @@ label7002:
     ld   [hl],e
     ret  
     ret  
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   a,$13
     call nz,call_00_0ff5
     call call_00_244a_Object_ApplyClampedVerticalVelocity
@@ -2930,7 +2970,7 @@ label7002:
     ret  
 
 call_02_702e:
-    call call_00_29f5
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,.label7056
     ld   hl,wDCDA
     ld   a,[hl]

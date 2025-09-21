@@ -44,9 +44,9 @@ entry_02_708f:
     xor  A, A                                          ;; 02:70f6 $af
     ld   [wDA00_CurrentObjectAddr], A                                    ;; 02:70f7 $ea $00 $da
     ld   C, $19                                        ;; 02:70fa $0e $19
-    call call_00_3792                                  ;; 02:70fc $cd $92 $37
+    call call_00_3792_PrepareRelativeObjectSpawn                                  ;; 02:70fc $cd $92 $37
     ld   C, $1b                                        ;; 02:70ff $0e $1b
-    call call_00_29ce                                  ;; 02:7101 $cd $ce $29
+    call call_00_29ce_ObjectExistsCheck                                  ;; 02:7101 $cd $ce $29
     jr   NZ, .jr_02_7115                               ;; 02:7104 $20 $0f
     ld   A, L                                          ;; 02:7106 $7d
     ld   [wDA00_CurrentObjectAddr], A                                    ;; 02:7107 $ea $00 $da
@@ -55,9 +55,9 @@ entry_02_708f:
     ld   HL, entry_02_5bb3                              ;; 02:710f $21 $b3 $5b
     call call_00_0edd_CallAltBankFunc                                  ;; 02:7112 $cd $dd $0e
 .jr_02_7115:
-    call call_00_3252                                  ;; 02:7115 $cd $52 $32
+    call call_00_3252_ResetObjectCounter                                  ;; 02:7115 $cd $52 $32
 .jr_02_7118:
-    call call_00_360c                                  ;; 02:7118 $cd $0c $36
+    call call_00_360c_SpawnObjectOnceImmediate                                  ;; 02:7118 $cd $0c $36
     ld   A, [wDAB8]                                    ;; 02:711b $fa $b8 $da
     cp   A, $01                                        ;; 02:711e $fe $01
     jr   NZ, .jr_02_7118                               ;; 02:7120 $20 $f6

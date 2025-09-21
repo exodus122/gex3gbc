@@ -4,7 +4,19 @@ call_00_21ef:
     call call_00_0ff5                                  ;; 00:21f2 $cd $f5 $0f
     pop  BC                                            ;; 00:21f5 $c1
 
-call_00_21f6:
+call_00_21f6_FindAndMarkObjectInList:
+; Switches to the bank containing the object list (wDC16_ObjectListBank).
+; Reads the start of the object list (wDC17_ObjectListBankOffset).
+; Iterates through 16-byte object records, searching for objects of type $11 
+; whose parameter matches C.
+; When found, it updates a D7xx structure at index B:
+; Sets a nibble/flag ([DE] = ([DE] & $F0) | value).
+; Uses a small table (db $00,$01,$02,$04 at $225C) and level mask (wDC1E_CurrentLevelNumber) 
+; to decide which flag (1 or 2) to apply.
+; Exits by restoring the previous bank. 
+; Usage:
+; Marks specific objects (e.g., collectibles, triggers, or doors) as “active” or “visited” 
+; for the current level. This is typical of collectible or progression flags.
     push BC                                            ;; 00:21f6 $c5
     ld   A, [wDC16_ObjectListBank]                                    ;; 00:21f7 $fa $16 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:21fa $cd $ee $0e
@@ -93,7 +105,20 @@ call_00_2cbf_LoadObjectPalettes:
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:2cdc $cd $6e $07
     jp   call_00_0f08_SwitchBank2                                  ;; 00:2cdf $c3 $08 $0f
 
-call_00_2ce2:
+call_00_2ce2_BuildGexSpriteDrawList:
+; This is a complex sprite/OAM population routine. It:
+; Sets wDAC2=1 and combines the player’s facing direction with a state byte (wDC7A) into wDC53.
+; Switches banks to retrieve sprite graphics metadata based on the current level (wDB6C_CurrentLevelId).
+; Computes the address of Gex’s sprite frame data (using offsets and increments).
+; Reads sprite tiles, positions, and attributes, adjusting for the player’s position 
+; relative to the map (wDBF9, wDBFB, wD80E, wD810).
+; Handles flipped and mirrored variants depending on direction bits (bits 5 and 6 in wDC53).
+; Writes formatted sprite entries (X, Y, tile index, attributes) into a buffer at D9xx.
+; Optionally writes extra entries if a certain flag (wDC51) is set, using offsets from data_00_2f14.
+; Updates wDC6F with the new buffer pointer and restores the previous ROM bank.
+; Usage:
+; Populates the hardware sprite list for Gex’s current animation frame, handling mirroring, flipping, 
+; and level-specific offsets.
     ld   A, $01                                        ;; 00:2ce2 $3e $01
     ld   [wDAC2], A                                    ;; 00:2ce4 $ea $c2 $da
     ld   A, [wD80D_PlayerFacingDirection]                                    ;; 00:2ce7 $fa $0d $d8
@@ -170,7 +195,7 @@ call_00_2ce2:
     ld   A, [wDC88]                                    ;; 00:2d6f $fa $88 $dc
     add  A, B                                          ;; 00:2d72 $80
     ld   B, A                                          ;; 00:2d73 $47
-    call call_00_2f00                                  ;; 00:2d74 $cd $00 $2f
+    call call_00_2f00_CallBank2_Helper_AndCheckBit8                                  ;; 00:2d74 $cd $00 $2f
     jr   NZ, .jr_00_2d87                               ;; 00:2d77 $20 $0e
     ld   A, [wDC7E]                                    ;; 00:2d79 $fa $7e $dc
     and  A, A                                          ;; 00:2d7c $a7
@@ -224,7 +249,7 @@ call_00_2ce2:
     ld   A, [wDC88]                                    ;; 00:2dca $fa $88 $dc
     add  A, B                                          ;; 00:2dcd $80
     ld   B, A                                          ;; 00:2dce $47
-    call call_00_2f00                                  ;; 00:2dcf $cd $00 $2f
+    call call_00_2f00_CallBank2_Helper_AndCheckBit8                                  ;; 00:2dcf $cd $00 $2f
     jr   NZ, .jr_00_2de2                               ;; 00:2dd2 $20 $0e
     ld   A, [wDC7E]                                    ;; 00:2dd4 $fa $7e $dc
     and  A, A                                          ;; 00:2dd7 $a7
@@ -283,7 +308,7 @@ call_00_2ce2:
     ld   A, [wDC88]                                    ;; 00:2e2e $fa $88 $dc
     add  A, B                                          ;; 00:2e31 $80
     ld   B, A                                          ;; 00:2e32 $47
-    call call_00_2f00                                  ;; 00:2e33 $cd $00 $2f
+    call call_00_2f00_CallBank2_Helper_AndCheckBit8                                  ;; 00:2e33 $cd $00 $2f
     jr   NZ, .jr_00_2e46                               ;; 00:2e36 $20 $0e
     ld   A, [wDC7E]                                    ;; 00:2e38 $fa $7e $dc
     and  A, A                                          ;; 00:2e3b $a7
@@ -340,7 +365,7 @@ call_00_2ce2:
     ld   A, [wDC88]                                    ;; 00:2e8d $fa $88 $dc
     add  A, B                                          ;; 00:2e90 $80
     ld   B, A                                          ;; 00:2e91 $47
-    call call_00_2f00                                  ;; 00:2e92 $cd $00 $2f
+    call call_00_2f00_CallBank2_Helper_AndCheckBit8                                  ;; 00:2e92 $cd $00 $2f
     jr   NZ, .jr_00_2ea4                               ;; 00:2e95 $20 $0d
     ld   A, [wDC7E]                                    ;; 00:2e97 $fa $7e $dc
     and  A, A                                          ;; 00:2e9a $a7
@@ -413,7 +438,11 @@ call_00_2ce2:
     ld   [wDC6F], A                                    ;; 00:2efa $ea $6f $dc
     jp   call_00_0f08_SwitchBank2                                  ;; 00:2efd $c3 $08 $0f
 
-call_00_2f00:
+call_00_2f00_CallBank2_Helper_AndCheckBit8:
+; Switch to Bank 2 and Run Entry
+; Behavior: Saves registers, stores current bank (wDAD6_ReturnBank), switches to bank $02, 
+; and calls entry_02_5541 using the alternate-bank call routine. Restores registers, masks result with $08, and returns.
+; Purpose: Executes a helper routine from bank 2 and checks a specific status bit.
     push HL                                            ;; 00:2f00 $e5
     push DE                                            ;; 00:2f01 $d5
     push BC                                            ;; 00:2f02 $c5
@@ -433,7 +462,12 @@ data_00_2f14:
     db   $00, $02, $fe, $00, $fe, $fe, $fc, $fc        ;; 00:2f24 ????????
     db   $fa, $fa, $fc, $f8, $fe, $fa, $00, $fc        ;; 00:2f2c ????????
 
-call_00_2f34:
+call_00_2f34_CountActiveCollectibles:
+; Count Enabled Collectibles
+; Behavior: Switches to the collectible list bank, iterates through the list (step $0003), 
+; counts active entries (!= 0), switches back and iterates object list comparing IDs against data_00_325F. 
+; Increments counter C for each collectible meeting bit-6 set criteria.
+; Purpose: Counts collectible items present for the current map.
     ld   a,[wDC19_CollectibleListBank]
     call call_00_0eee_SwitchBank
     ld   hl,wDC1A_CollectibleListBankOffset
@@ -488,7 +522,11 @@ label2F7E:
     pop  af
     ret  
 
-call_00_2f85_LoadCollectibleMapData:
+call_00_2f85_LoadAndSortCollectibleData:
+; Behavior: Clears collectible state tables (wD100–wD2FF), loads entries from the 
+; collectible list bank into working memory, sorts/organizes them (wD200, wD300), 
+; then returns to original bank.
+; Purpose: Initializes and sorts collectible positions for the current level.
     xor  A, A                                          ;; 00:2f85 $af
     ld   [wDC68], A                                    ;; 00:2f86 $ea $68 $dc
     ld   A, [wDC19_CollectibleListBank]                                    ;; 00:2f89 $fa $19 $dc
@@ -571,10 +609,16 @@ call_00_2f85_LoadCollectibleMapData:
     jr   NZ, .jr_00_2fd4                               ;; 00:2ff3 $20 $df
     jp   call_00_0f08_SwitchBank2                                  ;; 00:2ff5 $c3 $08 $0f
 
-call_00_2ff8:
+call_00_2ff8_InitLevelObjectsAndConfig:
+; Initialize Level State
+; Behavior: Switches to the object list bank, resets wDAB8 counter, clears a large block 
+; of level state variables (wDCC5–wDCDA), copies level-specific configuration tables 
+; (.data_00_30ba and .data_00_317a) into RAM, sets default timers (wDCD5–wDCD9), adjusts 
+; special-case values for level 07/08, and calls setup routines 3180, 31d9, 320d, and 3252.
+; Purpose: Sets up all object, collectible, and configuration state for a new level.
     ld   A, [wDC16_ObjectListBank]                                    ;; 00:2ff8 $fa $16 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:2ffb $cd $ee $0e
-    call call_00_3252                                  ;; 00:2ffe $cd $52 $32
+    call call_00_3252_ResetObjectCounter                                  ;; 00:2ffe $cd $52 $32
     ld   HL, wDC17_ObjectListBankOffset                                     ;; 00:3001 $21 $17 $dc
     ld   A, [HL+]                                      ;; 00:3004 $2a
     ld   H, [HL]                                       ;; 00:3005 $66
@@ -655,10 +699,10 @@ call_00_2ff8:
     ld   A, $3c                                        ;; 00:30a6 $3e $3c
     ld   [wDB6F], A                                    ;; 00:30a8 $ea $6f $db
 .jr_00_30ab:
-    call call_00_3180                                  ;; 00:30ab $cd $80 $31
-    call call_00_31d9                                  ;; 00:30ae $cd $d9 $31
-    call call_00_320d                                  ;; 00:30b1 $cd $0d $32
-    call call_00_3252                                  ;; 00:30b4 $cd $52 $32
+    call call_00_3180_MarkInitialLevelObjects                                  ;; 00:30ab $cd $80 $31
+    call call_00_31d9_CheckFlag4_ResetObjectType1                                  ;; 00:30ae $cd $d9 $31
+    call call_00_320d_ApplyLevelMaskToType3Objects                                  ;; 00:30b1 $cd $0d $32
+    call call_00_3252_ResetObjectCounter                                  ;; 00:30b4 $cd $52 $32
     jp   call_00_0f08_SwitchBank2                                  ;; 00:30b7 $c3 $08 $0f
 .data_00_30ba:
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:30ba ........
@@ -688,7 +732,12 @@ call_00_2ff8:
 .data_00_317a:
     db   $98, $02, $58, $01, $d8, $01                  ;; 00:317a ......
 
-call_00_3180:
+call_00_3180_MarkInitialLevelObjects:
+; Mark Starting Objects for Level
+; Behavior: If level number ≠ 0, looks up a bitmask table ($31C1+level) and, 
+; for each bit set, calls FindAndMarkObjectInList. For level 0, performs a banked 
+; call comparison loop using entry_01_4ab9 and thresholds in $31CD.
+; Purpose: Ensures certain objects are flagged or activated when the level begins.
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:3180 $fa $1e $dc
     and  A, A                                          ;; 00:3183 $a7
     jr   Z, .jr_00_31a0                                ;; 00:3184 $28 $1a
@@ -701,7 +750,7 @@ call_00_3180:
 .jr_00_3190:
     push BC                                            ;; 00:3190 $c5
     bit  0, B                                          ;; 00:3191 $cb $40
-    call NZ, call_00_21f6                              ;; 00:3193 $c4 $f6 $21
+    call NZ, call_00_21f6_FindAndMarkObjectInList                              ;; 00:3193 $c4 $f6 $21
     pop  BC                                            ;; 00:3196 $c1
     rr   B                                             ;; 00:3197 $cb $18
     inc  C                                             ;; 00:3199 $0c
@@ -722,7 +771,7 @@ call_00_3180:
     ld   HL, $31cd                                     ;; 00:31b1 $21 $cd $31
     add  HL, BC                                        ;; 00:31b4 $09
     cp   A, [HL]                                       ;; 00:31b5 $be
-    call NC, call_00_21f6                              ;; 00:31b6 $d4 $f6 $21
+    call NC, call_00_21f6_FindAndMarkObjectInList                              ;; 00:31b6 $d4 $f6 $21
     pop  BC                                            ;; 00:31b9 $c1
     inc  C                                             ;; 00:31ba $0c
     ld   A, C                                          ;; 00:31bb $79
@@ -733,7 +782,11 @@ call_00_3180:
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:31c9 ????????
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:31d1 ????????
 
-call_00_31d9:
+call_00_31d9_CheckFlag4_ResetObjectType1:
+; Handle Level Flag 4 Special Object
+; Behavior: Uses level number + wDC5C as a flag table, checks bit-4; if set, 
+; searches object list for type 01 and clears a RAM byte (wD7??) to zero.
+; Purpose: Disables or resets a specific object type when a special flag is set.
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:31d9 $21 $1e $dc
     ld   L, [HL]                                       ;; 00:31dc $6e
     ld   H, $00                                        ;; 00:31dd $26 $00
@@ -765,7 +818,12 @@ call_00_31d9:
     ld   [BC], A                                       ;; 00:3209 $02
     jp   call_00_0f08_SwitchBank2                                  ;; 00:320a $c3 $08 $0f
 
-call_00_320d:
+call_00_320d_ApplyLevelMaskToType3Objects:
+; Mask Object Flags by Level Setting
+; Behavior: Gets a bitmask (C) from wDC5C + level, scans the object list for type 03. 
+; For each, uses its 13th byte as an index into $324E (00,20,40,80), ANDs with C; if nonzero, 
+; clears the corresponding entry in RAM (wD7xx).
+; Purpose: Applies level-specific masking to object type 3 spawns.
     ld   A, [wDC16_ObjectListBank]                                    ;; 00:320d $fa $16 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:3210 $cd $ee $0e
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:3213 $21 $1e $dc
@@ -807,7 +865,10 @@ call_00_320d:
     jp   call_00_0f08_SwitchBank2                                  ;; 00:324b $c3 $08 $0f
     db   $00, $20, $40, $80                            ;; 00:324e ?...
 
-call_00_3252:
+call_00_3252_ResetObjectCounter:
+; Reset Object Counter
+; Behavior: Simply sets wDAB8 = 1 and returns.
+; Purpose: Initializes the object counter used by other routines.
     ld   A, $01                                        ;; 00:3252 $3e $01
     ld   [wDAB8], A                                    ;; 00:3254 $ea $b8 $da
     ret                                                ;; 00:3257 $c9
@@ -930,7 +991,10 @@ data_00_325F:
     db   $01, $0c, $0c, $31, $02, $00, $ff, $82        ;; 00:35d8 ????????
     db   $01, $0a, $0a, $04, $02, $00, $ff, $81        ;; 00:35e0 ????????
 
-call_00_35e8:
+call_00_35e8_GetObjectTypeIndex:
+; Follows a chain of lookups based on the current object address (wDA00_CurrentObjectAddr) to compute an index into data_00_325F.
+; Shifts HL left three times (×8), adds the table base, and returns the byte at that location.
+; Usage: Fetches an object-type ID or pointer index for the active object.
     ld   HL, wDA00_CurrentObjectAddr                                     ;; 00:35e8 $21 $00 $da
     ld   L, [HL]                                       ;; 00:35eb $6e
     ld   H, $d8                                        ;; 00:35ec $26 $d8
@@ -944,24 +1008,39 @@ call_00_35e8:
     ld   A, [HL]                                       ;; 00:35f8 $7e
     ret                                                ;; 00:35f9 $c9
 
-call_00_35fa:
+call_00_35fa_WaitForLineThenSpawnObject:
+; Switches to the current object list bank, then repeatedly calls 
+; call_00_3618_HandleObjectSpawn until the LCD Y-register (rLY) is ≥ $80.
+; Once the scanline threshold is reached, switches back to the previous bank.
+; Usage: Synchronizes spawning/updating objects with the LCD scanline timing to avoid VRAM conflicts.
     ld   A, [wDC16_ObjectListBank]                                    ;; 00:35fa $fa $16 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:35fd $cd $ee $0e
 .jr_00_3600:
-    call call_00_3618                                  ;; 00:3600 $cd $18 $36
+    call call_00_3618_HandleObjectSpawn                                  ;; 00:3600 $cd $18 $36
     ldh  A, [rLY]                                      ;; 00:3603 $f0 $44
     cp   A, $80                                        ;; 00:3605 $fe $80
     jr   C, .jr_00_3600                                ;; 00:3607 $38 $f7
     jp   call_00_0f08_SwitchBank2                                  ;; 00:3609 $c3 $08 $0f
 
-call_00_360c:
+call_00_360c_SpawnObjectOnceImmediate:
+; Similar to 35FA but calls 3618 once without waiting for the scanline, then switches banks back.
+; Usage: Quickly spawns or processes one object entry without frame timing checks.
     ld   A, [wDC16_ObjectListBank]                                    ;; 00:360c $fa $16 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:360f $cd $ee $0e
-    call call_00_3618                                  ;; 00:3612 $cd $18 $36
+    call call_00_3618_HandleObjectSpawn                                  ;; 00:3612 $cd $18 $36
     jp   call_00_0f08_SwitchBank2                                  ;; 00:3615 $c3 $08 $0f
 
-call_00_3618:
-    call call_00_2afc                                  ;; 00:3618 $cd $fc $2a
+call_00_3618_HandleObjectSpawn:
+; Finds a free object slot.
+; If none free, resets the object counter (3252).
+; If a slot is found:
+; Calculates an offset into the object spawn table using wDAB8 and the bank offset.
+; Checks for $FF sentinel and level ID match.
+; Performs collision-distance checks against player position (wDA14–wDA1B).
+; If within range, copies multiple fields from the spawn table into working object memory (wDA24, wDA1C, etc.).
+; Sets up animation/state data, calls alt-bank functions to finish initialization.
+; Usage: Core routine that validates and copies object-spawn data into live object RAM.
+    call call_00_2afc_FindFreeObjectSlot                                  ;; 00:3618 $cd $fc $2a
     jr   NZ, .jr_00_3641                               ;; 00:361b $20 $24
     ld   HL, wDC17_ObjectListBankOffset                                     ;; 00:361d $21 $17 $dc
     ld   A, [HL+]                                      ;; 00:3620 $2a
@@ -983,7 +1062,7 @@ call_00_3618:
     ld   D, H                                          ;; 00:3635 $54
     ld   A, [DE]                                       ;; 00:3636 $1a
     cp   A, $ff                                        ;; 00:3637 $fe $ff
-    jp   Z, call_00_3252                               ;; 00:3639 $ca $52 $32
+    jp   Z, call_00_3252_ResetObjectCounter                               ;; 00:3639 $ca $52 $32
     ld   HL, wDAB8                                     ;; 00:363c $21 $b8 $da
     inc  [HL]                                          ;; 00:363f $34
     ret                                                ;; 00:3640 $c9
@@ -1013,7 +1092,7 @@ call_00_3618:
     ld   D, H                                          ;; 00:3662 $54
     ld   A, [DE]                                       ;; 00:3663 $1a
     cp   A, $ff                                        ;; 00:3664 $fe $ff
-    jp   Z, call_00_3252                               ;; 00:3666 $ca $52 $32
+    jp   Z, call_00_3252_ResetObjectCounter                               ;; 00:3666 $ca $52 $32
     ld   [wDABB], A                                    ;; 00:3669 $ea $bb $da
     ld   HL, wDAB8                                     ;; 00:366c $21 $b8 $da
     ld   C, [HL]                                       ;; 00:366f $4e
@@ -1226,16 +1305,28 @@ call_00_3618:
     call call_00_0edd_CallAltBankFunc                                  ;; 00:378e $cd $dd $0e
     ret                                                ;; 00:3791 $c9
 
-call_00_3792:
+call_00_3792_PrepareRelativeObjectSpawn:
+; Switches to the object list bank, then calls 37A0 with BC preserved.
+; After execution, restores bank.
+; Usage: Prepares to spawn an object relative to another object or dynamic offset.
     push BC                                            ;; 00:3792 $c5
     ld   A, [wDC16_ObjectListBank]                                    ;; 00:3793 $fa $16 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:3796 $cd $ee $0e
     pop  BC                                            ;; 00:3799 $c1
-    call call_00_37a0                                  ;; 00:379a $cd $a0 $37
+    call call_00_37a0_SpawnObjectRelative                                  ;; 00:379a $cd $a0 $37
     jp   call_00_0f08_SwitchBank2                                  ;; 00:379d $c3 $08 $0f
 
-call_00_37a0:
-    call call_00_2afc                                  ;; 00:37a0 $cd $fc $2a
+call_00_37a0_SpawnObjectRelative:
+; Finds a free slot.
+; Calls a banked routine (entry_03_59c6) to fetch spawn data.
+; Derives offsets using the current object address.
+; Reads a table (.data_00_38b6) and copies positional deltas.
+; Depending on a flag in wDCE9, adds or subtracts position offsets.
+; Writes adjusted coordinates and state values into live object memory.
+; Calls 2a03_ResetObjectTempSlot and finalizes setup with banked calls.
+; Usage: Spawns a new object at a position relative to the parent object, 
+; handling direction and mirroring.
+    call call_00_2afc_FindFreeObjectSlot                                  ;; 00:37a0 $cd $fc $2a
     ret  Z                                             ;; 00:37a3 $c8
     push DE                                            ;; 00:37a4 $d5
     ld   [wDAD6_ReturnBank], A                                    ;; 00:37a5 $ea $d6 $da
@@ -1371,7 +1462,7 @@ call_00_37a0:
     inc  E                                             ;; 00:384a $1c
     ld   A, [wDCE8]                                    ;; 00:384b $fa $e8 $dc
     ld   [DE], A                                       ;; 00:384e $12
-    call call_00_2a03                                  ;; 00:384f $cd $03 $2a
+    call call_00_2a03_ResetObjectTempSlot                                  ;; 00:384f $cd $03 $2a
     xor  A, A                                          ;; 00:3852 $af
     ld   [wDAD6_ReturnBank], A                                    ;; 00:3853 $ea $d6 $da
     ld   A, $02                                        ;; 00:3856 $3e $02

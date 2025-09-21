@@ -1,368 +1,655 @@
 data_02_4000:
-    dw   .data_02_40e4_PlayerActionsTable                                      ;; 02:4000 w.
-    dw   $42c4                                         ;; 02:4002 wW
-    dw   $42cc                                         ;; 02:4004 wW
-    dw   $42d4                                         ;; 02:4006 wW
-    db   $dc, $42, $dc, $42, $dc, $42, $dc, $42        ;; 02:4008 ????????
-    db   $dc, $42, $e0, $42, $e0, $42, $e0, $42        ;; 02:4010 ????????
-    db   $e0, $42, $e0, $42, $f4, $42, $f8, $42        ;; 02:4018 ????????
-    db   $fc, $42                                      ;; 02:4020 ??
-    dw   $4300                                         ;; 02:4022 wW
-    dw   $4310                                         ;; 02:4024 wW
-    db   $24, $43                                      ;; 02:4026 ??
-    dw   $4328                                         ;; 02:4028 wW
-    dw   $432c                                         ;; 02:402a wW
-    dw   $4330                                         ;; 02:402c wW
-    dw   $4334                                         ;; 02:402e wW
-    db   $38, $43, $3c, $43, $40, $43, $44, $43        ;; 02:4030 ????????
-    dw   $4348                                         ;; 02:4038 wW
-    dw   $4354                                         ;; 02:403a wW
-    dw   $4360                                         ;; 02:403c wW
-    dw   $437c                                         ;; 02:403e wW
-    dw   $4398                                         ;; 02:4040 wW
-    dw   $43b0                                         ;; 02:4042 wW
-    db   $c0, $43, $d8, $43, $e0, $43, $e8, $43        ;; 02:4044 ????????
-    db   $f4, $43, $08, $44, $0c, $44, $24, $44        ;; 02:404c ????????
-    db   $28, $44, $40, $44, $54, $44, $58, $44        ;; 02:4054 ????????
-    db   $5c, $44, $70, $44, $7c, $44, $7c, $44        ;; 02:405c ????????
-    db   $90, $44, $94, $44, $98, $44, $a0, $44        ;; 02:4064 ????????
-    db   $a0, $44, $b0, $44, $c0, $44, $cc, $44        ;; 02:406c ????????
-    db   $e8, $44, $ec, $44, $fc, $44, $10, $45        ;; 02:4074 ????????
-    db   $18, $45, $2c, $45, $30, $45, $40, $45        ;; 02:407c ????????
-    db   $50, $45, $60, $45, $68, $45, $70, $45        ;; 02:4084 ????????
-    db   $78, $45, $80, $45, $8c, $45, $94, $45        ;; 02:408c ????????
-    db   $98, $45, $a0, $45, $a8, $45, $c8, $45        ;; 02:4094 ????????
-    db   $d8, $45, $e4, $45, $f8, $45, $fc, $45        ;; 02:409c ????????
-    db   $00, $46, $04, $46, $10, $46, $18, $46        ;; 02:40a4 ????????
-    db   $30, $46, $44, $46, $50, $46, $58, $46        ;; 02:40ac ????????
-    db   $68, $46, $78, $46, $90, $46, $a0, $46        ;; 02:40b4 ????????
-    db   $ac, $46, $bc, $46, $c8, $46, $cc, $46        ;; 02:40bc ????????
-    db   $e4, $46, $ec, $46, $f8, $46, $fc, $46        ;; 02:40c4 ????????
-    db   $04, $47, $20, $47, $44, $47, $48, $47        ;; 02:40cc ????????
-    db   $5c, $47, $60, $47, $64, $47, $68, $47        ;; 02:40d4 ????????
-    db   $6c, $47, $9c, $47, $a0, $47, $ac, $47        ;; 02:40dc ????????
-
-.data_02_40e4_PlayerActionsTable:
-    dw   call_02_47b4                                  ;; 02:40e4 pP
-    dw   data_02_739b                                  ;; 02:40e6 pP
-    dw   call_02_47ce                                  ;; 02:40e8 pP
-    dw   data_02_73ab                                  ;; 02:40ea pP
-    dw   call_02_47fe                                  ;; 02:40ec pP
-    dw   data_02_73b1                                  ;; 02:40ee pP
-    dw   call_02_480a                                  ;; 02:40f0 pP
-    dw   data_02_73c5                                  ;; 02:40f2 pP
-    dw   call_02_481a                                  ;; 02:40f4 pP
-    dw   data_02_73da                                  ;; 02:40f6 pP
-    dw   call_02_481f                                  ;; 02:40f8 pP
-    dw   data_02_73e6                                  ;; 02:40fa pP
-    dw   data_02_582e                                  ;; 02:40fc pP
-    dw   data_02_73ef                                  ;; 02:40fe pP
-    dw   data_02_482e                                  ;; 02:4100 pP
-    dw   data_02_73da                                  ;; 02:4102 pP
-    db   $3e, $48, $fb, $73                            ;; 02:4104 ????
-    dw   data_02_484d                                  ;; 02:4108 pP
-    dw   data_02_7401                                  ;; 02:410a pP
-    dw   data_02_4873                                  ;; 02:410c pP
-    dw   data_02_7408                                  ;; 02:410e pP
-    dw   data_02_4889                                  ;; 02:4110 pP
-    dw   data_02_7411                                  ;; 02:4112 pP
-    dw   data_02_48a1                                  ;; 02:4114 pP
-    dw   data_02_7422                                  ;; 02:4116 pP
-    dw   data_02_48b0                                  ;; 02:4118 pP
-    dw   data_02_7428                                  ;; 02:411a pP
-    dw   data_02_48bc                                  ;; 02:411c pP
-    dw   data_02_7435                                  ;; 02:411e pP
-    dw   data_02_48e8                                  ;; 02:4120 pP
-    dw   data_02_7442                                  ;; 02:4122 pP
-    dw   data_02_4911                                  ;; 02:4124 pP
-    dw   data_02_744e                                  ;; 02:4126 pP
-    dw   data_02_4957                                  ;; 02:4128 pP
-    dw   data_02_745b                                  ;; 02:412a pP
-    dw   data_02_497a                                  ;; 02:412c pP
-    dw   data_02_746d                                  ;; 02:412e pP
-    db   $89, $49, $73, $74, $a8, $49, $73, $74        ;; 02:4130 ????????
-    db   $b2, $49, $79, $74, $b2, $49, $7f, $74        ;; 02:4138 ????????
-    db   $b2, $49, $8f, $74, $b2, $49, $9f, $74        ;; 02:4140 ????????
-    db   $b3, $49, $a5, $74, $25, $4a, $5b, $74        ;; 02:4148 ????????
-    dw   data_02_4a37                                  ;; 02:4150 pP
-    dw   data_02_74ab                                  ;; 02:4152 pP
-    db   $51, $4a, $bd, $74, $52, $4a, $c8, $74        ;; 02:4154 ????????
-    db   $69, $4a, $ce, $74, $6e, $4a, $d4, $74        ;; 02:415c ????????
-    db   $9b, $4a, $e1, $74, $a1, $4a, $ed, $74        ;; 02:4164 ????????
-    db   $ac, $4a, $f7, $74, $b4, $47, $fd, $74        ;; 02:416c ????????
-    db   $b7, $4b, $0d, $75, $2c, $4c, $3b, $75        ;; 02:4174 ????????
-    db   $58, $4c, $43, $75, $7a, $4c, $4b, $75        ;; 02:417c ????????
-    db   $a4, $4c, $51, $75, $bd, $4c, $13, $75        ;; 02:4184 ????????
-    db   $73, $48, $19, $75, $89, $48, $22, $75        ;; 02:418c ????????
-    db   $a1, $48, $28, $75, $b0, $48, $2e, $75        ;; 02:4194 ????????
-    db   $25, $4a, $51, $75, $b4, $47, $59, $75        ;; 02:419c ????????
-    db   $e3, $4c, $8e, $75, $02, $4d, $94, $75        ;; 02:41a4 ????????
-    db   $14, $4d, $9f, $75, $33, $4d, $a5, $75        ;; 02:41ac ????????
-    db   $45, $4d, $ae, $75, $72, $4d, $bb, $75        ;; 02:41b4 ????????
-    db   $8b, $4d, $69, $75, $73, $48, $6f, $75        ;; 02:41bc ????????
-    db   $89, $48, $76, $75, $a1, $48, $7c, $75        ;; 02:41c4 ????????
-    db   $b0, $48, $82, $75, $25, $4a, $bb, $75        ;; 02:41cc ????????
-    db   $b4, $47, $9b, $73, $ce, $47, $ab, $73        ;; 02:41d4 ????????
-    db   $fe, $47, $b1, $73, $0a, $48, $c5, $73        ;; 02:41dc ????????
-    db   $1a, $48, $da, $73, $2e, $58, $e6, $73        ;; 02:41e4 ????????
-    db   $2e, $58, $ef, $73, $2e, $48, $da, $73        ;; 02:41ec ????????
-    db   $3e, $48, $fb, $73, $4d, $48, $01, $74        ;; 02:41f4 ????????
-    db   $73, $48, $08, $74, $89, $48, $11, $74        ;; 02:41fc ????????
-    db   $a1, $48, $22, $74, $b0, $48, $28, $74        ;; 02:4204 ????????
-    db   $bc, $48, $35, $74, $e8, $48, $42, $74        ;; 02:420c ????????
-    db   $11, $49, $4e, $74, $57, $49, $5b, $74        ;; 02:4214 ????????
-    db   $7a, $49, $6d, $74, $89, $49, $73, $74        ;; 02:421c ????????
-    db   $a8, $49, $73, $74, $b2, $49, $79, $74        ;; 02:4224 ????????
-    db   $b2, $49, $7f, $74, $b2, $49, $8f, $74        ;; 02:422c ????????
-    db   $b2, $49, $9f, $74, $b3, $49, $a5, $74        ;; 02:4234 ????????
-    db   $25, $4a, $5b, $74, $37, $4a, $ab, $74        ;; 02:423c ????????
-    db   $51, $4a, $bd, $74, $52, $4a, $c8, $74        ;; 02:4244 ????????
-    db   $69, $4a, $ce, $74, $6e, $4a, $d4, $74        ;; 02:424c ????????
-    db   $9b, $4a, $e1, $74, $a1, $4a, $ed, $74        ;; 02:4254 ????????
-    db   $ac, $4a, $f7, $74, $b4, $47, $fd, $74        ;; 02:425c ????????
-    db   $b7, $4b, $0d, $75, $2c, $4c, $3b, $75        ;; 02:4264 ????????
-    db   $58, $4c, $43, $75, $7a, $4c, $4b, $75        ;; 02:426c ????????
-    db   $a4, $4c, $51, $75, $bd, $4c, $13, $75        ;; 02:4274 ????????
-    db   $73, $48, $19, $75, $89, $48, $22, $75        ;; 02:427c ????????
-    db   $a1, $48, $28, $75, $b0, $48, $2e, $75        ;; 02:4284 ????????
-    db   $25, $4a, $51, $75, $b4, $47, $59, $75        ;; 02:428c ????????
-    db   $e3, $4c, $8e, $75, $02, $4d, $94, $75        ;; 02:4294 ????????
-    db   $14, $4d, $9f, $75, $33, $4d, $a5, $75        ;; 02:429c ????????
-    db   $45, $4d, $ae, $75, $72, $4d, $bb, $75        ;; 02:42a4 ????????
-    db   $8b, $4d, $69, $75, $73, $48, $6f, $75        ;; 02:42ac ????????
-    db   $89, $48, $76, $75, $a1, $48, $7c, $75        ;; 02:42b4 ????????
-    db   $b0, $48, $82, $75, $25, $4a, $bb, $75        ;; 02:42bc ????????
-
-
-    dw   data_02_582e                                  ;; 02:42c4 pP
-    dw   data_02_75c8                                  ;; 02:42c6 pP
-    dw   data_02_583c                                  ;; 02:42c8 pP
-    dw   data_02_75c2                                  ;; 02:42ca pP
-
-    dw   data_02_582e                                  ;; 02:42cc pP
-    dw   data_02_75d1                                  ;; 02:42ce pP
-    dw   data_02_583c                                  ;; 02:42d0 pP
-    dw   data_02_75c2                                  ;; 02:42d2 pP
-
-    dw   data_02_582e                                  ;; 02:42d4 pP
-    dw   data_02_75dc                                  ;; 02:42d6 pP
-    dw   data_02_583c                                  ;; 02:42d8 pP
-    dw   data_02_75c2                                  ;; 02:42da pP
-    
-    db   $18, $59, $e9, $75, $2e, $58, $ef, $75        ;; 02:42dc ????????
-    db   $2e, $58, $f5, $75, $8f, $59, $ef, $75        ;; 02:42e4 ????????
-    db   $aa, $59, $0b, $76, $2e, $58, $11, $76        ;; 02:42ec ????????
-    db   $ed, $59, $27, $76, $ed, $59, $2d, $76        ;; 02:42f4 ????????
-    db   $ed, $59, $33, $76                            ;; 02:42fc ????
-    dw   data_02_5a04                                  ;; 02:4300 pP
-    dw   data_02_7639                                  ;; 02:4302 pP
-    dw   data_02_5a1c                                  ;; 02:4304 pP
-    dw   data_02_7639                                  ;; 02:4306 pP
-    dw   call_02_5a75                                  ;; 02:4308 pP
-    dw   data_02_763f                                  ;; 02:430a pP
-    db   $83, $5a, $39, $76                            ;; 02:430c ????
-    dw   data_02_5ada                                  ;; 02:4310 pP
-    dw   data_02_7645                                  ;; 02:4312 pP
-    dw   data_02_5ae4                                  ;; 02:4314 pP
-    dw   data_02_764b                                  ;; 02:4316 pP
-    db   $ee, $5a, $58, $76                            ;; 02:4318 ????
-    dw   jr_02_5af8                                    ;; 02:431c pP
-    dw   data_02_7665                                  ;; 02:431e pP
-    dw   data_02_583c                                  ;; 02:4320 pP
-    dw   data_02_75c2                                  ;; 02:4322 pP
-    db   $3c, $58, $c2, $75                            ;; 02:4324 ????
-    dw   data_02_5b9a                                  ;; 02:4328 pP
-    dw   data_02_7675                                  ;; 02:432a pP
-    dw   data_02_5b9a                                  ;; 02:432c pP
-    dw   data_02_767b                                  ;; 02:432e pP
-    dw   data_02_5b9a                                  ;; 02:4330 pP
-    dw   data_02_7681                                  ;; 02:4332 pP
-    dw   data_02_5b9a                                  ;; 02:4334 pP
-    dw   data_02_7687                                  ;; 02:4336 pP
-    db   $9a, $5b, $8d, $76, $9a, $5b, $93, $76        ;; 02:4338 ????????
-    db   $9a, $5b, $99, $76, $b3, $5b, $9f, $76        ;; 02:4340 ????????
-    dw   data_02_5bd4                                  ;; 02:4348 pP
-    dw   data_02_76a5                                  ;; 02:434a pP
-    dw   data_02_5bef                                  ;; 02:434c pP
-    dw   data_02_764b                                  ;; 02:434e pP
-    dw   data_02_5bfa                                  ;; 02:4350 pP
-    dw   data_02_75c2                                  ;; 02:4352 pP
-    dw   data_02_582e                                  ;; 02:4354 pP
-    dw   data_02_76ab                                  ;; 02:4356 pP
-    dw   data_02_582e                                  ;; 02:4358 pP
-    dw   data_02_76b1                                  ;; 02:435a pP
-    dw   data_02_582e                                  ;; 02:435c pP
-    dw   data_02_76b7                                  ;; 02:435e pP
-    dw   data_02_5c43                                  ;; 02:4360 pP
-    dw   data_02_76bd                                  ;; 02:4362 pP
-    dw   data_02_5c50                                  ;; 02:4364 pP
-    dw   data_02_76c3                                  ;; 02:4366 pP
-    dw   data_02_5c74                                  ;; 02:4368 pP
-    dw   data_02_76ca                                  ;; 02:436a pP
-    dw   data_02_582e                                  ;; 02:436c pP
-    dw   data_02_76d9                                  ;; 02:436e pP
-    dw   data_02_5c82                                  ;; 02:4370 pP
-    dw   data_02_76df                                  ;; 02:4372 pP
-    dw   call_02_5ca5
-    db   $e5, $76
-    dw   call_02_5cd0
-    db   $f2, $76        ;; 02:4374 ????????
-    dw   data_02_5d10                                  ;; 02:437c pP
-    dw   data_02_7701                                  ;; 02:437e pP
-    dw   data_02_5d80                                  ;; 02:4380 pP
-    dw   data_02_7701                                  ;; 02:4382 pP
-    dw   data_02_5d80                                  ;; 02:4384 pP
-    dw   data_02_7707                                  ;; 02:4386 pP
-    dw   data_02_5d80                                  ;; 02:4388 pP
-    dw   data_02_770d                                  ;; 02:438a pP
-    dw   data_02_5d80                                  ;; 02:438c pP
-    dw   data_02_7713                                  ;; 02:438e pP
-    db   $d7, $5d, $19, $77                            ;; 02:4390 ????
-    dw   data_02_5dd7                                  ;; 02:4394 pP
-    dw   data_02_7721                                  ;; 02:4396 pP
-    dw   data_02_5dde                                  ;; 02:4398 pP
-    dw   data_02_7729                                  ;; 02:439a pP
-    dw   data_02_5dde                                  ;; 02:439c pP
-    dw   data_02_7738                                  ;; 02:439e pP
-    dw   data_02_5e0d                                  ;; 02:43a0 pP
-    dw   data_02_7747                                  ;; 02:43a2 pP
-    dw   data_02_5e25                                  ;; 02:43a4 pP
-    dw   data_02_7756                                  ;; 02:43a6 pP
-    dw   data_02_5e34                                  ;; 02:43a8 pP
-    dw   data_02_775c                                  ;; 02:43aa pP
-    dw   data_02_583c                                  ;; 02:43ac pP
-    dw   data_02_75c2                                  ;; 02:43ae pP
-    dw   data_02_5e7c                                  ;; 02:43b0 pP
-    dw   data_02_7763                                  ;; 02:43b2 pP
-    dw   data_02_5eb8                                  ;; 02:43b4 pP
-    dw   data_02_776e                                  ;; 02:43b6 pP
-    db   $2e, $58, $74, $77                            ;; 02:43b8 ????
-    dw   data_02_583c                                  ;; 02:43bc pP
-    dw   data_02_75c2                                  ;; 02:43be pP
-    db   $cc, $5e, $7b, $77, $da, $5e, $88, $77        ;; 02:43c0 ????????
-    db   $db, $5e, $90, $77, $dc, $5e, $96, $77        ;; 02:43c8 ????????
-    db   $2e, $58, $9c, $77, $3c, $58, $c2, $75        ;; 02:43d0 ????????
-    db   $2e, $58, $ad, $77, $2e, $58, $b6, $77        ;; 02:43d8 ????????
-    db   $dd, $5e, $bc, $77, $f9, $5e, $c5, $77        ;; 02:43e0 ????????
-    db   $2e, $58, $cb, $77, $2e, $58, $d8, $77        ;; 02:43e8 ????????
-    db   $3c, $58, $c2, $75, $01, $5f, $de, $77        ;; 02:43f0 ????????
-    db   $2e, $58, $f0, $77, $39, $5f, $fb, $77        ;; 02:43f8 ????????
-    db   $42, $5f, $06, $78, $3c, $58, $c2, $75        ;; 02:4400 ????????
-    db   $50, $5f, $0c, $78, $69, $5f, $12, $78        ;; 02:4408 ????????
-    db   $78, $5f, $18, $78, $2e, $58, $21, $78        ;; 02:4410 ????????
-    db   $91, $5f, $2a, $78, $2e, $58, $30, $78        ;; 02:4418 ????????
-    db   $3c, $58, $c2, $75, $c7, $60, $38, $78        ;; 02:4420 ????????
-    db   $3f, $61, $3e, $78, $4d, $61, $49, $78        ;; 02:4428 ????????
-    db   $63, $61, $52, $78, $6f, $61, $5b, $78        ;; 02:4430 ????????
-    db   $2e, $58, $61, $78, $b2, $61, $67, $78        ;; 02:4438 ????????
-    db   $2e, $58, $74, $78, $2e, $58, $7a, $78        ;; 02:4440 ????????
-    db   $b8, $61, $83, $78, $2e, $58, $89, $78        ;; 02:4448 ????????
-    db   $2e, $58, $95, $78, $bd, $58, $9b, $78        ;; 02:4450 ????????
-    db   $5f, $58, $9b, $78, $c6, $61, $a1, $78        ;; 02:4458 ????????
-    db   $ee, $61, $a8, $78, $ee, $61, $ae, $78        ;; 02:4460 ????????
-    db   $ee, $61, $b4, $78, $3c, $58, $c2, $75        ;; 02:4468 ????????
-    db   $14, $62, $ba, $78, $4e, $62, $ba, $78        ;; 02:4470 ????????
-    db   $93, $62, $ba, $78, $bc, $62, $c0, $78        ;; 02:4478 ????????
-    db   $f9, $62, $c6, $78, $15, $63, $ce, $78        ;; 02:4480 ????????
-    db   $2e, $58, $db, $78, $3c, $58, $c2, $75        ;; 02:4488 ????????
-    db   $1a, $63, $e1, $78, $33, $63, $e1, $78        ;; 02:4490 ????????
-    db   $2e, $58, $e7, $78, $3c, $58, $c2, $75        ;; 02:4498 ????????
-    db   $4c, $63, $f4, $78, $61, $63, $fa, $78        ;; 02:44a0 ????????
-    db   $2e, $58, $13, $79, $99, $63, $26, $79        ;; 02:44a8 ????????
-    db   $a8, $63, $2d, $79, $a8, $63, $33, $79        ;; 02:44b0 ????????
-    db   $a8, $63, $39, $79, $c0, $63, $3f, $79        ;; 02:44b8 ????????
-    db   $2e, $58, $45, $79, $2e, $58, $4b, $79        ;; 02:44c0 ????????
-    db   $d3, $63, $52, $79, $db, $63, $58, $79        ;; 02:44c8 ????????
-    db   $f0, $63, $61, $79, $2e, $58, $6a, $79        ;; 02:44d0 ????????
-    db   $2e, $58, $71, $79, $15, $64, $79, $79        ;; 02:44d8 ????????
-    db   $2e, $58, $80, $79, $2f, $58, $86, $79        ;; 02:44e0 ????????
-    db   $2e, $58, $8c, $79, $2e, $64, $92, $79        ;; 02:44e8 ????????
-    db   $59, $64, $98, $79, $6f, $64, $a5, $79        ;; 02:44f0 ????????
-    db   $7b, $64, $ab, $79, $91, $64, $b8, $79        ;; 02:44f8 ????????
-    db   $cd, $64, $c3, $79, $2e, $58, $c9, $79        ;; 02:4500 ????????
-    db   $2e, $58, $de, $79, $3c, $58, $c2, $75        ;; 02:4508 ????????
-    db   $2e, $58, $e4, $79, $3c, $58, $c2, $75        ;; 02:4510 ????????
-    db   $e9, $64, $f3, $79, $2e, $58, $f9, $79        ;; 02:4518 ????????
-    db   $02, $65, $06, $7a, $2e, $65, $0c, $7a        ;; 02:4520 ????????
-    db   $3c, $58, $c2, $75, $bd, $58, $12, $7a        ;; 02:4528 ????????
-    db   $2e, $58, $18, $7a, $3d, $65, $1e, $7a        ;; 02:4530 ????????
-    db   $49, $65, $26, $7a, $2e, $58, $2c, $7a        ;; 02:4538 ????????
-    db   $53, $65, $34, $7a, $2e, $58, $3a, $7a        ;; 02:4540 ????????
-    db   $2e, $58, $42, $7a, $5d, $65, $48, $7a        ;; 02:4548 ????????
-    db   $69, $65, $50, $7a, $2e, $58, $56, $7a        ;; 02:4550 ????????
-    db   $77, $65, $61, $7a, $2e, $58, $7a, $7a        ;; 02:4558 ????????
-    db   $9c, $65, $85, $7a, $3c, $58, $c2, $75        ;; 02:4560 ????????
-    db   $97, $65, $85, $7a, $3c, $58, $c2, $75        ;; 02:4568 ????????
-    db   $9d, $65, $91, $7a, $3c, $58, $c2, $75        ;; 02:4570 ????????
-    db   $2e, $58, $97, $7a, $b3, $65, $9d, $7a        ;; 02:4578 ????????
-    db   $2e, $58, $a3, $7a, $2e, $58, $ac, $7a        ;; 02:4580 ????????
-    db   $2e, $58, $b3, $7a, $c9, $65, $b9, $7a        ;; 02:4588 ????????
-    db   $2e, $58, $c2, $7a, $d7, $65, $c8, $7a        ;; 02:4590 ????????
-    db   $09, $66, $ce, $7a, $17, $66, $d4, $7a        ;; 02:4598 ????????
-    db   $25, $66, $da, $7a, $33, $66, $e0, $7a        ;; 02:45a0 ????????
-    db   $41, $66, $e6, $7a, $2e, $58, $ef, $7a        ;; 02:45a8 ????????
-    db   $87, $66, $fb, $7a, $8d, $66, $07, $7b        ;; 02:45b0 ????????
-    db   $2e, $58, $0d, $7b, $9d, $66, $14, $7b        ;; 02:45b8 ????????
-    db   $2e, $58, $1c, $7b, $3c, $58, $c2, $75        ;; 02:45c0 ????????
-    db   $bb, $66, $22, $7b, $cc, $66, $28, $7b        ;; 02:45c8 ????????
-    db   $e0, $66, $33, $7b, $ef, $66, $5a, $7b        ;; 02:45d0 ????????
-    db   $f6, $66, $6a, $7b, $32, $67, $77, $7b        ;; 02:45d8 ????????
-    db   $3c, $58, $c2, $75, $46, $67, $80, $7b        ;; 02:45e0 ????????
-    db   $68, $67, $89, $7b, $2e, $58, $8f, $7b        ;; 02:45e8 ????????
-    db   $2e, $58, $98, $7b, $3c, $58, $c2, $75        ;; 02:45f0 ????????
-    db   $9b, $67, $a1, $7b, $c2, $67, $a7, $7b        ;; 02:45f8 ????????
-    db   $af, $68, $ad, $7b, $b2, $68, $b8, $7b        ;; 02:4600 ????????
-    db   $ed, $68, $be, $7b, $28, $69, $cd, $7b        ;; 02:4608 ????????
-    db   $2e, $58, $d8, $7b, $3c, $58, $c2, $75        ;; 02:4610 ????????
-    db   $47, $69, $e3, $7b, $47, $69, $f8, $7b        ;; 02:4618 ????????
-    db   $3f, $69, $02, $7c, $47, $69, $0b, $7c        ;; 02:4620 ????????
-    db   $2e, $58, $13, $7c, $65, $69, $19, $7c        ;; 02:4628 ????????
-    db   $71, $69, $1f, $7c, $af, $69, $1f, $7c        ;; 02:4630 ????????
-    db   $04, $6a, $1f, $7c, $13, $6a, $1f, $7c        ;; 02:4638 ????????
-    db   $4c, $6a, $27, $7c, $91, $6a, $32, $7c        ;; 02:4640 ????????
-    db   $b4, $6a, $32, $7c, $2e, $58, $32, $7c        ;; 02:4648 ????????
-    db   $2e, $58, $38, $7c, $3c, $58, $c2, $75        ;; 02:4650 ????????
-    db   $cd, $6a, $3e, $7c, $2e, $58, $51, $7c        ;; 02:4658 ????????
-    db   $d4, $6a, $5e, $7c, $3c, $58, $c2, $75        ;; 02:4660 ????????
-    db   $03, $6b, $6a, $7c, $20, $6b, $6a, $7c        ;; 02:4668 ????????
-    db   $35, $6b, $6a, $7c, $3c, $58, $c2, $75        ;; 02:4670 ????????
-    db   $53, $6b, $72, $7c, $2e, $58, $79, $7c        ;; 02:4678 ????????
-    db   $2e, $58, $7f, $7c, $2e, $58, $8b, $7c        ;; 02:4680 ????????
-    db   $2e, $58, $92, $7c, $3c, $58, $c2, $75        ;; 02:4688 ????????
-    db   $69, $6b, $a1, $7c, $2e, $58, $aa, $7c        ;; 02:4690 ????????
-    db   $2e, $58, $b4, $7c, $3c, $58, $c2, $75        ;; 02:4698 ????????
-    db   $9b, $6b, $c4, $7c, $2e, $58, $cd, $7c        ;; 02:46a0 ????????
-    db   $3c, $58, $c2, $75, $a3, $6b, $d6, $7c        ;; 02:46a8 ????????
-    db   $e4, $6b, $d6, $7c, $c8, $6b, $df, $7c        ;; 02:46b0 ????????
-    db   $3c, $58, $c2, $75, $fb, $6b, $e6, $7c        ;; 02:46b8 ????????
-    db   $2e, $58, $ec, $7c, $08, $6c, $f3, $7c        ;; 02:46c0 ????????
-    db   $dd, $6a, $f9, $7c, $1d, $6c, $08, $7d        ;; 02:46c8 ????????
-    db   $1d, $6c, $17, $7d, $4c, $6c, $26, $7d        ;; 02:46d0 ????????
-    db   $64, $6c, $35, $7d, $73, $6c, $3b, $7d        ;; 02:46d8 ????????
-    db   $3c, $58, $c2, $75, $2e, $58, $42, $7d        ;; 02:46e0 ????????
-    db   $3c, $58, $c2, $75, $2e, $58, $4f, $7d        ;; 02:46e8 ????????
-    db   $2e, $58, $55, $7d, $2e, $58, $4f, $7d        ;; 02:46f0 ????????
-    db   $bb, $6c, $65, $7d, $dd, $6c, $73, $7d        ;; 02:46f8 ????????
-    db   $3c, $58, $c2, $75, $3a, $6d, $9a, $7d        ;; 02:4700 ????????
-    db   $39, $6d, $7c, $7d, $3b, $6d, $a3, $7d        ;; 02:4708 ????????
-    db   $2e, $58, $b1, $7d, $2e, $58, $b7, $7d        ;; 02:4710 ????????
-    db   $49, $6d, $c3, $7d, $52, $6d, $cd, $7d        ;; 02:4718 ????????
-    db   $6d, $6d, $d5, $7d, $6d, $6d, $db, $7d        ;; 02:4720 ????????
-    db   $85, $6d, $e1, $7d, $ba, $6d, $eb, $7d        ;; 02:4728 ????????
-    db   $da, $6d, $f9, $7d, $dd, $6d, $00, $7e        ;; 02:4730 ????????
-    db   $2e, $58, $09, $7e, $ee, $6d, $0f, $7e        ;; 02:4738 ????????
-    db   $09, $6e, $c2, $75, $c7, $6e, $15, $7e        ;; 02:4740 ????????
-    db   $88, $6e, $1b, $7e, $2e, $58, $21, $7e        ;; 02:4748 ????????
-    db   $a8, $6e, $34, $7e, $b9, $6e, $3a, $7e        ;; 02:4750 ????????
-    db   $2e, $58, $40, $7e, $44, $6e, $53, $7e        ;; 02:4758 ????????
-    db   $07, $6f, $5e, $7e, $0e, $6f, $67, $7e        ;; 02:4760 ????????
-    db   $0e, $6f, $6d, $7e, $0f, $6f, $73, $7e        ;; 02:4768 ????????
-    db   $0f, $6f, $79, $7e, $29, $6f, $7f, $7e        ;; 02:4770 ????????
-    db   $35, $6f, $8a, $7e, $2e, $58, $95, $7e        ;; 02:4778 ????????
-    db   $3e, $6f, $9b, $7e, $54, $6f, $a4, $7e        ;; 02:4780 ????????
-    db   $54, $6f, $aa, $7e, $64, $6f, $b0, $7e        ;; 02:4788 ????????
-    db   $9e, $6f, $b6, $7e, $a1, $6f, $c2, $7e        ;; 02:4790 ????????
-    db   $aa, $6f, $cb, $7e, $19, $70, $d1, $7e        ;; 02:4798 ????????
-    db   $2e, $58, $da, $7e, $1a, $70, $e0, $7e        ;; 02:47a0 ????????
-    db   $3c, $58, $c2, $75, $2e, $70, $ad, $7b        ;; 02:47a8 ????????
-    db   $3c, $58, $c2, $75                            ;; 02:47b0 ????
+    dw   .data_02_40e4 ; Object_Gex
+    dw   .data_02_42c4 ; Object_BonusCoin
+    dw   .data_02_42cc ; Object_FlyCoinSpawn
+    dw   .data_02_42d4 ; Object_PawCoin
+    dw   .data_02_42dc ; Object_unk04
+    dw   .data_02_42dc ; Object_unk05
+    dw   .data_02_42dc ; Object_unk06
+    dw   .data_02_42dc ; Object_unk07
+    dw   .data_02_42dc ; Object_unk08
+    dw   .data_02_42e0 ; Object_GreenFlyTV
+    dw   .data_02_42e0 ; Object_PurpleFlyTV
+    dw   .data_02_42e0 ; Object_unk0B
+    dw   .data_02_42e0 ; Object_BlueFlyTV
+    dw   .data_02_42e0 ; Object_unk0D
+    dw   .data_02_42f4 ; Object_unk0E
+    dw   .data_02_42f8 ; Object_unk0F
+    dw   .data_02_42fc ; Object_unk10
+    dw   .data_02_4300 ; Object_TVButton
+    dw   .data_02_4310 ; Object_TVRemote
+    dw   .data_02_4324 ; Object_unk13
+    dw   .data_02_4328 ; Object_GoalCounter
+    dw   .data_02_432c ; Object_unk15
+    dw   .data_02_4330 ; Object_unk16
+    dw   .data_02_4334 ; Object_unk17
+    dw   .data_02_4338 ; Object_unk18
+    dw   .data_02_433c ; Object_unk19
+    dw   .data_02_4340 ; Object_unk1A
+    dw   .data_02_4344 ; Object_BonusStageTimer
+    dw   .data_02_4348 ; Object_GexCave_Remote
+    dw   .data_02_4354 ; Object_HolidayTV_IceSculpture
+    dw   .data_02_4360 ; Object_HolidayTV_EvilSanta
+    dw   .data_02_437c ; Object_HolidayTV_EvilSantaProjectile
+    dw   .data_02_4398 ; Object_HolidayTV_SkatingElf
+    dw   .data_02_43b0 ; Object_HolidayTV_Penguin
+    dw   .data_02_43c0 ; Object_MysteryTV_TVEnemy
+    dw   .data_02_43d8 ; Object_MysteryTV_BloodCooler
+    dw   .data_02_43e0 ; Object_MysteryTV_FishEnemy
+    dw   .data_02_43e8 ; Object_MysteryTV_MagicSword
+    dw   .data_02_43f4 ; Object_MysteryTV_GunnerEnemy
+    dw   .data_02_4408 ; Object_MysteryTV_GunnerBullet
+    dw   .data_02_440c ; Object_MysteryTV_KnightBoss
+    dw   .data_02_4424 ; Object_MysteryTV_KnightBossProjectile
+    dw   .data_02_4428 ; Object_TutTV_Hand
+    dw   .data_02_4440 ; Object_TutTV_LostArk
+    dw   .data_02_4454 ; Object_TutTV_RisingPlatform
+    dw   .data_02_4458 ; Object_TutTV_SidewaysPlatform
+    dw   .data_02_445c ; Object_TutTV_Bee
+    dw   .data_02_4470 ; Object_TutTV_Raft
+    dw   .data_02_447c ; Object_TutTV_SnakeFacingRight
+    dw   .data_02_447c ; Object_TutTV_SnakeFacingLeft
+    dw   .data_02_4490 ; Object_TutTV_SnakeRightProjectile
+    dw   .data_02_4494 ; Object_TutTV_SnakeLeftProjectile
+    dw   .data_02_4498 ; Object_TutTV_RaStaff
+    dw   .data_02_44a0 ; Object_TutTV_RaStatueHorizontalProjectile
+    dw   .data_02_44a0 ; Object_TutTV_RaStatueDiagonalProjectile
+    dw   .data_02_44b0 ; Object_TutTV_BreakableBlock
+    dw   .data_02_44c0 ; Object_TutTV_Coffin
+    dw   .data_02_44cc ; Object_WesternStation_Cactus
+    dw   .data_02_44e8 ; Object_unk3A
+    dw   .data_02_44ec ; Object_WesternStation_RockPlatform
+    dw   .data_02_44fc ; Object_WesternStation_WalkerEnemy
+    dw   .data_02_4510 ; Object_WesternStation_PlayingCard
+    dw   .data_02_4518 ; Object_WesternStation_CeilingEnemy
+    dw   .data_02_452c ; Object_WesternStation_RisingPlatform
+    dw   .data_02_4530 ; Object_AnimeChannel_Door
+    dw   .data_02_4540 ; Object_AnimeChannel_Door2
+    dw   .data_02_4550 ; Object_AnimeChannel_FanLift
+    dw   .data_02_4560 ; Object_AnimeChannel_MechFacingRight
+    dw   .data_02_4568 ; Object_AnimeChannel_MechFacingLeft
+    dw   .data_02_4570 ; Object_AnimeChannel_DisappearingFloor
+    dw   .data_02_4578 ; Object_AnimeChannel_OnSwitch2
+    dw   .data_02_4580 ; Object_AnimeChannel_AlienCultureTube
+    dw   .data_02_458c ; Object_AnimeChannel_BlueBeamBarrier
+    dw   .data_02_4594 ; Object_AnimeChannel_RisingPlatform
+    dw   .data_02_4598 ; Object_AnimeChannel_OnSwitch
+    dw   .data_02_45a0 ; Object_AnimeChannel_OffSwitch
+    dw   .data_02_45a8 ; Object_AnimeChannel_PinkGirl
+    dw   .data_02_45c8 ; Object_AnimeChannel_BigSilverRobot
+    dw   .data_02_45d8 ; Object_AnimeChannel_SmallBlueRobot
+    dw   .data_02_45e4 ; Object_AnimeChannel_TransformerEnemy
+    dw   .data_02_45f8 ; Object_AnimeChannel_TransformerEnemyProjectile
+    dw   .data_02_45fc ; Object_AnimeChannel_Elevator
+    dw   .data_02_4600 ; Object_AnimeChannel_FireWallEnemy
+    dw   .data_02_4604 ; Object_AnimeChannel_FallingYellowEnemy
+    dw   .data_02_4610 ; Object_AnimeChannel_PlanetOBlastWeapon
+    dw   .data_02_4618 ; Object_SuperheroShow_MadBomber
+    dw   .data_02_4630 ; Object_SuperheroShow_Bomb
+    dw   .data_02_4644 ; Object_SuperheroShow_WaterTowerTank
+    dw   .data_02_4650 ; Object_SuperheroShow_WaterTowerStand
+    dw   .data_02_4658 ; Object_SuperheroShow_Convict
+    dw   .data_02_4668 ; Object_SuperheroShow_Spider
+    dw   .data_02_4678 ; Object_SuperheroShow_StrayCat
+    dw   .data_02_4690 ; Object_SuperheroShow_YellowGoon
+    dw   .data_02_46a0 ; Object_SuperheroShow_Rat
+    dw   .data_02_46ac ; Object_SuperheroShow_FlyingRobotHead
+    dw   .data_02_46bc ; Object_SuperheroShow_FalseFloor
+    dw   .data_02_46c8 ; Object_SuperheroShow_GreyConvictProjectile
+    dw   .data_02_46cc ; Object_GextremeSports_Elf
+    dw   .data_02_46e4 ; Object_GextremeSports_BonusTimeCoin
+    dw   .data_02_46ec ; Object_MarsupialMadness_Bell
+    dw   .data_02_46f8 ; Object_MarsupialMadness_Bird
+    dw   .data_02_46fc ; Object_MarsupialMadness_BirdProjectile
+    dw   .data_02_4704 ; Object_WWGexWrestling_RockHard
+    dw   .data_02_4720 ; Object_LizardOfOz_BrainOfOz
+    dw   .data_02_4744 ; Object_LizardOfOz_CannonProjectile
+    dw   .data_02_4748 ; Object_LizardOfOz_Cannon
+    dw   .data_02_475c ; Object_LizardOfOz_RockProjectile
+    dw   .data_02_4760 ; Object_unk6B
+    dw   .data_02_4764 ; Object_unk6C
+    dw   .data_02_4768 ; Object_unk6D
+    dw   .data_02_476c ; Object_ChannelZ_Rez
+    dw   .data_02_479c ; Object_unk6F
+    dw   .data_02_47a0 ; Object_ChannelZ_Meteor
+    dw   .data_02_47ac ; Object_ChannelZ_RockProjectile
+.data_02_40e4:
+    dw   call_02_47b4, data_02_739b
+    dw   call_02_47ce, data_02_73ab
+    dw   call_02_47fe, data_02_73b1
+    dw   call_02_480a, data_02_73c5
+    dw   call_02_481a, data_02_73da
+    dw   call_02_481f, data_02_73e6
+    dw   call_02_582e, data_02_73ef
+    dw   call_02_482e, data_02_73da
+    dw   call_02_483e, data_02_73fb
+    dw   call_02_484d, data_02_7401
+    dw   call_02_4873, data_02_7408
+    dw   call_02_4889, data_02_7411
+    dw   call_02_48a1, data_02_7422
+    dw   call_02_48b0, data_02_7428
+    dw   call_02_48bc, data_02_7435
+    dw   call_02_48e8, data_02_7442
+    dw   call_02_4911, data_02_744e
+    dw   call_02_4957, data_02_745b
+    dw   call_02_497a, data_02_746d
+    dw   call_02_4989, data_02_7473
+    dw   call_02_49a8, data_02_7473
+    dw   call_02_49b2, data_02_7479
+    dw   call_02_49b2, data_02_747f
+    dw   call_02_49b2, data_02_748f
+    dw   call_02_49b2, data_02_749f
+    dw   call_02_49b3, data_02_74a5
+    dw   call_02_4a25, data_02_745b
+    dw   call_02_4a37, data_02_74ab
+    dw   call_02_4a51, data_02_74bd
+    dw   call_02_4a52, data_02_74c8
+    dw   call_02_4a69, data_02_74ce
+    dw   call_02_4a6e, data_02_74d4
+    dw   call_02_4a9b, data_02_74e1
+    dw   call_02_4aa1, data_02_74ed
+    dw   call_02_4aac, data_02_74f7
+    dw   call_02_47b4, data_02_74fd
+    dw   call_02_4bb7, data_02_750d
+    dw   call_02_4c2c, data_02_753b
+    dw   call_02_4c58, data_02_7543
+    dw   call_02_4c7a, data_02_754b
+    dw   call_02_4ca4, data_02_7551
+    dw   call_02_4cbd, data_02_7513
+    dw   call_02_4873, data_02_7519
+    dw   call_02_4889, data_02_7522
+    dw   call_02_48a1, data_02_7528
+    dw   call_02_48b0, data_02_752e
+    dw   call_02_4a25, data_02_7551
+    dw   call_02_47b4, data_02_7559
+    dw   call_02_4ce3, data_02_758e
+    dw   call_02_4d02, data_02_7594
+    dw   call_02_4d14, data_02_759f
+    dw   call_02_4d33, data_02_75a5
+    dw   call_02_4d45, data_02_75ae
+    dw   call_02_4d72, data_02_75bb
+    dw   call_02_4d8b, data_02_7569
+    dw   call_02_4873, data_02_756f
+    dw   call_02_4889, data_02_7576
+    dw   call_02_48a1, data_02_757c
+    dw   call_02_48b0, data_02_7582
+    dw   call_02_4a25, data_02_75bb
+    dw   call_02_47b4, data_02_739b
+    dw   call_02_47ce, data_02_73ab
+    dw   call_02_47fe, data_02_73b1
+    dw   call_02_480a, data_02_73c5
+    dw   call_02_481a, data_02_73da
+    dw   call_02_582e, data_02_73e6
+    dw   call_02_582e, data_02_73ef
+    dw   call_02_482e, data_02_73da
+    dw   call_02_483e, data_02_73fb
+    dw   call_02_484d, data_02_7401
+    dw   call_02_4873, data_02_7408
+    dw   call_02_4889, data_02_7411
+    dw   call_02_48a1, data_02_7422
+    dw   call_02_48b0, data_02_7428
+    dw   call_02_48bc, data_02_7435
+    dw   call_02_48e8, data_02_7442
+    dw   call_02_4911, data_02_744e
+    dw   call_02_4957, data_02_745b
+    dw   call_02_497a, data_02_746d
+    dw   call_02_4989, data_02_7473
+    dw   call_02_49a8, data_02_7473
+    dw   call_02_49b2, data_02_7479
+    dw   call_02_49b2, data_02_747f
+    dw   call_02_49b2, data_02_748f
+    dw   call_02_49b2, data_02_749f
+    dw   call_02_49b3, data_02_74a5
+    dw   call_02_4a25, data_02_745b
+    dw   call_02_4a37, data_02_74ab
+    dw   call_02_4a51, data_02_74bd
+    dw   call_02_4a52, data_02_74c8
+    dw   call_02_4a69, data_02_74ce
+    dw   call_02_4a6e, data_02_74d4
+    dw   call_02_4a9b, data_02_74e1
+    dw   call_02_4aa1, data_02_74ed
+    dw   call_02_4aac, data_02_74f7
+    dw   call_02_47b4, data_02_74fd
+    dw   call_02_4bb7, data_02_750d
+    dw   call_02_4c2c, data_02_753b
+    dw   call_02_4c58, data_02_7543
+    dw   call_02_4c7a, data_02_754b
+    dw   call_02_4ca4, data_02_7551
+    dw   call_02_4cbd, data_02_7513
+    dw   call_02_4873, data_02_7519
+    dw   call_02_4889, data_02_7522
+    dw   call_02_48a1, data_02_7528
+    dw   call_02_48b0, data_02_752e
+    dw   call_02_4a25, data_02_7551
+    dw   call_02_47b4, data_02_7559
+    dw   call_02_4ce3, data_02_758e
+    dw   call_02_4d02, data_02_7594
+    dw   call_02_4d14, data_02_759f
+    dw   call_02_4d33, data_02_75a5
+    dw   call_02_4d45, data_02_75ae
+    dw   call_02_4d72, data_02_75bb
+    dw   call_02_4d8b, data_02_7569
+    dw   call_02_4873, data_02_756f
+    dw   call_02_4889, data_02_7576
+    dw   call_02_48a1, data_02_757c
+    dw   call_02_48b0, data_02_7582
+    dw   call_02_4a25, data_02_75bb
+.data_02_42c4:
+    dw   call_02_582e, data_02_75c8
+    dw   call_02_583c, data_02_75c2
+.data_02_42cc:
+    dw   call_02_582e, data_02_75d1
+    dw   call_02_583c, data_02_75c2
+.data_02_42d4:
+    dw   call_02_582e, data_02_75dc
+    dw   call_02_583c, data_02_75c2
+.data_02_42dc:
+    dw   call_02_5918, data_02_75e9
+.data_02_42e0:
+    dw   call_02_582e, data_02_75ef
+    dw   call_02_582e, data_02_75f5
+    dw   call_02_598f, data_02_75ef
+    dw   call_02_59aa, data_02_760b
+    dw   call_02_582e, data_02_7611
+.data_02_42f4:
+    dw   call_02_59ed, data_02_7627
+.data_02_42f8:
+    dw   call_02_59ed, data_02_762d
+.data_02_42fc:
+    dw   call_02_59ed, data_02_7633
+.data_02_4300:
+    dw   call_02_5a04, data_02_7639
+    dw   call_02_5a1c, data_02_7639
+    dw   call_02_5a75, data_02_763f
+    dw   call_02_5a83, data_02_7639
+.data_02_4310:
+    dw   call_02_5ada, data_02_7645
+    dw   call_02_5ae4, data_02_764b
+    dw   call_02_5aee, data_02_7658
+    dw   call_02_5af8, data_02_7665
+    dw   call_02_583c, data_02_75c2
+.data_02_4324:
+    dw   call_02_583c, data_02_75c2
+.data_02_4328:
+    dw   call_02_5b9a, data_02_7675
+.data_02_432c:
+    dw   call_02_5b9a, data_02_767b
+.data_02_4330:
+    dw   call_02_5b9a, data_02_7681
+.data_02_4334:
+    dw   call_02_5b9a, data_02_7687
+.data_02_4338:
+    dw   call_02_5b9a, data_02_768d
+.data_02_433c:
+    dw   call_02_5b9a, data_02_7693
+.data_02_4340:
+    dw   call_02_5b9a, data_02_7699
+.data_02_4344:
+    dw   call_02_5bb3, data_02_769f
+.data_02_4348:
+    dw   call_02_5bd4, data_02_76a5
+    dw   call_02_5bef, data_02_764b
+    dw   call_02_5bfa, data_02_75c2
+.data_02_4354:
+    dw   call_02_582e, data_02_76ab
+    dw   call_02_582e, data_02_76b1
+    dw   call_02_582e, data_02_76b7
+.data_02_4360:
+    dw   call_02_5c43, data_02_76bd
+    dw   call_02_5c50, data_02_76c3
+    dw   call_02_5c74, data_02_76ca
+    dw   call_02_582e, data_02_76d9
+    dw   call_02_5c82, data_02_76df
+    dw   call_02_5ca5, data_02_76e5
+    dw   call_02_5cd0, data_02_76f2
+.data_02_437c:
+    dw   call_02_5d10, data_02_7701
+    dw   call_02_5d80, data_02_7701
+    dw   call_02_5d80, data_02_7707
+    dw   call_02_5d80, data_02_770d
+    dw   call_02_5d80, data_02_7713
+    dw   call_02_5dd7, data_02_7719
+    dw   call_02_5dd7, data_02_7721
+.data_02_4398:
+    dw   call_02_5dde, data_02_7729
+    dw   call_02_5dde, data_02_7738
+    dw   call_02_5e0d, data_02_7747
+    dw   call_02_5e25, data_02_7756
+    dw   call_02_5e34, data_02_775c
+    dw   call_02_583c, data_02_75c2
+.data_02_43b0:
+    dw   call_02_5e7c, data_02_7763
+    dw   call_02_5eb8, data_02_776e
+    dw   call_02_582e, data_02_7774
+    dw   call_02_583c, data_02_75c2
+.data_02_43c0:
+    dw   call_02_5ecc, data_02_777b
+    dw   call_02_5eda, data_02_7788
+    dw   call_02_5edb, data_02_7790
+    dw   call_02_5edc, data_02_7796
+    dw   call_02_582e, data_02_779c
+    dw   call_02_583c, data_02_75c2
+.data_02_43d8:
+    dw   call_02_582e, data_02_77ad
+    dw   call_02_582e, data_02_77b6
+.data_02_43e0:
+    dw   call_02_5edd, data_02_77bc
+    dw   call_02_5ef9, data_02_77c5
+.data_02_43e8:
+    dw   call_02_582e, data_02_77cb
+    dw   call_02_582e, data_02_77d8
+    dw   call_02_583c, data_02_75c2
+.data_02_43f4:
+    dw   call_02_5f01, data_02_77de
+    dw   call_02_582e, data_02_77f0
+    dw   call_02_5f39, data_02_77fb
+    dw   call_02_5f42, data_02_7806
+    dw   call_02_583c, data_02_75c2
+.data_02_4408:
+    dw   call_02_5f50, data_02_780c
+.data_02_440c:
+    dw   call_02_5f69, data_02_7812
+    dw   call_02_5f78, data_02_7818
+    dw   call_02_582e, data_02_7821
+    dw   call_02_5f91, data_02_782a
+    dw   call_02_582e, data_02_7830
+    dw   call_02_583c, data_02_75c2
+.data_02_4424:
+    dw   call_02_60c7, data_02_7838
+.data_02_4428:
+    dw   call_02_613f, data_02_783e
+    dw   call_02_614d, data_02_7849
+    dw   call_02_6163, data_02_7852
+    dw   call_02_616f, data_02_785b
+    dw   call_02_582e, data_02_7861
+    dw   call_02_61b2, data_02_7867
+.data_02_4440:
+    dw   call_02_582e, data_02_7874
+    dw   call_02_582e, data_02_787a
+    dw   call_02_61b8, data_02_7883
+    dw   call_02_582e, data_02_7889
+    dw   call_02_582e, data_02_7895
+.data_02_4454:
+    dw   call_02_58bd, data_02_789b
+.data_02_4458:
+    dw   call_02_585f, data_02_789b
+.data_02_445c:
+    dw   call_02_61c6, data_02_78a1
+    dw   call_02_61ee, data_02_78a8
+    dw   call_02_61ee, data_02_78ae
+    dw   call_02_61ee, data_02_78b4
+    dw   call_02_583c, data_02_75c2
+.data_02_4470:
+    dw   call_02_6214, data_02_78ba
+    dw   call_02_624e, data_02_78ba
+    dw   call_02_6293, data_02_78ba
+.data_02_447c:
+    dw   call_02_62bc, data_02_78c0
+    dw   call_02_62f9, data_02_78c6
+    dw   call_02_6315, data_02_78ce
+    dw   call_02_582e, data_02_78db
+    dw   call_02_583c, data_02_75c2
+.data_02_4490:
+    dw   call_02_631a, data_02_78e1
+.data_02_4494:
+    dw   call_02_6333, data_02_78e1
+.data_02_4498:
+    dw   call_02_582e, data_02_78e7
+    dw   call_02_583c, data_02_75c2
+.data_02_44a0:
+    dw   call_02_634c, data_02_78f4
+    dw   call_02_6361, data_02_78fa
+    dw   call_02_582e, data_02_7913
+    dw   call_02_6399, data_02_7926
+.data_02_44b0:
+    dw   call_02_63a8, data_02_792d
+    dw   call_02_63a8, data_02_7933
+    dw   call_02_63a8, data_02_7939
+    dw   call_02_63c0, data_02_793f
+.data_02_44c0:
+    dw   call_02_582e, data_02_7945
+    dw   call_02_582e, data_02_794b
+    dw   call_02_63d3, data_02_7952
+.data_02_44cc:
+    dw   call_02_63db, data_02_7958
+    dw   call_02_63f0, data_02_7961
+    dw   call_02_582e, data_02_796a
+    dw   call_02_582e, data_02_7971
+    dw   call_02_6415, data_02_7979
+    dw   call_02_582e, data_02_7980
+    dw   call_02_582f, data_02_7986
+.data_02_44e8:
+    dw   call_02_582e, data_02_798c
+.data_02_44ec:
+    dw   call_02_642e, data_02_7992
+    dw   call_02_6459, data_02_7998
+    dw   call_02_646f, data_02_79a5
+    dw   call_02_647b, data_02_79ab
+.data_02_44fc:
+    dw   call_02_6491, data_02_79b8
+    dw   call_02_64cd, data_02_79c3
+    dw   call_02_582e, data_02_79c9
+    dw   call_02_582e, data_02_79de
+    dw   call_02_583c, data_02_75c2
+.data_02_4510:
+    dw   call_02_582e, data_02_79e4
+    dw   call_02_583c, data_02_75c2
+.data_02_4518:
+    dw   call_02_64e9, data_02_79f3
+    dw   call_02_582e, data_02_79f9
+    dw   call_02_6502, data_02_7a06
+    dw   call_02_652e, data_02_7a0c
+    dw   call_02_583c, data_02_75c2
+.data_02_452c:
+    dw   call_02_58bd, data_02_7a12
+.data_02_4530:
+    dw   call_02_582e, data_02_7a18
+    dw   call_02_653d, data_02_7a1e
+    dw   call_02_6549, data_02_7a26
+    dw   call_02_582e, data_02_7a2c
+.data_02_4540:
+    dw   $6553, data_02_7a34
+    dw   $582e, data_02_7a3a
+    dw   $582e, data_02_7a42
+    dw   $655d, data_02_7a48
+.data_02_4550:
+    dw   $6569, data_02_7a50
+    dw   $582e, data_02_7a56
+    dw   $6577, data_02_7a61
+    dw   $582e, data_02_7a7a
+.data_02_4560:
+    dw   $659c, data_02_7a85
+    dw   $583c, data_02_75c2
+.data_02_4568:
+    dw   $6597, data_02_7a85
+    dw   $583c, data_02_75c2
+.data_02_4570:
+    dw   $659d, data_02_7a91
+    dw   $583c, data_02_75c2
+.data_02_4578:
+    dw   $582e, data_02_7a97
+    dw   $65b3, data_02_7a9d
+.data_02_4580:
+    dw   $582e, data_02_7aa3
+    dw   $582e, data_02_7aac
+    dw   $582e, data_02_7ab3
+.data_02_458c:
+    dw   $65c9, data_02_7ab9
+    dw   $582e, data_02_7ac2
+.data_02_4594:
+    dw   $65d7, data_02_7ac8
+.data_02_4598:
+    dw   $6609, data_02_7ace
+    dw   $6617, data_02_7ad4
+.data_02_45a0:
+    dw   $6625, data_02_7ada
+    dw   $6633, data_02_7ae0
+.data_02_45a8:
+    dw   $6641, data_02_7ae6
+    dw   $582e, data_02_7aef
+    dw   $6687, data_02_7afb
+    dw   $668d, data_02_7b07
+    dw   $582e, data_02_7b0d
+    dw   $669d, data_02_7b14
+    dw   $582e, data_02_7b1c
+    dw   $583c, data_02_75c2
+.data_02_45c8:
+    dw   $66bb, data_02_7b22
+    dw   $66cc, data_02_7b28
+    dw   $66e0, data_02_7b33
+    dw   $66ef, data_02_7b5a
+.data_02_45d8:
+    dw   $66f6, data_02_7b6a
+    dw   $6732, data_02_7b77
+    dw   $583c, data_02_75c2
+.data_02_45e4:
+    dw   $6746, data_02_7b80
+    dw   $6768, data_02_7b89
+    dw   $582e, data_02_7b8f
+    dw   $582e, data_02_7b98
+    dw   $583c, data_02_75c2
+.data_02_45f8:
+    dw   $679b, data_02_7ba1
+.data_02_45fc:
+    dw   $67c2, data_02_7ba7
+.data_02_4600:
+    dw   $68af, data_02_7bad
+.data_02_4604:
+    dw   $68b2, data_02_7bb8
+    dw   $68ed, data_02_7bbe
+    dw   $6928, data_02_7bcd
+.data_02_4610:
+    dw   $582e, data_02_7bd8
+    dw   $583c, data_02_75c2
+.data_02_4618:
+    dw   $6947, data_02_7be3
+    dw   $6947, data_02_7bf8
+    dw   $693f, data_02_7c02
+    dw   $6947, data_02_7c0b
+    dw   $582e, data_02_7c13
+    dw   $6965, data_02_7c19
+.data_02_4630:
+    dw   $6971, data_02_7c1f
+    dw   $69af, data_02_7c1f
+    dw   $6a04, data_02_7c1f
+    dw   $6a13, data_02_7c1f
+    dw   $6a4c, data_02_7c27
+.data_02_4644:
+    dw   $6a91, data_02_7c32
+    dw   $6ab4, data_02_7c32
+    dw   $582e, data_02_7c32
+.data_02_4650:
+    dw   $582e, data_02_7c38
+    dw   $583c, data_02_75c2
+.data_02_4658:
+    dw   $6acd, data_02_7c3e
+    dw   $582e, data_02_7c51
+    dw   $6ad4, data_02_7c5e
+    dw   $583c, data_02_75c2
+.data_02_4668:
+    dw   $6b03, data_02_7c6a
+    dw   $6b20, data_02_7c6a
+    dw   $6b35, data_02_7c6a
+    dw   $583c, data_02_75c2
+.data_02_4678:
+    dw   $6b53, data_02_7c72
+    dw   $582e, data_02_7c79
+    dw   $582e, data_02_7c7f
+    dw   $582e, data_02_7c8b
+    dw   $582e, data_02_7c92
+    dw   $583c, data_02_75c2
+.data_02_4690:
+    dw   $6b69, data_02_7ca1
+    dw   $582e, data_02_7caa
+    dw   $582e, data_02_7cb4
+    dw   $583c, data_02_75c2
+.data_02_46a0:
+    dw   $6b9b, data_02_7cc4
+    dw   $582e, data_02_7ccd
+    dw   $583c, data_02_75c2
+.data_02_46ac:
+    dw   $6ba3, data_02_7cd6
+    dw   $6be4, data_02_7cd6
+    dw   $6bc8, data_02_7cdf
+    dw   $583c, data_02_75c2
+.data_02_46bc:
+    dw   $6bfb, data_02_7ce6
+    dw   $582e, data_02_7cec
+    dw   $6c08, data_02_7cf3
+.data_02_46c8:
+    dw   $6add, data_02_7cf9
+.data_02_46cc:
+    dw   $6c1d, data_02_7d08
+    dw   $6c1d, data_02_7d17
+    dw   $6c4c, data_02_7d26
+    dw   $6c64, data_02_7d35
+    dw   $6c73, data_02_7d3b
+    dw   $583c, data_02_75c2
+.data_02_46e4:
+    dw   $582e, data_02_7d42
+    dw   $583c, data_02_75c2
+.data_02_46ec:
+    dw   $582e, data_02_7d4f
+    dw   $582e, data_02_7d55
+    dw   $582e, data_02_7d4f
+.data_02_46f8:
+    dw   $6cbb, data_02_7d65
+.data_02_46fc:
+    dw   $6cdd, data_02_7d73
+    dw   $583c, data_02_75c2
+.data_02_4704:
+    dw   $6d3a, data_02_7d9a
+    dw   $6d39, data_02_7d7c
+    dw   $6d3b, data_02_7da3
+    dw   $582e, data_02_7db1
+    dw   $582e, data_02_7db7
+    dw   $6d49, data_02_7dc3
+    dw   $6d52, data_02_7dcd
+.data_02_4720:
+    dw   $6d6d, data_02_7dd5
+    dw   $6d6d, data_02_7ddb
+    dw   $6d85, data_02_7de1
+    dw   $6dba, data_02_7deb
+    dw   $6dda, data_02_7df9
+    dw   $6ddd, data_02_7e00
+    dw   $582e, data_02_7e09
+    dw   $6dee, data_02_7e0f
+    dw   $6e09, data_02_75c2
+.data_02_4744:
+    dw   $6ec7, data_02_7e15
+.data_02_4748:
+    dw   $6e88, data_02_7e1b
+    dw   $582e, data_02_7e21
+    dw   $6ea8, data_02_7e34
+    dw   $6eb9, data_02_7e3a
+    dw   $582e, data_02_7e40
+.data_02_475c:
+    dw   $6e44, data_02_7e53
+.data_02_4760:
+    dw   $6f07, data_02_7e5e
+.data_02_4764:
+    dw   $6f0e, data_02_7e67
+.data_02_4768:
+    dw   $6f0e, data_02_7e6d
+.data_02_476c:
+    dw   $6f0f, data_02_7e73
+    dw   $6f0f, data_02_7e79
+    dw   $6f29, data_02_7e7f
+    dw   $6f35, data_02_7e8a
+    dw   $582e, data_02_7e95
+    dw   $6f3e, data_02_7e9b
+    dw   $6f54, data_02_7ea4
+    dw   $6f54, data_02_7eaa
+    dw   $6f64, data_02_7eb0
+    dw   $6f9e, data_02_7eb6
+    dw   $6fa1, data_02_7ec2
+    dw   $6faa, data_02_7ecb
+.data_02_479c:
+    dw   $7019, data_02_7ed1
+.data_02_47a0:
+    dw   $582e, data_02_7eda
+    dw   $701a, data_02_7ee0
+    dw   $583c, data_02_75c2
+.data_02_47ac:
+    dw   $702e, data_02_7bad
+    dw   $583c, data_02_75c2

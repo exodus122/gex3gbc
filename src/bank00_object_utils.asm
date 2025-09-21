@@ -710,20 +710,22 @@ call_00_2602_Object_ApproachTargetValue_Y:
     ld   a,[hl]
     cp   c
     ret  z
-    jr   c,call_00_2613_SnapPositionAndUpdateDelta
+    jr   c,call_00_2613
     dec  [hl]
     ld   a,[hl]
     cp   c
     ret  
 
-call_00_2613_SnapPositionAndUpdateDelta:
-; Compares two object vectors (DA1E and DA1C) against current position; 
-; if behind boundary, decrements DE.
-; Snaps the stored position to (E,D) and adjusts global delta wDA13.
+call_00_2613:
     inc  [hl]
     ld   a,[hl]
     cp   c
     ret  
+
+call_00_2617_SnapPositionAndUpdateDelta:
+; Compares two object vectors (DA1E and DA1C) against current position; 
+; if behind boundary, decrements DE.
+; Snaps the stored position to (E,D) and adjusts global delta wDA13.
     call call_00_2857_Object_GetVector_DA1E
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
@@ -1484,20 +1486,29 @@ call_00_299f_ObjectFlipFacingDirection:
     ld   [HL], A                                       ;; 00:29aa $77
     ret                                                ;; 00:29ab $c9
 
-call_00_29ac:
-    call call_00_2a68
+call_00_29ac_ObjectFacingMatchesStoredDirection:
+; Calls call_00_2a68_ComputePlayerObjectXVector (unknown, likely updates or computes something about the current object).
+; Calls call_00_2976_ObjectGetFacingDirection (gets the object's facing direction).
+; Compares A (direction) to [wDA12] (a stored reference direction/state).
+; Returns if equal/different.
+; Summary: Checks if an object's current facing direction matches a stored direction after updating.
+    call call_00_2a68_ComputePlayerObjectXVector
     call call_00_2976_ObjectGetFacingDirection
     ld   hl,wDA12
     cp   [hl]
     ret  
 
-call_00_29b7:
+call_00_29b7_FindObjectByID_C:
+; Starts at object table base $D840.
+; Iterates through entries (+20h each = 32 bytes per object) comparing [HL] to register C.
+; If a match is found, jumps to call_00_29C8_FetchObjectSecondaryValue.
+; If none, sets C=$FF and returns.
     ld   h,$D8
     ld   l,$40
 label29BB:
     ld   a,[hl]
     cp   c
-    jr   z,call_00_29C8
+    jr   z,call_00_29C8_FetchObjectSecondaryValue
     ld   a,l
     add  a,$20
     ld   l,a
@@ -1505,14 +1516,20 @@ label29BB:
     ld   c,$FF
     ret  
 
-call_00_29C8:
+call_00_29C8_FetchObjectSecondaryValue:
+; When a match is found: ORs L with $01 (moves to second byte in object record).
+; Loads [HL] into C (likely returns a pointer or secondary ID).
     ld   a,l
     or   a,$01
     ld   l,a
     ld   c,[hl]
     ret  
 
-call_00_29ce:
+call_00_29ce_ObjectExistsCheck:
+; Almost identical to 29b7, but:
+; Returns immediately if found (ret Z).
+; If none found, loads $01 into A, ANDs A with itself, and returns 
+; (effectively a false indicator).
     ld   H, $d8                                        ;; 00:29ce $26 $d8
     ld   L, $40                                        ;; 00:29d0 $2e $40
 .jr_00_29d2:
@@ -1526,11 +1543,30 @@ call_00_29ce:
     ld   A, $01                                        ;; 00:29db $3e $01
     and  A, A                                          ;; 00:29dd $a7
     ret                                                ;; 00:29de $c9
-    db   $26, $d8, $fa, $00, $da, $f6, $0d, $6f        ;; 00:29df ????????
-    db   $cb, $fe, $c9, $26, $d8, $fa, $00, $da        ;; 00:29e7 ????????
-    db   $f6, $0d, $6f, $cb, $be, $c9                  ;; 00:29ef ??????
+    
+call_00_29df_ObjectSetActiveFlag:
+; Computes HL = $D80D + current object index.
+; Sets bit 7 of [HL] (marking object as “active,” “visible,” or “flagged”).
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0D
+    ld   l,a
+    set  7,[hl]
+    ret  
 
-call_00_29f5:
+call_00_29ea_ObjectClearActiveFlag:
+; Same indexing, but clears bit 7 instead of setting it.
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0D
+    ld   l,a
+    res  7,[hl]
+    ret  
+
+call_00_29f5_ObjectClearCollisionFlagAndCheck:
+; Gets object entry byte at $D805+index.
+; Clears bit 4 in memory.
+; Returns with carry based on the old bit 4 state (bit 4,A).
     ld   H, $d8                                        ;; 00:29f5 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:29f7 $fa $00 $da
     or   A, $05                                        ;; 00:29fa $f6 $05
@@ -1540,7 +1576,10 @@ call_00_29f5:
     bit  4, A                                          ;; 00:2a00 $cb $67
     ret                                                ;; 00:2a02 $c9
 
-call_00_2a03:
+call_00_2a03_ResetObjectTempSlot:
+; Derives a small index from wDA00_CurrentObjectAddr by rotating left and masking.
+; Writes 0 to wDA01 + index.
+; Likely clears a small per-object temporary slot.
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2a03 $fa $00 $da
     rlca                                               ;; 00:2a06 $07
     rlca                                               ;; 00:2a07 $07
@@ -1553,7 +1592,12 @@ call_00_2a03:
     ld   [HL], $00                                     ;; 00:2a12 $36 $00
     ret                                                ;; 00:2a14 $c9
 
-call_00_2a15:
+call_00_2a15_CheckObjectBoundingBoxCollision:
+; Derives an index from wDA00_CurrentObjectAddr (right rotate + mask).
+; Loads a 4-byte rectangle (E,D,C,B) from wDA1C.
+; Compares against another rectangle at wDA14 (x,y pairs) → first collision check.
+; If no carry (no fail), repeats with another rectangle from wDA20 vs wDA18.
+; Returns carry if overlap fails, else returns normally.
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2a15 $fa $00 $da
     rrca                                               ;; 00:2a18 $0f
     and  A, $70                                        ;; 00:2a19 $e6 $70
@@ -1611,7 +1655,10 @@ call_00_2a15:
     sbc  A, B                                          ;; 00:2a5b $98
     ret                                                ;; 00:2a5c $c9
 
-call_00_2a5d:
+call_00_2a5d_ObjectCheckFlag2:
+; Computes HL = D805 + current object index.
+; Tests bit 2 of the object’s flags.
+; Purpose: Checks a particular state flag (likely “grounded,” “active,” or similar).
     ld   H, $d8                                        ;; 00:2a5d $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2a5f $fa $00 $da
     or   A, $05                                        ;; 00:2a62 $f6 $05
@@ -1619,7 +1666,11 @@ call_00_2a5d:
     bit  2, [HL]                                       ;; 00:2a65 $cb $56
     ret                                                ;; 00:2a67 $c9
 
-call_00_2a68:
+call_00_2a68_ComputePlayerObjectXVector:
+; Calculates the X-distance vector between the player (wD80E/F) and the current object’s position (D80E + offset).
+; Normalizes the sign: if negative, flips and sets C=$20 to indicate direction.
+; Stores the horizontal difference or direction in wDA11/wDA12, and returns.
+; Purpose: Prepares relative X-direction info for later checks.
     ld   C, $00                                        ;; 00:2a68 $0e $00
     ld   H, $d8                                        ;; 00:2a6a $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2a6c $fa $00 $da
@@ -1653,7 +1704,12 @@ call_00_2a68:
     ld   [wDA12], A                                    ;; 00:2a94 $ea $12 $da
     ret                                                ;; 00:2a97 $c9
 
-call_00_2a98:
+call_00_2a98_HandlePlayerObjectInteraction:
+; Resolves an object list index, computes a pointer to an object’s bounding box/metadata in memory.
+; Compares the player’s X/Y positions against that object’s bounding box (series of sub/sbc, add, cp checks).
+; If inside bounds, copies several bytes from the object’s data into the current object’s D8xx structure and 
+; triggers a banked function (entry_02_72ac) via call_00_0edd_CallAltBankFunc.
+; Purpose: Detects when the player collides with or interacts with a special object and dispatches a handler.
     push de
     call call_00_230f_ResolveObjectListIndex
     ld   l,c
@@ -1731,7 +1787,11 @@ call_00_2a98:
     call call_00_0edd_CallAltBankFunc
     ret  
 
-call_00_2afc:
+call_00_2afc_FindFreeObjectSlot:
+; Iterates through all object slots ($D840… step $20).
+; Finds the first free slot (checks for inc A; jr NZ to catch zero).
+; Returns A=D as 0 if none found.
+; Purpose: Locate a free entry in the object table.
     ld   H, $d8                                        ;; 00:2afc $26 $d8
     ld   A, $40                                        ;; 00:2afe $3e $40
     ld   D, $00                                        ;; 00:2b00 $16 $00
@@ -1749,7 +1809,14 @@ call_00_2afc:
     and  A, A                                          ;; 00:2b0e $a7
     ret                                                ;; 00:2b0f $c9
 
-call_00_2b10:
+call_00_2b10_VerifyObjectPairExists:
+; Derives a per-object small index from wDA00_CurrentObjectAddr.
+; Loads a saved value B from wDA01 + index.
+; Scans the object table comparing:
+; Primary ID ([HL] vs C), then
+; A secondary ID ([HL|1F] vs B).
+; Returns carry if none, or sets A=1 if a match is found.
+; Purpose: Check whether an object with a given ID pair exists in the object table.
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2b10 $fa $00 $da
     rlca                                               ;; 00:2b13 $07
     rlca                                               ;; 00:2b14 $07
@@ -1784,7 +1851,10 @@ call_00_2b10:
     and  A, A                                          ;; 00:2b3b $a7
     ret                                                ;; 00:2b3c $c9
 
-call_00_2b3d:
+call_00_2b3d_SweepAndClearActiveObjects:
+; Iterates through object slots in increments of $20, checking each slot in wD8xx. 
+; If the slot value isn’t $FF (active), it calls call_00_2b5d_DeactivateObjectSlot to clear the entry. 
+; Restores wDA00_CurrentObjectAddr afterward. Essentially sweeps all object entries and deactivates them.
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2b3d $fa $00 $da
     push AF                                            ;; 00:2b40 $f5
     ld   A, $20                                        ;; 00:2b41 $3e $20
@@ -1795,7 +1865,7 @@ call_00_2b3d:
     ld   H, $d8                                        ;; 00:2b49 $26 $d8
     ld   A, [HL]                                       ;; 00:2b4b $7e
     cp   A, $ff                                        ;; 00:2b4c $fe $ff
-    call NZ, call_00_2b5d                              ;; 00:2b4e $c4 $5d $2b
+    call NZ, call_00_2b5d_DeactivateObjectSlot                              ;; 00:2b4e $c4 $5d $2b
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2b51 $fa $00 $da
     add  A, $20                                        ;; 00:2b54 $c6 $20
     jr   NZ, .jr_00_2b43                               ;; 00:2b56 $20 $eb
@@ -1803,7 +1873,10 @@ call_00_2b3d:
     ld   [wDA00_CurrentObjectAddr], A                                    ;; 00:2b59 $ea $00 $da
     ret                                                ;; 00:2b5c $c9
 
-call_00_2b5d:
+call_00_2b5d_DeactivateObjectSlot:
+; Marks the current object slot as inactive by writing $FF to wD8xx. Then computes a related index 
+; from the slot address to access another table (wDA01 → wD7xx) and clears bit 6 of its status 
+; byte—likely removing an “active” or “visible” flag for that object.
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2b5d $fa $00 $da
     or   A, $00                                        ;; 00:2b60 $f6 $00
     ld   L, A                                          ;; 00:2b62 $6f
@@ -1823,11 +1896,15 @@ call_00_2b5d:
     res  6, [HL]                                       ;; 00:2b77 $cb $b6
     ret                                                ;; 00:2b79 $c9
 
-jp_00_2b7a:
-    call call_00_2b80                                  ;; 00:2b7a $cd $80 $2b
-    jp   jp_00_2b94                                    ;; 00:2b7d $c3 $94 $2b
+call_00_2b7a_ClearObjectThenJump:
+; Calls call_00_2b80_ClearObjectMemoryEntry (sets slot to $FF), then jumps to call_00_2b94_ZeroObjectStatusEntry (zeroes a related entry in wD7xx). 
+; Used as a branch to fully clear an object before continuing.
+    call call_00_2b80_ClearObjectMemoryEntry                                  ;; 00:2b7a $cd $80 $2b
+    jp   call_00_2b94_ZeroObjectStatusEntry                                    ;; 00:2b7d $c3 $94 $2b
 
-call_00_2b80:
+call_00_2b80_ClearObjectMemoryEntry:
+; Writes $FF to the current object’s wD8xx slot. This is a lightweight variant 
+; of call_00_2b5d without touching flags.
     ld   H, $d8                                        ;; 00:2b80 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2b82 $fa $00 $da
     or   A, $00                                        ;; 00:2b85 $f6 $00
@@ -1835,13 +1912,18 @@ call_00_2b80:
     ld   [HL], $ff                                     ;; 00:2b88 $36 $ff
     ret                                                ;; 00:2b8a $c9
 
-call_00_2b8b:
-    call call_00_35e8                                  ;; 00:2b8b $cd $e8 $35
+call_00_2b8b_HandleObjectFlag6ClearOrInit:
+; Calls call_00_35e8_GetObjectTypeIndex (likely reads or updates object state), tests bit 6 of A. If clear, 
+; jumps to call_00_2b94_ZeroObjectStatusEntry (zero related data). If set, jumps to call_00_2ba9_SetObjectStatusTo50 to initialize a 
+; status value. Used to decide whether to zero or set $50.
+    call call_00_35e8_GetObjectTypeIndex                                  ;; 00:2b8b $cd $e8 $35
     bit  6, A                                          ;; 00:2b8e $cb $77
-    jr   Z, jp_00_2b94                                 ;; 00:2b90 $28 $02
-    jr   call_00_2ba9                                  ;; 00:2b92 $18 $15
+    jr   Z, call_00_2b94_ZeroObjectStatusEntry                                 ;; 00:2b90 $28 $02
+    jr   call_00_2ba9_SetObjectStatusTo50                                  ;; 00:2b92 $18 $15
 
-jp_00_2b94:
+call_00_2b94_ZeroObjectStatusEntry:
+; Computes an index from the object address and writes $00 to a corresponding wD7xx status 
+; byte—used to mark an object as inactive or reset its state.
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2b94 $fa $00 $da
     rlca                                               ;; 00:2b97 $07
     rlca                                               ;; 00:2b98 $07
@@ -1856,7 +1938,9 @@ jp_00_2b94:
     ld   [HL], $00                                     ;; 00:2ba6 $36 $00
     ret                                                ;; 00:2ba8 $c9
 
-call_00_2ba9:
+call_00_2ba9_SetObjectStatusTo50:
+; Like call_00_2b94_ZeroObjectStatusEntry, but writes $50 instead of $00. 
+; Likely initializes or flags an object as partially active.
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2ba9 $fa $00 $da
     rlca                                               ;; 00:2bac $07
     rlca                                               ;; 00:2bad $07
@@ -1871,12 +1955,19 @@ call_00_2ba9:
     ld   [HL], $50                                     ;; 00:2bbb $36 $50
     ret                                                ;; 00:2bbd $c9
 
-call_00_2bbe:
-    call call_00_35e8                                  ;; 00:2bbe $cd $e8 $35
+call_00_2bbe_InitializeNewObject:
+; Full object creation routine:
+; Validates current object value via call_00_35e8_GetObjectTypeIndex.
+; If not $FF and bit 6 is set, sets up multiple object parameters 
+; (ObjectSetId, Object_Set14, palette, facing direction, etc.).
+; Updates its status to $50, resets return bank, calls an alternate bank function (entry_02_72ac), 
+; and copies a palette (call_00_2c20_ObjectPalette_CopyToBuffer).
+; This is the main “spawn/setup object” function.
+    call call_00_35e8_GetObjectTypeIndex                                  ;; 00:2bbe $cd $e8 $35
     cp   A, $ff                                        ;; 00:2bc1 $fe $ff
-    jr   Z, jp_00_2b7a                                 ;; 00:2bc3 $28 $b5
+    jr   Z, call_00_2b7a_ClearObjectThenJump                                 ;; 00:2bc3 $28 $b5
     bit  6, A                                          ;; 00:2bc5 $cb $77
-    jr   Z, jp_00_2b7a                                 ;; 00:2bc7 $28 $b1
+    jr   Z, call_00_2b7a_ClearObjectThenJump                                 ;; 00:2bc7 $28 $b1
     ld   C, $02                                        ;; 00:2bc9 $0e $02
     call call_00_2930_ObjectSetId                                  ;; 00:2bcb $cd $30 $29
     ld   C, $08                                        ;; 00:2bce $0e $08
@@ -1891,7 +1982,7 @@ call_00_2bbe:
     call call_00_28aa_ObjectSet16                                  ;; 00:2be4 $cd $aa $28
     ld   C, $00                                        ;; 00:2be7 $0e $00
     call call_00_2299_SetObjectStatusLowNibble                                  ;; 00:2be9 $cd $99 $22
-    call call_00_2ba9                                  ;; 00:2bec $cd $a9 $2b
+    call call_00_2ba9_SetObjectStatusTo50                                  ;; 00:2bec $cd $a9 $2b
     xor  A, A                                          ;; 00:2bef $af
     ld   [wDAD6_ReturnBank], A                                    ;; 00:2bf0 $ea $d6 $da
     ld   A, $02                                        ;; 00:2bf3 $3e $02
@@ -1902,12 +1993,16 @@ call_00_2bbe:
 .data_02_2c01:
     db   $00, $00, $00, $00, $60, $02, $9c, $03        ;; 00:2c01 ........
 
-call_00_2c09:
+call_00_2c09_DispatchOffsetAction:
+; Adds $06 to A, moves it to C, and jumps to call_00_3792_PrepareRelativeObjectSpawn. 
+; Likely an offset-based action dispatcher or table index calculation.
     add  A, $06                                        ;; 00:2c09 $c6 $06
     ld   C, A                                          ;; 00:2c0b $4f
-    jp   call_00_3792                                  ;; 00:2c0c $c3 $92 $37
+    jp   call_00_3792_PrepareRelativeObjectSpawn                                  ;; 00:2c0c $c3 $92 $37
 
-call_00_2c0f:
+call_00_2c0f_AssignObjectPaletteId:
+; Uses the current object address to compute an index into wDAAE_ObjectPaletteIds, 
+; then stores register C there. Assigns a palette ID to the object for rendering.
     ld   a,[wDA00_CurrentObjectAddr]
     rlca 
     rlca 

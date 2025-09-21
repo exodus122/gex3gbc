@@ -273,8 +273,8 @@ call_00_0150_Init:
     ld   HL, entry_01_432b                                     ;; 00:033e $21 $2b $43
     call call_00_0edd_CallAltBankFunc                                  ;; 00:0341 $cd $dd $0e
     call call_00_0e3b                                  ;; 00:0344 $cd $3b $0e
-    call call_00_2f85_LoadCollectibleMapData                                  ;; 00:0347 $cd $85 $2f
-    call call_00_2ff8                                  ;; 00:034a $cd $f8 $2f
+    call call_00_2f85_LoadAndSortCollectibleData                                  ;; 00:0347 $cd $85 $2f
+    call call_00_2ff8_InitLevelObjectsAndConfig                                  ;; 00:034a $cd $f8 $2f
     call call_00_0595                                  ;; 00:034d $cd $95 $05
     call call_00_1ea0_UpdateMain                                  ;; 00:0350 $cd $a0 $1e
     xor  A, A                                          ;; 00:0353 $af
@@ -298,8 +298,8 @@ call_00_0150_Init:
     ld   A, $00                                        ;; 00:0380 $3e $00
     ld   [wDC78], A                                    ;; 00:0382 $ea $78 $dc
     call call_00_0e3b                                  ;; 00:0385 $cd $3b $0e
-    call call_00_2f85_LoadCollectibleMapData                                  ;; 00:0388 $cd $85 $2f
-    call call_00_2ff8                                  ;; 00:038b $cd $f8 $2f
+    call call_00_2f85_LoadAndSortCollectibleData                                  ;; 00:0388 $cd $85 $2f
+    call call_00_2ff8_InitLevelObjectsAndConfig                                  ;; 00:038b $cd $f8 $2f
 .jp_00_038e:
     ld   [wDAD6_ReturnBank], A                                    ;; 00:038e $ea $d6 $da
     ld   A, $03                                        ;; 00:0391 $3e $03
@@ -388,7 +388,7 @@ call_00_0150_Init:
     bit  2, [HL]                                       ;; 00:0451 $cb $56
     jr   Z, .jr_00_045e                                ;; 00:0453 $28 $09
     call call_00_1633                                  ;; 00:0455 $cd $33 $16
-    call call_00_2b3d                                  ;; 00:0458 $cd $3d $2b
+    call call_00_2b3d_SweepAndClearActiveObjects                                  ;; 00:0458 $cd $3d $2b
     jp   .jp_00_038e                                   ;; 00:045b $c3 $8e $03
 .jr_00_045e:
     ld   HL, wDB6A                                     ;; 00:045e $21 $6a $db
@@ -452,7 +452,7 @@ call_00_0150_Init:
     call call_00_11c8_LoadBgMap                                  ;; 00:04e9 $cd $c8 $11
     call call_00_0fc8                                  ;; 00:04ec $cd $c8 $0f
     call call_00_150f                                  ;; 00:04ef $cd $0f $15
-    call call_00_35fa                                  ;; 00:04f2 $cd $fa $35
+    call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:04f2 $cd $fa $35
     call call_00_08f8                                  ;; 00:04f5 $cd $f8 $08
     jp   .jp_00_0443                                   ;; 00:04f8 $c3 $43 $04
 
@@ -583,7 +583,7 @@ call_00_05c7:
     ret                                                ;; 00:05f0 $c9
 .jr_00_05f1:
     ld   C, $1c                                        ;; 00:05f1 $0e $1c
-    call call_00_29ce                                  ;; 00:05f3 $cd $ce $29
+    call call_00_29ce_ObjectExistsCheck                                  ;; 00:05f3 $cd $ce $29
     ret  Z                                             ;; 00:05f6 $c8
     ld   HL, wDB6A                                     ;; 00:05f7 $21 $6a $db
     set  4, [HL]                                       ;; 00:05fa $cb $e6
@@ -2217,7 +2217,7 @@ call_00_1ea0_UpdateMain:
     ld   HL, entry_02_7152_UpdateObjects                                     ;; 00:1f4d $21 $52 $71
     call call_00_0edd_CallAltBankFunc                                  ;; 00:1f50 $cd $dd $0e
     call call_00_11c8_LoadBgMap                                  ;; 00:1f53 $cd $c8 $11
-    call call_00_35fa                                  ;; 00:1f56 $cd $fa $35
+    call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:1f56 $cd $fa $35
     call call_00_08f8                                  ;; 00:1f59 $cd $f8 $08
     ld   HL, wDCDE                                     ;; 00:1f5c $21 $de $dc
     ld   A, [HL]                                       ;; 00:1f5f $7e
@@ -2250,7 +2250,7 @@ call_00_1ea0_UpdateMain:
     ld   HL, entry_02_7152_UpdateObjects                                     ;; 00:1f83 $21 $52 $71
     call call_00_0edd_CallAltBankFunc                                  ;; 00:1f86 $cd $dd $0e
     call call_00_11c8_LoadBgMap                                  ;; 00:1f89 $cd $c8 $11
-    call call_00_35fa                                  ;; 00:1f8c $cd $fa $35
+    call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:1f8c $cd $fa $35
     call call_00_08f8                                  ;; 00:1f8f $cd $f8 $08
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:1f92 $fa $d7 $da
     and  A, A                                          ;; 00:1f95 $a7

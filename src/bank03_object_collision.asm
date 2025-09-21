@@ -212,7 +212,7 @@ call_03_4c38_UpdateObjectCollision:
     ld   C, $01                                        ;; 03:4e7e $0e $01
     call Z, call_00_21ef                               ;; 03:4e80 $cc $ef $21
     ld   A, [wDCC3]                                    ;; 03:4e83 $fa $c3 $dc
-    jp   call_00_2c09                                  ;; 03:4e86 $c3 $09 $2c
+    jp   call_00_2c09_DispatchOffsetAction                                  ;; 03:4e86 $c3 $09 $2c
 .data_03_4e89:
     call call_00_28d2_ObjectGet1D                                  ;; 03:4e89 $cd $d2 $28
     bit  7, A                                          ;; 03:4e8c $cb $7f
@@ -229,8 +229,8 @@ call_03_4c38_UpdateObjectCollision:
     inc  A                                             ;; 03:4ea1 $3c
     ld   [HL], A                                       ;; 03:4ea2 $77
     ld   C, $1e                                        ;; 03:4ea3 $0e $1e
-    call call_00_29ce                                  ;; 03:4ea5 $cd $ce $29
-    jp   NZ, call_00_2b80                              ;; 03:4ea8 $c2 $80 $2b
+    call call_00_29ce_ObjectExistsCheck                                  ;; 03:4ea5 $cd $ce $29
+    jp   NZ, call_00_2b80_ClearObjectMemoryEntry                              ;; 03:4ea8 $c2 $80 $2b
     ld   A, L                                          ;; 03:4eab $7d
     or   A, $0e                                        ;; 03:4eac $f6 $0e
     ld   L, A                                          ;; 03:4eae $6f
@@ -313,11 +313,11 @@ call_03_4c38_UpdateObjectCollision:
     dec  [HL]                                          ;; 03:4f45 $35
     ret  NZ                                            ;; 03:4f46 $c0
     call call_00_288c_Object_Clear14                                  ;; 03:4f47 $cd $8a $28
-    call call_00_2b8b                                  ;; 03:4f4a $cd $8b $2b
+    call call_00_2b8b_HandleObjectFlag6ClearOrInit                                  ;; 03:4f4a $cd $8b $2b
     ld   HL, wDCC8                                     ;; 03:4f4d $21 $c8 $dc
     inc  [HL]                                          ;; 03:4f50 $34
     ld   A, [HL]                                       ;; 03:4f51 $7e
-    call call_00_2c09                                  ;; 03:4f52 $cd $09 $2c
+    call call_00_2c09_DispatchOffsetAction                                  ;; 03:4f52 $cd $09 $2c
     ld   HL, wDCD5                                     ;; 03:4f55 $21 $d5 $dc
     ld   A, [HL+]                                      ;; 03:4f58 $2a
     or   A, [HL]                                       ;; 03:4f59 $b6
@@ -707,9 +707,9 @@ call_03_5671:
     jr   NC, .jr_03_56b8                               ;; 03:5687 $30 $2f
 .jr_03_5689:
     ld   [HL], $00                                     ;; 03:5689 $36 $00
-    call call_00_35e8                                  ;; 03:568b $cd $e8 $35
+    call call_00_35e8_GetObjectTypeIndex                                  ;; 03:568b $cd $e8 $35
     cp   A, $ff                                        ;; 03:568e $fe $ff
-    jp   Z, jp_00_2b7a                                 ;; 03:5690 $ca $7a $2b
+    jp   Z, call_00_2b7a_ClearObjectThenJump                                 ;; 03:5690 $ca $7a $2b
     bit  7, A                                          ;; 03:5693 $cb $7f
     jr   Z, .jr_03_56a6                                ;; 03:5695 $28 $0f
     push AF                                            ;; 03:5697 $f5

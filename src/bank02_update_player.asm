@@ -1,5 +1,5 @@
 jp_02_4db1:
-    call call_00_29ce                                  ;; 02:4db1 $cd $ce $29
+    call call_00_29ce_ObjectExistsCheck                                  ;; 02:4db1 $cd $ce $29
     ret  NZ                                            ;; 02:4db4 $c0
     ld   A, L                                          ;; 02:4db5 $7d
     or   A, $0e                                        ;; 02:4db6 $f6 $0e

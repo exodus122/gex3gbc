@@ -256,7 +256,7 @@ entry_03_5ec1_UpdateObjectGraphics:
     jr   NZ, .jr_03_5eda                               ;; 03:5ef2 $20 $e6
     ld   A, [wDCA7]                                    ;; 03:5ef4 $fa $a7 $dc
     and  A, A                                          ;; 03:5ef7 $a7
-    call NZ, call_00_2ce2                              ;; 03:5ef8 $c4 $e2 $2c
+    call NZ, call_00_2ce2_BuildGexSpriteDrawList                              ;; 03:5ef8 $c4 $e2 $2c
     ld   A, $20                                        ;; 03:5efb $3e $20
 .jr_03_5efd:
     ld   [wDA00_CurrentObjectAddr], A                                    ;; 03:5efd $ea $00 $da
@@ -377,7 +377,7 @@ entry_03_5ec1_UpdateObjectGraphics:
 .jr_03_5fb2:
     ld   A, [wDCA7]                                    ;; 03:5fb2 $fa $a7 $dc
     and  A, A                                          ;; 03:5fb5 $a7
-    call NZ, call_00_2ce2                              ;; 03:5fb6 $c4 $e2 $2c
+    call NZ, call_00_2ce2_BuildGexSpriteDrawList                              ;; 03:5fb6 $c4 $e2 $2c
 .jr_03_5fb9:
     pop  HL                                            ;; 03:5fb9 $e1
     pop  BC                                            ;; 03:5fba $c1
@@ -463,8 +463,8 @@ call_03_5fc2_ObjectSpriteSetup:
     xor  A, A                                          ;; 03:6034 $af
     ld   [HL+], A                                      ;; 03:6035 $22
     ld   [HL], A                                       ;; 03:6036 $77
-    call call_00_2a15                                  ;; 03:6037 $cd $15 $2a
-    call C, call_00_2b5d                               ;; 03:603a $dc $5d $2b
+    call call_00_2a15_CheckObjectBoundingBoxCollision                                  ;; 03:6037 $cd $15 $2a
+    call C, call_00_2b5d_DeactivateObjectSlot                               ;; 03:603a $dc $5d $2b
     ret                                                ;; 03:603d $c9
 .jr_03_603e:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:603e $fa $00 $da

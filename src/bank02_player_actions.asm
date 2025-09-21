@@ -66,7 +66,7 @@ call_02_481f:
     ld   [wDCAC], A                                    ;; 02:482a $ea $ac $dc
     ret                                                ;; 02:482d $c9
 
-data_02_482e:
+call_02_482e:
     ld   A, [wD809]                                    ;; 02:482e $fa $09 $d8
     srl  A                                             ;; 02:4831 $cb $3f
     ld   C, A                                          ;; 02:4833 $4f
@@ -77,10 +77,12 @@ data_02_482e:
 .jr_02_483a:
     ld   [wDC87], A                                    ;; 02:483a $ea $87 $dc
     ret                                                ;; 02:483d $c9
+
+call_02_483e:
     db   $21, $05, $d8, $cb, $66, $c8, $3e, $05        ;; 02:483e ????????
     db   $cd, $f5, $0f, $af, $c3, $24, $06             ;; 02:4846 ???????
 
-data_02_484d:
+call_02_484d:
     ld   HL, wD805                                     ;; 02:484d $21 $05 $d8
     bit  4, [HL]                                       ;; 02:4850 $cb $66
     jr   Z, .jr_02_4864                                ;; 02:4852 $28 $10
@@ -99,7 +101,7 @@ data_02_484d:
     jp   Z, call_02_54f9                               ;; 02:486f $ca $f9 $54
     ret                                                ;; 02:4872 $c9
 
-data_02_4873:
+call_02_4873:
     ld   HL, wD805                                     ;; 02:4873 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:4876 $cb $66
     jr   Z, .jr_02_4883                                ;; 02:4878 $28 $09
@@ -112,7 +114,7 @@ data_02_4873:
     ld   [wDC7E], A                                    ;; 02:4885 $ea $7e $dc
     ret                                                ;; 02:4888 $c9
 
-data_02_4889:
+call_02_4889:
     xor  A, A                                          ;; 02:4889 $af
     ld   [wDC87], A                                    ;; 02:488a $ea $87 $dc
     ld   A, $3c                                        ;; 02:488d $3e $3c
@@ -125,7 +127,7 @@ data_02_4889:
     ld   [wDB6A], A                                    ;; 02:489d $ea $6a $db
     ret                                                ;; 02:48a0 $c9
 
-data_02_48a1:
+call_02_48a1:
     ld   HL, wD805                                     ;; 02:48a1 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:48a4 $cb $66
     ld   A, $1d                                        ;; 02:48a6 $3e $1d
@@ -133,7 +135,7 @@ data_02_48a1:
     ld   C, $11                                        ;; 02:48ab $0e $11
     jp   jp_02_4db1                                    ;; 02:48ad $c3 $b1 $4d
 
-data_02_48b0:
+call_02_48b0:
     ld   A, [wD805]                                    ;; 02:48b0 $fa $05 $d8
     and  A, $04                                        ;; 02:48b3 $e6 $04
     ret  Z                                             ;; 02:48b5 $c8
@@ -141,7 +143,7 @@ data_02_48b0:
     set  4, [HL]                                       ;; 02:48b9 $cb $e6
     ret                                                ;; 02:48bb $c9
 
-data_02_48bc:
+call_02_48bc:
     ld   HL, wD805                                     ;; 02:48bc $21 $05 $d8
     bit  4, [HL]                                       ;; 02:48bf $cb $66
     jr   Z, .jr_02_48d6                                ;; 02:48c1 $28 $13
@@ -162,7 +164,7 @@ data_02_48bc:
     jp   NZ, call_02_54f9                              ;; 02:48e2 $c2 $f9 $54
     jp   jp_02_4dce                                    ;; 02:48e5 $c3 $ce $4d
 
-data_02_48e8:
+call_02_48e8:
     ld   HL, wD805                                     ;; 02:48e8 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:48eb $cb $66
     jr   Z, .jr_02_4902                                ;; 02:48ed $28 $13
@@ -183,7 +185,7 @@ data_02_48e8:
     jr   NZ, .jr_02_48ef                               ;; 02:490c $20 $e1
     jp   jp_02_4dce                                    ;; 02:490e $c3 $ce $4d
 
-data_02_4911:
+call_02_4911:
     ld   HL, wD805                                     ;; 02:4911 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:4914 $cb $66
     jr   Z, .jr_02_492a                                ;; 02:4916 $28 $12
@@ -218,7 +220,7 @@ data_02_4911:
     ld   A, C                                          ;; 02:4953 $79
     jp   call_02_54f9                                  ;; 02:4954 $c3 $f9 $54
 
-data_02_4957:
+call_02_4957:
     ld   HL, wD805                                     ;; 02:4957 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:495a $cb $66
     jr   Z, .jr_02_4966                                ;; 02:495c $28 $08
@@ -236,7 +238,7 @@ data_02_4957:
     ld   A, $01                                        ;; 02:4975 $3e $01
     jp   call_02_54f9                                  ;; 02:4977 $c3 $f9 $54
 
-data_02_497a:
+call_02_497a:
     ld   HL, wD805                                     ;; 02:497a $21 $05 $d8
     bit  4, [HL]                                       ;; 02:497d $cb $66
     ld   A, $08                                        ;; 02:497f $3e $08
@@ -248,7 +250,7 @@ data_02_497a:
 call_02_4989:
     ld   hl,wD805
     bit  4,[hl]
-    jr   z,label49A8
+    jr   z,call_02_49a8
     ld   a,$30
     ld   [wDC8C],a
     ld   [wDC8E],a
@@ -258,7 +260,8 @@ call_02_4989:
     call call_00_0ff5
     ld   a,$14
     call entry_02_72ac
-label49A8:
+
+call_02_49a8:
     ld   a,[wDC8E]
     and  a
     ld   a,$01
@@ -326,7 +329,7 @@ call_02_49b3:
 .data_02_4a1d:
     db   $00, $00, $00, $00, $60, $20, $20, $20        ;; 02:4a19 ????????
 
-data_02_4a25:
+call_02_4a25:
     xor  a
     ld   [wDC87],a
     ld   a,$3C
@@ -336,7 +339,7 @@ data_02_4a25:
     jp   z,jp_00_06da
     ret  
 
-data_02_4a37:
+call_02_4a37:
     xor  A, A                                          ;; 02:4a37 $af
     ld   [wDC87], A                                    ;; 02:4a38 $ea $87 $dc
     ld   A, $3c                                        ;; 02:4a3b $3e $3c
@@ -369,6 +372,8 @@ label4A61:
 call_02_4a69:
     ld   c,$51
     jp   jp_02_4db1
+
+call_02_4a6e:
     ld   hl,wD805
     bit  4,[hl]
     jr   z,label4A87
@@ -389,6 +394,8 @@ label4A87:
     set  6,[hl]
     ld   a,$19
     jp   entry_02_54f9
+
+call_02_4a9b:
     ld   a,$01
     ld   [wDC87],a
     ret  
@@ -541,7 +548,7 @@ label4B7F:
     set  6,[hl]
     ret  
 
-call_02_4BB7:
+call_02_4bb7:
     ld   hl,wD805
     bit  4,[hl]
     jr   z,label4BDC
@@ -601,7 +608,7 @@ call_02_4C16:
     db   $00, $05, $20, $0b, $20, $0c, $20, $0e        ;; 02:4c1e ????????
     db   $20, $0f, $20, $10, $20, $ff
 
-call_02_4C2C:
+call_02_4c2c:
     ld   hl,wD805
     bit  4,[hl]
     jr   z,label4C46
@@ -621,6 +628,8 @@ label4C46:
     ld   a,$26
     jp   nz,entry_02_54f9
     jp   jp_02_4dce
+
+call_02_4c58:
     ld   hl,wD805
     bit  4,[hl]
     jr   z,label4C72
@@ -637,7 +646,7 @@ label4C72:
     jp   z,jp_02_4dce
     ret  
 
-call_02_4C7A:
+call_02_4c7a:
     ld   hl,wD805
     bit  4,[hl]
     jr   z,label4CA1
@@ -656,6 +665,8 @@ call_02_4C7A:
     call call_02_4e01
 label4CA1:
     jp   call_02_4E0C
+
+call_02_4ca4:
     ld   hl,wD805
     bit  4,[hl]
     jr   z,label4CB3
@@ -669,7 +680,7 @@ label4CB3:
     jp   z,entry_02_54f9
     ret  
 
-call_02_4CBD:
+call_02_4cbd:
     ld   hl,wD805
     bit  4,[hl]
     jr   z,label4CD4
@@ -688,7 +699,7 @@ label4CD4:
     jp   z,entry_02_54f9
     ret  
 
-call_02_4CE3:
+call_02_4ce3:
     ld   a,$06
     call call_00_0ff5
     call call_02_4e01
@@ -697,11 +708,11 @@ call_02_4CE3:
     call call_02_4df6
     ld   hl,wDABE
     bit  7,[hl]
-    jr   z,label4D02
+    jr   z,call_02_4d02
     ld   a,$1E
     ld   [wDC8C],a
     ld   [wDC8E],a
-label4D02:
+call_02_4d02:
     ld   a,[wDC8E]
     and  a
     ret  nz
@@ -710,6 +721,8 @@ label4D02:
     ld   a,$32
     jp   nz,entry_02_54f9
     jp   jp_02_4dce
+
+call_02_4d14:
     ld   a,$07
     call call_00_0ff5
     call call_02_4e01
@@ -718,11 +731,11 @@ label4D02:
     call call_02_4df6
     ld   hl,wDABE
     bit  7,[hl]
-    jr   z,label4D33
+    jr   z,call_02_4d33
     ld   a,$36
     ld   [wDC8C],a
     ld   [wDC8E],a
-label4D33:
+call_02_4d33:
     ld   a,[wDC8E]
     and  a
     ret  nz
@@ -731,6 +744,8 @@ label4D33:
     ld   a,$32
     jp   nz,entry_02_54f9
     jp   jp_02_4dce
+
+call_02_4d45:
     ld   hl,wD805
     bit  4,[hl]
     jr   z,label4D5E
@@ -751,6 +766,8 @@ label4D5E:
     set  6,[hl]
     ld   a,$30
     jp   entry_02_54f9
+
+call_02_4d72:
     ld   hl,wD805
     bit  4,[hl]
     jr   z,label4D81
@@ -764,7 +781,7 @@ label4D81:
     jp   z,entry_02_54f9
     ret  
 
-call_02_4D8B:
+call_02_4d8b:
     ld   hl,wD805
     bit  4,[hl]
     jr   z,label4DA2

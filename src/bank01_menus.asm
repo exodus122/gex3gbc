@@ -919,7 +919,7 @@ call_01_4722:
     dw   .call_01_4756                                 ;; 01:473c pP
     dw   .call_01_4759                                 ;; 01:473e pP
     dw   .call_01_475c                                 ;; 01:4740 pP
-    dw   call_00_2f34                                      ;; 01:4742 ??
+    dw   call_00_2f34_CountActiveCollectibles                                      ;; 01:4742 ??
 .call_01_4744:
     ld   A, [wDC68]                                    ;; 01:4744 $fa $68 $dc
     ret                                                ;; 01:4747 $c9
