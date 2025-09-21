@@ -136,15 +136,19 @@ data_02_4000:
 
     dw   data_02_582e                                  ;; 02:42c4 pP
     dw   data_02_75c8                                  ;; 02:42c6 pP
-    db   $3c, $58, $c2, $75                            ;; 02:42c8 ????
+    dw   data_02_583c                                  ;; 02:42c8 pP
+    dw   data_02_75c2                                  ;; 02:42ca pP
+
     dw   data_02_582e                                  ;; 02:42cc pP
     dw   data_02_75d1                                  ;; 02:42ce pP
     dw   data_02_583c                                  ;; 02:42d0 pP
     dw   data_02_75c2                                  ;; 02:42d2 pP
+
     dw   data_02_582e                                  ;; 02:42d4 pP
     dw   data_02_75dc                                  ;; 02:42d6 pP
     dw   data_02_583c                                  ;; 02:42d8 pP
     dw   data_02_75c2                                  ;; 02:42da pP
+    
     db   $18, $59, $e9, $75, $2e, $58, $ef, $75        ;; 02:42dc ????????
     db   $2e, $58, $f5, $75, $8f, $59, $ef, $75        ;; 02:42e4 ????????
     db   $aa, $59, $0b, $76, $2e, $58, $11, $76        ;; 02:42ec ????????

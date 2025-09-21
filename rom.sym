@@ -344,10 +344,11 @@
 00:2b8b call_00_2b8b
 00:2b94 jp_00_2b94
 00:2ba9 call_00_2ba9
-00:2bbe jp_00_2bbe
+00:2bbe call_00_2bbe
+00:2c01 call_00_2bbe.data_02_2c01
 00:2c09 call_00_2c09
 00:2c0f call_00_2c0f
-00:2c20 call_00_2c20
+00:2c20 call_00_2c20_ObjectPalette_CopyToBuffer
 00:2c43 data_00_2c43_ParticleBufferPointerTable
 00:2c53 call_00_2c53_ParticleSlot_GetBufferPtr
 00:2c67 call_00_2c67_Particle_InitBurst

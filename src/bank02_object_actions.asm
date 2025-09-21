@@ -5,20 +5,20 @@ data_02_582f:
     call call_00_288c_Object_Clear14
     call call_00_2b8b
     call call_00_2a5d
-    jp   nz,jp_00_2bbe
+    jp   nz,call_00_2bbe
     ret  
 
 data_02_583c:
     call call_00_29f5                                  ;; 02:583c $cd $f5 $29
     jr   Z, .jr_02_5850                                ;; 02:583f $28 $0f
     ld   HL, .data_02_5857                             ;; 02:5841 $21 $57 $58
-    call call_00_2c20                                  ;; 02:5844 $cd $20 $2c
+    call call_00_2c20_ObjectPalette_CopyToBuffer                                  ;; 02:5844 $cd $20 $2c
     call call_00_288c_Object_Clear14                                  ;; 02:5847 $cd $8a $28
     call call_00_2b8b                                  ;; 02:584a $cd $8b $2b
     call call_00_2c67_Particle_InitBurst                                  ;; 02:584d $cd $67 $2c
 .jr_02_5850:
     call call_00_2c89_Particle_UpdateBurst                                  ;; 02:5850 $cd $89 $2c
-    jp   Z, jp_00_2bbe                                 ;; 02:5853 $ca $be $2b
+    jp   Z, call_00_2bbe                                 ;; 02:5853 $ca $be $2b
     ret                                                ;; 02:5856 $c9
 .data_02_5857:
     db   $00, $00, $08, $02, $04, $01, $ff, $7f        ;; 02:5857 ........
@@ -230,7 +230,7 @@ data_02_5a04:
     ld   C, $00                                        ;; 02:5a09 $0e $00
     call call_00_22b1_HandleObjectStateChange                                  ;; 02:5a0b $cd $b1 $22
     ld   HL, .data_02_5a14                             ;; 02:5a0e $21 $14 $5a
-    jp   call_00_2c20                                  ;; 02:5a11 $c3 $20 $2c
+    jp   call_00_2c20_ObjectPalette_CopyToBuffer                                  ;; 02:5a11 $c3 $20 $2c
 .data_02_5a14:
     db   $00, $00, $00, $00, $73, $4e, $1f, $00        ;; 02:5a14 ........
 
@@ -283,7 +283,7 @@ data_02_5a1c:
 
 call_02_5a75:
     ld   HL, .data_02_5a7b                             ;; 02:5a75 $21 $7b $5a
-    jp   call_00_2c20                                  ;; 02:5a78 $c3 $20 $2c
+    jp   call_00_2c20_ObjectPalette_CopyToBuffer                                  ;; 02:5a78 $c3 $20 $2c
 .data_02_5a7b:
     db   $00, $00, $00, $00, $73, $4e, $e0, $03        ;; 02:5a7b ........
 
@@ -409,9 +409,9 @@ jr_02_5af8:
     ld   HL, .data_02_5b8a                             ;; 02:5b5f $21 $8a $5b
     ld   A, C                                          ;; 02:5b62 $79
     cp   A, $09                                        ;; 02:5b63 $fe $09
-    jp   C, call_00_2c20                               ;; 02:5b65 $da $20 $2c
+    jp   C, call_00_2c20_ObjectPalette_CopyToBuffer                               ;; 02:5b65 $da $20 $2c
     ld   HL, .data_02_5b92                             ;; 02:5b68 $21 $92 $5b
-    jp   call_00_2c20                                  ;; 02:5b6b $c3 $20 $2c
+    jp   call_00_2c20_ObjectPalette_CopyToBuffer                                  ;; 02:5b6b $c3 $20 $2c
 .jr_02_5b6e:
     call call_00_2962_ObjectGetActionId                                  ;; 02:5b6e $cd $62 $29
     cp   A, $01                                        ;; 02:5b71 $fe $01
@@ -489,7 +489,7 @@ data_02_5bfa:
     ld   A, $1e                                        ;; 02:5bff $3e $1e
     call call_00_0ff5                                  ;; 02:5c01 $cd $f5 $0f
     ld   HL, .data_02_5c3b                             ;; 02:5c04 $21 $3b $5c
-    call call_00_2c20                                  ;; 02:5c07 $cd $20 $2c
+    call call_00_2c20_ObjectPalette_CopyToBuffer                                  ;; 02:5c07 $cd $20 $2c
     call call_00_288c_Object_Clear14                                  ;; 02:5c0a $cd $8a $28
     call call_00_2b8b                                  ;; 02:5c0d $cd $8b $2b
     call call_00_2c67_Particle_InitBurst                                  ;; 02:5c10 $cd $67 $2c
@@ -574,9 +574,9 @@ call_02_5ca5:
     and  a,$0F
     cp   a,$0C
     ld   hl,.data_02_5cc8
-    jp   c,call_00_2c20
+    jp   c,call_00_2c20_ObjectPalette_CopyToBuffer
     ld   hl,.data_02_5cc0
-    jp   call_00_2c20
+    jp   call_00_2c20_ObjectPalette_CopyToBuffer
 .data_02_5cc0:
     db   $00, $00, $00, $00, $1f, $00, $ff, $7f
 .data_02_5cc8:
@@ -608,7 +608,7 @@ label5CF0:
 
 call_02_5d02:
     ld   HL, .data_02_5d08                             ;; 02:5d02 $21 $08 $5d
-    jp   call_00_2c20                                  ;; 02:5d05 $c3 $20 $2c
+    jp   call_00_2c20_ObjectPalette_CopyToBuffer                                  ;; 02:5d05 $c3 $20 $2c
 .data_02_5d08:
     db   $00, $00, $00, $00, $1f, $00, $ff, $7f        ;; 02:5d08 ........
 
@@ -1120,7 +1120,7 @@ call_02_61b2:
 
 call_02_61b8:
     ld   hl,.data_02_61be
-    jp   call_00_2c20
+    jp   call_00_2c20_ObjectPalette_CopyToBuffer
 .data_02_61be:
     db   $00, $00, $ff, $7f, $b5, $56, $ad, $35
 
@@ -1986,7 +1986,7 @@ call_02_68b2:
     call call_00_29f5
     ret  z
     ld   hl,.data_02_68e5
-    call call_00_2c20
+    call call_00_2c20_ObjectPalette_CopyToBuffer
     call call_00_2826_Object_SetXFromDA24
     ld   a,[wDC71]
     and  a,$0F
@@ -2043,7 +2043,7 @@ call_02_6928:
     ld   bc,$0008
     call nz,jp_00_250d
     ld   hl,.data_02_6937
-    jp   call_00_2c20
+    jp   call_00_2c20_ObjectPalette_CopyToBuffer
 .data_02_6937:
     db   $00, $00, $1b, $00, $5f, $02, $1f, $1b        ;; 02:6937 ????????
 
@@ -2179,7 +2179,7 @@ call_02_6A4c:
     ld   a,$19
     call nz,call_00_0ff5
     ld   hl,.data_02_6a89
-    call call_00_2c20
+    call call_00_2c20_ObjectPalette_CopyToBuffer
     call call_00_2a5d
     jp   nz,jp_00_2b7a
     ld   c,$55
@@ -2663,7 +2663,7 @@ call_02_6dda:
     ld   a,$1A
     call call_00_0ff5
     ld   hl,.data_6e3c
-    call call_00_2c20
+    call call_00_2c20_ObjectPalette_CopyToBuffer
     call call_00_288c_Object_Clear14
     call call_00_2b8b
     call call_00_2c67_Particle_InitBurst

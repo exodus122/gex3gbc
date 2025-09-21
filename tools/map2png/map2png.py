@@ -415,8 +415,6 @@ if generate_regular_maps:
 
         os.system('mkdir -p map_images')
         os.system('mkdir -p map_images/'+level_name)
-        os.system('mkdir -p map_images/with_collectibles')
-        os.system('mkdir -p map_images/with_collectibles/'+level_name)
         os.system('mkdir -p map_images/with_objects')
         os.system('mkdir -p map_images/with_objects/'+level_name)
 

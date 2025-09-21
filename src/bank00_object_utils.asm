@@ -1871,7 +1871,7 @@ call_00_2ba9:
     ld   [HL], $50                                     ;; 00:2bbb $36 $50
     ret                                                ;; 00:2bbd $c9
 
-jp_00_2bbe:
+call_00_2bbe:
     call call_00_35e8                                  ;; 00:2bbe $cd $e8 $35
     cp   A, $ff                                        ;; 00:2bc1 $fe $ff
     jr   Z, jp_00_2b7a                                 ;; 00:2bc3 $28 $b5
@@ -1897,8 +1897,9 @@ jp_00_2bbe:
     ld   A, $02                                        ;; 00:2bf3 $3e $02
     ld   HL, entry_02_72ac                              ;; 00:2bf5 $21 $ac $72
     call call_00_0edd_CallAltBankFunc                                  ;; 00:2bf8 $cd $dd $0e
-    ld   HL, $2c01                                     ;; 00:2bfb $21 $01 $2c
-    jp   call_00_2c20                                  ;; 00:2bfe $c3 $20 $2c
+    ld   HL, .data_02_2c01                                     ;; 00:2bfb $21 $01 $2c
+    jp   call_00_2c20_ObjectPalette_CopyToBuffer                                  ;; 00:2bfe $c3 $20 $2c
+.data_02_2c01:
     db   $00, $00, $00, $00, $60, $02, $9c, $03        ;; 00:2c01 ........
 
 call_00_2c09:
@@ -1919,7 +1920,10 @@ call_00_2c0f:
     ld   [hl],c
     ret  
 
-call_00_2c20:
+call_00_2c20_ObjectPalette_CopyToBuffer:
+; Looks up the palette slot previously stored in wDAAE for the current object.
+; Multiplies that index by 8 to get a byte offset into wDD2A_ObjectPalettes.
+; Copies 8 bytes from whatever source HL pointed to into that palette slot.
     push HL                                            ;; 00:2c20 $e5
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2c21 $fa $00 $da
     rlca                                               ;; 00:2c24 $07
@@ -1944,12 +1948,14 @@ call_00_2c20:
     jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:2c40 $c3 $6e $07
 
 data_00_2c43_ParticleBufferPointerTable:
+; The pointer table to the individual particle buffers.
     dw   wDDC4_ParticleSlot1Buffer, wDDD7_ParticleSlot2Buffer
     dw   wDDEA_ParticleSlot3Buffer, wDDFD_ParticleSlot4Buffer        ;; 00:2c43 ????????
     dw   wDE10_ParticleSlot5Buffer, wDE23_ParticleSlot6Buffer
     dw   wDE36_ParticleSlot7Buffer, wDE49_ParticleSlot8Buffer                                         ;; 00:2c51 pP
 
 call_00_2c53_ParticleSlot_GetBufferPtr:
+; Fetches the DE pointer for the particle slot based on the current object’s bits.
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2c53 $fa $00 $da
     rlca                                               ;; 00:2c56 $07
     rlca                                               ;; 00:2c57 $07
@@ -1966,6 +1972,7 @@ call_00_2c53_ParticleSlot_GetBufferPtr:
     ret                                                ;; 00:2c66 $c9
 
 call_00_2c67_Particle_InitBurst:
+; Initializes a particle slot with the default burst data and timer ($40).
     call call_00_2c53_ParticleSlot_GetBufferPtr                                  ;; 00:2c67 $cd $53 $2c
     ld   A, $40                                        ;; 00:2c6a $3e $40
     ld   [DE], A                                       ;; 00:2c6c $12
@@ -1974,11 +1981,13 @@ call_00_2c67_Particle_InitBurst:
     ld   BC, $12                                       ;; 00:2c71 $01 $12 $00
     jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:2c74 $c3 $6e $07
 .data_00_2c77_Particle_DefaultBurstTemplate:
+; Default particle data copied during initialization.
     db   $0b, $00, $00, $f5, $00, $00, $10, $00        ;; 00:2c77 ........
     db   $00, $00, $00, $00, $0b, $00, $00, $0b        ;; 00:2c7f ........
     db   $00, $00                                      ;; 00:2c87 ..
 
 call_00_2c89_Particle_UpdateBurst:
+; Per-frame update: decrements the timer and smooths/blends velocity/position values.
     call call_00_2c53_ParticleSlot_GetBufferPtr                                  ;; 00:2c89 $cd $53 $2c
     ld   L, E                                          ;; 00:2c8c $6b
     ld   H, D                                          ;; 00:2c8d $62
