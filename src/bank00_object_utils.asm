@@ -1,4 +1,13 @@
-call_00_2260:
+call_00_2260_FindAndFlagObjectType12:
+; Switches to the object list bank and scans through object entries starting 
+; from wDC17_ObjectListBankOffset.
+; For each entry, checks if the type byte is $12. If found, jumps 13 bytes 
+; forward and compares that value to C.
+; When a match is found, modifies a status nibble in the object’s status table ($D7xx) 
+; to set bits $04 while preserving upper bits.
+; If no match is found and a $FF terminator is reached, exits by restoring the bank.
+; Purpose: Search for an object of type $12 linked to a particular identifier C and 
+; flag it as active/triggered.
     push BC                                            ;; 00:2260 $c5
     ld   A, [wDC16_ObjectListBank]                                    ;; 00:2261 $fa $16 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:2264 $cd $ee $0e
@@ -37,7 +46,11 @@ call_00_2260:
     ld   [DE], A                                       ;; 00:2295 $12
     jp   call_00_0f08_SwitchBank2                                  ;; 00:2296 $c3 $08 $0f
 
-call_00_2299:
+call_00_2299_SetObjectStatusLowNibble:
+; Uses the current object’s ID (wDA00_CurrentObjectAddr) to compute a pointer 
+; into $D7xx status table.
+; Replaces the lower nibble of that status byte with C, preserving the upper nibble.
+; Purpose: Update the low-nibble state for the current object’s status entry.
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2299 $fa $00 $da
     rlca                                               ;; 00:229c $07
     rlca                                               ;; 00:229d $07
@@ -55,7 +68,14 @@ call_00_2299:
     ld   [HL], A                                       ;; 00:22af $77
     ret                                                ;; 00:22b0 $c9
 
-call_00_22b1:
+call_00_22b1_HandleObjectStateChange:
+; Similar indexing logic as 2299, but:
+; Compares the current low nibble with C.
+; If different, stores the old low nibble to wDAD6_ReturnBank.
+; Then calls an alternate-bank routine (entry_02_72ac) using bank-switch 
+; helper call_00_0EDD_CallAltBankFunc.
+; Purpose: Detect a change in the object’s state nibble and, if changed, 
+; trigger an alternate-bank handler for state transitions.
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:22b1 $fa $00 $da
     rlca                                               ;; 00:22b4 $07
     rlca                                               ;; 00:22b5 $07
@@ -77,8 +97,12 @@ call_00_22b1:
     call call_00_0edd_CallAltBankFunc                                  ;; 00:22d0 $cd $dd $0e
     ret                                                ;; 00:22d3 $c9
     
-call_00_22d4:
-    call call_00_230f
+call_00_22d4_CheckObjectSlotFlag:
+; Calls call_00_230f_ResolveObjectListIndex to resolve the current object’s index (C).
+; Uses that index to look up a byte in the table at wDCB1.
+; Returns with A = value at that slot (flags zero/non-zero).
+; Purpose: Check if a flag/slot for this object is set.
+    call call_00_230f_ResolveObjectListIndex
     ld   b,$00
     ld   hl,wDCB1
     add  hl,bc
@@ -86,8 +110,11 @@ call_00_22d4:
     and  a
     ret  
 
-call_00_22e0:
-    call call_00_230f
+call_00_22e0_IncrementObjectSlot:
+; Gets object index via 230F.
+; If index < $10, increments that object’s slot in wDCB1.
+; Purpose: Increment a small counter for this object (capped at 16 slots).
+    call call_00_230f_ResolveObjectListIndex
     ld   a,c
     cp   a,$10
     ret  nc
@@ -97,8 +124,11 @@ call_00_22e0:
     inc  [hl]
     ret  
 
-call_00_22ef:
-    call call_00_230f
+call_00_22ef_SetObjectSlotActive:
+; Gets object index via 230F.
+; If index < $10, sets that object’s slot to 1.
+; Purpose: Mark the slot as “active” or “initialized.”
+    call call_00_230f_ResolveObjectListIndex
     ld   a,c
     cp   a,$10
     ret  nc
@@ -108,8 +138,11 @@ call_00_22ef:
     ld   [hl],$01
     ret  
 
-call_00_22ff:
-    call call_00_230f
+call_00_22ff_ClearObjectSlot:
+; Gets object index via 230F.
+; If index < $10, clears that slot to 0.
+; Purpose: Mark the slot as inactive/cleared.
+    call call_00_230f_ResolveObjectListIndex
     ld   a,c
     cp   a,$10
     ret  nc
@@ -119,7 +152,13 @@ call_00_22ff:
     ld   [hl],$00
     ret  
 
-call_00_230f:
+call_00_230f_ResolveObjectListIndex:
+; Switches to the object list bank (wDC16_ObjectListBank).
+; Uses wDC17_ObjectListBankOffset and the current object’s ID (wDA00_CurrentObjectAddr) to compute 
+; an index (C) into the object list.
+; Performs bit shifts and offset calculations to get the proper entry pointer, then switches banks back.
+; Returns C = resolved index for the object.
+; Purpose: Resolve an object’s list index across banks.
     ld   A, [wDC16_ObjectListBank]                                    ;; 00:230f $fa $16 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:2312 $cd $ee $0e
     ld   HL, wDC17_ObjectListBankOffset                                     ;; 00:2315 $21 $17 $dc
@@ -151,7 +190,15 @@ call_00_230f:
     pop  BC                                            ;; 00:233c $c1
     ret                                                ;; 00:233d $c9
 
-call_00_233e:
+call_00_233e_UpdateObjectMotionFromVectorTable:
+; Increments an object timer ($1B/$1C fields).
+; Every $2E ticks, rolls over and increments a secondary counter while clearing a bit.
+; Uses the counters to pick a two-byte vector from .data_00_23B4_Velocities (a table of X/Y velocities).
+; Depending on the counter value, inverts and reorders components to get (e,c) velocity pair.
+; Converts those velocities into signed words (d,b) and (e,c).
+; Calls 2835_Object_GetVector_DA24 and 27F3_Object_GetVector_DA26 to adjust positions.
+; Stores the computed 4-byte vector back into the object’s data block at $0E.
+; Purpose: Generate and apply a predefined movement pattern (probably a curve or wave) over time to move an object.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$1B
@@ -171,7 +218,7 @@ call_00_233e:
     ld   l,[hl]
     ld   h,00
     add  hl,hl
-    ld   de,.data_00_23B4
+    ld   de,.data_00_23B4_Velocities
     add  hl,de
     cp   a,$00
     jr   z,.label2381
@@ -214,7 +261,7 @@ call_00_233e:
     adc  a,$00
     ld   d,a
     push de
-    call call_00_2835_GetDA24
+    call call_00_2835_Object_GetVector_DA24
     pop  hl
     add  hl,de
     push hl
@@ -224,7 +271,7 @@ call_00_233e:
     adc  a,$00
     ld   b,a
     push bc
-    call call_00_27f3_GetDA26
+    call call_00_27f3_Object_GetVector_DA26
     pop  hl
     add  hl,de
     push hl
@@ -242,7 +289,7 @@ call_00_233e:
     ldi  [hl],a
     ld   [hl],b
     ret  
-.data_00_23B4:
+.data_00_23B4_Velocities:
     db   $00, $e0        ;; 00:23ae ????????
     db   $01, $e0, $02, $e0, $03, $e0, $04, $e0        ;; 00:23b6 ????????
     db   $05, $e0, $06, $e1, $07, $e1, $08, $e1        ;; 00:23be ????????
@@ -257,7 +304,12 @@ call_00_233e:
     db   $1f, $fc, $1f, $fd, $1f, $fe, $1f, $ff        ;; 00:2406 ????????
     db   $1f, $00
 
-call_00_2410:
+call_00_2410_SetDirectionFlag_PlayerLeft:
+; Loads the current object’s position ($0E/$0F).
+; Compares it with the player’s X position (wD80E/F).
+; Sets a nearby state byte (L xor $02) to $20 if the player is 
+; left of the object, otherwise $00.
+; Purpose: A left/right proximity flag to influence AI.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$0E
@@ -277,7 +329,10 @@ label2427:
     ld   [hl],c
     ret  
     
-call_00_242d:
+call_00_242d_SetDirectionFlag_PlayerRight:
+; Same comparison as 2410 but reversed:
+; Sets the flag to $20 if the player is right of the object, otherwise $00.
+; Purpose: Mirror of the above for right-side checking.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$0E
@@ -297,7 +352,12 @@ label2444:
     ld   [hl],c
     ret  
 
-call_00_244a:
+call_00_244a_Object_ApplyClampedVerticalVelocity:
+; Gets a value from $1D (likely vertical velocity). Subtracts 2, clamps negative values to at least $C0.
+; Stores the result back.
+; Computes a small step (cpl/inc + four sra) to get a signed delta (C,B).
+; Jumps to jp_00_250d to apply the delta to object position.
+; Purpose: Reduces velocity, clamps it, and applies movement on Y-axis.
     ld   H, $d8                                        ;; 00:244a $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:244c $fa $00 $da
     or   A, $1d                                        ;; 00:244f $f6 $1d
@@ -324,7 +384,14 @@ call_00_244a:
     ld   B, A                                          ;; 00:2471 $47
     jp   jp_00_250d                                    ;; 00:2472 $c3 $0d $25
 
-call_00_2475:
+call_00_2475_Object_MoveAndClampVerticalPosition:
+; Similar to 244A: subtracts 2 from $1D, clamps to $C0.
+; Computes step (C,B) by shifting four times.
+; Adds the delta directly to position at $0D/$0E.
+; Calls 27F3_Object_GetVector_DA26 (likely gets a reference vector).
+; Compares the result (E,D) to another position vector at $10.
+; If overshooting, snaps the object back to (D,E) and clears $0D.
+; Purpose: Applies vertical movement with boundary checking and snapping.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$1D
@@ -356,7 +423,7 @@ label248A:
     ld   a,[hl]
     adc  b
     ld   [hl],a
-    call call_00_27f3_GetDA26
+    call call_00_27f3_Object_GetVector_DA26
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$10
@@ -377,7 +444,11 @@ label248A:
     ld   [hl],a
     ret  
 
-call_00_24c0:
+call_00_24c0_Object_IntegrateFractionalVelocity_X:
+; Reads two velocity bytes at offset $1B, accumulates them, 
+; keeps the lower nibble for fractional remainder.
+; Arithmetic right-shifts the sum to get a signed step (C,B).
+; Adds this step to the object’s position vector at $0E.
     ld   H, $d8                                        ;; 00:24c0 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:24c2 $fa $00 $da
     or   A, $1b                                        ;; 00:24c5 $f6 $1b
@@ -409,7 +480,9 @@ call_00_24c0:
     ld   [HL], A                                       ;; 00:24ec $77
     ret                                                ;; 00:24ed $c9
 
-call_00_24ee:
+call_00_24ee_Object_IntegrateFractionalVelocity_Y:
+; Same pattern as call_00_24c0_Object_IntegrateFractionalVelocity_X but works on 
+; $1D and updates position at $10.
     ld   H, $d8                                        ;; 00:24ee $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:24f0 $fa $00 $da
     or   A, $1d                                        ;; 00:24f3 $f6 $1d
@@ -429,7 +502,6 @@ call_00_24ee:
     ld   A, $ff                                        ;; 00:2508 $3e $ff
     adc  A, $00                                        ;; 00:250a $ce $00
     ld   B, A                                          ;; 00:250c $47
-
 jp_00_250d:
     ld   H, $d8                                        ;; 00:250d $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:250f $fa $00 $da
@@ -443,8 +515,11 @@ jp_00_250d:
     ld   [HL], A                                       ;; 00:251a $77
     ret                                                ;; 00:251b $c9
 
-call_00_251c:
-    call call_00_254a                                  ;; 00:251c $cd $4a $25
+call_00_251c_Object_CheckRegionAndSetFlag:
+; Uses 254A to update velocity, then compares object’s tile vector (wDA1C table)
+; against (E,D) to decide if the object is inside a region.
+; Updates a flag at $0D or returns zero if outside
+    call call_00_254a_Object_UpdateDeltaAndAdvancePosition                                  ;; 00:251c $cd $4a $25
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:251f $fa $00 $da
     rrca                                               ;; 00:2522 $0f
     and  A, $70                                        ;; 00:2523 $e6 $70
@@ -476,7 +551,10 @@ call_00_251c:
     cp   A, C                                          ;; 00:2548 $b9
     ret                                                ;; 00:2549 $c9
 
-call_00_254a:
+call_00_254a_Object_UpdateDeltaAndAdvancePosition:
+; Helper: computes a signed velocity delta from $1B and the current $0D state, 
+; preserves fractional nibble, shifts for step size, and adds to position at $12.
+; Stores intermediate delta in wDA13.
     ld   H, $d8                                        ;; 00:254a $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:254c $fa $00 $da
     or   A, $0d                                        ;; 00:254f $f6 $0d
@@ -520,7 +598,9 @@ call_00_254a:
     ld   D, A                                          ;; 00:2586 $57
     ret                                                ;; 00:2587 $c9
 
-call_00_2588:
+call_00_2588_Object_ApproachTargetValue_Byte:
+; Compares the value at $1B with C.
+; Increments or decrements $1B by 1 toward C.
     ld   H, $d8                                        ;; 00:2588 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:258a $fa $00 $da
     or   A, $1b                                        ;; 00:258d $f6 $1b
@@ -539,8 +619,11 @@ call_00_2588:
     cp   A, C                                          ;; 00:259b $b9
     ret                                                ;; 00:259c $c9
 
-call_00_259d:
-    call call_00_25CB
+call_00_259d_Object_CheckRegionAndUpdateState:
+; Calls 25CB to update velocity/position.
+; Compares two position ranges in wDA20 with (E,D).
+; If outside bounds, sets $0D to $40 or $00.
+    call call_00_25CB_Object_IntegrateFractionalVelocity_Helper
     ld   a,[wDA00_CurrentObjectAddr]
     rrca 
     and  a,$70
@@ -553,17 +636,18 @@ call_00_259d:
     sub  e
     ldi  a,[hl]
     sbc  d
-    jr   c,call_00_25BF
+    jr   c,call_00_25BF_Object_SetAndCompareState
     ld   c,$40
     ldi  a,[hl]
     sub  e
     ld   a,[hl]
     sbc  d
-    jr   nc,call_00_25BF
+    jr   nc,call_00_25BF_Object_SetAndCompareState
     xor  a
     ret  
 
-call_00_25BF:
+call_00_25BF_Object_SetAndCompareState:
+; Stores a new state value C into $0D and compares previous value.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$0D
@@ -573,7 +657,9 @@ call_00_25BF:
     cp   c
     ret  
 
-call_00_25CB:
+call_00_25CB_Object_IntegrateFractionalVelocity_Helper:
+; Computes signed delta from $0D and $10, masks the lower nibble, shifts, and adds to position.
+; Produces (D,E) as updated position deltas.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$0D
@@ -615,7 +701,8 @@ label25DF:
     ld   d,a
     ret  
 
-call_00_2602:
+call_00_2602_Object_ApproachTargetValue_Y:
+; Adjusts the value at $1D up or down until it equals C.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$1D
@@ -623,18 +710,21 @@ call_00_2602:
     ld   a,[hl]
     cp   c
     ret  z
-    jr   c,call_00_2613
+    jr   c,call_00_2613_SnapPositionAndUpdateDelta
     dec  [hl]
     ld   a,[hl]
     cp   c
     ret  
 
-call_00_2613:
+call_00_2613_SnapPositionAndUpdateDelta:
+; Compares two object vectors (DA1E and DA1C) against current position; 
+; if behind boundary, decrements DE.
+; Snaps the stored position to (E,D) and adjusts global delta wDA13.
     inc  [hl]
     ld   a,[hl]
     cp   c
     ret  
-    call call_00_2857_GetDA1E
+    call call_00_2857_Object_GetVector_DA1E
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$0E
@@ -644,7 +734,7 @@ call_00_2613:
     ldd  a,[hl]
     sbc  d
     jr   c,label2639
-    call call_00_2846_GetDA1C
+    call call_00_2846_Object_GetVector_DA1C
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$0E
@@ -667,12 +757,16 @@ label2639:
     xor  a
     ret  
 
-call_00_2645:
+call_00_2645_Object_SelectNearestVector_DA1C_DA1E:
+; Select Closest Vector From DA1C/DA1E
+; Chooses between two stored vectors (DA1C and DA1E) based on the sign bit of A.
+; It compares distances to some reference (after adjusting with call_00_2678_Vector_AddObjectXPos) and 
+; selects whichever vector (C,B) is closer, then writes it back through HL.
     bit  $7,a
     jr   nz,label265B
     ld   b,$00
-    call call_00_2846_GetDA1C
-    call call_00_2678
+    call call_00_2846_Object_GetVector_DA1C
+    call call_00_2678_Vector_AddObjectXPos
     ld   a,c
     sub  e
     ld   a,b
@@ -686,8 +780,8 @@ label265B:
     sub  c
     ld   c,a
     ld   b,$FF
-    call call_00_2857_GetDA1E
-    call call_00_2678
+    call call_00_2857_Object_GetVector_DA1E
+    call call_00_2678_Vector_AddObjectXPos
     ld   a,e
     sub  c
     ld   a,d
@@ -707,7 +801,10 @@ label266E:
     or   c
     ret  
 
-call_00_2678:
+call_00_2678_Vector_AddObjectXPos:
+; Offset Vector By Object X
+; Loads the object’s X position ($D8:xx0E/$D8:xx0F) and adds it to C,B. 
+; Used to convert local offsets into world coordinates.
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$0E
     ld   l,a
@@ -719,11 +816,16 @@ call_00_2678:
     adc  b
     ld   b,a
     ret  
+
+call_00_2687_Object_SelectNearestVector_DA20_DA22:
+; Select Closest Vector From DA20/DA22
+; Same selection pattern but for tables DA20 and DA22 and uses call_00_26BA_Vector_AddObjectYPos 
+; to offset with Y.
     bit  $7,a
     jr   nz,label269D
     ld   b,$00
-    call call_00_2804_GetDA20
-    call call_00_26BA
+    call call_00_2804_Object_GetVector_DA20
+    call call_00_26BA_Vector_AddObjectYPos
     ld   a,c
     sub  e
     ld   a,b
@@ -737,8 +839,8 @@ label269D:
     sub  c
     ld   c,a
     ld   b,$FF
-    call call_00_2815_GetDA22
-    call call_00_26BA
+    call call_00_2815_Object_GetVector_DA22
+    call call_00_26BA_Vector_AddObjectYPos
     ld   a,e
     sub  c
     ld   a,d
@@ -758,7 +860,9 @@ label26B0:
     or   c
     ret  
 
-call_00_26BA:
+call_00_26BA_Vector_AddObjectYPos:
+; Offset Vector By Object Y
+; Loads the object’s Y position ($D8:xx10) and adds it to C,B
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$10
     ld   l,a
@@ -771,7 +875,11 @@ call_00_26BA:
     ld   b,a
     ret  
 
-call_00_26c9:
+call_00_26c9_Object_HandleXCollisionOrSectorCheck:
+; Handle Object State / X Collision Probe
+; Reads a couple of object bytes at offsets $1B, $02, $17 into C,B,DE, checks a flag 
+; bit, possibly negates C, compares an upper-bits mask to wDC7B (tilemap or sector ID), 
+; and if equal calls call_00_26F1_Player_UpdateXFromObject. Finally stores the horizontal delta (C) to wDC85.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$1B
@@ -790,17 +898,19 @@ call_00_26c9:
     xor  a
     sub  c
     ld   c,a
-    label26E3:
+label26E3:
     ld   a,l
     and  a,$E0
     ld   hl,wDC7B
     cp   [hl]
-    jr   nz,call_00_26F1
+    jr   nz,call_00_26F1_Player_UpdateXFromObject
     ld   a,c
     ld   [wDC85],a
     ret  
 
-call_00_26F1:
+call_00_26F1_Player_UpdateXFromObject:
+; Update Player X Relative to Object
+; Compares player position to the object and adjusts or clamps X.
     ld   hl,wDC7D
     cp   [hl]
     ret  nz
@@ -812,7 +922,7 @@ call_00_26F1:
     sub  e
     ld   a,[wD80F_PlayerXPosition]
     sbc  d
-    jr   c,call_00_2714
+    jr   c,call_00_2714_Player_ClampXLeft
     ld   a,e
     add  [hl]
     ld   [wD80E_PlayerXPosition],a
@@ -821,7 +931,11 @@ call_00_26F1:
     ld   [wD80F_PlayerXPosition],a
     ret  
 
-call_00_2714:
+call_00_2714_Player_ClampXLeft:
+; Clamp Player X
+; When the player is too far left of the object, this clamps the player’s X position 
+; to just inside the object boundary (adds one to the object’s stored width, then 
+; subtracts from the delta).
     ld   c,[hl]
     inc  c
     ld   a,e
@@ -832,7 +946,12 @@ call_00_2714:
     ld   [wD80F_PlayerXPosition],a
     ret  
 
-call_00_2722:
+call_00_2722_Player_IsWithinObjectYRange:
+; Check Vertical Collision Window
+; Computes the relative Y distance between the player and an object, 
+; checks two auxiliary offsets (GetDA1E and GetDA1C), and returns A=1 
+; if the player is within a certain vertical band or collision box, 
+; else returns zero.
     ld   HL, wD810_PlayerYPosition                                     ;; 00:2722 $21 $10 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2725 $fa $00 $da
     or   A, $10                                        ;; 00:2728 $f6 $10
@@ -859,13 +978,13 @@ call_00_2722:
     add  A, A                                          ;; 00:2742 $87
     cp   A, E                                          ;; 00:2743 $bb
     jr   C, .jr_00_2764                                ;; 00:2744 $38 $1e
-    call call_00_2857_GetDA1E                                  ;; 00:2746 $cd $57 $28
+    call call_00_2857_Object_GetVector_DA1E                                  ;; 00:2746 $cd $57 $28
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2749 $fa $0e $d8
     sub  A, E                                          ;; 00:274c $93
     ld   A, [wD80F_PlayerXPosition]                                    ;; 00:274d $fa $0f $d8
     sbc  A, D                                          ;; 00:2750 $9a
     jr   C, .jr_00_2764                                ;; 00:2751 $38 $11
-    call call_00_2846_GetDA1C                                  ;; 00:2753 $cd $46 $28
+    call call_00_2846_Object_GetVector_DA1C                                  ;; 00:2753 $cd $46 $28
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2756 $fa $0e $d8
     sub  A, E                                          ;; 00:2759 $93
     ld   A, [wD80F_PlayerXPosition]                                    ;; 00:275a $fa $0f $d8
@@ -878,8 +997,12 @@ call_00_2722:
     xor  A, A                                          ;; 00:2764 $af
     ret                                                ;; 00:2765 $c9
 
-call_00_2766:
-    call call_00_27f3_GetDA26                                  ;; 00:2766 $cd $f3 $27
+call_00_2766_Object_UpdatePositionFromVector:
+; Update Object Position if Player Behind
+; Uses GetDA26 (probably retrieves the object’s movement vector), compares it to the 
+; player’s relative position. If the player is not in front, writes a new object 
+; position (E,D) into the object’s slot and clears a state flag.
+    call call_00_27f3_Object_GetVector_DA26                                  ;; 00:2766 $cd $f3 $27
     ld   H, $d8                                        ;; 00:2769 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:276b $fa $00 $da
     or   A, $10                                        ;; 00:276e $f6 $10
@@ -899,7 +1022,11 @@ call_00_2766:
     ld   [HL], A                                       ;; 00:277e $77
     ret                                                ;; 00:277f $c9
 
-call_00_2780:
+call_00_2780_Object_ComputeMapYDelta:
+; Compute Object-to-Map Y Delta
+; Loads the map’s Y base (wDBFB_YPositionInMap), adds an offset ($B0), then 
+; computes the difference between that and the object’s stored Y to get a signed 
+; vertical distance.
     ld   hl,wDBFB_YPositionInMap
     ldi  a,[hl]
     ld   h,[hl]
@@ -918,8 +1045,13 @@ call_00_2780:
     sbc  d
     ret  
 
-call_00_2799:
-    call call_00_2835_GetDA24
+call_00_2799_Object_InterpolateTowardVector:
+; Move Object Toward Target Vector
+; Gets a vector from GetDA24, computes the difference between the object’s position 
+; and the vector, halves the delta (srl d / rr e), then adds it back to the current 
+; stored vector (GetDA26). Finally, writes the interpolated position back into the 
+; object’s position slot. This looks like smooth following or homing movement.
+    call call_00_2835_Object_GetVector_DA24
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$0E
@@ -941,7 +1073,7 @@ label27B3:
     srl  d
     rr   e
     push de
-    call call_00_27f3_GetDA26
+    call call_00_27f3_Object_GetVector_DA26
     pop  hl
     add  hl,de
     ld   d,$D8
@@ -955,7 +1087,11 @@ label27B3:
     ld   [de],a
     ret  
 
-call_00_27cb:
+call_00_27cb_Object_SetYFromMap:
+; Store Map Y Position Into Object
+; Copies the map’s Y position minus $14 into the object’s Y slot, with carry handling:
+; if subtraction underflows, it zeros both low and high bytes. This anchors an object 
+; relative to the map’s scrolling.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$10
@@ -972,8 +1108,11 @@ call_00_27cb:
     ld   [hl],a
     ret  
 
-call_00_27e4_ObjectSetYPosition:
-    call call_00_27f3_GetDA26
+call_00_27e4_Object_SetYPosFromDA26:
+; Write DA26 Vector to Object Y Pos
+; Calls GetDA26 to fetch a two-byte vector from table wDA26 and writes it 
+; into the current object’s position slot at $D8:xx10.
+    call call_00_27f3_Object_GetVector_DA26
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$10
@@ -983,7 +1122,9 @@ call_00_27e4_ObjectSetYPosition:
     ld   [hl],d
     ret  
 
-call_00_27f3_GetDA26:
+call_00_27f3_Object_GetVector_DA26:
+; Uses wDA00_CurrentObjectAddr to compute an index, reads a two-byte 
+; vector from table wDA26 into DE.
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:27f3 $fa $00 $da
     rrca                                               ;; 00:27f6 $0f
     and  A, $70                                        ;; 00:27f7 $e6 $70
@@ -996,7 +1137,8 @@ call_00_27f3_GetDA26:
     ld   D, [HL]                                       ;; 00:2802 $56
     ret                                                ;; 00:2803 $c9
 
-call_00_2804_GetDA20:
+call_00_2804_Object_GetVector_DA20:
+; Reads a vector from wDA20
     ld   a,[wDA00_CurrentObjectAddr]
     rrca 
     and  a,$70
@@ -1009,7 +1151,8 @@ call_00_2804_GetDA20:
     ld   d,[hl]
     ret  
 
-call_00_2815_GetDA22:
+call_00_2815_Object_GetVector_DA22:
+; Reads a vector from wDA22
     ld   a,[wDA00_CurrentObjectAddr]
     rrca 
     and  a,$70
@@ -1022,8 +1165,9 @@ call_00_2815_GetDA22:
     ld   d,[hl]
     ret  
 
-call_00_2826_ObjectSetXPosition:
-    call call_00_2835_GetDA24
+call_00_2826_Object_SetXFromDA24:
+; Gets DA24 vector and stores it in the object’s $D8:xx0E slot (X position).
+    call call_00_2835_Object_GetVector_DA24
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$0E
@@ -1033,7 +1177,8 @@ call_00_2826_ObjectSetXPosition:
     ld   [hl],d
     ret  
 
-call_00_2835_GetDA24:
+call_00_2835_Object_GetVector_DA24:
+; Reads a vector from wDA24
     ld   a,[wDA00_CurrentObjectAddr]
     rrca 
     and  a,$70
@@ -1046,7 +1191,8 @@ call_00_2835_GetDA24:
     ld   d,[hl]
     ret  
 
-call_00_2846_GetDA1C:
+call_00_2846_Object_GetVector_DA1C:
+; Reads a vector from wDA1C
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2846 $fa $00 $da
     rrca                                               ;; 00:2849 $0f
     and  A, $70                                        ;; 00:284a $e6 $70
@@ -1059,7 +1205,8 @@ call_00_2846_GetDA1C:
     ld   D, [HL]                                       ;; 00:2855 $56
     ret                                                ;; 00:2856 $c9
 
-call_00_2857_GetDA1E:
+call_00_2857_Object_GetVector_DA1E:
+; Reads a vector from wDA1E
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2857 $fa $00 $da
     rrca                                               ;; 00:285a $0f
     and  A, $70                                        ;; 00:285b $e6 $70
@@ -1072,7 +1219,8 @@ call_00_2857_GetDA1E:
     ld   D, [HL]                                       ;; 00:2866 $56
     ret                                                ;; 00:2867 $c9
 
-call_00_2868_SetDA1C:
+call_00_2868_Object_SetVector_DA1C:
+; Writes DE into wDA1C entry for the current object.
     ld   a,[wDA00_CurrentObjectAddr]
     rrca 
     and  a,$70
@@ -1085,7 +1233,8 @@ call_00_2868_SetDA1C:
     ld   [hl],d
     ret  
 
-call_00_2879_SetDA1E:
+call_00_2879_Object_SetVector_DA1E:
+; Writes DE into wDA1E entry for the current object.
     ld   a,[wDA00_CurrentObjectAddr]
     rrca 
     and  a,$70
@@ -1098,10 +1247,12 @@ call_00_2879_SetDA1E:
     ld   [hl],d
     ret  
 
-call_00_288c_ObjectUnkAndSet14:
+call_00_288c_Object_Clear14:
+; Write Byte to Object Offset $14
+; Writes register C (or zero if called via the preceding stub) into the 
+; object’s $D8:xx14 slot, likely a state/timer field.
     ld   C, $00                                        ;; 00:288a $0e $00
-
-call_00_288c_ObjectSet14:
+call_00_288c_Object_Set14:
     ld   H, $d8                                        ;; 00:288c $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:288e $fa $00 $da
     or   A, $14                                        ;; 00:2891 $f6 $14
@@ -1109,7 +1260,8 @@ call_00_288c_ObjectSet14:
     ld   [HL], C                                       ;; 00:2894 $71
     ret                                                ;; 00:2895 $c9
 
-call_00_2896_ObjectSet15:
+call_00_2896_Object_Set15:
+; Writes C into the object’s $D8:xx15 slot—another per-object state byte.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$15
@@ -1503,7 +1655,7 @@ call_00_2a68:
 
 call_00_2a98:
     push de
-    call call_00_230f
+    call call_00_230f_ResolveObjectListIndex
     ld   l,c
     ld   h,$00
     add  hl,hl
@@ -1728,7 +1880,7 @@ jp_00_2bbe:
     ld   C, $02                                        ;; 00:2bc9 $0e $02
     call call_00_2930_ObjectSetId                                  ;; 00:2bcb $cd $30 $29
     ld   C, $08                                        ;; 00:2bce $0e $08
-    call call_00_288c_ObjectSet14                                  ;; 00:2bd0 $cd $8c $28
+    call call_00_288c_Object_Set14                                  ;; 00:2bd0 $cd $8c $28
     ld   C, $12                                        ;; 00:2bd3 $0e $12
     call call_00_2944_ObjectSet12                                  ;; 00:2bd5 $cd $44 $29
     ld   C, $12                                        ;; 00:2bd8 $0e $12
@@ -1738,7 +1890,7 @@ jp_00_2bbe:
     ld   C, $01                                        ;; 00:2be2 $0e $01
     call call_00_28aa_ObjectSet16                                  ;; 00:2be4 $cd $aa $28
     ld   C, $00                                        ;; 00:2be7 $0e $00
-    call call_00_2299                                  ;; 00:2be9 $cd $99 $22
+    call call_00_2299_SetObjectStatusLowNibble                                  ;; 00:2be9 $cd $99 $22
     call call_00_2ba9                                  ;; 00:2bec $cd $a9 $2b
     xor  A, A                                          ;; 00:2bef $af
     ld   [wDAD6_ReturnBank], A                                    ;; 00:2bf0 $ea $d6 $da

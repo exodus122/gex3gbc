@@ -47,6 +47,7 @@ wD579:
     ds 647                                             ;; d579
 
 ; From D800 to D900 is the loaded objects space
+
 wD800_PlayerObject_Id:
     ds 1                                               ;; d800
 

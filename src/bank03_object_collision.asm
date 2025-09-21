@@ -139,7 +139,7 @@ call_03_4c38_UpdateObjectCollision:
 .data_03_4dc2:
     call call_03_550e                                  ;; 03:4dc2 $cd $0e $55
     ret  NC                                            ;; 03:4dc5 $d0
-    call call_00_230f                                  ;; 03:4dc6 $cd $0f $23
+    call call_00_230f_ResolveObjectListIndex                                  ;; 03:4dc6 $cd $0f $23
     ld   B, $00                                        ;; 03:4dc9 $06 $00
     ld   HL, .data_03_4e00                             ;; 03:4dcb $21 $00 $4e
     add  HL, BC                                        ;; 03:4dce $09
@@ -196,7 +196,7 @@ call_03_4c38_UpdateObjectCollision:
     push AF                                            ;; 03:4e61 $f5
     push AF                                            ;; 03:4e62 $f5
     ld   C, A                                          ;; 03:4e63 $4f
-    call call_00_2299                                  ;; 03:4e64 $cd $99 $22
+    call call_00_2299_SetObjectStatusLowNibble                                  ;; 03:4e64 $cd $99 $22
     pop  AF                                            ;; 03:4e67 $f1
     ld   [wDAD6_ReturnBank], A                                    ;; 03:4e68 $ea $d6 $da
     ld   A, $02                                        ;; 03:4e6b $3e $02
@@ -303,7 +303,7 @@ call_03_4c38_UpdateObjectCollision:
     ld   A, $02                                        ;; 03:4f31 $3e $02
     ld   HL, entry_02_72ac                              ;; 03:4f33 $21 $ac $72
     call call_00_0edd_CallAltBankFunc                                  ;; 03:4f36 $cd $dd $0e
-    call call_00_230f                                  ;; 03:4f39 $cd $0f $23
+    call call_00_230f_ResolveObjectListIndex                                  ;; 03:4f39 $cd $0f $23
     ld   B, $00                                        ;; 03:4f3c $06 $00
     ld   HL, wDCD5                                     ;; 03:4f3e $21 $d5 $dc
     add  HL, BC                                        ;; 03:4f41 $09
@@ -312,7 +312,7 @@ call_03_4c38_UpdateObjectCollision:
     ret  Z                                             ;; 03:4f44 $c8
     dec  [HL]                                          ;; 03:4f45 $35
     ret  NZ                                            ;; 03:4f46 $c0
-    call call_00_288c_ObjectUnkAndSet14                                  ;; 03:4f47 $cd $8a $28
+    call call_00_288c_Object_Clear14                                  ;; 03:4f47 $cd $8a $28
     call call_00_2b8b                                  ;; 03:4f4a $cd $8b $2b
     ld   HL, wDCC8                                     ;; 03:4f4d $21 $c8 $dc
     inc  [HL]                                          ;; 03:4f50 $34
@@ -714,7 +714,7 @@ call_03_5671:
     jr   Z, .jr_03_56a6                                ;; 03:5695 $28 $0f
     push AF                                            ;; 03:5697 $f5
     ld   C, $00                                        ;; 03:5698 $0e $00
-    call call_00_288c_ObjectSet14                                  ;; 03:569a $cd $8c $28
+    call call_00_288c_Object_Set14                                  ;; 03:569a $cd $8c $28
     ld   C, $00                                        ;; 03:569d $0e $00
     call call_00_2958_ObjectSetFacingDirection                                  ;; 03:569f $cd $58 $29
     call call_00_2c67_Particle_InitBurst                                  ;; 03:56a2 $cd $67 $2c
@@ -782,6 +782,7 @@ jp_03_57e6:
     ld   [HL], $00                                     ;; 03:57f5 $36 $00
     ret                                                ;; 03:57f7 $c9
 
+entry_03_57f8:
 call_03_57f8:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:57f8 $fa $00 $da
     ld   HL, wDC7B                                     ;; 03:57fb $21 $7b $dc
