@@ -540,8 +540,8 @@
 01:4922 call_01_48cd.jr_01_4922
 01:493e call_01_48cd.jr_01_493e
 01:4980 call_01_48cd.jr_01_4980
-01:499f call_01_499f_ZeroOutMemory
-01:49a7 call_01_499f_ZeroOutMemory.jr_01_49a7
+01:499f call_01_499f
+01:49a7 call_01_499f.jr_01_49a7
 01:49bb call_01_49bb
 01:49be call_01_49bb.jr_01_49be
 01:49d6 call_01_49bb.jr_01_49d6
@@ -683,6 +683,11 @@
 01:64e9 data_01_64e9
 01:66f9 data_01_66f9
 01:6f39 data_01_6f39
+01:6f45 data_01_6f39.data_01_6f45
+01:6f88 data_01_6f39.data_01_6f88
+01:6f8b data_01_6f39.data_01_6f8b
+01:6fce data_01_6f39.data_01_6fce
+01:7051 data_01_6f39.data_01_7051
 02:4000 data_02_4000
 02:40e4 data_02_4000.data_02_40e4
 02:42c4 data_02_4000.data_02_42c4

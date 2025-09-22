@@ -222,9 +222,9 @@ def extract_bank_01():
     bank = "001"
     bank2 = "01"
     os.system('mkdir -p banks/bank_'+bank+'/')
-    starts = [0x5c79, 0x6069, 0x64e9, 0x66f9, 0x6f48]
-    ends = [0x6069, 0x64e9, 0x66f9, 0x6f39, 0x70a8]
-    widths = [63, 8, 33, 66, 11]
+    starts = [0x5c79, 0x6069, 0x64e9, 0x66f9, 0x6f48, 0x6f8e, 0x6fd1, 0x7054]
+    ends = [0x6069, 0x64e9, 0x66f9, 0x6f39, 0x6f88, 0x6fce, 0x7051, 0x7094]
+    widths = [63, 8, 33, 66, 2, 2, 4, 2]
 
     for i in range(0, len(starts)):
         addr = starts[i]
@@ -233,7 +233,10 @@ def extract_bank_01():
         out = open('./banks/bank_'+bank+'/image_'+bank+'_'+addr_str+'.bin', "wb")
         out.write(img_bin)
         out.close()
-        os.system('rgbgfx --reverse '+str(widths[i])+' --columns -o banks/bank_'+bank+'/image_'+bank+'_'+addr_str+'.bin banks/bank_'+bank+'/image_'+bank+'_'+addr_str+'.png')
+        if starts[i] == 0x7054:
+            os.system('rgbgfx --reverse '+str(widths[i])+' -o banks/bank_'+bank+'/image_'+bank+'_'+addr_str+'.bin banks/bank_'+bank+'/image_'+bank+'_'+addr_str+'.png')
+        else:
+            os.system('rgbgfx --reverse '+str(widths[i])+' --columns -o banks/bank_'+bank+'/image_'+bank+'_'+addr_str+'.bin banks/bank_'+bank+'/image_'+bank+'_'+addr_str+'.png')
 
 def extract_gex_sprites():
     banks2 = ["62", "63", "6b"]

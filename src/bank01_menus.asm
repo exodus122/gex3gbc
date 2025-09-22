@@ -624,7 +624,7 @@ call_01_446b:
     ld   [HL], A                                       ;; 01:44b4 $77
     ld   A, [wDBAA]                                    ;; 01:44b5 $fa $aa $db
     and  A, $01                                        ;; 01:44b8 $e6 $01
-    call NZ, call_01_499f_ZeroOutMemory                              ;; 01:44ba $c4 $9f $49
+    call NZ, call_01_499f                              ;; 01:44ba $c4 $9f $49
     ld   A, [wDBA8]                                    ;; 01:44bd $fa $a8 $db
     sub  A, $e0                                        ;; 01:44c0 $d6 $e0
     jr   C, .jr_01_44cd                                ;; 01:44c2 $38 $09
@@ -1215,7 +1215,7 @@ call_01_48cd:
     ld   [HL], A                                       ;; 01:499d $77
     ret                                                ;; 01:499e $c9
 
-call_01_499f_ZeroOutMemory:
+call_01_499f:
     call call_01_4ce5                                  ;; 01:499f $cd $e5 $4c
     ld   B, A                                          ;; 01:49a2 $47
     call call_01_4cd4                                  ;; 01:49a3 $cd $d4 $4c
@@ -2836,8 +2836,19 @@ data_01_66f9:
 
 
 data_01_6f39:
-    db   $45, $6f, $88, $6f, $45, $6f, $8b, $6f        ;; 01:6f39 ??....??
-    db   $ce, $6f, $51, $70, $02, $02, $00             ;; 01:6f45 .......
-
+    dw   .data_01_6f45, .data_01_6f88, .data_01_6f45, .data_01_6f8b
+    dw   .data_01_6fce, .data_01_7051
+.data_01_6f45:
+    db   $02, $02, $00
     INCBIN ".gfx/misc_sprites/image_001_6f48.bin"
-   
+.data_01_6f88:
+    db   $02, $02, $ff
+.data_01_6f8b:
+    db   $02, $02, $00
+    INCBIN ".gfx/misc_sprites/image_001_6f8e.bin"
+.data_01_6fce:
+    db   $04, $02, $00
+    INCBIN ".gfx/misc_sprites/image_001_6fd1.bin"
+.data_01_7051:
+    db   $02, $02, $00
+    INCBIN ".gfx/misc_sprites_horizontal/image_001_7054.bin"

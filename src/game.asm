@@ -34,7 +34,7 @@ INCLUDE "bank03_bg_collision.asm"
 INCLUDE "bank03_object_collision.asm"
 INCLUDE "bank03_object_graphics.asm"
 INCLUDE "bank03_map_boundaries_and_spawns.asm"
-INCLUDE "bank03_object_and_menu_palettes.asm"
+INCLUDE "bank03_palettes.asm"
 INCLUDE "bank03_map_metadata.asm"
 INCLUDE "bank03_hud_graphics.asm"
 
