@@ -1,4 +1,11 @@
-entry_02_708f:
+entry_02_708f_InitObjectsAndSpawnPlayer:
+; Purpose: Initializes core object-related state when entering a level or respawning the player.
+; Details:
+; Clears many object/flag variables (wDC84–wDC8F, wDABD–wDABE, etc.).
+; If a pending object ID exists in wDC78, spawns it using call_02_72ac_LoadObjectData.
+; Resets player-facing direction and flags, calls entry_02_7123_ClearObjectSlots to clear object slots, 
+; and spawns required relative objects.
+; Loops through call_00_360c_SpawnObjectOnceImmediate until the player object (wDAB8 == 1) is spawned.
     xor  A, A                                          ;; 02:708f $af
     ld   [wDB6A], A                                    ;; 02:7090 $ea $6a $db
     ld   A, [wDC78]                                    ;; 02:7093 $fa $78 $dc
@@ -9,7 +16,7 @@ entry_02_708f:
     ld   A, $00                                        ;; 02:709e $3e $00
     ld   [wD800_PlayerObject_Id], A                                    ;; 02:70a0 $ea $00 $d8
     ld   A, [wDC78]                                    ;; 02:70a3 $fa $78 $dc
-    call call_02_72ac                                  ;; 02:70a6 $cd $ac $72
+    call call_02_72ac_LoadObjectData                                  ;; 02:70a6 $cd $ac $72
     ld   A, $ff                                        ;; 02:70a9 $3e $ff
     ld   [wDC78], A                                    ;; 02:70ab $ea $78 $dc
     ld   A, $00                                        ;; 02:70ae $3e $00
@@ -37,7 +44,7 @@ entry_02_708f:
     ld   [wDC7B], A                                    ;; 02:70e4 $ea $7b $dc
     ld   [wDC7C], A                                    ;; 02:70e7 $ea $7c $dc
     ld   [wDC7D], A                                    ;; 02:70ea $ea $7d $dc
-    call call_02_7123                                  ;; 02:70ed $cd $23 $71
+    call call_02_7123_ClearObjectSlots                                  ;; 02:70ed $cd $23 $71
     ld   A, [wDB6D]                                    ;; 02:70f0 $fa $6d $db
     and  A, A                                          ;; 02:70f3 $a7
     jr   Z, .jr_02_7115                                ;; 02:70f4 $28 $1f
@@ -63,8 +70,11 @@ entry_02_708f:
     jr   NZ, .jr_02_7118                               ;; 02:7120 $20 $f6
     ret                                                ;; 02:7122 $c9
 
-entry_02_7123:
-call_02_7123:
+entry_02_7123_ClearObjectSlots:
+call_02_7123_ClearObjectSlots:
+; Purpose: Clears seven 32-byte object slots by filling them with $FF.
+; Details:
+; Starts at wD820, increments by $20 each time, repeats 7 times.
     ld   HL, wD820                                     ;; 02:7123 $21 $20 $d8
     ld   DE, $20                                       ;; 02:7126 $11 $20 $00
     ld   B, $07                                        ;; 02:7129 $06 $07
@@ -75,7 +85,10 @@ call_02_7123:
     jr   NZ, .jr_02_712b                               ;; 02:712f $20 $fa
     ret                                                ;; 02:7131 $c9
 
-entry_02_7132:
+entry_02_7132_BackupObjectTable:
+; Purpose: Copies all current object table entries from working memory (wD800) to a backup buffer (wDA09).
+; Details:
+; Iterates through object slots in steps of $20, copying each byte until wrap-around.
     ld   HL, wD800_PlayerObject_Id                                     ;; 02:7132 $21 $00 $d8
     ld   DE, wDA09                                     ;; 02:7135 $11 $09 $da
 .jr_02_7138:
@@ -88,7 +101,10 @@ entry_02_7132:
     jr   NZ, .jr_02_7138                               ;; 02:713f $20 $f7
     ret                                                ;; 02:7141 $c9
 
-entry_02_7142:
+entry_02_7142_RestoreObjectTable:
+; Purpose: Restores object table entries from the backup buffer back to working memory.
+; Details:
+; Reverse of BackupObjectTable, writing from wDA09 back to wD800.
     ld   HL, wD800_PlayerObject_Id                                     ;; 02:7142 $21 $00 $d8
     ld   DE, wDA09                                     ;; 02:7145 $11 $09 $da
 .jr_02_7148:
@@ -103,6 +119,14 @@ entry_02_7142:
 
 entry_02_7152_UpdateObjects:
 call_02_7152_UpdateObjects:
+; Purpose: Master routine for per-frame object updates and player-related checks.
+; Details:
+; Resets temporary flags and checks conditions in wDCA7.
+; Handles special cases for player actions/IDs, adjusts player Y-position (wD810/wD811).
+; Invokes object behavior routines (call_00_0f22_JumpHL) for special objects (wDC7B, wDC7D).
+; Calls call_02_72fb_UpdateMapWindow to update the scrolling window and environment.
+; Iterates through all objects (wDA00_CurrentObjectAddr) to run their update logic and 
+; finally triggers graphics updates via banked call entry_03_5ec1_UpdateObjectGraphics.
     xor  A, A                                          ;; 02:7152 $af
     ld   [wDC85], A                                    ;; 02:7153 $ea $85 $dc
     ld   [wDC84], A                                    ;; 02:7156 $ea $84 $dc
@@ -111,7 +135,7 @@ call_02_7152_UpdateObjects:
     ld   A, [wDCA7]                                    ;; 02:715f $fa $a7 $dc
     and  A, A                                          ;; 02:7162 $a7
     jp   Z, .jp_02_7200                                ;; 02:7163 $ca $00 $72
-    call call_02_5541                                  ;; 02:7166 $cd $41 $55
+    call call_02_5541_GetActionPropertyByte                                  ;; 02:7166 $cd $41 $55
     and  A, $08                                        ;; 02:7169 $e6 $08
     jr   NZ, .jr_02_717f                               ;; 02:716b $20 $12
     ld   A, [wDC93]                                    ;; 02:716d $fa $93 $dc
@@ -197,9 +221,9 @@ call_02_7152_UpdateObjects:
 .jr_02_71f8:
     ld   A, $00                                        ;; 02:71f8 $3e $00
     ld   [wDA00_CurrentObjectAddr], A                                    ;; 02:71fa $ea $00 $da
-    call call_02_4f32                                  ;; 02:71fd $cd $32 $4f
+    call call_02_4f32_PlayerUpdateMain                                  ;; 02:71fd $cd $32 $4f
 .jp_02_7200:
-    call call_02_72fb                                  ;; 02:7200 $cd $fb $72
+    call call_02_72fb_UpdateMapWindow                                  ;; 02:7200 $cd $fb $72
     ld   A, $20                                        ;; 02:7203 $3e $20
 .jr_02_7205:
     ld   [wDA00_CurrentObjectAddr], A                                    ;; 02:7205 $ea $00 $da
@@ -230,7 +254,7 @@ call_02_7152_UpdateObjects:
     ld   L, A                                          ;; 02:7233 $6f
     ld   A, [HL]                                       ;; 02:7234 $7e
     cp   A, $ff                                        ;; 02:7235 $fe $ff
-    call NZ, call_02_724d                              ;; 02:7237 $c4 $4d $72
+    call NZ, call_02_724d_ProcessObjectTimerAndState                              ;; 02:7237 $c4 $4d $72
 .jr_02_723a:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 02:723a $fa $00 $da
     add  A, $20                                        ;; 02:723d $c6 $20
@@ -241,7 +265,12 @@ call_02_7152_UpdateObjects:
     call call_00_0edd_CallAltBankFunc                                  ;; 02:7249 $cd $dd $0e
     ret                                                ;; 02:724c $c9
 
-call_02_724d:
+call_02_724d_ProcessObjectTimerAndState:
+; Purpose: Handles countdown timers, state flags, and transitions for an individual object slot.
+; Details:
+; Decrements a timer; when it reaches zero, reloads counters, updates flags (set 2, set 1), and fetches new data from tables.
+; Can trigger reinitialization via call_02_54f9_SwitchPlayerAction or call_02_72ac_LoadObjectData.
+; Updates related memory locations with new object state values.
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 02:724d $fa $00 $da
     or   A, $04                                        ;; 02:7250 $f6 $04
     ld   L, A                                          ;; 02:7252 $6f
@@ -271,8 +300,8 @@ call_02_724d:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 02:7271 $fa $00 $da
     and  A, A                                          ;; 02:7274 $a7
     ld   A, E                                          ;; 02:7275 $7b
-    jp   Z, call_02_54f9                               ;; 02:7276 $ca $f9 $54
-    jp   call_02_72ac                                  ;; 02:7279 $c3 $ac $72
+    jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:7276 $ca $f9 $54
+    jp   call_02_72ac_LoadObjectData                                  ;; 02:7279 $c3 $ac $72
 .jr_02_727c:
     bit  3, B                                          ;; 02:727c $cb $58
     jr   Z, .jr_02_7282                                ;; 02:727e $28 $02
@@ -305,7 +334,11 @@ call_02_724d:
     pop  HL                                            ;; 02:729f $e1
     ld   [HL], A                                       ;; 02:72a0 $77
 
-jp_02_72a1:
+call_02_72a1_SetFirstObjectActive:
+; Mark Object Slot Active
+; Description:
+; Checks if wDA00_CurrentObjectAddr is zero (no active object). If so, sets bit0 of 
+; wDB66 (likely enabling or flagging the first object slot).
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 02:72a1 $fa $00 $da
     and  A, A                                          ;; 02:72a4 $a7
     ret  NZ                                            ;; 02:72a5 $c0
@@ -313,8 +346,14 @@ jp_02_72a1:
     set  0, [HL]                                       ;; 02:72a9 $cb $c6
     ret                                                ;; 02:72ab $c9
 
-entry_02_72ac:
-call_02_72ac:
+entry_02_72ac_LoadObjectData:
+call_02_72ac_LoadObjectData:
+; Purpose: Loads an object's initialization data from a data table 
+; (data_02_4000) into its slot in working memory.
+; Details:
+; Uses the object ID (masked with $7F) as an index into the object data table.
+; Copies attributes like position, behavior pointers, and timers into the object's memory slot.
+; Sets auxiliary values and flags (wDB66 bit 0) to indicate a new object was loaded.
     and  A, $7f                                        ;; 02:72ac $e6 $7f
     ld   HL, wDA00_CurrentObjectAddr                                     ;; 02:72ae $21 $00 $da
     ld   L, [HL]                                       ;; 02:72b1 $6e
@@ -378,16 +417,25 @@ call_02_72ac:
     xor  A, $1b                                        ;; 02:72f4 $ee $1b
     ld   L, A                                          ;; 02:72f6 $6f
     ld   [HL], C                                       ;; 02:72f7 $71
-    jp   jp_02_72a1                                    ;; 02:72f8 $c3 $a1 $72
+    jp   call_02_72a1_SetFirstObjectActive                                    ;; 02:72f8 $c3 $a1 $72
 
-entry_02_72fb:
-call_02_72fb:
+entry_02_72fb_UpdateMapWindow:
+call_02_72fb_UpdateMapWindow:
+; Purpose: Updates player’s map window and handles scrolling or window movement triggers.
+; Details:
+; Calls call_00_10de_UpdatePlayerMapWindow.
+; Delegates Y-position checks to call_02_7305_CheckVerticalMapScroll and X-position checks to call_02_7337_CheckHorizontalMapScroll.
     call call_00_10de_UpdatePlayerMapWindow                                  ;; 02:72fb $cd $de $10
-    call call_02_7305                                  ;; 02:72fe $cd $05 $73
-    call call_02_7337                                  ;; 02:7301 $cd $37 $73
+    call call_02_7305_CheckVerticalMapScroll                                  ;; 02:72fe $cd $05 $73
+    call call_02_7337_CheckHorizontalMapScroll                                  ;; 02:7301 $cd $37 $73
     ret                                                ;; 02:7304 $c9
 
-call_02_7305:
+call_02_7305_CheckVerticalMapScroll:
+; Purpose: Compares current Y-position against previous to determine vertical scrolling needs.
+; Details:
+; Stores the fine Y-position (wDADA).
+; Shifts and subtracts to compute movement delta.
+; Sets flags in wDC20 for upward or downward scroll events.
     ld   HL, wDBFB_YPositionInMap                                     ;; 02:7305 $21 $fb $db
     ld   A, [HL+]                                      ;; 02:7308 $2a
     ld   D, [HL]                                       ;; 02:7309 $56
@@ -424,7 +472,11 @@ call_02_7305:
     ld   [HL], A                                       ;; 02:7335 $77
     ret                                                ;; 02:7336 $c9
 
-call_02_7337:
+call_02_7337_CheckHorizontalMapScroll:
+; Purpose: Analogous to CheckVerticalMapScroll, but for the X-axis.
+; Details:
+; Uses wDBF9_XPositionInMap and related values.
+; Updates horizontal scroll flags in wDC20.
     ld   HL, wDBF9_XPositionInMap                                     ;; 02:7337 $21 $f9 $db
     ld   A, [HL+]                                      ;; 02:733a $2a
     ld   D, [HL]                                       ;; 02:733b $56

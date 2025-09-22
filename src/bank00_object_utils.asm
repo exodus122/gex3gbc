@@ -72,7 +72,7 @@ call_00_22b1_HandleObjectStateChange:
 ; Similar indexing logic as 2299, but:
 ; Compares the current low nibble with C.
 ; If different, stores the old low nibble to wDAD6_ReturnBank.
-; Then calls an alternate-bank routine (entry_02_72ac) using bank-switch 
+; Then calls an alternate-bank routine (entry_02_72ac_LoadObjectData) using bank-switch 
 ; helper call_00_0EDD_CallAltBankFunc.
 ; Purpose: Detect a change in the object’s state nibble and, if changed, 
 ; trigger an alternate-bank handler for state transitions.
@@ -93,7 +93,7 @@ call_00_22b1_HandleObjectStateChange:
     ret  Z                                             ;; 00:22c7 $c8
     ld   [wDAD6_ReturnBank], A                                    ;; 00:22c8 $ea $d6 $da
     ld   A, $02                                        ;; 00:22cb $3e $02
-    ld   HL, entry_02_72ac                              ;; 00:22cd $21 $ac $72
+    ld   HL, entry_02_72ac_LoadObjectData                              ;; 00:22cd $21 $ac $72
     call call_00_0edd_CallAltBankFunc                                  ;; 00:22d0 $cd $dd $0e
     ret                                                ;; 00:22d3 $c9
     
@@ -1708,7 +1708,7 @@ call_00_2a98_HandlePlayerObjectInteraction:
 ; Resolves an object list index, computes a pointer to an object’s bounding box/metadata in memory.
 ; Compares the player’s X/Y positions against that object’s bounding box (series of sub/sbc, add, cp checks).
 ; If inside bounds, copies several bytes from the object’s data into the current object’s D8xx structure and 
-; triggers a banked function (entry_02_72ac) via call_00_0edd_CallAltBankFunc.
+; triggers a banked function (entry_02_72ac_LoadObjectData) via call_00_0edd_CallAltBankFunc.
 ; Purpose: Detects when the player collides with or interacts with a special object and dispatches a handler.
     push de
     call call_00_230f_ResolveObjectListIndex
@@ -1783,7 +1783,7 @@ call_00_2a98_HandlePlayerObjectInteraction:
     ld   a,[hl]
     ld   [wDAD6_ReturnBank],a
     ld   a,02
-    ld   hl,entry_02_72ac
+    ld   hl,entry_02_72ac_LoadObjectData
     call call_00_0edd_CallAltBankFunc
     ret  
 
@@ -1960,7 +1960,7 @@ call_00_2bbe_InitializeNewObject:
 ; Validates current object value via call_00_35e8_GetObjectTypeIndex.
 ; If not $FF and bit 6 is set, sets up multiple object parameters 
 ; (ObjectSetId, Object_Set14, palette, facing direction, etc.).
-; Updates its status to $50, resets return bank, calls an alternate bank function (entry_02_72ac), 
+; Updates its status to $50, resets return bank, calls an alternate bank function (entry_02_72ac_LoadObjectData), 
 ; and copies a palette (call_00_2c20_ObjectPalette_CopyToBuffer).
 ; This is the main “spawn/setup object” function.
     call call_00_35e8_GetObjectTypeIndex                                  ;; 00:2bbe $cd $e8 $35
@@ -1986,7 +1986,7 @@ call_00_2bbe_InitializeNewObject:
     xor  A, A                                          ;; 00:2bef $af
     ld   [wDAD6_ReturnBank], A                                    ;; 00:2bf0 $ea $d6 $da
     ld   A, $02                                        ;; 00:2bf3 $3e $02
-    ld   HL, entry_02_72ac                              ;; 00:2bf5 $21 $ac $72
+    ld   HL, entry_02_72ac_LoadObjectData                              ;; 00:2bf5 $21 $ac $72
     call call_00_0edd_CallAltBankFunc                                  ;; 00:2bf8 $cd $dd $0e
     ld   HL, .data_02_2c01                                     ;; 00:2bfb $21 $01 $2c
     jp   call_00_2c20_ObjectPalette_CopyToBuffer                                  ;; 00:2bfe $c3 $20 $2c

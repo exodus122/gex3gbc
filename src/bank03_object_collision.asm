@@ -101,7 +101,7 @@ call_03_4c38_UpdateObjectCollision:
 .jr_03_4d2c:
     ld   [wDAD6_ReturnBank], A                                    ;; 03:4d2c $ea $d6 $da
     ld   A, $02                                        ;; 03:4d2f $3e $02
-    ld   HL, entry_02_54f9                             ;; 03:4d31 $21 $f9 $54
+    ld   HL, entry_02_54f9_SwitchPlayerAction                             ;; 03:4d31 $21 $f9 $54
     call call_00_0edd_CallAltBankFunc                                  ;; 03:4d34 $cd $dd $0e
     ret                                                ;; 03:4d37 $c9
     db   $cd, $0e, $55, $d0, $fe, $00, $ca, $f6        ;; 03:4d38 ????????
@@ -200,7 +200,7 @@ call_03_4c38_UpdateObjectCollision:
     pop  AF                                            ;; 03:4e67 $f1
     ld   [wDAD6_ReturnBank], A                                    ;; 03:4e68 $ea $d6 $da
     ld   A, $02                                        ;; 03:4e6b $3e $02
-    ld   HL, entry_02_72ac                              ;; 03:4e6d $21 $ac $72
+    ld   HL, entry_02_72ac_LoadObjectData                              ;; 03:4e6d $21 $ac $72
     call call_00_0edd_CallAltBankFunc                                  ;; 03:4e70 $cd $dd $0e
     pop  AF                                            ;; 03:4e73 $f1
     cp   A, $02                                        ;; 03:4e74 $fe $02
@@ -283,7 +283,7 @@ call_03_4c38_UpdateObjectCollision:
     ld   A, $06                                        ;; 03:4eea $3e $06
     ld   [wDAD6_ReturnBank], A                                    ;; 03:4eec $ea $d6 $da
     ld   A, $02                                        ;; 03:4eef $3e $02
-    ld   HL, entry_02_72ac                              ;; 03:4ef1 $21 $ac $72
+    ld   HL, entry_02_72ac_LoadObjectData                              ;; 03:4ef1 $21 $ac $72
     call call_00_0edd_CallAltBankFunc                                  ;; 03:4ef4 $cd $dd $0e
     jp   .jp_03_4cea                                   ;; 03:4ef7 $c3 $ea $4c
 .data_03_4efa:
@@ -301,7 +301,7 @@ call_03_4c38_UpdateObjectCollision:
     ld   A, $04                                        ;; 03:4f2c $3e $04
     ld   [wDAD6_ReturnBank], A                                    ;; 03:4f2e $ea $d6 $da
     ld   A, $02                                        ;; 03:4f31 $3e $02
-    ld   HL, entry_02_72ac                              ;; 03:4f33 $21 $ac $72
+    ld   HL, entry_02_72ac_LoadObjectData                              ;; 03:4f33 $21 $ac $72
     call call_00_0edd_CallAltBankFunc                                  ;; 03:4f36 $cd $dd $0e
     call call_00_230f_ResolveObjectListIndex                                  ;; 03:4f39 $cd $0f $23
     ld   B, $00                                        ;; 03:4f3c $06 $00
@@ -723,7 +723,7 @@ call_03_5671:
     and  A, $3f                                        ;; 03:56a6 $e6 $3f
     ld   [wDAD6_ReturnBank], A                                    ;; 03:56a8 $ea $d6 $da
     ld   A, $02                                        ;; 03:56ab $3e $02
-    ld   HL, entry_02_72ac                              ;; 03:56ad $21 $ac $72
+    ld   HL, entry_02_72ac_LoadObjectData                              ;; 03:56ad $21 $ac $72
     call call_00_0edd_CallAltBankFunc                                  ;; 03:56b0 $cd $dd $0e
     ld   A, $10                                        ;; 03:56b3 $3e $10
     jp   call_00_0ff5_MaybeQueueBankChange                                  ;; 03:56b5 $c3 $f5 $0f

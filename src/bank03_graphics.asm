@@ -1,4 +1,7 @@
-call_03_747d:
+call_03_747d_StatusBar_UpdateOrTiles:
+; Checks status flags in wDB69. If bit 0 is set, clears it and draws numbers to tilemap using call_03_74f5_DrawTwoDigitNumber. 
+; If bit 1 is set, clears it and draws a multi-digit value to VRAM using a lookup table.
+; Effectively manages HUD/status bar updates.
     ld   HL, wDB69                                     ;; 03:747d $21 $69 $db
     bit  0, [HL]                                       ;; 03:7480 $cb $46
     jr   Z, .jr_03_749d                                ;; 03:7482 $28 $19
@@ -6,14 +9,14 @@ call_03_747d:
     ld   A, [wDC4E]                                    ;; 03:7486 $fa $4e $dc
     ld   HL, $9c02                                     ;; 03:7489 $21 $02 $9c
     ld   DE, $9c22                                     ;; 03:748c $11 $22 $9c
-    call call_03_74f5                                  ;; 03:748f $cd $f5 $74
+    call call_03_74f5_DrawTwoDigitNumber                                  ;; 03:748f $cd $f5 $74
     ld   A, [wDC68]                                    ;; 03:7492 $fa $68 $dc
     ld   HL, $9c11                                     ;; 03:7495 $21 $11 $9c
     ld   DE, $9c31                                     ;; 03:7498 $11 $31 $9c
-    jr   call_03_74f5                                  ;; 03:749b $18 $58
+    jr   call_03_74f5_DrawTwoDigitNumber                                  ;; 03:749b $18 $58
 .jr_03_749d:
     bit  1, [HL]                                       ;; 03:749d $cb $4e
-    jp   Z, jp_03_757e                                 ;; 03:749f $ca $7e $75
+    jp   Z, call_03_757e_LoadHUDSprites_HDMA                                 ;; 03:749f $ca $7e $75
     res  1, [HL]                                       ;; 03:74a2 $cb $8e
     ld   B, $00                                        ;; 03:74a4 $06 $00
 .jr_03_74a6:
@@ -65,7 +68,9 @@ call_03_747d:
 .data_03_74ed:
     db   $18, $14, $24, $20, $1c, $1c, $1c, $1c        ;; 03:74ed ....???.
 
-call_03_74f5:
+call_03_74f5_DrawTwoDigitNumber:
+; Writes a bordered region of $30/$31 tiles, then converts value A to tens and ones (and hundreds if needed) 
+; and writes corresponding digit tiles to the tilemap at HL and DE. Used by call_03_747d for number drawing.
     push HL                                            ;; 03:74f5 $e5
     ld   C, $30                                        ;; 03:74f6 $0e $30
     ld   [HL], C                                       ;; 03:74f8 $71
@@ -125,7 +130,9 @@ call_03_74f5:
     ld   [DE], A                                       ;; 03:753c $12
     ret                                                ;; 03:753d $c9
 
-call_03_753e:
+call_03_753e_AnimatedBackground_HDMA:
+; If bit 4 of wDB69 is set, advances frame counters (wDC72/wDC73) and uses HDMA to copy a 
+; tile graphic from image_003_4400 into VRAM bank 1. Provides a cycling background or HUD animation.
     ld   HL, wDB69                                     ;; 03:753e $21 $69 $db
     bit  4, [HL]                                       ;; 03:7541 $cb $66
     ret  Z                                             ;; 03:7543 $c8
@@ -166,7 +173,10 @@ call_03_753e:
     ldh  [rVBK], A                                     ;; 03:757b $e0 $4f
     ret                                                ;; 03:757d $c9
 
-jp_03_757e:
+call_03_757e_LoadHUDSprites_HDMA:
+; If bit 2 of wDB69 is set and a value exists in wDB6D, converts values in wDB6E 
+; to tile indices and issues several HDMA transfers from image_003_4580 to VRAM 
+; positions ($8400+). Loads a 4×2 block of HUD sprite tiles.
     ld   HL, wDB69                                     ;; 03:757e $21 $69 $db
     bit  2, [HL]                                       ;; 03:7581 $cb $56
     ret  Z                                             ;; 03:7583 $c8
@@ -191,19 +201,21 @@ jp_03_757e:
     push DE                                            ;; 03:75a1 $d5
     push DE                                            ;; 03:75a2 $d5
     ld   DE, $8400                                     ;; 03:75a3 $11 $00 $84
-    call call_03_75be                                  ;; 03:75a6 $cd $be $75
+    call call_03_75be_HDMA_CopyTileBlock                                  ;; 03:75a6 $cd $be $75
     ld   C, $0a                                        ;; 03:75a9 $0e $0a
     ld   DE, $8420                                     ;; 03:75ab $11 $20 $84
-    call call_03_75be                                  ;; 03:75ae $cd $be $75
+    call call_03_75be_HDMA_CopyTileBlock                                  ;; 03:75ae $cd $be $75
     pop  DE                                            ;; 03:75b1 $d1
     ld   C, D                                          ;; 03:75b2 $4a
     ld   DE, $8440                                     ;; 03:75b3 $11 $40 $84
-    call call_03_75be                                  ;; 03:75b6 $cd $be $75
+    call call_03_75be_HDMA_CopyTileBlock                                  ;; 03:75b6 $cd $be $75
     pop  DE                                            ;; 03:75b9 $d1
     ld   C, E                                          ;; 03:75ba $4b
     ld   DE, $8460                                     ;; 03:75bb $11 $60 $84
 
-call_03_75be:
+call_03_75be_HDMA_CopyTileBlock:
+; Core routine for jp_03_757e. Calculates tile source address in image_003_4580 based 
+; on index C and transfers 16×16-pixel tile data via HDMA to destination DE in VRAM bank 1.
     ld   L, C                                          ;; 03:75be $69
     ld   H, $00                                        ;; 03:75bf $26 $00
     add  HL, HL                                        ;; 03:75c1 $29
@@ -229,7 +241,10 @@ call_03_75be:
     ldh  [rVBK], A                                     ;; 03:75e0 $e0 $4f
     ret                                                ;; 03:75e2 $c9
 
-call_03_75e3:
+call_03_75e3_CopyMetatileBanked:
+; Copies a 32-byte metatile chunk from one of two source buffers (wCF80 or wCF00) into a VRAM 
+; destination determined by wDC21. Performs the transfer twice: once with VBK=1 (attribute layer) 
+; and once with VBK=0 (tile IDs).
     ld   A, $01                                        ;; 03:75e3 $3e $01
     ldh  [rVBK], A                                     ;; 03:75e5 $e0 $4f
     ld   HL, wDC21                                     ;; 03:75e7 $21 $21 $dc
@@ -238,7 +253,7 @@ call_03_75e3:
     ld   D, [HL]                                       ;; 03:75ed $56
     ld   E, A                                          ;; 03:75ee $5f
     ld   HL, wCF80                                     ;; 03:75ef $21 $80 $cf
-    call call_03_7604                                  ;; 03:75f2 $cd $04 $76
+    call call_03_7604_Copy32Bytes                                  ;; 03:75f2 $cd $04 $76
     ld   A, $00                                        ;; 03:75f5 $3e $00
     ldh  [rVBK], A                                     ;; 03:75f7 $e0 $4f
     ld   HL, wDC21                                     ;; 03:75f9 $21 $21 $dc
@@ -248,7 +263,9 @@ call_03_75e3:
     ld   E, A                                          ;; 03:7600 $5f
     ld   HL, wCF00                                     ;; 03:7601 $21 $00 $cf
 
-call_03_7604:
+call_03_7604_Copy32Bytes:
+; Helper for call_03_75e3. Sequentially copies 32 bytes (16 words) from HL to DE, 
+; incrementing DE after each byte.
     ld   A, [HL+]                                      ;; 03:7604 $2a
     ld   [DE], A                                       ;; 03:7605 $12
     inc  E                                             ;; 03:7606 $1c
@@ -346,7 +363,9 @@ call_03_7604:
     ld   [DE], A                                       ;; 03:7662 $12
     ret                                                ;; 03:7663 $c9
 
-call_03_7664:
+call_03_7664_CopyColumnBanked:
+; Similar to call_03_75e3, but uses wDC23 to choose a tilemap column (mask $1F) in VRAM ($98xx). 
+; Transfers one column of tile IDs and attributes from buffers (wCFC0 and wCF40) to VRAM.
     ld   A, $01                                        ;; 03:7664 $3e $01
     ldh  [rVBK], A                                     ;; 03:7666 $e0 $4f
     ld   A, [wDC23]                                    ;; 03:7668 $fa $23 $dc
@@ -354,7 +373,7 @@ call_03_7664:
     ld   L, A                                          ;; 03:766d $6f
     ld   H, $98                                        ;; 03:766e $26 $98
     ld   DE, wCFC0                                     ;; 03:7670 $11 $c0 $cf
-    call call_03_7685                                  ;; 03:7673 $cd $85 $76
+    call call_03_7685_CopyColumn32Step                                  ;; 03:7673 $cd $85 $76
     ld   A, $00                                        ;; 03:7676 $3e $00
     ldh  [rVBK], A                                     ;; 03:7678 $e0 $4f
     ld   A, [wDC23]                                    ;; 03:767a $fa $23 $dc
@@ -363,7 +382,10 @@ call_03_7664:
     ld   H, $98                                        ;; 03:7680 $26 $98
     ld   DE, wCF40                                     ;; 03:7682 $11 $40 $cf
 
-call_03_7685:
+call_03_7685_CopyColumn32Step:
+; Helper for call_03_7664. Copies an entire vertical column: for each step, 
+; writes a value from DE to HL, then advances HL by $20 (one BG tile row). 
+; Handles 32 rows for a full screen column.
     ld   BC, $20                                       ;; 03:7685 $01 $20 $00
     ld   A, [DE]                                       ;; 03:7688 $1a
     ld   [HL], A                                       ;; 03:7689 $77

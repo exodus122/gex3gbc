@@ -553,7 +553,7 @@ call_01_43f0:
     ld   C, [HL]                                       ;; 01:4438 $4e
     ld   [wDAD6_ReturnBank], A                                    ;; 01:4439 $ea $d6 $da
     ld   A, $03                                        ;; 01:443c $3e $03
-    ld   HL, entry_03_65c6_LoadPalettes                              ;; 01:443e $21 $c6 $65
+    ld   HL, entry_03_65c6_LoadMenuOrLevelPalettes                              ;; 01:443e $21 $c6 $65
     call call_00_0edd_CallAltBankFunc                                  ;; 01:4441 $cd $dd $0e
 .jr_01_4444:
     call call_01_43ba                                  ;; 01:4444 $cd $ba $43

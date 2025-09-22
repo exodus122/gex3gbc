@@ -1,12 +1,19 @@
-entry_03_6203:
-call_03_6203:
+entry_03_6203_LoadLevelBoundariesFromId:
+call_03_6203_LoadLevelBoundariesFromId:
+; Purpose: Given the current level ID, looks up and stores the level’s screen/window boundaries.
+; Behavior:
+; Reads wDB6C_CurrentLevelId.
+; Indexes .data_03_6210 and .data_03_62a4 tables.
+; Fills a series of wDC34–wDC43 registers with the level’s rectangle bounds 
+; (left/right/top/bottom and offsets for scrolling and collision).
+; Usage: Called whenever a new level or respawn is set to update collision/window limits.
     ld   HL, wDB6C_CurrentLevelId                                     ;; 03:6203 $21 $6c $db
     ld   L, [HL]                                       ;; 03:6206 $6e
     ld   H, $00                                        ;; 03:6207 $26 $00
     ld   DE, .data_03_6210                             ;; 03:6209 $11 $10 $62
     add  HL, DE                                        ;; 03:620c $19
     ld   C, [HL]                                       ;; 03:620d $4e
-    jr   .jr_03_624d                                   ;; 03:620e $18 $3d
+    jr   .call_03_624d                                   ;; 03:620e $18 $3d
 .data_03_6210:
     db   $01, $02, $06, $10, $17, $20, $29, $2f        ;; 03:6210 ww??????
     db   $33, $34, $35, $36, $01, $01, $01, $03        ;; 03:6218 ????wwww
@@ -16,7 +23,7 @@ call_03_6203:
     db   $1f, $21, $22, $23, $24, $25, $26, $27        ;; 03:6238 ????????
     db   $28, $2a, $2b, $2c, $2d, $2e, $30, $31        ;; 03:6240 ????????
     db   $32, $37, $38, $39, $3a                       ;; 03:6248 ?????
-.jr_03_624d:
+.call_03_624d:
     ld   HL, wDC2A                                     ;; 03:624d $21 $2a $dc
     ld   [HL], C                                       ;; 03:6250 $71
     ld   L, C                                          ;; 03:6251 $69
@@ -126,7 +133,15 @@ call_03_6203:
     db   $00, $00, $80, $01, $28, $00, $28, $00        ;; 03:6470 ????????
     db   $00, $00, $00, $00                            ;; 03:6478 ????
 
-entry_03_647c:
+entry_03_647c_InitPlayerPositionAndLevel:
+; Purpose: Initializes the player’s spawn coordinates and current level on scene entry or respawn.
+; Behavior:
+; Resets checkpoint flags (wDCAC/wDCAD).
+; If checkpoint bit set in wDB6A, restores stored X/Y from wDC6A–wDC6D.
+; Else, if level ID non-zero, fetches default spawn coords from .data_03_6537.
+; If level ID is zero, pulls next-level ID from .data_03_652b, copies level data (call_03_6c89), 
+; then fetches new spawn coords.
+; Calls call_03_6203 to set window boundaries and jumps to call_00_10de_UpdatePlayerMapWindow.
     xor  A, A                                          ;; 03:647c $af
     ld   [wDCAC], A                                    ;; 03:647d $ea $ac $dc
     ld   [wDCAD], A                                    ;; 03:6480 $ea $ad $dc
@@ -162,7 +177,7 @@ entry_03_647c:
     ld   A, [HL]                                       ;; 03:64c2 $7e
     ld   [wD811_PlayerYPosition], A                                    ;; 03:64c3 $ea $11 $d8
 .jr_03_64c6:
-    call call_03_6203                                  ;; 03:64c6 $cd $03 $62
+    call call_03_6203_LoadLevelBoundariesFromId                                  ;; 03:64c6 $cd $03 $62
     jp   call_00_10de_UpdatePlayerMapWindow                                  ;; 03:64c9 $c3 $de $10
 .jr_03_64cc:
     ld   HL, wDC5B                                     ;; 03:64cc $21 $5b $dc
@@ -212,6 +227,12 @@ entry_03_647c:
 
 entry_03_6567_SetupObjectPalettes:
 call_03_6567_SetupObjectPalettes:
+; Purpose: Chooses which object palette set to load based on state flags.
+; Behavior:
+; If wDCAB non-zero, uses default palette table .data_03_658c.
+; Otherwise, checks wDC51, indexes .data_03_6594, and resolves an HL pointer to palette data.
+; Copies 8 bytes into wDD2A_ObjectPalettes.
+; Usage: Called when loading or switching level themes/objects.
     ld   HL, .data_03_658c                             ;; 03:6567 $21 $8c $65
     ld   A, [wDCAB]                                    ;; 03:656a $fa $ab $dc
     and  A, A                                          ;; 03:656d $a7
@@ -243,8 +264,15 @@ call_03_6567_SetupObjectPalettes:
     db   $e0, $7f, $00, $00, $00, $00, $00, $00        ;; 03:65bc ????????
     db   $00, $00                                      ;; 03:65c4 ??
 
-entry_03_65c6_LoadPalettes:
-call_03_65c6_LoadPalettes:
+entry_03_65c6_LoadMenuOrLevelPalettes:
+call_03_65c6_LoadMenuOrLevelPalettes:
+; Purpose: Loads either level palettes or menu palettes depending on C.
+; Behavior:
+; If C is zero, loads map and object palettes via call_00_05af_LoadMapPalettes 
+; and call_00_2cbf_LoadObjectPalettes.
+; If bit 7 of C is set, returns immediately.
+; Else, uses C as index into .data_03_65f1_MenuPalettes to copy 0x40 bytes to wDCEA_BgPalettes, 
+; then loads a default set from .data_03_6803.
     inc  C                                             ;; 03:65c6 $0c
     dec  C                                             ;; 03:65c7 $0d
     jr   NZ, .jr_03_65d1                               ;; 03:65c8 $20 $07
@@ -374,8 +402,14 @@ call_03_65c6_LoadPalettes:
     db   $3e, $02, $21, $ac, $72, $cd, $dd, $0e        ;; 03:6873 ????????
     db   $c9                                           ;; 03:687b ?
 
-entry_03_687c:
-call_03_687c:
+entry_03_687c_AssignObjectPalette:
+call_03_687c_AssignObjectPalette:
+; Purpose: Assigns a palette to a single game object based on its type and state.
+; Behavior:
+; Derives a palette index from the current object address (wDA00_CurrentObjectAddr).
+; Stores the palette ID in wDAAE_ObjectPaletteIds.
+; Calculates an address into wDD2A_ObjectPalettes, then copies 8 palette bytes from data_03_68f9.
+; Usage: Ensures each on-screen object uses the correct colors.
     ld   H, $d8                                        ;; 03:687c $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:687e $fa $00 $da
     or   A, $05                                        ;; 03:6881 $f6 $05
@@ -445,7 +479,12 @@ call_03_687c:
     ld   [DE], A                                       ;; 03:68d7 $12
     ret                                                ;; 03:68d8 $c9
 
-entry_03_68d9:
+entry_03_68d9_AssignAllObjectPalettes:
+; Purpose: Loops through all active objects and assigns palettes to each.
+; Behavior:
+; Starts at address $40 in object memory.
+; For each object not marked FF (inactive), sets bit 1 of its flags, then calls AssignObjectPalette.
+; Increments by $20 for each object until wraparound.
     ld   A, $40                                        ;; 03:68d9 $3e $40
 .jr_03_68db:
     ld   [wDA00_CurrentObjectAddr], A                                    ;; 03:68db $ea $00 $da
@@ -459,7 +498,7 @@ entry_03_68d9:
     xor  A, $05                                        ;; 03:68e9 $ee $05
     ld   L, A                                          ;; 03:68eb $6f
     set  1, [HL]                                       ;; 03:68ec $cb $ce
-    call call_03_687c                                  ;; 03:68ee $cd $7c $68
+    call call_03_687c_AssignObjectPalette                                  ;; 03:68ee $cd $7c $68
 .jr_03_68f1:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:68f1 $fa $00 $da
     add  A, $20                                        ;; 03:68f4 $c6 $20
@@ -583,6 +622,11 @@ data_03_68f9:
 
 entry_03_6c89_CopyLevelData:
 call_03_6c89_CopyLevelData:
+; Purpose: Copies level-specific metadata from a lookup table into working RAM.
+; Behavior:
+; Uses wDB6C_CurrentLevelId as index into .data_03_6ca0_LevelData.
+; Reads a pointer to the level’s configuration, then copies 0x1F bytes into wDC01_MapBank.
+; Usage: Part of level setup, ensuring the correct map bank and related data are loaded.
     ld   HL, wDB6C_CurrentLevelId                                     ;; 03:6c89 $21 $6c $db
     ld   L, [HL]                                       ;; 03:6c8c $6e
     ld   H, $00                                        ;; 03:6c8d $26 $00

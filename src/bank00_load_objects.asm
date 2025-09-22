@@ -441,14 +441,14 @@ call_00_2ce2_BuildGexSpriteDrawList:
 call_00_2f00_CallBank2_Helper_AndCheckBit8:
 ; Switch to Bank 2 and Run Entry
 ; Behavior: Saves registers, stores current bank (wDAD6_ReturnBank), switches to bank $02, 
-; and calls entry_02_5541 using the alternate-bank call routine. Restores registers, masks result with $08, and returns.
+; and calls entry_02_5541_GetActionPropertyByte using the alternate-bank call routine. Restores registers, masks result with $08, and returns.
 ; Purpose: Executes a helper routine from bank 2 and checks a specific status bit.
     push HL                                            ;; 00:2f00 $e5
     push DE                                            ;; 00:2f01 $d5
     push BC                                            ;; 00:2f02 $c5
     ld   [wDAD6_ReturnBank], A                                    ;; 00:2f03 $ea $d6 $da
     ld   A, $02                                        ;; 00:2f06 $3e $02
-    ld   HL, entry_02_5541                                     ;; 00:2f08 $21 $41 $55
+    ld   HL, entry_02_5541_GetActionPropertyByte                                     ;; 00:2f08 $21 $41 $55
     call call_00_0edd_CallAltBankFunc                                  ;; 00:2f0b $cd $dd $0e
     pop  BC                                            ;; 00:2f0e $c1
     pop  DE                                            ;; 00:2f0f $d1
@@ -1297,11 +1297,11 @@ call_00_3618_HandleObjectSpawn:
     and  A, $0f                                        ;; 00:3779 $e6 $0f
     ld   [wDAD6_ReturnBank], A                                    ;; 00:377b $ea $d6 $da
     ld   A, $02                                        ;; 00:377e $3e $02
-    ld   HL, entry_02_72ac                                     ;; 00:3780 $21 $ac $72
+    ld   HL, entry_02_72ac_LoadObjectData                                     ;; 00:3780 $21 $ac $72
     call call_00_0edd_CallAltBankFunc                                  ;; 00:3783 $cd $dd $0e
     ld   [wDAD6_ReturnBank], A                                    ;; 00:3786 $ea $d6 $da
     ld   A, $03                                        ;; 00:3789 $3e $03
-    ld   HL, entry_03_687c                                     ;; 00:378b $21 $7c $68
+    ld   HL, entry_03_687c_AssignObjectPalette                                     ;; 00:378b $21 $7c $68
     call call_00_0edd_CallAltBankFunc                                  ;; 00:378e $cd $dd $0e
     ret                                                ;; 00:3791 $c9
 
@@ -1466,11 +1466,11 @@ call_00_37a0_SpawnObjectRelative:
     xor  A, A                                          ;; 00:3852 $af
     ld   [wDAD6_ReturnBank], A                                    ;; 00:3853 $ea $d6 $da
     ld   A, $02                                        ;; 00:3856 $3e $02
-    ld   HL, entry_02_72ac                                     ;; 00:3858 $21 $ac $72
+    ld   HL, entry_02_72ac_LoadObjectData                                     ;; 00:3858 $21 $ac $72
     call call_00_0edd_CallAltBankFunc                                  ;; 00:385b $cd $dd $0e
     ld   [wDAD6_ReturnBank], A                                    ;; 00:385e $ea $d6 $da
     ld   A, $03                                        ;; 00:3861 $3e $03
-    ld   HL, entry_03_687c                                     ;; 00:3863 $21 $7c $68
+    ld   HL, entry_03_687c_AssignObjectPalette                                     ;; 00:3863 $21 $7c $68
     call call_00_0edd_CallAltBankFunc                                  ;; 00:3866 $cd $dd $0e
     pop  AF                                            ;; 00:3869 $f1
     ld   HL, wDA00_CurrentObjectAddr                                     ;; 00:386a $21 $00 $da

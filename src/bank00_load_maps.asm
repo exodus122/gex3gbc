@@ -9,7 +9,7 @@ call_00_1056_LoadFullMap:
     ld   C, $00                                        ;; 00:105f $0e $00
     ld   [wDAD6_ReturnBank], A                                    ;; 00:1061 $ea $d6 $da
     ld   A, $03                                        ;; 00:1064 $3e $03
-    ld   HL, entry_03_65c6_LoadPalettes                              ;; 00:1066 $21 $c6 $65
+    ld   HL, entry_03_65c6_LoadMenuOrLevelPalettes                              ;; 00:1066 $21 $c6 $65
     call call_00_0edd_CallAltBankFunc                                  ;; 00:1069 $cd $dd $0e
     ld   C, $03                                        ;; 00:106c $0e $03
     call call_00_0a6a                                  ;; 00:106e $cd $6a $0a
@@ -20,15 +20,15 @@ call_00_1056_LoadFullMap:
     ld   C, $06                                        ;; 00:107b $0e $06
     call call_00_0a6a                                  ;; 00:107d $cd $6a $0a
     ld   A, $04                                        ;; 00:1080 $3e $04
-    call call_00_1a22_LoadBgMapInitial                                  ;; 00:1082 $cd $22 $1a
+    call call_00_1a22_LoadInitialBgMap                                  ;; 00:1082 $cd $22 $1a
     ld   C, $07                                        ;; 00:1085 $0e $07
     call call_00_0a6a                                  ;; 00:1087 $cd $6a $0a
     ld   A, $00                                        ;; 00:108a $3e $00
-    call call_00_1a22_LoadBgMapInitial                                  ;; 00:108c $cd $22 $1a
+    call call_00_1a22_LoadInitialBgMap                                  ;; 00:108c $cd $22 $1a
     ld   C, $08                                        ;; 00:108f $0e $08
     call call_00_0a6a                                  ;; 00:1091 $cd $6a $0a
     ld   A, $80                                        ;; 00:1094 $3e $80
-    call call_00_1a22_LoadBgMapInitial                                  ;; 00:1096 $cd $22 $1a
+    call call_00_1a22_LoadInitialBgMap                                  ;; 00:1096 $cd $22 $1a
     ld   A, $03                                        ;; 00:1099 $3e $03
     call call_00_0eee_SwitchBank                                  ;; 00:109b $cd $ee $0e
     ld   HL, image_003_4100_collision_tileset                                     ;; 00:109e $21 $00 $41
@@ -49,7 +49,7 @@ call_00_1056_LoadFullMap:
     call call_00_0b92_UpdateVRAMTiles                                  ;; 00:10b4 $cd $92 $0b
     ld   [wDAD6_ReturnBank], A                                    ;; 00:10b7 $ea $d6 $da
     ld   A, $02                                        ;; 00:10ba $3e $02
-    ld   HL, entry_02_72fb                                     ;; 00:10bc $21 $fb $72
+    ld   HL, entry_02_72fb_UpdateMapWindow                                     ;; 00:10bc $21 $fb $72
     call call_00_0edd_CallAltBankFunc                                  ;; 00:10bf $cd $dd $0e
     xor  A, A                                          ;; 00:10c2 $af
     ld   [wDC20], A                                    ;; 00:10c3 $ea $20 $dc
@@ -273,7 +273,7 @@ call_00_11e5_LoadVerticalBgStrip:
     ld   E, [HL]                                       ;; 00:11ff $5e
     inc  HL                                            ;; 00:1200 $23
     ld   D, [HL]                                       ;; 00:1201 $56
-    call call_00_14e2                                  ;; 00:1202 $cd $e2 $14
+    call call_00_14e2_ConvertXYToTileCoords                                  ;; 00:1202 $cd $e2 $14
     ld   A, C                                          ;; 00:1205 $79
     and  A, $f8                                        ;; 00:1206 $e6 $f8
     ld   L, A                                          ;; 00:1208 $6f
@@ -501,6 +501,10 @@ call_00_11e5_LoadVerticalBgStrip:
     jp   call_00_0f08_RestoreBank                                  ;; 00:134e $c3 $08 $0f
 
 call_00_1351_LoadBgMapHorizontal:
+; Role: Loads a horizontal strip of background tiles into VRAM based on the player’s X position. 
+; Switches between multiple banks to pull map, extended, and collision data, 
+; then assembles tiles and writes them to VRAM buffers.
+; Why: Updates the tilemap row(s) entering view when the camera scrolls horizontally.
     ld   HL, wDBF9_XPositionInMap                                     ;; 00:1351 $21 $f9 $db
     ld   A, [HL+]                                      ;; 00:1354 $2a
     ld   E, A                                          ;; 00:1355 $5f
@@ -519,7 +523,7 @@ call_00_1351_LoadBgMapHorizontal:
     ld   C, [HL]                                       ;; 00:136b $4e
     inc  HL                                            ;; 00:136c $23
     ld   B, [HL]                                       ;; 00:136d $46
-    call call_00_14e2                                  ;; 00:136e $cd $e2 $14
+    call call_00_14e2_ConvertXYToTileCoords                                  ;; 00:136e $cd $e2 $14
     ld   A, C                                          ;; 00:1371 $79
     and  A, $f0                                        ;; 00:1372 $e6 $f0
     ld   L, A                                          ;; 00:1374 $6f
@@ -769,7 +773,12 @@ call_00_1351_LoadBgMapHorizontal:
     jr   NZ, .jr_00_14bc                               ;; 00:14dd $20 $dd
     jp   call_00_0f08_RestoreBank                                  ;; 00:14df $c3 $08 $0f
 
-call_00_14e2:
+call_00_14e2_ConvertXYToTileCoords:
+; Coordinate Downscaler
+; Description:
+; Takes two 16-bit coordinates (BC and DE), right-shifts them four times (divides by 16), 
+; and stores the resulting low bytes in wDC27 (E → low Y) and wDC28 (C → low X). 
+; Used to convert pixel positions to tile indices for map lookups.
     push BC                                            ;; 00:14e2 $c5
     push DE                                            ;; 00:14e3 $d5
     srl  B                                             ;; 00:14e4 $cb $38
@@ -796,7 +805,12 @@ call_00_14e2:
     pop  BC                                            ;; 00:150d $c1
     ret                                                ;; 00:150e $c9
 
-call_00_150f:
+call_00_150f_CheckAndSetLevelTrigger:
+; Level Event Trigger Checker
+; Description:
+; Reads wDC8A as an event flag. If not already triggered (bit7 clear), it marks it triggered, 
+; looks up a table (.data_00_153f) indexed by current level and offset E, and loads a value into wDC69. 
+; It also sets bit2 of wDB6A. Handles special values $ff (no action) and $fe (conditional on wDCB1).
     ld   HL, wDC8A                                     ;; 00:150f $21 $8a $dc
     ld   E, [HL]                                       ;; 00:1512 $5e
     bit  7, E                                          ;; 00:1513 $cb $7b
@@ -858,12 +872,17 @@ call_00_150f:
     db   $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff        ;; 00:1627 ????????
     db   $ff, $ff, $ff, $ff                            ;; 00:162f ????
 
-call_00_1633:
+call_00_1633_HandleLevelWarpOrExit:
+; Level Transition Loader
+; Description:
+; Calculates a destination level and coordinates based on current level number (wDC1E) and 
+; player Y-position. It fetches a pointer from .data_00_16a2_PlayerSpawns, determines the new level ID, 
+; screen positions (wDC6A/B), and offset vector (wDC6C), ensuring transitions are within bounds.
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:1633 $21 $1e $dc
     ld   L, [HL]                                       ;; 00:1636 $6e
     ld   H, $00                                        ;; 00:1637 $26 $00
     add  HL, HL                                        ;; 00:1639 $29
-    ld   DE, .data_00_16a2                                     ;; 00:163a $11 $a2 $16
+    ld   DE, .data_00_16a2_PlayerSpawns                                     ;; 00:163a $11 $a2 $16
     add  HL, DE                                        ;; 00:163d $19
     ld   A, [HL+]                                      ;; 00:163e $2a
     ld   D, [HL]                                       ;; 00:163f $56
@@ -931,7 +950,7 @@ call_00_1633:
     inc  HL                                            ;; 00:169f $23
     ld   [HL], D                                       ;; 00:16a0 $72
     ret                                                ;; 00:16a1 $c9
-.data_00_16a2:
+.data_00_16a2_PlayerSpawns:
     dw   $16c2                                         ;; 00:16a2 wW
     dw   $16f2                                         ;; 00:16a4 wW
     db   $22, $17, $e2, $17, $4a, $18, $d2, $18        ;; 00:16a6 ????????
@@ -1053,12 +1072,16 @@ call_00_1633:
     db   $ff, $00, $00, $3c, $78, $00, $68, $00        ;; 00:1a17 ????????
     db   $ff, $00, $00                                 ;; 00:1a1f ???
 
-call_00_1a22_LoadBgMapInitial:
+call_00_1a22_LoadInitialBgMap:
+; Initialize Background Map Rows
+; Description:
+; Loops 22 times ($16), each time calling LoadBgMapInitial2, then increments the map’s Y position by 8 pixels, 
+; effectively filling the initial BG map rows. After finishing, it subtracts $b0 from Y to restore the pointer.
     ld   [wDC33], A                                    ;; 00:1a22 $ea $33 $dc
     ld   A, $16                                        ;; 00:1a25 $3e $16
 .jr_00_1a27:
     push AF                                            ;; 00:1a27 $f5
-    call call_00_1a46_LoadBgMapInitial2                                  ;; 00:1a28 $cd $46 $1a
+    call call_00_1a46_LoadBgMapRow                                  ;; 00:1a28 $cd $46 $1a
     ld   HL, wDBFB_YPositionInMap                                     ;; 00:1a2b $21 $fb $db
     ld   A, [HL]                                       ;; 00:1a2e $7e
     add  A, $08                                        ;; 00:1a2f $c6 $08
@@ -1078,7 +1101,14 @@ call_00_1a22_LoadBgMapInitial:
     ld   [HL], A                                       ;; 00:1a44 $77
     ret                                                ;; 00:1a45 $c9
 
-call_00_1a46_LoadBgMapInitial2:
+call_00_1a46_LoadBgMapRow:
+; Load One BG Map Row
+; Description:
+; Loads a single horizontal row of background map tiles:
+; Uses call_00_14e2 to convert pixel X/Y to tile indices.
+; Computes tile/block pointers, switches to the correct VRAM/map banks, 
+; copies tile and collision data into VRAM buffers, and restores banks.
+; Handles both visual tiles and collision blocks.
     ld   HL, wDBFB_YPositionInMap                                     ;; 00:1a46 $21 $fb $db
     ld   A, [HL+]                                      ;; 00:1a49 $2a
     sub  A, $01                                        ;; 00:1a4a $d6 $01
@@ -1090,7 +1120,7 @@ call_00_1a46_LoadBgMapInitial2:
     ld   A, [HL+]                                      ;; 00:1a54 $2a
     ld   E, A                                          ;; 00:1a55 $5f
     ld   D, [HL]                                       ;; 00:1a56 $56
-    call call_00_14e2                                  ;; 00:1a57 $cd $e2 $14
+    call call_00_14e2_ConvertXYToTileCoords                                  ;; 00:1a57 $cd $e2 $14
     ld   A, C                                          ;; 00:1a5a $79
     and  A, $f8                                        ;; 00:1a5b $e6 $f8
     ld   L, A                                          ;; 00:1a5d $6f

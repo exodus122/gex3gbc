@@ -1,13 +1,17 @@
-entry_03_46e0_UpdateBgCollision:
-call_03_46e0_UpdateBgCollision:
+entry_03_46e0_UpdateBgCollision_MainDispatcher:
+call_03_46e0_UpdateBgCollision_MainDispatcher:
+; Saves current bank in wDAD6_ReturnBank
+; Calls a banked function (entry_02_5541_GetActionPropertyByte) to get collision status
+; Depending on result bits, jumps to specialized collision handlers 
+; (call_03_4a3f_CollisionHandler_ByAction, call_03_4ae4_CollisionMask_LookupAndDispatch, or mode-specific handler table).
     ld   [wDAD6_ReturnBank], A                                    ;; 03:46e0 $ea $d6 $da
     ld   A, $02                                        ;; 03:46e3 $3e $02
-    ld   HL, entry_02_5541                                ;; 03:46e5 $21 $41 $55
+    ld   HL, entry_02_5541_GetActionPropertyByte                                ;; 03:46e5 $21 $41 $55
     call call_00_0edd_CallAltBankFunc                                  ;; 03:46e8 $cd $dd $0e
     bit  5, A                                          ;; 03:46eb $cb $6f
-    jp   NZ, call_03_4a3f                               ;; 03:46ed $c2 $3f $4a
+    jp   NZ, call_03_4a3f_CollisionHandler_ByAction                               ;; 03:46ed $c2 $3f $4a
     bit  7, A                                          ;; 03:46f0 $cb $7f
-    jp   NZ, call_03_4ae4                               ;; 03:46f2 $c2 $e4 $4a
+    jp   NZ, call_03_4ae4_CollisionMask_LookupAndDispatch                               ;; 03:46f2 $c2 $e4 $4a
     ld   HL, wDC1F                                     ;; 03:46f5 $21 $1f $dc
     ld   L, [HL]                                       ;; 03:46f8 $6e
     ld   H, $00                                        ;; 03:46f9 $26 $00
@@ -19,10 +23,20 @@ call_03_46e0_UpdateBgCollision:
     ld   L, A                                          ;; 03:4702 $6f
     jp   HL                                            ;; 03:4703 $e9
 .data_03_4704:
-    dw   call_03_4708_ProcessSidescrollCollision                                 ;; 03:4704 pP
-    dw   call_03_48ad_ProcessTopDownCollision                                      ;; 03:4706 ..
+    dw   call_03_4708_CollisionHandler_Sidescroller                                 ;; 03:4704 pP
+    dw   call_03_48ad_CollisionHandler_TopDown                                      ;; 03:4706 ..
 
-call_03_4708_ProcessSidescrollCollision:
+call_03_4708_CollisionHandler_Sidescroller:
+; Handles sidescrolling collision detection for the player.
+; Clears and updates collision flags in wDABE/wDABD.
+; Calculates collision offsets relative to player X/Y position.
+; Probes tilemap for solid tiles, adjusts player position, and sets collision response flags.
+; Handles edge cases (walls, floor, ceiling, slopes, special interactions).
+; Proposed name: CollisionHandler_Sidescroller
+
+; Performs detailed collision checks in side-scrolling levels: clears and stores collision flags (wDABE, wDABD), 
+; clamps vertical velocity, probes the tilemap (call_03_4b37_AccumulateMovementBias/call_03_4b4c_TileCollisionCheck), sets flags for wall/floor hits, 
+; adjusts horizontal/vertical movement masks, and updates collision state variables (wDC84–wDC8D).
     ld   HL, wDABE                                     ;; 03:4708 $21 $be $da
     ld   A, [HL]                                       ;; 03:470b $7e
     ld   [HL], $00                                     ;; 03:470c $36 $00
@@ -46,7 +60,7 @@ call_03_4708_ProcessSidescrollCollision:
     sra  A                                             ;; 03:472f $cb $2f
     sra  A                                             ;; 03:4731 $cb $2f
     ld   [wDC8B], A                                    ;; 03:4733 $ea $8b $dc
-    call call_03_4b37                                  ;; 03:4736 $cd $37 $4b
+    call call_03_4b37_AccumulateMovementBias                                  ;; 03:4736 $cd $37 $4b
     jp   Z, .jp_03_47f6                                ;; 03:4739 $ca $f6 $47
     ld   E, A                                          ;; 03:473c $5f
     bit  7, E                                          ;; 03:473d $cb $7b
@@ -126,7 +140,7 @@ call_03_4708_ProcessSidescrollCollision:
     ld   HL, wDABE                                     ;; 03:47b0 $21 $be $da
     bit  7, [HL]                                       ;; 03:47b3 $cb $7e
     jr   NZ, .jp_03_47f6                               ;; 03:47b5 $20 $3f
-    call call_03_4b37                                  ;; 03:47b7 $cd $37 $4b
+    call call_03_4b37_AccumulateMovementBias                                  ;; 03:47b7 $cd $37 $4b
     jr   Z, .jp_03_47f6                                ;; 03:47ba $28 $3a
     bit  7, A                                          ;; 03:47bc $cb $7f
     jr   NZ, .jr_03_47d5                               ;; 03:47be $20 $15
@@ -135,7 +149,7 @@ call_03_4708_ProcessSidescrollCollision:
 .jr_03_47c4:
     push AF                                            ;; 03:47c4 $f5
     push BC                                            ;; 03:47c5 $c5
-    call call_03_4b4c                                  ;; 03:47c6 $cd $4c $4b
+    call call_03_4b4c_TileCollisionCheck                                  ;; 03:47c6 $cd $4c $4b
     pop  BC                                            ;; 03:47c9 $c1
     and  A, A                                          ;; 03:47ca $a7
     jr   Z, .jr_03_47ce                                ;; 03:47cb $28 $01
@@ -152,7 +166,7 @@ call_03_4708_ProcessSidescrollCollision:
 .jr_03_47d9:
     push AF                                            ;; 03:47d9 $f5
     push BC                                            ;; 03:47da $c5
-    call call_03_4b4c                                  ;; 03:47db $cd $4c $4b
+    call call_03_4b4c_TileCollisionCheck                                  ;; 03:47db $cd $4c $4b
     pop  BC                                            ;; 03:47de $c1
     and  A, A                                          ;; 03:47df $a7
     jr   Z, .jr_03_47e3                                ;; 03:47e0 $28 $01
@@ -189,7 +203,7 @@ call_03_4708_ProcessSidescrollCollision:
     ld   A, $04                                        ;; 03:480f $3e $04
     jr   Z, .jr_03_486e                                ;; 03:4811 $28 $5b
     ld   B, $00                                        ;; 03:4813 $06 $00
-    call call_03_4b37                                  ;; 03:4815 $cd $37 $4b
+    call call_03_4b37_AccumulateMovementBias                                  ;; 03:4815 $cd $37 $4b
     ld   C, A                                          ;; 03:4818 $4f
     ld   A, [wD810_PlayerYPosition]                                    ;; 03:4819 $fa $10 $d8
     add  A, $10                                        ;; 03:481c $c6 $10
@@ -257,7 +271,7 @@ call_03_4708_ProcessSidescrollCollision:
     ld   [wDC8D], A                                    ;; 03:4872 $ea $8d $dc
     ret                                                ;; 03:4875 $c9
 .jr_03_4876:
-    call call_03_4b37                                  ;; 03:4876 $cd $37 $4b
+    call call_03_4b37_AccumulateMovementBias                                  ;; 03:4876 $cd $37 $4b
     ld   C, A                                          ;; 03:4879 $4f
     ld   A, [wDC8C]                                    ;; 03:487a $fa $8c $dc
     swap A                                             ;; 03:487d $cb $37
@@ -288,7 +302,12 @@ call_03_4708_ProcessSidescrollCollision:
     ret                                                ;; 03:48a4 $c9
     db   $80, $40, $20, $10, $08, $04, $02, $01        ;; 03:48a5 ........
 
-call_03_48ad_ProcessTopDownCollision:
+call_03_48ad_CollisionHandler_TopDown:
+; Handles top-down movement collisions.
+; Always sets collision-active bit (set 7,[wDABE]).
+; Uses wDC86 and wDC89 to determine direction/attempted movement.
+; Dispatches to one of several routines for checking walls/diagonals (.call_03_48E1_ResetDirectionState, .call_03_496B_CheckMove_UpLeft, etc.).
+; Updates collision status (wDC81, wDC86, wDC89) depending on blocked directions.
     ld   hl,wDABE
     ld   a,[hl]
     ld   [hl],00
@@ -309,141 +328,194 @@ call_03_48ad_ProcessTopDownCollision:
     ld   l,a
     jp   hl
 .data_03_48cf:
-    dw   .call_03_48E1, .call_03_49ED, .call_03_48E6
-    dw   .call_03_49ED, .call_03_491B, .call_03_49ED, .call_03_499F
-    dw   .call_03_49ED, .call_03_496B
-.call_03_48E1:
+    dw   .call_03_48E1_ResetDirectionState, .call_03_49ED_AdvanceAlongPath, .call_03_48E6_CheckMove_Up
+    dw   .call_03_49ED_AdvanceAlongPath, .call_03_491B_CheckMove_Down, .call_03_49ED_AdvanceAlongPath, .call_03_499F_CheckMove_DownLeft
+    dw   .call_03_49ED_AdvanceAlongPath, .call_03_496B_CheckMove_UpLeft
+.call_03_48E1_ResetDirectionState:
+; ResetDirection
+; What it does:
+; Clears wDC86 (direction attempt counter) and returns.
+; Purpose: Resets movement attempt state.
     xor  a
     ld   [wDC86],a
     ret  
-.call_03_48E6:
+.call_03_48E6_CheckMove_Up:
+; TryMoveUp
+; What it does:
+; Probes upward tiles (C=1, B=FF then C=2,B=FE) using call_03_4b4c_TileCollisionCheck.
+; If blocked, branches to TryUpSideAlternatives or triggers call_03_4A15.
+; Purpose: Checks moving up and handles blocked paths.
     ld   c,$01
     ld   b,$FF
-    call call_03_4b4c
-    jr   nz,.call_03_4900
+    call call_03_4b4c_TileCollisionCheck
+    jr   nz,.call_03_4900_Fallback_UpBlocked
     ld   a,[wDC86]
     cp   a,$02
     ret  c
     ld   c,$02
     ld   b,$FE
-    call call_03_4b4c
-    jp   nz,.call_03_4A15
+    call call_03_4b4c_TileCollisionCheck
+    jp   nz,.call_03_4A15_ForceSingleStep
     ret  
-.call_03_4900:
+.call_03_4900_Fallback_UpBlocked:
+; HandleUpBlocked
+; What it does:
+; Called if up movement blocked. Probes horizontal fallback (C=0,B=FF).
+; If successful, sets bit 6 (0x40) in wDC81 (collision flags), stores 1 to wDC89 (direction), 
+; then goes to .call_03_49ED_AdvanceAlongPath for path stepping.
     ld   c,$00
     ld   b,$FF
-    call call_03_4b4c
-    jr   nz,.call_03_4950
+    call call_03_4b4c_TileCollisionCheck
+    jr   nz,.call_03_4950_CheckMove_StraightHorizontal
     ld   a,[wDC81]
     and  a,$0F
     or   a,$40
     ld   [wDC81],a
     ld   a,$01
     ld   [wDC89],a
-    jp   .call_03_49ED
+    jp   .call_03_49ED_AdvanceAlongPath
 
-.call_03_491B:
+.call_03_491B_CheckMove_Down:
+; TryMoveDown
+; What it does:
+; Probes downward tiles (C=1,B=1 then C=2,B=2).
+; Similar logic to Up, with branch to HandleDownBlocked.
+; Purpose: Check downward movement, handle fallback if blocked.
     ld   c,$01
     ld   b,$01
-    call call_03_4b4c
-    jr   nz,.call_03_4935
+    call call_03_4b4c_TileCollisionCheck
+    jr   nz,.call_03_4935_Fallback_DownBlocked
     ld   a,[wDC86]
     cp   a,$02
     ret  c
     ld   c,$02
     ld   b,$02
-    call call_03_4b4c
-    jp   nz,.call_03_4A15
+    call call_03_4b4c_TileCollisionCheck
+    jp   nz,.call_03_4A15_ForceSingleStep
     ret  
-.call_03_4935:
+.call_03_4935_Fallback_DownBlocked:
+; HandleDownBlocked
+; What it does:
+; Handles blocked down movement by probing horizontal (C=0,B=1).
+; If clear, sets bit 7 (0x80) in wDC81, stores 5 to wDC89, jumps to .call_03_49ED_AdvanceAlongPath.
     ld   c,$00
     ld   b,$01
-    call call_03_4b4c
-    jr   nz,.call_03_4950
+    call call_03_4b4c_TileCollisionCheck
+    jr   nz,.call_03_4950_CheckMove_StraightHorizontal
     ld   a,[wDC81]
     and  a,$0F
     or   a,$80
     ld   [wDC81],a
     ld   a,$05
     ld   [wDC89],a
-    jp   .call_03_49ED
-.call_03_4950:
+    jp   .call_03_49ED_AdvanceAlongPath
+.call_03_4950_CheckMove_StraightHorizontal:
+; TryMoveSideways
+; What it does:
+; Probes straight horizontal (C=1,B=0).
+; If blocked, jumps back to reset; else sets bit 4 (0x10) in wDC81, stores 3 to wDC89.
     ld   c,$01
     ld   b,$00
-    call call_03_4b4c
-    jr   nz,.call_03_48E1
+    call call_03_4b4c_TileCollisionCheck
+    jr   nz,.call_03_48E1_ResetDirectionState
     ld   a,[wDC81]
     and  a,$0F
     or   a,$10
     ld   [wDC81],a
     ld   a,$03
     ld   [wDC89],a
-    jp   .call_03_49ED
+    jp   .call_03_49ED_AdvanceAlongPath
 
-.call_03_496B:
+.call_03_496B_CheckMove_UpLeft:
+; TryMoveUpLeft
+; What it does:
+; Checks diagonal up-left movement (C=FF,B=FF etc.).
+; Uses same two-step probe, branches to alternatives or .call_03_4A15_ForceSingleStep.
     ld   c,$FF
     ld   b,$FF
-    call call_03_4b4c
-    jr   nz,.call_03_4985
+    call call_03_4b4c_TileCollisionCheck
+    jr   nz,.call_03_4985_Fallback_UpLeftBlocked
     ld   a,[wDC86]
     cp   a,$02
     ret  c
     ld   c,$02
     ld   b,$FE
-    call call_03_4b4c
-    jp   nz,.call_03_4A15
+    call call_03_4b4c_TileCollisionCheck
+    jp   nz,.call_03_4A15_ForceSingleStep
     ret  
-.call_03_4985:
+.call_03_4985_Fallback_UpLeftBlocked:
+; HandleUpLeftBlocked
+; What it does:
+; If up-left blocked, probes vertical fallback (C=0,B=FF), 
+; sets bit 6 (0x40) and direction 1, jumps to .call_03_49ED_AdvanceAlongPath.
     ld   c,$00
     ld   b,$FF
-    call call_03_4b4c
-    jr   nz,.call_03_49D2
+    call call_03_4b4c_TileCollisionCheck
+    jr   nz,.call_03_49D2_CheckMove_Left
     ld   a,[wDC81]
     and  a,$0F
     or   a,$40
     ld   [wDC81],a
     ld   a,$01
     ld   [wDC89],a
-    jr   .call_03_49ED
+    jr   .call_03_49ED_AdvanceAlongPath
 
-.call_03_499F:
+.call_03_499F_CheckMove_DownLeft:
+; TryMoveDownLeft
+; What it does:
+; Checks diagonal down-left (C=FF,B=1 then C=2,B=2).
     ld   c,$FF
     ld   b,$01
-    call call_03_4b4c
-    jr   nz,.call_03_49B8
+    call call_03_4b4c_TileCollisionCheck
+    jr   nz,.call_03_49B8_Fallback_DownLeftBlocked
     ld   a,[wDC86]
     cp   a,$02
     ret  c
     ld   c,$02
     ld   b,$02
-    call call_03_4b4c
-    jr   nz,.call_03_4A15
+    call call_03_4b4c_TileCollisionCheck
+    jr   nz,.call_03_4A15_ForceSingleStep
     ret  
-.call_03_49B8:
+.call_03_49B8_Fallback_DownLeftBlocked:
+; HandleDownLeftBlocked
+; What it does:
+; If blocked, probes vertical fallback (C=0,B=1), sets bit 7 (0x80), 
+; direction 5, jumps to .call_03_49ED_AdvanceAlongPath.
     ld   c,$00
     ld   b,$01
-    call call_03_4b4c
-    jr   nz,.call_03_49D2
+    call call_03_4b4c_TileCollisionCheck
+    jr   nz,.call_03_49D2_CheckMove_Left
     ld   a,[wDC81]
     and  a,$0F
     or   a,$80
     ld   [wDC81],a
     ld   a,$05
     ld   [wDC89],a
-    jr   .call_03_49ED
-.call_03_49D2:
+    jr   .call_03_49ED_AdvanceAlongPath
+.call_03_49D2_CheckMove_Left:
+; TryMoveLeft
+; What it does:
+; Probes straight left (C=FF,B=0).
+; If free, sets bit 5 (0x20) and direction 7; else resets direction.
     ld   c,$FF
     ld   b,$00
-    call call_03_4b4c
-    jp   nz,.call_03_48E1
+    call call_03_4b4c_TileCollisionCheck
+    jp   nz,.call_03_48E1_ResetDirectionState
     ld   a,[wDC81]
     and  a,$0F
     or   a,$20
     ld   [wDC81],a
     ld   a,$07
     ld   [wDC89],a
-    jr   .call_03_49ED
-.call_03_49ED:
+    jr   .call_03_49ED_AdvanceAlongPath
+.call_03_49ED_AdvanceAlongPath:
+; MultiStepAdvance
+; What it does:
+; Performs multi-step tile probing for diagonal/complex movement.
+; Uses wDC89 as index into .data_03_4a1b for offset pairs.
+; Iteratively calls call_03_4b4c_TileCollisionCheck with varying offsets, counting successes 
+; in E and decrementing D (wDC86) until blocked or out of attempts.
+; Purpose: Fine-grained collision stepping along a chosen path.
     ld   hl,wDC89
     ld   l,[hl]
     ld   h,$00
@@ -454,25 +526,37 @@ call_03_48ad_ProcessTopDownCollision:
     ld   e,$00
     ld   a,[wDC86]
     ld   d,a
-.call_03_49FF:
+.call_03_49FF_PathStepLoop_CheckTiles:
+; PathStepLoop
+; What it does:
+; Reads pairs of X/Y offsets from .data_03_4a1b, pushes them through call_03_4b4c_TileCollisionCheck repeatedly.
+; Increments E on success, decrements D (remaining steps). Loops until blocked or out of attempts.
+; At .call_03_4A10_CommitStepCount, writes the total successful steps (E) back to wDC86.
     ldi  a,[hl]
     ld   c,a
     ldi  a,[hl]
     ld   b,a
     push hl
     push de
-    call call_03_4b4c
+    call call_03_4b4c_TileCollisionCheck
     pop  de
     pop  hl
-    jr   nz,.call_03_4A10
+    jr   nz,.call_03_4A10_CommitStepCount
     inc  e
     dec  d
-    jr   nz,.call_03_49FF
-.call_03_4A10:
+    jr   nz,.call_03_49FF_PathStepLoop_CheckTiles
+.call_03_4A10_CommitStepCount:
+; CommitStepCount
+; What it does:
+; Ends the path-stepping loop, commits the successful step count (E) to wDC86, then returns.
     ld   a,e
     ld   [wDC86],a
     ret  
-.call_03_4A15:
+.call_03_4A15_ForceSingleStep:
+; ForceStep
+; What it does:
+; Sets wDC86 to 1 and returns—used when blocked to ensure 
+; at least one movement attempt is registered.
     ld   a,$01
     ld   [wDC86],a
     ret  
@@ -484,7 +568,12 @@ call_03_48ad_ProcessTopDownCollision:
     db   $fe, $02, $ff, $00, $fe, $00, $ff, $ff        ;; 03:4a35 ????????
     db   $fe, $fe                                      ;; 03:4a3d ??
 
-call_03_4a3f:
+call_03_4a3f_CollisionHandler_ByAction:
+; Special action-dependent collision check.
+; Clears/sets collision flags.
+; Looks at the player’s current action ID (wD801_PlayerObject_ActionId) to pick a rule set.
+; Uses lookup tables (.data_03_4a98) for bitmasks and allowed transitions.
+; Updates wDC81 depending on what collisions are valid for that action (e.g. standing, climbing, swimming).
     ld   HL, wDABE                                     ;; 03:4a3f $21 $be $da
     ld   A, [HL]                                       ;; 03:4a42 $7e
     ld   [HL], $00                                     ;; 03:4a43 $36 $00
@@ -539,7 +628,7 @@ call_03_4a3f:
     ld   B, A                                          ;; 03:4a8d $47
     push BC                                            ;; 03:4a8e $c5
     push HL                                            ;; 03:4a8f $e5
-    call call_03_4b4c                                  ;; 03:4a90 $cd $4c $4b
+    call call_03_4b4c_TileCollisionCheck                                  ;; 03:4a90 $cd $4c $4b
     pop  HL                                            ;; 03:4a93 $e1
     pop  BC                                            ;; 03:4a94 $c1
     jr   NZ, .jr_03_4a7e                               ;; 03:4a95 $20 $e7
@@ -556,7 +645,14 @@ call_03_4a3f:
     db   $01, $00, $00, $01, $00, $05, $00, $80        ;; 03:4ad8 ????????
     db   $00, $10, $00, $01                            ;; 03:4ae0 ????
 
-call_03_4ae4:
+call_03_4ae4_CollisionMask_LookupAndDispatch:
+; CollisionMaskHandler
+; What it does:
+; Moves the current collision byte (wDABE) to wDABD, clears wDABE, then sets bit7 of the (now zeroed) wDABE.
+; Uses .data_03_4b1b as a mask/lookup table: ANDs the current collision flags (wDC81) with the mask.
+; If a match is found, loads a parameter block (B=counter, DE=step size, etc.), loops through entries comparing tiles.
+; If none match, clears high bits of wDC81. If a match, calls call_03_4c12_FetchTileValue to probe a specific tile, checks bit3, 
+; and conditionally returns.
     ld   HL, wDABE                                     ;; 03:4ae4 $21 $be $da
     ld   A, [HL]                                       ;; 03:4ae7 $7e
     ld   [HL], $00                                     ;; 03:4ae8 $36 $00
@@ -590,7 +686,7 @@ call_03_4ae4:
     ld   C, A                                          ;; 03:4b10 $4f
     ld   A, [HL]                                       ;; 03:4b11 $7e
     ld   B, A                                          ;; 03:4b12 $47
-    call call_03_4c12                                  ;; 03:4b13 $cd $12 $4c
+    call call_03_4c12_FetchTileValue                                  ;; 03:4b13 $cd $12 $4c
     bit  3, B                                          ;; 03:4b16 $cb $58
     jr   Z, .jr_03_4b05                                ;; 03:4b18 $28 $eb
     ret                                                ;; 03:4b1a $c9
@@ -600,7 +696,12 @@ call_03_4ae4:
     db   $60, $ff, $ff, $a0, $ff, $01, $50, $01        ;; 03:4b2b ????????
     db   $ff, $90, $01, $01                            ;; 03:4b33 ????
 
-call_03_4b37:
+call_03_4b37_AccumulateMovementBias:
+; AdjustedDirectionAccumulator
+; What it does:
+; Reads wDC86 (step count/direction bias).
+; If player-facing bit5 is set, complements and increments A to reverse direction.
+; Adds A to two accumulators (wDC84 and wDC85) to update directional totals.
     ld   A, [wDC86]                                    ;; 03:4b37 $fa $86 $dc
     ld   HL, wD80D_PlayerFacingDirection                                     ;; 03:4b3a $21 $0d $d8
     bit  5, [HL]                                       ;; 03:4b3d $cb $6e
@@ -614,7 +715,13 @@ call_03_4b37:
     add  A, [HL]                                       ;; 03:4b4a $86
     ret                                                ;; 03:4b4b $c9
 
-call_03_4b4c:
+call_03_4b4c_TileCollisionCheck:
+; ProbeTileCollision
+; What it does:
+; Core tilemap probe:
+; Uses player Y (wD810) + offsets B/C to compute a tilemap index in VRAM.
+; Fetches a byte from VRAM ([DE]) and applies a collision mask ([HL]) from .data_03_4b7a.
+; Returns Z if blocked or NZ if free.
     ld   A, [wD810_PlayerYPosition]                                    ;; 03:4b4c $fa $10 $d8
     add  A, $0f                                        ;; 03:4b4f $c6 $0f
     add  A, B                                          ;; 03:4b51 $80
@@ -650,7 +757,10 @@ call_03_4b4c:
 .data_03_4b7a:
     db   $80, $40, $20, $10, $08, $04, $02, $01        ;; 03:4b7a ????????
 
-call_03_4b82:
+call_03_4b82_TileCollisionCheck_Raw:
+; ProbeTileCollision_NoYOffset
+; What it does:
+; Similar to call_03_4b4c but skips the $0F Y-offset bias—used for a slightly different probe position.
     ld   a,[wD810_PlayerYPosition]
     add  b
     ld   b,a
@@ -685,8 +795,13 @@ call_03_4b82:
 .data_03_4bae:
     db   $80, $40, $20, $10, $08, $04, $02, $01                            ;; 03:4bb2 ????
 
-entry_03_4bb6:
-call_03_4bb6:
+entry_03_4bb6_CacheNearbyTileValues:
+call_03_4bb6_CacheNearbyTileValues:
+; SampleSurroundingTiles
+; What it does:
+; Samples four surrounding tiles relative to the player (above, below, etc.) into temporary buffers (wDC92–wDC97).
+; Chooses horizontal offset based on facing direction (C=$09 or $F7).
+; Updates additional sample (wDC94) for checking forward movement.
     ld   A, [wD810_PlayerYPosition]                                    ;; 03:4bb6 $fa $10 $d8
     sub  A, $10                                        ;; 03:4bb9 $d6 $10
     and  A, $f8                                        ;; 03:4bbb $e6 $f8
@@ -742,7 +857,11 @@ call_03_4bb6:
     ld   [wDC94], A                                    ;; 03:4c0e $ea $94 $dc
     ret                                                ;; 03:4c11 $c9
 
-call_03_4c12:
+call_03_4c12_FetchTileValue:
+; FetchTileFromCollisionMap
+; What it does:
+; Computes a tile index using player position + B/C offsets.
+; Loads the tile value from the collision map ([BC]), returns it in B for further tests.
     ld   A, [wD810_PlayerYPosition]                                    ;; 03:4c12 $fa $10 $d8
     add  A, B                                          ;; 03:4c15 $80
     and  A, $f8                                        ;; 03:4c16 $e6 $f8
@@ -764,9 +883,14 @@ call_03_4c12:
     ld   B, A                                          ;; 03:4c2c $47
     ret                                                ;; 03:4c2d $c9
 
-entry_03_4c2e:
+entry_03_4c2e_IsTileType3D:
+; CheckTileEquals3D
+; What it does:
+; Wrapper around call_03_4c12.
+; Fetches a tile, compares it to $3D, and returns.
+; Used to quickly test if the tile underfoot is a specific type (e.g., a special surface).
     ld   BC, $00                                       ;; 03:4c2e $01 $00 $00
-    call call_03_4c12                                  ;; 03:4c31 $cd $12 $4c
+    call call_03_4c12_FetchTileValue                                  ;; 03:4c31 $cd $12 $4c
     ld   A, C                                          ;; 03:4c34 $79
     cp   A, $3d                                        ;; 03:4c35 $fe $3d
     ret                                                ;; 03:4c37 $c9

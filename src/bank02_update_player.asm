@@ -1,4 +1,8 @@
-jp_02_4db1:
+call_02_4db1_CheckPlayerObjectXDistance:
+; Checks whether an object exists (call_00_29ce), then compares the object’s X position to the player’s. 
+; If the object is left of the player (carry set), branches to a special handler. If they are perfectly aligned, 
+; it returns. Otherwise jumps to a general trigger routine.
+; Purpose: Detects horizontal proximity for events.
     call call_00_29ce_ObjectExistsCheck                                  ;; 02:4db1 $cd $ce $29
     ret  NZ                                            ;; 02:4db4 $c0
     ld   A, L                                          ;; 02:4db5 $7d
@@ -11,22 +15,25 @@ jp_02_4db1:
     inc  HL                                            ;; 02:4dc1 $23
     ld   A, [wD80F_PlayerXPosition]                                    ;; 02:4dc2 $fa $0f $d8
     sbc  A, [HL]                                       ;; 02:4dc5 $9e
-    jp   C, call_02_51f9                               ;; 02:4dc6 $da $f9 $51
+    jp   C, call_02_51f9_ApplyRightwardCollisionAdjustment                               ;; 02:4dc6 $da $f9 $51
     or   A, E                                          ;; 02:4dc9 $b3
     ret  Z                                             ;; 02:4dca $c8
-    jp   call_02_518a                                  ;; 02:4dcb $c3 $8a $51
+    jp   call_02_518a_ApplyLeftwardCollisionAdjustment                                  ;; 02:4dcb $c3 $8a $51
 
-jp_02_4dce:
+call_02_4dce_SetTriggerByLevel:
+; Sets flag wDC80 bit 6, then selects a trigger value based on the current level (wDB6C_CurrentLevelId). 
+; Uses collision flags (wDC81) to decide between trigger IDs, then jumps to call_02_54f9_SwitchPlayerAction.
+; Purpose: Level-specific event/door trigger.
     ld   HL, wDC80                                     ;; 02:4dce $21 $80 $dc
     set  6, [HL]                                       ;; 02:4dd1 $cb $f6
     ld   A, [wDB6C_CurrentLevelId]                                    ;; 02:4dd3 $fa $6c $db
     cp   A, $07                                        ;; 02:4dd6 $fe $07
     ld   A, $24                                        ;; 02:4dd8 $3e $24
-    jp   Z, call_02_54f9                               ;; 02:4dda $ca $f9 $54
+    jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:4dda $ca $f9 $54
     ld   A, [wDB6C_CurrentLevelId]                                    ;; 02:4ddd $fa $6c $db
     cp   A, $08                                        ;; 02:4de0 $fe $08
     ld   A, $30                                        ;; 02:4de2 $3e $30
-    jp   Z, call_02_54f9                               ;; 02:4de4 $ca $f9 $54
+    jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:4de4 $ca $f9 $54
     ld   C, $01                                        ;; 02:4de7 $0e $01
     ld   A, [wDC81]                                    ;; 02:4de9 $fa $81 $dc
     and  A, $30                                        ;; 02:4dec $e6 $30
@@ -34,16 +41,20 @@ jp_02_4dce:
     ld   C, $03                                        ;; 02:4df0 $0e $03
 .jr_02_4df2:
     ld   A, C                                          ;; 02:4df2 $79
-    jp   call_02_54f9                                  ;; 02:4df3 $c3 $f9 $54
+    jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:4df3 $c3 $f9 $54
 
-call_02_4df6:
+call_02_4df6_FlagCollisionActive:
+; Masks the lower nibble of wDC80, forces the high bit, and stores it back.
+; Purpose: Marks that a collision/event state is active.
     ld   A, [wDC80]                                    ;; 02:4df6 $fa $80 $dc
     and  A, $0f                                        ;; 02:4df9 $e6 $0f
     or   A, $80                                        ;; 02:4dfb $f6 $80
     ld   [wDC80], A                                    ;; 02:4dfd $ea $80 $dc
     ret                                                ;; 02:4e00 $c9
 
-call_02_4e01:
+call_02_4e01_SetOneTimeFlag:
+; If wDC87 is zero, sets it to 1. Used to ensure an action happens only once per frame or state.
+; Purpose: Single-use event guard.
     ld   A, [wDC87]                                    ;; 02:4e01 $fa $87 $dc
     and  A, A                                          ;; 02:4e04 $a7
     ret  NZ                                            ;; 02:4e05 $c0
@@ -51,18 +62,23 @@ call_02_4e01:
     ld   [wDC87], A                                    ;; 02:4e08 $ea $87 $dc
     ret                                                ;; 02:4e0b $c9
 
-call_02_4E0C:
+call_02_4E0C_UpdateActionSequence:
+; Updates counters (wDCA2–wDCA6) for a repeating animation or scripted sequence. 
+; Uses call_02_4E7A_LookupFrameData to fetch frame data from tables at $4EA1/$4EC3. Handles two cases: 
+; when the player’s action ID is $27 (special move) or any other action. Sets flags (wDC7F, wDC80), 
+; triggers sound/action (entry_02_54f9_SwitchPlayerAction) when counters overflow, and sets wDB66 to signal a redraw.
+; Purpose: Manage complex animation or event sequences based on timers and player state.
     ld   a,[wDCA5]
     ld   [wDCA6],a
     ld   hl,wDC95
     ld   e,[hl]
-    call call_02_4E7A
+    call call_02_4E7A_LookupFrameData
     inc  d
     dec  d
     jr   nz,label4E24
     ld   hl,wDC93
     ld   e,[hl]
-    call call_02_4E7A
+    call call_02_4E7A_LookupFrameData
 label4E24:
     ld   hl,wDCA5
     ld   [hl],d
@@ -84,7 +100,7 @@ label4E24:
     ld   hl,wDC80
     set  6,[hl]
     ld   a,$24
-    jp   entry_02_54f9
+    jp   entry_02_54f9_SwitchPlayerAction
 label4E50:
     ld   a,[wDCA2]
     and  a,$07
@@ -111,7 +127,10 @@ label4E6A:
     set  0,[hl]
     ret  
 
-call_02_4E7A:
+call_02_4E7A_LookupFrameData:
+; Scans a table for an entry matching value E, then selects a frame or command 
+; byte based on facing direction. Stores result in wDCA4.
+; Purpose: Table-driven frame or pattern lookup for 4E0C.
     ld   d,$00
     ld   hl,$4EC3
     ld   a,[wD801_PlayerObject_ActionId]
@@ -150,7 +169,9 @@ label4E9F:
     db   $2b, $0c, $23, $2b, $0f, $23, $2b, $10        ;; 02:4edc ????????
     db   $23, $2b, $ff
 
-call_02_4ee7:
+call_02_4ee7_MapCollisionFlags:
+; Reads high nibble of wDC81. Searches .data_02_4F01 for a matching flag, returns mapped code or $FF if none.
+; Purpose: Convert collision flags into an index or behavior code.
     ld   a,[wDC81]
     and  a,$F0
     jr   z,.label4EFB
@@ -174,7 +195,10 @@ call_02_4ee7:
     db   $40, $00, $80, $04, $20, $06, $10, $02
     db   $60, $07, $a0, $05, $50, $01, $90, $03
 
-call_02_4f11:
+call_02_4f11_LevelCollisionToSound:
+; Combines wDABD|wDABE collision flags. If bit 7 isn’t set, chooses a sound/effect 
+; ID based on level and jumps to call_02_54f9_SwitchPlayerAction.
+; Purpose: Trigger level-specific sound or effect on collision.
     ld   A, [wDABD]                                    ;; 02:4f11 $fa $bd $da
     ld   HL, wDABE                                     ;; 02:4f14 $21 $be $da
     or   A, [HL]                                       ;; 02:4f17 $b6
@@ -190,9 +214,17 @@ call_02_4f11:
     jr   Z, .jr_02_4f2f                                ;; 02:4f2b $28 $02
     ld   A, $11                                        ;; 02:4f2d $3e $11
 .jr_02_4f2f:
-    jp   call_02_54f9                                  ;; 02:4f2f $c3 $f9 $54
+    jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:4f2f $c3 $f9 $54
 
-call_02_4f32:
+call_02_4f32_PlayerUpdateMain:
+; The main per-frame player update.
+; Actions:
+; - Processes inputs, clearing or setting bits in wDC80/wDC81.
+; - Manages timers (wDC7E, wDCA9–wDCAB) using call_02_4ffb_DecTimerEveryCycle.
+; - Calls palette setup (entry_03_6567_SetupObjectPalettes), BG collision update, object caching, and object loading.
+; - Jumps to the player action function (wD802_PlayerObject_ActionFunc).
+; - Clears bits and finalizes state before call_02_724d.
+; Purpose: Central routine for player state, input, collisions, and rendering per frame.
     ld   A, [wDAD7_CurrentInputs]                                    ;; 02:4f32 $fa $d7 $da
     ld   C, A                                          ;; 02:4f35 $4f
     ld   E, A                                          ;; 02:4f36 $5f
@@ -254,31 +286,31 @@ call_02_4f32:
     dec  [HL]                                          ;; 02:4f94 $35
 .jr_02_4f95:
     ld   HL, wDCA9                                     ;; 02:4f95 $21 $a9 $dc
-    call call_02_4ffb                                  ;; 02:4f98 $cd $fb $4f
+    call call_02_4ffb_DecTimerEveryCycle                                  ;; 02:4f98 $cd $fb $4f
     ld   HL, wDCAA                                     ;; 02:4f9b $21 $aa $dc
-    call call_02_4ffb                                  ;; 02:4f9e $cd $fb $4f
+    call call_02_4ffb_DecTimerEveryCycle                                  ;; 02:4f9e $cd $fb $4f
     ld   HL, wDCAB                                     ;; 02:4fa1 $21 $ab $dc
-    call call_02_4ffb                                  ;; 02:4fa4 $cd $fb $4f
+    call call_02_4ffb_DecTimerEveryCycle                                  ;; 02:4fa4 $cd $fb $4f
     ld   [wDAD6_ReturnBank], A                                    ;; 02:4fa7 $ea $d6 $da
     ld   A, $03                                        ;; 02:4faa $3e $03
     ld   HL, entry_03_6567_SetupObjectPalettes                              ;; 02:4fac $21 $67 $65
     call call_00_0edd_CallAltBankFunc                                  ;; 02:4faf $cd $dd $0e
-    call call_02_5081                                  ;; 02:4fb2 $cd $81 $50
+    call call_02_5081_UpdateFacingAndMovementVector                                  ;; 02:4fb2 $cd $81 $50
     ld   [wDAD6_ReturnBank], A                                    ;; 02:4fb5 $ea $d6 $da
     ld   A, $03                                        ;; 02:4fb8 $3e $03
-    ld   HL, entry_03_46e0_UpdateBgCollision                             ;; 02:4fba $21 $e0 $46
+    ld   HL, entry_03_46e0_UpdateBgCollision_MainDispatcher                             ;; 02:4fba $21 $e0 $46
     call call_00_0edd_CallAltBankFunc                                  ;; 02:4fbd $cd $dd $0e
-    call call_02_5267                                  ;; 02:4fc0 $cd $67 $52
+    call call_02_5267_PlatformSlopeAndTriggerHandler                                  ;; 02:4fc0 $cd $67 $52
     ld   [wDAD6_ReturnBank], A                                    ;; 02:4fc3 $ea $d6 $da
     ld   A, $03                                        ;; 02:4fc6 $3e $03
-    ld   HL, entry_03_4bb6                              ;; 02:4fc8 $21 $b6 $4b
+    ld   HL, entry_03_4bb6_CacheNearbyTileValues                              ;; 02:4fc8 $21 $b6 $4b
     call call_00_0edd_CallAltBankFunc                                  ;; 02:4fcb $cd $dd $0e
-    call call_02_5431                                  ;; 02:4fce $cd $31 $54
+    call call_02_5431_HandleActionTriggersAndEvents                                  ;; 02:4fce $cd $31 $54
     ld   HL, wDC79                                     ;; 02:4fd1 $21 $79 $dc
     ld   A, [HL]                                       ;; 02:4fd4 $7e
     ld   [HL], $ff                                     ;; 02:4fd5 $36 $ff
     cp   A, $ff                                        ;; 02:4fd7 $fe $ff
-    call NZ, call_02_72ac                              ;; 02:4fd9 $c4 $ac $72
+    call NZ, call_02_72ac_LoadObjectData                              ;; 02:4fd9 $c4 $ac $72
     ld   HL, wD802_PlayerObject_ActionFunc                                     ;; 02:4fdc $21 $02 $d8
     ld   A, [HL+]                                      ;; 02:4fdf $2a
     ld   H, [HL]                                       ;; 02:4fe0 $66
@@ -290,13 +322,15 @@ call_02_4f32:
     jr   Z, .jr_02_4fed                                ;; 02:4fea $28 $01
     dec  [HL]                                          ;; 02:4fec $35
 .jr_02_4fed:
-    call call_02_5100                                  ;; 02:4fed $cd $00 $51
-    call call_02_5047                                  ;; 02:4ff0 $cd $47 $50
+    call call_02_5100_PlayerHorizontalMovementHandler                                  ;; 02:4fed $cd $00 $51
+    call call_02_5047_CachePlayerTileCoords                                  ;; 02:4ff0 $cd $47 $50
     ld   HL, wD805                                     ;; 02:4ff3 $21 $05 $d8
     res  4, [HL]                                       ;; 02:4ff6 $cb $a6
-    jp   call_02_724d                                  ;; 02:4ff8 $c3 $4d $72
+    jp   call_02_724d_ProcessObjectTimerAndState                                  ;; 02:4ff8 $c3 $4d $72
 
-call_02_4ffb:
+call_02_4ffb_DecTimerEveryCycle:
+; Decrements a timer in [HL] every wDCA8 frames. Resets wDCA8 to 3C when it wraps.
+; Purpose: Frame-based countdown helper.
     ld   A, [HL]                                       ;; 02:4ffb $7e
     and  A, A                                          ;; 02:4ffc $a7
     ret  Z                                             ;; 02:4ffd $c8
@@ -311,22 +345,27 @@ call_02_4ffb:
     dec  [HL]                                          ;; 02:500c $35
     ret                                                ;; 02:500d $c9
 
-call_02_500e:
+call_02_500e_ApplyDirectionalInputToPlayer:
+; Checks for directional inputs (Right/Left/Down/Up) using call_00_0f6e etc. 
+; Adjusts X or Y position via call_02_5033_ApplyXDelta / 503d.
+; Purpose: Applies directional movement vectors to the player.
     call call_00_0f6e_CheckInputRight
     ld   bc,$0002
-    call nz,call_02_5033
+    call nz,call_02_5033_ApplyXDelta
     call call_00_0f68_CheckInputLeft
     ld   bc,hFFFE
-    call nz,call_02_5033
+    call nz,call_02_5033_ApplyXDelta
     call call_00_0f7a_CheckInputDown
     ld   bc,$0002
-    call nz,call_02_503d
+    call nz,call_02_503d_ApplyYDelta
     call call_00_0f74_CheckInputUp
     ld   bc,hFFFE
-    call nz,call_02_503d
+    call nz,call_02_503d_ApplyYDelta
     ret  
 
-call_02_5033:
+call_02_5033_ApplyXDelta:
+; Adds signed BC offset to player X position (wD80E).
+; Purpose: Horizontal position adjust.
     ld   hl,wD80E_PlayerXPosition
     ld   a,[hl]
     add  c
@@ -336,7 +375,9 @@ call_02_5033:
     ld   [hl],a
     ret  
 
-call_02_503d:
+call_02_503d_ApplyYDelta:
+; Adds signed BC offset to player Y position (wD810).
+; Purpose: Vertical position adjust.
     ld   hl,wD810_PlayerYPosition
     ld   a,[hl]
     add  c
@@ -346,7 +387,10 @@ call_02_503d:
     ld   [hl],a
     ret  
 
-call_02_5047:
+call_02_5047_CachePlayerTileCoords:
+; Shifts the player’s X and Y positions right by 4 (div 16) to convert from subpixel 
+; to tile coordinates, then stores them in wDC54–wDC56.
+; Purpose: Cache tilemap indices for collision lookups.
     ld   HL, wD80E_PlayerXPosition                                     ;; 02:5047 $21 $0e $d8
     ld   A, [HL+]                                      ;; 02:504a $2a
     ld   E, A                                          ;; 02:504b $5f
@@ -382,7 +426,12 @@ call_02_5047:
     ld   [HL], D                                       ;; 02:507f $72
     ret                                                ;; 02:5080 $c9
 
-call_02_5081:
+call_02_5081_UpdateFacingAndMovementVector:
+; Uses the player’s current action ID and collision flags to:
+; - Choose a new facing direction (wD80D_PlayerFacingDirection).
+; - Look up a movement vector from .data_02_50f0.
+; - Smoothly adjust acceleration (wDC86) with hysteresis against wDC87.
+; Purpose: Update facing direction and movement acceleration vectors.
     ld   HL, wD801_PlayerObject_ActionId                                     ;; 02:5081 $21 $01 $d8
     ld   L, [HL]                                       ;; 02:5084 $6e
     ld   H, $00                                        ;; 02:5085 $26 $00
@@ -390,7 +439,7 @@ call_02_5081:
     add  HL, DE                                        ;; 02:508a $19
     bit  2, [HL]                                       ;; 02:508b $cb $56
     jr   NZ, .jr_02_50db                               ;; 02:508d $20 $4c
-    call call_02_5541                                  ;; 02:508f $cd $41 $55
+    call call_02_5541_GetActionPropertyByte                                  ;; 02:508f $cd $41 $55
     and  A, $a0                                        ;; 02:5092 $e6 $a0
     jr   NZ, .jr_02_509d                               ;; 02:5094 $20 $07
     ld   A, [wDC1F]                                    ;; 02:5096 $fa $1f $dc
@@ -451,8 +500,16 @@ call_02_5081:
     db   $00, $03, $07, $03, $01, $02, $08, $02        ;; 02:50f0 ????????
     db   $05, $04, $06, $04, $05, $04, $06, $04        ;; 02:50f8 ????????
 
-call_02_5100:
-    call call_02_5541                                  ;; 02:5100 $cd $41 $55
+call_02_5100_PlayerHorizontalMovementHandler:
+; Purpose: Main dispatcher for handling horizontal player movement.
+; Details:
+; Calls call_02_5541_GetActionPropertyByte to poll input state.
+; Checks movement bits ($10, $20, $40, $80) and calls appropriate handlers 
+; (call_02_51f9_ApplyRightwardCollisionAdjustment for right, call_02_518a_ApplyLeftwardCollisionAdjustment for left, etc.).
+; Handles inversion if facing left (cpl/inc pattern), triggers collision tests (call_02_53e7_ApplyVerticalMovementAndClamp), 
+; and adjusts movement depending on player action IDs.
+; Falls back to a routine when no direct input (.jr_02_5159 path) to apply momentum or snapping
+    call call_02_5541_GetActionPropertyByte                                  ;; 02:5100 $cd $41 $55
     and  A, $a0                                        ;; 02:5103 $e6 $a0
     jr   NZ, .jr_02_510e                               ;; 02:5105 $20 $07
     ld   A, [wDC1F]                                    ;; 02:5107 $fa $1f $dc
@@ -466,13 +523,13 @@ call_02_5100:
     ld   C, [HL]                                       ;; 02:5116 $4e
     ld   A, [wDC81]                                    ;; 02:5117 $fa $81 $dc
     and  A, $10                                        ;; 02:511a $e6 $10
-    call NZ, call_02_51f9                              ;; 02:511c $c4 $f9 $51
+    call NZ, call_02_51f9_ApplyRightwardCollisionAdjustment                              ;; 02:511c $c4 $f9 $51
     ld   HL, wDC86                                     ;; 02:511f $21 $86 $dc
     ld   C, [HL]                                       ;; 02:5122 $4e
     ld   A, [wDC81]                                    ;; 02:5123 $fa $81 $dc
     and  A, $20                                        ;; 02:5126 $e6 $20
-    call NZ, call_02_518a                              ;; 02:5128 $c4 $8a $51
-    call call_02_553b                                  ;; 02:512b $cd $3b $55
+    call NZ, call_02_518a_ApplyLeftwardCollisionAdjustment                              ;; 02:5128 $c4 $8a $51
+    call call_02_553b_PollForSpecialInput                                  ;; 02:512b $cd $3b $55
     jr   Z, .jr_02_513a                                ;; 02:512e $28 $0a
     ld   A, [wD801_PlayerObject_ActionId]                                    ;; 02:5130 $fa $01 $d8
     cp   A, $19                                        ;; 02:5133 $fe $19
@@ -485,7 +542,7 @@ call_02_5100:
     ld   B, $00                                        ;; 02:513e $06 $00
     ld   A, [wDC81]                                    ;; 02:5140 $fa $81 $dc
     and  A, $80                                        ;; 02:5143 $e6 $80
-    call NZ, call_02_53e7                              ;; 02:5145 $c4 $e7 $53
+    call NZ, call_02_53e7_ApplyVerticalMovementAndClamp                              ;; 02:5145 $c4 $e7 $53
     ld   A, [wDC86]                                    ;; 02:5148 $fa $86 $dc
     cpl                                                ;; 02:514b $2f
     inc  A                                             ;; 02:514c $3c
@@ -493,7 +550,7 @@ call_02_5100:
     ld   B, $ff                                        ;; 02:514e $06 $ff
     ld   A, [wDC81]                                    ;; 02:5150 $fa $81 $dc
     and  A, $40                                        ;; 02:5153 $e6 $40
-    call NZ, call_02_53e7                              ;; 02:5155 $c4 $e7 $53
+    call NZ, call_02_53e7_ApplyVerticalMovementAndClamp                              ;; 02:5155 $c4 $e7 $53
     ret                                                ;; 02:5158 $c9
 .jr_02_5159:
     ld   A, [wDC86]                                    ;; 02:5159 $fa $86 $dc
@@ -516,26 +573,37 @@ call_02_5100:
     inc  A                                             ;; 02:5177 $3c
     ld   C, A                                          ;; 02:5178 $4f
     ld   B, $ff                                        ;; 02:5179 $06 $ff
-    call call_02_53e7                                  ;; 02:517b $cd $e7 $53
+    call call_02_53e7_ApplyVerticalMovementAndClamp                                  ;; 02:517b $cd $e7 $53
 .jr_02_517e:
     pop  AF                                            ;; 02:517e $f1
     ld   C, A                                          ;; 02:517f $4f
     bit  7, A                                          ;; 02:5180 $cb $7f
-    jr   Z, call_02_51f9                               ;; 02:5182 $28 $75
+    jr   Z, call_02_51f9_ApplyRightwardCollisionAdjustment                               ;; 02:5182 $28 $75
     cpl                                                ;; 02:5184 $2f
     inc  A                                             ;; 02:5185 $3c
     ld   C, A                                          ;; 02:5186 $4f
-    jp   call_02_518a                                  ;; 02:5187 $c3 $8a $51
+    jp   call_02_518a_ApplyLeftwardCollisionAdjustment                                  ;; 02:5187 $c3 $8a $51
 
-call_02_518a:
+call_02_518a_ApplyLeftwardCollisionAdjustment:
+; Purpose: Adjusts the player's X-position when moving left against solid tiles or obstacles.
+; Details:
+; Checks flags (wDC7C, wDC7D) for collision state.
+; Computes the delta between player position and reference points.
+; Writes corrected position back to wD80E_PlayerXPosition or clamps based on collision checks.
+; Works together with call_02_5195_ResolveLeftwardTilePushback to fine-tune adjustments.
     ld   A, [wDC7C]                                    ;; 02:518a $fa $7c $dc
     and  A, A                                          ;; 02:518d $a7
-    jr   NZ, jr_02_51cb                                ;; 02:518e $20 $3b
+    jr   NZ, call_02_51cb_CheckLeftCollisionAndStoreOffset                                ;; 02:518e $20 $3b
     ld   A, [wDC7D]                                    ;; 02:5190 $fa $7d $dc
     and  A, A                                          ;; 02:5193 $a7
     ret  NZ                                            ;; 02:5194 $c0
 
-call_02_5195:
+call_02_5195_ResolveLeftwardTilePushback:
+; Purpose: Performs fine collision resolution when pushing left into a block.
+; Details:
+; Calculates distance between player and tile edges (wDC3C, wD80E_PlayerXPosition).
+; Updates temporary velocity/direction flags (wDC8A).
+; Chooses whether to store adjusted coordinates or preserve original deltas based on flags.
     ld   HL, wDC3C                                     ;; 02:5195 $21 $3c $dc
     ld   A, [HL+]                                      ;; 02:5198 $2a
     ld   D, [HL]                                       ;; 02:5199 $56
@@ -576,7 +644,13 @@ call_02_5195:
     ld   [HL], A                                       ;; 02:51c9 $77
     ret                                                ;; 02:51ca $c9
 
-jr_02_51cb:
+call_02_51cb_CheckLeftCollisionAndStoreOffset:
+; Purpose: Handles left-side collision testing.
+; Behavior:
+; Offsets into the player object table, checks a collision flag (bit 7).
+; Compares the player’s X position to stored tile edge positions.
+; If overlap exists, calls ResolveLeftwardTilePushback.
+; Stores the corrected offset between player and solid edge back into the object table.
     or   A, $14                                        ;; 02:51cb $f6 $14
     ld   L, A                                          ;; 02:51cd $6f
     ld   H, $d8                                        ;; 02:51ce $26 $d8
@@ -593,10 +667,10 @@ jr_02_51cb:
     inc  HL                                            ;; 02:51de $23
     ld   A, [wD80F_PlayerXPosition]                                    ;; 02:51df $fa $0f $d8
     sbc  A, [HL]                                       ;; 02:51e2 $9e
-    jr   C, call_02_5195                               ;; 02:51e3 $38 $b0
+    jr   C, call_02_5195_ResolveLeftwardTilePushback                               ;; 02:51e3 $38 $b0
     push HL                                            ;; 02:51e5 $e5
     push DE                                            ;; 02:51e6 $d5
-    call call_02_5195                                  ;; 02:51e7 $cd $95 $51
+    call call_02_5195_ResolveLeftwardTilePushback                                  ;; 02:51e7 $cd $95 $51
     pop  DE                                            ;; 02:51ea $d1
     pop  HL                                            ;; 02:51eb $e1
     dec  L                                             ;; 02:51ec $2d
@@ -608,15 +682,23 @@ jr_02_51cb:
     ld   [HL], A                                       ;; 02:51f7 $77
     ret                                                ;; 02:51f8 $c9
 
-call_02_51f9:
+call_02_51f9_ApplyRightwardCollisionAdjustment:
+; Purpose: Mirrors call_02_518a for rightward movement.
+; Details:
+; Similar structure to 518a but uses addition instead of subtraction for position deltas.
+; Works with call_02_5204_ResolveRightwardTilePushback for fine collision detection.
     ld   A, [wDC7C]                                    ;; 02:51f9 $fa $7c $dc
     and  A, A                                          ;; 02:51fc $a7
-    jr   NZ, jr_02_5238                                ;; 02:51fd $20 $39
+    jr   NZ, call_02_5238_CheckRightCollisionAndStoreOffset                                ;; 02:51fd $20 $39
     ld   A, [wDC7D]                                    ;; 02:51ff $fa $7d $dc
     and  A, A                                          ;; 02:5202 $a7
     ret  NZ                                            ;; 02:5203 $c0
 
-call_02_5204:
+call_02_5204_ResolveRightwardTilePushback:
+; Purpose: Mirrors call_02_5195 for right side collisions.
+; Details:
+; Uses positive deltas to adjust player’s X-position when moving right.
+; pdates flags (wDC8A) and writes corrected values to player position.
     ld   HL, wDC3E                                     ;; 02:5204 $21 $3e $dc
     ld   A, [HL+]                                      ;; 02:5207 $2a
     ld   D, [HL]                                       ;; 02:5208 $56
@@ -656,7 +738,12 @@ call_02_5204:
     ld   [HL], A                                       ;; 02:5236 $77
     ret                                                ;; 02:5237 $c9
 
-jr_02_5238:
+call_02_5238_CheckRightCollisionAndStoreOffset:
+; Purpose: Right-side equivalent of 51CB.
+; Behavior:
+; Performs the same operations but for movement to the right.
+; Calls ResolveRightwardTilePushback when needed.
+; Updates the tile offset table after adjustment.
     or   A, $14                                        ;; 02:5238 $f6 $14
     ld   L, A                                          ;; 02:523a $6f
     ld   H, $d8                                        ;; 02:523b $26 $d8
@@ -674,10 +761,10 @@ jr_02_5238:
     inc  HL                                            ;; 02:524c $23
     ld   A, [wD80F_PlayerXPosition]                                    ;; 02:524d $fa $0f $d8
     sbc  A, [HL]                                       ;; 02:5250 $9e
-    jr   NC, call_02_5204                              ;; 02:5251 $30 $b1
+    jr   NC, call_02_5204_ResolveRightwardTilePushback                              ;; 02:5251 $30 $b1
     push HL                                            ;; 02:5253 $e5
     push DE                                            ;; 02:5254 $d5
-    call call_02_5204                                  ;; 02:5255 $cd $04 $52
+    call call_02_5204_ResolveRightwardTilePushback                                  ;; 02:5255 $cd $04 $52
     pop  DE                                            ;; 02:5258 $d1
     pop  HL                                            ;; 02:5259 $e1
     dec  L                                             ;; 02:525a $2d
@@ -689,8 +776,13 @@ jr_02_5238:
     ld   [HL], A                                       ;; 02:5265 $77
     ret                                                ;; 02:5266 $c9
 
-call_02_5267:
-    call call_02_5541                                  ;; 02:5267 $cd $41 $55
+call_02_5267_PlatformSlopeAndTriggerHandler:
+; Purpose: Manages sloped surfaces, triggers, and speed modifiers.
+; Details:
+; Reads slope/collision data (wDC8C, wDC8F, etc.) and adjusts horizontal velocity.
+; Checks level ID and player action IDs to trigger special cases (calls call_02_54f9_SwitchPlayerAction).
+; Handles different terrain behaviors (e.g., slippery slopes or triggers unique to levels 7 & 8).
+    call call_02_5541_GetActionPropertyByte                                  ;; 02:5267 $cd $41 $55
     and  A, $a0                                        ;; 02:526a $e6 $a0
     ret  NZ                                            ;; 02:526c $c0
     ld   A, [wDC1F]                                    ;; 02:526d $fa $1f $dc
@@ -725,11 +817,11 @@ call_02_5267:
     ld   C, A                                          ;; 02:52a4 $4f
     ld   B, $00                                        ;; 02:52a5 $06 $00
     bit  3, A                                          ;; 02:52a7 $cb $5f
-    jp   Z, call_02_53e7                               ;; 02:52a9 $ca $e7 $53
+    jp   Z, call_02_53e7_ApplyVerticalMovementAndClamp                               ;; 02:52a9 $ca $e7 $53
     or   A, $f0                                        ;; 02:52ac $f6 $f0
     ld   C, A                                          ;; 02:52ae $4f
     dec  B                                             ;; 02:52af $05
-    jp   call_02_53e7                                  ;; 02:52b0 $c3 $e7 $53
+    jp   call_02_53e7_ApplyVerticalMovementAndClamp                                  ;; 02:52b0 $c3 $e7 $53
 .jr_02_52b3:
     ld   A, [wDABE]                                    ;; 02:52b3 $fa $be $da
     and  A, $80                                        ;; 02:52b6 $e6 $80
@@ -762,7 +854,7 @@ call_02_5267:
     jr   Z, .jr_02_52f2                                ;; 02:52ee $28 $02
     ld   A, $11                                        ;; 02:52f0 $3e $11
 .jr_02_52f2:
-    call call_02_54f9                                  ;; 02:52f2 $cd $f9 $54
+    call call_02_54f9_SwitchPlayerAction                                  ;; 02:52f2 $cd $f9 $54
     jp   .jp_02_5283                                   ;; 02:52f5 $c3 $83 $52
 .jr_02_52f8:
     xor  A, A                                          ;; 02:52f8 $af
@@ -773,15 +865,15 @@ call_02_5267:
     ld   A, [wD801_PlayerObject_ActionId]                                    ;; 02:5302 $fa $01 $d8
     cp   A, $1a                                        ;; 02:5305 $fe $1a
     ld   A, $0a                                        ;; 02:5307 $3e $0a
-    jp   Z, call_02_54f9                               ;; 02:5309 $ca $f9 $54
+    jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:5309 $ca $f9 $54
     ld   A, [wD801_PlayerObject_ActionId]                                    ;; 02:530c $fa $01 $d8
     cp   A, $2e                                        ;; 02:530f $fe $2e
     ld   A, $2a                                        ;; 02:5311 $3e $2a
-    jp   Z, call_02_54f9                               ;; 02:5313 $ca $f9 $54
+    jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:5313 $ca $f9 $54
     ld   A, [wD801_PlayerObject_ActionId]                                    ;; 02:5316 $fa $01 $d8
     cp   A, $3b                                        ;; 02:5319 $fe $3b
     ld   A, $37                                        ;; 02:531b $3e $37
-    jp   Z, call_02_54f9                               ;; 02:531d $ca $f9 $54
+    jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:531d $ca $f9 $54
     ld   A, C                                          ;; 02:5320 $79
     cp   A, $08                                        ;; 02:5321 $fe $08
     jr   NC, .jr_02_532a                               ;; 02:5323 $30 $05
@@ -790,17 +882,17 @@ call_02_5267:
     ret                                                ;; 02:5329 $c9
 .jr_02_532a:
     cp   A, $10                                        ;; 02:532a $fe $10
-    jp   C, jp_02_4dce                                 ;; 02:532c $da $ce $4d
+    jp   C, call_02_4dce_SetTriggerByLevel                                 ;; 02:532c $da $ce $4d
     ld   A, [wDB6C_CurrentLevelId]                                    ;; 02:532f $fa $6c $db
     cp   A, $07                                        ;; 02:5332 $fe $07
     ld   A, $24                                        ;; 02:5334 $3e $24
-    jp   Z, call_02_54f9                               ;; 02:5336 $ca $f9 $54
+    jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:5336 $ca $f9 $54
     ld   A, [wDB6C_CurrentLevelId]                                    ;; 02:5339 $fa $6c $db
     cp   A, $08                                        ;; 02:533c $fe $08
     ld   A, $30                                        ;; 02:533e $3e $30
-    jp   Z, call_02_54f9                               ;; 02:5340 $ca $f9 $54
+    jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:5340 $ca $f9 $54
     ld   A, $12                                        ;; 02:5343 $3e $12
-    jp   call_02_54f9                                  ;; 02:5345 $c3 $f9 $54
+    jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:5345 $c3 $f9 $54
 .jp_02_5348:
     ld   A, [wDC8C]                                    ;; 02:5348 $fa $8c $dc
     sub  A, $02                                        ;; 02:534b $d6 $02
@@ -829,8 +921,14 @@ call_02_5267:
     ld   [HL], A                                       ;; 02:5372 $77
     ret                                                ;; 02:5373 $c9
 
-call_02_5374:
-    call call_02_5541                                  ;; 02:5374 $cd $41 $55
+call_02_5374_LevelSpecificEventTrigger:
+; Purpose: Triggers scripted events or hazards tied to specific X positions or collectibles.
+; Details:
+; Filters on input state (and A,$08).
+; Uses level number and index (wDC1E_CurrentLevelNumber) to find event tables (.data_02_53bf).
+; Compares collected values (wDCB1) to thresholds and modifies wDC8C (horizontal momentum or trigger accumulator).
+; Likely handles special pickups or doors that open based on conditions.
+    call call_02_5541_GetActionPropertyByte                                  ;; 02:5374 $cd $41 $55
     and  A, $08                                        ;; 02:5377 $e6 $08
     ret  NZ                                            ;; 02:5379 $c0
     ld   A, [wDC93]                                    ;; 02:537a $fa $93 $dc
@@ -876,7 +974,7 @@ call_02_5374:
 .jr_02_53b7:
     ld   [wDC8C], A                                    ;; 02:53b7 $ea $8c $dc
     ld   A, $1d                                        ;; 02:53ba $3e $1d
-    jp   call_02_54f9                                  ;; 02:53bc $c3 $f9 $54
+    jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:53bc $c3 $f9 $54
 .data_02_53bf:
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 02:53bf ????????
     db   $00, $00, $d7, $53, $df, $53, $00, $00        ;; 02:53c7 ????????
@@ -884,7 +982,13 @@ call_02_5374:
     db   $01, $06, $02, $06, $01, $01, $01, $04        ;; 02:53d7 ????????
     db   $00, $ff, $00, $ff, $00, $ff, $00, $ff        ;; 02:53df ????????
 
-call_02_53e7:
+call_02_53e7_ApplyVerticalMovementAndClamp:
+; Referenced by multiple functions: Applies calculated delta (C,B) to update or test tile collisions.
+; Purpose: Updates Y position and prevents moving outside bounds or through solids.
+; Behavior:
+; Adds (C,B) delta to Y coordinates (wD810–wD811).
+; If player isn’t in a special action (≠ $1B), compares the new position against stored map window bounds (wDC40–wDC43).
+; If out of bounds, clamps Y to the limit and sets wDC8A as a collision indicator.
     ld   HL, wD810_PlayerYPosition                                     ;; 02:53e7 $21 $10 $d8
     ld   A, [HL]                                       ;; 02:53ea $7e
     add  A, C                                          ;; 02:53eb $81
@@ -929,7 +1033,13 @@ call_02_53e7:
     ld   [wDC8A], A                                    ;; 02:542d $ea $8a $dc
     ret                                                ;; 02:5430 $c9
 
-call_02_5431:
+call_02_5431_HandleActionTriggersAndEvents:
+; Purpose: Central dispatcher for action-specific triggers, tile events, and scripted transitions.
+; Behavior:
+; Looks up the current action’s properties (data_02_554d) to check event bits.
+; Compares nearby tile IDs (wDC92, wDC93) for special cases (e.g., doors, hazards).
+; Calls LevelSpecificEventTrigger (5374) and call_02_553b_PollForSpecialInput (input polling).
+; May queue new action states via call_02_54f9_SwitchPlayerAction or reset collision variables if certain tile types are detected.
     ld   HL, wD801_PlayerObject_ActionId                                     ;; 02:5431 $21 $01 $d8
     ld   L, [HL]                                       ;; 02:5434 $6e
     ld   H, $00                                        ;; 02:5435 $26 $00
@@ -950,8 +1060,8 @@ call_02_5431:
     cp   A, $19                                        ;; 02:5456 $fe $19
     jp   Z, jp_00_06e8                                 ;; 02:5458 $ca $e8 $06
 .jr_02_545b:
-    call call_02_5374                                  ;; 02:545b $cd $74 $53
-    call call_02_553b                                  ;; 02:545e $cd $3b $55
+    call call_02_5374_LevelSpecificEventTrigger                                  ;; 02:545b $cd $74 $53
+    call call_02_553b_PollForSpecialInput                                  ;; 02:545e $cd $3b $55
     jr   Z, .jr_02_5488                                ;; 02:5461 $28 $25
     ld   A, [wD801_PlayerObject_ActionId]                                    ;; 02:5463 $fa $01 $d8
     cp   A, $19                                        ;; 02:5466 $fe $19
@@ -968,7 +1078,7 @@ call_02_5431:
     ld   A, $04                                        ;; 02:547c $3e $04
     ld   [wDC9D], A                                    ;; 02:547e $ea $9d $dc
     ld   A, $20                                        ;; 02:5481 $3e $20
-    call call_02_54f9                                  ;; 02:5483 $cd $f9 $54
+    call call_02_54f9_SwitchPlayerAction                                  ;; 02:5483 $cd $f9 $54
     jr   .jr_02_54a7                                   ;; 02:5486 $18 $1f
 .jr_02_5488:
     ld   A, [wD801_PlayerObject_ActionId]                                    ;; 02:5488 $fa $01 $d8
@@ -984,7 +1094,7 @@ call_02_5431:
     ld   A, $04                                        ;; 02:549d $3e $04
     ld   [wDC9D], A                                    ;; 02:549f $ea $9d $dc
     ld   A, $20                                        ;; 02:54a2 $3e $20
-    call call_02_54f9                                  ;; 02:54a4 $cd $f9 $54
+    call call_02_54f9_SwitchPlayerAction                                  ;; 02:54a4 $cd $f9 $54
 .jr_02_54a7:
     ld   A, [wDC81]                                    ;; 02:54a7 $fa $81 $dc
     and  A, $40                                        ;; 02:54aa $e6 $40
@@ -994,7 +1104,7 @@ call_02_5431:
     jr   Z, .jr_02_54d0                                ;; 02:54b3 $28 $1b
     ld   [wDAD6_ReturnBank], A                                    ;; 02:54b5 $ea $d6 $da
     ld   A, $03                                        ;; 02:54b8 $3e $03
-    ld   HL, entry_03_4c2e                              ;; 02:54ba $21 $2e $4c
+    ld   HL, entry_03_4c2e_IsTileType3D                              ;; 02:54ba $21 $2e $4c
     call call_00_0edd_CallAltBankFunc                                  ;; 02:54bd $cd $dd $0e
     jr   NZ, .jr_02_54d0                               ;; 02:54c0 $20 $0e
     xor  A, A                                          ;; 02:54c2 $af
@@ -1002,7 +1112,7 @@ call_02_5431:
     ld   [wDC86], A                                    ;; 02:54c6 $ea $86 $dc
     ld   [wDC8C], A                                    ;; 02:54c9 $ea $8c $dc
     ld   A, $22                                        ;; 02:54cc $3e $22
-    jr   call_02_54f9                                  ;; 02:54ce $18 $29
+    jr   call_02_54f9_SwitchPlayerAction                                  ;; 02:54ce $18 $29
 .jr_02_54d0:
     ld   HL, wD801_PlayerObject_ActionId                                     ;; 02:54d0 $21 $01 $d8
     ld   L, [HL]                                       ;; 02:54d3 $6e
@@ -1035,8 +1145,14 @@ call_02_5431:
 .jr_02_54f8:
     ld   A, [HL+]                                      ;; 02:54f8 $2a
 
-entry_02_54f9:
-call_02_54f9:
+entry_02_54f9_SwitchPlayerAction:
+call_02_54f9_SwitchPlayerAction:
+; Purpose: Safely change the player’s action/state.
+; Behavior:
+; Adjusts action index if in special level/bank.
+; Avoids redundant switches if already in that action.
+; Validates against flags in data_02_554d.
+; Writes new action ID to wDC79 and resets auxiliary timers (wDC7F, wDC7A).
     ld   L, A                                          ;; 02:54f9 $6f
     cp   A, $3c                                        ;; 02:54fa $fe $3c
     jr   NC, .jr_02_5509                               ;; 02:54fc $30 $0b
@@ -1076,13 +1192,21 @@ call_02_54f9:
     ld   [wDC7A], A                                    ;; 02:5537 $ea $7a $dc
     ret                                                ;; 02:553a $c9
 
-call_02_553b:
-    call call_02_5541                                  ;; 02:553b $cd $41 $55
+call_02_553b_PollForSpecialInput:
+; Purpose: Checks if a specific input bit ($20) is pressed.
+; Behavior:
+; Calls call_02_5541_GetActionPropertyByte to fetch current input/action data.
+; Returns Z/NZ depending on whether the special bit is set.
+    call call_02_5541_GetActionPropertyByte                                  ;; 02:553b $cd $41 $55
     and  A, $20                                        ;; 02:553e $e6 $20
     ret                                                ;; 02:5540 $c9
 
-entry_02_5541:
-call_02_5541:
+entry_02_5541_GetActionPropertyByte:
+call_02_5541_GetActionPropertyByte:
+; Purpose: Helper to fetch the property byte for the current action.
+; Behavior:
+; Uses the current action ID (wD801) as an index into data_02_554d.
+; Returns the byte containing action flags (e.g., input mask, movement rules).
     ld   HL, wD801_PlayerObject_ActionId                                     ;; 02:5541 $21 $01 $d8
     ld   L, [HL]                                       ;; 02:5544 $6e
     ld   H, $00                                        ;; 02:5545 $26 $00

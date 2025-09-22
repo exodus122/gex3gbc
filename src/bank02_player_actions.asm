@@ -27,18 +27,18 @@ call_02_47ce:
     ld   A, [wDC81]                                    ;; 02:47e9 $fa $81 $dc
     cp   A, $40                                        ;; 02:47ec $fe $40
     call Z, call_00_1bbc_CheckPlayerLevelTriggers                               ;; 02:47ee $cc $bc $1b
-    call call_02_4f11                                  ;; 02:47f1 $cd $11 $4f
+    call call_02_4f11_LevelCollisionToSound                                  ;; 02:47f1 $cd $11 $4f
     ld   HL, wDC83                                     ;; 02:47f4 $21 $83 $dc
     dec  [HL]                                          ;; 02:47f7 $35
     ld   A, $02                                        ;; 02:47f8 $3e $02
-    jp   Z, call_02_54f9                               ;; 02:47fa $ca $f9 $54
+    jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:47fa $ca $f9 $54
     ret                                                ;; 02:47fd $c9
 
 call_02_47fe:
     ld   A, [wDC81]                                    ;; 02:47fe $fa $81 $dc
     cp   A, $40                                        ;; 02:4801 $fe $40
     call Z, call_00_1bbc_CheckPlayerLevelTriggers                               ;; 02:4803 $cc $bc $1b
-    call call_02_4f11                                  ;; 02:4806 $cd $11 $4f
+    call call_02_4f11_LevelCollisionToSound                                  ;; 02:4806 $cd $11 $4f
     ret                                                ;; 02:4809 $c9
 
 call_02_480a:
@@ -48,7 +48,7 @@ call_02_480a:
     ld   A, $02                                        ;; 02:4811 $3e $02
     ld   [wDC87], A                                    ;; 02:4813 $ea $87 $dc
 .jr_02_4816:
-    call call_02_4f11                                  ;; 02:4816 $cd $11 $4f
+    call call_02_4f11_LevelCollisionToSound                                  ;; 02:4816 $cd $11 $4f
     ret                                                ;; 02:4819 $c9
 
 call_02_481a:
@@ -89,7 +89,7 @@ call_02_484d:
     ld   A, $1c                                        ;; 02:4854 $3e $1c
     ld   [wDC8C], A                                    ;; 02:4856 $ea $8c $dc
     ld   [wDC8E], A                                    ;; 02:4859 $ea $8e $dc
-    call call_02_4e01                                  ;; 02:485c $cd $01 $4e
+    call call_02_4e01_SetOneTimeFlag                                  ;; 02:485c $cd $01 $4e
     ld   A, $0a                                        ;; 02:485f $3e $0a
     call call_00_0ff5_MaybeQueueBankChange                                  ;; 02:4861 $cd $f5 $0f
 .jr_02_4864:
@@ -98,7 +98,7 @@ call_02_484d:
     ld   A, [wDC8E]                                    ;; 02:4869 $fa $8e $dc
     and  A, A                                          ;; 02:486c $a7
     ld   A, $01                                        ;; 02:486d $3e $01
-    jp   Z, call_02_54f9                               ;; 02:486f $ca $f9 $54
+    jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:486f $ca $f9 $54
     ret                                                ;; 02:4872 $c9
 
 call_02_4873:
@@ -133,7 +133,7 @@ call_02_48a1:
     ld   A, $1d                                        ;; 02:48a6 $3e $1d
     call NZ, call_00_0ff5_MaybeQueueBankChange                              ;; 02:48a8 $c4 $f5 $0f
     ld   C, $11                                        ;; 02:48ab $0e $11
-    jp   jp_02_4db1                                    ;; 02:48ad $c3 $b1 $4d
+    jp   call_02_4db1_CheckPlayerObjectXDistance                                    ;; 02:48ad $c3 $b1 $4d
 
 call_02_48b0:
     ld   A, [wD805]                                    ;; 02:48b0 $fa $05 $d8
@@ -152,8 +152,8 @@ call_02_48bc:
     ld   A, $2a                                        ;; 02:48c8 $3e $2a
     ld   [wDC8C], A                                    ;; 02:48ca $ea $8c $dc
     ld   [wDC8E], A                                    ;; 02:48cd $ea $8e $dc
-    call call_02_4df6                                  ;; 02:48d0 $cd $f6 $4d
-    call call_02_4e01                                  ;; 02:48d3 $cd $01 $4e
+    call call_02_4df6_FlagCollisionActive                                  ;; 02:48d0 $cd $f6 $4d
+    call call_02_4e01_SetOneTimeFlag                                  ;; 02:48d3 $cd $01 $4e
 .jr_02_48d6:
     ld   A, [wDC8E]                                    ;; 02:48d6 $fa $8e $dc
     and  A, A                                          ;; 02:48d9 $a7
@@ -161,8 +161,8 @@ call_02_48bc:
     ld   A, [wDC81]                                    ;; 02:48db $fa $81 $dc
     and  A, $02                                        ;; 02:48de $e6 $02
     ld   A, $0f                                        ;; 02:48e0 $3e $0f
-    jp   NZ, call_02_54f9                              ;; 02:48e2 $c2 $f9 $54
-    jp   jp_02_4dce                                    ;; 02:48e5 $c3 $ce $4d
+    jp   NZ, call_02_54f9_SwitchPlayerAction                              ;; 02:48e2 $c2 $f9 $54
+    jp   call_02_4dce_SetTriggerByLevel                                    ;; 02:48e5 $c3 $ce $4d
 
 call_02_48e8:
     ld   HL, wD805                                     ;; 02:48e8 $21 $05 $d8
@@ -174,8 +174,8 @@ call_02_48e8:
     ld   A, $3e                                        ;; 02:48f4 $3e $3e
     ld   [wDC8C], A                                    ;; 02:48f6 $ea $8c $dc
     ld   [wDC8E], A                                    ;; 02:48f9 $ea $8e $dc
-    call call_02_4df6                                  ;; 02:48fc $cd $f6 $4d
-    call call_02_4e01                                  ;; 02:48ff $cd $01 $4e
+    call call_02_4df6_FlagCollisionActive                                  ;; 02:48fc $cd $f6 $4d
+    call call_02_4e01_SetOneTimeFlag                                  ;; 02:48ff $cd $01 $4e
 .jr_02_4902:
     ld   A, [wDC8E]                                    ;; 02:4902 $fa $8e $dc
     and  A, A                                          ;; 02:4905 $a7
@@ -183,7 +183,7 @@ call_02_48e8:
     ld   A, [wDC81]                                    ;; 02:4907 $fa $81 $dc
     and  A, $02                                        ;; 02:490a $e6 $02
     jr   NZ, .jr_02_48ef                               ;; 02:490c $20 $e1
-    jp   jp_02_4dce                                    ;; 02:490e $c3 $ce $4d
+    jp   call_02_4dce_SetTriggerByLevel                                    ;; 02:490e $c3 $ce $4d
 
 call_02_4911:
     ld   HL, wD805                                     ;; 02:4911 $21 $05 $d8
@@ -195,7 +195,7 @@ call_02_4911:
     set  0, [HL]                                       ;; 02:4920 $cb $c6
     ld   A, $01                                        ;; 02:4922 $3e $01
     ld   [wDC7F], A                                    ;; 02:4924 $ea $7f $dc
-    call call_02_4e01                                  ;; 02:4927 $cd $01 $4e
+    call call_02_4e01_SetOneTimeFlag                                  ;; 02:4927 $cd $01 $4e
 .jr_02_492a:
     ld   A, [wD805]                                    ;; 02:492a $fa $05 $d8
     and  A, $04                                        ;; 02:492d $e6 $04
@@ -218,7 +218,7 @@ call_02_4911:
     ld   C, $03                                        ;; 02:4951 $0e $03
 .jr_02_4953:
     ld   A, C                                          ;; 02:4953 $79
-    jp   call_02_54f9                                  ;; 02:4954 $c3 $f9 $54
+    jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:4954 $c3 $f9 $54
 
 call_02_4957:
     ld   HL, wD805                                     ;; 02:4957 $21 $05 $d8
@@ -226,7 +226,7 @@ call_02_4957:
     jr   Z, .jr_02_4966                                ;; 02:495c $28 $08
     ld   A, $01                                        ;; 02:495e $3e $01
     ld   [wDC8E], A                                    ;; 02:4960 $ea $8e $dc
-    call call_02_4e01                                  ;; 02:4963 $cd $01 $4e
+    call call_02_4e01_SetOneTimeFlag                                  ;; 02:4963 $cd $01 $4e
 .jr_02_4966:
     ld   A, [wDC8E]                                    ;; 02:4966 $fa $8e $dc
     and  A, A                                          ;; 02:4969 $a7
@@ -234,9 +234,9 @@ call_02_4957:
     ld   A, [wDC81]                                    ;; 02:496b $fa $81 $dc
     and  A, $30                                        ;; 02:496e $e6 $30
     ld   A, $03                                        ;; 02:4970 $3e $03
-    jp   NZ, call_02_54f9                              ;; 02:4972 $c2 $f9 $54
+    jp   NZ, call_02_54f9_SwitchPlayerAction                              ;; 02:4972 $c2 $f9 $54
     ld   A, $01                                        ;; 02:4975 $3e $01
-    jp   call_02_54f9                                  ;; 02:4977 $c3 $f9 $54
+    jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:4977 $c3 $f9 $54
 
 call_02_497a:
     ld   HL, wD805                                     ;; 02:497a $21 $05 $d8
@@ -254,18 +254,18 @@ call_02_4989:
     ld   a,$30
     ld   [wDC8C],a
     ld   [wDC8E],a
-    call call_02_4e01
+    call call_02_4e01_SetOneTimeFlag
     call call_00_06f6
     ld   a,$0B
     call call_00_0ff5_MaybeQueueBankChange
     ld   a,$14
-    call entry_02_72ac
+    call entry_02_72ac_LoadObjectData
 
 call_02_49a8:
     ld   a,[wDC8E]
     and  a
     ld   a,$01
-    jp   z,entry_02_54f9
+    jp   z,entry_02_54f9_SwitchPlayerAction
     ret  
     
 call_02_49b2:  
@@ -284,7 +284,7 @@ call_02_49b3:
     ld   a,01
     ld   [wDC87],a
 .label49CE:
-    call call_02_4ee7
+    call call_02_4ee7_MapCollisionFlags
     ld   hl,wDC9D
     cp   a,$FF
     jr   z,.label49D9
@@ -362,16 +362,16 @@ call_02_4a52:
     jr   z,label4A61
     ld   a,$01
     ld   [wDC8E],a
-    call call_02_4e01
+    call call_02_4e01_SetOneTimeFlag
 label4A61:
     ld   a,[wDC8E]
     and  a
-    jp   z,jp_02_4dce
+    jp   z,call_02_4dce_SetTriggerByLevel
     ret  
 
 call_02_4a69:
     ld   c,$51
-    jp   jp_02_4db1
+    jp   call_02_4db1_CheckPlayerObjectXDistance
 
 call_02_4a6e:
     ld   hl,wD805
@@ -393,7 +393,7 @@ label4A87:
     ld   hl,wDC80
     set  6,[hl]
     ld   a,$19
-    jp   entry_02_54f9
+    jp   entry_02_54f9_SwitchPlayerAction
 
 call_02_4a9b:
     ld   a,$01
@@ -438,7 +438,7 @@ call_02_4adb:
     ld   c,d
     ld   h,[hl]
     ld   c,e
-    call call_02_4ee7
+    call call_02_4ee7_MapCollisionFlags
     ld   hl,wDCA1
     cp   a,$FF
     jr   z,.label4AEA
@@ -482,7 +482,7 @@ call_02_4adb:
     and  a,$02
     jr   z,.label4B32
     ld   a,$0E
-    call entry_02_54f9
+    call entry_02_54f9_SwitchPlayerAction
 .label4B32:
     ld   a,[wDC81]
     and  a,$01
@@ -491,7 +491,7 @@ call_02_4adb:
     call call_00_0ff5_MaybeQueueBankChange
     ld   hl,wDC80
     set  0,[hl]
-    call call_02_4e01
+    call call_02_4e01_SetOneTimeFlag
     ld   a,$01
     ld   [wDC9E],a
     xor  a
@@ -507,7 +507,7 @@ call_02_4adb:
     db   $00, $00, $00, $00, $60, $20, $20, $20
 
 call_02_4B66:
-    call call_02_4ee7
+    call call_02_4ee7_MapCollisionFlags
     ld   hl,wDCA1
     cp   a,$FF
     jr   z,label4B71
@@ -568,7 +568,7 @@ label4BDC:
     ld   a,[wDC81]
     bit  6,a
     call nz,call_00_1bbc_CheckPlayerLevelTriggers
-    call call_02_4E0C
+    call call_02_4E0C_UpdateActionSequence
     ld   a,[wDCA5]
     and  a
     jr   z,call_02_4C11
@@ -617,8 +617,8 @@ call_02_4c2c:
     ld   a,$2A
     ld   [wDC8C],a
     ld   [wDC8E],a
-    call call_02_4df6
-    call call_02_4e01
+    call call_02_4df6_FlagCollisionActive
+    call call_02_4e01_SetOneTimeFlag
 label4C46:
     ld   a,[wDC8E]
     and  a
@@ -626,8 +626,8 @@ label4C46:
     ld   a,[wDC81]
     and  a,$02
     ld   a,$26
-    jp   nz,entry_02_54f9
-    jp   jp_02_4dce
+    jp   nz,entry_02_54f9_SwitchPlayerAction
+    jp   call_02_4dce_SetTriggerByLevel
 
 call_02_4c58:
     ld   hl,wD805
@@ -638,12 +638,12 @@ call_02_4c58:
     ld   a,$3E
     ld   [wDC8C],a
     ld   [wDC8E],a
-    call call_02_4df6
-    call call_02_4e01
+    call call_02_4df6_FlagCollisionActive
+    call call_02_4e01_SetOneTimeFlag
 label4C72:
     ld   a,[wDC8E]
     and  a
-    jp   z,jp_02_4dce
+    jp   z,call_02_4dce_SetTriggerByLevel
     ret  
 
 call_02_4c7a:
@@ -662,9 +662,9 @@ call_02_4c7a:
     set  0,[hl]
     ld   a,$01
     ld   [wDC7F],a
-    call call_02_4e01
+    call call_02_4e01_SetOneTimeFlag
 label4CA1:
-    jp   call_02_4E0C
+    jp   call_02_4E0C_UpdateActionSequence
 
 call_02_4ca4:
     ld   hl,wD805
@@ -672,12 +672,12 @@ call_02_4ca4:
     jr   z,label4CB3
     ld   a,$01
     ld   [wDC8E],a
-    call call_02_4e01
+    call call_02_4e01_SetOneTimeFlag
 label4CB3:
     ld   a,[wDC8E]
     and  a
     ld   a,$24
-    jp   z,entry_02_54f9
+    jp   z,entry_02_54f9_SwitchPlayerAction
     ret  
 
 call_02_4cbd:
@@ -687,7 +687,7 @@ call_02_4cbd:
     ld   a,$1C
     ld   [wDC8C],a
     ld   [wDC8E],a
-    call call_02_4e01
+    call call_02_4e01_SetOneTimeFlag
     ld   a,$0A
     call call_00_0ff5_MaybeQueueBankChange
 label4CD4:
@@ -696,16 +696,16 @@ label4CD4:
     ld   a,[wDC8E]
     and  a
     ld   a,$24
-    jp   z,entry_02_54f9
+    jp   z,entry_02_54f9_SwitchPlayerAction
     ret  
 
 call_02_4ce3:
     ld   a,$06
     call call_00_0ff5_MaybeQueueBankChange
-    call call_02_4e01
+    call call_02_4e01_SetOneTimeFlag
     ld   a,$31
-    call entry_02_54f9
-    call call_02_4df6
+    call entry_02_54f9_SwitchPlayerAction
+    call call_02_4df6_FlagCollisionActive
     ld   hl,wDABE
     bit  7,[hl]
     jr   z,call_02_4d02
@@ -719,16 +719,16 @@ call_02_4d02:
     ld   a,[wDC81]
     and  a,$02
     ld   a,$32
-    jp   nz,entry_02_54f9
-    jp   jp_02_4dce
+    jp   nz,entry_02_54f9_SwitchPlayerAction
+    jp   call_02_4dce_SetTriggerByLevel
 
 call_02_4d14:
     ld   a,$07
     call call_00_0ff5_MaybeQueueBankChange
-    call call_02_4e01
+    call call_02_4e01_SetOneTimeFlag
     ld   a,$33
-    call entry_02_54f9
-    call call_02_4df6
+    call entry_02_54f9_SwitchPlayerAction
+    call call_02_4df6_FlagCollisionActive
     ld   hl,wDABE
     bit  7,[hl]
     jr   z,call_02_4d33
@@ -742,8 +742,8 @@ call_02_4d33:
     ld   a,[wDC81]
     and  a,$02
     ld   a,$32
-    jp   nz,entry_02_54f9
-    jp   jp_02_4dce
+    jp   nz,entry_02_54f9_SwitchPlayerAction
+    jp   call_02_4dce_SetTriggerByLevel
 
 call_02_4d45:
     ld   hl,wD805
@@ -755,7 +755,7 @@ call_02_4d45:
     set  0,[hl]
     ld   a,$01
     ld   [wDC7F],a
-    call call_02_4e01
+    call call_02_4e01_SetOneTimeFlag
 label4D5E:
     ld   a,[wD805]
     and  a,$04
@@ -765,7 +765,7 @@ label4D5E:
     ld   hl,wDC80
     set  6,[hl]
     ld   a,$30
-    jp   entry_02_54f9
+    jp   entry_02_54f9_SwitchPlayerAction
 
 call_02_4d72:
     ld   hl,wD805
@@ -773,12 +773,12 @@ call_02_4d72:
     jr   z,label4D81
     ld   a,$01
     ld   [wDC8E],a
-    call call_02_4e01
+    call call_02_4e01_SetOneTimeFlag
 label4D81:
     ld   a,[wDC8E]
     and  a
     ld   a,$30
-    jp   z,entry_02_54f9
+    jp   z,entry_02_54f9_SwitchPlayerAction
     ret  
 
 call_02_4d8b:
@@ -788,7 +788,7 @@ call_02_4d8b:
     ld   a,$1C
     ld   [wDC8C],a
     ld   [wDC8E],a
-    call call_02_4e01
+    call call_02_4e01_SetOneTimeFlag
     ld   a,$0A
     call call_00_0ff5_MaybeQueueBankChange
 label4DA2:
@@ -797,5 +797,5 @@ label4DA2:
     ld   a,[wDC8E]
     and  a
     ld   a,$30
-    jp   z,entry_02_54f9
+    jp   z,entry_02_54f9_SwitchPlayerAction
     ret  
