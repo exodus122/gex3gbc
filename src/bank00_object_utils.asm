@@ -308,7 +308,7 @@ call_00_244a_Object_ApplyClampedVerticalVelocity:
 ; Gets a value from $1D (likely vertical velocity). Subtracts 2, clamps negative values to at least $C0.
 ; Stores the result back.
 ; Computes a small step (cpl/inc + four sra) to get a signed delta (C,B).
-; Jumps to jp_00_250d to apply the delta to object position.
+; Jumps to call_00_250d_Object_UpdateYPosition to apply the delta to object position.
 ; Purpose: Reduces velocity, clamps it, and applies movement on Y-axis.
     ld   H, $d8                                        ;; 00:244a $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:244c $fa $00 $da
@@ -334,7 +334,7 @@ call_00_244a_Object_ApplyClampedVerticalVelocity:
     ld   A, $ff                                        ;; 00:246d $3e $ff
     adc  A, $00                                        ;; 00:246f $ce $00
     ld   B, A                                          ;; 00:2471 $47
-    jp   jp_00_250d                                    ;; 00:2472 $c3 $0d $25
+    jp   call_00_250d_Object_UpdateYPosition                                    ;; 00:2472 $c3 $0d $25
 
 call_00_2475_Object_MoveAndClampVerticalPosition:
 ; Similar to 244A: subtracts 2 from $1D, clamps to $C0.
@@ -454,7 +454,7 @@ call_00_24ee_Object_IntegrateFractionalVelocity_Y:
     ld   A, $ff                                        ;; 00:2508 $3e $ff
     adc  A, $00                                        ;; 00:250a $ce $00
     ld   B, A                                          ;; 00:250c $47
-jp_00_250d:
+call_00_250d_Object_UpdateYPosition:
     ld   H, $d8                                        ;; 00:250d $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:250f $fa $00 $da
     or   A, $10                                        ;; 00:2512 $f6 $10
@@ -951,7 +951,7 @@ call_00_2722_Player_IsWithinObjectYRange:
     xor  A, A                                          ;; 00:2764 $af
     ret                                                ;; 00:2765 $c9
 
-call_00_2766_Object_UpdatePositionFromVector:
+call_00_2766_Object_UpdateXPositionFromVector:
 ; Update Object Position if Player Behind
 ; Uses GetDA26 (probably retrieves the object’s movement vector), compares it to the 
 ; player’s relative position. If the player is not in front, writes a new object 
@@ -1907,7 +1907,7 @@ call_00_2ba9_SetObjectStatusTo50:
     ld   [HL], $50                                     ;; 00:2bbb $36 $50
     ret                                                ;; 00:2bbd $c9
 
-call_00_2bbe_InitializeNewObject:
+call_00_2bbe_SpawnCollectibleObject:
 ; Full object creation routine:
 ; Validates current object value via call_00_35e8_GetObjectTypeIndex.
 ; If not $FF and bit 6 is set, sets up multiple object parameters 

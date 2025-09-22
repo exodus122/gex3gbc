@@ -5,7 +5,7 @@ call_02_582f:
     call call_00_288c_Object_Clear14
     call call_00_2b8b_HandleObjectFlag6ClearOrInit
     call call_00_2a5d_ObjectCheckFlag2
-    jp   nz,call_00_2bbe_InitializeNewObject
+    jp   nz,call_00_2bbe_SpawnCollectibleObject
     ret  
 
 call_02_583c:
@@ -18,7 +18,7 @@ call_02_583c:
     call call_00_2c67_Particle_InitBurst                                  ;; 02:584d $cd $67 $2c
 .jr_02_5850:
     call call_00_2c89_Particle_UpdateBurst                                  ;; 02:5850 $cd $89 $2c
-    jp   Z, call_00_2bbe_InitializeNewObject                                 ;; 02:5853 $ca $be $2b
+    jp   Z, call_00_2bbe_SpawnCollectibleObject                                 ;; 02:5853 $ca $be $2b
     ret                                                ;; 02:5856 $c9
 .data_02_5857:
     db   $00, $00, $08, $02, $04, $01, $ff, $7f        ;; 02:5857 ........
@@ -305,7 +305,7 @@ call_02_5a83:
     push HL                                            ;; 02:5a95 $e5
     ld   [wDAD6_ReturnBank], A                                    ;; 02:5a96 $ea $d6 $da
     ld   A, $01                                        ;; 02:5a99 $3e $01
-    ld   HL, entry_01_4ae7                              ;; 02:5a9b $21 $e7 $4a
+    ld   HL, entry_01_4ae7_CountLevelsWithFlag4                              ;; 02:5a9b $21 $e7 $4a
     call call_00_0edd_CallAltBankFunc                                  ;; 02:5a9e $cd $dd $0e
     pop  HL                                            ;; 02:5aa1 $e1
     ld   C, [HL]                                       ;; 02:5aa2 $4e
@@ -317,7 +317,7 @@ call_02_5a83:
     push HL                                            ;; 02:5aaa $e5
     ld   [wDAD6_ReturnBank], A                                    ;; 02:5aab $ea $d6 $da
     ld   A, $01                                        ;; 02:5aae $3e $01
-    ld   HL, entry_01_4ab9                              ;; 02:5ab0 $21 $b9 $4a
+    ld   HL, entry_01_4ab9_CountSetBitsInFlags                              ;; 02:5ab0 $21 $b9 $4a
     call call_00_0edd_CallAltBankFunc                                  ;; 02:5ab3 $cd $dd $0e
     pop  HL                                            ;; 02:5ab6 $e1
     cp   A, [HL]                                       ;; 02:5ab7 $be
@@ -368,7 +368,7 @@ call_02_5af8:
     push HL                                            ;; 02:5b0a $e5
     ld   [wDAD6_ReturnBank], A                                    ;; 02:5b0b $ea $d6 $da
     ld   A, $01                                        ;; 02:5b0e $3e $01
-    ld   HL, entry_01_4ae7                              ;; 02:5b10 $21 $e7 $4a
+    ld   HL, entry_01_4ae7_CountLevelsWithFlag4                              ;; 02:5b10 $21 $e7 $4a
     call call_00_0edd_CallAltBankFunc                                  ;; 02:5b13 $cd $dd $0e
     pop  HL                                            ;; 02:5b16 $e1
     ld   C, [HL]                                       ;; 02:5b17 $4e
@@ -380,7 +380,7 @@ call_02_5af8:
     push HL                                            ;; 02:5b1f $e5
     ld   [wDAD6_ReturnBank], A                                    ;; 02:5b20 $ea $d6 $da
     ld   A, $01                                        ;; 02:5b23 $3e $01
-    ld   HL, entry_01_4ab9                              ;; 02:5b25 $21 $b9 $4a
+    ld   HL, entry_01_4ab9_CountSetBitsInFlags                              ;; 02:5b25 $21 $b9 $4a
     call call_00_0edd_CallAltBankFunc                                  ;; 02:5b28 $cd $dd $0e
     pop  HL                                            ;; 02:5b2b $e1
     cp   A, [HL]                                       ;; 02:5b2c $be
@@ -541,7 +541,7 @@ call_02_5c50:
 .jr_02_5c62:
     call call_00_251c_Object_CheckRegionAndSetFlag                                  ;; 02:5c62 $cd $1c $25
     call call_00_244a_Object_ApplyClampedVerticalVelocity                                  ;; 02:5c65 $cd $4a $24
-    call call_00_2766_Object_UpdatePositionFromVector                                  ;; 02:5c68 $cd $66 $27
+    call call_00_2766_Object_UpdateXPositionFromVector                                  ;; 02:5c68 $cd $66 $27
     ret  C                                             ;; 02:5c6b $d8
     call call_00_299f_ObjectFlipFacingDirection                                  ;; 02:5c6c $cd $9f $29
     ld   A, $02                                        ;; 02:5c6f $3e $02
@@ -767,7 +767,7 @@ call_02_5e0d:
 call_02_5e25:
     call call_00_251c_Object_CheckRegionAndSetFlag                                  ;; 02:5e25 $cd $1c $25
     call call_00_244a_Object_ApplyClampedVerticalVelocity                                  ;; 02:5e28 $cd $4a $24
-    call call_00_2766_Object_UpdatePositionFromVector                                  ;; 02:5e2b $cd $66 $27
+    call call_00_2766_Object_UpdateXPositionFromVector                                  ;; 02:5e2b $cd $66 $27
     ld   A, $00                                        ;; 02:5e2e $3e $00
     jp   NC, call_02_72ac_LoadObjectData                              ;; 02:5e30 $d2 $ac $72
     ret                                                ;; 02:5e33 $c9
@@ -775,7 +775,7 @@ call_02_5e25:
 call_02_5e34:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck                                  ;; 02:5e34 $cd $f5 $29
     jr   Z, .jr_02_5e45                                ;; 02:5e37 $28 $0c
-    call call_00_2766_Object_UpdatePositionFromVector                                  ;; 02:5e39 $cd $66 $27
+    call call_00_2766_Object_UpdateXPositionFromVector                                  ;; 02:5e39 $cd $66 $27
     ld   C, $00                                        ;; 02:5e3c $0e $00
     jr   C, .jr_02_5e42                                ;; 02:5e3e $38 $02
     ld   C, $01                                        ;; 02:5e40 $0e $01
@@ -803,7 +803,7 @@ call_02_5e34:
 .jr_02_5e6d:
     call call_00_251c_Object_CheckRegionAndSetFlag                                  ;; 02:5e6d $cd $1c $25
     call call_00_244a_Object_ApplyClampedVerticalVelocity                                  ;; 02:5e70 $cd $4a $24
-    call call_00_2766_Object_UpdatePositionFromVector                                  ;; 02:5e73 $cd $66 $27
+    call call_00_2766_Object_UpdateXPositionFromVector                                  ;; 02:5e73 $cd $66 $27
     ld   C, $01                                        ;; 02:5e76 $0e $01
     call NC, call_00_2980_ObjectSet19                              ;; 02:5e78 $d4 $80 $29
     ret                                                ;; 02:5e7b $c9
@@ -842,7 +842,7 @@ call_02_5eb8:
     call call_00_2588_Object_ApproachTargetValue_Byte                                  ;; 02:5eba $cd $88 $25
     call call_00_251c_Object_CheckRegionAndSetFlag                                  ;; 02:5ebd $cd $1c $25
     call call_00_244a_Object_ApplyClampedVerticalVelocity                                  ;; 02:5ec0 $cd $4a $24
-    call call_00_2766_Object_UpdatePositionFromVector                                  ;; 02:5ec3 $cd $66 $27
+    call call_00_2766_Object_UpdateXPositionFromVector                                  ;; 02:5ec3 $cd $66 $27
     ld   A, $00                                        ;; 02:5ec6 $3e $00
     jp   NC, call_02_72ac_LoadObjectData                              ;; 02:5ec8 $d2 $ac $72
     ret                                                ;; 02:5ecb $c9
@@ -919,7 +919,7 @@ call_02_5f42:
     ld   c,$30
     call nz,call_00_28dc_ObjectSet1D
     call call_00_244a_Object_ApplyClampedVerticalVelocity
-    jp   call_00_2766_Object_UpdatePositionFromVector
+    jp   call_00_2766_Object_UpdateXPositionFromVector
 
 call_02_5f50:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
@@ -1088,7 +1088,7 @@ label6155:
 
 call_02_6163:
     call call_00_244a_Object_ApplyClampedVerticalVelocity
-    call call_00_2766_Object_UpdatePositionFromVector
+    call call_00_2766_Object_UpdateXPositionFromVector
     ld   a,$03
     jp   nc,entry_02_72ac_LoadObjectData
     ret  
@@ -1123,7 +1123,7 @@ call_02_616f:
     ld   [wDCDC],a
 .label61A1:
     call call_00_244a_Object_ApplyClampedVerticalVelocity
-    call call_00_2766_Object_UpdatePositionFromVector
+    call call_00_2766_Object_UpdateXPositionFromVector
     ret  c
     ld   a,$19
     call call_00_0ff5_MaybeQueueBankChange
@@ -1132,7 +1132,7 @@ call_02_616f:
 
 call_02_61b2:
     call call_00_244a_Object_ApplyClampedVerticalVelocity
-    jp   call_00_2766_Object_UpdatePositionFromVector
+    jp   call_00_2766_Object_UpdateXPositionFromVector
 
 call_02_61b8:
     ld   hl,.data_02_61be
@@ -1194,7 +1194,7 @@ call_02_6214:
     ld   c,$00
     call call_00_2958_ObjectSetFacingDirection
     ld   bc,$0028
-    call jp_00_250d
+    call call_00_250d_Object_UpdateYPosition
     ld   c,$28
     call call_00_290d_ObjectSetTimer1A
 .label6239:
@@ -1202,7 +1202,7 @@ call_02_6214:
     and  a,$03
     ret  nz
     ld   bc,$FFFF
-    call jp_00_250d
+    call call_00_250d_Object_UpdateYPosition
     call call_00_2922_ObjectTimer1ACountdown
     ld   a,$01
     jp   z,entry_02_72ac_LoadObjectData
@@ -1262,7 +1262,7 @@ call_02_6293:
     and  a,$03
     ret  nz
     ld   bc,$0001
-    call jp_00_250d
+    call call_00_250d_Object_UpdateYPosition
     call call_00_2922_ObjectTimer1ACountdown
     ld   a,$00
     jp   z,entry_02_72ac_LoadObjectData
@@ -1439,7 +1439,7 @@ call_02_6415:
     call nz,call_00_28dc_ObjectSet1D
     call call_00_251c_Object_CheckRegionAndSetFlag
     call call_00_244a_Object_ApplyClampedVerticalVelocity
-    call call_00_2766_Object_UpdatePositionFromVector
+    call call_00_2766_Object_UpdateXPositionFromVector
     ret  c
     ld   a,$03
     call entry_02_72ac_LoadObjectData
@@ -1540,7 +1540,7 @@ call_02_64cd:
     call call_00_2588_Object_ApproachTargetValue_Byte
     call call_00_251c_Object_CheckRegionAndSetFlag
     call call_00_244a_Object_ApplyClampedVerticalVelocity
-    call call_00_2766_Object_UpdatePositionFromVector
+    call call_00_2766_Object_UpdateXPositionFromVector
     ld   a,$00
     jp   nc,entry_02_72ac_LoadObjectData
     ret  
@@ -1673,7 +1673,7 @@ call_02_6549:
     ret  nc
     inc  [hl]
     ld   bc,$FFFF
-    jp   jp_00_250d
+    jp   call_00_250d_Object_UpdateYPosition
 .label65F8:
     ld   a,[wDC71]
     and  a,$03
@@ -1682,7 +1682,7 @@ call_02_6549:
     ret  z
     dec  [hl]
     ld   bc,$0001
-    jp   jp_00_250d
+    jp   call_00_250d_Object_UpdateYPosition
     call call_00_22d4_CheckObjectSlotFlag
     ret  z
     ld   c,$01
@@ -1746,9 +1746,9 @@ call_02_667e:
     inc  b
     ld   b,$04
     call call_00_244a_Object_ApplyClampedVerticalVelocity
-    jp   call_00_2766_Object_UpdatePositionFromVector
+    jp   call_00_2766_Object_UpdateXPositionFromVector
     call call_00_244a_Object_ApplyClampedVerticalVelocity
-    call call_00_2766_Object_UpdatePositionFromVector
+    call call_00_2766_Object_UpdateXPositionFromVector
     ret  c
     call call_00_2a5d_ObjectCheckFlag2
     ld   a,$04
@@ -1763,7 +1763,7 @@ call_02_667e:
 .label66AC:
     call call_00_251c_Object_CheckRegionAndSetFlag
     call call_00_244a_Object_ApplyClampedVerticalVelocity
-    call call_00_2766_Object_UpdatePositionFromVector
+    call call_00_2766_Object_UpdateXPositionFromVector
     ld   a,$00
     jp   nc,entry_02_72ac_LoadObjectData
     ret  
@@ -1824,7 +1824,7 @@ call_02_667e:
     call call_00_2588_Object_ApproachTargetValue_Byte
     call call_00_251c_Object_CheckRegionAndSetFlag
     call call_00_244a_Object_ApplyClampedVerticalVelocity
-    call call_00_2766_Object_UpdatePositionFromVector
+    call call_00_2766_Object_UpdateXPositionFromVector
     ld   a,$00
     jp   nc,entry_02_72ac_LoadObjectData
     ret  
@@ -1847,7 +1847,7 @@ call_02_667e:
     jr   z,.label6776
     inc  [hl]
     ld   bc,$FFFF
-    call jp_00_250d
+    call call_00_250d_Object_UpdateYPosition
 .label6776:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$00
@@ -1881,7 +1881,7 @@ call_02_667e:
     jp   z,call_00_2b7a_ClearObjectThenJump
     call call_00_24c0_Object_IntegrateFractionalVelocity_X
     call call_00_244a_Object_ApplyClampedVerticalVelocity
-    jp   call_00_2766_Object_UpdatePositionFromVector
+    jp   call_00_2766_Object_UpdateXPositionFromVector
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,.label67DF
     call $688E
@@ -1988,7 +1988,7 @@ call_02_667e:
     ld   a,[wD80F_PlayerXPosition]
     sbc  [hl]
     or   e
-    jp   z,jp_00_250d
+    jp   z,call_00_250d_Object_UpdateYPosition
     ret  
 .data_02_686a:    
     db   $00, $a0, $01, $98, $02        ;; 02:6867 ????????
@@ -2038,7 +2038,7 @@ call_02_68b2:
     call call_00_27e4_Object_SetYPosFromDA26
     call call_00_230f_ResolveObjectListIndex
     ld   b,$FF
-    call jp_00_250d
+    call call_00_250d_Object_UpdateYPosition
     ld   c,$04
     call call_00_290d_ObjectSetTimer1A
     ld   c,$00
@@ -2052,7 +2052,7 @@ call_02_68b2:
 call_02_68ed:
     call call_00_24c0_Object_IntegrateFractionalVelocity_X
     call call_00_244a_Object_ApplyClampedVerticalVelocity
-    call call_00_2766_Object_UpdatePositionFromVector
+    call call_00_2766_Object_UpdateXPositionFromVector
     ret  c
     call call_00_2922_ObjectTimer1ACountdown
     ld   a,$02
@@ -2082,7 +2082,7 @@ call_02_68ed:
 call_02_6928:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   bc,$0008
-    call nz,jp_00_250d
+    call nz,call_00_250d_Object_UpdateYPosition
     ld   hl,.data_02_6937
     jp   call_00_2c20_ObjectPalette_CopyToBuffer
 .data_02_6937:
@@ -2253,7 +2253,7 @@ call_02_6A91:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label6AA1
     ld   bc,$FFD0
-    call jp_00_250d
+    call call_00_250d_Object_UpdateYPosition
     ld   c,$28
     call call_00_294e_ObjectSet13
 label6AA1:
@@ -2269,7 +2269,7 @@ label6AA1:
     ld   c,$10
     call nz,call_00_294e_ObjectSet13
     call call_00_244a_Object_ApplyClampedVerticalVelocity
-    call call_00_2766_Object_UpdatePositionFromVector
+    call call_00_2766_Object_UpdateXPositionFromVector
     ret  c
     ld   a,$19
     call call_00_0ff5_MaybeQueueBankChange
@@ -2309,7 +2309,7 @@ label6AF5:
     call call_00_290d_ObjectSetTimer1A
 label6B0E:
     ld   bc,$0002
-    call jp_00_250d
+    call call_00_250d_Object_UpdateYPosition
     call call_00_2917_ObjectCheckIfTimer1AIsZero
     sub  a,$02
     ld   [hl],a
@@ -2319,7 +2319,7 @@ label6B0E:
 
 
     ld   bc,$FFFF
-    call jp_00_250d
+    call call_00_250d_Object_UpdateYPosition
     call call_00_230f_ResolveObjectListIndex
     call call_00_2917_ObjectCheckIfTimer1AIsZero
     inc  a
@@ -2390,7 +2390,7 @@ label6B8B:
 label6BB3:
     call call_00_251c_Object_CheckRegionAndSetFlag
     ld   bc,$0002
-    call jp_00_250d
+    call call_00_250d_Object_UpdateYPosition
     call call_00_2917_ObjectCheckIfTimer1AIsZero
     sub  a,$02
     ld   [hl],a
@@ -2421,7 +2421,7 @@ label6BDC:
     inc  a
     ld   [hl],a
     ld   bc,$FFFF
-    jp   jp_00_250d
+    jp   call_00_250d_Object_UpdateYPosition
     ld   a,[wDC7B]
     ld   hl,wDA00_CurrentObjectAddr
     cp   [hl]
@@ -2476,7 +2476,7 @@ label6BDC:
 
     call call_00_251c_Object_CheckRegionAndSetFlag
     call call_00_244a_Object_ApplyClampedVerticalVelocity
-    call call_00_2766_Object_UpdatePositionFromVector
+    call call_00_2766_Object_UpdateXPositionFromVector
     ld   a,$00
     jp   nc,entry_02_72ac_LoadObjectData
     ret  
@@ -2484,7 +2484,7 @@ label6BDC:
 
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label6C84
-    call call_00_2766_Object_UpdatePositionFromVector
+    call call_00_2766_Object_UpdateXPositionFromVector
     ld   c,$00
     jr   c,label6C81
     ld   c,$01
@@ -2512,7 +2512,7 @@ label6C84:
 label6CAC:
     call call_00_251c_Object_CheckRegionAndSetFlag
     call call_00_244a_Object_ApplyClampedVerticalVelocity
-    call call_00_2766_Object_UpdatePositionFromVector
+    call call_00_2766_Object_UpdateXPositionFromVector
     ld   c,$01
     call nc,call_00_2980_ObjectSet19
     ret 
@@ -2964,7 +2964,7 @@ label7002:
     ld   a,$13
     call nz,call_00_0ff5_MaybeQueueBankChange
     call call_00_244a_Object_ApplyClampedVerticalVelocity
-    call call_00_2766_Object_UpdatePositionFromVector
+    call call_00_2766_Object_UpdateXPositionFromVector
     ld   a,$02
     jp   nc,entry_02_72ac_LoadObjectData
     ret  

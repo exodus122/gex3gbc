@@ -1,19 +1,89 @@
 SECTION "bank01", ROMX[$4000], BANK[$01]
 
-call_01_4000:
+call_01_4000_LoadMenu:
+; Purpose:
+; Initializes menu variables (wDBE9, wDBEA_MenuType, etc.) and copies menu-type–specific data into wDB92.
+; Saves/restores the current level ID when transitioning to the menu.
+; Loads map/VRAM data for menu backgrounds (entry_03_6c89_LoadMapData).
+; Handles multiple input modes:
+; Navigation (up/down/left/right) through menu entries.
+; Page wrapping, clamping, and cursor movement (wDBED, wDBEE, etc.).
+; Sub-menu branching (jp_01_42c2, 42d0, etc.) and returning to game states.
+; Calls tile loading and VRAM update routines between frames.
+; Summary: Full menu controller—initializes, updates cursor positions, processes input, updates graphics, 
+; and manages transitions between menu states.
+;
+; 1. Initialization Phase
+; - Reset flags & menu state:
+;   - Clears wDBE9 (menu state flags).
+;   - Sets wDBEA_MenuType to the incoming menu ID.
+;   - Saves the current level ID (wDB6C_CurrentLevelId) so it can be restored after the menu closes.
+;   - Copies a block of menu-specific data (pointer table or palette data) into wDB92—this acts as the active menu configuration.
+; - Background setup:
+;   - Calls entry_03_6c89_CopyLevelData (or similar) to copy map/VRAM tile data so the menu’s background appears.
+;   - Loads background and object palettes for the menu screen.
+;   - Resets the OAM pointer (wDC6F) and clears unused sprite slots.
+;
+; 2. Main Menu Loop
+; - This loop runs each frame while the menu is active:
+;
+; A. Poll Input
+; - Reads controller state into a working register.
+; - Masks to check directional inputs (up, down, left, right), confirm/accept, and cancel/back.
+;
+; B. Update Cursor Position
+; - Vertical movement (wDBED):
+;   - If UP is pressed → decrements wDBED.
+;   - If DOWN is pressed → increments wDBED.
+;   - Wraps/clamps wDBED within valid menu entries (e.g., from 0 → max_index).
+; - Horizontal/page movement (wDBEE):
+;   - LEFT/RIGHT changes page or sub-option index.
+;   - Also wrapped/clamped to prevent out-of-range pages.
+;
+; C. Handle Accept/Cancel
+; - Accept/confirm button:
+;   - Uses the cursor index (wDBED, wDBEE) to look up a jump table or handler routine for that menu option.
+; - Calls routines like jp_01_42c2, jp_01_42d0, or others to branch to sub-menus, start a level, or change settings.
+; - Cancel/back button:
+;   - Restores the saved wDB6C_CurrentLevelId.
+;   - Exits the menu loop, returning control to the game world.
+;
+; D. Draw/Update Graphics
+; - Loads menu option graphics or cursor sprites into VRAM each frame:
+;   - Calls tile loading routines to update any changed options.
+;   - Writes cursor sprite attributes to OAM.
+;   - Clears any unused sprite slots to prevent flicker.
+;
+; E. Loop Continuation
+; - Returns to Poll Input for the next frame until an accept or cancel action triggers an exit.
+;
+; 3. Exit Phase
+; - Restores game state:
+;   - Restores the saved level ID.
+;   - Reinitializes map data if necessary.
+;   - Passes control back to the main game loop or another state (like level select or intro).
+;
+; Summary
+; MenuHandler_LoadAndProcess is essentially a menu state machine:
+; 1. Initialize graphics and state.
+; 2. Poll input each frame.
+; 3. Adjust cursor/page indices (wDBED, wDBEE).
+; 4. Handle confirm or cancel to branch or exit.
+; 5. Update VRAM/OAM for smooth visuals.
+; 6. On exit, restore level and resume gameplay.
     ld   HL, wDBE9                                     ;; 01:4000 $21 $e9 $db
     ld   [HL], $00                                     ;; 01:4003 $36 $00
 .jp_01_4005:
-    ld   [wDBEA], A                                    ;; 01:4005 $ea $ea $db
+    ld   [wDBEA_MenuType], A                                    ;; 01:4005 $ea $ea $db
     ld   L, A                                          ;; 01:4008 $6f
     ld   H, $00                                        ;; 01:4009 $26 $00
     add  HL, HL                                        ;; 01:400b $29
     add  HL, HL                                        ;; 01:400c $29
     add  HL, HL                                        ;; 01:400d $29
     add  HL, HL                                        ;; 01:400e $29
-    ld   DE, data_01_53c6                              ;; 01:400f $11 $c6 $53
+    ld   DE, data_01_53c6_MenuTypeData                              ;; 01:400f $11 $c6 $53
     add  HL, DE                                        ;; 01:4012 $19
-    ld   DE, wDB92                                     ;; 01:4013 $11 $92 $db
+    ld   DE, wDB92_MenuTypeDataPointer                                     ;; 01:4013 $11 $92 $db
     ld   BC, $0c                                       ;; 01:4016 $01 $0c $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4019 $cd $6e $07
     ld   A, [wDB6C_CurrentLevelId]                                    ;; 01:401c $fa $6c $db
@@ -22,7 +92,7 @@ call_01_4000:
     ld   [wDB6C_CurrentLevelId], A                                    ;; 01:4025 $ea $6c $db
     cp   A, $07                                        ;; 01:4028 $fe $07
     jr   C, .jr_01_4037                                ;; 01:402a $38 $0b
-    ld   A, [wDBEA]                                    ;; 01:402c $fa $ea $db
+    ld   A, [wDBEA_MenuType]                                    ;; 01:402c $fa $ea $db
     cp   A, $08                                        ;; 01:402f $fe $08
     jr   NZ, .jr_01_4037                               ;; 01:4031 $20 $04
     xor  A, A                                          ;; 01:4033 $af
@@ -37,11 +107,11 @@ call_01_4000:
     ld   [wDBEC], A                                    ;; 01:4046 $ea $ec $db
     ld   [wDBED], A                                    ;; 01:4049 $ea $ed $db
     ld   [wDBEE], A                                    ;; 01:404c $ea $ee $db
-    ld   HL, wDB92                                     ;; 01:404f $21 $92 $db
+    ld   HL, wDB92_MenuTypeDataPointer                                     ;; 01:404f $21 $92 $db
     ld   A, [HL+]                                      ;; 01:4052 $2a
     ld   H, [HL]                                       ;; 01:4053 $66
     ld   L, A                                          ;; 01:4054 $6f
-    call call_01_43f0                                  ;; 01:4055 $cd $f0 $43
+    call call_01_43f0_MenuEngine_MainLoop                                  ;; 01:4055 $cd $f0 $43
     ld   A, [wDB94]                                    ;; 01:4058 $fa $94 $db
     and  A, $02                                        ;; 01:405b $e6 $02
     jp   NZ, .jp_01_42c2                               ;; 01:405d $c2 $c2 $42
@@ -54,11 +124,11 @@ call_01_4000:
 .jp_01_4070:
     ld   A, $ff                                        ;; 01:4070 $3e $ff
     ld   [wDBDC], A                                    ;; 01:4072 $ea $dc $db
-    call call_01_4d2c                                  ;; 01:4075 $cd $2c $4d
+    call call_01_4d2c_ProcessTileStreamingLoop                                  ;; 01:4075 $cd $2c $4d
 .jp_01_4078:
-    call call_01_4bb8                                  ;; 01:4078 $cd $b8 $4b
+    call call_01_4bb8_UpdateInterpolationStep                                  ;; 01:4078 $cd $b8 $4b
     call call_00_0b92_UpdateVRAMTiles                                  ;; 01:407b $cd $92 $0b
-    call call_01_4b6b                                  ;; 01:407e $cd $6b $4b
+    call call_01_4b6b_StreamTileDataToBuffer                                  ;; 01:407e $cd $6b $4b
     ld   HL, wDBDC                                     ;; 01:4081 $21 $dc $db
     dec  [HL]                                          ;; 01:4084 $35
     ld   A, [wDB94]                                    ;; 01:4085 $fa $94 $db
@@ -156,7 +226,7 @@ call_01_4000:
     ld   DE, wDB7E                                     ;; 01:4137 $11 $7e $db
     add  HL, DE                                        ;; 01:413a $19
     ld   [HL], C                                       ;; 01:413b $71
-    call call_01_4d6e                                  ;; 01:413c $cd $6e $4d
+    call call_01_4d6e_PrepareStreamingPointers                                  ;; 01:413c $cd $6e $4d
     ld   HL, wDBEB                                     ;; 01:413f $21 $eb $db
     inc  [HL]                                          ;; 01:4142 $34
     ld   A, [HL]                                       ;; 01:4143 $7e
@@ -174,7 +244,7 @@ call_01_4000:
     call call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:4155 $cd $d7 $0f
     jp   .jp_01_4070                                   ;; 01:4158 $c3 $70 $40
 .jp_01_415b:
-    call call_01_505a                                  ;; 01:415b $cd $5a $50
+    call call_01_505a_ValidateTileBufferAndRebuildCollisionData                                  ;; 01:415b $cd $5a $50
     push AF                                            ;; 01:415e $f5
     cp   A, $20                                        ;; 01:415f $fe $20
     ld   A, $ff                                        ;; 01:4161 $3e $ff
@@ -193,7 +263,7 @@ call_01_4000:
     cp   A, $20                                        ;; 01:4175 $fe $20
     ret  Z                                             ;; 01:4177 $c8
     ld   A, $04                                        ;; 01:4178 $3e $04
-    call call_01_4000                                  ;; 01:417a $cd $00 $40
+    call call_01_4000_LoadMenu                                  ;; 01:417a $cd $00 $40
     jp   .jp_01_42a1                                   ;; 01:417d $c3 $a1 $42
 .jp_01_4180:
     call call_00_0f6e_CheckInputRight                                  ;; 01:4180 $cd $6e $0f
@@ -260,7 +330,7 @@ call_01_4000:
 .jr_01_41f1:
     ld   A, $01                                        ;; 01:41f1 $3e $01
     call call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:41f3 $cd $d7 $0f
-    call call_01_43ba                                  ;; 01:41f6 $cd $ba $43
+    call call_01_43ba_JumpToDynamicHandler                                  ;; 01:41f6 $cd $ba $43
     jp   .jp_01_4070                                   ;; 01:41f9 $c3 $70 $40
 .jp_01_41fc:
     ld   A, [wDB94]                                    ;; 01:41fc $fa $94 $db
@@ -290,7 +360,7 @@ call_01_4000:
     ld   HL, entry_03_6c89_LoadMapData                              ;; 01:4228 $21 $89 $6c
     call call_00_0edd_CallAltBankFunc                                  ;; 01:422b $cd $dd $0e
     ld   HL, data_01_5692                              ;; 01:422e $21 $92 $56
-    call call_01_4454                                  ;; 01:4231 $cd $54 $44
+    call call_01_4454_SetMenuPointer                                  ;; 01:4231 $cd $54 $44
     ld   A, $01                                        ;; 01:4234 $3e $01
     call call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:4236 $cd $d7 $0f
     jp   .jp_01_4070                                   ;; 01:4239 $c3 $70 $40
@@ -333,19 +403,19 @@ call_01_4000:
     call call_00_0f5e_WaitForInputClear                                  ;; 01:4285 $cd $5e $0f
     ld   A, [wDBE9]                                    ;; 01:4288 $fa $e9 $db
     and  A, A                                          ;; 01:428b $a7
-    jp   NZ, call_01_4000                              ;; 01:428c $c2 $00 $40
+    jp   NZ, call_01_4000_LoadMenu                              ;; 01:428c $c2 $00 $40
     ret                                                ;; 01:428f $c9
 .jr_01_4290:
-    ld   A, [wDBEA]                                    ;; 01:4290 $fa $ea $db
+    ld   A, [wDBEA_MenuType]                                    ;; 01:4290 $fa $ea $db
     ld   [wDBE9], A                                    ;; 01:4293 $ea $e9 $db
-    call call_01_4f8c                                  ;; 01:4296 $cd $8c $4f
-    call call_01_5027                                  ;; 01:4299 $cd $27 $50
+    call call_01_4f8c_BuildCollisionBitfieldAndChecksum                                  ;; 01:4296 $cd $8c $4f
+    call call_01_5027_BuildTileFlagBufferFromBitfield                                  ;; 01:4299 $cd $27 $50
     ld   A, $02                                        ;; 01:429c $3e $02
     jp   .jp_01_4005                                   ;; 01:429e $c3 $05 $40
 .jp_01_42a1:
-    call call_01_4f7e                                  ;; 01:42a1 $cd $7e $4f
+    call call_01_4f7e_SeedTileLookupTable                                  ;; 01:42a1 $cd $7e $4f
     ld   A, $01                                        ;; 01:42a4 $3e $01
-    jp   call_01_4000                                  ;; 01:42a6 $c3 $00 $40
+    jp   call_01_4000_LoadMenu                                  ;; 01:42a6 $c3 $00 $40
 .jr_01_42a9:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 01:42a9 $fa $1e $dc
     and  A, A                                          ;; 01:42ac $a7
@@ -354,7 +424,7 @@ call_01_4000:
     ld   A, $0e                                        ;; 01:42b2 $3e $0e
     jp   .jp_01_4005                                   ;; 01:42b4 $c3 $05 $40
 .jr_01_42b7:
-    ld   A, [wDBEA]                                    ;; 01:42b7 $fa $ea $db
+    ld   A, [wDBEA_MenuType]                                    ;; 01:42b7 $fa $ea $db
     ld   [wDBE9], A                                    ;; 01:42ba $ea $e9 $db
     ld   A, $08                                        ;; 01:42bd $3e $08
     jp   .jp_01_4005                                   ;; 01:42bf $c3 $05 $40
@@ -383,11 +453,11 @@ call_01_4000:
     jr   NZ, .jr_01_42d3                               ;; 01:42df $20 $f2
     ret                                                ;; 01:42e1 $c9
 .jp_01_42e2:
-    call call_01_4d2c                                  ;; 01:42e2 $cd $2c $4d
+    call call_01_4d2c_ProcessTileStreamingLoop                                  ;; 01:42e2 $cd $2c $4d
 .jr_01_42e5:
-    call call_01_4bb8                                  ;; 01:42e5 $cd $b8 $4b
+    call call_01_4bb8_UpdateInterpolationStep                                  ;; 01:42e5 $cd $b8 $4b
     call call_00_0b92_UpdateVRAMTiles                                  ;; 01:42e8 $cd $92 $0b
-    call call_01_4b6b                                  ;; 01:42eb $cd $6b $4b
+    call call_01_4b6b_StreamTileDataToBuffer                                  ;; 01:42eb $cd $6b $4b
     ld   HL, wDBDC                                     ;; 01:42ee $21 $dc $db
     dec  [HL]                                          ;; 01:42f1 $35
     ld   A, [wDAD7_CurrentInputs]                                    ;; 01:42f2 $fa $d7 $da
@@ -396,30 +466,42 @@ call_01_4000:
     ld   A, $01                                        ;; 01:42f8 $3e $01
     jp   call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:42fa $c3 $d7 $0f
 
-entry_01_42fd:
+entry_01_42fd_InitMenuTilebank15_LoadMenu03:
+; Behavior:
+; Loads tile bank $15 (via UpdateTileBankForNewID) and immediately jumps to LoadMenu with ID $03.
+; Likely Purpose: Entry point to show a specific menu screen (e.g., pause/options).
     ld   A, $15                                        ;; 01:42fd $3e $15
     call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:42ff $cd $a2 $0f
     ld   A, $03                                        ;; 01:4302 $3e $03
-    jp   call_01_4000                                  ;; 01:4304 $c3 $00 $40
+    jp   call_01_4000_LoadMenu                                  ;; 01:4304 $c3 $00 $40
 
-call_01_4307:
+call_01_4307_PreloadMenus_15to1A:
+; Behavior:
+; Loads tile bank $19, then sequentially loads menus $15–$1A.
+; Likely Purpose: Preloads multiple menu assets into VRAM (like caching 
+; graphics for level select or transitions).
     ld   A, $19                                        ;; 01:4307 $3e $19
     call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:4309 $cd $a2 $0f
     ld   A, $15                                        ;; 01:430c $3e $15
-    call call_01_4000                                  ;; 01:430e $cd $00 $40
+    call call_01_4000_LoadMenu                                  ;; 01:430e $cd $00 $40
     ld   A, $16                                        ;; 01:4311 $3e $16
-    call call_01_4000                                  ;; 01:4313 $cd $00 $40
+    call call_01_4000_LoadMenu                                  ;; 01:4313 $cd $00 $40
     ld   A, $17                                        ;; 01:4316 $3e $17
-    call call_01_4000                                  ;; 01:4318 $cd $00 $40
+    call call_01_4000_LoadMenu                                  ;; 01:4318 $cd $00 $40
     ld   A, $18                                        ;; 01:431b $3e $18
-    call call_01_4000                                  ;; 01:431d $cd $00 $40
+    call call_01_4000_LoadMenu                                  ;; 01:431d $cd $00 $40
     ld   A, $19                                        ;; 01:4320 $3e $19
-    call call_01_4000                                  ;; 01:4322 $cd $00 $40
+    call call_01_4000_LoadMenu                                  ;; 01:4322 $cd $00 $40
     ld   A, $1a                                        ;; 01:4325 $3e $1a
-    call call_01_4000                                  ;; 01:4327 $cd $00 $40
+    call call_01_4000_LoadMenu                                  ;; 01:4327 $cd $00 $40
     ret                                                ;; 01:432a $c9
 
-entry_01_432b:
+entry_01_432b_SetLevelMenuAndPalette:
+; Behavior:
+; Checks wDB6C_CurrentLevelId. If zero, returns. Otherwise updates tile bank $04, compares level ID to $07, and:
+; For ≥ $07: sets wDC59=1, loads menu $05, and stores a value into wDC5A.
+; For < $07: sets wDC59=3, loads menu $07, and stores the same palette value.
+; Likely Purpose: Chooses which menu/palette to display depending on current level group.
     ld   A, [wDB6C_CurrentLevelId]                                    ;; 01:432b $fa $6c $db
     and  A, A                                          ;; 01:432e $a7
     ret  Z                                             ;; 01:432f $c8
@@ -431,7 +513,7 @@ entry_01_432b:
     ld   A, $01                                        ;; 01:433c $3e $01
     ld   [wDC59], A                                    ;; 01:433e $ea $59 $dc
     ld   A, $05                                        ;; 01:4341 $3e $05
-    call call_01_4000                                  ;; 01:4343 $cd $00 $40
+    call call_01_4000_LoadMenu                                  ;; 01:4343 $cd $00 $40
     ld   A, [wDBEC]                                    ;; 01:4346 $fa $ec $db
     ld   [wDC5A], A                                    ;; 01:4349 $ea $5a $dc
     ret                                                ;; 01:434c $c9
@@ -439,12 +521,21 @@ entry_01_432b:
     ld   A, $03                                        ;; 01:434d $3e $03
     ld   [wDC59], A                                    ;; 01:434f $ea $59 $dc
     ld   A, $07                                        ;; 01:4352 $3e $07
-    call call_01_4000                                  ;; 01:4354 $cd $00 $40
+    call call_01_4000_LoadMenu                                  ;; 01:4354 $cd $00 $40
     ld   A, [wDBEC]                                    ;; 01:4357 $fa $ec $db
     ld   [wDC5A], A                                    ;; 01:435a $ea $5a $dc
     ret                                                ;; 01:435d $c9
 
-entry_01_435e:
+entry_01_435e_HandleLevelTransitionMenu:
+; Behavior:
+; Clears a flag bit in wDB6A.
+; Copies CurrentLevelNumber to CurrentLevelId.
+; If a previous level ID exists (wDB6D), selects between tilebank $15 + menu $0A 
+; or tilebank $13 + menu $1B.
+; Otherwise, checks if the ID is a “late” level (≥$07, $09, $0A) to either preload a 
+; batch (call_01_4307) or show menu $09.
+; At the end, resets CurrentLevelId.
+; Likely Purpose: Manages menu/graphics updates when transitioning between levels.
     ld   HL, wDB6A                                     ;; 01:435e $21 $6a $db
     res  4, [HL]                                       ;; 01:4361 $cb $a6
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 01:4363 $fa $1e $dc
@@ -460,13 +551,13 @@ entry_01_435e:
     ld   A, $15                                        ;; 01:4378 $3e $15
     call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:437a $cd $a2 $0f
     ld   A, $0a                                        ;; 01:437d $3e $0a
-    call call_01_4000                                  ;; 01:437f $cd $00 $40
+    call call_01_4000_LoadMenu                                  ;; 01:437f $cd $00 $40
     jr   .jr_01_43ae                                   ;; 01:4382 $18 $2a
 .jr_01_4384:
     ld   A, $13                                        ;; 01:4384 $3e $13
     call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:4386 $cd $a2 $0f
     ld   A, $1b                                        ;; 01:4389 $3e $1b
-    call call_01_4000                                  ;; 01:438b $cd $00 $40
+    call call_01_4000_LoadMenu                                  ;; 01:438b $cd $00 $40
     jr   .jr_01_43ae                                   ;; 01:438e $18 $1e
 .jr_01_4390:
     ld   A, [wDB6C_CurrentLevelId]                                    ;; 01:4390 $fa $6c $db
@@ -476,13 +567,13 @@ entry_01_435e:
     jr   Z, .jr_01_4384                                ;; 01:4399 $28 $e9
     cp   A, $0a                                        ;; 01:439b $fe $0a
     jr   Z, .jr_01_4384                                ;; 01:439d $28 $e5
-    call call_01_4307                                  ;; 01:439f $cd $07 $43
+    call call_01_4307_PreloadMenus_15to1A                                  ;; 01:439f $cd $07 $43
     jr   .jr_01_43ae                                   ;; 01:43a2 $18 $0a
 .jr_01_43a4:
     ld   A, $13                                        ;; 01:43a4 $3e $13
     call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:43a6 $cd $a2 $0f
     ld   A, $09                                        ;; 01:43a9 $3e $09
-    call call_01_4000                                  ;; 01:43ab $cd $00 $40
+    call call_01_4000_LoadMenu                                  ;; 01:43ab $cd $00 $40
 .jr_01_43ae:
     xor  A, A                                          ;; 01:43ae $af
     ld   [wDB6C_CurrentLevelId], A                                    ;; 01:43af $ea $6c $db
@@ -492,7 +583,10 @@ entry_01_435e:
     ld   [wDB6C_CurrentLevelId], A                                    ;; 01:43b6 $ea $6c $db
     ret                                                ;; 01:43b9 $c9
 
-call_01_43ba:
+call_01_43ba_JumpToDynamicHandler:
+; Behavior:
+; Reads a pointer from wDB9C/wDB9D; if nonzero, jumps there.
+; Likely Purpose: Generic “execute callback” mechanism for menu or level-specific code.
     ld   HL, wDB9C                                     ;; 01:43ba $21 $9c $db
     ld   A, [HL+]                                      ;; 01:43bd $2a
     ld   H, [HL]                                       ;; 01:43be $66
@@ -501,7 +595,10 @@ call_01_43ba:
     ret  Z                                             ;; 01:43c1 $c8
     jp   HL                                            ;; 01:43c2 $e9
 
-data_01_43c3:
+call_01_43c3_LoadMenuObjectPalette:
+; Behavior:
+; Copies one of two 16-byte palette sets into wDD4A_ObjectPalettes depending on wDBEC.
+; Likely Purpose: Sets object sprite palettes based on context (e.g., regular vs. alternate theme).
     ld   HL, .data_01_43d8                             ;; 01:43c3 $21 $d8 $43
     ld   A, [wDBEC]                                    ;; 01:43c6 $fa $ec $db
     and  A, A                                          ;; 01:43c9 $a7
@@ -517,11 +614,17 @@ data_01_43c3:
     db   $00, $00, $ef, $3d, $6b, $2d, $e7, $1c        ;; 01:43e0 ........
     db   $00, $00, $ff, $7f, $f7, $5e, $ef, $3d        ;; 01:43e8 ........
 
-call_01_43f0:
+call_01_43f0_MenuEngine_MainLoop:
+; Behavior:
+; Clears/reset game state and VRAM, loads resources, then:
+; Saves HL as a pointer.
+; Repeatedly processes a menu/script stream (call_01_445c_ProcessMenuScript and call_01_446b_ExecuteMenuCommand), executing commands until $FF.
+; Updates palettes and LCD control, then finalizes VRAM updates.
+; Likely Purpose: Core loop for processing menu scripts or transitions.
     push HL                                            ;; 01:43f0 $e5
     call call_00_0e3b_ClearGameState                                  ;; 01:43f1 $cd $3b $0e
     call call_00_0e62_ResetDD6AAndVRAM                                  ;; 01:43f4 $cd $62 $0e
-    call call_01_4f27                                  ;; 01:43f7 $cd $27 $4f
+    call call_01_4f27_ClearBgAndTileBuffers                                  ;; 01:43f7 $cd $27 $4f
     ld   A, $ff                                        ;; 01:43fa $3e $ff
     ld   [wDBC7], A                                    ;; 01:43fc $ea $c7 $db
     xor  A, A                                          ;; 01:43ff $af
@@ -537,7 +640,7 @@ call_01_43f0:
     ld   [wDBBA], A                                    ;; 01:4411 $ea $ba $db
     ld   A, $ff                                        ;; 01:4414 $3e $ff
     ld   [wDBDD], A                                    ;; 01:4416 $ea $dd $db
-    call call_01_445c                                  ;; 01:4419 $cd $5c $44
+    call call_01_445c_ProcessMenuScript                                  ;; 01:4419 $cd $5c $44
     ld   A, [wDBDD]                                    ;; 01:441c $fa $dd $db
     cp   A, $ff                                        ;; 01:441f $fe $ff
     jr   Z, .jr_01_442b                                ;; 01:4421 $28 $08
@@ -545,8 +648,8 @@ call_01_43f0:
     call call_00_0777                                  ;; 01:4426 $cd $77 $07
     jr   .jr_01_440c                                   ;; 01:4429 $18 $e1
 .jr_01_442b:
-    call call_01_4f51                                  ;; 01:442b $cd $51 $4f
-    call call_01_4f5c                                  ;; 01:442e $cd $5c $4f
+    call call_01_4f51_UploadSecondaryTileLayer                                  ;; 01:442b $cd $51 $4f
+    call call_01_4f5c_UploadPrimaryTileLayer                                  ;; 01:442e $cd $5c $4f
     ld   HL, wDB9B                                     ;; 01:4431 $21 $9b $db
     bit  7, [HL]                                       ;; 01:4434 $cb $7e
     jr   NZ, .jr_01_4444                               ;; 01:4436 $20 $0c
@@ -556,20 +659,27 @@ call_01_43f0:
     ld   HL, entry_03_65c6_LoadMenuOrLevelPalettes                              ;; 01:443e $21 $c6 $65
     call call_00_0edd_CallAltBankFunc                                  ;; 01:4441 $cd $dd $0e
 .jr_01_4444:
-    call call_01_43ba                                  ;; 01:4444 $cd $ba $43
+    call call_01_43ba_JumpToDynamicHandler                                  ;; 01:4444 $cd $ba $43
     ld   A, $d3                                        ;; 01:4447 $3e $d3
     call call_00_0e33_SetLCDControl                                  ;; 01:4449 $cd $33 $0e
     ld   A, $01                                        ;; 01:444c $3e $01
     ld   [wDD6A], A                                    ;; 01:444e $ea $6a $dd
     jp   call_00_0b92_UpdateVRAMTiles                                  ;; 01:4451 $c3 $92 $0b
 
-call_01_4454:
+call_01_4454_SetMenuPointer:
+; Behavior:
+; Stores HL into wDBB9/wDBBA.
+; Likely Purpose: Initializes the menu-script pointer for the engine.
     ld   A, L                                          ;; 01:4454 $7d
     ld   [wDBB9], A                                    ;; 01:4455 $ea $b9 $db
     ld   A, H                                          ;; 01:4458 $7c
     ld   [wDBBA], A                                    ;; 01:4459 $ea $ba $db
 
-call_01_445c:
+call_01_445c_ProcessMenuScript:
+; Behavior:
+; Dereferences wDBB9 pointer, fetches a byte, and—until $FF—calls call_01_446b_ExecuteMenuCommand 
+; to process each command, looping through the script.
+; Likely Purpose: Iterates through a menu script.
     ld   HL, wDBB9                                     ;; 01:445c $21 $b9 $db
     ld   A, [HL+]                                      ;; 01:445f $2a
     ld   H, [HL]                                       ;; 01:4460 $66
@@ -577,10 +687,14 @@ call_01_445c:
     ld   A, [HL]                                       ;; 01:4462 $7e
     cp   A, $ff                                        ;; 01:4463 $fe $ff
     ret  Z                                             ;; 01:4465 $c8
-    call call_01_446b                                  ;; 01:4466 $cd $6b $44
-    jr   call_01_445c                                  ;; 01:4469 $18 $f1
+    call call_01_446b_ExecuteMenuCommand                                  ;; 01:4466 $cd $6b $44
+    jr   call_01_445c_ProcessMenuScript                                  ;; 01:4469 $18 $f1
 
-call_01_446b:
+call_01_446b_ExecuteMenuCommand:
+; Behavior:
+; Advances the script pointer, copies menu command parameters to working RAM (wDB9E, wDBA4), 
+; updates tile maps, handles jump tables, checks flags (wDBAA), and may jump to specialized handlers in .data_01_456b_MenuCommandJumpTable.
+; Likely Purpose: Decodes and executes individual menu commands, updating VRAM or branching to specialized routines.
     ld   HL, wDBB9                                     ;; 01:446b $21 $b9 $db
     ld   E, [HL]                                       ;; 01:446e $5e
     inc  HL                                            ;; 01:446f $23
@@ -624,17 +738,17 @@ call_01_446b:
     ld   [HL], A                                       ;; 01:44b4 $77
     ld   A, [wDBAA]                                    ;; 01:44b5 $fa $aa $db
     and  A, $01                                        ;; 01:44b8 $e6 $01
-    call NZ, call_01_499f                              ;; 01:44ba $c4 $9f $49
+    call NZ, call_01_499f_ClearTilemapRegion                              ;; 01:44ba $c4 $9f $49
     ld   A, [wDBA8]                                    ;; 01:44bd $fa $a8 $db
     sub  A, $e0                                        ;; 01:44c0 $d6 $e0
     jr   C, .jr_01_44cd                                ;; 01:44c2 $38 $09
-    ld   DE, .data_01_456b                             ;; 01:44c4 $11 $6b $45
+    ld   DE, .data_01_456b_MenuCommandJumpTable                             ;; 01:44c4 $11 $6b $45
     call call_00_0777                                  ;; 01:44c7 $cd $77 $07
     call call_00_0f22_JumpHL                                  ;; 01:44ca $cd $22 $0f
 .jr_01_44cd:
     ld   A, [wDBAA]                                    ;; 01:44cd $fa $aa $db
     and  A, $02                                        ;; 01:44d0 $e6 $02
-    call NZ, call_01_4875                              ;; 01:44d2 $c4 $75 $48
+    call NZ, call_01_4875_ProcessTilemapOrCollectibles                              ;; 01:44d2 $c4 $75 $48
     ld   A, [wDBAA]                                    ;; 01:44d5 $fa $aa $db
     and  A, $20                                        ;; 01:44d8 $e6 $20
     jr   Z, .jr_01_448c                                ;; 01:44da $28 $b0
@@ -737,32 +851,50 @@ call_01_446b:
     ret  Z                                             ;; 01:4565 $c8
     ld   C, $09                                        ;; 01:4566 $0e $09
     jp   call_00_0a6a                                  ;; 01:4568 $c3 $6a $0a
-.data_01_456b: ; probably menutype jump table
-    db   $8d, $45                                      ;; 01:456b ??
-    dw   call_01_4599                                  ;; 01:456d pP
-    dw   call_01_45a5                                  ;; 01:456f pP
-    dw   call_01_466f                                  ;; 01:4571 pP
-    dw   call_01_4675                                  ;; 01:4573 pP
-    dw   call_01_467b                                  ;; 01:4575 pP
-    dw   call_01_46d4                                  ;; 01:4577 pP
-    dw   call_01_46f9                                  ;; 01:4579 pP
-    dw   call_01_470c                                  ;; 01:457b pP
-    dw   call_01_4760                                  ;; 01:457d pP
-    dw   call_01_477b                                      ;; 01:457f ??
-    dw   call_01_477c                                  ;; 01:4581 pP
-    dw   call_01_47aa                                  ;; 01:4583 pP
-    dw   call_01_47b1                                  ;; 01:4585 pP
-    db   $0c, $48, $25, $48, $26, $48, $fa, $a7        ;; 01:4587 ????????
-    db   $db, $11, $39, $6f, $cd, $77, $07, $c3        ;; 01:458f ????????
-    db   $03, $4d                                      ;; 01:4597 ??
+.data_01_456b_MenuCommandJumpTable: ; probably menutype jump table
+; Behavior:
+; List of function pointers (call_01_458d_MenuHandler_LoadAssetsAndJump, call_01_4599_MenuHandler_LoadAssetsAndJump, etc.) for specific menu command handlers.
+; Likely Purpose: Dispatch table for specialized menu drawing or behavior.
+    dw   call_01_458d_MenuHandler_LoadAssetsAndJump                                      ;; 01:456b ??
+    dw   call_01_4599_MenuHandler_LoadAssetsAndJump                                  ;; 01:456d pP
+    dw   call_01_45a5_MenuHandler_LoadBgPalettesAndMap                                  ;; 01:456f pP
+    dw   call_01_466f_MenuState_LoadAndDrawA                                  ;; 01:4571 pP
+    dw   call_01_4675_MenuState_LoadAndDrawB                                  ;; 01:4573 pP
+    dw   call_01_467b_MenuState_UpdateLevelCursor                                  ;; 01:4575 pP
+    dw   call_01_46d4_MenuState_InitSelectionScreen                                  ;; 01:4577 pP
+    dw   call_01_46f9_ResetTemporaryFlags                                  ;; 01:4579 pP
+    dw   call_01_470c_MenuState_DispatchAndDraw                                  ;; 01:457b pP
+    dw   call_01_4760_MenuState_SubmenuHandler                                  ;; 01:457d pP
+    dw   call_01_477b_MenuState_NoOp                                      ;; 01:457f ??
+    dw   call_01_477c_DrawMenuNumberSprite                                  ;; 01:4581 pP
+    dw   call_01_47aa_StoreCurrentMenuIndex                                  ;; 01:4583 pP
+    dw   call_01_47b1_LoadMenuConfigData                                  ;; 01:4585 pP
+    dw   call_01_480c_MenuState_DrawWithOffset
+    dw   call_01_480c_MenuState_Empty
+    dw   call_01_4826_MenuState_UpdateCursorAlt
 
-call_01_4599:
+call_01_458d_MenuHandler_LoadAssetsAndJump:
+; Behavior:
+; Copy data_01_6f39 to VRAM using wDBA7 and then jump to call_01_4d03_StreamTilemapBlockToBg.
+; Likely Purpose: Load specific menu graphics and branch to a menu update routine.
+    ld   a,[wDBA7]
+    ld   de,data_01_6f39
+    call call_00_0777
+    jp   call_01_4d03_StreamTilemapBlockToBg
+
+call_01_4599_MenuHandler_LoadAssetsAndJump:
+; Behavior:
+; same as above
     ld   A, [wDBA7]                                    ;; 01:4599 $fa $a7 $db
     ld   DE, data_01_6f39                              ;; 01:459c $11 $39 $6f
     call call_00_0777                                  ;; 01:459f $cd $77 $07
-    jp   jp_01_4d03                                    ;; 01:45a2 $c3 $03 $4d
+    jp   call_01_4d03_StreamTilemapBlockToBg                                    ;; 01:45a2 $c3 $03 $4d
 
-call_01_45a5:
+call_01_45a5_MenuHandler_LoadBgPalettesAndMap:
+; Behavior:
+; Copies background palettes from .data_01_45ef to VRAM, uses wDB6C_CurrentLevelId for 
+; selecting additional data, then calls helper functions (call_01_4ce5_ComputeTilemapBlockOffset) to set up the background tile map.
+; Likely Purpose: Initialize a menu’s background palettes and map tiles.
     ld   HL, .data_01_45ef                             ;; 01:45a5 $21 $ef $45
     ld   DE, wDCEA_BgPalettes                                     ;; 01:45a8 $11 $ea $dc
     ld   BC, $80                                       ;; 01:45ab $01 $80 $00
@@ -786,7 +918,7 @@ call_01_45a5:
     ld   A, $06                                        ;; 01:45dd $3e $06
     ld   [wDB9F], A                                    ;; 01:45df $ea $9f $db
     push HL                                            ;; 01:45e2 $e5
-    call call_01_4ce5                                  ;; 01:45e3 $cd $e5 $4c
+    call call_01_4ce5_ComputeTilemapBlockOffset                                  ;; 01:45e3 $cd $e5 $4c
     pop  HL                                            ;; 01:45e6 $e1
     ld   DE, $c010                                     ;; 01:45e7 $11 $10 $c0 ; wC000_BgMapTileIds
     ld   A, $1f                                        ;; 01:45ea $3e $1f
@@ -810,15 +942,22 @@ call_01_45a5:
     db   $00, $00, $00, $00, $20, $03, $bf, $0b        ;; 01:465f ........
     db   $00, $00, $1f, $00, $ff, $01, $7f, $03        ;; 01:4667 ........
 
-call_01_466f:
-    call call_01_4b22                                  ;; 01:466f $cd $22 $4b
-    jp   call_01_4cfa                                  ;; 01:4672 $c3 $fa $4c
+call_01_466f_MenuState_LoadAndDrawA:
+; Description: Calls a subroutine at 4B22 to prepare or select some data, then jumps to a common 
+; rendering/processing routine at 4CFA. Likely a simple wrapper for a specific menu/page state.
+    call call_01_4b22_GetLevelDataBasePtr                                  ;; 01:466f $cd $22 $4b
+    jp   call_01_4cfa_SetStreamPointerHL                                  ;; 01:4672 $c3 $fa $4c
 
-call_01_4675:
-    call call_01_4b2a                                  ;; 01:4675 $cd $2a $4b
-    jp   call_01_4cfa                                  ;; 01:4678 $c3 $fa $4c
+call_01_4675_MenuState_LoadAndDrawB:
+; Description: Same structure as above but uses 4B2A for setup. 
+; Probably a different page/state initialization before rendering.
+    call call_01_4b2a_GetLevelDataOffsetA                                  ;; 01:4675 $cd $2a $4b
+    jp   call_01_4cfa_SetStreamPointerHL                                  ;; 01:4678 $c3 $fa $4c
 
-call_01_467b:
+call_01_467b_MenuState_UpdateLevelCursor:
+; Description: Uses wDBA7 (likely current menu index) and wDB6C_CurrentLevelId to compute bitmask checks, 
+; updates several wDA?? variables (cursor positions, palette/offset values), calls 4C7E to draw, 
+; then jumps to common rendering at 4CFA.
     ld   HL, wDBA7                                     ;; 01:467b $21 $a7 $db
     ld   L, [HL]                                       ;; 01:467e $6e
     ld   H, $00                                        ;; 01:467f $26 $00
@@ -859,15 +998,17 @@ call_01_467b:
     add  A, $04                                        ;; 01:46bd $c6 $04
     ld   [wDBDB], A                                    ;; 01:46bf $ea $db $db
     ld   BC, $202                                      ;; 01:46c2 $01 $02 $02
-    call call_01_4c7e                                  ;; 01:46c5 $cd $7e $4c
+    call call_01_4c7e_CopyTileBlockToBuffer                                  ;; 01:46c5 $cd $7e $4c
     ld   A, [wDBA7]                                    ;; 01:46c8 $fa $a7 $db
-    call call_01_4b32                                  ;; 01:46cb $cd $32 $4b
-    jp   call_01_4cfa                                  ;; 01:46ce $c3 $fa $4c
+    call call_01_4b32_GetLevelDataSubsectionPtr                                  ;; 01:46cb $cd $32 $4b
+    jp   call_01_4cfa_SetStreamPointerHL                                  ;; 01:46ce $c3 $fa $4c
 .data_01_46d1:
     db   $01, $02, $04                                 ;; 01:46d1 ...
 
-call_01_46d4:
-    call call_01_4599                                  ;; 01:46d4 $cd $99 $45
+call_01_46d4_MenuState_InitSelectionScreen:
+; Description: Loads menu assets via call_01_4599, clears/sets wDBBF–wDBC7 control values, 
+; then jumps to 4BB8 for rendering or state change. Likely initializes a menu selection.
+    call call_01_4599_MenuHandler_LoadAssetsAndJump                                  ;; 01:46d4 $cd $99 $45
     xor  A, A                                          ;; 01:46d7 $af
     ld   [wDBBF], A                                    ;; 01:46d8 $ea $bf $db
     ld   A, [wDB9E]                                    ;; 01:46db $fa $9e $db
@@ -880,9 +1021,11 @@ call_01_46d4:
     sub  A, $00                                        ;; 01:46ef $d6 $00
     add  A, $00                                        ;; 01:46f1 $c6 $00
     ld   [wDBC7], A                                    ;; 01:46f3 $ea $c7 $db
-    jp   call_01_4bb8                                  ;; 01:46f6 $c3 $b8 $4b
+    jp   call_01_4bb8_UpdateInterpolationStep                                  ;; 01:46f6 $c3 $b8 $4b
 
-call_01_46f9:
+call_01_46f9_ResetTemporaryFlags:
+; Description: Clears a block of wDBE3–wDBE7 flags and sets wDBE3=1. 
+; Likely resets some state variables (e.g., reset counters or flags).
     xor  A, A                                          ;; 01:46f9 $af
     ld   [wDBE4], A                                    ;; 01:46fa $ea $e4 $db
     ld   [wDBE5], A                                    ;; 01:46fd $ea $e5 $db
@@ -892,29 +1035,33 @@ call_01_46f9:
     ld   [wDBE3], A                                    ;; 01:4708 $ea $e3 $db
     ret                                                ;; 01:470b $c9
 
-call_01_470c:
+call_01_470c_MenuState_DispatchAndDraw:
+; Description: Writes $80 to wDADD, calls a state handler table (4722), conditionally triggers 4D49 if 
+; a flag is set, then loads data_01_4e97 and jumps to 4CFA. Acts as a generic dispatcher.
     ld   HL, wDADD                                     ;; 01:470c $21 $dd $da
     ld   [HL], $80                                     ;; 01:470f $36 $80
-    call call_01_4722                                  ;; 01:4711 $cd $22 $47
+    call call_01_4722_MenuStateHandlerTable                                  ;; 01:4711 $cd $22 $47
     ld   HL, wDADD                                     ;; 01:4714 $21 $dd $da
     bit  7, [HL]                                       ;; 01:4717 $cb $7e
-    call NZ, call_01_4d49                              ;; 01:4719 $c4 $49 $4d
+    call NZ, call_01_4d49_FormatDecimalToAsciiDigits                              ;; 01:4719 $c4 $49 $4d
     ld   HL, data_01_4e97                              ;; 01:471c $21 $97 $4e
-    jp   call_01_4cfa                                  ;; 01:471f $c3 $fa $4c
+    jp   call_01_4cfa_SetStreamPointerHL                                  ;; 01:471f $c3 $fa $4c
 
-call_01_4722:
+call_01_4722_MenuStateHandlerTable:
+; Description: Table-based dispatcher: uses wDBA7 as index to pick one of several subroutines (.data_01_472c). 
+; Contains inline small handlers (.4744, .4748, .474c, etc.) that return values or constants.
     ld   A, [wDBA7]                                    ;; 01:4722 $fa $a7 $db
     ld   DE, .data_01_472c                             ;; 01:4725 $11 $2c $47
     call call_00_0777                                  ;; 01:4728 $cd $77 $07
     jp   HL                                            ;; 01:472b $e9
 .data_01_472c:
-    dw   call_01_4acf                                  ;; 01:472c pP
-    dw   call_01_4b0a                                  ;; 01:472e pP
-    dw   call_01_4af9                                  ;; 01:4730 pP
+    dw   call_01_4acf_CountCollectedBitsForLevel                                  ;; 01:472c pP
+    dw   call_01_4b0a_CountLowBitsForLevel                                  ;; 01:472e pP
+    dw   call_01_4af9_IsLevelFlag4Set                                  ;; 01:4730 pP
     dw   .call_01_4744                                 ;; 01:4732 pP
-    dw   call_01_4ae7                                  ;; 01:4734 pP
+    dw   call_01_4ae7_CountLevelsWithFlag4                                  ;; 01:4734 pP
     dw   .call_01_4748                                 ;; 01:4736 pP
-    dw   call_01_4ab9                                  ;; 01:4738 pP
+    dw   call_01_4ab9_CountSetBitsInFlags                                  ;; 01:4738 pP
     dw   .call_01_474c                                 ;; 01:473a pP
     dw   .call_01_4756                                 ;; 01:473c pP
     dw   .call_01_4759                                 ;; 01:473e pP
@@ -943,7 +1090,9 @@ call_01_4722:
     ld   A, [wDC4E]                                    ;; 01:475c $fa $4e $dc
     ret                                                ;; 01:475f $c9
 
-call_01_4760:
+call_01_4760_MenuState_SubmenuHandler:
+; Description: If wDBA6 is nonzero, copies it and wDBA7 to wDBDE/DBDF, 
+; then dispatches via table at data_01_5b61 and jumps to 4C45. Likely another state handler for sub-menus.
     ld   A, [wDBA6]                                    ;; 01:4760 $fa $a6 $db
     and  A, A                                          ;; 01:4763 $a7
     jr   Z, .jr_01_476f                                ;; 01:4764 $28 $09
@@ -954,12 +1103,15 @@ call_01_4760:
     ld   A, [wDBA7]                                    ;; 01:476f $fa $a7 $db
     ld   DE, data_01_5b61                              ;; 01:4772 $11 $61 $5b
     call call_00_0777                                  ;; 01:4775 $cd $77 $07
-    jp   call_01_4c45                                  ;; 01:4778 $c3 $45 $4c
+    jp   call_01_4c45_ParseAndPlaceSpriteRecords                                  ;; 01:4778 $c3 $45 $4c
 
-call_01_477b:
+call_01_477b_MenuState_NoOp:
+; Description: Empty ret. Likely a placeholder or unused state.
     ret                                           ;; 01:477b ?
 
-call_01_477c:
+call_01_477c_DrawMenuNumberSprite:
+; Description: Uses wDBA7 to compute sprite data offsets into wC980_NumbersSprites, 
+;then uses wDB7E to pick a number graphic, combines with data_01_66f9, and jumps to jp_00_0bcf (sprite draw). Likely draws a numeric value (e.g., score).
     ld   HL, wDBA7                                     ;; 01:477c $21 $a7 $db
     ld   L, [HL]                                       ;; 01:477f $6e
     ld   H, $00                                        ;; 01:4780 $26 $00
@@ -991,12 +1143,15 @@ call_01_477c:
     ld   B, $04                                        ;; 01:47a5 $06 $04
     jp   jp_00_0bcf                                    ;; 01:47a7 $c3 $cf $0b
 
-call_01_47aa:
+call_01_47aa_StoreCurrentMenuIndex:
+; Description: Copies wDBA7 to wDBDD. Probably stores the current selection.
     ld   A, [wDBA7]                                    ;; 01:47aa $fa $a7 $db
     ld   [wDBDD], A                                    ;; 01:47ad $ea $dd $db
     ret                                                ;; 01:47b0 $c9
 
-call_01_47b1:
+call_01_47b1_LoadMenuConfigData:
+; Description: Uses a jump table (.data_01_47c6) to pick a configuration, 
+; copies 8 bytes into wDBB1, then jumps to jp_00_0781 (likely continues processing).
     ld   A, [wDBA7]                                    ;; 01:47b1 $fa $a7 $db
     ld   DE, .data_01_47c6                             ;; 01:47b4 $11 $c6 $47
     call call_00_0777                                  ;; 01:47b7 $cd $77 $07
@@ -1013,22 +1168,76 @@ call_01_47b1:
     db   $06, $66, $86, $60, $80, $05, $00, $06        ;; 01:47ee ........
     db   $66, $6b, $c6, $67, $a0, $03, $00, $06        ;; 01:47f6 ........
     db   $ce, $5e, $ce, $59, $00, $05, $01, $11        ;; 01:47fe ......??
-    db   $90, $51, $00, $40, $90, $11, $21, $dd        ;; 01:4806 ????????
-    db   $da, $36, $80, $11, $c3, $4a, $cd, $65        ;; 01:480e ????????
-    db   $08, $cd, $cf, $4a, $c6, $30, $ea, $dd        ;; 01:4816 ????????
-    db   $da, $21, $97, $4e, $c3, $fa, $4c, $c9        ;; 01:481e ????????
-    db   $21, $a7, $db, $6e, $26, $00, $11, $71        ;; 01:4826 ????????
-    db   $48, $19, $4e, $21, $6c, $db, $6e, $26        ;; 01:482e ????????
-    db   $00, $11, $5c, $dc, $19, $7e, $a1, $0e        ;; 01:4836 ????????
-    db   $e4, $20, $02, $0e, $e8, $79, $ea, $df        ;; 01:483e ????????
-    db   $da, $fa, $a1, $db, $c6, $02, $87, $87        ;; 01:4846 ????????
-    db   $87, $ea, $dd, $da, $fa, $a0, $db, $3c        ;; 01:484e ????????
-    db   $87, $87, $87, $ea, $de, $da, $3e, $01        ;; 01:4856 ????????
-    db   $ea, $e0, $da, $fa, $a7, $db, $87, $87        ;; 01:485e ????????
-    db   $c6, $04, $ea, $db, $db, $01, $02, $02        ;; 01:4866 ????????
-    db   $c3, $7e, $4c, $01, $02, $04, $08             ;; 01:486e ???????
+    db   $90, $51, $00, $40, $90, $11
 
-call_01_4875:
+call_01_480c_MenuState_DrawWithOffset:
+; Description: Writes $80 to wDADD, performs some setup with call_01_4ab9_CountSetBitsInFlags and 4acf, 
+; adjusts wDADD based on result, then prepares data_01_4e97 and jumps to 4CFA. Similar to 470c but with extra processing.
+    ld   hl,wDADD
+    ld   [hl],$80
+    ld   de,call_01_4ab9_CountSetBitsInFlags.jr_01_4ac3
+    call call_00_0865
+    call call_01_4acf_CountCollectedBitsForLevel
+    add  a,$30
+    ld   [wDADD],a
+    ld   hl,data_01_4e97
+    jp   call_01_4cfa_SetStreamPointerHL
+
+call_01_480c_MenuState_Empty:
+; Description: Empty return. Likely another placeholder.
+    ret  
+
+call_01_4826_MenuState_UpdateCursorAlt:
+; Description: Almost identical to 467b but uses a different mask table (.data_01_4871) 
+; and sets wDAE0=1 instead of 3. Computes positions/offsets and calls 4C7E for drawing.
+; Suggested Name: MenuState_UpdateCursorAlt
+    ld   hl,wDBA7
+    ld   l,[hl]
+    ld   h,$00
+    ld   de,.data_01_4871
+    add  hl,de
+    ld   c,[hl]
+    ld   hl,wDB6C_CurrentLevelId
+    ld   l,[hl]
+    ld   h,$00
+    ld   de,wDC5C
+    add  hl,de
+    ld   a,[hl]
+    and  c
+    ld   c,$E4
+    jr   nz,.label4843
+    ld   c,$E8
+.label4843:
+    ld   a,c
+    ld   [wDADF],a
+    ld   a,[wDBA1]
+    add  a,$02
+    add  a
+    add  a
+    add  a
+    ld   [wDADD],a
+    ld   a,[wDBA0]
+    inc  a
+    add  a
+    add  a
+    add  a
+    ld   [wDADE],a
+    ld   a,$01
+    ld   [wDAE0],a
+    ld   a,[wDBA7]
+    add  a
+    add  a
+    add  a,$04
+    ld   [wDBDB],a
+    ld   bc,$0202
+    jp   call_01_4c7e_CopyTileBlockToBuffer
+.data_01_4871:
+    db   $01, $02, $04, $08             ;; 01:486e ???????
+
+call_01_4875_ProcessTilemapOrCollectibles:
+; Description: Loads object/sprite data from a table into wDBAB, calls call_01_49bb_FormatAndPaginateText for setup, 
+; iterates through tile data at wDBA7, performs collision/bitmask checks, updates wDBA4 and wDBA5, 
+; and repeatedly calls call_01_48cd_TilemapXorBlitter. Appears to process tilemap collisions or update collectible graphics.
     ld   HL, wDBA6                                     ;; 01:4875 $21 $a6 $db
     ld   L, [HL]                                       ;; 01:4878 $6e
     ld   H, $00                                        ;; 01:4879 $26 $00
@@ -1040,7 +1249,7 @@ call_01_4875:
     ld   DE, wDBAB                                     ;; 01:4882 $11 $ab $db
     ld   BC, $06                                       ;; 01:4885 $01 $06 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4888 $cd $6e $07
-    call call_01_49bb                                  ;; 01:488b $cd $bb $49
+    call call_01_49bb_FormatAndPaginateText                                  ;; 01:488b $cd $bb $49
 .jr_01_488e:
     ld   HL, wDBA7                                     ;; 01:488e $21 $a7 $db
     ld   E, [HL]                                       ;; 01:4891 $5e
@@ -1054,7 +1263,7 @@ call_01_4875:
     ld   A, [wDBE1]                                    ;; 01:489a $fa $e1 $db
     cp   A, $fe                                        ;; 01:489d $fe $fe
     jr   NZ, .jr_01_48ac                               ;; 01:489f $20 $0b
-    call call_01_4a55                                  ;; 01:48a1 $cd $55 $4a
+    call call_01_4a55_MeasureTextWidth                                  ;; 01:48a1 $cd $55 $4a
     ld   A, [wDB9E]                                    ;; 01:48a4 $fa $9e $db
     add  A, A                                          ;; 01:48a7 $87
     add  A, A                                          ;; 01:48a8 $87
@@ -1069,20 +1278,22 @@ call_01_4875:
 .jr_01_48b5:
     ld   A, [HL+]                                      ;; 01:48b5 $2a
     push HL                                            ;; 01:48b6 $e5
-    call call_01_48cd                                  ;; 01:48b7 $cd $cd $48
+    call call_01_48cd_TilemapXorBlitter                                  ;; 01:48b7 $cd $cd $48
     pop  HL                                            ;; 01:48ba $e1
     bit  7, [HL]                                       ;; 01:48bb $cb $7e
     jr   Z, .jr_01_48b5                                ;; 01:48bd $28 $f6
     inc  HL                                            ;; 01:48bf $23
-    call call_01_4cfa                                  ;; 01:48c0 $cd $fa $4c
+    call call_01_4cfa_SetStreamPointerHL                                  ;; 01:48c0 $cd $fa $4c
     ld   HL, wDBA5                                     ;; 01:48c3 $21 $a5 $db
     ld   A, [wDBE2]                                    ;; 01:48c6 $fa $e2 $db
     add  A, [HL]                                       ;; 01:48c9 $86
     ld   [HL], A                                       ;; 01:48ca $77
     jr   .jr_01_488e                                   ;; 01:48cb $18 $c1
 
-call_01_48cd:
-    call call_01_4a7f                                  ;; 01:48cd $cd $7f $4a
+call_01_48cd_TilemapXorBlitter:
+; Description: Performs bit manipulation to combine map data (uses wDBA4, wDBA5, wDB9E) with tile memory. 
+; Does multiple shifts and XOR writes—likely draws or updates tile graphics.
+    call call_01_4a7f_GetCharTileAddress                                  ;; 01:48cd $cd $7f $4a
     ld   A, [wDBA4]                                    ;; 01:48d0 $fa $a4 $db
     and  A, $07                                        ;; 01:48d3 $e6 $07
     ld   C, A                                          ;; 01:48d5 $4f
@@ -1120,7 +1331,7 @@ call_01_48cd:
     jr   NZ, .jr_01_4908                               ;; 01:490a $20 $fc
 .jr_01_490c:
     push HL                                            ;; 01:490c $e5
-    call call_01_4cd4                                  ;; 01:490d $cd $d4 $4c
+    call call_01_4cd4_GetBgTilemapPtrFromIndex                                  ;; 01:490d $cd $d4 $4c
     pop  HL                                            ;; 01:4910 $e1
     add  HL, DE                                        ;; 01:4911 $19
     ld   A, [wDBAF]                                    ;; 01:4912 $fa $af $db
@@ -1215,10 +1426,12 @@ call_01_48cd:
     ld   [HL], A                                       ;; 01:499d $77
     ret                                                ;; 01:499e $c9
 
-call_01_499f:
-    call call_01_4ce5                                  ;; 01:499f $cd $e5 $4c
+call_01_499f_ClearTilemapRegion:
+; Description: Calls routines to get a tile pointer, clears a rectangular block of VRAM 
+; (loops writing zero). Used to blank out an area before redrawing.
+    call call_01_4ce5_ComputeTilemapBlockOffset                                  ;; 01:499f $cd $e5 $4c
     ld   B, A                                          ;; 01:49a2 $47
-    call call_01_4cd4                                  ;; 01:49a3 $cd $d4 $4c
+    call call_01_4cd4_GetBgTilemapPtrFromIndex                                  ;; 01:49a3 $cd $d4 $4c
     xor  A, A                                          ;; 01:49a6 $af
 .jr_01_49a7:
     ld   [HL+], A                                      ;; 01:49a7 $22
@@ -1241,10 +1454,16 @@ call_01_499f:
     jr   NZ, .jr_01_49a7                               ;; 01:49b8 $20 $ed
     ret                                                ;; 01:49ba $c9
 
-call_01_49bb:
+call_01_49bb_FormatAndPaginateText:
+; Description:
+; Main text/selection loop. Loads a text bank (via call_00_0835_LoadFromTextBank1C), 
+; repeatedly checks available text width (call_01_4a55_MeasureTextWidth), compares the width against the text buffer, and either:
+; Scans backward to replace the last space with a break marker ($80) if overfull.
+; Scans forward, invoking call_01_4cfa_SetStreamPointerHL to process text entries.
+; Also updates indices (wDBA5, wDBB0, etc.) and computes offsets for selecting the next text chunk.
     call call_00_0835_LoadFromTextBank1C                                  ;; 01:49bb $cd $35 $08
 .jr_01_49be:
-    call call_01_4a55                                  ;; 01:49be $cd $55 $4a
+    call call_01_4a55_MeasureTextWidth                                  ;; 01:49be $cd $55 $4a
     ld   HL, wDB9E                                     ;; 01:49c1 $21 $9e $db
     ld   L, [HL]                                       ;; 01:49c4 $6e
     ld   H, $00                                        ;; 01:49c5 $26 $00
@@ -1283,7 +1502,7 @@ call_01_49bb:
     ld   A, [HL]                                       ;; 01:49f0 $7e
     and  A, A                                          ;; 01:49f1 $a7
     jr   Z, .jr_01_4a06                                ;; 01:49f2 $28 $12
-    call call_01_4cfa                                  ;; 01:49f4 $cd $fa $4c
+    call call_01_4cfa_SetStreamPointerHL                                  ;; 01:49f4 $cd $fa $4c
 .jr_01_49f7:
     ld   A, [HL+]                                      ;; 01:49f7 $2a
     bit  7, A                                          ;; 01:49f8 $cb $7f
@@ -1299,7 +1518,7 @@ call_01_49bb:
     ld   A, [wDBA4]                                    ;; 01:4a06 $fa $a4 $db
     ld   [wDBE1], A                                    ;; 01:4a09 $ea $e1 $db
     ld   HL, wDADD                                     ;; 01:4a0c $21 $dd $da
-    call call_01_4cfa                                  ;; 01:4a0f $cd $fa $4c
+    call call_01_4cfa_SetStreamPointerHL                                  ;; 01:4a0f $cd $fa $4c
     ld   A, [wDBB0]                                    ;; 01:4a12 $fa $b0 $db
     inc  A                                             ;; 01:4a15 $3c
     ld   [wDBE2], A                                    ;; 01:4a16 $ea $e2 $db
@@ -1345,7 +1564,11 @@ call_01_49bb:
     ld   [wDBE2], A                                    ;; 01:4a51 $ea $e2 $db
     ret                                                ;; 01:4a54 $c9
 
-call_01_4a55:
+call_01_4a55_MeasureTextWidth:
+; Description:
+; Traverses a text buffer pointed to by wDBA7, uses call_01_4df4_LookupTileFromTranslationTable to decode characters, 
+; and sums their widths (via wDBAD as a font-width table) into BC. Stops at a high-bit 
+; terminator and returns the accumulated width minus 1.
     ld   HL, wDBA7                                     ;; 01:4a55 $21 $a7 $db
     ld   A, [HL+]                                      ;; 01:4a58 $2a
     ld   H, [HL]                                       ;; 01:4a59 $66
@@ -1356,7 +1579,7 @@ call_01_4a55:
 .jr_01_4a61:
     ld   A, [HL+]                                      ;; 01:4a61 $2a
     push HL                                            ;; 01:4a62 $e5
-    call call_01_4df4                                  ;; 01:4a63 $cd $f4 $4d
+    call call_01_4df4_LookupTileFromTranslationTable                                  ;; 01:4a63 $cd $f4 $4d
     ld   HL, wDBAD                                     ;; 01:4a66 $21 $ad $db
     ld   E, [HL]                                       ;; 01:4a69 $5e
     inc  HL                                            ;; 01:4a6a $23
@@ -1377,8 +1600,11 @@ call_01_4a55:
     dec  BC                                            ;; 01:4a7d $0b
     ret                                                ;; 01:4a7e $c9
 
-call_01_4a7f:
-    call call_01_4df4                                  ;; 01:4a7f $cd $f4 $4d
+call_01_4a7f_GetCharTileAddress:
+; Description:
+; Given a character index from call_01_4df4_LookupTileFromTranslationTable, looks up a pointer into a character tilemap: 
+; multiplies tile height/width (wDBB0, wDBAF) to compute an offset and stores the final address in wDBBD/wDBBE.
+    call call_01_4df4_LookupTileFromTranslationTable                                  ;; 01:4a7f $cd $f4 $4d
     push AF                                            ;; 01:4a82 $f5
     ld   HL, wDBAD                                     ;; 01:4a83 $21 $ad $db
     ld   E, [HL]                                       ;; 01:4a86 $5e
@@ -1419,8 +1645,11 @@ call_01_4a7f:
     ld   [wDBBE], A                                    ;; 01:4ab5 $ea $be $db
     ret                                                ;; 01:4ab8 $c9
 
-entry_01_4ab9:
-call_01_4ab9:
+entry_01_4ab9_CountSetBitsInFlags:
+call_01_4ab9_CountSetBitsInFlags:
+; Description:
+; Counts the total number of set bits (1s) in the 12 bytes at wDC5C. 
+; Likely used to count collected items or flags.
     ld   HL, wDC5C                                     ;; 01:4ab9 $21 $5c $dc
     ld   B, $0c                                        ;; 01:4abc $06 $0c
     ld   C, $00                                        ;; 01:4abe $0e $00
@@ -1439,7 +1668,10 @@ call_01_4ab9:
     ld   A, C                                          ;; 01:4acd $79
     ret                                                ;; 01:4ace $c9
 
-call_01_4acf:
+call_01_4acf_CountCollectedBitsForLevel:
+; Description:
+; For the current level number, reads a byte from wDC5C + level, 
+; counts how many of its low 4 bits are set.
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 01:4acf $21 $1e $dc
     ld   L, [HL]                                       ;; 01:4ad2 $6e
     ld   H, $00                                        ;; 01:4ad3 $26 $00
@@ -1458,8 +1690,11 @@ call_01_4acf:
     ld   A, C                                          ;; 01:4ae5 $79
     ret                                                ;; 01:4ae6 $c9
 
-entry_01_4ae7:
-call_01_4ae7:
+entry_01_4ae7_CountLevelsWithFlag4:
+call_01_4ae7_CountLevelsWithFlag4:
+; Description:
+; Counts how many of the first seven bytes in wDC5C have bit 4 set,
+; probably counts levels with a specific completion flag.
     ld   HL, wDC5C                                     ;; 01:4ae7 $21 $5c $dc
     ld   B, $07                                        ;; 01:4aea $06 $07
     ld   C, $00                                        ;; 01:4aec $0e $00
@@ -1474,7 +1709,9 @@ call_01_4ae7:
     ld   A, C                                          ;; 01:4af7 $79
     ret                                                ;; 01:4af8 $c9
 
-call_01_4af9:
+call_01_4af9_IsLevelFlag4Set:
+; Description:
+; Checks if the current level’s flag byte at wDC5C + level has bit 4 set, returning 1 if so.
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 01:4af9 $21 $1e $dc
     ld   L, [HL]                                       ;; 01:4afc $6e
     ld   H, $00                                        ;; 01:4afd $26 $00
@@ -1486,7 +1723,9 @@ call_01_4af9:
     ld   A, $01                                        ;; 01:4b07 $3e $01
     ret                                                ;; 01:4b09 $c9
 
-call_01_4b0a:
+call_01_4b0a_CountLowBitsForLevel:
+; Description:
+; Counts how many of the lowest three bits are set in the current level’s flag byte.
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 01:4b0a $21 $1e $dc
     ld   L, [HL]                                       ;; 01:4b0d $6e
     ld   H, $00                                        ;; 01:4b0e $26 $00
@@ -1505,20 +1744,23 @@ call_01_4b0a:
     ld   A, C                                          ;; 01:4b20 $79
     ret                                                ;; 01:4b21 $c9
 
-call_01_4b22:
-    call call_01_4b43                                  ;; 01:4b22 $cd $43 $4b
+call_01_4b22_GetLevelDataBasePtr:
+; Returns a pointer for a level’s base data.
+    call call_01_4b43_LookupLevelBasePointer                                  ;; 01:4b22 $cd $43 $4b
     ld   DE, $00                                       ;; 01:4b25 $11 $00 $00
     add  HL, DE                                        ;; 01:4b28 $19
     ret                                                ;; 01:4b29 $c9
 
-call_01_4b2a:
-    call call_01_4b43                                  ;; 01:4b2a $cd $43 $4b
+call_01_4b2a_GetLevelDataOffsetA:
+; Returns pointer offset by $0A from base.
+    call call_01_4b43_LookupLevelBasePointer                                  ;; 01:4b2a $cd $43 $4b
     ld   DE, $0a                                       ;; 01:4b2d $11 $0a $00
     add  HL, DE                                        ;; 01:4b30 $19
     ret                                                ;; 01:4b31 $c9
 
-call_01_4b32:
-    call call_01_4b43                                  ;; 01:4b32 $cd $43 $4b
+call_01_4b32_GetLevelDataSubsectionPtr:
+; Returns pointer offset by $14 plus a scaled sub-offset based on A.
+    call call_01_4b43_LookupLevelBasePointer                                  ;; 01:4b32 $cd $43 $4b
     ld   DE, $14                                       ;; 01:4b35 $11 $14 $00
     add  HL, DE                                        ;; 01:4b38 $19
     add  A, A                                          ;; 01:4b39 $87
@@ -1531,7 +1773,10 @@ call_01_4b32:
     add  HL, DE                                        ;; 01:4b41 $19
     ret                                                ;; 01:4b42 $c9
 
-call_01_4b43:
+call_01_4b43_LookupLevelBasePointer:
+; Description:
+; Given wDB6C_CurrentLevelId, doubles it and indexes into a table (.data_01_4b53) 
+; to retrieve the base address of that level’s data.
     ld   HL, wDB6C_CurrentLevelId                                     ;; 01:4b43 $21 $6c $db
     ld   L, [HL]                                       ;; 01:4b46 $6e
     ld   H, $00                                        ;; 01:4b47 $26 $00
@@ -1554,7 +1799,10 @@ call_01_4b43:
     db   $06, $60, $4e, $61, $a4, $62, $a5, $64        ;; 01:4b61 ????????
     db   $3e, $66                                      ;; 01:4b69 ??
 
-call_01_4b6b:
+call_01_4b6b_StreamTileDataToBuffer:
+; Description:
+; Handles timed or input-triggered loading of map/tile data. Decrements a countdown (wDBDE), 
+; checks input, fetches a data stream (data_01_5b61), and writes tile values into wD900 as a buffer.
     ld   HL, wDBDE                                     ;; 01:4b6b $21 $de $db
     ld   A, [HL]                                       ;; 01:4b6e $7e
     and  A, A                                          ;; 01:4b6f $a7
@@ -1615,7 +1863,11 @@ call_01_4b6b:
     jr   NZ, .jr_01_4ba6                               ;; 01:4bb4 $20 $f0
     jr   .jr_01_4b98                                   ;; 01:4bb6 $18 $e0
 
-call_01_4bb8:
+call_01_4bb8_UpdateInterpolationStep:
+; Description:
+; Calculates an interpolated point between two coordinates over time. Uses differences (wDB97–99, wDB96–98) 
+; and step counts (wDBEC, wDBEB) to update wDBC0/wDBC1, stores control bytes (wDBC2/wDBC3), and handles 
+; special cases when wDBC7 is $ff or $01.
     ld   A, [wDBC7]                                    ;; 01:4bb8 $fa $c7 $db
     cp   A, $ff                                        ;; 01:4bbb $fe $ff
     ret  Z                                             ;; 01:4bbd $c8
@@ -1623,7 +1875,7 @@ call_01_4bb8:
     ld   B, $00                                        ;; 01:4bc0 $06 $00
     cp   A, $01                                        ;; 01:4bc2 $fe $01
     jr   NZ, .jr_01_4bd8                               ;; 01:4bc4 $20 $12
-    call call_01_4de3                                  ;; 01:4bc6 $cd $e3 $4d
+    call call_01_4de3_ComputeTilemapVramOffset                                  ;; 01:4bc6 $cd $e3 $4d
     ld   C, A                                          ;; 01:4bc9 $4f
     ld   A, [wDBDC]                                    ;; 01:4bca $fa $dc $db
     and  A, $10                                        ;; 01:4bcd $e6 $10
@@ -1664,7 +1916,7 @@ call_01_4bb8:
     jr   NZ, .jr_01_4c01                               ;; 01:4c03 $20 $fc
     ld   [wDBC1], A                                    ;; 01:4c05 $ea $c1 $db
     ld   HL, wDBBF                                     ;; 01:4c08 $21 $bf $db
-    call call_01_4c45                                  ;; 01:4c0b $cd $45 $4c
+    call call_01_4c45_ParseAndPlaceSpriteRecords                                  ;; 01:4c0b $cd $45 $4c
     ld   A, [wDBC7]                                    ;; 01:4c0e $fa $c7 $db
     cp   A, $01                                        ;; 01:4c11 $fe $01
     ret  NZ                                            ;; 01:4c13 $c0
@@ -1702,7 +1954,12 @@ call_01_4bb8:
     ld   [HL], A                                       ;; 01:4c43 $77
     ret                                                ;; 01:4c44 $c9
 
-call_01_4c45:
+call_01_4c45_ParseAndPlaceSpriteRecords:
+; Description:
+; Reads a sequence of sprite or tile-placement records from memory until a $FF terminator. 
+; For each record, extracts an ID, X/Y offsets (adjusted by $10/$08), attribute flags 
+; (with optional lookup in wDAE1), and a size (C,B). Calls call_01_4c7e_CopyTileBlockToBuffer to copy tile entries 
+; into the staging buffer at wD900.
     ld   A, [HL+]                                      ;; 01:4c45 $2a
     cp   A, $ff                                        ;; 01:4c46 $fe $ff
     ret  Z                                             ;; 01:4c48 $c8
@@ -1736,11 +1993,14 @@ call_01_4c45:
     ld   B, [HL]                                       ;; 01:4c75 $46
     inc  HL                                            ;; 01:4c76 $23
     push HL                                            ;; 01:4c77 $e5
-    call call_01_4c7e                                  ;; 01:4c78 $cd $7e $4c
+    call call_01_4c7e_CopyTileBlockToBuffer                                  ;; 01:4c78 $cd $7e $4c
     pop  HL                                            ;; 01:4c7b $e1
     jr   .jr_01_4c4c                                   ;; 01:4c7c $18 $ce
 
-call_01_4c7e:
+call_01_4c7e_CopyTileBlockToBuffer:
+; Description:
+; Copies a rectangular block of sprite/tile data into wD900. Uses wDBDB as a tile index, 
+; increments coordinates, and fills multiple rows/columns according to width (B) and height (C).
     ld   HL, wDBDB                                     ;; 01:4c7e $21 $db $db
     ld   L, [HL]                                       ;; 01:4c81 $6e
     ld   H, $00                                        ;; 01:4c82 $26 $00
@@ -1779,11 +2039,28 @@ call_01_4c7e:
     dec  C                                             ;; 01:4cbf $0d
     jr   NZ, .jr_01_4c8d                               ;; 01:4cc0 $20 $cb
     ret                                                ;; 01:4cc2 $c9
-    db   $21, $a2, $db, $6e, $26, $00, $29, $29        ;; 01:4cc3 ????????
-    db   $29, $29, $11, $00, $80, $19, $5d, $54        ;; 01:4ccb ????????
-    db   $c9                                           ;; 01:4cd3 ?
 
-call_01_4cd4:
+call_01_4cc3_GetVramTilePtrFromIndex:
+; Description:
+; Computes a VRAM tile address by scaling wDBA2 by 16 (tile size in bytes) 
+; and adding the base address $8000. Returns DE = tile address.
+    ld   hl,wDBA2
+    ld   l,[hl]
+    ld   h,$00
+    add  hl,hl
+    add  hl,hl
+    add  hl,hl
+    add  hl,hl
+    ld   de,$8000
+    add  hl,de
+    ld   e,l
+    ld   d,h
+    ret  
+
+call_01_4cd4_GetBgTilemapPtrFromIndex:
+; Description:
+; Calculates a pointer into the background tilemap (wC000_BgMapTileIds) based on index wDBA2. 
+; Performs several shifts to scale the index by tile size (×16) and returns DE = pointer.
     ld   HL, wDBA2                                     ;; 01:4cd4 $21 $a2 $db
     ld   L, [HL]                                       ;; 01:4cd7 $6e
     ld   H, $00                                        ;; 01:4cd8 $26 $00
@@ -1797,7 +2074,10 @@ call_01_4cd4:
     ld   D, H                                          ;; 01:4ce3 $54
     ret                                                ;; 01:4ce4 $c9
 
-call_01_4ce5:
+call_01_4ce5_ComputeTilemapBlockOffset:
+; Description:
+; Given width (C) and height (B) from wDB9E/wDB9F, computes a linear offset equal to width × height ×16 
+; (via repeated addition and shifting) and returns BC = offset.
     ld   HL, wDB9E                                     ;; 01:4ce5 $21 $9e $db
     ld   C, [HL]                                       ;; 01:4ce8 $4e
     inc  HL                                            ;; 01:4ce9 $23
@@ -1817,14 +2097,20 @@ call_01_4ce5:
     ld   B, H                                          ;; 01:4cf8 $44
     ret                                                ;; 01:4cf9 $c9
 
-call_01_4cfa:
+call_01_4cfa_SetStreamPointerHL:
+; Description:
+; Stores a pointer (HL) into wDBA7/wDBA8. Used by text or 
+; sprite loaders to update the current stream position.
     ld   A, L                                          ;; 01:4cfa $7d
     ld   [wDBA7], A                                    ;; 01:4cfb $ea $a7 $db
     ld   A, H                                          ;; 01:4cfe $7c
     ld   [wDBA8], A                                    ;; 01:4cff $ea $a8 $db
     ret                                                ;; 01:4d02 $c9
 
-jp_01_4d03:
+call_01_4d03_StreamTilemapBlockToBg:
+; Description:
+; Loads width/height from a stream into wDB9E/F, computes a background tilemap address from wDBA6, 
+; and copies a block of BC bytes from HL to DE if a nonzero flag is present. Handles staging of tilemap updates.
     ld   A, [wDBA6]                                    ;; 01:4d03 $fa $a6 $db
     ld   [wDBA2], A                                    ;; 01:4d06 $ea $a2 $db
     ld   A, [HL+]                                      ;; 01:4d09 $2a
@@ -1832,7 +2118,7 @@ jp_01_4d03:
     ld   A, [HL+]                                      ;; 01:4d0d $2a
     ld   [wDB9F], A                                    ;; 01:4d0e $ea $9f $db
     push HL                                            ;; 01:4d11 $e5
-    call call_01_4ce5                                  ;; 01:4d12 $cd $e5 $4c
+    call call_01_4ce5_ComputeTilemapBlockOffset                                  ;; 01:4d12 $cd $e5 $4c
     ld   HL, wDBA6                                     ;; 01:4d15 $21 $a6 $db
     ld   L, [HL]                                       ;; 01:4d18 $6e
     ld   H, $00                                        ;; 01:4d19 $26 $00
@@ -1850,9 +2136,12 @@ jp_01_4d03:
     jp   Z, call_00_076e_CopyBCBytesFromHLToDE                               ;; 01:4d28 $ca $6e $07
     ret                                                ;; 01:4d2b $c9
 
-call_01_4d2c:
-    call call_01_4bb8                                  ;; 01:4d2c $cd $b8 $4b
-    call call_01_4b6b                                  ;; 01:4d2f $cd $6b $4b
+call_01_4d2c_ProcessTileStreamingLoop:
+; Description:
+; Main tile-update loop: updates interpolation step, streams tile data to buffers, updates VRAM, 
+; decrements wDBDC, filters inputs, and repeats until inputs clear.
+    call call_01_4bb8_UpdateInterpolationStep                                  ;; 01:4d2c $cd $b8 $4b
+    call call_01_4b6b_StreamTileDataToBuffer                                  ;; 01:4d2f $cd $6b $4b
     call call_00_0b92_UpdateVRAMTiles                                  ;; 01:4d32 $cd $92 $0b
     ld   HL, wDBDC                                     ;; 01:4d35 $21 $dc $db
     dec  [HL]                                          ;; 01:4d38 $35
@@ -1863,10 +2152,14 @@ call_01_4d2c:
     and  A, $fe                                        ;; 01:4d43 $e6 $fe
 .jr_01_4d45:
     and  A, A                                          ;; 01:4d45 $a7
-    jr   NZ, call_01_4d2c                              ;; 01:4d46 $20 $e4
+    jr   NZ, call_01_4d2c_ProcessTileStreamingLoop                              ;; 01:4d46 $20 $e4
     ret                                                ;; 01:4d48 $c9
 
-call_01_4d49:
+call_01_4d49_FormatDecimalToAsciiDigits:
+; Description:
+; Converts a value in A into three ASCII digits (hundreds, tens, ones), 
+; writes them to wDADD (with $80 terminator), using $2F as prefill. 
+; Essentially formats a decimal number for display.
     ld   HL, wDADD                                     ;; 01:4d49 $21 $dd $da
     cp   A, $0a                                        ;; 01:4d4c $fe $0a
     jr   C, .jr_01_4d68                                ;; 01:4d4e $38 $18
@@ -1893,17 +2186,21 @@ call_01_4d49:
     ld   [HL], $80                                     ;; 01:4d6b $36 $80
     ret                                                ;; 01:4d6d $c9
 
-call_01_4d6e:
+call_01_4d6e_PrepareStreamingPointers:
+; Description:
+; Waits for wDBEF to clear, sets up several control flags (wDBEF–wDBF7), 
+; calculates offsets into two data tables (data_01_66f9 and VRAM $8000), 
+; and stores resulting pointers. Prepares for a rendering or data streaming operation.
     ld   A, [wDBEF]                                    ;; 01:4d6e $fa $ef $db
     and  A, A                                          ;; 01:4d71 $a7
-    jr   NZ, call_01_4d6e                              ;; 01:4d72 $20 $fa
+    jr   NZ, call_01_4d6e_PrepareStreamingPointers                              ;; 01:4d72 $20 $fa
     ld   A, $01                                        ;; 01:4d74 $3e $01
     ld   [wDBEF], A                                    ;; 01:4d76 $ea $ef $db
     ld   A, $04                                        ;; 01:4d79 $3e $04
     ld   [wDBF0], A                                    ;; 01:4d7b $ea $f0 $db
     ld   A, $01                                        ;; 01:4d7e $3e $01
     ld   [wDBF1], A                                    ;; 01:4d80 $ea $f1 $db
-    call call_01_4dc9                                  ;; 01:4d83 $cd $c9 $4d
+    call call_01_4dc9_GetTileIdFromMapCoords                                  ;; 01:4d83 $cd $c9 $4d
     ld   L, A                                          ;; 01:4d86 $6f
     ld   H, $00                                        ;; 01:4d87 $26 $00
     add  HL, HL                                        ;; 01:4d89 $29
@@ -1918,7 +2215,7 @@ call_01_4d6e:
     ld   [wDBF2], A                                    ;; 01:4d94 $ea $f2 $db
     ld   A, H                                          ;; 01:4d97 $7c
     ld   [wDBF3], A                                    ;; 01:4d98 $ea $f3 $db
-    call call_01_4de3                                  ;; 01:4d9b $cd $e3 $4d
+    call call_01_4de3_ComputeTilemapVramOffset                                  ;; 01:4d9b $cd $e3 $4d
     ld   L, A                                          ;; 01:4d9e $6f
     ld   H, $00                                        ;; 01:4d9f $26 $00
     add  HL, HL                                        ;; 01:4da1 $29
@@ -1944,7 +2241,10 @@ call_01_4d6e:
     ld   [wDBF7], A                                    ;; 01:4dc5 $ea $f7 $db
     ret                                                ;; 01:4dc8 $c9
 
-call_01_4dc9:
+call_01_4dc9_GetTileIdFromMapCoords:
+; Description:
+; Derives a tile ID from row (wDBEC) and column (wDBEB) offsets, performs arithmetic 
+; to locate the correct entry in wDB7E, and returns the byte at that position.
     ld   HL, wDBEC                                     ;; 01:4dc9 $21 $ec $db
     ld   B, [HL]                                       ;; 01:4dcc $46
     ld   A, $fa                                        ;; 01:4dcd $3e $fa
@@ -1962,7 +2262,10 @@ call_01_4dc9:
     ld   A, [HL]                                       ;; 01:4de1 $7e
     ret                                                ;; 01:4de2 $c9
 
-call_01_4de3:
+call_01_4de3_ComputeTilemapVramOffset:
+; Description:
+; Computes an intermediate VRAM/tilemap offset from wDBEC and wDBEB using weighted sums and bit shifts, 
+; then adds $98. Used as part of address calculations for map-to-VRAM conversions.
     ld   A, [wDBEC]                                    ;; 01:4de3 $fa $ec $db
     add  A, A                                          ;; 01:4de6 $87
     ld   L, A                                          ;; 01:4de7 $6f
@@ -1976,7 +2279,10 @@ call_01_4de3:
     add  A, $98                                        ;; 01:4df1 $c6 $98
     ret                                                ;; 01:4df3 $c9
 
-call_01_4df4:
+call_01_4df4_LookupTileFromTranslationTable:
+; Description:
+; Looks up a tile ID from a fixed translation table .data_01_4dfd based 
+; on the index in A. Returns the mapped ID.
     ld   E, A                                          ;; 01:4df4 $5f
     ld   D, $00                                        ;; 01:4df5 $16 $00
     ld   HL, .data_01_4dfd                             ;; 01:4df7 $21 $fd $4d
@@ -2025,7 +2331,10 @@ data_01_4e97:
     db   $51, $52, $53, $54, $55, $56, $57, $58        ;; 01:4f17 ????????
     db   $59, $5a, $30, $31, $32, $33, $34, $35        ;; 01:4f1f ????????
 
-call_01_4f27:
+call_01_4f27_ClearBgAndTileBuffers:
+; Description:
+; Clears and initializes background map (wC000), tile buffers (wD400, wD578) 
+; by filling them with zeros or $01. Uses CopyBCBytesFromHLToDE to perform block clears.
     ld   HL, wC000_BgMapTileIds                                     ;; 01:4f27 $21 $00 $c0
     ld   DE, $c001                                     ;; 01:4f2a $11 $01 $c0 ; wC000_BgMapTileIds
     ld   [HL], $00                                     ;; 01:4f2d $36 $00
@@ -2042,19 +2351,26 @@ call_01_4f27:
     ld   BC, $167                                      ;; 01:4f4b $01 $67 $01
     jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4f4e $c3 $6e $07
 
-call_01_4f51:
+call_01_4f51_UploadSecondaryTileLayer:
+; Copies the contents of wD578 into the background tilemap using call_01_4f67_CopyTileBufferToBgMap, 
+; then calls call_00_0a6a with C=$07 (likely triggers VRAM transfer).
     ld   DE, wD578                                     ;; 01:4f51 $11 $78 $d5
-    call call_01_4f67                                  ;; 01:4f54 $cd $67 $4f
+    call call_01_4f67_CopyTileBufferToBgMap                                  ;; 01:4f54 $cd $67 $4f
     ld   C, $07                                        ;; 01:4f57 $0e $07
     jp   call_00_0a6a                                  ;; 01:4f59 $c3 $6a $0a
 
-call_01_4f5c:
+call_01_4f5c_UploadPrimaryTileLayer:
+; Description:
+; Same as above but copies from wD400 instead of wD578 and uses C=$08.
     ld   DE, wD400                                     ;; 01:4f5c $11 $00 $d4
-    call call_01_4f67                                  ;; 01:4f5f $cd $67 $4f
+    call call_01_4f67_CopyTileBufferToBgMap                                  ;; 01:4f5f $cd $67 $4f
     ld   C, $08                                        ;; 01:4f62 $0e $08
     jp   call_00_0a6a                                  ;; 01:4f64 $c3 $6a $0a
 
-call_01_4f67:
+call_01_4f67_CopyTileBufferToBgMap:
+; Description:
+; Writes a 12×20 block of tiles from DE to HL, skipping 12 bytes each row to match map stride. 
+; Core routine for transferring tile buffers to the BG map.
     ld   HL, wC000_BgMapTileIds                                     ;; 01:4f67 $21 $00 $c0
     ld   B, $12                                        ;; 01:4f6a $06 $12
 .jr_01_4f6c:
@@ -2073,14 +2389,21 @@ call_01_4f67:
     jr   NZ, .jr_01_4f6c                               ;; 01:4f7b $20 $ef
     ret                                                ;; 01:4f7d $c9
 
-call_01_4f7e:
+call_01_4f7e_SeedTileLookupTable:
+; Description:
+; Initializes wDB7E with $20 and copies it forward 17 bytes, 
+; clearing or seeding a lookup table used by map computations.
     ld   HL, wDB7E                                     ;; 01:4f7e $21 $7e $db
     ld   DE, wDB7F                                     ;; 01:4f81 $11 $7f $db
     ld   BC, $11                                       ;; 01:4f84 $01 $11 $00
     ld   [HL], $20                                     ;; 01:4f87 $36 $20
     jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4f89 $c3 $6e $07
 
-call_01_4f8c:
+call_01_4f8c_BuildCollisionBitfieldAndChecksum:
+; Description:
+; Clears wDB72–wDB7D, seeds wDB73–wDB75 from wDC4E/AF/4F, then iterates through DC5C/DC5D data, 
+; checking bit masks (.data_01_5013 and .data_01_501f) to build bitfields in wDB76+. 
+; Sums values for a checksum in wDB72 and sets a completion flag wDB91.
     ld   HL, wDB72                                     ;; 01:4f8c $21 $72 $db
     ld   B, $0c                                        ;; 01:4f8f $06 $0c
     xor  A, A                                          ;; 01:4f91 $af
@@ -2166,7 +2489,11 @@ call_01_4f8c:
 .data_01_501f:
     db   $80, $40, $20, $10, $08, $04, $02, $01        ;; 01:501f ??.?.???
 
-call_01_5027:
+call_01_5027_BuildTileFlagBufferFromBitfield:
+; Description:
+; Initializes the buffer at wDB7E to zeros, then iterates through bits in wDB72 to set flags in the buffer. 
+; It scans wDB72 bitfields (masking with $80, $40, etc.) and for each set bit, ORs $10 into the corresponding 
+; entry in wDB7E. Essentially, it maps a bitfield of collision/attribute flags into a tile-flag buffer.
     ld   HL, wDB7E                                     ;; 01:5027 $21 $7e $db
     ld   DE, wDB7F                                     ;; 01:502a $11 $7f $db
     ld   BC, $11                                       ;; 01:502d $01 $11 $00
@@ -2200,7 +2527,12 @@ call_01_5027:
     jr   NZ, .jr_01_5041                               ;; 01:5057 $20 $e8
     ret                                                ;; 01:5059 $c9
 
-call_01_505a:
+call_01_505a_ValidateTileBufferAndRebuildCollisionData:
+; Description:
+; Checks wDB7E for any tile flagged $20. If found early, returns 0. If not found after scanning $12 entries, 
+; it resets buffers (wDB72–wDB7D), then reconstructs bitfields from wDB7E back into wDB72. It sums these values, 
+; XORs with $B6, and compares to wDB72 as a checksum. On match, it calls call_01_50b5_GenerateCollisionTableFromMasks 
+; (which rebuilds DC5C/DC4E tile collision data) and returns $20; otherwise, returns 0.
     ld   HL, wDB7E                                     ;; 01:505a $21 $7e $db
     ld   B, $12                                        ;; 01:505d $06 $12
 .jr_01_505f:
@@ -2252,20 +2584,25 @@ call_01_505a:
     ld   HL, wDB72                                     ;; 01:50a6 $21 $72 $db
     cp   A, [HL]                                       ;; 01:50a9 $be
     jr   NZ, .jr_01_50b2                               ;; 01:50aa $20 $06
-    call call_01_50b5                                  ;; 01:50ac $cd $b5 $50
+    call call_01_50b5_GenerateCollisionTableFromMasks                                  ;; 01:50ac $cd $b5 $50
     ld   A, $20                                        ;; 01:50af $3e $20
     ret                                                ;; 01:50b1 $c9
 .jr_01_50b2:
     ld   A, $00                                        ;; 01:50b2 $3e $00
     ret                                                ;; 01:50b4 $c9
 
-call_01_50b5:
+call_01_50b5_GenerateCollisionTableFromMasks:
+; Description:
+; Builds a collision lookup table (wDC5C) from static mask tables .data_01_511a_CollisionColumnMaskTable and .data_01_5126_BitMaskLut_80to01. 
+; It iterates through each mask byte, rotates bits, checks wDB76 bitfields, and sets collision bits 
+; in a temporary register (C). Once a row is processed, it stores the result into wDC5C, repeating 
+; for 12 entries. Finally, it updates wDC4E/AF/4F with values from wDB73–wDB75.
     xor  A, A                                          ;; 01:50b5 $af
     ld   [wDB90], A                                    ;; 01:50b6 $ea $90 $db
     ld   DE, $00                                       ;; 01:50b9 $11 $00 $00
 .jr_01_50bc:
     push DE                                            ;; 01:50bc $d5
-    ld   HL, .data_01_511a                             ;; 01:50bd $21 $1a $51
+    ld   HL, .data_01_511a_CollisionColumnMaskTable                             ;; 01:50bd $21 $1a $51
     add  HL, DE                                        ;; 01:50c0 $19
     ld   B, [HL]                                       ;; 01:50c1 $46
     ld   C, $00                                        ;; 01:50c2 $0e $00
@@ -2287,7 +2624,7 @@ call_01_50b5:
     and  A, $07                                        ;; 01:50df $e6 $07
     ld   E, A                                          ;; 01:50e1 $5f
     ld   D, $00                                        ;; 01:50e2 $16 $00
-    ld   HL, .data_01_5126                             ;; 01:50e4 $21 $26 $51
+    ld   HL, .data_01_5126_BitMaskLut_80to01                             ;; 01:50e4 $21 $26 $51
     add  HL, DE                                        ;; 01:50e7 $19
     ld   A, [HL]                                       ;; 01:50e8 $7e
     pop  HL                                            ;; 01:50e9 $e1
@@ -2318,10 +2655,16 @@ call_01_50b5:
     ld   A, [wDB75]                                    ;; 01:5113 $fa $75 $db
     ld   [wDC4F], A                                    ;; 01:5116 $ea $4f $dc
     ret                                                ;; 01:5119 $c9
-.data_01_511a:
+.data_01_511a_CollisionColumnMaskTable:
+; Description:
+; A static table of bit masks used by call_01_50b5 to control which collision checks 
+; to perform for each column. Likely a column mask pattern for map rows.
     db   $f1, $ff, $ff, $ff, $ff, $ff, $ff, $01        ;; 01:511a ????????
     db   $01, $01, $01, $01                            ;; 01:5122 ????
-.data_01_5126:
+.data_01_5126_BitMaskLut_80to01:
+; Description:
+; A standard bitmask lookup table for individual bits ($80, $40, $20 … $01). 
+; Used for testing individual tile bits in wDB76.
     db   $80, $40, $20, $10, $08, $04, $02, $01        ;; 01:5126 ????????
 
 data_01_512e:
@@ -2428,10 +2771,10 @@ data_01_512e:
     db   $03, $00, $00, $10, $10, $02, $01, $01        ;; 01:53bb ???w.www
     db   $02, $00, $00                                 ;; 01:53c3 .??
 
-data_01_53c6:
+data_01_53c6_MenuTypeData:
     dw   data_01_559a                                  ;; 01:53c6 pP
     db   $00, $02, $20, $54, $00, $10, $d3, $04        ;; 01:53c8 ........
-    dw   data_01_43c3                                  ;; 01:53d0 pP
+    dw   call_01_43c3_LoadMenuObjectPalette                                  ;; 01:53d0 pP
     db   $00, $00, $00, $00                            ;; 01:53d2 ????
     dw   data_01_55c3                                  ;; 01:53d6 pP
     db   $01, $12, $08, $20, $18, $18, $d3, $07        ;; 01:53d8 ........
@@ -2833,7 +3176,6 @@ data_01_64e9:
 
 data_01_66f9:
     INCBIN ".gfx/misc_sprites/image_001_66f9.bin"
-
 
 data_01_6f39:
     dw   .data_01_6f45, .data_01_6f88, .data_01_6f45, .data_01_6f8b

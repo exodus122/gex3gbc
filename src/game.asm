@@ -43,49 +43,49 @@ INCLUDE "audio_engine/bank05_audio2.asm"
 
 SECTION "bank06", ROMX[$4000], BANK[$06]
 image_006_4000:
-    INCBIN ".gfx/menus/tilesets/image_006_4000.bin"
+    INCBIN ".gfx/menu_tilesets/image_006_4000.bin"
 image_006_4000_bgmap_tile_ids:
-    INCBIN "gfx/menus/bgmap_tile_ids/image_006_4000_bgmap_tile_ids.bin"
+    INCBIN "gfx/menu_tilesets/bgmap_tile_ids/image_006_4000_bgmap_tile_ids.bin"
 image_006_4000_palette_ids:
-    INCBIN "gfx/menus/palette_ids/image_006_4000_palette_ids.bin"
+    INCBIN "gfx/menu_tilesets/palette_ids/image_006_4000_palette_ids.bin"
 image_006_47a6:
-    INCBIN ".gfx/menus/tilesets/image_006_47a6.bin"
+    INCBIN ".gfx/menu_tilesets/image_006_47a6.bin"
 image_006_47a6_bgmap_tile_ids:
-    INCBIN "gfx/menus/bgmap_tile_ids/image_006_47a6_bgmap_tile_ids.bin"
+    INCBIN "gfx/menu_tilesets/bgmap_tile_ids/image_006_47a6_bgmap_tile_ids.bin"
 image_006_47a6_palette_ids:
-    INCBIN "gfx/menus/palette_ids/image_006_47a6_palette_ids.bin"
+    INCBIN "gfx/menu_tilesets/palette_ids/image_006_47a6_palette_ids.bin"
 image_006_4a1e:
-    INCBIN ".gfx/menus/tilesets/image_006_4a1e.bin"
+    INCBIN ".gfx/menu_tilesets/image_006_4a1e.bin"
 image_006_4a1e_bgmap_tile_ids:
-    INCBIN "gfx/menus/bgmap_tile_ids/image_006_4a1e_bgmap_tile_ids.bin"
+    INCBIN "gfx/menu_tilesets/bgmap_tile_ids/image_006_4a1e_bgmap_tile_ids.bin"
 image_006_4a1e_palette_ids:
-    INCBIN "gfx/menus/palette_ids/image_006_4a1e_palette_ids.bin"
+    INCBIN "gfx/menu_tilesets/palette_ids/image_006_4a1e_palette_ids.bin"
 image_006_59ce:
-    INCBIN ".gfx/menus/tilesets/image_006_59ce.bin"
+    INCBIN ".gfx/menu_tilesets/image_006_59ce.bin"
 image_006_59ce_bgmap_tile_ids:
-    INCBIN "gfx/menus/bgmap_tile_ids/image_006_59ce_bgmap_tile_ids.bin"
+    INCBIN "gfx/menu_tilesets/bgmap_tile_ids/image_006_59ce_bgmap_tile_ids.bin"
 image_006_59ce_palette_ids:
-    INCBIN "gfx/menus/palette_ids/image_006_59ce_palette_ids.bin"
+    INCBIN "gfx/menu_tilesets/palette_ids/image_006_59ce_palette_ids.bin"
 image_006_6086:
-    INCBIN ".gfx/menus/tilesets/image_006_6086.bin"
+    INCBIN ".gfx/menu_tilesets/image_006_6086.bin"
 image_006_6086_bgmap_tile_ids:
-    INCBIN "gfx/menus/bgmap_tile_ids/image_006_6086_bgmap_tile_ids.bin"
+    INCBIN "gfx/menu_tilesets/bgmap_tile_ids/image_006_6086_bgmap_tile_ids.bin"
 image_006_6086_palette_ids:
-    INCBIN "gfx/menus/palette_ids/image_006_6086_palette_ids.bin"
+    INCBIN "gfx/menu_tilesets/palette_ids/image_006_6086_palette_ids.bin"
 image_006_67c6:
-    INCBIN ".gfx/menus/tilesets/image_006_67c6.bin"
+    INCBIN ".gfx/menu_tilesets/image_006_67c6.bin"
 image_006_67c6_bgmap_tile_ids:
-    INCBIN "gfx/menus/bgmap_tile_ids/image_006_67c6_bgmap_tile_ids.bin"
+    INCBIN "gfx/menu_tilesets/bgmap_tile_ids/image_006_67c6_bgmap_tile_ids.bin"
 image_006_67c6_palette_ids:
-    INCBIN "gfx/menus/palette_ids/image_006_67c6_palette_ids.bin"
+    INCBIN "gfx/menu_tilesets/palette_ids/image_006_67c6_palette_ids.bin"
 
 SECTION "bank07", ROMX[$4000], BANK[$07]
 image_007_4000:
     INCBIN "./.gfx/object_sprites/image_007_4000.bin"
 image_007_5b00:
-    INCBIN "./.gfx/menus/tilesets/image_007_5b00.bin"
+    INCBIN "./.gfx/menu_tilesets/image_007_5b00.bin"
 image_007_5b00_bgmap_tile_ids:
-    INCBIN "gfx/menus/bgmap_tile_ids/image_007_5b00_bgmap_tile_ids.bin"
+    INCBIN "gfx/menu_tilesets/bgmap_tile_ids/image_007_5b00_bgmap_tile_ids.bin"
 
 SECTION "bank08", ROMX[$4000], BANK[$08]
 image_08_4000:
@@ -127,11 +127,11 @@ image_10_4000:
 
 SECTION "bank11", ROMX[$4000], BANK[$11]
 image_11_4000:
-    INCBIN ".gfx/menus/tilesets/image_011_4000.bin"
+    INCBIN ".gfx/menu_tilesets/image_011_4000.bin"
 image_11_4000_bgmap_tile_ids:
-    INCBIN "gfx/menus/bgmap_tile_ids/image_011_4000_bgmap_tile_ids.bin"
+    INCBIN "gfx/menu_tilesets/bgmap_tile_ids/image_011_4000_bgmap_tile_ids.bin"
 image_11_4000_palette_ids:
-    INCBIN "gfx/menus/palette_ids/image_011_4000_palette_ids.bin"
+    INCBIN "gfx/menu_tilesets/palette_ids/image_011_4000_palette_ids.bin"
 
 SECTION "bank12", ROMX[$4000], BANK[$12]
 SECTION "bank13", ROMX[$4000], BANK[$13]

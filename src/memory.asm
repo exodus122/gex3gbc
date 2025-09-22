@@ -338,7 +338,7 @@ wDB90:
 wDB91:
     ds 1                                               ;; db91
 
-wDB92:
+wDB92_MenuTypeDataPointer:
     ds 2                                               ;; db92
 
 wDB94:
@@ -530,7 +530,7 @@ wDBE8:
 wDBE9:
     ds 1                                               ;; dbe9
 
-wDBEA:
+wDBEA_MenuType:
     ds 1                                               ;; dbea
 
 wDBEB:

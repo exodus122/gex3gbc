@@ -784,7 +784,7 @@ call_00_3180_MarkInitialLevelObjects:
 ; Mark Starting Objects for Level
 ; Behavior: If level number ≠ 0, looks up a bitmask table ($31C1+level) and, 
 ; for each bit set, calls FindAndMarkObjectInList. For level 0, performs a banked 
-; call comparison loop using entry_01_4ab9 and thresholds in $31CD.
+; call comparison loop using entry_01_4ab9_CountSetBitsInFlags and thresholds in $31CD.
 ; Purpose: Ensures certain objects are flagged or activated when the level begins.
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:3180 $fa $1e $dc
     and  A, A                                          ;; 00:3183 $a7
@@ -813,7 +813,7 @@ call_00_3180_MarkInitialLevelObjects:
     push BC                                            ;; 00:31a4 $c5
     ld   [wDAD6_ReturnBank], A                                    ;; 00:31a5 $ea $d6 $da
     ld   A, $01                                        ;; 00:31a8 $3e $01
-    ld   HL, entry_01_4ab9                                     ;; 00:31aa $21 $b9 $4a
+    ld   HL, entry_01_4ab9_CountSetBitsInFlags                                     ;; 00:31aa $21 $b9 $4a
     call call_00_0edd_CallAltBankFunc                                  ;; 00:31ad $cd $dd $0e
     pop  BC                                            ;; 00:31b0 $c1
     ld   HL, $31cd                                     ;; 00:31b1 $21 $cd $31
@@ -1366,7 +1366,7 @@ call_00_3792_PrepareRelativeObjectSpawn:
 
 call_00_37a0_SpawnObjectRelative:
 ; Finds a free slot.
-; Calls a banked routine (entry_03_59c6) to fetch spawn data.
+; Calls a banked routine (entry_03_59c6_IsObjectFlaggedHighBit) to fetch spawn data.
 ; Derives offsets using the current object address.
 ; Reads a table (.data_00_38b6) and copies positional deltas.
 ; Depending on a flag in wDCE9, adds or subtracts position offsets.
@@ -1379,7 +1379,7 @@ call_00_37a0_SpawnObjectRelative:
     push DE                                            ;; 00:37a4 $d5
     ld   [wDAD6_ReturnBank], A                                    ;; 00:37a5 $ea $d6 $da
     ld   A, $03                                        ;; 00:37a8 $3e $03
-    ld   HL, entry_03_59c6                                     ;; 00:37aa $21 $c6 $59
+    ld   HL, entry_03_59c6_IsObjectFlaggedHighBit                                     ;; 00:37aa $21 $c6 $59
     call call_00_0edd_CallAltBankFunc                                  ;; 00:37ad $cd $dd $0e
     ld   [wDCE9], A                                    ;; 00:37b0 $ea $e9 $dc
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:37b3 $fa $00 $da

@@ -126,7 +126,7 @@ call_02_7152_UpdateObjects:
 ; Invokes object behavior routines (call_00_0f22_JumpHL) for special objects (wDC7B, wDC7D).
 ; Calls call_02_72fb_UpdateMapWindow to update the scrolling window and environment.
 ; Iterates through all objects (wDA00_CurrentObjectAddr) to run their update logic and 
-; finally triggers graphics updates via banked call entry_03_5ec1_UpdateObjectGraphics.
+; finally triggers graphics updates via banked call entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision.
     xor  A, A                                          ;; 02:7152 $af
     ld   [wDC85], A                                    ;; 02:7153 $ea $85 $dc
     ld   [wDC84], A                                    ;; 02:7156 $ea $84 $dc
@@ -261,7 +261,7 @@ call_02_7152_UpdateObjects:
     jr   NZ, .jr_02_7205                               ;; 02:723f $20 $c4
     ld   [wDAD6_ReturnBank], A                                    ;; 02:7241 $ea $d6 $da
     ld   A, $03                                        ;; 02:7244 $3e $03
-    ld   HL, entry_03_5ec1_UpdateObjectGraphics                                     ;; 02:7246 $21 $c1 $5e
+    ld   HL, entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision                                     ;; 02:7246 $21 $c1 $5e
     call call_00_0edd_CallAltBankFunc                                  ;; 02:7249 $cd $dd $0e
     ret                                                ;; 02:724c $c9
 

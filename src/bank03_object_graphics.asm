@@ -31,7 +31,11 @@ data_03_58d3:
     db   $02, $05, $02, $91, $1c, $09, $01, $04        ;; 03:59ab ????????
     db   $01, $05, $02                                 ;; 03:59b3 ???
 
-entry_03_59b6:
+entry_03_59b6_GetObjectPropertyFromDB61:
+; Object Property Lookup (DB61-based)
+; Description:
+; Uses the byte at wDB61 as an index into a two-byte table at data_03_58d3 to return an object property byte. 
+; Likely retrieves a behavior or sprite index based on some game state or object slot.
     ld   HL, wDB61                                     ;; 03:59b6 $21 $61 $db
     ld   L, [HL]                                       ;; 03:59b9 $6e
     ld   H, $d8                                        ;; 03:59ba $26 $d8
@@ -43,7 +47,11 @@ entry_03_59b6:
     ld   A, [HL]                                       ;; 03:59c4 $7e
     ret                                                ;; 03:59c5 $c9
 
-entry_03_59c6:
+entry_03_59c6_IsObjectFlaggedHighBit:
+; Check High-Bit Flag for Current Object
+; Description:
+; Fetches the current object’s index from wDA00_CurrentObjectAddr, looks it up in data_03_58d2, 
+; masks bit 7 ($80), and returns it. Used as a quick “is flagged?” test for the object (e.g., active/inactive, hidden).
     ld   HL, wDA00_CurrentObjectAddr                                     ;; 03:59c6 $21 $00 $da
     ld   L, [HL]                                       ;; 03:59c9 $6e
     ld   H, $d8                                        ;; 03:59ca $26 $d8
@@ -56,7 +64,11 @@ entry_03_59c6:
     and  A, $80                                        ;; 03:59d5 $e6 $80
     ret                                                ;; 03:59d7 $c9
 
-call_03_59d8:
+call_03_59d8_IsObjectRenderableFlag:
+; Check Mid-Bit Flag for Current Object
+; Description:
+; Very similar to the above but masks bit 6 ($40). Returns whether the object has that mid-bit set—likely 
+; another state flag such as “should render” or “has sprite.”
     ld   HL, wDA00_CurrentObjectAddr                                     ;; 03:59d8 $21 $00 $da
     ld   L, [HL]                                       ;; 03:59db $6e
     ld   H, $d8                                        ;; 03:59dc $26 $d8
@@ -227,7 +239,17 @@ data_03_59ea_SpriteData:
     db   $fc, $1e, $08, $10, $04, $26, $08, $10        ;; 03:5eb2 ????????
     db   $0c, $2e, $08, $10, $14, $36, $08             ;; 03:5eba ???????
 
-entry_03_5ec1_UpdateObjectGraphics:
+entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
+; Main Object Graphics/Collision Updater
+; Description:
+; Top-level routine for each frame’s object processing:
+; Iterates through all object slots ($20 spacing).
+; Skips unused entries ($FF).
+; Calls IsObjectRenderableFlag and, if set, runs ObjectSpriteSetup.
+; Builds Gex’s own sprite draw list when required.
+; Clears unused sprite slots, sets up collectibles, and updates collision for all objects.
+; Sorts or reorders objects (wDC44 sorting loop) for sprite priority.
+; This is the game’s primary per-frame object graphics pipeline.
     ld   A, $08                                        ;; 03:5ec1 $3e $08
     ld   [wDC6F], A                                    ;; 03:5ec3 $ea $6f $dc
     ld   A, [wDC1F]                                    ;; 03:5ec6 $fa $1f $dc
@@ -248,8 +270,8 @@ entry_03_5ec1_UpdateObjectGraphics:
     ld   A, [HL]                                       ;; 03:5ee2 $7e
     cp   A, $ff                                        ;; 03:5ee3 $fe $ff
     jr   Z, .jr_03_5eed                                ;; 03:5ee5 $28 $06
-    call call_03_59d8                                  ;; 03:5ee7 $cd $d8 $59
-    call NZ, call_03_5fc2_ObjectSpriteSetup                              ;; 03:5eea $c4 $c2 $5f
+    call call_03_59d8_IsObjectRenderableFlag                                  ;; 03:5ee7 $cd $d8 $59
+    call NZ, call_03_5fc2_SetupObjectSprite                              ;; 03:5eea $c4 $c2 $5f
 .jr_03_5eed:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5eed $fa $00 $da
     add  A, $20                                        ;; 03:5ef0 $c6 $20
@@ -266,14 +288,14 @@ entry_03_5ec1_UpdateObjectGraphics:
     ld   A, [HL]                                       ;; 03:5f05 $7e
     cp   A, $ff                                        ;; 03:5f06 $fe $ff
     jr   Z, .jr_03_5f10                                ;; 03:5f08 $28 $06
-    call call_03_59d8                                  ;; 03:5f0a $cd $d8 $59
-    call Z, call_03_5fc2_ObjectSpriteSetup                               ;; 03:5f0d $cc $c2 $5f
+    call call_03_59d8_IsObjectRenderableFlag                                  ;; 03:5f0a $cd $d8 $59
+    call Z, call_03_5fc2_SetupObjectSprite                               ;; 03:5f0d $cc $c2 $5f
 .jr_03_5f10:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5f10 $fa $00 $da
     add  A, $20                                        ;; 03:5f13 $c6 $20
     jr   NZ, .jr_03_5efd                               ;; 03:5f15 $20 $e6
 .jp_03_5f17:
-    call call_03_615d_CollectibleSpriteSetup                                  ;; 03:5f17 $cd $5d $61
+    call call_03_615d_SetupCollectibleSprites                                  ;; 03:5f17 $cd $5d $61
     call call_03_6148_ClearUnusedSpriteSlots                                  ;; 03:5f1a $cd $48 $61
     ld   A, $20                                        ;; 03:5f1d $3e $20
 .jr_03_5f1f:
@@ -372,7 +394,7 @@ entry_03_5ec1_UpdateObjectGraphics:
     ld   H, $d8                                        ;; 03:5fa8 $26 $d8
     ld   A, [HL]                                       ;; 03:5faa $7e
     cp   A, $ff                                        ;; 03:5fab $fe $ff
-    call NZ, call_03_5fc2_ObjectSpriteSetup                              ;; 03:5fad $c4 $c2 $5f
+    call NZ, call_03_5fc2_SetupObjectSprite                              ;; 03:5fad $c4 $c2 $5f
     jr   .jr_03_5fb9                                   ;; 03:5fb0 $18 $07
 .jr_03_5fb2:
     ld   A, [wDCA7]                                    ;; 03:5fb2 $fa $a7 $dc
@@ -386,7 +408,16 @@ entry_03_5ec1_UpdateObjectGraphics:
     jr   NZ, .jr_03_5f9c                               ;; 03:5fbd $20 $dd
     jp   .jp_03_5f17                                   ;; 03:5fbf $c3 $17 $5f
 
-call_03_5fc2_ObjectSpriteSetup:
+call_03_5fc2_SetupObjectSprite:
+; Build Sprite Data for an Object
+; Description:
+; Given the current object:
+; Determines its palette (wDAAE_ObjectPaletteIds).
+; Computes screen-relative X/Y distances vs. the camera (wDBF9, wDBFB).
+; Checks if it’s within the visible window; deactivates it if far outside.
+; Handles bounding-box collision tests.
+; Prepares OAM (sprite) entries: calculates tile indices, attributes, flips, and writes to the sprite buffer (wDC6F pointer).
+; Has a branch for special particle effects (call_03_60e6_SetupParticleSprite).
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5fc2 $fa $00 $da
     rlca                                               ;; 03:5fc5 $07
     rlca                                               ;; 03:5fc6 $07
@@ -502,7 +533,7 @@ call_03_5fc2_ObjectSpriteSetup:
     bit  0, A                                          ;; 03:606f $cb $47
     ret  NZ                                            ;; 03:6071 $c0
     bit  6, A                                          ;; 03:6072 $cb $77
-    jp   NZ, .jp_03_60e6                               ;; 03:6074 $c2 $e6 $60
+    jp   NZ, call_03_60e6_SetupParticleSprite                               ;; 03:6074 $c2 $e6 $60
     bit  5, A                                          ;; 03:6077 $cb $6f
     ld   A, $40                                        ;; 03:6079 $3e $40
     jr   NZ, .jr_03_6083                               ;; 03:607b $20 $06
@@ -577,7 +608,14 @@ call_03_5fc2_ObjectSpriteSetup:
     ld   A, E                                          ;; 03:60e1 $7b
     ld   [wDC6F], A                                    ;; 03:60e2 $ea $6f $dc
     ret                                                ;; 03:60e5 $c9
-.jp_03_60e6:
+
+call_03_60e6_SetupParticleSprite:
+; Particle Sprite Setup Subroutine
+; Description:
+; Handles special case when the object’s data marks it as a particle effect:
+; Gets particle buffer pointer (ParticleSlot_GetBufferPtr).
+; Converts a velocity/magnitude value into a frame index using .data_03_6140.
+; Updates wDAB6 flags and writes three small sprite entries for the particle effect.
     call call_00_2c53_ParticleSlot_GetBufferPtr                                  ;; 03:60e6 $cd $53 $2c
     ld   L, E                                          ;; 03:60e9 $6b
     ld   H, D                                          ;; 03:60ea $62
@@ -642,6 +680,10 @@ call_03_5fc2_ObjectSpriteSetup:
     db   $34, $36, $38, $3a, $3a, $3a, $3a, $3a        ;; 03:6140 ........
 
 call_03_6148_ClearUnusedSpriteSlots:
+; Purpose: Iterates through sprite attribute table memory, starting at wDC6F/$D900, 
+; and fills unused slots with zero until a boundary ($9F) is reached. This clears out 
+; leftover OAM/sprite data to prevent rendering glitches.
+; Summary: Clears inactive sprite slots in VRAM.
     ld   A, $9f                                        ;; 03:6148 $3e $9f
     ld   HL, wDC6F                                     ;; 03:614a $21 $6f $dc
     ld   L, [HL]                                       ;; 03:614d $6e
@@ -657,7 +699,16 @@ call_03_6148_ClearUnusedSpriteSlots:
     jr   NC, .jr_03_6157                               ;; 03:615a $30 $fb
     ret                                                ;; 03:615c $c9
 
-call_03_615d_CollectibleSpriteSetup:
+call_03_615d_SetupCollectibleSprites:
+; Purpose:
+; Calculates screen-relative X/Y offsets (wDB70, wDB71) for collectibles based 
+; on the player’s map position.
+; Walks through collectible table entries for the current level.
+; Checks if collectibles are within a visible region.
+; Marks collected items ($FF) and calls call_03_61db_LoadCollectibleSprite to load them 
+; into sprite memory.
+; Updates tracking variables to prevent re-drawing already collected items.
+; Summary: Determines which collectible items should be visible and spawns their sprites.
     ld   A, [wDBF9_XPositionInMap]                                    ;; 03:615d $fa $f9 $db
     and  A, $0f                                        ;; 03:6160 $e6 $0f
     ld   B, A                                          ;; 03:6162 $47
@@ -736,6 +787,11 @@ call_03_615d_CollectibleSpriteSetup:
     ret                                                ;; 03:61da $c9
 
 call_03_61db_LoadCollectibleSprite:
+; Purpose:
+; Inserts a collectible’s sprite data (two 8×8 tiles forming the collectible graphic) into OAM memory.
+; Adjusts X/Y coordinates slightly (−8 offset) for correct placement.
+; Updates wDC6F pointer to the next available sprite slot.
+; Summary: Writes a collectible sprite’s graphics and position into the sprite buffer.
     ld   A, [wDC6F]                                    ;; 03:61db $fa $6f $dc
     cp   A, $9c                                        ;; 03:61de $fe $9c
     ret  NC                                            ;; 03:61e0 $d0
