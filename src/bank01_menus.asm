@@ -30,7 +30,7 @@ call_01_4000:
 .jr_01_4037:
     ld   [wDAD6_ReturnBank], A                                    ;; 01:4037 $ea $d6 $da
     ld   A, $03                                        ;; 01:403a $3e $03
-    ld   HL, entry_03_6c89_CopyLevelData                              ;; 01:403c $21 $89 $6c
+    ld   HL, entry_03_6c89_LoadMapData                              ;; 01:403c $21 $89 $6c
     call call_00_0edd_CallAltBankFunc                                  ;; 01:403f $cd $dd $0e
     xor  A, A                                          ;; 01:4042 $af
     ld   [wDBEB], A                                    ;; 01:4043 $ea $eb $db
@@ -73,7 +73,7 @@ call_01_4000:
     ld   [wDB6C_CurrentLevelId], A                                    ;; 01:409c $ea $6c $db
     ld   [wDAD6_ReturnBank], A                                    ;; 01:409f $ea $d6 $da
     ld   A, $03                                        ;; 01:40a2 $3e $03
-    ld   HL, entry_03_6c89_CopyLevelData                              ;; 01:40a4 $21 $89 $6c
+    ld   HL, entry_03_6c89_LoadMapData                              ;; 01:40a4 $21 $89 $6c
     call call_00_0edd_CallAltBankFunc                                  ;; 01:40a7 $cd $dd $0e
     jp   .jp_01_4285                                   ;; 01:40aa $c3 $85 $42
 .jr_01_40ad:
@@ -287,7 +287,7 @@ call_01_4000:
 .jr_01_4223:
     ld   [wDAD6_ReturnBank], A                                    ;; 01:4223 $ea $d6 $da
     ld   A, $03                                        ;; 01:4226 $3e $03
-    ld   HL, entry_03_6c89_CopyLevelData                              ;; 01:4228 $21 $89 $6c
+    ld   HL, entry_03_6c89_LoadMapData                              ;; 01:4228 $21 $89 $6c
     call call_00_0edd_CallAltBankFunc                                  ;; 01:422b $cd $dd $0e
     ld   HL, data_01_5692                              ;; 01:422e $21 $92 $56
     call call_01_4454                                  ;; 01:4231 $cd $54 $44
@@ -304,7 +304,7 @@ call_01_4000:
     ld   [wDB6C_CurrentLevelId], A                                    ;; 01:424d $ea $6c $db
     ld   [wDAD6_ReturnBank], A                                    ;; 01:4250 $ea $d6 $da
     ld   A, $03                                        ;; 01:4253 $3e $03
-    ld   HL, entry_03_6c89_CopyLevelData                              ;; 01:4255 $21 $89 $6c
+    ld   HL, entry_03_6c89_LoadMapData                              ;; 01:4255 $21 $89 $6c
     call call_00_0edd_CallAltBankFunc                                  ;; 01:4258 $cd $dd $0e
     ld   A, [wDB95]                                    ;; 01:425b $fa $95 $db
     and  A, A                                          ;; 01:425e $a7

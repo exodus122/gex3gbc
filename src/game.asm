@@ -6,7 +6,11 @@ INCLUDE "include/charmaps.inc"
 INCLUDE "constants.inc"
 INCLUDE "memory.asm"
 
-INCLUDE "bank00_home.asm"
+SECTION "bank00", ROM0[$0000]
+INCLUDE "bank00_main.asm"
+INCLUDE "bank00_maps_core.asm"
+INCLUDE "bank00_objects_core.asm"
+
 INCLUDE "bank01_menus.asm"
 
 SECTION "bank02", ROMX[$4000], BANK[$02]
@@ -29,8 +33,10 @@ image_003_4580:
 INCLUDE "bank03_bg_collision.asm"
 INCLUDE "bank03_object_collision.asm"
 INCLUDE "bank03_object_graphics.asm"
-INCLUDE "bank03_load_map_data.asm"
-INCLUDE "bank03_graphics.asm"
+INCLUDE "bank03_map_boundaries_and_spawns.asm"
+INCLUDE "bank03_object_and_menu_palettes.asm"
+INCLUDE "bank03_map_metadata.asm"
+INCLUDE "bank03_hud_graphics.asm"
 
 INCLUDE "audio_engine/bank04_audio1.asm"
 INCLUDE "audio_engine/bank05_audio2.asm"

@@ -295,7 +295,7 @@ call_02_4f32_PlayerUpdateMain:
     ld   A, $03                                        ;; 02:4faa $3e $03
     ld   HL, entry_03_6567_SetupObjectPalettes                              ;; 02:4fac $21 $67 $65
     call call_00_0edd_CallAltBankFunc                                  ;; 02:4faf $cd $dd $0e
-    call call_02_5081_UpdateFacingAndMovementVector                                  ;; 02:4fb2 $cd $81 $50
+    call call_02_5081_Player_UpdateFacingAndMovementVector                                  ;; 02:4fb2 $cd $81 $50
     ld   [wDAD6_ReturnBank], A                                    ;; 02:4fb5 $ea $d6 $da
     ld   A, $03                                        ;; 02:4fb8 $3e $03
     ld   HL, entry_03_46e0_UpdateBgCollision_MainDispatcher                             ;; 02:4fba $21 $e0 $46
@@ -322,7 +322,7 @@ call_02_4f32_PlayerUpdateMain:
     jr   Z, .jr_02_4fed                                ;; 02:4fea $28 $01
     dec  [HL]                                          ;; 02:4fec $35
 .jr_02_4fed:
-    call call_02_5100_PlayerHorizontalMovementHandler                                  ;; 02:4fed $cd $00 $51
+    call call_02_5100_Player_HorizontalMovementHandler                                  ;; 02:4fed $cd $00 $51
     call call_02_5047_CachePlayerTileCoords                                  ;; 02:4ff0 $cd $47 $50
     ld   HL, wD805                                     ;; 02:4ff3 $21 $05 $d8
     res  4, [HL]                                       ;; 02:4ff6 $cb $a6
@@ -347,23 +347,23 @@ call_02_4ffb_DecTimerEveryCycle:
 
 call_02_500e_ApplyDirectionalInputToPlayer:
 ; Checks for directional inputs (Right/Left/Down/Up) using call_00_0f6e etc. 
-; Adjusts X or Y position via call_02_5033_ApplyXDelta / 503d.
+; Adjusts X or Y position via call_02_5033_Player_ApplyXDelta / 503d.
 ; Purpose: Applies directional movement vectors to the player.
     call call_00_0f6e_CheckInputRight
     ld   bc,$0002
-    call nz,call_02_5033_ApplyXDelta
+    call nz,call_02_5033_Player_ApplyXDelta
     call call_00_0f68_CheckInputLeft
     ld   bc,hFFFE
-    call nz,call_02_5033_ApplyXDelta
+    call nz,call_02_5033_Player_ApplyXDelta
     call call_00_0f7a_CheckInputDown
     ld   bc,$0002
-    call nz,call_02_503d_ApplyYDelta
+    call nz,call_02_503d_Player_ApplyYDelta
     call call_00_0f74_CheckInputUp
     ld   bc,hFFFE
-    call nz,call_02_503d_ApplyYDelta
+    call nz,call_02_503d_Player_ApplyYDelta
     ret  
 
-call_02_5033_ApplyXDelta:
+call_02_5033_Player_ApplyXDelta:
 ; Adds signed BC offset to player X position (wD80E).
 ; Purpose: Horizontal position adjust.
     ld   hl,wD80E_PlayerXPosition
@@ -375,7 +375,7 @@ call_02_5033_ApplyXDelta:
     ld   [hl],a
     ret  
 
-call_02_503d_ApplyYDelta:
+call_02_503d_Player_ApplyYDelta:
 ; Adds signed BC offset to player Y position (wD810).
 ; Purpose: Vertical position adjust.
     ld   hl,wD810_PlayerYPosition
@@ -426,7 +426,7 @@ call_02_5047_CachePlayerTileCoords:
     ld   [HL], D                                       ;; 02:507f $72
     ret                                                ;; 02:5080 $c9
 
-call_02_5081_UpdateFacingAndMovementVector:
+call_02_5081_Player_UpdateFacingAndMovementVector:
 ; Uses the player’s current action ID and collision flags to:
 ; - Choose a new facing direction (wD80D_PlayerFacingDirection).
 ; - Look up a movement vector from .data_02_50f0.
@@ -500,7 +500,7 @@ call_02_5081_UpdateFacingAndMovementVector:
     db   $00, $03, $07, $03, $01, $02, $08, $02        ;; 02:50f0 ????????
     db   $05, $04, $06, $04, $05, $04, $06, $04        ;; 02:50f8 ????????
 
-call_02_5100_PlayerHorizontalMovementHandler:
+call_02_5100_Player_HorizontalMovementHandler:
 ; Purpose: Main dispatcher for handling horizontal player movement.
 ; Details:
 ; Calls call_02_5541_GetActionPropertyByte to poll input state.
