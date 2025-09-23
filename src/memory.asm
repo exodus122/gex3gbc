@@ -1008,7 +1008,10 @@ wDCAC:
     ds 1                                               ;; dcac
 
 wDCAD:
-    ds 2                                               ;; dcad
+    ds 1                                               ;; dcad
+
+wDCAE:
+    ds 1                                               ;; dcae
 
 wDCAF:
     ds 2                                               ;; dcaf

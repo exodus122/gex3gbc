@@ -184,27 +184,27 @@ call_00_0150_Init:
     ld   A, $11                                        ;; 00:0271 $3e $11
     ld   [wDAD6_ReturnBank], A                                    ;; 00:0273 $ea $d6 $da
     ld   A, $01                                        ;; 00:0276 $3e $01
-    ld   HL, call_01_4000_LoadMenu                              ;; 00:0278 $21 $00 $40
+    ld   HL, call_01_4000_MenuHandler_LoadAndProcess                              ;; 00:0278 $21 $00 $40
     call call_00_0edd_CallAltBankFunc                                  ;; 00:027b $cd $dd $0e
     ld   A, $12                                        ;; 00:027e $3e $12
     ld   [wDAD6_ReturnBank], A                                    ;; 00:0280 $ea $d6 $da
     ld   A, $01                                        ;; 00:0283 $3e $01
-    ld   HL, call_01_4000_LoadMenu                              ;; 00:0285 $21 $00 $40
+    ld   HL, call_01_4000_MenuHandler_LoadAndProcess                              ;; 00:0285 $21 $00 $40
     call call_00_0edd_CallAltBankFunc                                  ;; 00:0288 $cd $dd $0e
     ld   A, $14                                        ;; 00:028b $3e $14
     ld   [wDAD6_ReturnBank], A                                    ;; 00:028d $ea $d6 $da
     ld   A, $01                                        ;; 00:0290 $3e $01
-    ld   HL, call_01_4000_LoadMenu                              ;; 00:0292 $21 $00 $40
+    ld   HL, call_01_4000_MenuHandler_LoadAndProcess                              ;; 00:0292 $21 $00 $40
     call call_00_0edd_CallAltBankFunc                                  ;; 00:0295 $cd $dd $0e
     ld   A, $13                                        ;; 00:0298 $3e $13
     ld   [wDAD6_ReturnBank], A                                    ;; 00:029a $ea $d6 $da
     ld   A, $01                                        ;; 00:029d $3e $01
-    ld   HL, call_01_4000_LoadMenu                              ;; 00:029f $21 $00 $40
+    ld   HL, call_01_4000_MenuHandler_LoadAndProcess                              ;; 00:029f $21 $00 $40
     call call_00_0edd_CallAltBankFunc                                  ;; 00:02a2 $cd $dd $0e
     ld   A, $0f                                        ;; 00:02a5 $3e $0f
     ld   [wDAD6_ReturnBank], A                                    ;; 00:02a7 $ea $d6 $da
     ld   A, $01                                        ;; 00:02aa $3e $01
-    ld   HL, call_01_4000_LoadMenu                              ;; 00:02ac $21 $00 $40
+    ld   HL, call_01_4000_MenuHandler_LoadAndProcess                              ;; 00:02ac $21 $00 $40
     call call_00_0edd_CallAltBankFunc                                  ;; 00:02af $cd $dd $0e
 .jp_00_02b2:
     ld   A, $01                                        ;; 00:02b2 $3e $01
@@ -212,7 +212,7 @@ call_00_0150_Init:
     ld   A, $00                                        ;; 00:02b7 $3e $00
     ld   [wDAD6_ReturnBank], A                                    ;; 00:02b9 $ea $d6 $da
     ld   A, $01                                        ;; 00:02bc $3e $01
-    ld   HL, call_01_4000_LoadMenu                              ;; 00:02be $21 $00 $40
+    ld   HL, call_01_4000_MenuHandler_LoadAndProcess                              ;; 00:02be $21 $00 $40
     call call_00_0edd_CallAltBankFunc                                  ;; 00:02c1 $cd $dd $0e
     cp   A, $20                                        ;; 00:02c4 $fe $20
     jr   Z, .jr_00_02ed                                ;; 00:02c6 $28 $25
@@ -431,7 +431,7 @@ call_00_0150_Init:
 .jr_00_04ba:
     ld   [wDAD6_ReturnBank], A                                    ;; 00:04ba $ea $d6 $da
     ld   A, $01                                        ;; 00:04bd $3e $01
-    ld   HL, call_01_4000_LoadMenu                              ;; 00:04bf $21 $00 $40
+    ld   HL, call_01_4000_MenuHandler_LoadAndProcess                              ;; 00:04bf $21 $00 $40
     call call_00_0edd_CallAltBankFunc                                  ;; 00:04c2 $cd $dd $0e
     cp   A, $60                                        ;; 00:04c5 $fe $60
     jp   NZ, .jp_00_0421                               ;; 00:04c7 $c2 $21 $04
@@ -610,20 +610,64 @@ call_00_05fd:
     ld   HL, entry_02_54f9_SwitchPlayerAction                                     ;; 00:061d $21 $f9 $54
     call call_00_0edd_CallAltBankFunc                                  ;; 00:0620 $cd $dd $0e
     ret                                                ;; 00:0623 $c9
-    db   $21, $51, $dc, $4e, $77, $79, $fe, $03        ;; 00:0624 ????????
-    db   $28, $54, $fe, $04, $ca, $4b, $07, $fe        ;; 00:062c ????????
-    db   $01, $28, $35, $fe, $05, $28, $1a, $fe        ;; 00:0634 ????????
-    db   $02, $c0, $af, $ea, $aa, $dc, $ea, $ab        ;; 00:063c ????????
-    db   $dc, $3e, $14, $ea, $a9, $dc, $3e, $3c        ;; 00:0644 ????????
-    db   $ea, $a8, $dc, $3e, $02, $ea, $ae, $dc        ;; 00:064c ????????
-    db   $c9, $af, $ea, $aa, $dc, $ea, $a9, $dc        ;; 00:0654 ????????
-    db   $3e, $14, $ea, $ab, $dc, $3e, $3c, $ea        ;; 00:065c ????????
-    db   $a8, $dc, $3e, $01, $ea, $ae, $dc, $c9        ;; 00:0664 ????????
-    db   $af, $ea, $a9, $dc, $ea, $ab, $dc, $3e        ;; 00:066c ????????
-    db   $14, $ea, $aa, $dc, $3e, $3c, $ea, $a8        ;; 00:0674 ????????
-    db   $dc, $af, $ea, $ae, $dc, $c9, $fa, $4f        ;; 00:067c ????????
-    db   $dc, $c6, $04, $21, $50, $dc, $be, $c8        ;; 00:0684 ????????
-    db   $34, $21, $69, $db, $cb, $ce, $c9             ;; 00:068c ???????
+
+call_00_0624:
+    ld   hl,wDC51
+    ld   c,[hl]
+    ld   [hl],a
+    ld   a,c
+    cp   a,$03
+    jr   z,label0682
+    cp   a,$04
+    jp   z,call_00_0723.jr_00_074b
+    cp   a,$01
+    jr   z,label066C
+    cp   a,$05
+    jr   z,label0655
+    cp   a,$02
+    ret  nz
+    xor  a
+    ld   [wDCAA],a
+    ld   [wDCAB],a
+    ld   a,$14
+    ld   [wDCA9],a
+    ld   a,$3C
+    ld   [wDCA8],a
+    ld   a,$02
+    ld   [wDCAE],a
+    ret  
+label0655:
+    xor  a
+    ld   [wDCAA],a
+    ld   [wDCA9],a
+    ld   a,$14
+    ld   [wDCAB],a
+    ld   a,$3C
+    ld   [wDCA8],a
+    ld   a,$01
+    ld   [wDCAE],a
+    ret  
+label066C:
+    xor  a
+    ld   [wDCA9],a
+    ld   [wDCAB],a
+    ld   a,$14
+    ld   [wDCAA],a
+    ld   a,$3C
+    ld   [wDCA8],a
+    xor  a
+    ld   [wDCAE],a
+    ret  
+label0682:
+    ld   a,[wDC4F]
+    add  a,$04
+    ld   hl,wDC50
+    cp   [hl]
+    ret  z
+    inc  [hl]
+    ld   hl,wDB69
+    set  1,[hl]
+    ret  
 
 jp_00_0693:
     ld   HL, wDABE                                     ;; 00:0693 $21 $be $da
@@ -1051,7 +1095,7 @@ call_00_08f8:
     xor  A, $0a                                        ;; 00:0937 $ee $0a
     ld   L, A                                          ;; 00:0939 $6f
     ld   B, [HL]                                       ;; 00:093a $46
-    ld   HL, $96e                                      ;; 00:093b $21 $6e $09
+    ld   HL, .jr_00_096e                                      ;; 00:093b $21 $6e $09
     ld   DE, $05                                       ;; 00:093e $11 $05 $00
 .jr_00_0941:
     add  HL, DE                                        ;; 00:0941 $19
@@ -1082,6 +1126,7 @@ call_00_08f8:
     call call_00_0edd_CallAltBankFunc                                  ;; 00:0965 $cd $dd $0e
     ld   [wDB63], A                                    ;; 00:0968 $ea $63 $db
     ld   HL, wDB66                                     ;; 00:096b $21 $66 $db
+.jr_00_096e:
     set  1, [HL]                                       ;; 00:096e $cb $ce
     set  7, [HL]                                       ;; 00:0970 $cb $fe
     ret                                                ;; 00:0972 $c9
@@ -1110,7 +1155,7 @@ call_00_08f8:
     ld   L, A                                          ;; 00:09b6 $6f
     ld   H, $00                                        ;; 00:09b7 $26 $00
     add  HL, HL                                        ;; 00:09b9 $29
-    ld   DE, $a58                                      ;; 00:09ba $11 $58 $0a
+    ld   DE, .data_00_0a58                                      ;; 00:09ba $11 $58 $0a
     add  HL, DE                                        ;; 00:09bd $19
     ld   A, [HL+]                                      ;; 00:09be $2a
     ld   H, [HL]                                       ;; 00:09bf $66
@@ -1119,13 +1164,33 @@ call_00_08f8:
     ld   D, A                                          ;; 00:09c2 $57
     ld   E, $00                                        ;; 00:09c3 $1e $00
     jp   HL                                            ;; 00:09c5 $e9
-    db   $cb, $3a, $cb, $1b, $cb, $3a, $cb, $1b        ;; 00:09c6 ????????
-    db   $6b, $62, $cb, $3a, $cb, $1b, $19, $11        ;; 00:09ce ????????
-    db   $e0, $79, $19, $18, $6a, $cb, $3a, $cb        ;; 00:09d6 ????????
-    db   $1b, $6b, $62, $cb, $3a, $cb, $1b, $cb        ;; 00:09de ????????
-    db   $3a, $cb, $1b, $19, $11, $a0, $7a, $19        ;; 00:09e6 ????????
-    db   $18, $55                                      ;; 00:09ee ??
-.data_00_09f0:
+.jr_00_09c6:
+    srl  d
+    rr   e
+    srl  d
+    rr   e
+    ld   l,e
+    ld   h,d
+    srl  d
+    rr   e
+    add  hl,de
+    ld   de,$79E0
+    add  hl,de
+    jr   .jr_00_0a45
+.jr_00_09db:
+    srl  d
+    rr   e
+    ld   l,e
+    ld   h,d
+    srl  d
+    rr   e
+    srl  d
+    rr   e
+    add  hl,de
+    ld   de,$7AA0
+    add  hl,de
+    jr   .jr_00_0a45
+.jr_00_09f0:
     srl  D                                             ;; 00:09f0 $cb $3a
     rr   E                                             ;; 00:09f2 $cb $1b
     ld   L, E                                          ;; 00:09f4 $6b
@@ -1133,23 +1198,34 @@ call_00_08f8:
     srl  D                                             ;; 00:09f6 $cb $3a
     rr   E                                             ;; 00:09f8 $cb $1b
     add  HL, DE                                        ;; 00:09fa $19
-    ld   DE, call_01_4000_LoadMenu                              ;; 00:09fb $11 $00 $40
+    ld   DE, call_01_4000_MenuHandler_LoadAndProcess                              ;; 00:09fb $11 $00 $40
     add  HL, DE                                        ;; 00:09fe $19
     jr   .jr_00_0a45                                   ;; 00:09ff $18 $44
-    db   $cb, $3a, $cb, $1b, $6b, $62, $cb, $3a        ;; 00:0a01 ????????
-    db   $cb, $1b, $19, $cb, $3a, $cb, $1b, $19        ;; 00:0a09 ????????
-    db   $11, $a0, $7a, $19, $18, $2e                  ;; 00:0a11 ??????
-.data_00_0a17:
+.jr_00_0a01:
+    srl  d
+    rr   e
+    ld   l,e
+    ld   h,d
+    srl  d
+    rr   e
+    add  hl,de
+    srl  d
+    rr   e
+    add  hl,de
+    ld   de,$7AA0
+    add  hl,de
+    jr   .jr_00_0a45
+.jr_00_0a17:
     srl  D                                             ;; 00:0a17 $cb $3a
     rr   E                                             ;; 00:0a19 $cb $1b
     srl  D                                             ;; 00:0a1b $cb $3a
     rr   E                                             ;; 00:0a1d $cb $1b
     srl  D                                             ;; 00:0a1f $cb $3a
     rr   E                                             ;; 00:0a21 $cb $1b
-    ld   HL, call_01_4000_LoadMenu                              ;; 00:0a23 $21 $00 $40
+    ld   HL, call_01_4000_MenuHandler_LoadAndProcess                              ;; 00:0a23 $21 $00 $40
     add  HL, DE                                        ;; 00:0a26 $19
     jr   .jr_00_0a45                                   ;; 00:0a27 $18 $1c
-.data_00_0a29:
+.jr_00_0a29:
     srl  D                                             ;; 00:0a29 $cb $3a
     rr   E                                             ;; 00:0a2b $cb $1b
     srl  D                                             ;; 00:0a2d $cb $3a
@@ -1157,10 +1233,14 @@ call_00_08f8:
     ld   HL, $4aa0                                     ;; 00:0a31 $21 $a0 $4a
     add  HL, DE                                        ;; 00:0a34 $19
     jr   .jr_00_0a45                                   ;; 00:0a35 $18 $0e
-    db   $cb, $3a, $cb, $1b, $21, $00, $40, $19        ;; 00:0a37 ????????
-    db   $18, $04                                      ;; 00:0a3f ??
-.data_00_0a41:
-    ld   HL, call_01_4000_LoadMenu                              ;; 00:0a41 $21 $00 $40
+.jr_00_0a37:
+    srl  d
+    rr   e
+    ld   hl,data_02_4000
+    add  hl,de
+    jr   .jr_00_0a45
+.jr_00_0a41:
+    ld   HL, call_01_4000_MenuHandler_LoadAndProcess                              ;; 00:0a41 $21 $00 $40
     add  HL, DE                                        ;; 00:0a44 $19
 .jr_00_0a45:
     ld   A, L                                          ;; 00:0a45 $7d
@@ -1173,13 +1253,10 @@ call_00_08f8:
     ld   HL, wDB66                                     ;; 00:0a52 $21 $66 $db
     set  7, [HL]                                       ;; 00:0a55 $cb $fe
     ret                                                ;; 00:0a57 $c9
-    db   $17, $0a                                      ;; 00:0a58 ??
-    dw   .data_00_0a17                                 ;; 00:0a5a pP
-    dw   .data_00_0a29                                 ;; 00:0a5c pP
-    db   $c6, $09, $37, $0a, $db, $09                  ;; 00:0a5e ??????
-    dw   .data_00_09f0                                 ;; 00:0a64 pP
-    db   $01, $0a                                      ;; 00:0a66 ??
-    dw   .data_00_0a41                                 ;; 00:0a68 pP
+.data_00_0a58:
+    dw   .jr_00_0a17, .jr_00_0a17, .jr_00_0a29        ;; 00:0a58 ??
+    dw   .jr_00_09c6, .jr_00_0a37, .jr_00_09db        ;; 00:0a5e ??????
+    dw   .jr_00_09f0, .jr_00_0a01, .jr_00_0a41        ;; 00:0a64 pP
 
 call_00_0a6a:
     ld   L, C                                          ;; 00:0a6a $69
@@ -1390,7 +1467,7 @@ call_00_0c1b:
     or   A, $80                                        ;; 00:0c1c $f6 $80
     ld   [wD9FD], A                                    ;; 00:0c1e $ea $fd $d9
     ld   H, $00                                        ;; 00:0c21 $26 $00
-    ld   DE, $c44                                      ;; 00:0c23 $11 $44 $0c
+    ld   DE, .data_00_0c44                                      ;; 00:0c23 $11 $44 $0c
     add  HL, DE                                        ;; 00:0c26 $19
     ld   A, [HL+]                                      ;; 00:0c27 $2a
     ldh  [rSTAT], A                                    ;; 00:0c28 $e0 $41
@@ -1413,6 +1490,7 @@ call_00_0c1b:
     ld   A, H                                          ;; 00:0c3f $7c
     ld   [wD9FF], A                                    ;; 00:0c40 $ea $ff $d9
     ret                                                ;; 00:0c43 $c9
+.data_00_0c44:
     db   $08, $00, $01, $53, $0c, $08, $00, $15        ;; 00:0c44 ........
     db   $55, $0c, $08, $00, $01, $f8, $0d, $d9        ;; 00:0c4c ........
     ret                                                ;; 00:0c54 $c9
@@ -1981,7 +2059,7 @@ call_00_0fd7_ProcessBankedTileLoad:
     jp   call_00_0f08_RestoreBank                                  ;; 00:0ff2 $c3 $08 $0f
 
 call_00_0ff5_MaybeQueueBankChange:
-; Uses A as an index into a small table at $1037 → gets a priority/weight in B.
+; Uses A as an index into a small table at .data_00_1037 → gets a priority/weight in B.
 ; Checks several flags in the wDF68…wDF71 range (likely “busy” or “VRAM locked” flags).
 ; If resources are free, and if the new request’s priority is not lower than the 
 ; currently queued one (wDE5F/wDE5E), stores the new ID (wDE5D) and priority (wDE5E).
@@ -1990,7 +2068,7 @@ call_00_0ff5_MaybeQueueBankChange:
     ret  Z                                             ;; 00:0ff7 $c8
     ld   C, A                                          ;; 00:0ff8 $4f
     ld   B, $00                                        ;; 00:0ff9 $06 $00
-    ld   HL, $1037                                     ;; 00:0ffb $21 $37 $10
+    ld   HL, .data_00_1037                                     ;; 00:0ffb $21 $37 $10
     add  HL, BC                                        ;; 00:0ffe $09
     ld   B, [HL]                                       ;; 00:0fff $46
     xor  A, A                                          ;; 00:1000 $af
@@ -2029,6 +2107,7 @@ call_00_0ff5_MaybeQueueBankChange:
     ld   HL, wDE5E                                     ;; 00:1032 $21 $5e $de
     ld   [HL], B                                       ;; 00:1035 $70
     ret                                                ;; 00:1036 $c9
+.data_00_1037:
     db   $11, $01, $08, $08, $01, $01, $01, $01        ;; 00:1037 ??.?.?..
     db   $01, $01, $01, $01, $01, $10, $10, $07        ;; 00:103f .?.??..?
     db   $07, $01, $01, $01, $08, $08, $01, $08        ;; 00:1047 .???????

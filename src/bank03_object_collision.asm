@@ -30,18 +30,23 @@ call_03_4c38_UpdateObjectCollision:
     ld   L, A                                          ;; 03:4c61 $6f
     jp   HL                                            ;; 03:4c62 $e9
 .data_03_4c63_ObjectCollisionJumpTable:
-    dw   .data_03_4ccf                                 ;; 03:4c63 pP
-    db   $c1, $56, $d0, $4c, $d7, $4c                  ;; 03:4c65 ??????
-    dw   .data_03_4ce1                                 ;; 03:4c6b pP
-    db   $38, $4d, $44, $4d                            ;; 03:4c6d ????
-    dw   .data_03_4d9b                                 ;; 03:4c71 pP
-    dw   .data_03_4db3                                 ;; 03:4c73 pP
-    dw   .data_03_4dc2                                 ;; 03:4c75 pP
-    db   $04, $4e, $31, $4e                            ;; 03:4c77 ????
-    dw   .data_03_4e4b                                 ;; 03:4c7b pP
-    dw   .data_03_4e89                                 ;; 03:4c7d pP
-    dw   .data_03_4f23                                 ;; 03:4c7f pP
-    db   $60, $4f, $8c, $4f, $98, $4f, $ad, $4f        ;; 03:4c81 ????????
+    dw   .call_03_4ccf                                 ;; 03:4c63 pP
+    dw   call_03_56c1
+    dw   .call_03_4cd0
+    dw   .call_03_4cd7                  ;; 03:4c65 ??????
+    dw   .call_03_4ce1                                 ;; 03:4c6b pP
+    dw   .call_03_4d38
+    dw   .call_03_4d44                            ;; 03:4c6d ????
+    dw   .call_03_4d9b                                 ;; 03:4c71 pP
+    dw   .call_03_4db3                                 ;; 03:4c73 pP
+    dw   .call_03_4dc2                                 ;; 03:4c75 pP
+    dw   .call_03_4e04
+    dw   .call_03_4e31                           ;; 03:4c77 ????
+    dw   .call_03_4e4b                                 ;; 03:4c7b pP
+    dw   .call_03_4e89                                 ;; 03:4c7d pP
+    dw   .call_03_4f23                                 ;; 03:4c7f pP
+    dw   .call_03_4f60
+    db   $8c, $4f, $98, $4f, $ad, $4f        ;; 03:4c81 ????????
     db   $ca, $4f, $f1, $4f, $0d, $50, $b6, $50        ;; 03:4c89 ????????
     db   $e0, $50, $ea, $50, $f4, $50, $16, $51        ;; 03:4c91 ????????
     db   $56, $51, $96, $51, $b8, $51, $01, $52        ;; 03:4c99 ????????
@@ -54,12 +59,18 @@ call_03_4c38_UpdateObjectCollision:
     db   $a8, $54                                      ;; 03:4cc7 ??
     dw   data_03_581a                                  ;; 03:4cc9 pP
     db   $ee, $54, $c2, $53                            ;; 03:4ccb ????
-.data_03_4ccf:
+.call_03_4ccf:
     ret                                                ;; 03:4ccf $c9
-    db   $cd, $0e, $55, $da, $f6, $06, $c9, $cd        ;; 03:4cd0 ????????
-    db   $0e, $55, $d0, $cd, $ea, $4c, $c3, $80        ;; 03:4cd8 ????????
-    db   $2b                                           ;; 03:4ce0 ?
-.data_03_4ce1:
+.call_03_4cd0:
+    call call_03_550e
+    jp   c,call_00_06f6
+    ret  
+.call_03_4cd7:
+    call call_03_550e
+    ret  nc
+    call .jp_03_4cea
+    jp   call_00_2b80_ClearObjectMemoryEntry
+.call_03_4ce1:
     call call_03_550e                                  ;; 03:4ce1 $cd $0e $55
     ret  NC                                            ;; 03:4ce4 $d0
     cp   A, $00                                        ;; 03:4ce5 $fe $00
@@ -104,20 +115,58 @@ call_03_4c38_UpdateObjectCollision:
     ld   HL, entry_02_54f9_SwitchPlayerAction                             ;; 03:4d31 $21 $f9 $54
     call call_00_0edd_CallAltBankFunc                                  ;; 03:4d34 $cd $dd $0e
     ret                                                ;; 03:4d37 $c9
-    db   $cd, $0e, $55, $d0, $fe, $00, $ca, $f6        ;; 03:4d38 ????????
-    db   $06, $c3, $71, $56, $fa, $01, $d8, $fe        ;; 03:4d40 ????????
-    db   $09, $c8, $fe, $29, $c8, $fe, $36, $c8        ;; 03:4d48 ????????
-    db   $fe, $45, $c8, $cd, $0e, $55, $d0, $fe        ;; 03:4d50 ????????
-    db   $01, $ca, $71, $56, $3e, $3c, $ea, $7e        ;; 03:4d58 ????????
-    db   $dc, $26, $d8, $fa, $00, $da, $f6, $0e        ;; 03:4d60 ????????
-    db   $6f, $fa, $0e, $d8, $96, $23, $fa, $0f        ;; 03:4d68 ????????
-    db   $d8, $9e, $3e, $ff, $38, $02, $3e, $01        ;; 03:4d70 ????????
-    db   $ea, $98, $dc, $fa, $6c, $db, $fe, $07        ;; 03:4d78 ????????
-    db   $3e, $29, $28, $0b, $fa, $6c, $db, $fe        ;; 03:4d80 ????????
-    db   $08, $3e, $36, $28, $02, $3e, $09, $ea        ;; 03:4d88 ????????
-    db   $d6, $da, $3e, $02, $21, $f9, $54, $cd        ;; 03:4d90 ????????
-    db   $dd, $0e, $c9                                 ;; 03:4d98 ???
-.data_03_4d9b:
+.call_03_4d38:
+    call call_03_550e
+    ret  nc
+    cp   a,$00
+    jp   z,call_00_06f6
+    jp   entry_03_5671
+.call_03_4d44:
+    ld   a,[wD801_PlayerObject_ActionId]
+    cp   a,$09
+    ret  z
+    cp   a,$29
+    ret  z
+    cp   a,$36
+    ret  z
+    cp   a,$45
+    ret  z
+    call call_03_550e
+    ret  nc
+    cp   a,$01
+    jp   z,entry_03_5671
+    ld   a,$3C
+    ld   [wDC7E],a
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   l,a
+    ld   a,[wD80E_PlayerXPosition]
+    sub  [hl]
+    inc  hl
+    ld   a,[wD80F_PlayerXPosition]
+    sbc  [hl]
+    ld   a,$FF
+    jr   c,.label4D78
+    ld   a,$01
+.label4D78:
+    ld   [wDC98],a
+    ld   a,[wDB6C_CurrentLevelId]
+    cp   a,$07
+    ld   a,$29
+    jr   z,.label4D8F
+    ld   a,[wDB6C_CurrentLevelId]
+    cp   a,$08
+    ld   a,$36
+    jr   z,.label4D8F
+    ld   a,$09
+.label4D8F:
+    ld   [wDAD6_ReturnBank],a
+    ld   a,$02
+    ld   hl,$54F9
+    call call_00_0edd_CallAltBankFunc
+    ret  
+.call_03_4d9b:
     call call_03_550e                                  ;; 03:4d9b $cd $0e $55
     ret  NC                                            ;; 03:4d9e $d0
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 03:4d9f $21 $1e $dc
@@ -129,14 +178,14 @@ call_03_4c38_UpdateObjectCollision:
     ld   A, $02                                        ;; 03:4dab $3e $02
     call call_00_0ff5_MaybeQueueBankChange                                  ;; 03:4dad $cd $f5 $0f
     jp   call_03_5671                                    ;; 03:4db0 $c3 $71 $56
-.data_03_4db3:
+.call_03_4db3:
     call call_03_550e                                  ;; 03:4db3 $cd $0e $55
     ret  NC                                            ;; 03:4db6 $d0
     call call_00_0723                                  ;; 03:4db7 $cd $23 $07
     ld   A, $02                                        ;; 03:4dba $3e $02
     call call_00_0ff5_MaybeQueueBankChange                                  ;; 03:4dbc $cd $f5 $0f
     jp   call_03_5671                                    ;; 03:4dbf $c3 $71 $56
-.data_03_4dc2:
+.call_03_4dc2:
     call call_03_550e                                  ;; 03:4dc2 $cd $0e $55
     ret  NC                                            ;; 03:4dc5 $d0
     call call_00_230f_ResolveObjectListIndex                                  ;; 03:4dc6 $cd $0f $23
@@ -171,17 +220,45 @@ call_03_4c38_UpdateObjectCollision:
     call call_00_0ff5_MaybeQueueBankChange                                  ;; 03:4dfa $cd $f5 $0f
     jp   call_03_5671                                    ;; 03:4dfd $c3 $71 $56
 .data_03_4e00:
-    db   $00, $20, $40, $80, $cd, $0e, $55, $d0        ;; 03:4e00 ?...????
-    db   $cd, $3a, $29, $d6, $04, $6f, $26, $00        ;; 03:4e08 ????????
-    db   $11, $2c, $4e, $19, $7e, $cd, $24, $06        ;; 03:4e10 ????????
-    db   $26, $d8, $fa, $00, $da, $f6, $1f, $6f        ;; 03:4e18 ????????
-    db   $6e, $26, $d7, $7e, $e6, $f0, $f6, $03        ;; 03:4e20 ????????
-    db   $77, $c3, $80, $2b, $03, $04, $01, $05        ;; 03:4e28 ????????
-    db   $02, $cd, $62, $29, $fe, $00, $c0, $cd        ;; 03:4e30 ????????
-    db   $0e, $55, $d0, $fe, $01, $c0, $3e, $03        ;; 03:4e38 ????????
-    db   $cd, $f5, $0f, $cd, $71, $56, $0e, $02        ;; 03:4e40 ????????
-    db   $c3, $99, $22                                 ;; 03:4e48 ???
-.data_03_4e4b:
+    db   $00, $20, $40, $80
+.call_03_4e04:
+    call call_03_550e
+    ret  nc
+    call call_00_293a_ObjectGetId
+    sub  a,04
+    ld   l,a
+    ld   h,00
+    ld   de,.data_03_4e2c
+    add  hl,de
+    ld   a,[hl]
+    call call_00_0624
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$1F
+    ld   l,a
+    ld   l,[hl]
+    ld   h,$D7
+    ld   a,[hl]
+    and  a,$F0
+    or   a,$03
+    ld   [hl],a
+    jp   call_00_2b80_ClearObjectMemoryEntry
+.data_03_4e2c:
+    db   $03, $04, $01, $05, $02
+.call_03_4e31:
+    call call_00_2962_ObjectGetActionId
+    cp   a,$00
+    ret  nz
+    call call_03_550e
+    ret  nc
+    cp   a,$01
+    ret  nz
+    ld   a,$03
+    call call_00_0ff5_MaybeQueueBankChange
+    call entry_03_5671
+    ld   c,$02
+    jp   call_00_2299_SetObjectStatusLowNibble
+.call_03_4e4b:
     call call_00_2962_ObjectGetActionId                                  ;; 03:4e4b $cd $62 $29
     cp   A, $02                                        ;; 03:4e4e $fe $02
     ret  NC                                            ;; 03:4e50 $d0
@@ -213,7 +290,7 @@ call_03_4c38_UpdateObjectCollision:
     call Z, call_00_21ef                               ;; 03:4e80 $cc $ef $21
     ld   A, [wDCC3]                                    ;; 03:4e83 $fa $c3 $dc
     jp   call_00_2c09_DispatchOffsetAction                                  ;; 03:4e86 $c3 $09 $2c
-.data_03_4e89:
+.call_03_4e89:
     call call_00_28d2_ObjectGet1D                                  ;; 03:4e89 $cd $d2 $28
     bit  7, A                                          ;; 03:4e8c $cb $7f
     ret  NZ                                            ;; 03:4e8e $c0
@@ -293,7 +370,7 @@ call_03_4c38_UpdateObjectCollision:
     db   $1a, $1b, $1c, $1d, $1e, $1f, $20, $21        ;; 03:4f12 ????????
     db   $22, $23, $24, $25, $27, $28, $29, $2a        ;; 03:4f1a ????????
     db   $2b                                           ;; 03:4f22 ?
-.data_03_4f23:
+.call_03_4f23:
     call call_03_550e                                  ;; 03:4f23 $cd $0e $55
     ret  NC                                            ;; 03:4f26 $d0
     cp   A, $01                                        ;; 03:4f27 $fe $01
@@ -324,6 +401,7 @@ call_03_4c38_UpdateObjectCollision:
     ret  NZ                                            ;; 03:4f5a $c0
     ld   C, $02                                        ;; 03:4f5b $0e $02
     jp   call_00_21ef                                  ;; 03:4f5d $c3 $ef $21
+.call_03_4f60:
     db   $cd, $62, $29, $fe, $00, $c0, $cd, $0e        ;; 03:4f60 ????????
     db   $55, $d0, $fe, $01, $c0, $cd, $71, $56        ;; 03:4f68 ????????
     db   $3e, $19, $cd, $f5, $0f, $0e, $01, $cd        ;; 03:4f70 ????????
@@ -733,43 +811,194 @@ call_03_5671:
     ld   [HL], $3c                                     ;; 03:56ba $36 $3c
     ld   A, $0f                                        ;; 03:56bc $3e $0f
     jp   call_00_0ff5_MaybeQueueBankChange                                  ;; 03:56be $c3 $f5 $0f
-    db   $fa, $01, $d8, $fe, $1a, $ca, $f8, $57        ;; 03:56c1 ????????
-    db   $fe, $2e, $ca, $f8, $57, $fe, $3b, $ca        ;; 03:56c9 ????????
-    db   $f8, $57, $fe, $1b, $ca, $f8, $57, $fa        ;; 03:56d1 ????????
-    db   $88, $dc, $5f, $16, $00, $cb, $7f, $28        ;; 03:56d9 ????????
-    db   $01, $15, $fa, $10, $d8, $83, $5f, $fa        ;; 03:56e1 ????????
-    db   $11, $d8, $8a, $57, $26, $d8, $fa, $00        ;; 03:56e9 ????????
-    db   $da, $f6, $10, $6f, $7b, $96, $5f, $23        ;; 03:56f1 ????????
-    db   $7a, $9e, $57, $38, $0f, $a7, $c2, $f8        ;; 03:56f9 ????????
-    db   $57, $2c, $2c, $3a, $c6, $0f, $bb, $da        ;; 03:5701 ????????
-    db   $f8, $57, $18, $12, $af, $93, $5f, $3e        ;; 03:5709 ????????
-    db   $00, $9a, $a7, $c2, $f8, $57, $2c, $2c        ;; 03:5711 ????????
-    db   $3a, $c6, $0f, $bb, $38, $5d, $4e, $7d        ;; 03:5719 ????????
-    db   $ee, $1c, $6f, $fa, $0e, $d8, $96, $5f        ;; 03:5721 ????????
-    db   $23, $fa, $0f, $d8, $9e, $57, $7b, $81        ;; 03:5729 ????????
-    db   $5f, $7a, $ce, $00, $cb, $7f, $20, $24        ;; 03:5731 ????????
-    db   $a7, $c2, $f8, $57, $7b, $cb, $21, $91        ;; 03:5739 ????????
-    db   $da, $f8, $57, $fe, $08, $d2, $f8, $57        ;; 03:5741 ????????
-    db   $4f, $cd, $a9, $58, $79, $90, $83, $82        ;; 03:5749 ????????
-    db   $cb, $7f, $c2, $0b, $58, $a7, $ca, $0b        ;; 03:5751 ????????
-    db   $58, $c3, $f8, $57, $14, $c2, $f8, $57        ;; 03:5759 ????????
-    db   $7b, $2f, $fe, $08, $d2, $f8, $57, $4f        ;; 03:5761 ????????
-    db   $cd, $a9, $58, $79, $80, $93, $92, $cb        ;; 03:5769 ????????
-    db   $7f, $c2, $0b, $58, $a7, $ca, $0b, $58        ;; 03:5771 ????????
-    db   $c3, $f8, $57, $2a, $4f, $46, $7d, $ee        ;; 03:5779 ????????
-    db   $1d, $6f, $fa, $0e, $d8, $96, $5f, $23        ;; 03:5781 ????????
-    db   $fa, $0f, $d8, $9e, $57, $7b, $81, $5f        ;; 03:5789 ????????
-    db   $3e, $00, $8a, $20, $62, $79, $87, $bb        ;; 03:5791 ????????
-    db   $38, $5d, $2c, $2a, $90, $4f, $7e, $de        ;; 03:5799 ????????
-    db   $00, $47, $fa, $88, $dc, $5f, $16, $00        ;; 03:57a1 ????????
-    db   $cb, $7f, $28, $01, $15, $fa, $10, $d8        ;; 03:57a9 ????????
-    db   $83, $5f, $fa, $11, $d8, $8a, $57, $7b        ;; 03:57b1 ????????
-    db   $c6, $10, $5f, $7a, $ce, $00, $57, $79        ;; 03:57b9 ????????
-    db   $93, $4f, $78, $9a, $47, $38, $30, $20        ;; 03:57c1 ????????
-    db   $2e, $79, $fe, $10, $30, $29, $fa, $8c        ;; 03:57c9 ????????
-    db   $dc, $cb, $2f, $cb, $2f, $cb, $2f, $cb        ;; 03:57d1 ????????
-    db   $2f, $81, $3d, $cb, $7f, $20, $06, $fe        ;; 03:57d9 ????????
-    db   $02, $38, $02, $18, $12                       ;; 03:57e1 ?????
+
+call_03_56c1:
+    ld   a,[wD801_PlayerObject_ActionId]
+    cp   a,$1A
+    jp   z,entry_03_57f8
+    cp   a,$2E
+    jp   z,entry_03_57f8
+    cp   a,$3B
+    jp   z,entry_03_57f8
+    cp   a,$1B
+    jp   z,entry_03_57f8
+    ld   a,[wDC88]
+    ld   e,a
+    ld   d,$00
+    bit  7,a
+    jr   z,label56E3
+    dec  d
+label56E3:
+    ld   a,[wD810_PlayerYPosition]
+    add  e
+    ld   e,a
+    ld   a,[wD811_PlayerYPosition]
+    adc  d
+    ld   d,a
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$10
+    ld   l,a
+    ld   a,e
+    sub  [hl]
+    ld   e,a
+    inc  hl
+    ld   a,d
+    sbc  [hl]
+    ld   d,a
+    jr   c,label570D
+    and  a
+    jp   nz,entry_03_57f8
+    inc  l
+    inc  l
+    ldd  a,[hl]
+    add  a,$0F
+    cp   e
+    jp   c,entry_03_57f8
+    jr   label571F
+label570D:
+    xor  a
+    sub  e
+    ld   e,a
+    ld   a,$00
+    sbc  d
+    and  a
+    jp   nz,entry_03_57f8
+    inc  l
+    inc  l
+    ldd  a,[hl]
+    add  a,$0F
+    cp   e
+    jr   c,label577C
+label571F:
+    ld   c,[hl]
+    ld   a,l
+    xor  a,$1C
+    ld   l,a
+    ld   a,[wD80E_PlayerXPosition]
+    sub  [hl]
+    ld   e,a
+    inc  hl
+    ld   a,[wD80F_PlayerXPosition]
+    sbc  [hl]
+    ld   d,a
+    ld   a,e
+    add  c
+    ld   e,a
+    ld   a,d
+    adc  a,$00
+    bit  7,a
+    jr   nz,label575D
+    and  a
+    jp   nz,entry_03_57f8
+    ld   a,e
+    sla  c
+    sub  c
+    jp   c,entry_03_57f8
+    cp   a,$08
+    jp   nc,entry_03_57f8
+    ld   c,a
+    call call_03_58a9
+    ld   a,c
+    sub  b
+    add  e
+    add  d
+    bit  7,a
+    jp   nz,call_03_580b
+    and  a
+    jp   z,call_03_580b
+    jp   entry_03_57f8
+label575D:
+    inc  d
+    jp   nz,entry_03_57f8
+    ld   a,e
+    cpl  
+    cp   a,$08
+    jp   nc,entry_03_57f8
+    ld   c,a
+    call call_03_58a9
+    ld   a,c
+    add  b
+    sub  e
+    sub  d
+    bit  7,a
+    jp   nz,call_03_580b
+    and  a
+    jp   z,call_03_580b
+    jp   entry_03_57f8
+label577C:
+    ldi  a,[hl]
+    ld   c,a
+    ld   b,[hl]
+    ld   a,l
+    xor  a,$1D
+    ld   l,a
+    ld   a,[wD80E_PlayerXPosition]
+    sub  [hl]
+    ld   e,a
+    inc  hl
+    ld   a,[wD80F_PlayerXPosition]
+    sbc  [hl]
+    ld   d,a
+    ld   a,e
+    add  c
+    ld   e,a
+    ld   a,$00
+    adc  d
+    jr   nz,entry_03_57f8
+    ld   a,c
+    add  a
+    cp   e
+    jr   c,entry_03_57f8
+    inc  l
+    ldi  a,[hl]
+    sub  b
+    ld   c,a
+    ld   a,[hl]
+    sbc  a,$00
+    ld   b,a
+    ld   a,[wDC88]
+    ld   e,a
+    ld   d,$00
+    bit  7,a
+    jr   z,label57AE
+    dec  d
+label57AE:
+    ld   a,[wD810_PlayerYPosition]
+    add  e
+    ld   e,a
+    ld   a,[wD811_PlayerYPosition]
+    adc  d
+    ld   d,a
+    ld   a,e
+    add  a,$10
+    ld   e,a
+    ld   a,d
+    adc  a,$00
+    ld   d,a
+    ld   a,c
+    sub  e
+    ld   c,a
+    ld   a,b
+    sbc  d
+    ld   b,a
+    jr   c,entry_03_57f8
+    jr   nz,entry_03_57f8
+    ld   a,c
+    cp   a,$10
+    jr   nc,entry_03_57f8
+    ld   a,[wDC8C]
+    sra  a
+    sra  a
+    sra  a
+    sra  a
+    add  c
+    dec  a
+    bit  7,a
+    jr   nz,jp_03_57e6
+    cp   a,$02
+    jr   c,jp_03_57e6
+    jr   entry_03_57f8
 
 jp_03_57e6:
     xor  A, A                                          ;; 03:57e6 $af
@@ -795,8 +1024,16 @@ call_03_57f8:
     ret  NZ                                            ;; 03:5807 $c0
     ld   [HL], $00                                     ;; 03:5808 $36 $00
     ret                                                ;; 03:580a $c9
-    db   $fa, $00, $da, $21, $7b, $dc, $be, $20        ;; 03:580b ????????
-    db   $02, $36, $00, $ea, $7d, $dc, $c9             ;; 03:5813 ???????
+
+call_03_580b:
+    ld   a,[wDA00_CurrentObjectAddr]
+    ld   hl,wDC7B
+    cp   [hl]
+    jr   nz,label5816
+    ld   [hl],$00
+label5816:
+    ld   [wDC7D],a
+    ret  
 
 data_03_581a:
     ld   A, [wD801_PlayerObject_ActionId]                                    ;; 03:581a $fa $01 $d8
@@ -884,9 +1121,32 @@ data_03_581a:
     cp   A, $02                                        ;; 03:58a1 $fe $02
     jp   C, jp_03_57e6                                 ;; 03:58a3 $da $e6 $57
     jp   call_03_57f8                                    ;; 03:58a6 $c3 $f8 $57
-    db   $26, $d8, $fa, $00, $da, $f6, $1b, $6f        ;; 03:58a9 ????????
-    db   $46, $2d, $2d, $cb, $7e, $28, $03, $af        ;; 03:58b1 ????????
-    db   $90, $47, $fa, $84, $dc, $57, $fa, $85        ;; 03:58b9 ????????
-    db   $dc, $82, $57, $fa, $86, $dc, $5f, $21        ;; 03:58c1 ????????
-    db   $0d, $d8, $cb, $6e, $c8, $2f, $3c, $5f        ;; 03:58c9 ????????
-    db   $c9                                           ;; 03:58d1 ?
+
+call_03_58a9:
+    ld   h,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$1B
+    ld   l,a
+    ld   b,[hl]
+    dec  l
+    dec  l
+    bit  7,[hl]
+    jr   z,label58BB
+    xor  a
+    sub  b
+    ld   b,a
+    label58BB:
+    ld   a,[wDC84]
+    ld   d,a
+    ld   a,[wDC85]
+    add  d
+    ld   d,a
+    ld   a,[wDC86]
+    ld   e,a
+    ld   hl,wD80D_PlayerFacingDirection
+    bit  5,[hl]
+    ret  z
+    cpl  
+    inc  a
+    ld   e,a
+    ret  

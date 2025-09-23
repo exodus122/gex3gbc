@@ -1,6 +1,6 @@
 SECTION "bank01", ROMX[$4000], BANK[$01]
 
-call_01_4000_LoadMenu:
+call_01_4000_MenuHandler_LoadAndProcess:
 ; Purpose:
 ; Initializes menu variables (wDBE9, wDBEA_MenuType, etc.) and copies menu-type–specific data into wDB92.
 ; Saves/restores the current level ID when transitioning to the menu.
@@ -263,7 +263,7 @@ call_01_4000_LoadMenu:
     cp   A, $20                                        ;; 01:4175 $fe $20
     ret  Z                                             ;; 01:4177 $c8
     ld   A, $04                                        ;; 01:4178 $3e $04
-    call call_01_4000_LoadMenu                                  ;; 01:417a $cd $00 $40
+    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:417a $cd $00 $40
     jp   .jp_01_42a1                                   ;; 01:417d $c3 $a1 $42
 .jp_01_4180:
     call call_00_0f6e_CheckInputRight                                  ;; 01:4180 $cd $6e $0f
@@ -403,7 +403,7 @@ call_01_4000_LoadMenu:
     call call_00_0f5e_WaitForInputClear                                  ;; 01:4285 $cd $5e $0f
     ld   A, [wDBE9]                                    ;; 01:4288 $fa $e9 $db
     and  A, A                                          ;; 01:428b $a7
-    jp   NZ, call_01_4000_LoadMenu                              ;; 01:428c $c2 $00 $40
+    jp   NZ, call_01_4000_MenuHandler_LoadAndProcess                              ;; 01:428c $c2 $00 $40
     ret                                                ;; 01:428f $c9
 .jr_01_4290:
     ld   A, [wDBEA_MenuType]                                    ;; 01:4290 $fa $ea $db
@@ -415,7 +415,7 @@ call_01_4000_LoadMenu:
 .jp_01_42a1:
     call call_01_4f7e_SeedTileLookupTable                                  ;; 01:42a1 $cd $7e $4f
     ld   A, $01                                        ;; 01:42a4 $3e $01
-    jp   call_01_4000_LoadMenu                                  ;; 01:42a6 $c3 $00 $40
+    jp   call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:42a6 $c3 $00 $40
 .jr_01_42a9:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 01:42a9 $fa $1e $dc
     and  A, A                                          ;; 01:42ac $a7
@@ -473,7 +473,7 @@ entry_01_42fd_InitMenuTilebank15_LoadMenu03:
     ld   A, $15                                        ;; 01:42fd $3e $15
     call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:42ff $cd $a2 $0f
     ld   A, $03                                        ;; 01:4302 $3e $03
-    jp   call_01_4000_LoadMenu                                  ;; 01:4304 $c3 $00 $40
+    jp   call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4304 $c3 $00 $40
 
 call_01_4307_PreloadMenus_15to1A:
 ; Behavior:
@@ -483,17 +483,17 @@ call_01_4307_PreloadMenus_15to1A:
     ld   A, $19                                        ;; 01:4307 $3e $19
     call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:4309 $cd $a2 $0f
     ld   A, $15                                        ;; 01:430c $3e $15
-    call call_01_4000_LoadMenu                                  ;; 01:430e $cd $00 $40
+    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:430e $cd $00 $40
     ld   A, $16                                        ;; 01:4311 $3e $16
-    call call_01_4000_LoadMenu                                  ;; 01:4313 $cd $00 $40
+    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4313 $cd $00 $40
     ld   A, $17                                        ;; 01:4316 $3e $17
-    call call_01_4000_LoadMenu                                  ;; 01:4318 $cd $00 $40
+    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4318 $cd $00 $40
     ld   A, $18                                        ;; 01:431b $3e $18
-    call call_01_4000_LoadMenu                                  ;; 01:431d $cd $00 $40
+    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:431d $cd $00 $40
     ld   A, $19                                        ;; 01:4320 $3e $19
-    call call_01_4000_LoadMenu                                  ;; 01:4322 $cd $00 $40
+    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4322 $cd $00 $40
     ld   A, $1a                                        ;; 01:4325 $3e $1a
-    call call_01_4000_LoadMenu                                  ;; 01:4327 $cd $00 $40
+    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4327 $cd $00 $40
     ret                                                ;; 01:432a $c9
 
 entry_01_432b_SetLevelMenuAndPalette:
@@ -513,7 +513,7 @@ entry_01_432b_SetLevelMenuAndPalette:
     ld   A, $01                                        ;; 01:433c $3e $01
     ld   [wDC59], A                                    ;; 01:433e $ea $59 $dc
     ld   A, $05                                        ;; 01:4341 $3e $05
-    call call_01_4000_LoadMenu                                  ;; 01:4343 $cd $00 $40
+    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4343 $cd $00 $40
     ld   A, [wDBEC]                                    ;; 01:4346 $fa $ec $db
     ld   [wDC5A], A                                    ;; 01:4349 $ea $5a $dc
     ret                                                ;; 01:434c $c9
@@ -521,7 +521,7 @@ entry_01_432b_SetLevelMenuAndPalette:
     ld   A, $03                                        ;; 01:434d $3e $03
     ld   [wDC59], A                                    ;; 01:434f $ea $59 $dc
     ld   A, $07                                        ;; 01:4352 $3e $07
-    call call_01_4000_LoadMenu                                  ;; 01:4354 $cd $00 $40
+    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4354 $cd $00 $40
     ld   A, [wDBEC]                                    ;; 01:4357 $fa $ec $db
     ld   [wDC5A], A                                    ;; 01:435a $ea $5a $dc
     ret                                                ;; 01:435d $c9
@@ -551,13 +551,13 @@ entry_01_435e_HandleLevelTransitionMenu:
     ld   A, $15                                        ;; 01:4378 $3e $15
     call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:437a $cd $a2 $0f
     ld   A, $0a                                        ;; 01:437d $3e $0a
-    call call_01_4000_LoadMenu                                  ;; 01:437f $cd $00 $40
+    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:437f $cd $00 $40
     jr   .jr_01_43ae                                   ;; 01:4382 $18 $2a
 .jr_01_4384:
     ld   A, $13                                        ;; 01:4384 $3e $13
     call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:4386 $cd $a2 $0f
     ld   A, $1b                                        ;; 01:4389 $3e $1b
-    call call_01_4000_LoadMenu                                  ;; 01:438b $cd $00 $40
+    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:438b $cd $00 $40
     jr   .jr_01_43ae                                   ;; 01:438e $18 $1e
 .jr_01_4390:
     ld   A, [wDB6C_CurrentLevelId]                                    ;; 01:4390 $fa $6c $db
@@ -573,7 +573,7 @@ entry_01_435e_HandleLevelTransitionMenu:
     ld   A, $13                                        ;; 01:43a4 $3e $13
     call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:43a6 $cd $a2 $0f
     ld   A, $09                                        ;; 01:43a9 $3e $09
-    call call_01_4000_LoadMenu                                  ;; 01:43ab $cd $00 $40
+    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:43ab $cd $00 $40
 .jr_01_43ae:
     xor  A, A                                          ;; 01:43ae $af
     ld   [wDB6C_CurrentLevelId], A                                    ;; 01:43af $ea $6c $db
@@ -1237,7 +1237,7 @@ call_01_4826_MenuState_UpdateCursorAlt:
 call_01_4875_ProcessTilemapOrCollectibles:
 ; Description: Loads object/sprite data from a table into wDBAB, calls call_01_49bb_FormatAndPaginateText for setup, 
 ; iterates through tile data at wDBA7, performs collision/bitmask checks, updates wDBA4 and wDBA5, 
-; and repeatedly calls call_01_48cd_TilemapXorBlitter. Appears to process tilemap collisions or update collectible graphics.
+; and repeatedly calls call_01_48cd_TilemapXorCopy. Appears to process tilemap collisions or update collectible graphics.
     ld   HL, wDBA6                                     ;; 01:4875 $21 $a6 $db
     ld   L, [HL]                                       ;; 01:4878 $6e
     ld   H, $00                                        ;; 01:4879 $26 $00
@@ -1278,7 +1278,7 @@ call_01_4875_ProcessTilemapOrCollectibles:
 .jr_01_48b5:
     ld   A, [HL+]                                      ;; 01:48b5 $2a
     push HL                                            ;; 01:48b6 $e5
-    call call_01_48cd_TilemapXorBlitter                                  ;; 01:48b7 $cd $cd $48
+    call call_01_48cd_TilemapXorCopy                                  ;; 01:48b7 $cd $cd $48
     pop  HL                                            ;; 01:48ba $e1
     bit  7, [HL]                                       ;; 01:48bb $cb $7e
     jr   Z, .jr_01_48b5                                ;; 01:48bd $28 $f6
@@ -1290,7 +1290,7 @@ call_01_4875_ProcessTilemapOrCollectibles:
     ld   [HL], A                                       ;; 01:48ca $77
     jr   .jr_01_488e                                   ;; 01:48cb $18 $c1
 
-call_01_48cd_TilemapXorBlitter:
+call_01_48cd_TilemapXorCopy:
 ; Description: Performs bit manipulation to combine map data (uses wDBA4, wDBA5, wDB9E) with tile memory. 
 ; Does multiple shifts and XOR writes—likely draws or updates tile graphics.
     call call_01_4a7f_GetCharTileAddress                                  ;; 01:48cd $cd $7f $4a

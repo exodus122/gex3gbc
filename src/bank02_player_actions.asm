@@ -79,8 +79,13 @@ call_02_482e:
     ret                                                ;; 02:483d $c9
 
 call_02_483e:
-    db   $21, $05, $d8, $cb, $66, $c8, $3e, $05        ;; 02:483e ????????
-    db   $cd, $f5, $0f, $af, $c3, $24, $06             ;; 02:4846 ???????
+    ld   hl,wD805
+    bit  4,[hl]
+    ret  z
+    ld   a,$05
+    call call_00_0ff5_MaybeQueueBankChange
+    xor  a
+    jp   call_00_0624
 
 call_02_484d:
     ld   HL, wD805                                     ;; 02:484d $21 $05 $d8
