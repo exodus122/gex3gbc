@@ -236,7 +236,7 @@ wDAD6_ReturnBank:
 wDAD7_CurrentInputs:
     ds 1                                               ;; dad7
 
-wDAD8:
+wDAD8_LCDControlMirror:
     ds 1                                               ;; dad8
 
 wDAD9:
@@ -1159,6 +1159,7 @@ wDE36_ParticleSlot7Buffer:
 wDE49_ParticleSlot8Buffer:
     ds 19
 
+; Start of Audio wRAM section
 wDE5C:
     ds 1                                               ;; de5c
 
@@ -1174,7 +1175,7 @@ wDE5F:
 wDE60:
     ds 160                                             ;; de60
 
-; Start of Audio wRAM section
+; Start of Bank 04-05 audio ram
 wDF00:
     ds 1                                               ;; df00
 

@@ -114,12 +114,12 @@ data_02_4000:
     dw   .data_02_47a0 ; Object_ChannelZ_Meteor
     dw   .data_02_47ac ; Object_ChannelZ_RockProjectile
 .data_02_40e4:
-    dw   call_02_47b4, data_02_739b
-    dw   call_02_47ce, data_02_73ab
-    dw   call_02_47fe, data_02_73b1
+    dw   call_02_47b4_PlayerAction_Spawn, data_02_739b
+    dw   call_02_47ce_PlayerAction_Idle, data_02_73ab
+    dw   call_02_47fe_PlayerAction_IdleAnimation, data_02_73b1
     dw   call_02_480a, data_02_73c5
     dw   call_02_481a, data_02_73da
-    dw   call_02_481f, data_02_73e6
+    dw   call_02_481f_IncrementDCACWithClamp, data_02_73e6
     dw   call_02_582e, data_02_73ef
     dw   call_02_482e, data_02_73da
     dw   call_02_483e, data_02_73fb
@@ -149,7 +149,7 @@ data_02_4000:
     dw   call_02_4a9b, data_02_74e1
     dw   call_02_4aa1, data_02_74ed
     dw   call_02_4aac, data_02_74f7
-    dw   call_02_47b4, data_02_74fd
+    dw   call_02_47b4_PlayerAction_Spawn, data_02_74fd
     dw   call_02_4bb7, data_02_750d
     dw   call_02_4c2c, data_02_753b
     dw   call_02_4c58, data_02_7543
@@ -161,7 +161,7 @@ data_02_4000:
     dw   call_02_48a1, data_02_7528
     dw   call_02_48b0, data_02_752e
     dw   call_02_4a25, data_02_7551
-    dw   call_02_47b4, data_02_7559
+    dw   call_02_47b4_PlayerAction_Spawn, data_02_7559
     dw   call_02_4ce3, data_02_758e
     dw   call_02_4d02, data_02_7594
     dw   call_02_4d14, data_02_759f
@@ -174,9 +174,9 @@ data_02_4000:
     dw   call_02_48a1, data_02_757c
     dw   call_02_48b0, data_02_7582
     dw   call_02_4a25, data_02_75bb
-    dw   call_02_47b4, data_02_739b
-    dw   call_02_47ce, data_02_73ab
-    dw   call_02_47fe, data_02_73b1
+    dw   call_02_47b4_PlayerAction_Spawn, data_02_739b
+    dw   call_02_47ce_PlayerAction_Idle, data_02_73ab
+    dw   call_02_47fe_PlayerAction_IdleAnimation, data_02_73b1
     dw   call_02_480a, data_02_73c5
     dw   call_02_481a, data_02_73da
     dw   call_02_582e, data_02_73e6
@@ -209,7 +209,7 @@ data_02_4000:
     dw   call_02_4a9b, data_02_74e1
     dw   call_02_4aa1, data_02_74ed
     dw   call_02_4aac, data_02_74f7
-    dw   call_02_47b4, data_02_74fd
+    dw   call_02_47b4_PlayerAction_Spawn, data_02_74fd
     dw   call_02_4bb7, data_02_750d
     dw   call_02_4c2c, data_02_753b
     dw   call_02_4c58, data_02_7543
@@ -221,7 +221,7 @@ data_02_4000:
     dw   call_02_48a1, data_02_7528
     dw   call_02_48b0, data_02_752e
     dw   call_02_4a25, data_02_7551
-    dw   call_02_47b4, data_02_7559
+    dw   call_02_47b4_PlayerAction_Spawn, data_02_7559
     dw   call_02_4ce3, data_02_758e
     dw   call_02_4d02, data_02_7594
     dw   call_02_4d14, data_02_759f

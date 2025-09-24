@@ -1,10 +1,10 @@
 call_00_1056_LoadFullMap:
 ; Role: Orchestrates loading an entire level/map. Clears game state, resets VRAM/tables, 
 ; loads palettes and background maps in several passes, copies collision tileset data to WRAM, 
-; updates VRAM tiles, calls external banked functions for map-specific assets, and finally resets status flags.
+; Calls external banked functions for map-specific assets, and finally resets status flags.
 ; Why: It’s the master routine for initializing a new map and its supporting graphics/collision data.
-    call call_00_0e3b_ClearGameState                                  ;; 00:1056 $cd $3b $0e
-    call call_00_0e62_ResetDD6AAndVRAM                                  ;; 00:1059 $cd $62 $0e
+    call call_00_0e3b_ClearGameStateVariables                                  ;; 00:1056 $cd $3b $0e
+    call call_00_0e62_ResetFlagsAndVRAMState                                  ;; 00:1059 $cd $62 $0e
     call call_00_10c7_InitRowOffsetTableForMap                                  ;; 00:105c $cd $c7 $10
     ld   C, $00                                        ;; 00:105f $0e $00
     ld   [wDAD6_ReturnBank], A                                    ;; 00:1061 $ea $d6 $da
@@ -12,21 +12,21 @@ call_00_1056_LoadFullMap:
     ld   HL, entry_03_65c6_LoadMenuOrLevelPalettes                              ;; 00:1066 $21 $c6 $65
     call call_00_0edd_CallAltBankFunc                                  ;; 00:1069 $cd $dd $0e
     ld   C, $03                                        ;; 00:106c $0e $03
-    call call_00_0a6a                                  ;; 00:106e $cd $6a $0a
+    call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:106e $cd $6a $0a
     ld   C, $04                                        ;; 00:1071 $0e $04
-    call call_00_0a6a                                  ;; 00:1073 $cd $6a $0a
+    call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:1073 $cd $6a $0a
     ld   C, $05                                        ;; 00:1076 $0e $05
-    call call_00_0a6a                                  ;; 00:1078 $cd $6a $0a
+    call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:1078 $cd $6a $0a
     ld   C, $06                                        ;; 00:107b $0e $06
-    call call_00_0a6a                                  ;; 00:107d $cd $6a $0a
+    call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:107d $cd $6a $0a
     ld   A, $04                                        ;; 00:1080 $3e $04
     call call_00_1a22_LoadInitialBgMap                                  ;; 00:1082 $cd $22 $1a
     ld   C, $07                                        ;; 00:1085 $0e $07
-    call call_00_0a6a                                  ;; 00:1087 $cd $6a $0a
+    call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:1087 $cd $6a $0a
     ld   A, $00                                        ;; 00:108a $3e $00
     call call_00_1a22_LoadInitialBgMap                                  ;; 00:108c $cd $22 $1a
     ld   C, $08                                        ;; 00:108f $0e $08
-    call call_00_0a6a                                  ;; 00:1091 $cd $6a $0a
+    call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:1091 $cd $6a $0a
     ld   A, $80                                        ;; 00:1094 $3e $80
     call call_00_1a22_LoadInitialBgMap                                  ;; 00:1096 $cd $22 $1a
     ld   A, $03                                        ;; 00:1099 $3e $03
@@ -46,7 +46,7 @@ call_00_1056_LoadFullMap:
     inc  E                                             ;; 00:10ae $1c
     jr   NZ, .jr_00_10a4                               ;; 00:10af $20 $f3
     call call_00_0f08_RestoreBank                                  ;; 00:10b1 $cd $08 $0f
-    call call_00_0b92_UpdateVRAMTiles                                  ;; 00:10b4 $cd $92 $0b
+    call call_00_0b92_WaitForInterrupt                                  ;; 00:10b4 $cd $92 $0b
     ld   [wDAD6_ReturnBank], A                                    ;; 00:10b7 $ea $d6 $da
     ld   A, $02                                        ;; 00:10ba $3e $02
     ld   HL, entry_02_72fb_UpdateMapWindow                                     ;; 00:10bc $21 $fb $72
@@ -1527,8 +1527,7 @@ call_00_1ea0_LoadAndRunLevelScript:
 ; Sets the player’s starting X/Y positions and various working variables.
 
 ; Enters a loop that:
-; Waits for input or script completion.
-; Updates VRAM tiles and background map.
+; Waits for inputs and updates the map
 ; Calls call_00_217f_ApplyPlayerMovementFlags (movement handler below) and updates objects (entry_02_7152_UpdateObjects).
 ; Spawns any queued objects (call_00_35fa_WaitForLineThenSpawnObject).
 ; Decrements timing counters until the script says to advance or exit.
@@ -1634,7 +1633,7 @@ call_00_1ea0_LoadAndRunLevelScript:
     pop  HL                                            ;; 00:1f3e $e1
     jp   .jp_00_1f9f                                   ;; 00:1f3f $c3 $9f $1f
 .jr_00_1f42:
-    call call_00_0b92_UpdateVRAMTiles                                  ;; 00:1f42 $cd $92 $0b
+    call call_00_0b92_WaitForInterrupt                                  ;; 00:1f42 $cd $92 $0b
     call call_00_217f_ApplyPlayerMovementFlags                                  ;; 00:1f45 $cd $7f $21
     ld   [wDAD6_ReturnBank], A                                    ;; 00:1f48 $ea $d6 $da
     ld   A, $02                                        ;; 00:1f4b $3e $02
@@ -1642,7 +1641,7 @@ call_00_1ea0_LoadAndRunLevelScript:
     call call_00_0edd_CallAltBankFunc                                  ;; 00:1f50 $cd $dd $0e
     call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:1f53 $cd $c8 $11
     call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:1f56 $cd $fa $35
-    call call_00_08f8                                  ;; 00:1f59 $cd $f8 $08
+    call call_00_08f8_HandleObjectInteractionOrTriggerEvent                                  ;; 00:1f59 $cd $f8 $08
     ld   HL, wDCDE                                     ;; 00:1f5c $21 $de $dc
     ld   A, [HL]                                       ;; 00:1f5f $7e
     sub  A, $01                                        ;; 00:1f60 $d6 $01
@@ -1668,14 +1667,14 @@ call_00_1ea0_LoadAndRunLevelScript:
     ld   A, $b4                                        ;; 00:1f78 $3e $b4
 .jr_00_1f7a:
     push AF                                            ;; 00:1f7a $f5
-    call call_00_0b92_UpdateVRAMTiles                                  ;; 00:1f7b $cd $92 $0b
+    call call_00_0b92_WaitForInterrupt                                  ;; 00:1f7b $cd $92 $0b
     ld   [wDAD6_ReturnBank], A                                    ;; 00:1f7e $ea $d6 $da
     ld   A, $02                                        ;; 00:1f81 $3e $02
     ld   HL, entry_02_7152_UpdateObjects                                     ;; 00:1f83 $21 $52 $71
     call call_00_0edd_CallAltBankFunc                                  ;; 00:1f86 $cd $dd $0e
     call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:1f89 $cd $c8 $11
     call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:1f8c $cd $fa $35
-    call call_00_08f8                                  ;; 00:1f8f $cd $f8 $08
+    call call_00_08f8_HandleObjectInteractionOrTriggerEvent                                  ;; 00:1f8f $cd $f8 $08
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:1f92 $fa $d7 $da
     and  A, A                                          ;; 00:1f95 $a7
     jr   Z, .jr_00_1f9b                                ;; 00:1f96 $28 $03

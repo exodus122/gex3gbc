@@ -1,7 +1,7 @@
 call_00_21ef:
     push BC                                            ;; 00:21ef $c5
     ld   A, $1e                                        ;; 00:21f0 $3e $1e
-    call call_00_0ff5_MaybeQueueBankChange                                  ;; 00:21f2 $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 00:21f2 $cd $f5 $0f
     pop  BC                                            ;; 00:21f5 $c1
 
 call_00_21f6_FindAndMarkObjectInList:

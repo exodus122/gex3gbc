@@ -20,7 +20,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
 ;   - Saves the current level ID (wDB6C_CurrentLevelId) so it can be restored after the menu closes.
 ;   - Copies a block of menu-specific data (pointer table or palette data) into wDB92—this acts as the active menu configuration.
 ; - Background setup:
-;   - Calls entry_03_6c89_CopyLevelData (or similar) to copy map/VRAM tile data so the menu’s background appears.
+;   - Calls entry_03_6c89_CopyLevelData (or similar) to copy map data so the menu’s background appears.
 ;   - Loads background and object palettes for the menu screen.
 ;   - Resets the OAM pointer (wDC6F) and clears unused sprite slots.
 ;
@@ -127,7 +127,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     call call_01_4d2c_ProcessTileStreamingLoop                                  ;; 01:4075 $cd $2c $4d
 .jp_01_4078:
     call call_01_4bb8_UpdateInterpolationStep                                  ;; 01:4078 $cd $b8 $4b
-    call call_00_0b92_UpdateVRAMTiles                                  ;; 01:407b $cd $92 $0b
+    call call_00_0b92_WaitForInterrupt                                  ;; 01:407b $cd $92 $0b
     call call_01_4b6b_StreamTileDataToBuffer                                  ;; 01:407e $cd $6b $4b
     ld   HL, wDBDC                                     ;; 01:4081 $21 $dc $db
     dec  [HL]                                          ;; 01:4084 $35
@@ -138,7 +138,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     bit  2, [HL]                                       ;; 01:4090 $cb $56
     jr   Z, .jr_01_40ad                                ;; 01:4092 $28 $19
     ld   A, $01                                        ;; 01:4094 $3e $01
-    call call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:4096 $cd $d7 $0f
+    call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4096 $cd $d7 $0f
     ld   A, [wDBE8]                                    ;; 01:4099 $fa $e8 $db
     ld   [wDB6C_CurrentLevelId], A                                    ;; 01:409c $ea $6c $db
     ld   [wDAD6_ReturnBank], A                                    ;; 01:409f $ea $d6 $da
@@ -197,7 +197,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   [HL], $01                                     ;; 01:4107 $36 $01
 .jr_01_4109:
     ld   A, $01                                        ;; 01:4109 $3e $01
-    call call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:410b $cd $d7 $0f
+    call call_00_0fd7_TriggerSoundEffect                                  ;; 01:410b $cd $d7 $0f
     jp   .jp_01_4070                                   ;; 01:410e $c3 $70 $40
 .jr_01_4111:
     ld   HL, wDBEE                                     ;; 01:4111 $21 $ee $db
@@ -241,7 +241,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   [HL], A                                       ;; 01:4152 $77
 .jr_01_4153:
     ld   A, $01                                        ;; 01:4153 $3e $01
-    call call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:4155 $cd $d7 $0f
+    call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4155 $cd $d7 $0f
     jp   .jp_01_4070                                   ;; 01:4158 $c3 $70 $40
 .jp_01_415b:
     call call_01_505a_ValidateTileBufferAndRebuildCollisionData                                  ;; 01:415b $cd $5a $50
@@ -251,11 +251,11 @@ call_01_4000_MenuHandler_LoadAndProcess:
     jr   Z, .jr_01_4167                                ;; 01:4163 $28 $02
     ld   A, $ff                                        ;; 01:4165 $3e $ff
 .jr_01_4167:
-    call call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:4167 $cd $d7 $0f
+    call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4167 $cd $d7 $0f
     ld   B, $3c                                        ;; 01:416a $06 $3c
 .jr_01_416c:
     push BC                                            ;; 01:416c $c5
-    call call_00_0b92_UpdateVRAMTiles                                  ;; 01:416d $cd $92 $0b
+    call call_00_0b92_WaitForInterrupt                                  ;; 01:416d $cd $92 $0b
     pop  BC                                            ;; 01:4170 $c1
     dec  B                                             ;; 01:4171 $05
     jr   NZ, .jr_01_416c                               ;; 01:4172 $20 $f8
@@ -304,7 +304,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   [HL], $02                                     ;; 01:41c1 $36 $02
 .jr_01_41c3:
     ld   A, $01                                        ;; 01:41c3 $3e $01
-    call call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:41c5 $cd $d7 $0f
+    call call_00_0fd7_TriggerSoundEffect                                  ;; 01:41c5 $cd $d7 $0f
     jp   .jp_01_4070                                   ;; 01:41c8 $c3 $70 $40
 .jp_01_41cb:
     ld   A, [wDB95]                                    ;; 01:41cb $fa $95 $db
@@ -329,7 +329,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     inc  [HL]                                          ;; 01:41f0 $34
 .jr_01_41f1:
     ld   A, $01                                        ;; 01:41f1 $3e $01
-    call call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:41f3 $cd $d7 $0f
+    call call_00_0fd7_TriggerSoundEffect                                  ;; 01:41f3 $cd $d7 $0f
     call call_01_43ba_JumpToDynamicHandler                                  ;; 01:41f6 $cd $ba $43
     jp   .jp_01_4070                                   ;; 01:41f9 $c3 $70 $40
 .jp_01_41fc:
@@ -362,14 +362,14 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   HL, data_01_5692                              ;; 01:422e $21 $92 $56
     call call_01_4454_SetMenuPointer                                  ;; 01:4231 $cd $54 $44
     ld   A, $01                                        ;; 01:4234 $3e $01
-    call call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:4236 $cd $d7 $0f
+    call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4236 $cd $d7 $0f
     jp   .jp_01_4070                                   ;; 01:4239 $c3 $70 $40
 .jr_01_423c:
     call call_00_0f9c_CheckInputB                                  ;; 01:423c $cd $9c $0f
     jp   Z, .jp_01_4078                                ;; 01:423f $ca $78 $40
     ld   A, $01                                        ;; 01:4242 $3e $01
-    call call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:4244 $cd $d7 $0f
-    call call_00_0f5e_WaitForInputClear                                  ;; 01:4247 $cd $5e $0f
+    call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4244 $cd $d7 $0f
+    call call_00_0f5e_WaitUntilNoInputPressed                                  ;; 01:4247 $cd $5e $0f
     ld   A, [wDBE8]                                    ;; 01:424a $fa $e8 $db
     ld   [wDB6C_CurrentLevelId], A                                    ;; 01:424d $ea $6c $db
     ld   [wDAD6_ReturnBank], A                                    ;; 01:4250 $ea $d6 $da
@@ -400,7 +400,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     cp   A, $40                                        ;; 01:4282 $fe $40
     ret  Z                                             ;; 01:4284 $c8
 .jp_01_4285:
-    call call_00_0f5e_WaitForInputClear                                  ;; 01:4285 $cd $5e $0f
+    call call_00_0f5e_WaitUntilNoInputPressed                                  ;; 01:4285 $cd $5e $0f
     ld   A, [wDBE9]                                    ;; 01:4288 $fa $e9 $db
     and  A, A                                          ;; 01:428b $a7
     jp   NZ, call_01_4000_MenuHandler_LoadAndProcess                              ;; 01:428c $c2 $00 $40
@@ -432,7 +432,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   BC, $12c                                      ;; 01:42c2 $01 $2c $01
 .jr_01_42c5:
     push BC                                            ;; 01:42c5 $c5
-    call call_00_0b92_UpdateVRAMTiles                                  ;; 01:42c6 $cd $92 $0b
+    call call_00_0b92_WaitForInterrupt                                  ;; 01:42c6 $cd $92 $0b
     pop  BC                                            ;; 01:42c9 $c1
     dec  BC                                            ;; 01:42ca $0b
     ld   A, B                                          ;; 01:42cb $78
@@ -443,7 +443,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   BC, $2d0                                      ;; 01:42d0 $01 $d0 $02
 .jr_01_42d3:
     push BC                                            ;; 01:42d3 $c5
-    call call_00_0b92_UpdateVRAMTiles                                  ;; 01:42d4 $cd $92 $0b
+    call call_00_0b92_WaitForInterrupt                                  ;; 01:42d4 $cd $92 $0b
     call call_00_0f9c_CheckInputB                                  ;; 01:42d7 $cd $9c $0f
     pop  BC                                            ;; 01:42da $c1
     ret  NZ                                            ;; 01:42db $c0
@@ -456,7 +456,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     call call_01_4d2c_ProcessTileStreamingLoop                                  ;; 01:42e2 $cd $2c $4d
 .jr_01_42e5:
     call call_01_4bb8_UpdateInterpolationStep                                  ;; 01:42e5 $cd $b8 $4b
-    call call_00_0b92_UpdateVRAMTiles                                  ;; 01:42e8 $cd $92 $0b
+    call call_00_0b92_WaitForInterrupt                                  ;; 01:42e8 $cd $92 $0b
     call call_01_4b6b_StreamTileDataToBuffer                                  ;; 01:42eb $cd $6b $4b
     ld   HL, wDBDC                                     ;; 01:42ee $21 $dc $db
     dec  [HL]                                          ;; 01:42f1 $35
@@ -464,14 +464,14 @@ call_01_4000_MenuHandler_LoadAndProcess:
     and  A, A                                          ;; 01:42f5 $a7
     jr   Z, .jr_01_42e5                                ;; 01:42f6 $28 $ed
     ld   A, $01                                        ;; 01:42f8 $3e $01
-    jp   call_00_0fd7_ProcessBankedTileLoad                                  ;; 01:42fa $c3 $d7 $0f
+    jp   call_00_0fd7_TriggerSoundEffect                                  ;; 01:42fa $c3 $d7 $0f
 
 entry_01_42fd_InitMenuTilebank15_LoadMenu03:
 ; Behavior:
 ; Loads tile bank $15 (via UpdateTileBankForNewID) and immediately jumps to LoadMenu with ID $03.
 ; Likely Purpose: Entry point to show a specific menu screen (e.g., pause/options).
     ld   A, $15                                        ;; 01:42fd $3e $15
-    call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:42ff $cd $a2 $0f
+    call call_00_0fa2_RequestSongBankAndPlay                                  ;; 01:42ff $cd $a2 $0f
     ld   A, $03                                        ;; 01:4302 $3e $03
     jp   call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4304 $c3 $00 $40
 
@@ -481,7 +481,7 @@ call_01_4307_PreloadMenus_15to1A:
 ; Likely Purpose: Preloads multiple menu assets into VRAM (like caching 
 ; graphics for level select or transitions).
     ld   A, $19                                        ;; 01:4307 $3e $19
-    call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:4309 $cd $a2 $0f
+    call call_00_0fa2_RequestSongBankAndPlay                                  ;; 01:4309 $cd $a2 $0f
     ld   A, $15                                        ;; 01:430c $3e $15
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:430e $cd $00 $40
     ld   A, $16                                        ;; 01:4311 $3e $16
@@ -506,7 +506,7 @@ entry_01_432b_SetLevelMenuAndPalette:
     and  A, A                                          ;; 01:432e $a7
     ret  Z                                             ;; 01:432f $c8
     ld   A, $04                                        ;; 01:4330 $3e $04
-    call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:4332 $cd $a2 $0f
+    call call_00_0fa2_RequestSongBankAndPlay                                  ;; 01:4332 $cd $a2 $0f
     ld   A, [wDB6C_CurrentLevelId]                                    ;; 01:4335 $fa $6c $db
     cp   A, $07                                        ;; 01:4338 $fe $07
     jr   C, .jr_01_434d                                ;; 01:433a $38 $11
@@ -549,13 +549,13 @@ entry_01_435e_HandleLevelTransitionMenu:
     jr   Z, .jr_01_4384                                ;; 01:4374 $28 $0e
     res  5, [HL]                                       ;; 01:4376 $cb $ae
     ld   A, $15                                        ;; 01:4378 $3e $15
-    call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:437a $cd $a2 $0f
+    call call_00_0fa2_RequestSongBankAndPlay                                  ;; 01:437a $cd $a2 $0f
     ld   A, $0a                                        ;; 01:437d $3e $0a
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:437f $cd $00 $40
     jr   .jr_01_43ae                                   ;; 01:4382 $18 $2a
 .jr_01_4384:
     ld   A, $13                                        ;; 01:4384 $3e $13
-    call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:4386 $cd $a2 $0f
+    call call_00_0fa2_RequestSongBankAndPlay                                  ;; 01:4386 $cd $a2 $0f
     ld   A, $1b                                        ;; 01:4389 $3e $1b
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:438b $cd $00 $40
     jr   .jr_01_43ae                                   ;; 01:438e $18 $1e
@@ -571,7 +571,7 @@ entry_01_435e_HandleLevelTransitionMenu:
     jr   .jr_01_43ae                                   ;; 01:43a2 $18 $0a
 .jr_01_43a4:
     ld   A, $13                                        ;; 01:43a4 $3e $13
-    call call_00_0fa2_UpdateTileBankForNewID                                  ;; 01:43a6 $cd $a2 $0f
+    call call_00_0fa2_RequestSongBankAndPlay                                  ;; 01:43a6 $cd $a2 $0f
     ld   A, $09                                        ;; 01:43a9 $3e $09
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:43ab $cd $00 $40
 .jr_01_43ae:
@@ -622,8 +622,8 @@ call_01_43f0_MenuEngine_MainLoop:
 ; Updates palettes and LCD control, then finalizes VRAM updates.
 ; Likely Purpose: Core loop for processing menu scripts or transitions.
     push HL                                            ;; 01:43f0 $e5
-    call call_00_0e3b_ClearGameState                                  ;; 01:43f1 $cd $3b $0e
-    call call_00_0e62_ResetDD6AAndVRAM                                  ;; 01:43f4 $cd $62 $0e
+    call call_00_0e3b_ClearGameStateVariables                                  ;; 01:43f1 $cd $3b $0e
+    call call_00_0e62_ResetFlagsAndVRAMState                                  ;; 01:43f4 $cd $62 $0e
     call call_01_4f27_ClearBgAndTileBuffers                                  ;; 01:43f7 $cd $27 $4f
     ld   A, $ff                                        ;; 01:43fa $3e $ff
     ld   [wDBC7], A                                    ;; 01:43fc $ea $c7 $db
@@ -661,10 +661,10 @@ call_01_43f0_MenuEngine_MainLoop:
 .jr_01_4444:
     call call_01_43ba_JumpToDynamicHandler                                  ;; 01:4444 $cd $ba $43
     ld   A, $d3                                        ;; 01:4447 $3e $d3
-    call call_00_0e33_SetLCDControl                                  ;; 01:4449 $cd $33 $0e
+    call call_00_0e33_SetLCDControlRegister                                  ;; 01:4449 $cd $33 $0e
     ld   A, $01                                        ;; 01:444c $3e $01
     ld   [wDD6A], A                                    ;; 01:444e $ea $6a $dd
-    jp   call_00_0b92_UpdateVRAMTiles                                  ;; 01:4451 $c3 $92 $0b
+    jp   call_00_0b92_WaitForInterrupt                                  ;; 01:4451 $c3 $92 $0b
 
 call_01_4454_SetMenuPointer:
 ; Behavior:
@@ -850,7 +850,7 @@ call_01_446b_ExecuteMenuCommand:
     and  A, $80                                        ;; 01:4563 $e6 $80
     ret  Z                                             ;; 01:4565 $c8
     ld   C, $09                                        ;; 01:4566 $0e $09
-    jp   call_00_0a6a                                  ;; 01:4568 $c3 $6a $0a
+    jp   call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 01:4568 $c3 $6a $0a
 .data_01_456b_MenuCommandJumpTable: ; probably menutype jump table
 ; Behavior:
 ; List of function pointers (call_01_458d_MenuHandler_LoadAssetsAndJump, call_01_4599_MenuHandler_LoadAssetsAndJump, etc.) for specific menu command handlers.
@@ -2142,7 +2142,7 @@ call_01_4d2c_ProcessTileStreamingLoop:
 ; decrements wDBDC, filters inputs, and repeats until inputs clear.
     call call_01_4bb8_UpdateInterpolationStep                                  ;; 01:4d2c $cd $b8 $4b
     call call_01_4b6b_StreamTileDataToBuffer                                  ;; 01:4d2f $cd $6b $4b
-    call call_00_0b92_UpdateVRAMTiles                                  ;; 01:4d32 $cd $92 $0b
+    call call_00_0b92_WaitForInterrupt                                  ;; 01:4d32 $cd $92 $0b
     ld   HL, wDBDC                                     ;; 01:4d35 $21 $dc $db
     dec  [HL]                                          ;; 01:4d38 $35
     ld   A, [wDB94]                                    ;; 01:4d39 $fa $94 $db
@@ -2353,11 +2353,11 @@ call_01_4f27_ClearBgAndTileBuffers:
 
 call_01_4f51_UploadSecondaryTileLayer:
 ; Copies the contents of wD578 into the background tilemap using call_01_4f67_CopyTileBufferToBgMap, 
-; then calls call_00_0a6a with C=$07 (likely triggers VRAM transfer).
+; then calls call_00_0a6a_LoadMapConfigAndWaitVBlank with C=$07 (likely triggers VRAM transfer).
     ld   DE, wD578                                     ;; 01:4f51 $11 $78 $d5
     call call_01_4f67_CopyTileBufferToBgMap                                  ;; 01:4f54 $cd $67 $4f
     ld   C, $07                                        ;; 01:4f57 $0e $07
-    jp   call_00_0a6a                                  ;; 01:4f59 $c3 $6a $0a
+    jp   call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 01:4f59 $c3 $6a $0a
 
 call_01_4f5c_UploadPrimaryTileLayer:
 ; Description:
@@ -2365,7 +2365,7 @@ call_01_4f5c_UploadPrimaryTileLayer:
     ld   DE, wD400                                     ;; 01:4f5c $11 $00 $d4
     call call_01_4f67_CopyTileBufferToBgMap                                  ;; 01:4f5f $cd $67 $4f
     ld   C, $08                                        ;; 01:4f62 $0e $08
-    jp   call_00_0a6a                                  ;; 01:4f64 $c3 $6a $0a
+    jp   call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 01:4f64 $c3 $6a $0a
 
 call_01_4f67_CopyTileBufferToBgMap:
 ; Description:

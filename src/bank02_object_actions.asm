@@ -495,7 +495,7 @@ call_02_5bfa:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck                                  ;; 02:5bfa $cd $f5 $29
     jr   Z, .jr_02_5c23                                ;; 02:5bfd $28 $24
     ld   A, $1e                                        ;; 02:5bff $3e $1e
-    call call_00_0ff5_MaybeQueueBankChange                                  ;; 02:5c01 $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 02:5c01 $cd $f5 $0f
     ld   HL, .data_02_5c3b                             ;; 02:5c04 $21 $3b $5c
     call call_00_2c20_ObjectPalette_CopyToBuffer                                  ;; 02:5c07 $cd $20 $2c
     call call_00_288c_Object_Clear14                                  ;; 02:5c0a $cd $8a $28
@@ -577,7 +577,7 @@ call_02_5c82:
 call_02_5ca5:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   a,$19
-    call nz,call_00_0ff5_MaybeQueueBankChange
+    call nz,call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,[wDC71]
     and  a,$0F
     cp   a,$0C
@@ -594,7 +594,7 @@ call_02_5cd0:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label5CF0
     ld   a,$1A
-    call call_00_0ff5_MaybeQueueBankChange
+    call call_00_0ff5_QueueSoundEffectWithPriority
     call call_02_5d02
     call call_00_2976_ObjectGetFacingDirection
     ld   c,$F2
@@ -1097,7 +1097,7 @@ call_02_616f:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,.label61A1
     ld   a,$19
-    call call_00_0ff5_MaybeQueueBankChange
+    call call_00_0ff5_QueueSoundEffectWithPriority
     ld   c,$10
     call call_00_28dc_ObjectSet1D
     ld   h,$D8
@@ -1126,7 +1126,7 @@ call_02_616f:
     call call_00_2766_Object_UpdateXPositionFromVector
     ret  c
     ld   a,$19
-    call call_00_0ff5_MaybeQueueBankChange
+    call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$04
     jp   entry_02_72ac_LoadObjectData
 
@@ -1390,7 +1390,7 @@ call_02_63a8:
 
 call_02_63c0:
     ld   a,$1A
-    call call_00_0ff5_MaybeQueueBankChange
+    call call_00_0ff5_QueueSoundEffectWithPriority
     ld   [wDAD6_ReturnBank],a
     ld   a,$03
     ld   hl,entry_03_57f8
@@ -2168,7 +2168,7 @@ call_02_69af:
     ld   c,$2D
     call call_00_290d_ObjectSetTimer1A
     ld   a,$1C
-    call call_00_0ff5_MaybeQueueBankChange
+    call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$02
     jp   entry_02_72ac_LoadObjectData
 .data_02_69fc:    
@@ -2217,7 +2217,7 @@ call_02_6A13:
 call_02_6A4c:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   a,$19
-    call nz,call_00_0ff5_MaybeQueueBankChange
+    call nz,call_00_0ff5_QueueSoundEffectWithPriority
     ld   hl,.data_02_6a89
     call call_00_2c20_ObjectPalette_CopyToBuffer
     call call_00_2a5d_ObjectCheckFlag2
@@ -2260,7 +2260,7 @@ label6AA1:
     call call_00_22d4_CheckObjectSlotFlag
     ret  z
     ld   a,$1A
-    call call_00_0ff5_MaybeQueueBankChange
+    call call_00_0ff5_QueueSoundEffectWithPriority
     ld   c,$02
     call call_00_2299_SetObjectStatusLowNibble
     ld   a,$01
@@ -2272,7 +2272,7 @@ label6AA1:
     call call_00_2766_Object_UpdateXPositionFromVector
     ret  c
     ld   a,$19
-    call call_00_0ff5_MaybeQueueBankChange
+    call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$02
     jp   entry_02_72ac_LoadObjectData
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
@@ -2574,7 +2574,7 @@ label6CF5:
     dec  l
     ld   [hl],e
     ld   a,$19
-    call call_00_0ff5_MaybeQueueBankChange
+    call call_00_0ff5_QueueSoundEffectWithPriority
     call call_00_2922_ObjectTimer1ACountdown
     ld   c,$20
     jp   nz,call_00_28dc_ObjectSet1D
@@ -2593,7 +2593,7 @@ label6CF5:
     call call_00_2a5d_ObjectCheckFlag2
     ret  z
     ld   a,$1A
-    call call_00_0ff5_MaybeQueueBankChange
+    call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$03
     jp   entry_02_72ac_LoadObjectData
     call call_00_2a5d_ObjectCheckFlag2
@@ -2679,7 +2679,7 @@ call_02_6dda:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ret  z
     ld   a,$15
-    call call_00_0ff5_MaybeQueueBankChange
+    call call_00_0ff5_QueueSoundEffectWithPriority
     ld   c,$18
     jp   call_00_3792_PrepareRelativeObjectSpawn
     call call_00_244a_Object_ApplyClampedVerticalVelocity
@@ -2701,7 +2701,7 @@ call_02_6dda:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,.label6E27
     ld   a,$1A
-    call call_00_0ff5_MaybeQueueBankChange
+    call call_00_0ff5_QueueSoundEffectWithPriority
     ld   hl,.data_6e3c
     call call_00_2c20_ObjectPalette_CopyToBuffer
     call call_00_288c_Object_Clear14
@@ -2775,7 +2775,7 @@ label6E6F:
     jp   entry_02_72ac_LoadObjectData
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   a,$1B
-    call nz,call_00_0ff5_MaybeQueueBankChange
+    call nz,call_00_0ff5_QueueSoundEffectWithPriority
     call call_00_2922_ObjectTimer1ACountdown
     ld   a,$04
     jp   z,entry_02_72ac_LoadObjectData
@@ -2785,7 +2785,7 @@ label6E6F:
     ld   c,$16
     call call_00_3792_PrepareRelativeObjectSpawn
     ld   a,$14
-    jp   call_00_0ff5_MaybeQueueBankChange
+    jp   call_00_0ff5_QueueSoundEffectWithPriority
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$3C
     call nz,call_00_28dc_ObjectSet1D
@@ -2817,7 +2817,7 @@ label6E6F:
     ld   [hl],e
 label6EFA:
     ld   a,$19
-    call call_00_0ff5_MaybeQueueBankChange
+    call call_00_0ff5_QueueSoundEffectWithPriority
     ld   c,$17
     call call_00_3792_PrepareRelativeObjectSpawn
     jp   call_00_2b7a_ClearObjectThenJump
@@ -2897,7 +2897,7 @@ label6F93:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label6FBE
     ld   a,$1A
-    call call_00_0ff5_MaybeQueueBankChange
+    call call_00_0ff5_QueueSoundEffectWithPriority
     ld   c,$B4
     call call_00_290d_ObjectSetTimer1A
     ld   c,$30
@@ -2962,7 +2962,7 @@ label7002:
     ret  
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   a,$13
-    call nz,call_00_0ff5_MaybeQueueBankChange
+    call nz,call_00_0ff5_QueueSoundEffectWithPriority
     call call_00_244a_Object_ApplyClampedVerticalVelocity
     call call_00_2766_Object_UpdateXPositionFromVector
     ld   a,$02
@@ -3016,7 +3016,7 @@ call_02_702e:
     dec  hl
     ld   [hl],e
     ld   a,$19
-    call call_00_0ff5_MaybeQueueBankChange
+    call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$01
     jp   entry_02_72ac_LoadObjectData
 .data_02_707f:

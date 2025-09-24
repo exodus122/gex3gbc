@@ -3,7 +3,7 @@
 SECTION "isrVBlank", ROM0[$0040]
 
 isrVBlank:
-    jp   jp_00_0b25                                    ;; 00:0040 $c3 $25 $0b
+    jp   call_00_0b25_MainGameLoop_UpdateAndRenderFrame                                    ;; 00:0040 $c3 $25 $0b
 
 SECTION "isrLCDC", ROM0[$0048]
 
@@ -158,7 +158,7 @@ call_00_0150_Init:
     ldh  [rIE], A                                      ;; 00:0232 $e0 $ff
     ld   A, $04                                        ;; 00:0234 $3e $04
     call call_00_0eee_SwitchBank                                  ;; 00:0236 $cd $ee $0e
-    call entry_04_4000                                  ;; 00:0239 $cd $00 $40
+    call entry_04_4000_Audio                                  ;; 00:0239 $cd $00 $40
     call call_00_0f08_RestoreBank                                  ;; 00:023c $cd $08 $0f
     xor  A, A                                          ;; 00:023f $af
     ld   [wDE60], A                                    ;; 00:0240 $ea $60 $de
@@ -168,19 +168,19 @@ call_00_0150_Init:
     ld   [wDE5C], A                                    ;; 00:024b $ea $5c $de
     ld   [wDE5D], A                                    ;; 00:024e $ea $5d $de
     ld   A, $c7                                        ;; 00:0251 $3e $c7
-    ld   [wDAD8], A                                    ;; 00:0253 $ea $d8 $da
+    ld   [wDAD8_LCDControlMirror], A                                    ;; 00:0253 $ea $d8 $da
     ldh  [rLCDC], A                                    ;; 00:0256 $e0 $40
     ei                                                 ;; 00:0258 $fb
-    call call_00_0b92_UpdateVRAMTiles                                  ;; 00:0259 $cd $92 $0b
+    call call_00_0b92_WaitForInterrupt                                  ;; 00:0259 $cd $92 $0b
     ld   [wDAD6_ReturnBank], A                                    ;; 00:025c $ea $d6 $da
     ld   A, $01                                        ;; 00:025f $3e $01
     ld   HL, call_01_4f7e_SeedTileLookupTable                              ;; 00:0261 $21 $7e $4f
     call call_00_0edd_CallAltBankFunc                                  ;; 00:0264 $cd $dd $0e
 .jp_00_0267:
     ld   A, $00                                        ;; 00:0267 $3e $00
-    call call_00_0fa2_UpdateTileBankForNewID                                  ;; 00:0269 $cd $a2 $0f
+    call call_00_0fa2_RequestSongBankAndPlay                                  ;; 00:0269 $cd $a2 $0f
     ld   A, $00                                        ;; 00:026c $3e $00
-    call call_00_0fd7_ProcessBankedTileLoad                                  ;; 00:026e $cd $d7 $0f
+    call call_00_0fd7_TriggerSoundEffect                                  ;; 00:026e $cd $d7 $0f
     ld   A, $11                                        ;; 00:0271 $3e $11
     ld   [wDAD6_ReturnBank], A                                    ;; 00:0273 $ea $d6 $da
     ld   A, $01                                        ;; 00:0276 $3e $01
@@ -208,7 +208,7 @@ call_00_0150_Init:
     call call_00_0edd_CallAltBankFunc                                  ;; 00:02af $cd $dd $0e
 .jp_00_02b2:
     ld   A, $01                                        ;; 00:02b2 $3e $01
-    call call_00_0fa2_UpdateTileBankForNewID                                  ;; 00:02b4 $cd $a2 $0f
+    call call_00_0fa2_RequestSongBankAndPlay                                  ;; 00:02b4 $cd $a2 $0f
     ld   A, $00                                        ;; 00:02b7 $3e $00
     ld   [wDAD6_ReturnBank], A                                    ;; 00:02b9 $ea $d6 $da
     ld   A, $01                                        ;; 00:02bc $3e $01
@@ -241,16 +241,16 @@ call_00_0150_Init:
     ld   [wDC5B], A                                    ;; 00:02f1 $ea $5b $dc
     ld   [wDC69], A                                    ;; 00:02f4 $ea $69 $dc
     ld   [wDB6A], A                                    ;; 00:02f7 $ea $6a $db
-    call call_00_0e3b_ClearGameState                                  ;; 00:02fa $cd $3b $0e
-    call call_00_0e62_ResetDD6AAndVRAM                                  ;; 00:02fd $cd $62 $0e
+    call call_00_0e3b_ClearGameStateVariables                                  ;; 00:02fa $cd $3b $0e
+    call call_00_0e62_ResetFlagsAndVRAMState                                  ;; 00:02fd $cd $62 $0e
     ld   C, $00                                        ;; 00:0300 $0e $00
-    call call_00_0a6a                                  ;; 00:0302 $cd $6a $0a
+    call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:0302 $cd $6a $0a
     ld   C, $01                                        ;; 00:0305 $0e $01
-    call call_00_0a6a                                  ;; 00:0307 $cd $6a $0a
+    call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:0307 $cd $6a $0a
     ld   C, $02                                        ;; 00:030a $0e $02
-    call call_00_0a6a                                  ;; 00:030c $cd $6a $0a
+    call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:030c $cd $6a $0a
     ld   A, $e7                                        ;; 00:030f $3e $e7
-    call call_00_0e33_SetLCDControl                                  ;; 00:0311 $cd $33 $0e
+    call call_00_0e33_SetLCDControlRegister                                  ;; 00:0311 $cd $33 $0e
 .jp_00_0314:
     ld   A, [wDB6A]                                    ;; 00:0314 $fa $6a $db
     and  A, $10                                        ;; 00:0317 $e6 $10
@@ -271,7 +271,7 @@ call_00_0150_Init:
     ld   A, $01                                        ;; 00:033c $3e $01
     ld   HL, entry_01_432b_SetLevelMenuAndPalette                                     ;; 00:033e $21 $2b $43
     call call_00_0edd_CallAltBankFunc                                  ;; 00:0341 $cd $dd $0e
-    call call_00_0e3b_ClearGameState                                  ;; 00:0344 $cd $3b $0e
+    call call_00_0e3b_ClearGameStateVariables                                  ;; 00:0344 $cd $3b $0e
     call call_00_2f85_LoadAndSortCollectibleData                                  ;; 00:0347 $cd $85 $2f
     call call_00_2ff8_InitLevelObjectsAndConfig                                  ;; 00:034a $cd $f8 $2f
     call call_00_0595                                  ;; 00:034d $cd $95 $05
@@ -296,7 +296,7 @@ call_00_0150_Init:
     ld   [wDC50], A                                    ;; 00:037d $ea $50 $dc
     ld   A, $00                                        ;; 00:0380 $3e $00
     ld   [wDC78], A                                    ;; 00:0382 $ea $78 $dc
-    call call_00_0e3b_ClearGameState                                  ;; 00:0385 $cd $3b $0e
+    call call_00_0e3b_ClearGameStateVariables                                  ;; 00:0385 $cd $3b $0e
     call call_00_2f85_LoadAndSortCollectibleData                                  ;; 00:0388 $cd $85 $2f
     call call_00_2ff8_InitLevelObjectsAndConfig                                  ;; 00:038b $cd $f8 $2f
 .jp_00_038e:
@@ -379,7 +379,7 @@ call_00_0150_Init:
     call call_00_0edd_CallAltBankFunc                                  ;; 00:043d $cd $dd $0e
     call call_00_0513                                  ;; 00:0440 $cd $13 $05
 .jp_00_0443:
-    call call_00_0b92_UpdateVRAMTiles                                  ;; 00:0443 $cd $92 $0b
+    call call_00_0b92_WaitForInterrupt                                  ;; 00:0443 $cd $92 $0b
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:0446 $fa $d7 $da
     cp   A, $0f                                        ;; 00:0449 $fe $0f
     jp   Z, .jp_00_0267                                ;; 00:044b $ca $67 $02
@@ -416,9 +416,9 @@ call_00_0150_Init:
     call call_00_0f80_CheckInputStart                                  ;; 00:0496 $cd $80 $0f
     jr   Z, .jr_00_04d8                                ;; 00:0499 $28 $3d
     ld   A, $00                                        ;; 00:049b $3e $00
-    call call_00_0fa2_UpdateTileBankForNewID                                  ;; 00:049d $cd $a2 $0f
+    call call_00_0fa2_RequestSongBankAndPlay                                  ;; 00:049d $cd $a2 $0f
     ld   A, $00                                        ;; 00:04a0 $3e $00
-    call call_00_0fd7_ProcessBankedTileLoad                                  ;; 00:04a2 $cd $d7 $0f
+    call call_00_0fd7_TriggerSoundEffect                                  ;; 00:04a2 $cd $d7 $0f
     ld   [wDAD6_ReturnBank], A                                    ;; 00:04a5 $ea $d6 $da
     ld   A, $02                                        ;; 00:04a8 $3e $02
     ld   HL, entry_02_7132_BackupObjectTable                                     ;; 00:04aa $21 $32 $71
@@ -449,10 +449,10 @@ call_00_0150_Init:
     ld   HL, entry_02_7152_UpdateObjects                                     ;; 00:04e3 $21 $52 $71
     call call_00_0edd_CallAltBankFunc                                  ;; 00:04e6 $cd $dd $0e
     call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:04e9 $cd $c8 $11
-    call call_00_0fc8_ProcessQueuedBankChange                                  ;; 00:04ec $cd $c8 $0f
+    call call_00_0fc8_ProcessQueuedSoundEffect                                  ;; 00:04ec $cd $c8 $0f
     call call_00_150f_CheckAndSetLevelTrigger                                  ;; 00:04ef $cd $0f $15
     call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:04f2 $cd $fa $35
-    call call_00_08f8                                  ;; 00:04f5 $cd $f8 $08
+    call call_00_08f8_HandleObjectInteractionOrTriggerEvent                                  ;; 00:04f5 $cd $f8 $08
     jp   .jp_00_0443                                   ;; 00:04f8 $c3 $43 $04
 
 call_00_04fb:
@@ -461,10 +461,10 @@ call_00_04fb:
     ld   [wDE5F], A                                    ;; 00:04ff $ea $5f $de
     ld   A, $ff                                        ;; 00:0502 $3e $ff
     ld   [wDE5D], A                                    ;; 00:0504 $ea $5d $de
-    call call_00_0e3b_ClearGameState                                  ;; 00:0507 $cd $3b $0e
-    call call_00_0e62_ResetDD6AAndVRAM                                  ;; 00:050a $cd $62 $0e
+    call call_00_0e3b_ClearGameStateVariables                                  ;; 00:0507 $cd $3b $0e
+    call call_00_0e62_ResetFlagsAndVRAMState                                  ;; 00:050a $cd $62 $0e
     ld   A, $e7                                        ;; 00:050d $3e $e7
-    call call_00_0e33_SetLCDControl                                  ;; 00:050f $cd $33 $0e
+    call call_00_0e33_SetLCDControlRegister                                  ;; 00:050f $cd $33 $0e
     ret                                                ;; 00:0512 $c9
 
 call_00_0513:
@@ -518,8 +518,8 @@ call_00_0513:
     ld   HL, wDB69                                     ;; 00:0569 $21 $69 $db
     ld   [HL], $17                                     ;; 00:056c $36 $17
 .jr_00_056e:
-    call call_00_0b92_UpdateVRAMTiles                                  ;; 00:056e $cd $92 $0b
-    call call_00_08f8                                  ;; 00:0571 $cd $f8 $08
+    call call_00_0b92_WaitForInterrupt                                  ;; 00:056e $cd $92 $0b
+    call call_00_08f8_HandleObjectInteractionOrTriggerEvent                                  ;; 00:0571 $cd $f8 $08
     ld   A, [wDB66]                                    ;; 00:0574 $fa $66 $db
     and  A, $ff                                        ;; 00:0577 $e6 $ff
     jr   NZ, .jr_00_056e                               ;; 00:0579 $20 $f3
@@ -532,7 +532,7 @@ call_00_0513:
     call call_00_0edd_CallAltBankFunc                                  ;; 00:058a $cd $dd $0e
     ld   A, $01                                        ;; 00:058d $3e $01
     ld   [wDD6A], A                                    ;; 00:058f $ea $6a $dd
-    jp   call_00_0b92_UpdateVRAMTiles                                  ;; 00:0592 $c3 $92 $0b
+    jp   call_00_0b92_WaitForInterrupt                                  ;; 00:0592 $c3 $92 $0b
 
 call_00_0595:
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:0595 $21 $1e $dc
@@ -541,7 +541,7 @@ call_00_0595:
     ld   DE, $5a3                                      ;; 00:059b $11 $a3 $05
     add  HL, DE                                        ;; 00:059e $19
     ld   A, [HL]                                       ;; 00:059f $7e
-    jp   call_00_0fa2_UpdateTileBankForNewID                                  ;; 00:05a0 $c3 $a2 $0f
+    jp   call_00_0fa2_RequestSongBankAndPlay                                  ;; 00:05a0 $c3 $a2 $0f
     db   $04, $02, $12, $05, $03, $14, $17, $16        ;; 00:05a3 ..??????
     db   $16, $11, $11, $18                            ;; 00:05ab ????
 
@@ -729,7 +729,7 @@ call_00_06f6:
     ld   HL, wDB69                                     ;; 00:06ff $21 $69 $db
     set  1, [HL]                                       ;; 00:0702 $cb $ce
     ld   A, $0a                                        ;; 00:0704 $3e $0a
-    call call_00_0ff5_MaybeQueueBankChange                                  ;; 00:0706 $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 00:0706 $cd $f5 $0f
     ld   HL, wDC51                                     ;; 00:0709 $21 $51 $dc
     ld   A, [HL]                                       ;; 00:070c $7e
     and  A, A                                          ;; 00:070d $a7
@@ -751,7 +751,7 @@ call_00_0723:
     ld   HL, wDB69                                     ;; 00:0723 $21 $69 $db
     set  0, [HL]                                       ;; 00:0726 $cb $c6
     ld   A, $02                                        ;; 00:0728 $3e $02
-    call call_00_0ff5_MaybeQueueBankChange                                  ;; 00:072a $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 00:072a $cd $f5 $0f
     ld   HL, wDC68                                     ;; 00:072d $21 $68 $dc
     inc  [HL]                                          ;; 00:0730 $34
     ld   A, [HL]                                       ;; 00:0731 $7e
@@ -760,7 +760,7 @@ call_00_0723:
     cp   A, $64                                        ;; 00:0736 $fe $64
     ret  NZ                                            ;; 00:0738 $c0
     ld   A, $1e                                        ;; 00:0739 $3e $1e
-    call call_00_0ff5_MaybeQueueBankChange                                  ;; 00:073b $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 00:073b $cd $f5 $0f
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:073e $21 $1e $dc
     ld   L, [HL]                                       ;; 00:0741 $6e
     ld   H, $00                                        ;; 00:0742 $26 $00
@@ -841,7 +841,7 @@ jp_00_0781:
     ld   DE, wC000_BgMapTileIds                                     ;; 00:07a3 $11 $00 $c0
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:07a6 $cd $6e $07
     ld   C, $0a                                        ;; 00:07a9 $0e $0a
-    call call_00_0a6a                                  ;; 00:07ab $cd $6a $0a
+    call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:07ab $cd $6a $0a
     pop  HL                                            ;; 00:07ae $e1
     ld   BC, $1000                                     ;; 00:07af $01 $00 $10
 .jr_00_07b2:
@@ -1051,10 +1051,19 @@ jp_00_088a:
     dw   wDBE7                                         ;; 00:08f1 pP
     db   $08, $20, $4d, $40, $8f                       ;; 00:08f3 .....
 
-call_00_08f8:
+call_00_08f8_HandleObjectInteractionOrTriggerEvent:
+; This function appears to poll a status byte (wDB66) and processes a set of objects or entities to determine whether an event, trigger, or interaction should occur. It does so by checking and modifying various bits in memory, resolving object properties, and calculating function pointers.
+;
+; Key Actions:
+; - Waits for bit 7 of wDB66 to clear (a "ready" or "idle" flag).
+; - Checks bits 0, 1, and 2 to see if specific subroutines should be jumped to.
+; - Loops through object slots at wD840, checking status bits (bit 1 and 5), and acts on qualifying objects.
+; - Resolves function pointers using a table (.data_00_0a58_ObjectPropertyJumpTable) and object data from wDB61.
+; - Sets up memory locations for function execution.
+; - Marks the object slot as active again by setting bits 1 and 7 in wDB66.
     ld   HL, wDB66                                     ;; 00:08f8 $21 $66 $db
     bit  7, [HL]                                       ;; 00:08fb $cb $7e
-    jr   NZ, call_00_08f8                              ;; 00:08fd $20 $f9
+    jr   NZ, call_00_08f8_HandleObjectInteractionOrTriggerEvent                              ;; 00:08fd $20 $f9
     bit  2, [HL]                                       ;; 00:08ff $cb $56
     jp   NZ, .jp_00_0a52                               ;; 00:0901 $c2 $52 $0a
     bit  0, [HL]                                       ;; 00:0904 $cb $46
@@ -1155,7 +1164,7 @@ call_00_08f8:
     ld   L, A                                          ;; 00:09b6 $6f
     ld   H, $00                                        ;; 00:09b7 $26 $00
     add  HL, HL                                        ;; 00:09b9 $29
-    ld   DE, .data_00_0a58                                      ;; 00:09ba $11 $58 $0a
+    ld   DE, .data_00_0a58_ObjectPropertyJumpTable                                      ;; 00:09ba $11 $58 $0a
     add  HL, DE                                        ;; 00:09bd $19
     ld   A, [HL+]                                      ;; 00:09be $2a
     ld   H, [HL]                                       ;; 00:09bf $66
@@ -1253,18 +1262,29 @@ call_00_08f8:
     ld   HL, wDB66                                     ;; 00:0a52 $21 $66 $db
     set  7, [HL]                                       ;; 00:0a55 $cb $fe
     ret                                                ;; 00:0a57 $c9
-.data_00_0a58:
+.data_00_0a58_ObjectPropertyJumpTable:
+; Used to resolve which object function to run based on object type (wDB63).
     dw   .jr_00_0a17, .jr_00_0a17, .jr_00_0a29        ;; 00:0a58 ??
     dw   .jr_00_09c6, .jr_00_0a37, .jr_00_09db        ;; 00:0a5e ??????
     dw   .jr_00_09f0, .jr_00_0a01, .jr_00_0a41        ;; 00:0a64 pP
 
-call_00_0a6a:
+call_00_0a6a_LoadMapConfigAndWaitVBlank:
+; This function loads configuration data for a map or scene, stores it in working memory (wDC2B), 
+; adjusts tile bank offsets if needed, and waits for bit 2 of wDB66 to clear, 
+; likely indicating VBlank or scene loading finished.
+;
+; Key Actions:
+; - Indexes into .data_00_0aa9_TilesetLoadConfigTable using a value in register C to get map/scene config.
+; - Copies 8 bytes of data to wDC2B.
+; - If a certain flag is unset (wDC31 == $FF), calculates and writes tile offsets and assigns tile bank (wDC07).
+; - Sets bits 2 and 7 in wDB66.
+; - Waits for VBlank or completion signal (bit 2 of wDB66 cleared).
     ld   L, C                                          ;; 00:0a6a $69
     ld   H, $00                                        ;; 00:0a6b $26 $00
     add  HL, HL                                        ;; 00:0a6d $29
     add  HL, HL                                        ;; 00:0a6e $29
     add  HL, HL                                        ;; 00:0a6f $29
-    ld   DE, .data_00_0aa9                                      ;; 00:0a70 $11 $a9 $0a
+    ld   DE, .data_00_0aa9_TilesetLoadConfigTable                                      ;; 00:0a70 $11 $a9 $0a
     add  HL, DE                                        ;; 00:0a73 $19
     ld   DE, wDC2B                                     ;; 00:0a74 $11 $2b $dc
     ld   BC, $08                                       ;; 00:0a77 $01 $08 $00
@@ -1286,12 +1306,18 @@ call_00_0a6a:
     set  2, [HL]                                       ;; 00:0a9a $cb $d6
     set  7, [HL]                                       ;; 00:0a9c $cb $fe
 .jr_00_0a9e:
-    call call_00_0b92_UpdateVRAMTiles                                  ;; 00:0a9e $cd $92 $0b
+    call call_00_0b92_WaitForInterrupt                                  ;; 00:0a9e $cd $92 $0b
     ld   HL, wDB66                                     ;; 00:0aa1 $21 $66 $db
     bit  2, [HL]                                       ;; 00:0aa4 $cb $56
     jr   NZ, .jr_00_0a9e                               ;; 00:0aa6 $20 $f6
     ret                                                ;; 00:0aa8 $c9
-.data_00_0aa9:
+.data_00_0aa9_TilesetLoadConfigTable:
+; Each entry seems to have:
+; - Source address
+; - Destination address
+; - Size
+; - Mode/flags
+; Likely defines how to load a tileset.
     dw   $7800, $8000, $03c0, $010c                    ;; 00:0aa9 $78 $00
     dw   $7c00, $9c00, $0040, $010c                    ;; 00:0ab1 $00 $0c
     dw   $7bc0, $9c00, $0040, $000c                    ;; 00:0ab9 $00 $0c
@@ -1309,7 +1335,23 @@ call_00_0a6a:
     dw   $0100, $0502, $0d09, $8312                    ;; 00:0b19 .???????
     dw   $0e87, $1713                                  ;; 00:0b21 .???????
 
-jp_00_0b25:
+call_00_0b25_MainGameLoop_UpdateAndRenderFrame:
+; This function looks like the main game engine loop's frame handler, managing:
+; - Logic processing
+; - Rendering updates
+; - Palette transfer
+; - Scroll registers
+; - Double-buffered bank switching
+; It’s called each frame, updates the game state, handles the player/controller input, 
+; and finally waits for a proper rendering time based on LY.
+;
+; Key Actions:
+; - Calls hFF80, possibly a hardware/interrupt-related routine.
+; - Runs a subroutine from a pointer in wD9FE (game logic function).
+; - Reads joypad input and updates the display (scrolling, window, etc.).
+; - Loads palette data to hardware.
+; - Uses double-buffered or bank-switched VRAM access.
+; - Waits for LY (current scanline) to pass a threshold for proper frame pacing.
     push AF                                            ;; 00:0b25 $f5
     push BC                                            ;; 00:0b26 $c5
     push DE                                            ;; 00:0b27 $d5
@@ -1326,7 +1368,7 @@ jp_00_0b25:
     call call_00_0f22_JumpHL                                  ;; 00:0b3d $cd $22 $0f
     call call_00_0f31_ReadJoypadInput                                  ;; 00:0b40 $cd $31 $0f
     call call_00_0e81_LoadPalettesToHardware                                  ;; 00:0b43 $cd $81 $0e
-    ld   A, [wDAD8]                                    ;; 00:0b46 $fa $d8 $da
+    ld   A, [wDAD8_LCDControlMirror]                                    ;; 00:0b46 $fa $d8 $da
     ldh  [rLCDC], A                                    ;; 00:0b49 $e0 $40
     ld   A, [wDAD9]                                    ;; 00:0b4b $fa $d9 $da
     ldh  [rSCX], A                                     ;; 00:0b4e $e0 $43
@@ -1364,7 +1406,20 @@ jp_00_0b25:
     pop  AF                                            ;; 00:0b90 $f1
     reti                                               ;; 00:0b91 $d9
 
-call_00_0b92_UpdateVRAMTiles:
+call_00_0b92_WaitForInterrupt:
+; Waits until wDB6B is set to a non-zero value.
+; Clears wDB6B, then halts repeatedly until it changes,
+;
+; Likely Purpose:
+; WaitForInterrupt() is a function that halts execution until the next VBlank interrupt 
+; (or possibly HBlank, depending on timing needs). It helps:
+; Synchronize screen updates: Ensures that graphics updates happen between frames to avoid screen tearing.
+; Pace execution: Prevents the game from running logic too fast.
+; Wait for user input timing: Helps in detecting stable button states.
+;
+; In general:
+; This is typical Game Boy programming practice, as VBlank occurs ~60 times/sec and is the best 
+; moment to safely write to VRAM and OAM.
     xor  A, A                                          ;; 00:0b92 $af
     ld   [wDB6B], A                                    ;; 00:0b93 $ea $6b $db
 .jr_00_0b96:
@@ -1723,16 +1778,21 @@ label0E2F:
     jr   nz,label0E2F
     ret                             ;; 00:0e30 ...
 
-call_00_0e33_SetLCDControl:
-; Stores A into wDAD8 and rLCDC to change LCD control, 
-; then updates VRAM tiles (call_00_0b92_UpdateVRAMTiles).
-    ld   [wDAD8], A                                    ;; 00:0e33 $ea $d8 $da
+call_00_0e33_SetLCDControlRegister:
+; Purpose: Writes a value to both a RAM mirror (wDAD8_LCDControlMirror) and the LCDC hardware register (rLCDC), 
+; which controls screen enable, sprite settings, background, etc.
+; Then: Waits for an interrupt.
+; Use Case: Likely used when enabling/disabling the screen or adjusting rendering 
+; settings before/after screen updates.
+    ld   [wDAD8_LCDControlMirror], A                                    ;; 00:0e33 $ea $d8 $da
     ldh  [rLCDC], A                                    ;; 00:0e36 $e0 $40
-    jp   call_00_0b92_UpdateVRAMTiles                                  ;; 00:0e38 $c3 $92 $0b
+    jp   call_00_0b92_WaitForInterrupt                                  ;; 00:0e38 $c3 $92 $0b
 
-call_00_0e3b_ClearGameState:
-; Clears many RAM flags/variables (collision, timers, bank returns), 
-; calls a banked init function (entry_02_7123_ClearObjectSlots), then updates VRAM tiles.
+call_00_0e3b_ClearGameStateVariables:
+; Purpose: Clears/reset various RAM variables related to the game state and objects.
+; Then: Calls a function in bank 02 to clear object slots.
+; Then: Waits for interrupt.
+; Use Case: Prepares the game for a fresh state, probably at start of a level or menu.
     xor  A, A                                          ;; 00:0e3b $af
     ld   [wDC7E], A                                    ;; 00:0e3c $ea $7e $dc
     ld   [wDC20], A                                    ;; 00:0e3f $ea $20 $dc
@@ -1746,14 +1806,15 @@ call_00_0e3b_ClearGameState:
     ld   A, $02                                        ;; 00:0e57 $3e $02
     ld   HL, entry_02_7123_ClearObjectSlots                                     ;; 00:0e59 $21 $23 $71
     call call_00_0edd_CallAltBankFunc                                  ;; 00:0e5c $cd $dd $0e
-    jp   call_00_0b92_UpdateVRAMTiles                                  ;; 00:0e5f $c3 $92 $0b
+    jp   call_00_0b92_WaitForInterrupt                                  ;; 00:0e5f $c3 $92 $0b
 
-call_00_0e62_ResetDD6AAndVRAM:
-; Resets palette/tile flags, clears a 0x9F-byte buffer at wD900, 
-; and updates VRAM tiles. Used for state resets.
+call_00_0e62_ResetFlagsAndVRAMState:
+; Purpose: Resets some RAM variables (wDD6A, wDAD9, wDADA) and clears a chunk of RAM (wD900 to wD99F).
+; Then: Waits for interrupts at key points.
+; Use Case: VRAM/object state reset before loading new assets or scenes.
     xor  A, A                                          ;; 00:0e62 $af
     ld   [wDD6A], A                                    ;; 00:0e63 $ea $6a $dd
-    call call_00_0b92_UpdateVRAMTiles                                  ;; 00:0e66 $cd $92 $0b
+    call call_00_0b92_WaitForInterrupt                                  ;; 00:0e66 $cd $92 $0b
     xor  A, A                                          ;; 00:0e69 $af
     ld   [wDAD9], A                                    ;; 00:0e6a $ea $d9 $da
     ld   [wDADA], A                                    ;; 00:0e6d $ea $da $da
@@ -1762,7 +1823,7 @@ call_00_0e62_ResetDD6AAndVRAM:
     ld   BC, $9f                                       ;; 00:0e76 $01 $9f $00
     ld   [HL], $00                                     ;; 00:0e79 $36 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:0e7b $cd $6e $07
-    jp   call_00_0b92_UpdateVRAMTiles                                  ;; 00:0e7e $c3 $92 $0b
+    jp   call_00_0b92_WaitForInterrupt                                  ;; 00:0e7e $c3 $92 $0b
 
 call_00_0e81_LoadPalettesToHardware:
 ; If wDD6A=0, fills BG/OBJ palettes with default gray values. 
@@ -1937,13 +1998,13 @@ call_00_0f31_ReadJoypadInput:
     ld   [wDAD7_CurrentInputs], A                                    ;; 00:0f5a $ea $d7 $da
     ret                                                ;; 00:0f5d $c9
 
-call_00_0f5e_WaitForInputClear:
-; Continuously updates VRAM tiles and loops until wDAD7_CurrentInputs 
-; becomes zero (no buttons pressed).
-    call call_00_0b92_UpdateVRAMTiles                                  ;; 00:0f5e $cd $92 $0b
+call_00_0f5e_WaitUntilNoInputPressed:
+; Purpose: Waits until all buttons are released (wDAD7_CurrentInputs == 0).
+; Use Case: Used after menus or cutscenes to avoid unintended input carryover.
+    call call_00_0b92_WaitForInterrupt                                  ;; 00:0f5e $cd $92 $0b
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:0f61 $fa $d7 $da
     and  A, A                                          ;; 00:0f64 $a7
-    jr   NZ, call_00_0f5e_WaitForInputClear                              ;; 00:0f65 $20 $f7
+    jr   NZ, call_00_0f5e_WaitUntilNoInputPressed                              ;; 00:0f65 $20 $f7
     ret                                                ;; 00:0f67 $c9
 
 call_00_0f68_CheckInputLeft:
@@ -2002,19 +2063,22 @@ call_00_0f9c_CheckInputB:
     and  A, $02                                        ;; 00:0f9f $e6 $02
     ret                                                ;; 00:0fa1 $c9
 
-call_00_0fa2_UpdateTileBankForNewID:
-; Compares a new ID in A against $FF and the current ID at wDE5C.
-; If it changed, writes it, updates VRAM tiles (call_00_0b92_UpdateVRAMTiles), 
-; swaps nibbles to compute a bank index (wDE60), and calls two bank-switch helpers 
-; (call_00_0eee_SwitchBank and call_00_0f08_RestoreBank).
-; Usage: Manages background/tileset bank changes when a new tile set is requested.
+call_00_0fa2_RequestSongBankAndPlay:
+; Accepts an audio code in A.
+; If $FF (no song) or equal to the current song (wDE5C), it does nothing.
+; Otherwise, it stores the new code in wDE5C.
+; Waits for an interrupt (call_00_0b92_WaitForInterrupt)—this syncs playback changes to a safe frame.
+; Derives wDE60 as (wDE5C >> 4) & $0F (bank group) and uses it +4 to switch to the appropriate ROM bank.
+; Then isolates the lower nibble and calls entry_04_4006_Audio in bank 04 to start the track.
+; Finally restores the original bank (call_00_0f08_RestoreBank).
+; Summary: Changes music track safely by switching banks and calling the main audio engine.
     cp   A, $ff                                        ;; 00:0fa2 $fe $ff
     ret  Z                                             ;; 00:0fa4 $c8
     ld   HL, wDE5C                                     ;; 00:0fa5 $21 $5c $de
     cp   A, [HL]                                       ;; 00:0fa8 $be
     ret  Z                                             ;; 00:0fa9 $c8
     ld   [HL], A                                       ;; 00:0faa $77
-    call call_00_0b92_UpdateVRAMTiles                                  ;; 00:0fab $cd $92 $0b
+    call call_00_0b92_WaitForInterrupt                                  ;; 00:0fab $cd $92 $0b
     ld   A, [wDE5C]                                    ;; 00:0fae $fa $5c $de
     swap A                                             ;; 00:0fb1 $cb $37
     and  A, $0f                                        ;; 00:0fb3 $e6 $0f
@@ -2023,47 +2087,55 @@ call_00_0fa2_UpdateTileBankForNewID:
     call call_00_0eee_SwitchBank                                  ;; 00:0fba $cd $ee $0e
     ld   A, [wDE5C]                                    ;; 00:0fbd $fa $5c $de
     and  A, $0f                                        ;; 00:0fc0 $e6 $0f
-    call call_04_4006                                  ;; 00:0fc2 $cd $06 $40
+    call entry_04_4006_Audio                                  ;; 00:0fc2 $cd $06 $40
     jp   call_00_0f08_RestoreBank                                  ;; 00:0fc5 $c3 $08 $0f
 
-call_00_0fc8_ProcessQueuedBankChange:
-; Reads wDE5D (queued ID), clears it to $FF.
-; If valid, switches to bank $04, calls tile loading (call_04_4024) twice, 
-; updates wDE5F with a stored value, then switches back via call_00_0f08_RestoreBank.
-; Usage: Deferred processing of a requested bank/tile update after the previous one completed.
+call_00_0fc8_ProcessQueuedSoundEffect:
+; Loads the queued effect ID from wDE5D and clears that slot to $FF.
+; If it was $FF (none queued), clears wDE5E (priority) and exits.
+; Otherwise branches to call_00_0fd7_TriggerSoundEffect.
     ld   HL, wDE5D                                     ;; 00:0fc8 $21 $5d $de
     ld   A, [HL]                                       ;; 00:0fcb $7e
     ld   [HL], $ff                                     ;; 00:0fcc $36 $ff
     cp   A, $ff                                        ;; 00:0fce $fe $ff
-    jr   NZ, call_00_0fd7_ProcessBankedTileLoad                              ;; 00:0fd0 $20 $05
+    jr   NZ, call_00_0fd7_TriggerSoundEffect                              ;; 00:0fd0 $20 $05
     xor  A, A                                          ;; 00:0fd2 $af
     ld   [wDE5E], A                                    ;; 00:0fd3 $ea $5e $de
     ret                                                ;; 00:0fd6 $c9
 
-call_00_0fd7_ProcessBankedTileLoad:
-; If A≠$FF, switches to bank $04, calls tile loading in call_04_4024, 
-; saves/clears queued bank info (wDE5E/wDE5F), and restores previous bank.
+call_00_0fd7_TriggerSoundEffect:
+; Re-validates ID (not $FF).
+; Bank-switches to 04, calls entry_04_4024_Audio twice:
+; First with A=$00 (resets/flushes channels?),
+; Then with A=effect ID (plays the new effect).
+; Moves wDE5E (effect priority) into wDE5F after zeroing wDE5E.
+; Restores bank and exits.
+; Summary: Handles actually starting a queued sound effect in the audio engine.
     cp   A, $ff                                        ;; 00:0fd7 $fe $ff
     ret  Z                                             ;; 00:0fd9 $c8
     push AF                                            ;; 00:0fda $f5
     ld   A, $04                                        ;; 00:0fdb $3e $04
     call call_00_0eee_SwitchBank                                  ;; 00:0fdd $cd $ee $0e
     ld   A, $00                                        ;; 00:0fe0 $3e $00
-    call call_04_4024                                  ;; 00:0fe2 $cd $24 $40
+    call entry_04_4024_Audio                                  ;; 00:0fe2 $cd $24 $40
     pop  AF                                            ;; 00:0fe5 $f1
-    call call_04_4024                                  ;; 00:0fe6 $cd $24 $40
+    call entry_04_4024_Audio                                  ;; 00:0fe6 $cd $24 $40
     ld   HL, wDE5E                                     ;; 00:0fe9 $21 $5e $de
     ld   A, [HL]                                       ;; 00:0fec $7e
     ld   [HL], $00                                     ;; 00:0fed $36 $00
     ld   [wDE5F], A                                    ;; 00:0fef $ea $5f $de
     jp   call_00_0f08_RestoreBank                                  ;; 00:0ff2 $c3 $08 $0f
 
-call_00_0ff5_MaybeQueueBankChange:
-; Uses A as an index into a small table at .data_00_1037 → gets a priority/weight in B.
-; Checks several flags in the wDF68…wDF71 range (likely “busy” or “VRAM locked” flags).
-; If resources are free, and if the new request’s priority is not lower than the 
-; currently queued one (wDE5F/wDE5E), stores the new ID (wDE5D) and priority (wDE5E).
-; Usage: Chooses whether to queue a new bank/tile update based on system state and priority.
+call_00_0ff5_QueueSoundEffectWithPriority:
+; Accepts a sound effect code in A. If $FF, returns.
+; Uses .data_00_1037 as a priority lookup table: B = priorityTable[A].
+; Checks multiple channel-status bytes (wDF68–wDF72) to see if the sound hardware is busy.
+; If any channel active, compares B against wDE5F (currently playing effect priority) 
+; and returns early if the new effect is lower priority.
+; If no channels active or priority is higher/equal, also compares against
+; wDE5E (last queued priority) when a sound is already queued.
+; If it passes priority checks, stores the effect code in wDE5D and its priority in wDE5E.
+; Summary: Decides whether a new effect should replace the current/queued effect based on priority.
     cp   A, $ff                                        ;; 00:0ff5 $fe $ff
     ret  Z                                             ;; 00:0ff7 $c8
     ld   C, A                                          ;; 00:0ff8 $4f

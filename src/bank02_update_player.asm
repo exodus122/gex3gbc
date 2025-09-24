@@ -195,10 +195,14 @@ call_02_4ee7_MapCollisionFlags:
     db   $40, $00, $80, $04, $20, $06, $10, $02
     db   $60, $07, $a0, $05, $50, $01, $90, $03
 
-call_02_4f11_LevelCollisionToSound:
-; Combines wDABD|wDABE collision flags. If bit 7 isn’t set, chooses a sound/effect 
-; ID based on level and jumps to call_02_54f9_SwitchPlayerAction.
-; Purpose: Trigger level-specific sound or effect on collision.
+call_02_4f11_ChooseNextActionBasedOnLevel:
+; Reads two state flags (wDABD and wDABE) and ORs them together. 
+; If bit 7 is set (likely “player busy/disabled”), it returns immediately. 
+; Otherwise, it checks the current level ID (wDB6C_CurrentLevelId) to pick an action ID:
+; If level is 07h → $28.
+; If level is 08h → $35.
+; Otherwise → $11.
+; It then jumps to call_02_54f9_SwitchPlayerAction to switch the player's action/animation.
     ld   A, [wDABD]                                    ;; 02:4f11 $fa $bd $da
     ld   HL, wDABE                                     ;; 02:4f14 $21 $be $da
     or   A, [HL]                                       ;; 02:4f17 $b6

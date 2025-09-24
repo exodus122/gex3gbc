@@ -176,14 +176,14 @@ call_03_4c38_UpdateObjectCollision:
     add  HL, DE                                        ;; 03:4da8 $19
     set  4, [HL]                                       ;; 03:4da9 $cb $e6
     ld   A, $02                                        ;; 03:4dab $3e $02
-    call call_00_0ff5_MaybeQueueBankChange                                  ;; 03:4dad $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 03:4dad $cd $f5 $0f
     jp   call_03_5671                                    ;; 03:4db0 $c3 $71 $56
 .call_03_4db3:
     call call_03_550e                                  ;; 03:4db3 $cd $0e $55
     ret  NC                                            ;; 03:4db6 $d0
     call call_00_0723                                  ;; 03:4db7 $cd $23 $07
     ld   A, $02                                        ;; 03:4dba $3e $02
-    call call_00_0ff5_MaybeQueueBankChange                                  ;; 03:4dbc $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 03:4dbc $cd $f5 $0f
     jp   call_03_5671                                    ;; 03:4dbf $c3 $71 $56
 .call_03_4dc2:
     call call_03_550e                                  ;; 03:4dc2 $cd $0e $55
@@ -217,7 +217,7 @@ call_03_4c38_UpdateObjectCollision:
     set  1, [HL]                                       ;; 03:4df6 $cb $ce
 .jr_03_4df8:
     ld   A, $02                                        ;; 03:4df8 $3e $02
-    call call_00_0ff5_MaybeQueueBankChange                                  ;; 03:4dfa $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 03:4dfa $cd $f5 $0f
     jp   call_03_5671                                    ;; 03:4dfd $c3 $71 $56
 .data_03_4e00:
     db   $00, $20, $40, $80
@@ -254,7 +254,7 @@ call_03_4c38_UpdateObjectCollision:
     cp   a,$01
     ret  nz
     ld   a,$03
-    call call_00_0ff5_MaybeQueueBankChange
+    call call_00_0ff5_QueueSoundEffectWithPriority
     call entry_03_5671
     ld   c,$02
     jp   call_00_2299_SetObjectStatusLowNibble
@@ -267,7 +267,7 @@ call_03_4c38_UpdateObjectCollision:
     cp   A, $01                                        ;; 03:4e55 $fe $01
     ret  NZ                                            ;; 03:4e57 $c0
     ld   A, $19                                        ;; 03:4e58 $3e $19
-    call call_00_0ff5_MaybeQueueBankChange                                  ;; 03:4e5a $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 03:4e5a $cd $f5 $0f
     call call_00_2962_ObjectGetActionId                                  ;; 03:4e5d $cd $62 $29
     inc  A                                             ;; 03:4e60 $3c
     push AF                                            ;; 03:4e61 $f5
@@ -804,13 +804,13 @@ call_03_5671:
     ld   HL, entry_02_72ac_LoadObjectData                              ;; 03:56ad $21 $ac $72
     call call_00_0edd_CallAltBankFunc                                  ;; 03:56b0 $cd $dd $0e
     ld   A, $10                                        ;; 03:56b3 $3e $10
-    jp   call_00_0ff5_MaybeQueueBankChange                                  ;; 03:56b5 $c3 $f5 $0f
+    jp   call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 03:56b5 $c3 $f5 $0f
 .jr_03_56b8:
     ld   [HL], A                                       ;; 03:56b8 $77
     dec  L                                             ;; 03:56b9 $2d
     ld   [HL], $3c                                     ;; 03:56ba $36 $3c
     ld   A, $0f                                        ;; 03:56bc $3e $0f
-    jp   call_00_0ff5_MaybeQueueBankChange                                  ;; 03:56be $c3 $f5 $0f
+    jp   call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 03:56be $c3 $f5 $0f
 
 call_03_56c1:
     ld   a,[wD801_PlayerObject_ActionId]
