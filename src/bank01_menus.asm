@@ -466,9 +466,9 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   A, $01                                        ;; 01:42f8 $3e $01
     jp   call_00_0fd7_TriggerSoundEffect                                  ;; 01:42fa $c3 $d7 $0f
 
-entry_01_42fd_InitMenuTilebank15_LoadMenu03:
+entry_01_42fd_LoadMenu03_InitSong15:
 ; Behavior:
-; Loads tile bank $15 (via UpdateTileBankForNewID) and immediately jumps to LoadMenu with ID $03.
+; Requests song bank 15 and starts playback, then immediately jumps to LoadMenu with ID $03.
 ; Likely Purpose: Entry point to show a specific menu screen (e.g., pause/options).
     ld   A, $15                                        ;; 01:42fd $3e $15
     call call_00_0fa2_RequestSongBankAndPlay                                  ;; 01:42ff $cd $a2 $0f
@@ -477,7 +477,7 @@ entry_01_42fd_InitMenuTilebank15_LoadMenu03:
 
 call_01_4307_PreloadMenus_15to1A:
 ; Behavior:
-; Loads tile bank $19, then sequentially loads menus $15–$1A.
+; Requests song bank 19 and plays it, then sequentially loads menus $15–$1A.
 ; Likely Purpose: Preloads multiple menu assets into VRAM (like caching 
 ; graphics for level select or transitions).
     ld   A, $19                                        ;; 01:4307 $3e $19
@@ -498,7 +498,8 @@ call_01_4307_PreloadMenus_15to1A:
 
 entry_01_432b_SetLevelMenuAndPalette:
 ; Behavior:
-; Checks wDB6C_CurrentLevelId. If zero, returns. Otherwise updates tile bank $04, compares level ID to $07, and:
+; Checks wDB6C_CurrentLevelId. If zero, returns. Otherwise requests song bank 04 and plays it, 
+; compares level ID to $07, and:
 ; For ≥ $07: sets wDC59=1, loads menu $05, and stores a value into wDC5A.
 ; For < $07: sets wDC59=3, loads menu $07, and stores the same palette value.
 ; Likely Purpose: Chooses which menu/palette to display depending on current level group.
@@ -530,11 +531,16 @@ entry_01_435e_HandleLevelTransitionMenu:
 ; Behavior:
 ; Clears a flag bit in wDB6A.
 ; Copies CurrentLevelNumber to CurrentLevelId.
-; If a previous level ID exists (wDB6D), selects between tilebank $15 + menu $0A 
-; or tilebank $13 + menu $1B.
-; Otherwise, checks if the ID is a “late” level (≥$07, $09, $0A) to either preload a 
-; batch (call_01_4307) or show menu $09.
-; At the end, resets CurrentLevelId.
+; If that ID is 0, restores it from wDC5B and returns.
+; Otherwise, branching logic:
+;  - If [wDB6D] != 0:
+;    - If bit 5 of wDB6A is set: clear it, request song 15, load menu 0A.
+;  - Else: request song 13, load menu 1B.
+;  - If [wDB6D] == 0:
+;    - If LevelId ≥ 07 but not 09 or 0A → preload menus 15–1A.
+;    - Else if LevelId < 07 → request song 13, load menu 09.
+;    - Else (exact 09 or 0A) → same as above “song 13/menu 1B”.
+; At the end, clears wDB6C_CurrentLevelId (so the menu system takes over).
 ; Likely Purpose: Manages menu/graphics updates when transitioning between levels.
     ld   HL, wDB6A                                     ;; 01:435e $21 $6a $db
     res  4, [HL]                                       ;; 01:4361 $cb $a6

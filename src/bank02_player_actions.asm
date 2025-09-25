@@ -105,7 +105,7 @@ call_02_483e:
     ld   a,$05
     call call_00_0ff5_QueueSoundEffectWithPriority
     xor  a
-    jp   call_00_0624
+    jp   call_00_0624_SetPhase_TimersAndFlags
 
 call_02_484d:
     ld   HL, wD805                                     ;; 02:484d $21 $05 $d8
@@ -280,7 +280,7 @@ call_02_4989:
     ld   [wDC8C],a
     ld   [wDC8E],a
     call call_02_4e01_SetOneTimeFlag
-    call call_00_06f6
+    call call_00_06f6_HandleGenericHitResponse
     ld   a,$0B
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$14

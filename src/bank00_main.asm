@@ -401,7 +401,7 @@ call_00_0150_Init:
     jp   NZ, .jp_00_0357                               ;; 00:0471 $c2 $57 $03
     ld   [wDAD6_ReturnBank], A                                    ;; 00:0474 $ea $d6 $da
     ld   A, $01                                        ;; 00:0477 $3e $01
-    ld   HL, entry_01_42fd_InitMenuTilebank15_LoadMenu03                                     ;; 00:0479 $21 $fd $42
+    ld   HL, entry_01_42fd_LoadMenu03_InitSong15                                     ;; 00:0479 $21 $fd $42
     call call_00_0edd_CallAltBankFunc                                  ;; 00:047c $cd $dd $0e
     cp   A, $40                                        ;; 00:047f $fe $40
     jp   Z, .jp_00_02cc                                ;; 00:0481 $ca $cc $02
@@ -611,7 +611,12 @@ call_00_05fd:
     call call_00_0edd_CallAltBankFunc                                  ;; 00:0620 $cd $dd $0e
     ret                                                ;; 00:0623 $c9
 
-call_00_0624:
+call_00_0624_SetPhase_TimersAndFlags:
+; Acts like a state setter for variables around wDC5x–wDCAx.
+; Reads current state from wDC51, swaps with A, and depending on the old state (01–05) 
+; initializes timers/flags (wDCAA, wDCAB, wDCA8, wDCA9, wDCAE).
+; Special case for state 03: increments a counter, sets a flag in wDB69.
+; Looks like it initializes different “modes” or “phases” (timers controlling durations).
     ld   hl,wDC51
     ld   c,[hl]
     ld   [hl],a
@@ -619,7 +624,7 @@ call_00_0624:
     cp   a,$03
     jr   z,label0682
     cp   a,$04
-    jp   z,call_00_0723.jr_00_074b
+    jp   z,call_00_0723_IncrementProgressCounter.jr_00_074b
     cp   a,$01
     jr   z,label066C
     cp   a,$05
@@ -721,7 +726,11 @@ jp_00_06e8:
     call call_00_0edd_CallAltBankFunc                                  ;; 00:06f2 $cd $dd $0e
     ret                                                ;; 00:06f5 $c9
 
-call_00_06f6:
+call_00_06f6_HandleGenericHitResponse:
+; Calls call_00_0759 (a check routine). If it fails, exits.
+; If passes: sets timer wDC7E=3C, sets flag bit1 in wDB69, plays sound 0A.
+; Then manipulates wDC51 and wDC50 counters, decrementing until zero. If it hits 0, jumps to jp_00_0693.
+; This is a hit/interaction response handler with timers, sound, and state decrement.
     call call_00_0759                                  ;; 00:06f6 $cd $59 $07
     ret  NZ                                            ;; 00:06f9 $c0
     ld   A, $3c                                        ;; 00:06fa $3e $3c
@@ -747,7 +756,12 @@ call_00_06f6:
     jp   Z, jp_00_0693                                 ;; 00:071f $ca $93 $06
     ret                                                ;; 00:0722 $c9
 
-call_00_0723:
+call_00_0723_IncrementProgressCounter:
+; Sets flag bit0 in wDB69, plays sound 02.
+; Increments counter wDC68, triggers sound effects and sets a per-level 
+; completion flag when it reaches 0x32 or 0x64.
+; Also increments wDC4E but caps at 63.
+; Looks like it manages collectible counters / progress milestones.
     ld   HL, wDB69                                     ;; 00:0723 $21 $69 $db
     set  0, [HL]                                       ;; 00:0726 $cb $c6
     ld   A, $02                                        ;; 00:0728 $3e $02

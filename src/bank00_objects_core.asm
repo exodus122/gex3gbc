@@ -1,4 +1,6 @@
-call_00_21ef:
+call_00_21ef_PlaySound_1E:
+; Pushes BC (preserve), loads A=1E, calls QueueSoundEffectWithPriority, restores BC.
+; Just plays a fixed sound effect.
     push BC                                            ;; 00:21ef $c5
     ld   A, $1e                                        ;; 00:21f0 $3e $1e
     call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 00:21f2 $cd $f5 $0f

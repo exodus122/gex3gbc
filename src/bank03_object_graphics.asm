@@ -305,7 +305,7 @@ entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     ld   H, $d8                                        ;; 03:5f25 $26 $d8
     ld   A, [HL]                                       ;; 03:5f27 $7e
     cp   A, $ff                                        ;; 03:5f28 $fe $ff
-    call NZ, call_03_4c38_UpdateObjectCollision                              ;; 03:5f2a $c4 $38 $4c
+    call NZ, call_03_4c38_UpdateObjectCollision_Dispatch                              ;; 03:5f2a $c4 $38 $4c
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5f2d $fa $00 $da
     add  A, $20                                        ;; 03:5f30 $c6 $20
     jr   NZ, .jr_03_5f1f                               ;; 03:5f32 $20 $eb
@@ -776,7 +776,7 @@ call_03_615d_SetupCollectibleSprites:
     set  7, E                                          ;; 03:61cb $cb $fb
     ld   A, $ff                                        ;; 03:61cd $3e $ff
     ld   [DE], A                                       ;; 03:61cf $12
-    call call_00_0723                                  ;; 03:61d0 $cd $23 $07
+    call call_00_0723_IncrementProgressCounter                                  ;; 03:61d0 $cd $23 $07
     pop  DE                                            ;; 03:61d3 $d1
 .jr_03_61d4:
     inc  E                                             ;; 03:61d4 $1c

@@ -1,7 +1,9 @@
 call_02_582e:
+; call_02_582e_None
     ret                                                ;; 02:582e $c9
 
 call_02_582f:
+; call_02_582f_Destroy
     call call_00_288c_Object_Clear14
     call call_00_2b8b_HandleObjectFlag6ClearOrInit
     call call_00_2a5d_ObjectCheckFlag2
@@ -9,6 +11,7 @@ call_02_582f:
     ret  
 
 call_02_583c:
+; call_02_583c_DestroyWithParticles
     call call_00_29f5_ObjectClearCollisionFlagAndCheck                                  ;; 02:583c $cd $f5 $29
     jr   Z, .jr_02_5850                                ;; 02:583f $28 $0f
     ld   HL, .data_02_5857                             ;; 02:5841 $21 $57 $58
@@ -352,8 +355,10 @@ call_02_5ae4:
     jp   call_00_22b1_HandleObjectStateChange         
 
 call_02_5aee:    ;; 02:5aeb $c3 $b1 $22
-    db   $cd, $f5, $29, $20, $05, $0e, $02, $c3        ;; 02:5aee ????????
-    db   $b1, $22                                      ;; 02:5af6 ??
+    call call_00_29f5_ObjectClearCollisionFlagAndCheck
+    jr   nz,call_02_5af8
+    ld   c,$02
+    jp   call_00_22b1_HandleObjectStateChange
 
 call_02_5af8:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 02:5af8 $fa $1e $dc
@@ -611,7 +616,7 @@ label5CF0:
     call call_00_2a5d_ObjectCheckFlag2
     ret  z
     ld   c,$03
-    call call_00_21ef
+    call call_00_21ef_PlaySound_1E
     jp   call_00_2b7a_ClearObjectThenJump
 
 call_02_5d02:
@@ -1393,7 +1398,7 @@ call_02_63c0:
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   [wDAD6_ReturnBank],a
     ld   a,$03
-    ld   hl,entry_03_57f8
+    ld   hl,entry_03_57f8_ClearCollisionForObject
     call call_00_0edd_CallAltBankFunc
     jp   call_00_2b7a_ClearObjectThenJump
 
@@ -1476,13 +1481,12 @@ call_02_6459:
     ld   c,[hl]
     jp   call_00_294e_ObjectSet13
 .data_02_6467:
-    db   $10, $0e, $0c, $0a, $08        ;; 02:6464 ????????
-    db   $06, $04, $02
+    db   $10, $0e, $0c, $0a, $08, $06, $04, $02
 
 call_02_646f:
     ld   [wDAD6_ReturnBank],a
     ld   a,$03
-    ld   hl,entry_03_57f8
+    ld   hl,entry_03_57f8_ClearCollisionForObject
     call call_00_0edd_CallAltBankFunc
     ret  
 
@@ -1639,7 +1643,7 @@ call_02_6549:
     ret  c
     ld   [wDAD6_ReturnBank],a
     ld   a,$03
-    ld   hl,entry_03_57f8
+    ld   hl,entry_03_57f8_ClearCollisionForObject
     call call_00_0edd_CallAltBankFunc
     ld   a,$01
     jp   entry_02_72ac_LoadObjectData
@@ -2104,7 +2108,7 @@ call_02_693f:
     call entry_02_72ac_LoadObjectData
     ld   [wDAD6_ReturnBank],a
     ld   a,$03
-    ld   hl,entry_03_5671
+    ld   hl,entry_03_5671_HandleObjectHitOrRespawn
     call call_00_0edd_CallAltBankFunc
     ret  
 
@@ -2112,7 +2116,7 @@ call_02_6965:
     call call_00_2a5d_ObjectCheckFlag2
     ret  z
     ld   c,$01
-    call call_00_21ef
+    call call_00_21ef_PlaySound_1E
     jp   call_00_2b7a_ClearObjectThenJump
 
 call_02_6971:
@@ -2123,11 +2127,33 @@ call_02_6971:
     ld   a,$01
     jp   nz,entry_02_72ac_LoadObjectData
     
-    db   $7d        ;; 02:6977 ????????
-    db   $ee, $08, $6f, $6e, $26, $00, $29, $29        ;; 02:697f ????????
-    db   $11, $9f, $69, $19, $16, $d8, $fa, $00        ;; 02:6987 ????????
-    db   $da, $f6, $0e, $5f, $2a, $12, $1c, $2a        ;; 02:698f ????????
-    db   $12, $1c, $2a, $12, $1c, $7e, $12, $c9        ;; 02:6997 ????????
+call_02_697e:
+    ld   a,l
+    xor  a,$08
+    ld   l,a
+    ld   l,[hl]
+    ld   h,$00
+    add  hl,hl
+    add  hl,hl
+    ld   de,.data_02_699f
+    add  hl,de
+    ld   d,$D8
+    ld   a,[wDA00_CurrentObjectAddr]
+    or   a,$0E
+    ld   e,a
+    ldi  a,[hl]
+    ld   [de],a
+    inc  e
+    ldi  a,[hl]
+    ld   [de],a
+    inc  e
+    ldi  a,[hl]
+    ld   [de],a
+    inc  e
+    ld   a,[hl]
+    ld   [de],a
+    ret  
+.data_02_699f:
     db   $50, $00, $1c, $00, $50, $00, $1c, $00        ;; 02:699f ????????
     db   $50, $00, $1c, $00, $50, $00, $19, $00        ;; 02:69a7 ????????
 
@@ -2432,7 +2458,7 @@ label6BDC:
 
     ld   [wDAD6_ReturnBank],a
     ld   a,$03
-    ld   hl,entry_03_57f8
+    ld   hl,entry_03_57f8_ClearCollisionForObject
     call call_00_0edd_CallAltBankFunc
     call call_00_244a_Object_ApplyClampedVerticalVelocity
     call call_00_2780_Object_ComputeMapYDelta

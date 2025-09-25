@@ -99,6 +99,7 @@ wD904:
     ds 156                                             ;; d904
 
 wD9A0:
+; Interrupt code location?
     ds 93                                              ;; d9a0
 
 wD9FD:
