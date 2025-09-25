@@ -29,7 +29,7 @@ SECTION "entry", ROM0[$0100]
 
 entry:
     nop                                                ;; 00:0100 $00
-    jp   call_00_0150_Init                                   ;; 00:0101 $c3 $50 $01
+    jp   call_00_0150_Init                             ;; 00:0101 $c3 $50 $01
     ds   $30                                           ;; 00:0104
     db   "POCKET GEX3AXGE"                             ;; 00:0134
     db   CART_COMPATIBLE_GBC                           ;; 00:0143
@@ -149,7 +149,7 @@ call_00_0150_Init:
     stop                                               ;; 00:0222 $10 $00
 .jr_00_0224:
     ld   A, $00                                        ;; 00:0224 $3e $00
-    call call_00_0c1b                                  ;; 00:0226 $cd $1b $0c
+    call call_00_0c1b_LCDInterrupt_Setup                                  ;; 00:0226 $cd $1b $0c
     xor  A, A                                          ;; 00:0229 $af
     ldh  [rIF], A                                      ;; 00:022a $e0 $0f
     ld   A, $08                                        ;; 00:022c $3e $08
@@ -448,7 +448,7 @@ call_00_0513:
     ld   HL, wDB66                                     ;; 00:055f $21 $66 $db
     set  0, [HL]                                       ;; 00:0562 $cb $c6
     ld   A, $05                                        ;; 00:0564 $3e $05
-    call call_00_0c10                                  ;; 00:0566 $cd $10 $0c
+    call call_00_0c10_QueueVRAMCopyRequest                                  ;; 00:0566 $cd $10 $0c
     ld   HL, wDB69                                     ;; 00:0569 $21 $69 $db
     ld   [HL], $17                                     ;; 00:056c $36 $17
 .jr_00_056e:
@@ -887,7 +887,7 @@ call_00_0835_LoadFromTextBank1C:
     ld   [wDBA8], A                                    ;; 00:085f $ea $a8 $db
     jp   call_00_0f08_RestoreBank                                  ;; 00:0862 $c3 $08 $0f
 
-call_00_0865:
+call_00_0865_LoadFromTextBank1C:
     push de
     ld   a,$1C
     call call_00_0eee_SwitchBank
@@ -914,7 +914,13 @@ label0880:
     jr   nz,label0880
     jp   call_00_0f08_RestoreBank
 
-jp_00_088a:
+call_00_088a_HDMA_BackgroundAnimator:
+; Animated HDMA effect updater.
+; Increments counters, steps through a small table of structs,
+; and sets up rHDMA1–rHDMA5 for transfers.
+; Used for per-frame wavy/gradient background effects.
+; Purpose: This one handles HDMA-driven background animations (parallax, waves, etc.).
+; It’s only called if wDBE3 is nonzero (animation active).
     ld   A, [wDBE3]                                    ;; 00:088a $fa $e3 $db
     and  A, A                                          ;; 00:088d $a7
     ret  Z                                             ;; 00:088e $c8
@@ -927,7 +933,7 @@ jp_00_088a:
     jr   NZ, .jr_00_089e                               ;; 00:089b $20 $01
     ld   [HL], A                                       ;; 00:089d $77
 .jr_00_089e:
-    ld   DE, $8dc                                      ;; 00:089e $11 $dc $08
+    ld   DE, .data_00_08dc                                      ;; 00:089e $11 $dc $08
     ld   B, $04                                        ;; 00:08a1 $06 $04
 .jr_00_08a3:
     ld   A, [DE]                                       ;; 00:08a3 $1a
@@ -973,6 +979,7 @@ jp_00_088a:
     dec  B                                             ;; 00:08d6 $05
     jr   NZ, .jr_00_08a3                               ;; 00:08d7 $20 $ca
     jp   call_00_0f08_RestoreBank                                  ;; 00:08d9 $c3 $08 $0f
+.data_00_08dc:
     dw   wDBE4                                         ;; 00:08dc pP
     db   $08, $a0, $57, $80, $8f                       ;; 00:08de .....
     dw   wDBE5                                         ;; 00:08e3 pP
@@ -983,7 +990,9 @@ jp_00_088a:
     db   $08, $20, $4d, $40, $8f                       ;; 00:08f3 .....
 
 call_00_08f8_HandleObjectInteractionOrTriggerEvent:
-; This function appears to poll a status byte (wDB66) and processes a set of objects or entities to determine whether an event, trigger, or interaction should occur. It does so by checking and modifying various bits in memory, resolving object properties, and calculating function pointers.
+; This function appears to poll a status byte (wDB66) and processes a set of objects or entities to determine 
+; whether an event, trigger, or interaction should occur. It does so by checking and modifying various bits 
+; in memory, resolving object properties, and calculating function pointers.
 ;
 ; Key Actions:
 ; - Waits for bit 7 of wDB66 to clear (a "ready" or "idle" flag).
@@ -1271,21 +1280,24 @@ call_00_0b25_MainGameLoop_UpdateAndRenderFrame:
 ; and finally waits for a proper rendering time based on LY.
 ;
 ; Key Actions:
-; - Calls hFF80, possibly a hardware/interrupt-related routine.
-; - Runs a subroutine from a pointer in wD9FE (game logic function).
-; - Reads joypad input and updates the display (scrolling, window, etc.).
+; - Saves registers.
+; - Calls system update (hFF80, call_00_0b9f).
+; - Runs frame callback from wD9FE.
+; - Reads joypad input, updates palettes, writes scroll/window registers.
 ; - Loads palette data to hardware.
-; - Uses double-buffered or bank-switched VRAM access.
-; - Waits for LY (current scanline) to pass a threshold for proper frame pacing.
+; - Increments frame counter.
+; - Bank-switches and calls rendering code.
+; - Sets interrupt flag and waits until scanline passes certain points before continuing.
+; - Clears LCD interrupt flag and restores registers.
     push AF                                            ;; 00:0b25 $f5
     push BC                                            ;; 00:0b26 $c5
     push DE                                            ;; 00:0b27 $d5
     push HL                                            ;; 00:0b28 $e5
     call hFF80                                         ;; 00:0b29 $cd $80 $ff
-    call call_00_0b9f                                  ;; 00:0b2c $cd $9f $0b
+    call call_00_0b9f_Frame_TilemapUpdateHandler                                  ;; 00:0b2c $cd $9f $0b
     ld   A, [wD9FD]                                    ;; 00:0b2f $fa $fd $d9
     bit  7, A                                          ;; 00:0b32 $cb $7f
-    call Z, call_00_0c1b                               ;; 00:0b34 $cc $1b $0c
+    call Z, call_00_0c1b_LCDInterrupt_Setup                               ;; 00:0b34 $cc $1b $0c
     ld   HL, wD9FE                                     ;; 00:0b37 $21 $fe $d9
     ld   A, [HL+]                                      ;; 00:0b3a $2a
     ld   H, [HL]                                       ;; 00:0b3b $66
@@ -1355,7 +1367,16 @@ call_00_0b92_WaitForInterrupt:
     jr   Z, .jr_00_0b96                                ;; 00:0b9c $28 $f8
     ret                                                ;; 00:0b9e $c9
 
-call_00_0b9f:
+call_00_0b9f_Frame_TilemapUpdateHandler:
+;; Bank switch to 3.
+; Checks wDC20 flags (bit 7 is a “dirty” flag).
+; If set, applies queued tilemap updates:
+;   - if low 2 bits set → update block (`75e3`)
+;   - if bits 2–3 set  → update column (`7664`)
+; Clears wDC20 afterwards.
+; If no updates, calls status bar and animated background update.
+; Purpose: This is the frame entry point for tilemap updates.
+; It either processes pending updates (via buffers), or if nothing queued, it runs HUD/background effects.
     ld   A, $03                                        ;; 00:0b9f $3e $03
     call call_00_0f25_AltSwitchBank                                  ;; 00:0ba1 $cd $25 $0f
     ld   HL, wDC20                                     ;; 00:0ba4 $21 $20 $dc
@@ -1366,19 +1387,22 @@ call_00_0b9f:
     and  A, $0f                                        ;; 00:0bb0 $e6 $0f
     jr   Z, .jr_00_0bc6                                ;; 00:0bb2 $28 $12
     and  A, $03                                        ;; 00:0bb4 $e6 $03
-    call NZ, call_03_75e3_CopyMetatileBanked                              ;; 00:0bb6 $c4 $e3 $75
+    call NZ, call_03_75e3_Tilemap_UpdateBlockFromBuffer                              ;; 00:0bb6 $c4 $e3 $75
     ld   A, [wDC20]                                    ;; 00:0bb9 $fa $20 $dc
     and  A, $0c                                        ;; 00:0bbc $e6 $0c
-    call NZ, call_03_7664_CopyColumnBanked                              ;; 00:0bbe $c4 $64 $76
+    call NZ, call_03_7664_Tilemap_UpdateColumnFromBuffer                              ;; 00:0bbe $c4 $64 $76
     xor  A, A                                          ;; 00:0bc1 $af
     ld   [wDC20], A                                    ;; 00:0bc2 $ea $20 $dc
     ret                                                ;; 00:0bc5 $c9
 .jr_00_0bc6:
     call call_03_747d_StatusBar_UpdateOrTiles                                  ;; 00:0bc6 $cd $7d $74
     call call_03_753e_AnimatedBackground_HDMA                                  ;; 00:0bc9 $cd $3e $75
-    jp   jp_00_088a                                    ;; 00:0bcc $c3 $8a $08
+    jp   call_00_088a_HDMA_BackgroundAnimator                                    ;; 00:0bcc $c3 $8a $08
 
-jp_00_0bcf:
+jp_00_0bcf_CopyBlock16BytesLoop:
+; What it does:
+; A tight copy loop: copies 16 bytes from [HL+] to [DE], decrements counter B, and repeats until zero.
+; Generic block-copy routine used by the transfer queue.
     ld   A, [HL+]                                      ;; 00:0bcf $2a
     ld   [DE], A                                       ;; 00:0bd0 $12
     inc  E                                             ;; 00:0bd1 $1c
@@ -1428,12 +1452,26 @@ jp_00_0bcf:
     ld   [DE], A                                       ;; 00:0bfd $12
     inc  DE                                            ;; 00:0bfe $13
     dec  B                                             ;; 00:0bff $05
-    jr   NZ, jp_00_0bcf                                ;; 00:0c00 $20 $cd
+    jr   NZ, jp_00_0bcf_CopyBlock16BytesLoop                                ;; 00:0c00 $20 $cd
     ret                                                ;; 00:0c02 $c9
-    db   $fa, $fd, $d9, $e6, $7f, $fe, $00, $c8        ;; 00:0c03 ????????
-    db   $cd, $92, $0b, $18, $f3                       ;; 00:0c0b ?????
+    
+call_00_0c03_WaitForVRAMCopyCompletion:
+; What it does:
+; Polls wD9FD masked with $7F. If zero, returns. Otherwise, 
+; repeatedly calls call_00_0b92_WaitForInterrupt and loops.
+; Essentially “wait until VRAM safe period ends.”
+    ld   a,[wD9FD]
+    and  a,$7F
+    cp   a,$00
+    ret  z
+    call call_00_0b92_WaitForInterrupt
+    jr   call_00_0c03_WaitForVRAMCopyCompletion
 
-call_00_0c10:
+call_00_0c10_QueueVRAMCopyRequest:
+; What it does:
+; Ensures only one copy operation is queued at a time.
+; Takes accumulator A, ORs $80, compares against wD9FD. If same, return. Otherwise mask to 7 bits and write.
+; Likely a “request VRAM transfer” trigger.
     ld   HL, wD9FD                                     ;; 00:0c10 $21 $fd $d9
     or   A, $80                                        ;; 00:0c13 $f6 $80
     cp   A, [HL]                                       ;; 00:0c15 $be
@@ -1442,12 +1480,17 @@ call_00_0c10:
     ld   [HL], A                                       ;; 00:0c19 $77
     ret                                                ;; 00:0c1a $c9
 
-call_00_0c1b:
+call_00_0c1b_LCDInterrupt_Setup:
+; Sets up LCD STAT/LYC registers and DMA data.
+; Loads parameters from a table (call_00_0c44_LCDInterrupt_Table),
+; copies data into wD9A0, stores continuation pointer.
+; Purpose: This sets up an LCD interrupt handler configuration (STAT/LYC compare values, data to load on match).
+; Likely used for special scanline effects (split screen, color changes).
     ld   L, A                                          ;; 00:0c1b $6f
     or   A, $80                                        ;; 00:0c1c $f6 $80
     ld   [wD9FD], A                                    ;; 00:0c1e $ea $fd $d9
     ld   H, $00                                        ;; 00:0c21 $26 $00
-    ld   DE, .data_00_0c44                                      ;; 00:0c23 $11 $44 $0c
+    ld   DE, call_00_0c44_LCDInterrupt_Table                                      ;; 00:0c23 $11 $44 $0c
     add  HL, DE                                        ;; 00:0c26 $19
     ld   A, [HL+]                                      ;; 00:0c27 $2a
     ldh  [rSTAT], A                                    ;; 00:0c28 $e0 $41
@@ -1470,15 +1513,45 @@ call_00_0c1b:
     ld   A, H                                          ;; 00:0c3f $7c
     ld   [wD9FF], A                                    ;; 00:0c40 $ea $ff $d9
     ret                                                ;; 00:0c43 $c9
-.data_00_0c44:
-    db   $08, $00, $01, $53, $0c, $08, $00, $15        ;; 00:0c44 ........
-    db   $55, $0c, $08, $00, $01, $f8, $0d, $d9        ;; 00:0c4c ........
-    ret                                                ;; 00:0c54 $c9
-    db   $f5, $e5, $fa, $67, $db, $d6, $7f, $ca        ;; 00:0c55 ........
-    db   $8b, $0d, $3d, $ca, $c6, $0d, $21, $67        ;; 00:0c5d ........
-    db   $db, $34, $e1, $f1, $d9                       ;; 00:0c65 .....
 
-call_00_0c6a:
+call_00_0c44_LCDInterrupt_Table:
+; Table of interrupt handlers and parameters.
+; Contains a dispatcher that increments wDB67 and calls routines like 0d8b, 0dc6.
+; Purpose: This is a vector table and handler dispatcher for the STAT/LYC interrupts.
+; Different entries configure palette changes, etc.
+    ld   [entry],sp
+    ld   d,e
+    inc  c
+    ld   [$1500],sp
+    ld   d,l
+    inc  c
+    ld   [entry],sp
+    ld   hl,sp+$0D
+    reti 
+    ret  
+    push af
+    push hl
+    ld   a,[wDB67]
+    sub  a,$7F
+    jp   z,call_00_0d8b_Palette_UpdateBG
+    dec  a
+    jp   z,call_00_0dc6_HBlankInterrupt_LoadPaletteSlice
+    ld   hl,wDB67
+    inc  [hl]
+    pop  hl
+    pop  af
+    reti 
+
+call_00_0c6a_HandlePendingHDMATransfers:
+; What it does:
+; Clears wDB67.
+; Reads control flags from wDB66.
+; Depending on bits, it sets up HDMA transfers from different sources:
+; Bit 0 → copy tiles from wDAC0–wDAC2.
+; Bit 1 → copy tiles from wDB64–wDB65.
+; Bit 2 → perform a variable-length transfer using wDC2B–wDC32.
+; Manages VBK for VRAM bank selection when needed.
+; Clears the trigger bits after performing the transfer.
     xor  A, A                                          ;; 00:0c6a $af
     ld   [wDB67], A                                    ;; 00:0c6b $ea $67 $db
     ld   HL, wDB66                                     ;; 00:0c6e $21 $66 $db
@@ -1641,21 +1714,88 @@ call_00_0c6a:
     res  2, [HL]                                       ;; 00:0d86 $cb $96
     res  7, [HL]                                       ;; 00:0d88 $cb $be
     ret                                                ;; 00:0d8a $c9
-    db   $21, $be, $0d, $3e, $80, $e0, $68, $2a        ;; 00:0d8b ????????
-    db   $e0, $69, $2a, $e0, $69, $2a, $e0, $69        ;; 00:0d93 ????????
-    db   $2a, $e0, $69, $3e, $88, $e0, $68, $2a        ;; 00:0d9b ????????
-    db   $e0, $69, $2a, $e0, $69, $2a, $e0, $69        ;; 00:0da3 ????????
-    db   $2a, $e0, $69, $fa, $d8, $da, $e6, $fd        ;; 00:0dab ????????
-    db   $f6, $10, $e0, $40, $21, $67, $db, $34        ;; 00:0db3 ????????
-    db   $e1, $f1, $d9, $00, $00, $e0, $01, $00        ;; 00:0dbb ????????
-    db   $00, $e0, $01, $21, $f0, $0d, $3e, $84        ;; 00:0dc3 ????????
-    db   $e0, $68, $2a, $e0, $69, $2a, $e0, $69        ;; 00:0dcb ????????
-    db   $2a, $e0, $69, $2a, $e0, $69, $3e, $8c        ;; 00:0dd3 ????????
-    db   $e0, $68, $2a, $e0, $69, $2a, $e0, $69        ;; 00:0ddb ????????
-    db   $2a, $e0, $69, $2a, $e0, $69, $21, $67        ;; 00:0de3 ????????
-    db   $db, $34, $e1, $f1, $d9, $ff, $7f, $80        ;; 00:0deb ????????
-    db   $03, $ff, $03, $ff, $7f, $d9                  ;; 00:0df3 ?????.
-    call call_00_0c6a                                  ;; 00:0df9 $cd $6a $0c
+
+call_00_0d8b_Palette_UpdateBG:
+; Writes a set of palette data into rBCPS/BCPD (BG palettes).
+; Loads from .data_00_0dbe.
+; Purpose: Loads color data into background palettes.
+; Likely triggered by the LCD interrupt system (0c44).
+    ld   hl,.data_00_0dbe
+    ld   a,$80
+    ldh  [rBCPS],a
+    ldi  a,[hl]
+    ldh  [rBCPD],a
+    ldi  a,[hl]
+    ldh  [rBCPD],a
+    ldi  a,[hl]
+    ldh  [rBCPD],a
+    ldi  a,[hl]
+    ldh  [rBCPD],a
+    ld   a,$88
+    ldh  [rBCPS],a
+    ldi  a,[hl]
+    ldh  [rBCPD],a
+    ldi  a,[hl]
+    ldh  [rBCPD],a
+    ldi  a,[hl]
+    ldh  [rBCPD],a
+    ldi  a,[hl]
+    ldh  [rBCPD],a
+    ld   a,[wDAD8_LCDControlMirror]
+    and  a,$FD
+    or   a,$10
+    ldh  [rLCDC],a
+    ld   hl,wDB67
+    inc  [hl]
+    pop  hl
+    pop  af
+    reti 
+.data_00_0dbe
+    db   $00, $00, $e0, $01, $00, $00, $e0, $01
+    
+call_00_0dc6_HBlankInterrupt_LoadPaletteSlice:
+; What it does:
+; Writes a hardcoded set of 8 bytes (.data_00_0df0) into the CGB background palettes 
+; registers (rBCPS/rBCPD) — two full palette entries.
+; Then increments a counter at wDB67 (used as a “scanline mark” in the frame loop).
+; Pops registers and reti. Clearly an interrupt handler, specifically updating palettes.
+    ld   hl,.data_00_0df0
+    ld   a,$84
+    ldh  [rBCPS],a
+    ldi  a,[hl]
+    ldh  [rBCPD],a
+    ldi  a,[hl]
+    ldh  [rBCPD],a
+    ldi  a,[hl]
+    ldh  [rBCPD],a
+    ldi  a,[hl]
+    ldh  [rBCPD],a
+    ld   a,$8C
+    ldh  [rBCPS],a
+    ldi  a,[hl]
+    ldh  [rBCPD],a
+    ldi  a,[hl]
+    ldh  [rBCPD],a
+    ldi  a,[hl]
+    ldh  [rBCPD],a
+    ldi  a,[hl]
+    ldh  [rBCPD],a
+    ld   hl,wDB67
+    inc  [hl]
+    pop  hl
+    pop  af
+    reti 
+.data_00_0df0:
+    db   $ff, $7f, $80, $03, $ff, $03, $ff, $7f, $d9                  ;; 00:0df3 ?????.
+
+call_00_0df9_ProcessVRAMTransferQueue:
+; What it does:
+; First calls call_00_0c6a_HandlePendingHDMATransfers (HDMA/VRAM copy handler).
+; Then checks a counter at wDBEF. If nonzero, decrements it and uses wDBF0..wDBF7 
+; as a state structure to fetch source/destination pointers and a bank.
+; Sets up a copy loop through jp_00_0bcf_CopyBlock16BytesLoop, which transfers a block of data from 
+; ROM (after bank switching) into RAM/VRAM.
+    call call_00_0c6a_HandlePendingHDMATransfers                                  ;; 00:0df9 $cd $6a $0c
     jp   .jp_00_0dff                                   ;; 00:0dfc $c3 $ff $0d
 .jp_00_0dff:
     ld   HL, wDBEF                                     ;; 00:0dff $21 $ef $db
@@ -1686,7 +1826,7 @@ call_00_0c6a:
     ld   A, H                                          ;; 00:0e20 $7c
     ld   [wDBF7], A                                    ;; 00:0e21 $ea $f7 $db
     pop  HL                                            ;; 00:0e24 $e1
-    jp   jp_00_0bcf                                    ;; 00:0e25 $c3 $cf $0b
+    jp   jp_00_0bcf_CopyBlock16BytesLoop                                    ;; 00:0e25 $c3 $cf $0b
 
 call_00_0e28_Return:
 ; Empty routine—just returns.
@@ -1868,8 +2008,8 @@ call_00_0f08_RestoreBank:
 call_00_0f22_JumpHL:
 ; Jumps to the address in HL (tail-call helper).
     jp   HL                                            ;; 00:0f22 $e9
-    db   $3e, $03                                      ;; 00:0f23 ??
 
+    ld   a, $03                                      ;; 00:0f23 ??
 call_00_0f25_AltSwitchBank:
 ; Lightweight bank switch: writes A directly to MBC1RomBank 
 ; and SRAM bank. Used for quick bank changes.

@@ -209,7 +209,7 @@ DEF Object_unk3A                                       EQU $3A
 DEF Object_WesternStation_RockPlatform                 EQU $3B
 DEF Object_WesternStation_WalkerEnemy                  EQU $3C
 DEF Object_WesternStation_PlayingCard                  EQU $3D
-DEF Object_WesternStation_CeilingEnemy                 EQU $3E
+DEF Object_WesternStation_Bat                          EQU $3E
 DEF Object_WesternStation_RisingPlatform               EQU $3F
 DEF Object_AnimeChannel_Door                           EQU $40
 DEF Object_AnimeChannel_Door2                          EQU $41

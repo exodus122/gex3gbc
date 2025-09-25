@@ -5,7 +5,7 @@ wC000_BgMapTileIds:
 wC001_BgMapTileIds:
     ds 1023                                         ;; c001
 
-wC400: ; C400-CC00 is a copy of 03:4100-03:48FF but in a different order
+wC400_CollisionTilesetData: ; C400-CC00 is a copy of 03:4100-03:48FF but in a different order
 ; that is the collision tileset data, collectible sprites, and number sprites, and some code
     ds 1408                                            ;; c400
 
@@ -25,7 +25,10 @@ wCF80:
     ds 64                                              ;; cf80
 
 wCFC0:
-    ds 192                                            ;; cfc0
+    ds 64                                              ;; cfc0
+
+; $D000-$D07F seems unused?
+    ds 128 
 
 wD080: ; Collectible Map numbers
     ds 128

@@ -29,7 +29,7 @@ call_00_1056_LoadFullMap:
     ld   A, $03                                        ;; 00:1099 $3e $03
     call call_00_0eee_SwitchBank                                  ;; 00:109b $cd $ee $0e
     ld   HL, image_003_4100_collision_tileset                                     ;; 00:109e $21 $00 $41
-    ld   DE, wC400                                     ;; 00:10a1 $11 $00 $c4
+    ld   DE, wC400_CollisionTilesetData                                     ;; 00:10a1 $11 $00 $c4
 .jr_00_10a4:
     push DE                                            ;; 00:10a4 $d5
     ld   B, $08                                        ;; 00:10a5 $06 $08

@@ -626,7 +626,7 @@ call_01_43f0_MenuEngine_MainLoop:
     ld   [wDBDE], A                                    ;; 01:4400 $ea $de $db
     ld   [wDBE3], A                                    ;; 01:4403 $ea $e3 $db
     ld   A, $0a                                        ;; 01:4406 $3e $0a
-    call call_00_0c10                                  ;; 01:4408 $cd $10 $0c
+    call call_00_0c10_QueueVRAMCopyRequest                                  ;; 01:4408 $cd $10 $0c
     pop  HL                                            ;; 01:440b $e1
 .jr_01_440c:
     ld   A, L                                          ;; 01:440c $7d
@@ -1103,7 +1103,7 @@ call_01_477b_MenuState_NoOp:
 
 call_01_477c_DrawMenuNumberSprite:
 ; Description: Uses wDBA7 to compute sprite data offsets into wC980_NumbersSprites, 
-;then uses wDB7E to pick a number graphic, combines with data_01_66f9, and jumps to jp_00_0bcf (sprite draw). Likely draws a numeric value (e.g., score).
+;then uses wDB7E to pick a number graphic, combines with data_01_66f9, and jumps to jp_00_0bcf_CopyBlock16BytesLoop (sprite draw). Likely draws a numeric value (e.g., score).
     ld   HL, wDBA7                                     ;; 01:477c $21 $a7 $db
     ld   L, [HL]                                       ;; 01:477f $6e
     ld   H, $00                                        ;; 01:4780 $26 $00
@@ -1133,7 +1133,7 @@ call_01_477c_DrawMenuNumberSprite:
     ld   BC, data_01_66f9                              ;; 01:47a1 $01 $f9 $66
     add  HL, BC                                        ;; 01:47a4 $09
     ld   B, $04                                        ;; 01:47a5 $06 $04
-    jp   jp_00_0bcf                                    ;; 01:47a7 $c3 $cf $0b
+    jp   jp_00_0bcf_CopyBlock16BytesLoop                                    ;; 01:47a7 $c3 $cf $0b
 
 call_01_47aa_StoreCurrentMenuIndex:
 ; Description: Copies wDBA7 to wDBDD. Probably stores the current selection.
@@ -1168,7 +1168,7 @@ call_01_480c_MenuState_DrawWithOffset:
     ld   hl,wDADD
     ld   [hl],$80
     ld   de,call_01_4ab9_CountSetBitsInFlags.jr_01_4ac3
-    call call_00_0865
+    call call_00_0865_LoadFromTextBank1C
     call call_01_4acf_CountCollectedBitsForLevel
     add  a,$30
     ld   [wDADD],a

@@ -10,7 +10,7 @@ MACRO short_stop
 db $10
 ENDM
 
-; Far calls to another bank
+; Calls a function in a different bank
 MACRO farcall
     ld   [wDAD6_ReturnBank], a
 	ld   a, BANK(\1)

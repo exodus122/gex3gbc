@@ -61,7 +61,7 @@ data_02_4000:
     dw   .data_02_44ec ; Object_WesternStation_RockPlatform
     dw   .data_02_44fc ; Object_WesternStation_WalkerEnemy
     dw   .data_02_4510 ; Object_WesternStation_PlayingCard
-    dw   .data_02_4518 ; Object_WesternStation_CeilingEnemy
+    dw   .data_02_4518 ; Object_WesternStation_Bat
     dw   .data_02_452c ; Object_WesternStation_RisingPlatform
     dw   .data_02_4530 ; Object_AnimeChannel_Door
     dw   .data_02_4540 ; Object_AnimeChannel_Door2

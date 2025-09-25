@@ -64,7 +64,7 @@ object_names = [
     "Object_WesternStation_RockPlatform",
     "Object_WesternStation_WalkerEnemy",
     "Object_WesternStation_PlayingCard",
-    "Object_WesternStation_CeilingEnemy",
+    "Object_WesternStation_Bat",
     "Object_WesternStation_RisingPlatform",
     "Object_AnimeChannel_Door",
     "Object_AnimeChannel_Door2",

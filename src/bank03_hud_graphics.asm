@@ -201,19 +201,19 @@ call_03_757e_LoadHUDSprites_HDMA:
     push DE                                            ;; 03:75a1 $d5
     push DE                                            ;; 03:75a2 $d5
     ld   DE, $8400                                     ;; 03:75a3 $11 $00 $84
-    call call_03_75be_HDMA_CopyTileBlock                                  ;; 03:75a6 $cd $be $75
+    call call_03_75be_HDMA_CopyNumberTileBlock                                  ;; 03:75a6 $cd $be $75
     ld   C, $0a                                        ;; 03:75a9 $0e $0a
     ld   DE, $8420                                     ;; 03:75ab $11 $20 $84
-    call call_03_75be_HDMA_CopyTileBlock                                  ;; 03:75ae $cd $be $75
+    call call_03_75be_HDMA_CopyNumberTileBlock                                  ;; 03:75ae $cd $be $75
     pop  DE                                            ;; 03:75b1 $d1
     ld   C, D                                          ;; 03:75b2 $4a
     ld   DE, $8440                                     ;; 03:75b3 $11 $40 $84
-    call call_03_75be_HDMA_CopyTileBlock                                  ;; 03:75b6 $cd $be $75
+    call call_03_75be_HDMA_CopyNumberTileBlock                                  ;; 03:75b6 $cd $be $75
     pop  DE                                            ;; 03:75b9 $d1
     ld   C, E                                          ;; 03:75ba $4b
     ld   DE, $8460                                     ;; 03:75bb $11 $60 $84
 
-call_03_75be_HDMA_CopyTileBlock:
+call_03_75be_HDMA_CopyNumberTileBlock:
 ; Core routine for jp_03_757e. Calculates tile source address in image_003_4580 based 
 ; on index C and transfers 16×16-pixel tile data via HDMA to destination DE in VRAM bank 1.
     ld   L, C                                          ;; 03:75be $69
@@ -241,10 +241,13 @@ call_03_75be_HDMA_CopyTileBlock:
     ldh  [rVBK], A                                     ;; 03:75e0 $e0 $4f
     ret                                                ;; 03:75e2 $c9
 
-call_03_75e3_CopyMetatileBanked:
-; Copies a 32-byte metatile chunk from one of two source buffers (wCF80 or wCF00) into a VRAM 
-; destination determined by wDC21. Performs the transfer twice: once with VBK=1 (attribute layer) 
-; and once with VBK=0 (tile IDs).
+call_03_75e3_Tilemap_UpdateBlockFromBuffer:
+; Sets VRAM bank 1, reads tilemap pointer from wDC21,
+; copies a 32-byte metatile chunk (block) of data from scratch buffer (wCF80) into VRAM.
+; Then repeats for VRAM bank 0 with a different buffer (wCF00).
+; This routine sets up a destination in VRAM (DE) based on wDC21 (likely current tile update coordinates) 
+; and uses call_03_7604 to copy a fixed-size block of data from a RAM staging area into VRAM.
+; It does this once for VRAM bank 1 (attributes) and again for bank 0 (tile indices).
     ld   A, $01                                        ;; 03:75e3 $3e $01
     ldh  [rVBK], A                                     ;; 03:75e5 $e0 $4f
     ld   HL, wDC21                                     ;; 03:75e7 $21 $21 $dc
@@ -253,7 +256,7 @@ call_03_75e3_CopyMetatileBanked:
     ld   D, [HL]                                       ;; 03:75ed $56
     ld   E, A                                          ;; 03:75ee $5f
     ld   HL, wCF80                                     ;; 03:75ef $21 $80 $cf
-    call call_03_7604_Copy32Bytes                                  ;; 03:75f2 $cd $04 $76
+    call call_03_7604_MemCopy32Bytes                                  ;; 03:75f2 $cd $04 $76
     ld   A, $00                                        ;; 03:75f5 $3e $00
     ldh  [rVBK], A                                     ;; 03:75f7 $e0 $4f
     ld   HL, wDC21                                     ;; 03:75f9 $21 $21 $dc
@@ -263,9 +266,10 @@ call_03_75e3_CopyMetatileBanked:
     ld   E, A                                          ;; 03:7600 $5f
     ld   HL, wCF00                                     ;; 03:7601 $21 $00 $cf
 
-call_03_7604_Copy32Bytes:
-; Helper for call_03_75e3. Sequentially copies 32 bytes (16 words) from HL to DE, 
-; incrementing DE after each byte.
+call_03_7604_MemCopy32Bytes:
+; Copies 32 bytes sequentially from HL -> DE (VRAM).
+; This is a fixed unrolled loop that copies 32 bytes from the RAM buffer (HL) into VRAM ([DE]).
+; It increments DE after each write, so it’s just a fast DMA-like copy.
     ld   A, [HL+]                                      ;; 03:7604 $2a
     ld   [DE], A                                       ;; 03:7605 $12
     inc  E                                             ;; 03:7606 $1c
@@ -363,9 +367,13 @@ call_03_7604_Copy32Bytes:
     ld   [DE], A                                       ;; 03:7662 $12
     ret                                                ;; 03:7663 $c9
 
-call_03_7664_CopyColumnBanked:
-; Similar to call_03_75e3, but uses wDC23 to choose a tilemap column (mask $1F) in VRAM ($98xx). 
-; Transfers one column of tile IDs and attributes from buffers (wCFC0 and wCF40) to VRAM.
+call_03_7664_Tilemap_UpdateColumnFromBuffer:
+; Sets VRAM bank 1, computes tilemap address from wDC23,
+; copies a vertical strip from scratch buffer (wCFC0) into VRAM.
+; Repeats for VRAM bank 0 with wCF40.
+; This one differs from 75e3: instead of a block copy, it writes values 
+; spaced 32 tiles apart (adds BC=$20 after each).
+; That means it’s writing a vertical column of tiles/attributes into the tilemap at $9800 (BG map).
     ld   A, $01                                        ;; 03:7664 $3e $01
     ldh  [rVBK], A                                     ;; 03:7666 $e0 $4f
     ld   A, [wDC23]                                    ;; 03:7668 $fa $23 $dc
@@ -373,7 +381,7 @@ call_03_7664_CopyColumnBanked:
     ld   L, A                                          ;; 03:766d $6f
     ld   H, $98                                        ;; 03:766e $26 $98
     ld   DE, wCFC0                                     ;; 03:7670 $11 $c0 $cf
-    call call_03_7685_CopyColumn32Step                                  ;; 03:7673 $cd $85 $76
+    call call_03_7685_MemCopyColumn16                                  ;; 03:7673 $cd $85 $76
     ld   A, $00                                        ;; 03:7676 $3e $00
     ldh  [rVBK], A                                     ;; 03:7678 $e0 $4f
     ld   A, [wDC23]                                    ;; 03:767a $fa $23 $dc
@@ -382,10 +390,11 @@ call_03_7664_CopyColumnBanked:
     ld   H, $98                                        ;; 03:7680 $26 $98
     ld   DE, wCF40                                     ;; 03:7682 $11 $40 $cf
 
-call_03_7685_CopyColumn32Step:
-; Helper for call_03_7664. Copies an entire vertical column: for each step, 
-; writes a value from DE to HL, then advances HL by $20 (one BG tile row). 
-; Handles 32 rows for a full screen column.
+call_03_7685_MemCopyColumn16:
+; Core routine: copy 16 bytes from DE -> HL,
+; but each step jumps down one row in the BG map (HL += $20).
+; Takes DE (buffer in RAM) and writes its contents into a column of the BG map.
+; Used by call_03_7664.
     ld   BC, $20                                       ;; 03:7685 $01 $20 $00
     ld   A, [DE]                                       ;; 03:7688 $1a
     ld   [HL], A                                       ;; 03:7689 $77
