@@ -1,6 +1,6 @@
 SECTION "bank01", ROMX[$4000], BANK[$01]
 
-call_01_4000_MenuHandler_LoadAndProcess:
+entry_01_4000_MenuHandler_LoadAndProcess:
 ; Purpose:
 ; Initializes menu variables (wDBE9, wDBEA_MenuType, etc.) and copies menu-type–specific data into wDB92.
 ; Saves/restores the current level ID when transitioning to the menu.
@@ -98,10 +98,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     xor  A, A                                          ;; 01:4033 $af
     ld   [wDB6C_CurrentLevelId], A                                    ;; 01:4034 $ea $6c $db
 .jr_01_4037:
-    ld   [wDAD6_ReturnBank], A                                    ;; 01:4037 $ea $d6 $da
-    ld   A, $03                                        ;; 01:403a $3e $03
-    ld   HL, entry_03_6c89_LoadMapData                              ;; 01:403c $21 $89 $6c
-    call call_00_0edd_CallAltBankFunc                                  ;; 01:403f $cd $dd $0e
+    farcall entry_03_6c89_LoadMapData
     xor  A, A                                          ;; 01:4042 $af
     ld   [wDBEB], A                                    ;; 01:4043 $ea $eb $db
     ld   [wDBEC], A                                    ;; 01:4046 $ea $ec $db
@@ -141,10 +138,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4096 $cd $d7 $0f
     ld   A, [wDBE8]                                    ;; 01:4099 $fa $e8 $db
     ld   [wDB6C_CurrentLevelId], A                                    ;; 01:409c $ea $6c $db
-    ld   [wDAD6_ReturnBank], A                                    ;; 01:409f $ea $d6 $da
-    ld   A, $03                                        ;; 01:40a2 $3e $03
-    ld   HL, entry_03_6c89_LoadMapData                              ;; 01:40a4 $21 $89 $6c
-    call call_00_0edd_CallAltBankFunc                                  ;; 01:40a7 $cd $dd $0e
+    farcall entry_03_6c89_LoadMapData
     jp   .jp_01_4285                                   ;; 01:40aa $c3 $85 $42
 .jr_01_40ad:
     ld   A, [wDB95]                                    ;; 01:40ad $fa $95 $db
@@ -263,7 +257,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     cp   A, $20                                        ;; 01:4175 $fe $20
     ret  Z                                             ;; 01:4177 $c8
     ld   A, $04                                        ;; 01:4178 $3e $04
-    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:417a $cd $00 $40
+    call entry_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:417a $cd $00 $40
     jp   .jp_01_42a1                                   ;; 01:417d $c3 $a1 $42
 .jp_01_4180:
     call call_00_0f6e_CheckInputRight                                  ;; 01:4180 $cd $6e $0f
@@ -355,10 +349,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     jr   Z, .jr_01_4223                                ;; 01:421f $28 $02
     ld   [HL], $06                                     ;; 01:4221 $36 $06
 .jr_01_4223:
-    ld   [wDAD6_ReturnBank], A                                    ;; 01:4223 $ea $d6 $da
-    ld   A, $03                                        ;; 01:4226 $3e $03
-    ld   HL, entry_03_6c89_LoadMapData                              ;; 01:4228 $21 $89 $6c
-    call call_00_0edd_CallAltBankFunc                                  ;; 01:422b $cd $dd $0e
+    farcall entry_03_6c89_LoadMapData
     ld   HL, data_01_5692                              ;; 01:422e $21 $92 $56
     call call_01_4454_SetMenuPointer                                  ;; 01:4231 $cd $54 $44
     ld   A, $01                                        ;; 01:4234 $3e $01
@@ -372,10 +363,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     call call_00_0f5e_WaitUntilNoInputPressed                                  ;; 01:4247 $cd $5e $0f
     ld   A, [wDBE8]                                    ;; 01:424a $fa $e8 $db
     ld   [wDB6C_CurrentLevelId], A                                    ;; 01:424d $ea $6c $db
-    ld   [wDAD6_ReturnBank], A                                    ;; 01:4250 $ea $d6 $da
-    ld   A, $03                                        ;; 01:4253 $3e $03
-    ld   HL, entry_03_6c89_LoadMapData                              ;; 01:4255 $21 $89 $6c
-    call call_00_0edd_CallAltBankFunc                                  ;; 01:4258 $cd $dd $0e
+    farcall entry_03_6c89_LoadMapData
     ld   A, [wDB95]                                    ;; 01:425b $fa $95 $db
     and  A, A                                          ;; 01:425e $a7
     jr   Z, .jp_01_4285                                ;; 01:425f $28 $24
@@ -403,7 +391,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     call call_00_0f5e_WaitUntilNoInputPressed                                  ;; 01:4285 $cd $5e $0f
     ld   A, [wDBE9]                                    ;; 01:4288 $fa $e9 $db
     and  A, A                                          ;; 01:428b $a7
-    jp   NZ, call_01_4000_MenuHandler_LoadAndProcess                              ;; 01:428c $c2 $00 $40
+    jp   NZ, entry_01_4000_MenuHandler_LoadAndProcess                              ;; 01:428c $c2 $00 $40
     ret                                                ;; 01:428f $c9
 .jr_01_4290:
     ld   A, [wDBEA_MenuType]                                    ;; 01:4290 $fa $ea $db
@@ -415,7 +403,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
 .jp_01_42a1:
     call call_01_4f7e_SeedTileLookupTable                                  ;; 01:42a1 $cd $7e $4f
     ld   A, $01                                        ;; 01:42a4 $3e $01
-    jp   call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:42a6 $c3 $00 $40
+    jp   entry_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:42a6 $c3 $00 $40
 .jr_01_42a9:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 01:42a9 $fa $1e $dc
     and  A, A                                          ;; 01:42ac $a7
@@ -473,7 +461,7 @@ entry_01_42fd_LoadMenu03_InitSong15:
     ld   A, $15                                        ;; 01:42fd $3e $15
     call call_00_0fa2_RequestSongBankAndPlay                                  ;; 01:42ff $cd $a2 $0f
     ld   A, $03                                        ;; 01:4302 $3e $03
-    jp   call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4304 $c3 $00 $40
+    jp   entry_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4304 $c3 $00 $40
 
 call_01_4307_PreloadMenus_15to1A:
 ; Behavior:
@@ -483,17 +471,17 @@ call_01_4307_PreloadMenus_15to1A:
     ld   A, $19                                        ;; 01:4307 $3e $19
     call call_00_0fa2_RequestSongBankAndPlay                                  ;; 01:4309 $cd $a2 $0f
     ld   A, $15                                        ;; 01:430c $3e $15
-    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:430e $cd $00 $40
+    call entry_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:430e $cd $00 $40
     ld   A, $16                                        ;; 01:4311 $3e $16
-    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4313 $cd $00 $40
+    call entry_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4313 $cd $00 $40
     ld   A, $17                                        ;; 01:4316 $3e $17
-    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4318 $cd $00 $40
+    call entry_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4318 $cd $00 $40
     ld   A, $18                                        ;; 01:431b $3e $18
-    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:431d $cd $00 $40
+    call entry_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:431d $cd $00 $40
     ld   A, $19                                        ;; 01:4320 $3e $19
-    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4322 $cd $00 $40
+    call entry_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4322 $cd $00 $40
     ld   A, $1a                                        ;; 01:4325 $3e $1a
-    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4327 $cd $00 $40
+    call entry_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4327 $cd $00 $40
     ret                                                ;; 01:432a $c9
 
 entry_01_432b_SetLevelMenuAndPalette:
@@ -514,7 +502,7 @@ entry_01_432b_SetLevelMenuAndPalette:
     ld   A, $01                                        ;; 01:433c $3e $01
     ld   [wDC59], A                                    ;; 01:433e $ea $59 $dc
     ld   A, $05                                        ;; 01:4341 $3e $05
-    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4343 $cd $00 $40
+    call entry_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4343 $cd $00 $40
     ld   A, [wDBEC]                                    ;; 01:4346 $fa $ec $db
     ld   [wDC5A], A                                    ;; 01:4349 $ea $5a $dc
     ret                                                ;; 01:434c $c9
@@ -522,7 +510,7 @@ entry_01_432b_SetLevelMenuAndPalette:
     ld   A, $03                                        ;; 01:434d $3e $03
     ld   [wDC59], A                                    ;; 01:434f $ea $59 $dc
     ld   A, $07                                        ;; 01:4352 $3e $07
-    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4354 $cd $00 $40
+    call entry_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4354 $cd $00 $40
     ld   A, [wDBEC]                                    ;; 01:4357 $fa $ec $db
     ld   [wDC5A], A                                    ;; 01:435a $ea $5a $dc
     ret                                                ;; 01:435d $c9
@@ -557,13 +545,13 @@ entry_01_435e_HandleLevelTransitionMenu:
     ld   A, $15                                        ;; 01:4378 $3e $15
     call call_00_0fa2_RequestSongBankAndPlay                                  ;; 01:437a $cd $a2 $0f
     ld   A, $0a                                        ;; 01:437d $3e $0a
-    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:437f $cd $00 $40
+    call entry_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:437f $cd $00 $40
     jr   .jr_01_43ae                                   ;; 01:4382 $18 $2a
 .jr_01_4384:
     ld   A, $13                                        ;; 01:4384 $3e $13
     call call_00_0fa2_RequestSongBankAndPlay                                  ;; 01:4386 $cd $a2 $0f
     ld   A, $1b                                        ;; 01:4389 $3e $1b
-    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:438b $cd $00 $40
+    call entry_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:438b $cd $00 $40
     jr   .jr_01_43ae                                   ;; 01:438e $18 $1e
 .jr_01_4390:
     ld   A, [wDB6C_CurrentLevelId]                                    ;; 01:4390 $fa $6c $db
@@ -579,7 +567,7 @@ entry_01_435e_HandleLevelTransitionMenu:
     ld   A, $13                                        ;; 01:43a4 $3e $13
     call call_00_0fa2_RequestSongBankAndPlay                                  ;; 01:43a6 $cd $a2 $0f
     ld   A, $09                                        ;; 01:43a9 $3e $09
-    call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:43ab $cd $00 $40
+    call entry_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:43ab $cd $00 $40
 .jr_01_43ae:
     xor  A, A                                          ;; 01:43ae $af
     ld   [wDB6C_CurrentLevelId], A                                    ;; 01:43af $ea $6c $db
@@ -660,10 +648,7 @@ call_01_43f0_MenuEngine_MainLoop:
     bit  7, [HL]                                       ;; 01:4434 $cb $7e
     jr   NZ, .jr_01_4444                               ;; 01:4436 $20 $0c
     ld   C, [HL]                                       ;; 01:4438 $4e
-    ld   [wDAD6_ReturnBank], A                                    ;; 01:4439 $ea $d6 $da
-    ld   A, $03                                        ;; 01:443c $3e $03
-    ld   HL, entry_03_65c6_LoadMenuOrLevelPalettes                              ;; 01:443e $21 $c6 $65
-    call call_00_0edd_CallAltBankFunc                                  ;; 01:4441 $cd $dd $0e
+    farcall entry_03_65c6_LoadMenuOrLevelPalettes
 .jr_01_4444:
     call call_01_43ba_JumpToDynamicHandler                                  ;; 01:4444 $cd $ba $43
     ld   A, $d3                                        ;; 01:4447 $3e $d3
@@ -2395,6 +2380,7 @@ call_01_4f67_CopyTileBufferToBgMap:
     jr   NZ, .jr_01_4f6c                               ;; 01:4f7b $20 $ef
     ret                                                ;; 01:4f7d $c9
 
+entry_01_4f7e_SeedTileLookupTable:
 call_01_4f7e_SeedTileLookupTable:
 ; Description:
 ; Initializes wDB7E with $20 and copies it forward 17 bytes, 
@@ -2405,6 +2391,7 @@ call_01_4f7e_SeedTileLookupTable:
     ld   [HL], $20                                     ;; 01:4f87 $36 $20
     jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4f89 $c3 $6e $07
 
+entry_01_4f8c_BuildCollisionBitfieldAndChecksum:
 call_01_4f8c_BuildCollisionBitfieldAndChecksum:
 ; Description:
 ; Clears wDB72–wDB7D, seeds wDB73–wDB75 from wDC4E/AF/4F, then iterates through DC5C/DC5D data, 

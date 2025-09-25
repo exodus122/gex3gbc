@@ -24,8 +24,7 @@ call_00_22b1_HandleObjectStateChange:
 ; Similar indexing logic as 2299, but:
 ; Compares the current low nibble with C.
 ; If different, stores the old low nibble to wDAD6_ReturnBank.
-; Then calls an alternate-bank routine (entry_02_72ac_LoadObjectData) using bank-switch 
-; helper call_00_0EDD_CallAltBankFunc.
+; Then calls an alternate-bank routine (entry_02_72ac_LoadObjectData)
 ; Purpose: Detect a change in the object’s state nibble and, if changed, 
 ; trigger an alternate-bank handler for state transitions.
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:22b1 $fa $00 $da
@@ -43,10 +42,7 @@ call_00_22b1_HandleObjectStateChange:
     and  A, $0f                                        ;; 00:22c4 $e6 $0f
     cp   A, C                                          ;; 00:22c6 $b9
     ret  Z                                             ;; 00:22c7 $c8
-    ld   [wDAD6_ReturnBank], A                                    ;; 00:22c8 $ea $d6 $da
-    ld   A, $02                                        ;; 00:22cb $3e $02
-    ld   HL, entry_02_72ac_LoadObjectData                              ;; 00:22cd $21 $ac $72
-    call call_00_0edd_CallAltBankFunc                                  ;; 00:22d0 $cd $dd $0e
+    farcall entry_02_72ac_LoadObjectData
     ret                                                ;; 00:22d3 $c9
     
 call_00_22d4_CheckObjectSlotFlag:
@@ -1660,7 +1656,7 @@ call_00_2a98_HandlePlayerObjectInteraction:
 ; Resolves an object list index, computes a pointer to an object’s bounding box/metadata in memory.
 ; Compares the player’s X/Y positions against that object’s bounding box (series of sub/sbc, add, cp checks).
 ; If inside bounds, copies several bytes from the object’s data into the current object’s D8xx structure and 
-; triggers a banked function (entry_02_72ac_LoadObjectData) via call_00_0edd_CallAltBankFunc.
+; triggers a banked function (entry_02_72ac_LoadObjectData)
 ; Purpose: Detects when the player collides with or interacts with a special object and dispatches a handler.
     push de
     call call_00_230f_ResolveObjectListIndex
@@ -1733,10 +1729,7 @@ call_00_2a98_HandlePlayerObjectInteraction:
     xor  a
     ld   [de],a
     ld   a,[hl]
-    ld   [wDAD6_ReturnBank],a
-    ld   a,02
-    ld   hl,entry_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     ret  
 
 call_00_2afc_FindFreeObjectSlot:
@@ -1936,10 +1929,7 @@ call_00_2bbe_SpawnCollectibleObject:
     call call_00_2299_SetObjectStatusLowNibble                                  ;; 00:2be9 $cd $99 $22
     call call_00_2ba9_SetObjectStatusTo50                                  ;; 00:2bec $cd $a9 $2b
     xor  A, A                                          ;; 00:2bef $af
-    ld   [wDAD6_ReturnBank], A                                    ;; 00:2bf0 $ea $d6 $da
-    ld   A, $02                                        ;; 00:2bf3 $3e $02
-    ld   HL, entry_02_72ac_LoadObjectData                              ;; 00:2bf5 $21 $ac $72
-    call call_00_0edd_CallAltBankFunc                                  ;; 00:2bf8 $cd $dd $0e
+    farcall entry_02_72ac_LoadObjectData
     ld   HL, .data_02_2c01                                     ;; 00:2bfb $21 $01 $2c
     jp   call_00_2c20_ObjectPalette_CopyToBuffer                                  ;; 00:2bfe $c3 $20 $2c
 .data_02_2c01:

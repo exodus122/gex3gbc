@@ -57,10 +57,7 @@ entry_02_708f_InitObjectsAndSpawnPlayer:
     jr   NZ, .jr_02_7115                               ;; 02:7104 $20 $0f
     ld   A, L                                          ;; 02:7106 $7d
     ld   [wDA00_CurrentObjectAddr], A                                    ;; 02:7107 $ea $00 $da
-    ld   [wDAD6_ReturnBank], A                                    ;; 02:710a $ea $d6 $da
-    ld   A, $02                                        ;; 02:710d $3e $02
-    ld   HL, entry_02_5bb3                              ;; 02:710f $21 $b3 $5b
-    call call_00_0edd_CallAltBankFunc                                  ;; 02:7112 $cd $dd $0e
+    farcall entry_02_5bb3
 .jr_02_7115:
     call call_00_3252_ResetObjectCounter                                  ;; 02:7115 $cd $52 $32
 .jr_02_7118:
@@ -259,10 +256,7 @@ call_02_7152_UpdateObjects:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 02:723a $fa $00 $da
     add  A, $20                                        ;; 02:723d $c6 $20
     jr   NZ, .jr_02_7205                               ;; 02:723f $20 $c4
-    ld   [wDAD6_ReturnBank], A                                    ;; 02:7241 $ea $d6 $da
-    ld   A, $03                                        ;; 02:7244 $3e $03
-    ld   HL, entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision                                     ;; 02:7246 $21 $c1 $5e
-    call call_00_0edd_CallAltBankFunc                                  ;; 02:7249 $cd $dd $0e
+    farcall entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision
     ret                                                ;; 02:724c $c9
 
 call_02_724d_ProcessObjectTimerAndState:

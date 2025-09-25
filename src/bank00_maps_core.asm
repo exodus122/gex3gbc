@@ -7,10 +7,7 @@ call_00_1056_LoadFullMap:
     call call_00_0e62_ResetFlagsAndVRAMState                                  ;; 00:1059 $cd $62 $0e
     call call_00_10c7_InitRowOffsetTableForMap                                  ;; 00:105c $cd $c7 $10
     ld   C, $00                                        ;; 00:105f $0e $00
-    ld   [wDAD6_ReturnBank], A                                    ;; 00:1061 $ea $d6 $da
-    ld   A, $03                                        ;; 00:1064 $3e $03
-    ld   HL, entry_03_65c6_LoadMenuOrLevelPalettes                              ;; 00:1066 $21 $c6 $65
-    call call_00_0edd_CallAltBankFunc                                  ;; 00:1069 $cd $dd $0e
+    farcall entry_03_65c6_LoadMenuOrLevelPalettes
     ld   C, $03                                        ;; 00:106c $0e $03
     call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:106e $cd $6a $0a
     ld   C, $04                                        ;; 00:1071 $0e $04
@@ -47,10 +44,7 @@ call_00_1056_LoadFullMap:
     jr   NZ, .jr_00_10a4                               ;; 00:10af $20 $f3
     call call_00_0f08_RestoreBank                                  ;; 00:10b1 $cd $08 $0f
     call call_00_0b92_WaitForInterrupt                                  ;; 00:10b4 $cd $92 $0b
-    ld   [wDAD6_ReturnBank], A                                    ;; 00:10b7 $ea $d6 $da
-    ld   A, $02                                        ;; 00:10ba $3e $02
-    ld   HL, entry_02_72fb_UpdateMapWindow                                     ;; 00:10bc $21 $fb $72
-    call call_00_0edd_CallAltBankFunc                                  ;; 00:10bf $cd $dd $0e
+    farcall entry_02_72fb_UpdateMapWindow
     xor  A, A                                          ;; 00:10c2 $af
     ld   [wDC20], A                                    ;; 00:10c3 $ea $20 $dc
     ret                                                ;; 00:10c6 $c9
@@ -1588,20 +1582,11 @@ call_00_1ea0_LoadAndRunLevelScript:
     ld   A, $00                                        ;; 00:1ee5 $3e $00
     ld   [wDC78], A                                    ;; 00:1ee7 $ea $78 $dc
     call call_00_04fb                                  ;; 00:1eea $cd $fb $04
-    ld   [wDAD6_ReturnBank], A                                    ;; 00:1eed $ea $d6 $da
-    ld   A, $03                                        ;; 00:1ef0 $3e $03
-    ld   HL, entry_03_6c89_LoadMapData                              ;; 00:1ef2 $21 $89 $6c
-    call call_00_0edd_CallAltBankFunc                                  ;; 00:1ef5 $cd $dd $0e
-    ld   [wDAD6_ReturnBank], A                                    ;; 00:1ef8 $ea $d6 $da
-    ld   A, $03                                        ;; 00:1efb $3e $03
-    ld   HL, entry_03_6203_LoadLevelBoundariesFromId                                     ;; 00:1efd $21 $03 $62
-    call call_00_0edd_CallAltBankFunc                                  ;; 00:1f00 $cd $dd $0e
+    farcall entry_03_6c89_LoadMapData
+    farcall entry_03_6203_LoadLevelBoundariesFromId
     call call_00_10de_UpdatePlayerMapWindow                                  ;; 00:1f03 $cd $de $10
     call call_00_1056_LoadFullMap                                  ;; 00:1f06 $cd $56 $10
-    ld   [wDAD6_ReturnBank], A                                    ;; 00:1f09 $ea $d6 $da
-    ld   A, $02                                        ;; 00:1f0c $3e $02
-    ld   HL, entry_02_708f_InitObjectsAndSpawnPlayer                                     ;; 00:1f0e $21 $8f $70
-    call call_00_0edd_CallAltBankFunc                                  ;; 00:1f11 $cd $dd $0e
+    farcall entry_02_708f_InitObjectsAndSpawnPlayer
     call call_00_0513                                  ;; 00:1f14 $cd $13 $05
     pop  HL                                            ;; 00:1f17 $e1
     ld   E, [HL]                                       ;; 00:1f18 $5e
@@ -1635,10 +1620,7 @@ call_00_1ea0_LoadAndRunLevelScript:
 .jr_00_1f42:
     call call_00_0b92_WaitForInterrupt                                  ;; 00:1f42 $cd $92 $0b
     call call_00_217f_ApplyPlayerMovementFlags                                  ;; 00:1f45 $cd $7f $21
-    ld   [wDAD6_ReturnBank], A                                    ;; 00:1f48 $ea $d6 $da
-    ld   A, $02                                        ;; 00:1f4b $3e $02
-    ld   HL, entry_02_7152_UpdateObjects                                     ;; 00:1f4d $21 $52 $71
-    call call_00_0edd_CallAltBankFunc                                  ;; 00:1f50 $cd $dd $0e
+    farcall entry_02_7152_UpdateObjects
     call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:1f53 $cd $c8 $11
     call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:1f56 $cd $fa $35
     call call_00_08f8_HandleObjectInteractionOrTriggerEvent                                  ;; 00:1f59 $cd $f8 $08
@@ -1668,10 +1650,7 @@ call_00_1ea0_LoadAndRunLevelScript:
 .jr_00_1f7a:
     push AF                                            ;; 00:1f7a $f5
     call call_00_0b92_WaitForInterrupt                                  ;; 00:1f7b $cd $92 $0b
-    ld   [wDAD6_ReturnBank], A                                    ;; 00:1f7e $ea $d6 $da
-    ld   A, $02                                        ;; 00:1f81 $3e $02
-    ld   HL, entry_02_7152_UpdateObjects                                     ;; 00:1f83 $21 $52 $71
-    call call_00_0edd_CallAltBankFunc                                  ;; 00:1f86 $cd $dd $0e
+    farcall entry_02_7152_UpdateObjects
     call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:1f89 $cd $c8 $11
     call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:1f8c $cd $fa $35
     call call_00_08f8_HandleObjectInteractionOrTriggerEvent                                  ;; 00:1f8f $cd $f8 $08
@@ -1699,10 +1678,7 @@ call_00_1ea0_LoadAndRunLevelScript:
     ld   [HL], C                                       ;; 00:1faf $71
     pop  AF                                            ;; 00:1fb0 $f1
     ld   [wDB6C_CurrentLevelId], A                                    ;; 00:1fb1 $ea $6c $db
-    ld   [wDAD6_ReturnBank], A                                    ;; 00:1fb4 $ea $d6 $da
-    ld   A, $03                                        ;; 00:1fb7 $3e $03
-    ld   HL, entry_03_6c89_LoadMapData                              ;; 00:1fb9 $21 $89 $6c
-    call call_00_0edd_CallAltBankFunc                                  ;; 00:1fbc $cd $dd $0e
+    farcall entry_03_6c89_LoadMapData
     ret                                                ;; 00:1fbf $c9
 .data_00_1fc0:
     db   $ff, $ff, $ff, $ff, $00, $01, $02, $ff        ;; 00:1fc0 ...?www?

@@ -1,4 +1,4 @@
-; wRAM notes:
+; Relevant wRAM notes:
 ; Many are multi-collectible handlers (wDCC5–wDCCF).
 ; Others are slot managers (activate/clear/increment).
 ; A few are conditional transforms (load new object data depending on state or player).
@@ -6,7 +6,6 @@
 ; Transformations usually load new object data from a bank depending on state.
 ; Slot functions either set/clear/accumulate object slot values.
 ; Special flags (wDCD2, wDC88) are level or event triggers.
-
 
 call_03_4c38_UpdateObjectCollision_Dispatch:
 ; Main dispatcher: checks if collisions enabled (wDCA7).
@@ -16,7 +15,7 @@ call_03_4c38_UpdateObjectCollision_Dispatch:
     and  A, A                                          ;; 03:4c3b $a7
     ret  Z                                             ;; 03:4c3c $c8
     ld   H, $d8                                        ;; 03:4c3d $26 $d8
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:4c3f $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddr]                  ;; 03:4c3f $fa $00 $da
     or   A, $15                                        ;; 03:4c42 $f6 $15
     ld   L, A                                          ;; 03:4c44 $6f
     ld   A, [HL]                                       ;; 03:4c45 $7e
@@ -36,7 +35,7 @@ call_03_4c38_UpdateObjectCollision_Dispatch:
     res  7, L                                          ;; 03:4c56 $cb $bd
     ld   H, $00                                        ;; 03:4c58 $26 $00
     add  HL, HL                                        ;; 03:4c5a $29
-    ld   BC, .data_03_4c63_ObjectCollisionJumpTable                             ;; 03:4c5b $01 $63 $4c
+    ld   BC, .data_03_4c63_ObjectCollisionJumpTable    ;; 03:4c5b $01 $63 $4c
     add  HL, BC                                        ;; 03:4c5e $09
     ld   A, [HL+]                                      ;; 03:4c5f $2a
     ld   H, [HL]                                       ;; 03:4c60 $66
@@ -59,19 +58,44 @@ call_03_4c38_UpdateObjectCollision_Dispatch:
     dw   call_03_4e89_Collision_ObjectStateOrTransform                                 ;; 03:4c7d pP
     dw   call_03_4f23_Collision_ObjectCounterDecrement                                 ;; 03:4c7f pP
     dw   call_03_4f60_Collision_TripleCollectible_Counter
-    dw   call_03_4f8c_Collision_PlaySoundAndRemove, call_03_4f98_Collision_ObjectActivateIfAction5, call_03_4fad_Collision_TransformIfIdle        ;; 03:4c81 ????????
-    dw   call_03_4fca_Collision_TripleCollectible_TypeB, call_03_4ff1_Collision_TripleCollectible_TypeC, call_03_500d_Collision_IdleToLoadedTransform, call_03_50b6_Collision_TripleCollectible_WithSlot        ;; 03:4c89 ????????
-    dw   call_03_50e0_Collision_ActivateSlot, call_03_50ea_Collision_ClearSlot, call_03_50f4_Collision_SlotIncrementTransform, call_03_5116_Collision_ConditionalTransform_Sound18or1B        ;; 03:4c91 ????????
-    dw   call_03_5156_Collision_ConditionalTransform_Bank3, call_03_5196_Collision_RespawnOrActivateSlot, call_03_51b8_Collision_TransformOrSlotBurst, call_03_5201_Collision_TransformOrSlotSet        ;; 03:4c99 ????????
-    dw   call_03_5231_Collision_Counter4_LevelGate, call_03_5274_Collision_ClearSlot_OnType2, call_03_528c_Collision_TripleCollectible_Counter2, call_03_52aa_Collision_QuintCollectible_Counter3        ;; 03:4ca1 ????????
-    dw   call_03_52c8_Collision_FacingSensitiveHit, call_03_52da_Collision_RespawnOrTransform, call_03_52fa_Collision_ActionSwitchOrTransform, call_03_531a_Collision_SlotSetIfFlags        ;; 03:4ca9 ????????
-    dw   call_03_532f_Collision_DecrementCounterBank4, call_03_537a_Collision_SlotIndexAccumulator, call_03_538e_Collision_HeptCollectibleToBank1, call_03_53eb_Collision_Action2Transform        ;; 03:4cb1 ????????
-    dw   call_03_5406_Collision_ProximityTransform_Bank6, call_03_5469_Collision_ClearObjectAlways                            ;; 03:4cb9 ????
+    dw   call_03_4f8c_Collision_PlaySoundAndRemove
+    dw   call_03_4f98_Collision_ObjectActivateIfAction5
+    dw   call_03_4fad_Collision_TransformIfIdle        ;; 03:4c81 ????????
+    dw   call_03_4fca_Collision_TripleCollectible_TypeB
+    dw   call_03_4ff1_Collision_TripleCollectible_TypeC
+    dw   call_03_500d_Collision_IdleToLoadedTransform
+    dw   call_03_50b6_Collision_TripleCollectible_WithSlot        ;; 03:4c89 ????????
+    dw   call_03_50e0_Collision_ActivateSlot
+    dw   call_03_50ea_Collision_ClearSlot
+    dw   call_03_50f4_Collision_SlotIncrementTransform
+    dw   call_03_5116_Collision_ConditionalTransform_Sound18or1B        ;; 03:4c91 ????????
+    dw   call_03_5156_Collision_ConditionalTransform_Bank3
+    dw   call_03_5196_Collision_RespawnOrActivateSlot
+    dw   call_03_51b8_Collision_TransformOrSlotBurst
+    dw   call_03_5201_Collision_TransformOrSlotSet        ;; 03:4c99 ????????
+    dw   call_03_5231_Collision_Counter4_LevelGate
+    dw   call_03_5274_Collision_ClearSlot_OnType2
+    dw   call_03_528c_Collision_TripleCollectible_Counter2
+    dw   call_03_52aa_Collision_QuintCollectible_Counter3        ;; 03:4ca1 ????????
+    dw   call_03_52c8_Collision_FacingSensitiveHit
+    dw   call_03_52da_Collision_RespawnOrTransform
+    dw   call_03_52fa_Collision_ActionSwitchOrTransform
+    dw   call_03_531a_Collision_SlotSetIfFlags        ;; 03:4ca9 ????????
+    dw   call_03_532f_Collision_DecrementCounterBank4
+    dw   call_03_537a_Collision_SlotIndexAccumulator
+    dw   call_03_538e_Collision_HeptCollectibleToBank1
+    dw   call_03_53eb_Collision_Action2Transform        ;; 03:4cb1 ????????
+    dw   call_03_5406_Collision_ProximityTransform_Bank6
+    dw   call_03_5469_Collision_ClearObjectAlways                            ;; 03:4cb9 ????
     dw   call_03_5473_Collision_SetEvent81                                 ;; 03:4cbd pP
-    dw   call_03_5028_Collision_ConditionalTransformByDistance, call_03_5069_Collision_QuintCollectible, call_03_5085_Collision_TransformOrRespawnSwitch, call_03_5483_Collision_YMapTransform        ;; 03:4cbf ????????
+    dw   call_03_5028_Collision_ConditionalTransformByDistance
+    dw   call_03_5069_Collision_QuintCollectible
+    dw   call_03_5085_Collision_TransformOrRespawnSwitch
+    dw   call_03_5483_Collision_YMapTransform        ;; 03:4cbf ????????
     dw   call_03_54a8_Collision_PropertyBasedTransform                                   ;; 03:4cc7 ??
     dw   call_03_581a_CheckPlayerObjectCollision_Simple                                  ;; 03:4cc9 pP
-    dw   call_03_54ee_Collision_TransformBank0AndSetTimer, call_03_53c2_Collision_TransformIfFlagClear                           ;; 03:4ccb ????
+    dw   call_03_54ee_Collision_TransformBank0AndSetTimer
+    dw   call_03_53c2_Collision_TransformIfFlagClear                           ;; 03:4ccb ????
 
 call_03_4ccf_CollisionHandler_None:
 ; Does nothing, just returns.
@@ -144,10 +168,7 @@ call_03_4cea_TriggerPlayerActionChange:
     jr   Z, .jr_03_4d2c                                ;; 03:4d28 $28 $02
     ld   A, $09                                        ;; 03:4d2a $3e $09
 .jr_03_4d2c:
-    ld   [wDAD6_ReturnBank], A                                    ;; 03:4d2c $ea $d6 $da
-    ld   A, $02                                        ;; 03:4d2f $3e $02
-    ld   HL, entry_02_54f9_SwitchPlayerAction                             ;; 03:4d31 $21 $f9 $54
-    call call_00_0edd_CallAltBankFunc                                  ;; 03:4d34 $cd $dd $0e
+    farcall entry_02_54f9_SwitchPlayerAction
     ret                                                ;; 03:4d37 $c9
 
 call_03_4d38_Collision_PlayerHit_GenericOrRespawn:
@@ -201,10 +222,7 @@ call_03_4d44_Collision_PlayerHit_ActionChangeConditional:
     jr   z,.label4D8F
     ld   a,$09
 .label4D8F:
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,$54F9
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_54f9_SwitchPlayerAction
     ret  
 
 call_03_4d9b_Collision_PlayerHit_SetLevelFlag:
@@ -342,10 +360,7 @@ call_03_4e4b_Collision_PlayerHit_MultiStageCollectible:
     ld   C, A                                          ;; 03:4e63 $4f
     call call_00_2299_SetObjectStatusLowNibble                                  ;; 03:4e64 $cd $99 $22
     pop  AF                                            ;; 03:4e67 $f1
-    ld   [wDAD6_ReturnBank], A                                    ;; 03:4e68 $ea $d6 $da
-    ld   A, $02                                        ;; 03:4e6b $3e $02
-    ld   HL, entry_02_72ac_LoadObjectData                              ;; 03:4e6d $21 $ac $72
-    call call_00_0edd_CallAltBankFunc                                  ;; 03:4e70 $cd $dd $0e
+    farcall entry_02_72ac_LoadObjectData
     pop  AF                                            ;; 03:4e73 $f1
     cp   A, $02                                        ;; 03:4e74 $fe $02
     ret  NZ                                            ;; 03:4e76 $c0
@@ -432,10 +447,7 @@ call_03_4e89_Collision_ObjectStateOrTransform:
     ret                                                ;; 03:4ee9 $c9
 .jr_03_4eea:
     ld   A, $06                                        ;; 03:4eea $3e $06
-    ld   [wDAD6_ReturnBank], A                                    ;; 03:4eec $ea $d6 $da
-    ld   A, $02                                        ;; 03:4eef $3e $02
-    ld   HL, entry_02_72ac_LoadObjectData                              ;; 03:4ef1 $21 $ac $72
-    call call_00_0edd_CallAltBankFunc                                  ;; 03:4ef4 $cd $dd $0e
+    farcall entry_02_72ac_LoadObjectData
     jp   call_03_4cea_TriggerPlayerActionChange                                   ;; 03:4ef7 $c3 $ea $4c
 .data_03_4efa:
     db   $00, $01, $02, $03, $04, $05, $06, $07        ;; 03:4efa ???.????
@@ -456,10 +468,7 @@ call_03_4f23_Collision_ObjectCounterDecrement:
     cp   A, $01                                        ;; 03:4f27 $fe $01
     jp   NZ, call_03_4cea_TriggerPlayerActionChange                               ;; 03:4f29 $c2 $ea $4c
     ld   A, $04                                        ;; 03:4f2c $3e $04
-    ld   [wDAD6_ReturnBank], A                                    ;; 03:4f2e $ea $d6 $da
-    ld   A, $02                                        ;; 03:4f31 $3e $02
-    ld   HL, entry_02_72ac_LoadObjectData                              ;; 03:4f33 $21 $ac $72
-    call call_00_0edd_CallAltBankFunc                                  ;; 03:4f36 $cd $dd $0e
+    farcall entry_02_72ac_LoadObjectData
     call call_00_230f_ResolveObjectListIndex                                  ;; 03:4f39 $cd $0f $23
     ld   B, $00                                        ;; 03:4f3c $06 $00
     ld   HL, wDCD5                                     ;; 03:4f3e $21 $d5 $dc
@@ -541,10 +550,7 @@ call_03_4fad_Collision_TransformIfIdle:
     cp   a,$00
     ret  nz
     ld   a,$01
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     ret  
     
 call_03_4fca_Collision_TripleCollectible_TypeB:
@@ -602,10 +608,7 @@ call_03_500d_Collision_IdleToLoadedTransform:
     cp   a,$01
     ret  nz
     ld   a,$01
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     ret  
    
 call_03_5028_Collision_ConditionalTransformByDistance:
@@ -640,10 +643,7 @@ label504C:
     cp   a,$28
     ret  nc
     ld   a,$05
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     ret  
 
 call_03_5069_Collision_QuintCollectible:
@@ -682,17 +682,11 @@ call_03_5085_Collision_TransformOrRespawnSwitch:
     cp   a,$01
     jp   z,entry_03_5671_HandleObjectHitOrRespawn
     ld   a,$02
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     ret  
 label50A8:
     ld   a,$01
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     ret  
 
 call_03_50b6_Collision_TripleCollectible_WithSlot:
@@ -750,10 +744,7 @@ call_03_50f4_Collision_SlotIncrementTransform:
     ld   c,$01
     call call_00_2299_SetObjectStatusLowNibble
     ld   a,$01
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     jp   call_00_22e0_IncrementObjectSlot
     
 call_03_5116_Collision_ConditionalTransform_Sound18or1B:
@@ -787,10 +778,7 @@ label5143:
     ld   a,$18
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$01
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     ret  
 
 call_03_5156_Collision_ConditionalTransform_Bank3:
@@ -821,10 +809,7 @@ label5183:
     ld   a,$18
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$03
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     ret  
     
 call_03_5196_Collision_RespawnOrActivateSlot:
@@ -840,10 +825,7 @@ call_03_5196_Collision_RespawnOrActivateSlot:
     cp   a,$00
     jp   nz,call_00_22ef_SetObjectSlotActive
     ld   a,$02
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     ret  
     
 call_03_51b8_Collision_TransformOrSlotBurst:
@@ -865,10 +847,7 @@ call_03_51b8_Collision_TransformOrSlotBurst:
     ld   c,$02
     jp   z,call_00_2299_SetObjectStatusLowNibble
     ld   a,$03
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     ret  
 label51E3:
     call call_00_22ef_SetObjectSlotActive
@@ -878,10 +857,7 @@ label51E3:
     call call_00_2958_ObjectSetFacingDirection
     call call_00_2c67_Particle_InitBurst
     ld   a,$07
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     ret  
     
 call_03_5201_Collision_TransformOrSlotSet:
@@ -897,10 +873,7 @@ call_03_5201_Collision_TransformOrSlotSet:
     jr   z,label5222
     call call_03_4cea_TriggerPlayerActionChange
     ld   a,$02
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     jp   call_00_2410_SetDirectionFlag_PlayerLeft
 label5222:
     call call_00_2410_SetDirectionFlag_PlayerLeft
@@ -1029,10 +1002,7 @@ call_03_52da_Collision_RespawnOrTransform:
     cp   a,$03
     ret  z
     ld   a,$02
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     ret  
     
 call_03_52fa_Collision_ActionSwitchOrTransform:
@@ -1048,10 +1018,7 @@ call_03_52fa_Collision_ActionSwitchOrTransform:
     cp   a,$01
     ret  nz
     ld   a,$03
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     ret  
     
 call_03_531a_Collision_SlotSetIfFlags:
@@ -1085,10 +1052,7 @@ call_03_532f_Collision_DecrementCounterBank4:
     cp   a,$01
     jp   nz,call_03_4cea_TriggerPlayerActionChange
     ld   a,$04
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     call call_00_230f_ResolveObjectListIndex
     ld   b,$00
     ld   hl,wDCD5
@@ -1154,10 +1118,7 @@ call_03_538e_Collision_HeptCollectibleToBank1:
     ld   [wDCD2],a
 label53B0:
     ld   a,$01
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     ld   c,$02
     jp   call_00_2299_SetObjectStatusLowNibble
 
@@ -1180,10 +1141,7 @@ label53D6:
     and  a
     ret  nz
     ld   a,$01
-    ld   [wDAD6_ReturnBank],a
-    ld   a,02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     jp   call_03_4cea_TriggerPlayerActionChange
     
 call_03_53eb_Collision_Action2Transform:
@@ -1197,10 +1155,7 @@ call_03_53eb_Collision_Action2Transform:
     cp   a,$01
     ret  nz
     ld   a,$03
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     ret  
     
 call_03_5406_Collision_ProximityTransform_Bank6:
@@ -1268,10 +1223,7 @@ call_03_5406_Collision_ProximityTransform_Bank6:
     cp   a,$07
     ret  z
     ld   a,$06
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     ret  
     
 call_03_5469_Collision_ClearObjectAlways:
@@ -1309,10 +1261,7 @@ call_03_5483_Collision_YMapTransform:
 .jr_03_5497:
     call call_00_27cb_Object_SetYFromMap
     ld   a,$01
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     ret                                          ;; 03:5482 $c9
     
 call_03_54a8_Collision_PropertyBasedTransform:
@@ -1350,24 +1299,20 @@ call_03_54a8_Collision_PropertyBasedTransform:
     ld   c,$09
 label54E1:
     ld   a,c
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     ret  
     
 call_03_54ee_Collision_TransformBank0AndSetTimer:
 ; On collision: always triggers player action change, then transforms to bank0.
-; Also writes 0x3C to byte at offset 15.
     call call_03_550e_CheckPlayerObjectInteraction
     ret  nc
     call call_03_4cea_TriggerPlayerActionChange
     ld   a,$00
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$02
-    ld   hl,call_02_72ac_LoadObjectData
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_02_72ac_LoadObjectData
     ret  
+
+call_03_54f9:
+; Writes 0x3C to byte at offset 15.
     ld   a,[wDA00_CurrentObjectAddr]
     or   a,$15
     ld   l,a
@@ -1624,10 +1569,7 @@ call_03_5671_HandleObjectHitOrRespawn:
     pop  AF                                            ;; 03:56a5 $f1
 .jr_03_56a6:
     and  A, $3f                                        ;; 03:56a6 $e6 $3f
-    ld   [wDAD6_ReturnBank], A                                    ;; 03:56a8 $ea $d6 $da
-    ld   A, $02                                        ;; 03:56ab $3e $02
-    ld   HL, entry_02_72ac_LoadObjectData                              ;; 03:56ad $21 $ac $72
-    call call_00_0edd_CallAltBankFunc                                  ;; 03:56b0 $cd $dd $0e
+    farcall entry_02_72ac_LoadObjectData
     ld   A, $10                                        ;; 03:56b3 $3e $10
     jp   call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 03:56b5 $c3 $f5 $0f
 .jr_03_56b8:

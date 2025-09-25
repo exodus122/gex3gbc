@@ -496,10 +496,7 @@ call_00_2f00_CallBank2_Helper_AndCheckBit8:
     push HL                                            ;; 00:2f00 $e5
     push DE                                            ;; 00:2f01 $d5
     push BC                                            ;; 00:2f02 $c5
-    ld   [wDAD6_ReturnBank], A                                    ;; 00:2f03 $ea $d6 $da
-    ld   A, $02                                        ;; 00:2f06 $3e $02
-    ld   HL, entry_02_5541_GetActionPropertyByte                                     ;; 00:2f08 $21 $41 $55
-    call call_00_0edd_CallAltBankFunc                                  ;; 00:2f0b $cd $dd $0e
+    farcall entry_02_5541_GetActionPropertyByte
     pop  BC                                            ;; 00:2f0e $c1
     pop  DE                                            ;; 00:2f0f $d1
     pop  HL                                            ;; 00:2f10 $e1
@@ -813,10 +810,7 @@ call_00_3180_MarkInitialLevelObjects:
 .jr_00_31a3:
     push BC                                            ;; 00:31a3 $c5
     push BC                                            ;; 00:31a4 $c5
-    ld   [wDAD6_ReturnBank], A                                    ;; 00:31a5 $ea $d6 $da
-    ld   A, $01                                        ;; 00:31a8 $3e $01
-    ld   HL, entry_01_4ab9_CountSetBitsInFlags                                     ;; 00:31aa $21 $b9 $4a
-    call call_00_0edd_CallAltBankFunc                                  ;; 00:31ad $cd $dd $0e
+    farcall entry_01_4ab9_CountSetBitsInFlags
     pop  BC                                            ;; 00:31b0 $c1
     ld   HL, $31cd                                     ;; 00:31b1 $21 $cd $31
     add  HL, BC                                        ;; 00:31b4 $09
@@ -1345,14 +1339,8 @@ call_00_3618_HandleObjectSpawn:
     or   A, $40                                        ;; 00:3776 $f6 $40
     ld   [HL], A                                       ;; 00:3778 $77
     and  A, $0f                                        ;; 00:3779 $e6 $0f
-    ld   [wDAD6_ReturnBank], A                                    ;; 00:377b $ea $d6 $da
-    ld   A, $02                                        ;; 00:377e $3e $02
-    ld   HL, entry_02_72ac_LoadObjectData                                     ;; 00:3780 $21 $ac $72
-    call call_00_0edd_CallAltBankFunc                                  ;; 00:3783 $cd $dd $0e
-    ld   [wDAD6_ReturnBank], A                                    ;; 00:3786 $ea $d6 $da
-    ld   A, $03                                        ;; 00:3789 $3e $03
-    ld   HL, entry_03_687c_AssignObjectPalette                                     ;; 00:378b $21 $7c $68
-    call call_00_0edd_CallAltBankFunc                                  ;; 00:378e $cd $dd $0e
+    farcall entry_02_72ac_LoadObjectData
+    farcall entry_03_687c_AssignObjectPalette
     ret                                                ;; 00:3791 $c9
 
 call_00_3792_PrepareRelativeObjectSpawn:
@@ -1379,10 +1367,7 @@ call_00_37a0_SpawnObjectRelative:
     call call_00_2afc_FindFreeObjectSlot                                  ;; 00:37a0 $cd $fc $2a
     ret  Z                                             ;; 00:37a3 $c8
     push DE                                            ;; 00:37a4 $d5
-    ld   [wDAD6_ReturnBank], A                                    ;; 00:37a5 $ea $d6 $da
-    ld   A, $03                                        ;; 00:37a8 $3e $03
-    ld   HL, entry_03_59c6_IsObjectFlaggedHighBit                                     ;; 00:37aa $21 $c6 $59
-    call call_00_0edd_CallAltBankFunc                                  ;; 00:37ad $cd $dd $0e
+    farcall entry_03_59c6_IsObjectFlaggedHighBit
     ld   [wDCE9], A                                    ;; 00:37b0 $ea $e9 $dc
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:37b3 $fa $00 $da
     rlca                                               ;; 00:37b6 $07
@@ -1514,14 +1499,8 @@ call_00_37a0_SpawnObjectRelative:
     ld   [DE], A                                       ;; 00:384e $12
     call call_00_2a03_ResetObjectTempSlot                                  ;; 00:384f $cd $03 $2a
     xor  A, A                                          ;; 00:3852 $af
-    ld   [wDAD6_ReturnBank], A                                    ;; 00:3853 $ea $d6 $da
-    ld   A, $02                                        ;; 00:3856 $3e $02
-    ld   HL, entry_02_72ac_LoadObjectData                                     ;; 00:3858 $21 $ac $72
-    call call_00_0edd_CallAltBankFunc                                  ;; 00:385b $cd $dd $0e
-    ld   [wDAD6_ReturnBank], A                                    ;; 00:385e $ea $d6 $da
-    ld   A, $03                                        ;; 00:3861 $3e $03
-    ld   HL, entry_03_687c_AssignObjectPalette                                     ;; 00:3863 $21 $7c $68
-    call call_00_0edd_CallAltBankFunc                                  ;; 00:3866 $cd $dd $0e
+    farcall entry_02_72ac_LoadObjectData
+    farcall entry_03_687c_AssignObjectPalette
     pop  AF                                            ;; 00:3869 $f1
     ld   HL, wDA00_CurrentObjectAddr                                     ;; 00:386a $21 $00 $da
     ld   C, [HL]                                       ;; 00:386d $4e

@@ -9,3 +9,11 @@ ENDM
 MACRO short_stop
 db $10
 ENDM
+
+; Far calls to another bank
+MACRO farcall
+    ld   [wDAD6_ReturnBank], a
+	ld   a, BANK(\1)
+	ld   hl, \1
+	call call_00_0edd_FarCall
+ENDM

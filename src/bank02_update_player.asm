@@ -295,20 +295,11 @@ call_02_4f32_PlayerUpdateMain:
     call call_02_4ffb_DecTimerEveryCycle                                  ;; 02:4f9e $cd $fb $4f
     ld   HL, wDCAB                                     ;; 02:4fa1 $21 $ab $dc
     call call_02_4ffb_DecTimerEveryCycle                                  ;; 02:4fa4 $cd $fb $4f
-    ld   [wDAD6_ReturnBank], A                                    ;; 02:4fa7 $ea $d6 $da
-    ld   A, $03                                        ;; 02:4faa $3e $03
-    ld   HL, entry_03_6567_SetupObjectPalettes                              ;; 02:4fac $21 $67 $65
-    call call_00_0edd_CallAltBankFunc                                  ;; 02:4faf $cd $dd $0e
+    farcall entry_03_6567_SetupObjectPalettes
     call call_02_5081_Player_UpdateFacingAndMovementVector                                  ;; 02:4fb2 $cd $81 $50
-    ld   [wDAD6_ReturnBank], A                                    ;; 02:4fb5 $ea $d6 $da
-    ld   A, $03                                        ;; 02:4fb8 $3e $03
-    ld   HL, entry_03_46e0_UpdateBgCollision_MainDispatcher                             ;; 02:4fba $21 $e0 $46
-    call call_00_0edd_CallAltBankFunc                                  ;; 02:4fbd $cd $dd $0e
+    farcall entry_03_46e0_UpdateBgCollision_MainDispatcher
     call call_02_5267_PlatformSlopeAndTriggerHandler                                  ;; 02:4fc0 $cd $67 $52
-    ld   [wDAD6_ReturnBank], A                                    ;; 02:4fc3 $ea $d6 $da
-    ld   A, $03                                        ;; 02:4fc6 $3e $03
-    ld   HL, entry_03_4bb6_CacheNearbyTileValues                              ;; 02:4fc8 $21 $b6 $4b
-    call call_00_0edd_CallAltBankFunc                                  ;; 02:4fcb $cd $dd $0e
+    farcall entry_03_4bb6_CacheNearbyTileValues
     call call_02_5431_HandleActionTriggersAndEvents                                  ;; 02:4fce $cd $31 $54
     ld   HL, wDC79                                     ;; 02:4fd1 $21 $79 $dc
     ld   A, [HL]                                       ;; 02:4fd4 $7e
@@ -1106,10 +1097,7 @@ call_02_5431_HandleActionTriggersAndEvents:
     ld   A, [wD801_PlayerObject_ActionId]                                    ;; 02:54ae $fa $01 $d8
     cp   A, $22                                        ;; 02:54b1 $fe $22
     jr   Z, .jr_02_54d0                                ;; 02:54b3 $28 $1b
-    ld   [wDAD6_ReturnBank], A                                    ;; 02:54b5 $ea $d6 $da
-    ld   A, $03                                        ;; 02:54b8 $3e $03
-    ld   HL, entry_03_4c2e_IsTileType3D                              ;; 02:54ba $21 $2e $4c
-    call call_00_0edd_CallAltBankFunc                                  ;; 02:54bd $cd $dd $0e
+    farcall entry_03_4c2e_IsTileType3D
     jr   NZ, .jr_02_54d0                               ;; 02:54c0 $20 $0e
     xor  A, A                                          ;; 02:54c2 $af
     ld   [wDCA1], A                                    ;; 02:54c3 $ea $a1 $dc

@@ -306,10 +306,7 @@ call_02_5a83:
     bit  7, [HL]                                       ;; 02:5a91 $cb $7e
     jr   Z, .jr_02_5aaa                                ;; 02:5a93 $28 $15
     push HL                                            ;; 02:5a95 $e5
-    ld   [wDAD6_ReturnBank], A                                    ;; 02:5a96 $ea $d6 $da
-    ld   A, $01                                        ;; 02:5a99 $3e $01
-    ld   HL, entry_01_4ae7_CountLevelsWithFlag4                              ;; 02:5a9b $21 $e7 $4a
-    call call_00_0edd_CallAltBankFunc                                  ;; 02:5a9e $cd $dd $0e
+    farcall entry_01_4ae7_CountLevelsWithFlag4
     pop  HL                                            ;; 02:5aa1 $e1
     ld   C, [HL]                                       ;; 02:5aa2 $4e
     res  7, C                                          ;; 02:5aa3 $cb $b9
@@ -318,10 +315,7 @@ call_02_5a83:
     jr   .jr_02_5aca                                   ;; 02:5aa8 $18 $20
 .jr_02_5aaa:
     push HL                                            ;; 02:5aaa $e5
-    ld   [wDAD6_ReturnBank], A                                    ;; 02:5aab $ea $d6 $da
-    ld   A, $01                                        ;; 02:5aae $3e $01
-    ld   HL, entry_01_4ab9_CountSetBitsInFlags                              ;; 02:5ab0 $21 $b9 $4a
-    call call_00_0edd_CallAltBankFunc                                  ;; 02:5ab3 $cd $dd $0e
+    farcall entry_01_4ab9_CountSetBitsInFlags
     pop  HL                                            ;; 02:5ab6 $e1
     cp   A, [HL]                                       ;; 02:5ab7 $be
     jr   NC, .jr_02_5aca                               ;; 02:5ab8 $30 $10
@@ -371,10 +365,7 @@ call_02_5af8:
     bit  7, [HL]                                       ;; 02:5b06 $cb $7e
     jr   Z, .jr_02_5b1f                                ;; 02:5b08 $28 $15
     push HL                                            ;; 02:5b0a $e5
-    ld   [wDAD6_ReturnBank], A                                    ;; 02:5b0b $ea $d6 $da
-    ld   A, $01                                        ;; 02:5b0e $3e $01
-    ld   HL, entry_01_4ae7_CountLevelsWithFlag4                              ;; 02:5b10 $21 $e7 $4a
-    call call_00_0edd_CallAltBankFunc                                  ;; 02:5b13 $cd $dd $0e
+    farcall entry_01_4ae7_CountLevelsWithFlag4
     pop  HL                                            ;; 02:5b16 $e1
     ld   C, [HL]                                       ;; 02:5b17 $4e
     res  7, C                                          ;; 02:5b18 $cb $b9
@@ -383,10 +374,7 @@ call_02_5af8:
     jr   .jr_02_5b6e                                   ;; 02:5b1d $18 $4f
 .jr_02_5b1f:
     push HL                                            ;; 02:5b1f $e5
-    ld   [wDAD6_ReturnBank], A                                    ;; 02:5b20 $ea $d6 $da
-    ld   A, $01                                        ;; 02:5b23 $3e $01
-    ld   HL, entry_01_4ab9_CountSetBitsInFlags                              ;; 02:5b25 $21 $b9 $4a
-    call call_00_0edd_CallAltBankFunc                                  ;; 02:5b28 $cd $dd $0e
+    farcall entry_01_4ab9_CountSetBitsInFlags
     pop  HL                                            ;; 02:5b2b $e1
     cp   A, [HL]                                       ;; 02:5b2c $be
     jr   NC, .jr_02_5b6e                               ;; 02:5b2d $30 $3f
@@ -1396,10 +1384,7 @@ call_02_63a8:
 call_02_63c0:
     ld   a,$1A
     call call_00_0ff5_QueueSoundEffectWithPriority
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$03
-    ld   hl,entry_03_57f8_ClearCollisionForObject
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_03_57f8_ClearCollisionForObject
     jp   call_00_2b7a_ClearObjectThenJump
 
 call_02_63d3:
@@ -1484,10 +1469,7 @@ call_02_6459:
     db   $10, $0e, $0c, $0a, $08, $06, $04, $02
 
 call_02_646f:
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$03
-    ld   hl,entry_03_57f8_ClearCollisionForObject
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_03_57f8_ClearCollisionForObject
     ret  
 
 call_02_647b:
@@ -1641,10 +1623,7 @@ call_02_6549:
     call call_00_22d4_CheckObjectSlotFlag
     cp   a,$02
     ret  c
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$03
-    ld   hl,entry_03_57f8_ClearCollisionForObject
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_03_57f8_ClearCollisionForObject
     ld   a,$01
     jp   entry_02_72ac_LoadObjectData
     ld   a,[wDB6C_CurrentLevelId]
@@ -2106,10 +2085,7 @@ call_02_693f:
     ret  nz
     ld   a,$04
     call entry_02_72ac_LoadObjectData
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$03
-    ld   hl,entry_03_5671_HandleObjectHitOrRespawn
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_03_5671_HandleObjectHitOrRespawn
     ret  
 
 call_02_6965:
@@ -2456,10 +2432,7 @@ label6BDC:
     ret  
 
 
-    ld   [wDAD6_ReturnBank],a
-    ld   a,$03
-    ld   hl,entry_03_57f8_ClearCollisionForObject
-    call call_00_0edd_CallAltBankFunc
+    farcall entry_03_57f8_ClearCollisionForObject
     call call_00_244a_Object_ApplyClampedVerticalVelocity
     call call_00_2780_Object_ComputeMapYDelta
     jp   nc,call_00_2b7a_ClearObjectThenJump

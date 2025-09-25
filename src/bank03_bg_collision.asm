@@ -4,10 +4,7 @@ call_03_46e0_UpdateBgCollision_MainDispatcher:
 ; Calls a banked function (entry_02_5541_GetActionPropertyByte) to get collision status
 ; Depending on result bits, jumps to specialized collision handlers 
 ; (call_03_4a3f_CollisionHandler_ByAction, call_03_4ae4_CollisionMask_LookupAndDispatch, or mode-specific handler table).
-    ld   [wDAD6_ReturnBank], A                                    ;; 03:46e0 $ea $d6 $da
-    ld   A, $02                                        ;; 03:46e3 $3e $02
-    ld   HL, entry_02_5541_GetActionPropertyByte                                ;; 03:46e5 $21 $41 $55
-    call call_00_0edd_CallAltBankFunc                                  ;; 03:46e8 $cd $dd $0e
+    farcall entry_02_5541_GetActionPropertyByte
     bit  5, A                                          ;; 03:46eb $cb $6f
     jp   NZ, call_03_4a3f_CollisionHandler_ByAction                               ;; 03:46ed $c2 $3f $4a
     bit  7, A                                          ;; 03:46f0 $cb $7f
