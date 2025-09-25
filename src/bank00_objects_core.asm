@@ -139,7 +139,7 @@ INCLUDE "bank00_object_utils.asm"
 call_00_2cbf_LoadObjectPalettes:
     ld   A, $7f                                        ;; 00:2cbf $3e $7f
     call call_00_0eee_SwitchBank                                  ;; 00:2cc1 $cd $ee $0e
-    ld   HL, wDB6C_CurrentLevelId                                     ;; 00:2cc4 $21 $6c $db
+    ld   HL, wDB6C_CurrentMapId                                     ;; 00:2cc4 $21 $6c $db
     ld   E, [HL]                                       ;; 00:2cc7 $5e
     ld   D, $00                                        ;; 00:2cc8 $16 $00
     ld   HL, $4000                                     ;; 00:2cca $21 $00 $40
@@ -158,7 +158,7 @@ call_00_2cbf_LoadObjectPalettes:
 call_00_2ce2_BuildGexSpriteDrawList:
 ; This is a complex sprite/OAM population routine. It:
 ; Sets wDAC2=1 and combines the player’s facing direction with a state byte (wDC7A) into wDC53.
-; Switches banks to retrieve sprite graphics metadata based on the current level (wDB6C_CurrentLevelId).
+; Switches banks to retrieve sprite graphics metadata based on the current level (wDB6C_CurrentMapId).
 ; Computes the address of Gex’s sprite frame data (using offsets and increments).
 ; Reads sprite tiles, positions, and attributes, adjusting for the player’s position 
 ; relative to the map (wDBF9, wDBFB, wD80E, wD810).
@@ -177,7 +177,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     ld   [wDC53], A                                    ;; 00:2cee $ea $53 $dc
     ld   A, $7f                                        ;; 00:2cf1 $3e $7f
     call call_00_0eee_SwitchBank                                  ;; 00:2cf3 $cd $ee $0e
-    ld   HL, wDB6C_CurrentLevelId                                     ;; 00:2cf6 $21 $6c $db
+    ld   HL, wDB6C_CurrentMapId                                     ;; 00:2cf6 $21 $6c $db
     ld   E, [HL]                                       ;; 00:2cf9 $5e
     ld   D, $00                                        ;; 00:2cfa $16 $00
     ld   HL, $4000                                     ;; 00:2cfc $21 $00 $40
@@ -918,7 +918,9 @@ call_00_3252_ResetObjectCounter:
     ret                                                ;; 00:3257 $c9
 
 data_00_3258:
-    db   $00, $00, $00, $00, $00, $00, $00
+    db   $00
+data_00_3259:
+    db   $00, $00, $00, $00, $00, $00
 data_00_325F:    
     db   $ff        ;; 00:3258 ????????
     db   $01, $0c, $0c, $07, $02, $00, $ff, $81        ;; 00:3260 ......??
@@ -1157,7 +1159,7 @@ call_00_3618_HandleObjectSpawn:
     ld   [wDABA], A                                    ;; 00:3686 $ea $ba $da
     ld   HL, $0f                                       ;; 00:3689 $21 $0f $00
     add  HL, DE                                        ;; 00:368c $19
-    ld   A, [wDB6C_CurrentLevelId]                                    ;; 00:368d $fa $6c $db
+    ld   A, [wDB6C_CurrentMapId]                                    ;; 00:368d $fa $6c $db
     cp   A, [HL]                                       ;; 00:3690 $be
     ret  NZ                                            ;; 00:3691 $c0
     inc  DE                                            ;; 00:3692 $13
@@ -1456,7 +1458,7 @@ call_00_37a0_SpawnObjectRelative:
     add  HL, HL                                        ;; 00:381e $29
     add  HL, HL                                        ;; 00:381f $29
     add  HL, HL                                        ;; 00:3820 $29
-    ld   BC, $3259                                     ;; 00:3821 $01 $59 $32
+    ld   BC, data_00_3259                              ;; 00:3821 $01 $59 $32
     add  HL, BC                                        ;; 00:3824 $09
     ld   A, E                                          ;; 00:3825 $7b
     xor  A, $12                                        ;; 00:3826 $ee $12

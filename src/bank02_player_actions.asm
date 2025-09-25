@@ -21,7 +21,7 @@ call_02_47ce_PlayerAction_Idle:
 ; Sets bit 6 of wDC80 (marking a new sub-state).
 ; Clears wDC86, wDC8C, and wDC87.
 ; Sets wDC83 = F0h (a countdown timer).
-; Regardless, it checks if wDC81 == 40h and, if so, calls call_00_1bbc_CheckPlayerLevelTriggers.
+; Regardless, it checks if wDC81_CurrentInputs == Input_Up and, if so, calls call_00_1bbc_CheckForDoorAndEnter.
 ; It then calls call_02_4f11 to potentially switch actions.
 ; Finally, it decrements the countdown timer at wDC83. If it hits zero, it switches player action to $02.
     ld   HL, wD805                                     ;; 02:47ce $21 $05 $d8
@@ -36,9 +36,9 @@ call_02_47ce_PlayerAction_Idle:
     ld   A, $f0                                        ;; 02:47e4 $3e $f0
     ld   [wDC83], A                                    ;; 02:47e6 $ea $83 $dc
 .jr_02_47e9:
-    ld   A, [wDC81]                                    ;; 02:47e9 $fa $81 $dc
-    cp   A, $40                                        ;; 02:47ec $fe $40
-    call Z, call_00_1bbc_CheckPlayerLevelTriggers                               ;; 02:47ee $cc $bc $1b
+    ld   A, [wDC81_CurrentInputs]                                    ;; 02:47e9 $fa $81 $dc
+    cp   A, Input_Up                                        ;; 02:47ec $fe $40
+    call Z, call_00_1bbc_CheckForDoorAndEnter                               ;; 02:47ee $cc $bc $1b
     call call_02_4f11_ChooseNextActionBasedOnLevel                                  ;; 02:47f1 $cd $11 $4f
     ld   HL, wDC83                                     ;; 02:47f4 $21 $83 $dc
     dec  [HL]                                          ;; 02:47f7 $35
@@ -47,11 +47,11 @@ call_02_47ce_PlayerAction_Idle:
     ret                                                ;; 02:47fd $c9
 
 call_02_47fe_PlayerAction_IdleAnimation:
-; Simpler variant of the above. Checks if wDC81 == 40h, and if so, calls the level trigger routine. 
+; Simpler variant of the above. Checks if wDC81_CurrentInputs == Input_Up, and if so, calls the level trigger routine. 
 ; Then calls call_02_4f11 to update the player’s action. No countdown logic.
-    ld   A, [wDC81]                                    ;; 02:47fe $fa $81 $dc
-    cp   A, $40                                        ;; 02:4801 $fe $40
-    call Z, call_00_1bbc_CheckPlayerLevelTriggers                               ;; 02:4803 $cc $bc $1b
+    ld   A, [wDC81_CurrentInputs]                                    ;; 02:47fe $fa $81 $dc
+    cp   A, Input_Up                                        ;; 02:4801 $fe $40
+    call Z, call_00_1bbc_CheckForDoorAndEnter                               ;; 02:4803 $cc $bc $1b
     call call_02_4f11_ChooseNextActionBasedOnLevel                                  ;; 02:4806 $cd $11 $4f
     ret                                                ;; 02:4809 $c9
 
@@ -183,7 +183,7 @@ call_02_48bc:
     ld   A, [wDC8E]                                    ;; 02:48d6 $fa $8e $dc
     and  A, A                                          ;; 02:48d9 $a7
     ret  NZ                                            ;; 02:48da $c0
-    ld   A, [wDC81]                                    ;; 02:48db $fa $81 $dc
+    ld   A, [wDC81_CurrentInputs]                                    ;; 02:48db $fa $81 $dc
     and  A, $02                                        ;; 02:48de $e6 $02
     ld   A, $0f                                        ;; 02:48e0 $3e $0f
     jp   NZ, call_02_54f9_SwitchPlayerAction                              ;; 02:48e2 $c2 $f9 $54
@@ -205,7 +205,7 @@ call_02_48e8:
     ld   A, [wDC8E]                                    ;; 02:4902 $fa $8e $dc
     and  A, A                                          ;; 02:4905 $a7
     ret  NZ                                            ;; 02:4906 $c0
-    ld   A, [wDC81]                                    ;; 02:4907 $fa $81 $dc
+    ld   A, [wDC81_CurrentInputs]                                    ;; 02:4907 $fa $81 $dc
     and  A, $02                                        ;; 02:490a $e6 $02
     jr   NZ, .jr_02_48ef                               ;; 02:490c $20 $e1
     jp   call_02_4dce_SetTriggerByLevel                                    ;; 02:490e $c3 $ce $4d
@@ -237,7 +237,7 @@ call_02_4911:
     bit  7, [HL]                                       ;; 02:4944 $cb $7e
     jr   Z, .jr_02_4953                                ;; 02:4946 $28 $0b
     ld   C, $01                                        ;; 02:4948 $0e $01
-    ld   A, [wDC81]                                    ;; 02:494a $fa $81 $dc
+    ld   A, [wDC81_CurrentInputs]                                    ;; 02:494a $fa $81 $dc
     and  A, $30                                        ;; 02:494d $e6 $30
     jr   Z, .jr_02_4953                                ;; 02:494f $28 $02
     ld   C, $03                                        ;; 02:4951 $0e $03
@@ -256,7 +256,7 @@ call_02_4957:
     ld   A, [wDC8E]                                    ;; 02:4966 $fa $8e $dc
     and  A, A                                          ;; 02:4969 $a7
     ret  NZ                                            ;; 02:496a $c0
-    ld   A, [wDC81]                                    ;; 02:496b $fa $81 $dc
+    ld   A, [wDC81_CurrentInputs]                                    ;; 02:496b $fa $81 $dc
     and  A, $30                                        ;; 02:496e $e6 $30
     ld   A, $03                                        ;; 02:4970 $3e $03
     jp   NZ, call_02_54f9_SwitchPlayerAction                              ;; 02:4972 $c2 $f9 $54
@@ -503,13 +503,13 @@ call_02_4adb:
     ld   hl,wDB66
     set  0,[hl]
 .label4B26:
-    ld   a,[wDC81]
+    ld   a,[wDC81_CurrentInputs]
     and  a,$02
     jr   z,.label4B32
     ld   a,$0E
     call entry_02_54f9_SwitchPlayerAction
 .label4B32:
-    ld   a,[wDC81]
+    ld   a,[wDC81_CurrentInputs]
     and  a,$01
     jr   z,.call_02_4B55
     ld   a,$04
@@ -590,9 +590,9 @@ call_02_4bb7:
     ld   hl,wDC80
     set  6,[hl]
 label4BDC:
-    ld   a,[wDC81]
+    ld   a,[wDC81_CurrentInputs]
     bit  6,a
-    call nz,call_00_1bbc_CheckPlayerLevelTriggers
+    call nz,call_00_1bbc_CheckForDoorAndEnter
     call call_02_4E0C_UpdateActionSequence
     ld   a,[wDCA5]
     and  a
@@ -648,7 +648,7 @@ label4C46:
     ld   a,[wDC8E]
     and  a
     ret  nz
-    ld   a,[wDC81]
+    ld   a,[wDC81_CurrentInputs]
     and  a,$02
     ld   a,$26
     jp   nz,entry_02_54f9_SwitchPlayerAction
@@ -741,7 +741,7 @@ call_02_4d02:
     ld   a,[wDC8E]
     and  a
     ret  nz
-    ld   a,[wDC81]
+    ld   a,[wDC81_CurrentInputs]
     and  a,$02
     ld   a,$32
     jp   nz,entry_02_54f9_SwitchPlayerAction
@@ -764,7 +764,7 @@ call_02_4d33:
     ld   a,[wDC8E]
     and  a
     ret  nz
-    ld   a,[wDC81]
+    ld   a,[wDC81_CurrentInputs]
     and  a,$02
     ld   a,$32
     jp   nz,entry_02_54f9_SwitchPlayerAction

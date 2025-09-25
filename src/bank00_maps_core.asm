@@ -239,7 +239,7 @@ call_00_11c8_LoadBgMapDirtyRegions:
     call NZ, call_00_11e5_LoadVerticalBgStrip                              ;; 00:11d4 $c4 $e5 $11
     ld   A, [wDC20]                                    ;; 00:11d7 $fa $20 $dc
     and  A, $0c                                        ;; 00:11da $e6 $0c
-    call NZ, call_00_1351_LoadBgMapHorizontal                              ;; 00:11dc $c4 $51 $13
+    call NZ, call_00_1351_LoadHorizontalBgStrip                              ;; 00:11dc $c4 $51 $13
     ld   HL, wDC20                                     ;; 00:11df $21 $20 $dc
     set  7, [HL]                                       ;; 00:11e2 $cb $fe
     ret                                                ;; 00:11e4 $c9
@@ -494,7 +494,7 @@ call_00_11e5_LoadVerticalBgStrip:
     jr   NZ, .jr_00_1332                               ;; 00:134c $20 $e4
     jp   call_00_0f08_RestoreBank                                  ;; 00:134e $c3 $08 $0f
 
-call_00_1351_LoadBgMapHorizontal:
+call_00_1351_LoadHorizontalBgStrip:
 ; Role: Loads a horizontal strip of background tiles into VRAM based on the player’s X position. 
 ; Switches between multiple banks to pull map, extended, and collision data, 
 ; then assembles tiles and writes them to VRAM buffers.
@@ -811,7 +811,7 @@ call_00_150f_CheckAndSetLevelTrigger:
     ret  NZ                                            ;; 00:1515 $c0
     ld   [HL], $ff                                     ;; 00:1516 $36 $ff
     ld   D, $00                                        ;; 00:1518 $16 $00
-    ld   HL, wDB6C_CurrentLevelId                                     ;; 00:151a $21 $6c $db
+    ld   HL, wDB6C_CurrentMapId                                     ;; 00:151a $21 $6c $db
     ld   L, [HL]                                       ;; 00:151d $6e
     ld   H, $00                                        ;; 00:151e $26 $00
     add  HL, HL                                        ;; 00:1520 $29
@@ -870,13 +870,13 @@ call_00_1633_HandleLevelWarpOrExit:
 ; Level Transition Loader
 ; Description:
 ; Calculates a destination level and coordinates based on current level number (wDC1E) and 
-; player Y-position. It fetches a pointer from .data_00_16a2, determines the new level ID, 
+; player Y-position. It fetches a pointer from .data_00_16a2_PlayerSpawnPositions, determines the new level ID, 
 ; screen positions (wDC6A/B), and offset vector (wDC6C), ensuring transitions are within bounds.
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:1633 $21 $1e $dc
     ld   L, [HL]                                       ;; 00:1636 $6e
     ld   H, $00                                        ;; 00:1637 $26 $00
     add  HL, HL                                        ;; 00:1639 $29
-    ld   DE, .data_00_16a2                             ;; 00:163a $11 $a2 $16
+    ld   DE, .data_00_16a2_PlayerSpawnPositions                             ;; 00:163a $11 $a2 $16
     add  HL, DE                                        ;; 00:163d $19
     ld   A, [HL+]                                      ;; 00:163e $2a
     ld   D, [HL]                                       ;; 00:163f $56
@@ -896,7 +896,7 @@ call_00_1633_HandleLevelWarpOrExit:
     jr   NZ, .jr_00_1663                               ;; 00:1653 $20 $0e
     pop  HL                                            ;; 00:1655 $e1
     ld   A, [HL+]                                      ;; 00:1656 $2a
-    ld   [wDB6C_CurrentLevelId], A                                    ;; 00:1657 $ea $6c $db
+    ld   [wDB6C_CurrentMapId], A                                    ;; 00:1657 $ea $6c $db
     ld   DE, wDC6A                                     ;; 00:165a $11 $6a $dc
     ld   BC, $04                                       ;; 00:165d $01 $04 $00
     jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:1660 $c3 $6e $07
@@ -918,7 +918,7 @@ call_00_1633_HandleLevelWarpOrExit:
     ld   D, A                                          ;; 00:1678 $57
     pop  HL                                            ;; 00:1679 $e1
     ld   A, [HL+]                                      ;; 00:167a $2a
-    ld   [wDB6C_CurrentLevelId], A                                    ;; 00:167b $ea $6c $db
+    ld   [wDB6C_CurrentMapId], A                                    ;; 00:167b $ea $6c $db
     ld   A, [HL+]                                      ;; 00:167e $2a
     ld   [wDC6A], A                                    ;; 00:167f $ea $6a $dc
     ld   A, [HL+]                                      ;; 00:1682 $2a
@@ -944,12 +944,17 @@ call_00_1633_HandleLevelWarpOrExit:
     inc  HL                                            ;; 00:169f $23
     ld   [HL], D                                       ;; 00:16a0 $72
     ret                                                ;; 00:16a1 $c9
-.data_00_16a2:
+.data_00_16a2_PlayerSpawnPositions:
     dw   $16c2                                         ;; 00:16a2 wW
     dw   $16f2                                         ;; 00:16a4 wW
     db   $22, $17, $e2, $17, $4a, $18, $d2, $18        ;; 00:16a6 ????????
-    db   $62, $19, $b2, $19, $ba, $16, $ba, $16        ;; 00:16ae ????????
-    db   $ba, $16, $e2, $19, $00, $00, $00, $00        ;; 00:16b6 ????????
+    db   $62, $19, $b2, $19
+    dw   .data_00_16ba
+    dw   .data_00_16ba
+    dw   .data_00_16ba
+    db   $e2, $19
+.data_00_16ba:
+    db   $00, $00, $00, $00        ;; 00:16b6 ????????
     db   $00, $00, $00, $00, $00, $b0, $01             ;; 00:16be ????w..
     dw   $00f0                                         ;; 00:16c5 wW
     db   $ff, $00, $00, $00, $50, $00                  ;; 00:16c7 .??w..
@@ -1350,11 +1355,12 @@ call_00_1a46_LoadBgMapRow:
     jr   NZ, .jr_00_1b98                               ;; 00:1bb7 $20 $df
     jp   call_00_0f08_RestoreBank                                  ;; 00:1bb9 $c3 $08 $0f
 
-call_00_1bbc_CheckPlayerLevelTriggers:
+call_00_1bbc_CheckForDoorAndEnter:
 ; Using the current level number (wDC1E_CurrentLevelNumber) and position (wD80E/wD810), 
-; scans a table (.data_00_1c33) for proximity to trigger points. If within a bounding box, 
+; scans a table (.data_00_1c33_DoorLocationsByMap) for proximity to door trigger points. If within a bounding box, 
 ; writes trigger data to wDCC1/wDCC2, sets wDC69, and marks wDB6A flag. 
-; Skips special levels $05 or $0B.
+; Skips special levels $05 and $0B.
+; Purpose: Used to enter doors after pressing Up on Dpad
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:1bbc $fa $1e $dc
     cp   A, $05                                        ;; 00:1bbf $fe $05
     ret  Z                                             ;; 00:1bc1 $c8
@@ -1366,11 +1372,11 @@ call_00_1bbc_CheckPlayerLevelTriggers:
     cp   A, $81                                        ;; 00:1bcb $fe $81
     ret  Z                                             ;; 00:1bcd $c8
 .jr_00_1bce:
-    ld   HL, wDB6C_CurrentLevelId                                     ;; 00:1bce $21 $6c $db
+    ld   HL, wDB6C_CurrentMapId                                     ;; 00:1bce $21 $6c $db
     ld   L, [HL]                                       ;; 00:1bd1 $6e
     ld   H, $00                                        ;; 00:1bd2 $26 $00
     add  HL, HL                                        ;; 00:1bd4 $29
-    ld   DE, .data_00_1c33                                     ;; 00:1bd5 $11 $33 $1c
+    ld   DE, .data_00_1c33_DoorLocationsByMap                                     ;; 00:1bd5 $11 $33 $1c
     add  HL, DE                                        ;; 00:1bd8 $19
     ld   A, [HL+]                                      ;; 00:1bd9 $2a
     ld   H, [HL]                                       ;; 00:1bda $66
@@ -1432,8 +1438,9 @@ call_00_1bbc_CheckPlayerLevelTriggers:
     ld   HL, wDB6A                                     ;; 00:1c2d $21 $6a $db
     set  2, [HL]                                       ;; 00:1c30 $cb $d6
     ret                                                ;; 00:1c32 $c9
-.data_00_1c33:
-    db   $ad, $1c, $d5, $1c, $f6, $1c, $00, $00        ;; 00:1c33 ....????
+.data_00_1c33_DoorLocationsByMap:
+    dw   .data_00_1cad
+    db   $d5, $1c, $f6, $1c, $00, $00        ;; 00:1c33 ....????
     db   $5c, $1d, $9f, $1d, $08, $1e, $4a, $1e        ;; 00:1c3b ????????
     db   $00, $00, $00, $00, $00, $00, $72, $1e        ;; 00:1c43 ????????
     db   $c0, $1c, $c7, $1c, $ce, $1c, $e8, $1c        ;; 00:1c4b ........
@@ -1448,7 +1455,9 @@ call_00_1bbc_CheckPlayerLevelTriggers:
     db   $ef, $1d, $15, $1e, $28, $1e, $2f, $1e        ;; 00:1c93 ????????
     db   $36, $1e, $43, $1e, $5d, $1e, $64, $1e        ;; 00:1c9b ????????
     db   $6b, $1e, $79, $1e, $92, $1e, $99, $1e        ;; 00:1ca3 ????????
-    db   $00, $00, $03, $ff, $b0, $01, $f0, $00        ;; 00:1cab ??w...??
+    db   $00, $00
+.data_00_1cad:
+    db   $03, $ff, $b0, $01, $f0, $00        ;; 00:1cab ??w...??
     db   $04, $ff, $50, $00, $70, $00, $05, $ff        ;; 00:1cb3 w...??w.
     db   $50, $01, $40, $00, $ff, $00, $ff, $f0        ;; 00:1cbb ..??.w..
     db   $00, $80, $00, $ff, $01, $ff, $f0, $00        ;; 00:1cc3 .???w...
@@ -1512,7 +1521,7 @@ call_00_1bbc_CheckPlayerLevelTriggers:
     db   $ff, $38, $01, $80, $01, $ff, $02, $ff        ;; 00:1e93 ????????
     db   $38, $01, $80, $01, $ff                       ;; 00:1e9b ?????
 
-call_00_1ea0_LoadAndRunLevelScript:
+call_00_1ea0_LoadAndRunMissionPreviewCutscene:
 ; Uses the current level number (wDC1E_CurrentLevelNumber) and sub-index (wDC5A) 
 ; to select an entry from .data_00_1fc0.
 ; Retrieves a pointer from .data_00_1ff0 to a level setup script (data_2014, 202a, 2040, …).
@@ -1522,14 +1531,14 @@ call_00_1ea0_LoadAndRunLevelScript:
 
 ; Enters a loop that:
 ; Waits for inputs and updates the map
-; Calls call_00_217f_ApplyPlayerMovementFlags (movement handler below) and updates objects (entry_02_7152_UpdateObjects).
+; Calls call_00_217f_ApplyCutsceneMovementFlags (movement handler below) and updates objects (entry_02_7152_UpdateObjects).
 ; Spawns any queued objects (call_00_35fa_WaitForLineThenSpawnObject).
 ; Decrements timing counters until the script says to advance or exit.
 
 ; After finishing, restores the previous level ID and player positions, 
 ; then copies level data again for the new state.
-; Usage: Core routine for loading and running scripted level transitions—used for cutscenes, checkpoints, 
-; or changing areas while preserving player state.
+; Usage: Core routine for loading and running scripted level transitions—used for mission preview cutscenes, 
+; changing areas while preserving player state.
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:1ea0 $21 $1e $dc
     ld   L, [HL]                                       ;; 00:1ea3 $6e
     ld   H, $00                                        ;; 00:1ea4 $26 $00
@@ -1552,10 +1561,10 @@ call_00_1ea0_LoadAndRunLevelScript:
     ld   E, [HL]                                       ;; 00:1ebf $5e
     inc  HL                                            ;; 00:1ec0 $23
     ld   D, [HL]                                       ;; 00:1ec1 $56
-    ld   A, [wDB6C_CurrentLevelId]                                    ;; 00:1ec2 $fa $6c $db
+    ld   A, [wDB6C_CurrentMapId]                                    ;; 00:1ec2 $fa $6c $db
     push AF                                            ;; 00:1ec5 $f5
     ld   A, [DE]                                       ;; 00:1ec6 $1a
-    ld   [wDB6C_CurrentLevelId], A                                    ;; 00:1ec7 $ea $6c $db
+    ld   [wDB6C_CurrentMapId], A                                    ;; 00:1ec7 $ea $6c $db
     inc  DE                                            ;; 00:1eca $13
     ld   HL, wD80E_PlayerXPosition                                     ;; 00:1ecb $21 $0e $d8
     ld   C, [HL]                                       ;; 00:1ece $4e
@@ -1604,7 +1613,7 @@ call_00_1ea0_LoadAndRunLevelScript:
     ld   [wDCE1], A                                    ;; 00:1f27 $ea $e1 $dc
     ld   A, [HL+]                                      ;; 00:1f2a $2a
 .jr_00_1f2b:
-    ld   [wDC81], A                                    ;; 00:1f2b $ea $81 $dc
+    ld   [wDC81_CurrentInputs], A                                    ;; 00:1f2b $ea $81 $dc
     ld   A, [HL+]                                      ;; 00:1f2e $2a
     ld   [wDCDE], A                                    ;; 00:1f2f $ea $de $dc
     ld   A, [HL+]                                      ;; 00:1f32 $2a
@@ -1619,7 +1628,7 @@ call_00_1ea0_LoadAndRunLevelScript:
     jp   .jp_00_1f9f                                   ;; 00:1f3f $c3 $9f $1f
 .jr_00_1f42:
     call call_00_0b92_WaitForInterrupt                                  ;; 00:1f42 $cd $92 $0b
-    call call_00_217f_ApplyPlayerMovementFlags                                  ;; 00:1f45 $cd $7f $21
+    call call_00_217f_ApplyCutsceneMovementFlags                                  ;; 00:1f45 $cd $7f $21
     farcall entry_02_7152_UpdateObjects
     call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:1f53 $cd $c8 $11
     call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:1f56 $cd $fa $35
@@ -1677,7 +1686,7 @@ call_00_1ea0_LoadAndRunLevelScript:
     dec  HL                                            ;; 00:1fae $2b
     ld   [HL], C                                       ;; 00:1faf $71
     pop  AF                                            ;; 00:1fb0 $f1
-    ld   [wDB6C_CurrentLevelId], A                                    ;; 00:1fb1 $ea $6c $db
+    ld   [wDB6C_CurrentMapId], A                                    ;; 00:1fb1 $ea $6c $db
     farcall entry_03_6c89_LoadMapData
     ret                                                ;; 00:1fbf $c9
 .data_00_1fc0:
@@ -1745,17 +1754,18 @@ call_00_1ea0_LoadAndRunLevelScript:
     db   $00, $00, $00, $3c, $00, $10, $20, $02        ;; 00:2170 ????????
     db   $50, $40, $00, $00, $3c, $00, $ff             ;; 00:2178 ???????
 
-call_00_217f_ApplyPlayerMovementFlags:
-; Reads wDC81 (movement/control flags).
+call_00_217f_ApplyCutsceneMovementFlags:
+; Reads wDC81_CurrentInputs (movement/control flags).
 ; Writes either $10 or $00 to wDCE0, mixes low bits into its second byte, then derives a movement step (C).
-; Checks bits in wDC81 to adjust player position:
+; Checks bits in wDC81_CurrentInputs to adjust player position:
 ; Bit 4: move player right by C.
 ; Bit 5: move player left by C.
 ; Bit 7: move player down by C.
 ; Bit 6: move player up by C.
 ; Updates both low and high bytes of player X/Y position (wD80E–wD811) with proper carry/borrow handling.
 ; Usage: Low-level player movement updater—applies directional flags and speed accumulation each frame.
-    ld   A, [wDC81]                                    ;; 00:217f $fa $81 $dc
+; This is used to move around the "camera" for the mission preview cutscenes
+    ld   A, [wDC81_CurrentInputs]                                    ;; 00:217f $fa $81 $dc
     and  A, A                                          ;; 00:2182 $a7
     jr   NZ, .jr_00_218c                               ;; 00:2183 $20 $07
     ld   HL, wDCE0                                     ;; 00:2185 $21 $e0 $dc
@@ -1775,7 +1785,7 @@ call_00_217f_ApplyPlayerMovementFlags:
     swap A                                             ;; 00:219b $cb $37
     and  A, $0f                                        ;; 00:219d $e6 $0f
     ld   C, A                                          ;; 00:219f $4f
-    ld   HL, wDC81                                     ;; 00:21a0 $21 $81 $dc
+    ld   HL, wDC81_CurrentInputs                                     ;; 00:21a0 $21 $81 $dc
     bit  4, [HL]                                       ;; 00:21a3 $cb $66
     jr   Z, .jr_00_21b6                                ;; 00:21a5 $28 $0f
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:21a7 $fa $0e $d8

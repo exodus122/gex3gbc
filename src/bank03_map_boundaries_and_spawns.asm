@@ -2,12 +2,12 @@ entry_03_6203_LoadLevelBoundariesFromId:
 call_03_6203_LoadLevelBoundariesFromId:
 ; Purpose: Given the current level ID, looks up and stores the level’s screen/window boundaries.
 ; Behavior:
-; Reads wDB6C_CurrentLevelId.
+; Reads wDB6C_CurrentMapId.
 ; Indexes .data_03_6210 and .data_03_62a4 tables.
 ; Fills a series of wDC34–wDC43 registers with the level’s rectangle bounds 
 ; (left/right/top/bottom and offsets for scrolling and collision).
 ; Usage: Called whenever a new level or respawn is set to update collision/window limits.
-    ld   HL, wDB6C_CurrentLevelId                                     ;; 03:6203 $21 $6c $db
+    ld   HL, wDB6C_CurrentMapId                                     ;; 03:6203 $21 $6c $db
     ld   L, [HL]                                       ;; 03:6206 $6e
     ld   H, $00                                        ;; 03:6207 $26 $00
     ld   DE, .data_03_6210                             ;; 03:6209 $11 $10 $62
@@ -158,10 +158,10 @@ entry_03_647c_InitPlayerPositionAndLevel:
     ld   [wD811_PlayerYPosition], A                                    ;; 03:649f $ea $11 $d8
     jr   .jr_03_64c6                                   ;; 03:64a2 $18 $22
 .jr_03_64a4:
-    ld   A, [wDB6C_CurrentLevelId]                                    ;; 03:64a4 $fa $6c $db
+    ld   A, [wDB6C_CurrentMapId]                                    ;; 03:64a4 $fa $6c $db
     and  A, A                                          ;; 03:64a7 $a7
     jr   Z, .jr_03_64cc                                ;; 03:64a8 $28 $22
-    ld   HL, wDB6C_CurrentLevelId                                     ;; 03:64aa $21 $6c $db
+    ld   HL, wDB6C_CurrentMapId                                     ;; 03:64aa $21 $6c $db
     ld   L, [HL]                                       ;; 03:64ad $6e
     ld   H, $00                                        ;; 03:64ae $26 $00
     add  HL, HL                                        ;; 03:64b0 $29
@@ -186,7 +186,7 @@ entry_03_647c_InitPlayerPositionAndLevel:
     ld   DE, .data_03_652b                             ;; 03:64d2 $11 $2b $65
     add  HL, DE                                        ;; 03:64d5 $19
     ld   A, [HL]                                       ;; 03:64d6 $7e
-    ld   [wDB6C_CurrentLevelId], A                                    ;; 03:64d7 $ea $6c $db
+    ld   [wDB6C_CurrentMapId], A                                    ;; 03:64d7 $ea $6c $db
     call entry_03_6c89_LoadMapData                                  ;; 03:64da $cd $89 $6c
     ld   HL, wDC5B                                     ;; 03:64dd $21 $5b $dc
     ld   L, [HL]                                       ;; 03:64e0 $6e

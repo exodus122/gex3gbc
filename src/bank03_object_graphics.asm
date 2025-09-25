@@ -255,7 +255,7 @@ entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     ld   A, [wDC1F]                                    ;; 03:5ec6 $fa $1f $dc
     cp   A, $01                                        ;; 03:5ec9 $fe $01
     jr   NZ, .jr_03_5ed8                               ;; 03:5ecb $20 $0b
-    ld   A, [wDB6C_CurrentLevelId]                                    ;; 03:5ecd $fa $6c $db
+    ld   A, [wDB6C_CurrentMapId]                                    ;; 03:5ecd $fa $6c $db
     cp   A, $18                                        ;; 03:5ed0 $fe $18
     jr   Z, .jr_03_5ed8                                ;; 03:5ed2 $28 $04
     cp   A, $1a                                        ;; 03:5ed4 $fe $1a
@@ -738,7 +738,7 @@ call_03_615d_SetupCollectibleSprites:
     push BC                                            ;; 03:6189 $c5
     set  7, E                                          ;; 03:618a $cb $fb
     ld   D, $d0                                        ;; 03:618c $16 $d0
-    ld   HL, wDB6C_CurrentLevelId                                     ;; 03:618e $21 $6c $db
+    ld   HL, wDB6C_CurrentMapId                                     ;; 03:618e $21 $6c $db
     ld   A, [DE]                                       ;; 03:6191 $1a
     cp   A, [HL]                                       ;; 03:6192 $be
     jr   NZ, .jr_03_61d4                               ;; 03:6193 $20 $3f

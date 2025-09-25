@@ -1,7 +1,9 @@
 SECTION "wram0", WRAM0[$c000]
 
 wC000_BgMapTileIds:
-    ds 1024                                            ;; c000
+    ds 1                                            ;; c000
+wC001_BgMapTileIds:
+    ds 1023                                         ;; c001
 
 wC400: ; C400-CC00 is a copy of 03:4100-03:48FF but in a different order
 ; that is the collision tileset data, collectible sprites, and number sprites, and some code
@@ -291,10 +293,10 @@ wDB69:
 wDB6A:
     ds 1                                               ;; db6a
 
-wDB6B:
+wDB6B_InterruptFlag:
     ds 1                                               ;; db6b
 
-wDB6C_CurrentLevelId: ; can freeze and enter world to get to another world
+wDB6C_CurrentMapId: ; can freeze and enter level to get to another level
     ds 1                                               ;; db6c
 
 wDB6D:
@@ -888,7 +890,7 @@ wDC7F:
 wDC80:
     ds 1                                               ;; dc80
 
-wDC81:
+wDC81_CurrentInputs:
     ds 2                                               ;; dc81
 
 wDC83:
@@ -1140,7 +1142,7 @@ wDD4A_ObjectPalettes:
 wDD6A:
     ds 1                                               ;; dd6a
 
-wDD6B:
+wDD6B: ; this section seems to be unused
     ds 89                                             ;; dd6b
 
 wDDC4_ParticleSlot1Buffer:

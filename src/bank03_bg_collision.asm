@@ -304,7 +304,7 @@ call_03_48ad_CollisionHandler_TopDown:
 ; Always sets collision-active bit (set 7,[wDABE]).
 ; Uses wDC86 and wDC89 to determine direction/attempted movement.
 ; Dispatches to one of several routines for checking walls/diagonals (.call_03_48E1_ResetDirectionState, .call_03_496B_CheckMove_UpLeft, etc.).
-; Updates collision status (wDC81, wDC86, wDC89) depending on blocked directions.
+; Updates collision status (wDC81_CurrentInputs, wDC86, wDC89) depending on blocked directions.
     ld   hl,wDABE
     ld   a,[hl]
     ld   [hl],00
@@ -358,16 +358,16 @@ call_03_48ad_CollisionHandler_TopDown:
 ; HandleUpBlocked
 ; What it does:
 ; Called if up movement blocked. Probes horizontal fallback (C=0,B=FF).
-; If successful, sets bit 6 (0x40) in wDC81 (collision flags), stores 1 to wDC89 (direction), 
+; If successful, sets bit 6 (0x40) in wDC81_CurrentInputs (collision flags), stores 1 to wDC89 (direction), 
 ; then goes to .call_03_49ED_AdvanceAlongPath for path stepping.
     ld   c,$00
     ld   b,$FF
     call call_03_4b4c_TileCollisionCheck
     jr   nz,.call_03_4950_CheckMove_StraightHorizontal
-    ld   a,[wDC81]
+    ld   a,[wDC81_CurrentInputs]
     and  a,$0F
     or   a,$40
-    ld   [wDC81],a
+    ld   [wDC81_CurrentInputs],a
     ld   a,$01
     ld   [wDC89],a
     jp   .call_03_49ED_AdvanceAlongPath
@@ -394,15 +394,15 @@ call_03_48ad_CollisionHandler_TopDown:
 ; HandleDownBlocked
 ; What it does:
 ; Handles blocked down movement by probing horizontal (C=0,B=1).
-; If clear, sets bit 7 (0x80) in wDC81, stores 5 to wDC89, jumps to .call_03_49ED_AdvanceAlongPath.
+; If clear, sets bit 7 (0x80) in wDC81_CurrentInputs, stores 5 to wDC89, jumps to .call_03_49ED_AdvanceAlongPath.
     ld   c,$00
     ld   b,$01
     call call_03_4b4c_TileCollisionCheck
     jr   nz,.call_03_4950_CheckMove_StraightHorizontal
-    ld   a,[wDC81]
+    ld   a,[wDC81_CurrentInputs]
     and  a,$0F
     or   a,$80
-    ld   [wDC81],a
+    ld   [wDC81_CurrentInputs],a
     ld   a,$05
     ld   [wDC89],a
     jp   .call_03_49ED_AdvanceAlongPath
@@ -410,15 +410,15 @@ call_03_48ad_CollisionHandler_TopDown:
 ; TryMoveSideways
 ; What it does:
 ; Probes straight horizontal (C=1,B=0).
-; If blocked, jumps back to reset; else sets bit 4 (0x10) in wDC81, stores 3 to wDC89.
+; If blocked, jumps back to reset; else sets bit 4 (0x10) in wDC81_CurrentInputs, stores 3 to wDC89.
     ld   c,$01
     ld   b,$00
     call call_03_4b4c_TileCollisionCheck
     jr   nz,.call_03_48E1_ResetDirectionState
-    ld   a,[wDC81]
+    ld   a,[wDC81_CurrentInputs]
     and  a,$0F
     or   a,$10
-    ld   [wDC81],a
+    ld   [wDC81_CurrentInputs],a
     ld   a,$03
     ld   [wDC89],a
     jp   .call_03_49ED_AdvanceAlongPath
@@ -449,10 +449,10 @@ call_03_48ad_CollisionHandler_TopDown:
     ld   b,$FF
     call call_03_4b4c_TileCollisionCheck
     jr   nz,.call_03_49D2_CheckMove_Left
-    ld   a,[wDC81]
+    ld   a,[wDC81_CurrentInputs]
     and  a,$0F
     or   a,$40
-    ld   [wDC81],a
+    ld   [wDC81_CurrentInputs],a
     ld   a,$01
     ld   [wDC89],a
     jr   .call_03_49ED_AdvanceAlongPath
@@ -482,10 +482,10 @@ call_03_48ad_CollisionHandler_TopDown:
     ld   b,$01
     call call_03_4b4c_TileCollisionCheck
     jr   nz,.call_03_49D2_CheckMove_Left
-    ld   a,[wDC81]
+    ld   a,[wDC81_CurrentInputs]
     and  a,$0F
     or   a,$80
-    ld   [wDC81],a
+    ld   [wDC81_CurrentInputs],a
     ld   a,$05
     ld   [wDC89],a
     jr   .call_03_49ED_AdvanceAlongPath
@@ -498,10 +498,10 @@ call_03_48ad_CollisionHandler_TopDown:
     ld   b,$00
     call call_03_4b4c_TileCollisionCheck
     jp   nz,.call_03_48E1_ResetDirectionState
-    ld   a,[wDC81]
+    ld   a,[wDC81_CurrentInputs]
     and  a,$0F
     or   a,$20
-    ld   [wDC81],a
+    ld   [wDC81_CurrentInputs],a
     ld   a,$07
     ld   [wDC89],a
     jr   .call_03_49ED_AdvanceAlongPath
@@ -570,7 +570,7 @@ call_03_4a3f_CollisionHandler_ByAction:
 ; Clears/sets collision flags.
 ; Looks at the player’s current action ID (wD801_PlayerObject_ActionId) to pick a rule set.
 ; Uses lookup tables (.data_03_4a98) for bitmasks and allowed transitions.
-; Updates wDC81 depending on what collisions are valid for that action (e.g. standing, climbing, swimming).
+; Updates wDC81_CurrentInputs depending on what collisions are valid for that action (e.g. standing, climbing, swimming).
     ld   HL, wDABE                                     ;; 03:4a3f $21 $be $da
     ld   A, [HL]                                       ;; 03:4a42 $7e
     ld   [HL], $00                                     ;; 03:4a43 $36 $00
@@ -595,7 +595,7 @@ call_03_4a3f_CollisionHandler_ByAction:
     ld   A, [HL+]                                      ;; 03:4a68 $2a
     ld   H, [HL]                                       ;; 03:4a69 $66
     ld   L, A                                          ;; 03:4a6a $6f
-    ld   A, [wDC81]                                    ;; 03:4a6b $fa $81 $dc
+    ld   A, [wDC81_CurrentInputs]                                    ;; 03:4a6b $fa $81 $dc
     and  A, [HL]                                       ;; 03:4a6e $a6
     ret  Z                                             ;; 03:4a6f $c8
     inc  HL                                            ;; 03:4a70 $23
@@ -612,9 +612,9 @@ call_03_4a3f_CollisionHandler_ByAction:
     dec  B                                             ;; 03:4a7b $05
     jr   NZ, .jr_03_4a77                               ;; 03:4a7c $20 $f9
 .jr_03_4a7e:
-    ld   A, [wDC81]                                    ;; 03:4a7e $fa $81 $dc
+    ld   A, [wDC81_CurrentInputs]                                    ;; 03:4a7e $fa $81 $dc
     and  A, $0f                                        ;; 03:4a81 $e6 $0f
-    ld   [wDC81], A                                    ;; 03:4a83 $ea $81 $dc
+    ld   [wDC81_CurrentInputs], A                                    ;; 03:4a83 $ea $81 $dc
     ret                                                ;; 03:4a86 $c9
 .jr_03_4a87:
     inc  HL                                            ;; 03:4a87 $23
@@ -646,9 +646,9 @@ call_03_4ae4_CollisionMask_LookupAndDispatch:
 ; CollisionMaskHandler
 ; What it does:
 ; Moves the current collision byte (wDABE) to wDABD, clears wDABE, then sets bit7 of the (now zeroed) wDABE.
-; Uses .data_03_4b1b as a mask/lookup table: ANDs the current collision flags (wDC81) with the mask.
+; Uses .data_03_4b1b as a mask/lookup table: ANDs the current collision flags (wDC81_CurrentInputs) with the mask.
 ; If a match is found, loads a parameter block (B=counter, DE=step size, etc.), loops through entries comparing tiles.
-; If none match, clears high bits of wDC81. If a match, calls call_03_4c12_FetchTileValue to probe a specific tile, checks bit3, 
+; If none match, clears high bits of wDC81_CurrentInputs. If a match, calls call_03_4c12_FetchTileValue to probe a specific tile, checks bit3, 
 ; and conditionally returns.
     ld   HL, wDABE                                     ;; 03:4ae4 $21 $be $da
     ld   A, [HL]                                       ;; 03:4ae7 $7e
@@ -656,7 +656,7 @@ call_03_4ae4_CollisionMask_LookupAndDispatch:
     ld   [wDABD], A                                    ;; 03:4aea $ea $bd $da
     set  7, [HL]                                       ;; 03:4aed $cb $fe
     ld   HL, .data_03_4b1b                             ;; 03:4aef $21 $1b $4b
-    ld   A, [wDC81]                                    ;; 03:4af2 $fa $81 $dc
+    ld   A, [wDC81_CurrentInputs]                                    ;; 03:4af2 $fa $81 $dc
     and  A, [HL]                                       ;; 03:4af5 $a6
     ret  Z                                             ;; 03:4af6 $c8
     inc  HL                                            ;; 03:4af7 $23
@@ -673,9 +673,9 @@ call_03_4ae4_CollisionMask_LookupAndDispatch:
     dec  B                                             ;; 03:4b02 $05
     jr   NZ, .jr_03_4afe                               ;; 03:4b03 $20 $f9
 .jr_03_4b05:
-    ld   A, [wDC81]                                    ;; 03:4b05 $fa $81 $dc
+    ld   A, [wDC81_CurrentInputs]                                    ;; 03:4b05 $fa $81 $dc
     and  A, $0f                                        ;; 03:4b08 $e6 $0f
-    ld   [wDC81], A                                    ;; 03:4b0a $ea $81 $dc
+    ld   [wDC81_CurrentInputs], A                                    ;; 03:4b0a $ea $81 $dc
     ret                                                ;; 03:4b0d $c9
 .jr_03_4b0e:
     inc  HL                                            ;; 03:4b0e $23

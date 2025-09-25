@@ -58,7 +58,7 @@ call_00_0150_Init:
     ld   [MBC1SRamEnable], A                                    ;; 00:016a $ea $01 $00
     ld   [MBC1SRamBankingMode], A                                    ;; 00:016d $ea $01 $60
     ld   HL, wC000_BgMapTileIds                                     ;; 00:0170 $21 $00 $c0
-    ld   DE, $c001                                     ;; 00:0173 $11 $01 $c0 ; wC000_BgMapTileIds
+    ld   DE, wC001_BgMapTileIds                                     ;; 00:0173 $11 $01 $c0 ; wC000_BgMapTileIds
     ld   BC, $1fff                                     ;; 00:0176 $01 $ff $1f
     ld   [HL], $00                                     ;; 00:0179 $36 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:017b $cd $6e $07
@@ -175,7 +175,7 @@ call_00_0150_Init:
     farcall entry_01_4f7e_SeedTileLookupTable
 .jp_00_0267:
     ld   A, $00                                        ;; 00:0267 $3e $00
-    call call_00_0fa2_RequestSongBankAndPlay                                  ;; 00:0269 $cd $a2 $0f
+    call call_00_0fa2_PlaySong                                  ;; 00:0269 $cd $a2 $0f
     ld   A, $00                                        ;; 00:026c $3e $00
     call call_00_0fd7_TriggerSoundEffect                                  ;; 00:026e $cd $d7 $0f
     ld   A, $11                                        ;; 00:0271 $3e $11
@@ -190,7 +190,7 @@ call_00_0150_Init:
     farcall entry_01_4000_MenuHandler_LoadAndProcess
 .jp_00_02b2:
     ld   A, $01                                        ;; 00:02b2 $3e $01
-    call call_00_0fa2_RequestSongBankAndPlay                                  ;; 00:02b4 $cd $a2 $0f
+    call call_00_0fa2_PlaySong                                  ;; 00:02b4 $cd $a2 $0f
     ld   A, $00                                        ;; 00:02b7 $3e $00
     farcall entry_01_4000_MenuHandler_LoadAndProcess
     cp   A, $20                                        ;; 00:02c4 $fe $20
@@ -213,7 +213,7 @@ call_00_0150_Init:
     farcall entry_01_4f8c_BuildCollisionBitfieldAndChecksum
 .jr_00_02ed:
     xor  A, A                                          ;; 00:02ed $af
-    ld   [wDB6C_CurrentLevelId], A                                    ;; 00:02ee $ea $6c $db
+    ld   [wDB6C_CurrentMapId], A                                    ;; 00:02ee $ea $6c $db
     ld   [wDC5B], A                                    ;; 00:02f1 $ea $5b $dc
     ld   [wDC69], A                                    ;; 00:02f4 $ea $69 $dc
     ld   [wDB6A], A                                    ;; 00:02f7 $ea $6a $db
@@ -242,12 +242,12 @@ call_00_0150_Init:
     call call_00_2f85_LoadAndSortCollectibleData                                  ;; 00:0347 $cd $85 $2f
     call call_00_2ff8_InitLevelObjectsAndConfig                                  ;; 00:034a $cd $f8 $2f
     call call_00_0595_PlaySongBasedOnLevel                                  ;; 00:034d $cd $95 $05
-    call call_00_1ea0_LoadAndRunLevelScript                                  ;; 00:0350 $cd $a0 $1e
+    call call_00_1ea0_LoadAndRunMissionPreviewCutscene                                  ;; 00:0350 $cd $a0 $1e
     xor  A, A                                          ;; 00:0353 $af
     ld   [wDC69], A                                    ;; 00:0354 $ea $69 $dc
 .jp_00_0357:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:0357 $fa $1e $dc
-    ld   [wDB6C_CurrentLevelId], A                                    ;; 00:035a $ea $6c $db
+    ld   [wDB6C_CurrentMapId], A                                    ;; 00:035a $ea $6c $db
     farcall entry_03_6c89_LoadMapData
     xor  A, A                                          ;; 00:0368 $af
     ld   [wDC51], A                                    ;; 00:0369 $ea $51 $dc
@@ -272,7 +272,7 @@ call_00_0150_Init:
     cp   A, $00                                        ;; 00:03a3 $fe $00
     ld   A, $23                                        ;; 00:03a5 $3e $23
     jr   Z, .jr_00_03e8                                ;; 00:03a7 $28 $3f
-    ld   A, [wDB6C_CurrentLevelId]                                    ;; 00:03a9 $fa $6c $db
+    ld   A, [wDB6C_CurrentMapId]                                    ;; 00:03a9 $fa $6c $db
     cp   A, $07                                        ;; 00:03ac $fe $07
     ld   A, $24                                        ;; 00:03ae $3e $24
     jr   Z, .jr_00_03e8                                ;; 00:03b0 $28 $36
@@ -359,7 +359,7 @@ call_00_0150_Init:
     call call_00_0f80_CheckInputStart                                  ;; 00:0496 $cd $80 $0f
     jr   Z, .jr_00_04d8                                ;; 00:0499 $28 $3d
     ld   A, $00                                        ;; 00:049b $3e $00
-    call call_00_0fa2_RequestSongBankAndPlay                                  ;; 00:049d $cd $a2 $0f
+    call call_00_0fa2_PlaySong                                  ;; 00:049d $cd $a2 $0f
     ld   A, $00                                        ;; 00:04a0 $3e $00
     call call_00_0fd7_TriggerSoundEffect                                  ;; 00:04a2 $cd $d7 $0f
     farcall entry_02_7132_BackupObjectTable
@@ -376,7 +376,7 @@ call_00_0150_Init:
     and  A, A                                          ;; 00:04cd $a7
     jp   Z, .jp_00_02b2                                ;; 00:04ce $ca $b2 $02
     xor  A, A                                          ;; 00:04d1 $af
-    ld   [wDB6C_CurrentLevelId], A                                    ;; 00:04d2 $ea $6c $db
+    ld   [wDB6C_CurrentMapId], A                                    ;; 00:04d2 $ea $6c $db
     jp   .jp_00_0314                                   ;; 00:04d5 $c3 $14 $03
 .jr_00_04d8:
     call call_00_05fd                                  ;; 00:04d8 $cd $fd $05
@@ -404,7 +404,7 @@ call_00_04fb:
 call_00_0513:
     ld   A, $7f                                        ;; 00:0513 $3e $7f
     call call_00_0eee_SwitchBank                                  ;; 00:0515 $cd $ee $0e
-    ld   HL, wDB6C_CurrentLevelId                                     ;; 00:0518 $21 $6c $db
+    ld   HL, wDB6C_CurrentMapId                                     ;; 00:0518 $21 $6c $db
     ld   E, [HL]                                       ;; 00:051b $5e
     ld   D, $00                                        ;; 00:051c $16 $00
     ld   HL, $4000                                     ;; 00:051e $21 $00 $40
@@ -472,7 +472,7 @@ call_00_0595_PlaySongBasedOnLevel:
     ld   DE, .data_00_05a3                                      ;; 00:059b $11 $a3 $05
     add  HL, DE                                        ;; 00:059e $19
     ld   A, [HL]                                       ;; 00:059f $7e
-    jp   call_00_0fa2_RequestSongBankAndPlay                                  ;; 00:05a0 $c3 $a2 $0f
+    jp   call_00_0fa2_PlaySong                                  ;; 00:05a0 $c3 $a2 $0f
 .data_00_05a3:
     db   $04, $02, $12, $05, $03, $14, $17, $16        ;; 00:05a3 ..??????
     db   $16, $11, $11, $18                            ;; 00:05ab ????
@@ -607,11 +607,11 @@ jp_00_0693:
     ld   HL, wDABE                                     ;; 00:0693 $21 $be $da
     bit  7, [HL]                                       ;; 00:0696 $cb $7e
     jr   NZ, .jr_00_06ba                               ;; 00:0698 $20 $20
-    ld   A, [wDB6C_CurrentLevelId]                                    ;; 00:069a $fa $6c $db
+    ld   A, [wDB6C_CurrentMapId]                                    ;; 00:069a $fa $6c $db
     cp   A, $07                                        ;; 00:069d $fe $07
     ld   A, $2e                                        ;; 00:069f $3e $2e
     jr   Z, .jr_00_06ae                                ;; 00:06a1 $28 $0b
-    ld   A, [wDB6C_CurrentLevelId]                                    ;; 00:06a3 $fa $6c $db
+    ld   A, [wDB6C_CurrentMapId]                                    ;; 00:06a3 $fa $6c $db
     cp   A, $08                                        ;; 00:06a6 $fe $08
     ld   A, $3b                                        ;; 00:06a8 $3e $3b
     jr   Z, .jr_00_06ae                                ;; 00:06aa $28 $02
@@ -620,11 +620,11 @@ jp_00_0693:
     farcall entry_02_54f9_SwitchPlayerAction
     ret                                                ;; 00:06b9 $c9
 .jr_00_06ba:
-    ld   A, [wDB6C_CurrentLevelId]                                    ;; 00:06ba $fa $6c $db
+    ld   A, [wDB6C_CurrentMapId]                                    ;; 00:06ba $fa $6c $db
     cp   A, $07                                        ;; 00:06bd $fe $07
     ld   A, $2a                                        ;; 00:06bf $3e $2a
     jr   Z, .jr_00_06ce                                ;; 00:06c1 $28 $0b
-    ld   A, [wDB6C_CurrentLevelId]                                    ;; 00:06c3 $fa $6c $db
+    ld   A, [wDB6C_CurrentMapId]                                    ;; 00:06c3 $fa $6c $db
     cp   A, $08                                        ;; 00:06c6 $fe $08
     ld   A, $37                                        ;; 00:06c8 $3e $37
     jr   Z, .jr_00_06ce                                ;; 00:06ca $28 $02
@@ -825,7 +825,7 @@ call_00_0800:
     push HL                                            ;; 00:0803 $e5
     ld   A, $1f                                        ;; 00:0804 $3e $1f
     call call_00_0eee_SwitchBank                                  ;; 00:0806 $cd $ee $0e
-    ld   A, [wDB6C_CurrentLevelId]                                    ;; 00:0809 $fa $6c $db
+    ld   A, [wDB6C_CurrentMapId]                                    ;; 00:0809 $fa $6c $db
     ld   DE, $b01                                      ;; 00:080c $11 $01 $0b
     call call_00_0777                                  ;; 00:080f $cd $77 $07
     ld   DE, $300                                      ;; 00:0812 $11 $00 $03
@@ -1312,7 +1312,7 @@ call_00_0b25_MainGameLoop_UpdateAndRenderFrame:
     ld   A, [wDAD5]                                    ;; 00:0b6e $fa $d5 $da
     call call_00_0f25_AltSwitchBank                                  ;; 00:0b71 $cd $25 $0f
     ld   A, $01                                        ;; 00:0b74 $3e $01
-    ld   [wDB6B], A                                    ;; 00:0b76 $ea $6b $db
+    ld   [wDB6B_InterruptFlag], A                                    ;; 00:0b76 $ea $6b $db
     ldh  A, [rLY]                                      ;; 00:0b79 $f0 $44
     cp   A, $90                                        ;; 00:0b7b $fe $90
     jr   NC, .jr_00_0b88                               ;; 00:0b7d $30 $09
@@ -1332,8 +1332,8 @@ call_00_0b25_MainGameLoop_UpdateAndRenderFrame:
     reti                                               ;; 00:0b91 $d9
 
 call_00_0b92_WaitForInterrupt:
-; Waits until wDB6B is set to a non-zero value.
-; Clears wDB6B, then halts repeatedly until it changes,
+; Waits until wDB6B_InterruptFlag is set to a non-zero value.
+; Clears wDB6B_InterruptFlag, then halts repeatedly until it changes,
 ;
 ; Likely Purpose:
 ; WaitForInterrupt() is a function that halts execution until the next VBlank interrupt 
@@ -1346,11 +1346,11 @@ call_00_0b92_WaitForInterrupt:
 ; This is typical Game Boy programming practice, as VBlank occurs ~60 times/sec and is the best 
 ; moment to safely write to VRAM and OAM.
     xor  A, A                                          ;; 00:0b92 $af
-    ld   [wDB6B], A                                    ;; 00:0b93 $ea $6b $db
+    ld   [wDB6B_InterruptFlag], A                                    ;; 00:0b93 $ea $6b $db
 .jr_00_0b96:
     halt                                               ;; 00:0b96 $76
     nop                                                ;; 00:0b97 $00
-    ld   A, [wDB6B]                                    ;; 00:0b98 $fa $6b $db
+    ld   A, [wDB6B_InterruptFlag]                                    ;; 00:0b98 $fa $6b $db
     and  A, A                                          ;; 00:0b9b $a7
     jr   Z, .jr_00_0b96                                ;; 00:0b9c $28 $f8
     ret                                                ;; 00:0b9e $c9
@@ -1985,8 +1985,8 @@ call_00_0f9c_CheckInputB:
     and  A, $02                                        ;; 00:0f9f $e6 $02
     ret                                                ;; 00:0fa1 $c9
 
-call_00_0fa2_RequestSongBankAndPlay:
-; Accepts an audio code in A.
+call_00_0fa2_PlaySong:
+; Accepts a song ID in A.
 ; If $FF (no song) or equal to the current song (wDE5C), it does nothing.
 ; Otherwise, it stores the new code in wDE5C.
 ; Waits for an interrupt (call_00_0b92_WaitForInterrupt)—this syncs playback changes to a safe frame.

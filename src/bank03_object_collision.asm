@@ -158,11 +158,11 @@ call_03_4cea_TriggerPlayerActionChange:
     ld   A, $01                                        ;; 03:4d13 $3e $01
 .jr_03_4d15:
     ld   [wDC98], A                                    ;; 03:4d15 $ea $98 $dc
-    ld   A, [wDB6C_CurrentLevelId]                                    ;; 03:4d18 $fa $6c $db
+    ld   A, [wDB6C_CurrentMapId]                                    ;; 03:4d18 $fa $6c $db
     cp   A, $07                                        ;; 03:4d1b $fe $07
     ld   A, $29                                        ;; 03:4d1d $3e $29
     jr   Z, .jr_03_4d2c                                ;; 03:4d1f $28 $0b
-    ld   A, [wDB6C_CurrentLevelId]                                    ;; 03:4d21 $fa $6c $db
+    ld   A, [wDB6C_CurrentMapId]                                    ;; 03:4d21 $fa $6c $db
     cp   A, $08                                        ;; 03:4d24 $fe $08
     ld   A, $36                                        ;; 03:4d26 $3e $36
     jr   Z, .jr_03_4d2c                                ;; 03:4d28 $28 $02
@@ -212,11 +212,11 @@ call_03_4d44_Collision_PlayerHit_ActionChangeConditional:
     ld   a,$01
 .label4D78:
     ld   [wDC98],a
-    ld   a,[wDB6C_CurrentLevelId]
+    ld   a,[wDB6C_CurrentMapId]
     cp   a,$07
     ld   a,$29
     jr   z,.label4D8F
-    ld   a,[wDB6C_CurrentLevelId]
+    ld   a,[wDB6C_CurrentMapId]
     cp   a,$08
     ld   a,$36
     jr   z,.label4D8F
@@ -749,7 +749,7 @@ call_03_50f4_Collision_SlotIncrementTransform:
     
 call_03_5116_Collision_ConditionalTransform_Sound18or1B:
 ; For action 00 only.
-; On collision: requires certain global flags (wDABE, wDC81) and player action between 01–02.
+; On collision: requires certain global flags (wDABE, wDC81_CurrentInputs) and player action between 01–02.
 ; Checks object slot flag; plays sound 1B if not set, else sound 18.
 ; Loads new object data (bank 1).
     call call_00_2962_ObjectGetActionId
@@ -760,7 +760,7 @@ call_03_5116_Collision_ConditionalTransform_Sound18or1B:
     ld   hl,wDABE
     bit  7,[hl]
     ret  z
-    ld   hl,wDC81
+    ld   hl,wDC81_CurrentInputs
     bit  6,[hl]
     ret  z
     ld   a,[wD801_PlayerObject_ActionId]
@@ -791,7 +791,7 @@ call_03_5156_Collision_ConditionalTransform_Bank3:
     ld   hl,wDABE
     bit  7,[hl]
     ret  z
-    ld   hl,wDC81
+    ld   hl,wDC81_CurrentInputs
     bit  6,[hl]
     ret  z
     ld   a,[wD801_PlayerObject_ActionId]
@@ -905,7 +905,7 @@ call_03_5231_Collision_Counter4_LevelGate:
     cp   a,$01
     ret  nz
     call call_00_22e0_IncrementObjectSlot
-    ld   a,[wDB6C_CurrentLevelId]
+    ld   a,[wDB6C_CurrentMapId]
     cp   a,$29
     jr   z,label5258
     cp   a,$2A
@@ -1590,17 +1590,17 @@ call_03_56c1_CheckPlayerObjectCollision_Main:
 ; Splits into several cases depending on whether the player is above, below, or inside the object.
 ; If overlap is valid, it calls into call_03_58a9_ComputeCollisionOffset for fine-grained offset adjustment and then either:
 ; Jumps to call_03_580b_RegisterSecondaryCollision (registers the object as the active collision target),
-; Or to entry_03_57f8_ClearCollisionForObject (clear/ignore collision).
+; Or to call_03_57f8_ClearCollisionForObject (clear/ignore collision).
 ; Role: The main “does the player collide with this object?” function.
     ld   a,[wD801_PlayerObject_ActionId]
     cp   a,$1A
-    jp   z,entry_03_57f8_ClearCollisionForObject
+    jp   z,call_03_57f8_ClearCollisionForObject
     cp   a,$2E
-    jp   z,entry_03_57f8_ClearCollisionForObject
+    jp   z,call_03_57f8_ClearCollisionForObject
     cp   a,$3B
-    jp   z,entry_03_57f8_ClearCollisionForObject
+    jp   z,call_03_57f8_ClearCollisionForObject
     cp   a,$1B
-    jp   z,entry_03_57f8_ClearCollisionForObject
+    jp   z,call_03_57f8_ClearCollisionForObject
     ld   a,[wDC88]
     ld   e,a
     ld   d,$00
@@ -1627,13 +1627,13 @@ label56E3:
     ld   d,a
     jr   c,label570D
     and  a
-    jp   nz,entry_03_57f8_ClearCollisionForObject
+    jp   nz,call_03_57f8_ClearCollisionForObject
     inc  l
     inc  l
     ldd  a,[hl]
     add  a,$0F
     cp   e
-    jp   c,entry_03_57f8_ClearCollisionForObject
+    jp   c,call_03_57f8_ClearCollisionForObject
     jr   label571F
 label570D:
     xor  a
@@ -1642,7 +1642,7 @@ label570D:
     ld   a,$00
     sbc  d
     and  a
-    jp   nz,entry_03_57f8_ClearCollisionForObject
+    jp   nz,call_03_57f8_ClearCollisionForObject
     inc  l
     inc  l
     ldd  a,[hl]
@@ -1669,13 +1669,13 @@ label571F:
     bit  7,a
     jr   nz,label575D
     and  a
-    jp   nz,entry_03_57f8_ClearCollisionForObject
+    jp   nz,call_03_57f8_ClearCollisionForObject
     ld   a,e
     sla  c
     sub  c
-    jp   c,entry_03_57f8_ClearCollisionForObject
+    jp   c,call_03_57f8_ClearCollisionForObject
     cp   a,$08
-    jp   nc,entry_03_57f8_ClearCollisionForObject
+    jp   nc,call_03_57f8_ClearCollisionForObject
     ld   c,a
     call call_03_58a9_ComputeCollisionOffset
     ld   a,c
@@ -1686,14 +1686,14 @@ label571F:
     jp   nz,call_03_580b_RegisterSecondaryCollision
     and  a
     jp   z,call_03_580b_RegisterSecondaryCollision
-    jp   entry_03_57f8_ClearCollisionForObject
+    jp   call_03_57f8_ClearCollisionForObject
 label575D:
     inc  d
-    jp   nz,entry_03_57f8_ClearCollisionForObject
+    jp   nz,call_03_57f8_ClearCollisionForObject
     ld   a,e
     cpl  
     cp   a,$08
-    jp   nc,entry_03_57f8_ClearCollisionForObject
+    jp   nc,call_03_57f8_ClearCollisionForObject
     ld   c,a
     call call_03_58a9_ComputeCollisionOffset
     ld   a,c
@@ -1704,7 +1704,7 @@ label575D:
     jp   nz,call_03_580b_RegisterSecondaryCollision
     and  a
     jp   z,call_03_580b_RegisterSecondaryCollision
-    jp   entry_03_57f8_ClearCollisionForObject
+    jp   call_03_57f8_ClearCollisionForObject
 label577C:
     ldi  a,[hl]
     ld   c,a
@@ -1724,11 +1724,11 @@ label577C:
     ld   e,a
     ld   a,$00
     adc  d
-    jr   nz,entry_03_57f8_ClearCollisionForObject
+    jr   nz,call_03_57f8_ClearCollisionForObject
     ld   a,c
     add  a
     cp   e
-    jr   c,entry_03_57f8_ClearCollisionForObject
+    jr   c,call_03_57f8_ClearCollisionForObject
     inc  l
     ldi  a,[hl]
     sub  b
@@ -1761,11 +1761,11 @@ label57AE:
     ld   a,b
     sbc  d
     ld   b,a
-    jr   c,entry_03_57f8_ClearCollisionForObject
-    jr   nz,entry_03_57f8_ClearCollisionForObject
+    jr   c,call_03_57f8_ClearCollisionForObject
+    jr   nz,call_03_57f8_ClearCollisionForObject
     ld   a,c
     cp   a,$10
-    jr   nc,entry_03_57f8_ClearCollisionForObject
+    jr   nc,call_03_57f8_ClearCollisionForObject
     ld   a,[wDC8C]
     sra  a
     sra  a
@@ -1777,7 +1777,7 @@ label57AE:
     jr   nz,call_03_57e6_ResolveCollision_Reset
     cp   a,$02
     jr   c,call_03_57e6_ResolveCollision_Reset
-    jr   entry_03_57f8_ClearCollisionForObject
+    jr   call_03_57f8_ClearCollisionForObject
 
 call_03_57e6_ResolveCollision_Reset:
 ; What it does:

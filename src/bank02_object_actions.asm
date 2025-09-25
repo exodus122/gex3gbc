@@ -252,11 +252,11 @@ call_02_5a1c:
     ret  NZ                                            ;; 02:5a2b $c0
     ld   A, $02                                        ;; 02:5a2c $3e $02
     call call_02_72ac_LoadObjectData                                  ;; 02:5a2e $cd $ac $72
-    ld   A, [wDB6C_CurrentLevelId]                                    ;; 02:5a31 $fa $6c $db
+    ld   A, [wDB6C_CurrentMapId]                                    ;; 02:5a31 $fa $6c $db
     cp   A, $07                                        ;; 02:5a34 $fe $07
     ld   A, $2c                                        ;; 02:5a36 $3e $2c
     jr   Z, .jr_02_5a45                                ;; 02:5a38 $28 $0b
-    ld   A, [wDB6C_CurrentLevelId]                                    ;; 02:5a3a $fa $6c $db
+    ld   A, [wDB6C_CurrentMapId]                                    ;; 02:5a3a $fa $6c $db
     cp   A, $08                                        ;; 02:5a3d $fe $08
     ld   A, $39                                        ;; 02:5a3f $3e $39
     jr   Z, .jr_02_5a45                                ;; 02:5a41 $28 $02
@@ -1577,7 +1577,7 @@ call_02_652e:
 call_02_653d:
     call call_00_2a5d_ObjectCheckFlag2
     ret  z
-    call call_00_1bbc_CheckPlayerLevelTriggers.jr_00_1bce
+    call call_00_1bbc_CheckForDoorAndEnter.jr_00_1bce
     ld   c,$02
     jp   call_00_2299_SetObjectStatusLowNibble
 
@@ -1592,7 +1592,7 @@ call_02_6549:
     jp   entry_02_72ac_LoadObjectData
     call call_00_2a5d_ObjectCheckFlag2
     ret  z
-    call call_00_1bbc_CheckPlayerLevelTriggers.jr_00_1bce
+    call call_00_1bbc_CheckForDoorAndEnter.jr_00_1bce
     ld   c,$00
     jp   call_00_2299_SetObjectStatusLowNibble
     call call_00_22d4_CheckObjectSlotFlag
@@ -1626,7 +1626,7 @@ call_02_6549:
     farcall entry_03_57f8_ClearCollisionForObject
     ld   a,$01
     jp   entry_02_72ac_LoadObjectData
-    ld   a,[wDB6C_CurrentLevelId]
+    ld   a,[wDB6C_CurrentMapId]
     cp   a,$2B
     ret  nz
     call call_00_22d4_CheckObjectSlotFlag

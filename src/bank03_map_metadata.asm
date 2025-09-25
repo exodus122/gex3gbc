@@ -2,10 +2,10 @@ entry_03_6c89_LoadMapData:
 call_03_6c89_LoadMapData:
 ; Purpose: Copies level-specific metadata from a lookup table into working RAM.
 ; Behavior:
-; Uses wDB6C_CurrentLevelId as index into .data_03_6ca0_LevelData.
+; Uses wDB6C_CurrentMapId as index into .data_03_6ca0_LevelData.
 ; Reads a pointer to the level’s configuration, then copies 0x1F bytes into wDC01_MapBank.
 ; Usage: Part of level setup, ensuring the correct map bank and related data are loaded.
-    ld   HL, wDB6C_CurrentLevelId                                     ;; 03:6c89 $21 $6c $db
+    ld   HL, wDB6C_CurrentMapId                                     ;; 03:6c89 $21 $6c $db
     ld   L, [HL]                                       ;; 03:6c8c $6e
     ld   H, $00                                        ;; 03:6c8d $26 $00
     add  HL, HL                                        ;; 03:6c8f $29
