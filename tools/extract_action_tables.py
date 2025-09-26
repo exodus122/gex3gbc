@@ -30,7 +30,7 @@ object_names = [
     "Object_unk19",
     "Object_unk1A",
     "Object_BonusStageTimer",
-    "Object_GexCave_Remote",
+    "Object_FreestandingRemote",
     "Object_HolidayTV_IceSculpture",
     "Object_HolidayTV_EvilSanta",
     "Object_HolidayTV_EvilSantaProjectile",

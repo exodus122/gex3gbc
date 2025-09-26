@@ -1321,7 +1321,6 @@ call_03_54f9:
     ret  
 
 call_03_550e_CheckPlayerObjectInteraction:
-; What it does:
 ; Starts by checking an object’s state byte at offset +$15. If nonzero, bails out (call_03_55fd_ReturnNoInteraction → return 0).
 ; Otherwise, looks up a value in the data_03_55ff_ObjectInteractionFlagsTable table using the object’s type ID. 
 ; - Stores this into wDC58 — looks like an interaction ruleset (bitflags: different behavior per object type).
@@ -1485,7 +1484,6 @@ call_03_550e_CheckPlayerObjectInteraction:
     ret                                                ;; 03:55fc $c9
 
 call_03_55fd_ReturnNoInteraction:
-; What it does:
 ; Just xor A and ret.
 ; Acts as the “failed collision / no interaction” exit for call_03_550e.
     xor  A, A                                          ;; 03:55fd $af
@@ -1516,7 +1514,6 @@ data_03_55ff_ObjectInteractionFlagsTable:
 
 entry_03_5671_HandleObjectHitOrRespawn:
 call_03_5671_HandleObjectHitOrRespawn:
-; What it does:
 ; Reads object state bytes at +$15/$16.
 ; If $15 is nonzero, returns (object busy).
 ; If $16 is $FF or 0, returns (inactive/dead).
@@ -1580,7 +1577,6 @@ call_03_5671_HandleObjectHitOrRespawn:
     jp   call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 03:56be $c3 $f5 $0f
 
 call_03_56c1_CheckPlayerObjectCollision_Main:
-; What it does:
 ; Early exit if the player’s ActionId is in certain states 
 ; (1A, 2E, 3B, 1B = probably cutscenes, knockback, death, or other “don’t collide” states).
 ; Otherwise, it takes the player’s Y position + vertical offset (wDC88, which looks like a 
@@ -1780,7 +1776,6 @@ label57AE:
     jr   call_03_57f8_ClearCollisionForObject
 
 call_03_57e6_ResolveCollision_Reset:
-; What it does:
 ; Clears wDC88 (the player’s vertical delta).
 ; Stores the current object ID (wDA00_CurrentObjectAddr) into wDC7B.
 ; If that ID was already in wDC7D, resets it to zero.
@@ -1799,7 +1794,6 @@ call_03_57e6_ResolveCollision_Reset:
 
 entry_03_57f8_ClearCollisionForObject:
 call_03_57f8_ClearCollisionForObject:
-; What it does:
 ; Compares the current object ID to the two “last touched object” slots (wDC7B and wDC7D).
 ; If it matches, clears those slots.
 ; Effectively means: “This object is no longer colliding with the player, remove it from tracking.”
@@ -1817,7 +1811,6 @@ call_03_57f8_ClearCollisionForObject:
     ret                                                ;; 03:580a $c9
 
 call_03_580b_RegisterSecondaryCollision:
-; What it does:
 ; Marks the current object as the “secondary” collision slot (wDC7D).
 ; If it was in wDC7B, clears that first.
 ; Role: Assigns the object as the active secondary collision candidate.
@@ -1831,7 +1824,6 @@ label5816:
     ret  
 
 call_03_581a_CheckPlayerObjectCollision_Simple:
-; What it does:
 ; Another collision test, but narrower than 56c1.
 ; Skips entirely if the player is in the same “ignore” action IDs.
 ; Uses the object’s width/height at $D8xx+12/+13 to test bounding-box intersection against the player.
@@ -1926,7 +1918,6 @@ call_03_581a_CheckPlayerObjectCollision_Simple:
     jp   call_03_57f8_ClearCollisionForObject                                    ;; 03:58a6 $c3 $f8 $57
 
 call_03_58a9_ComputeCollisionOffset:
-; What it does:
 ; Loads the object’s parameter at $D8xx+1B.
 ; Flips it if the object’s direction byte ($D8xx+19) has bit 7 set (sign extension trick).
 ; Combines this with wDC84–wDC86 (looks like camera or scroll deltas).

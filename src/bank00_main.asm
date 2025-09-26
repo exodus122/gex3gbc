@@ -1400,7 +1400,6 @@ call_00_0b9f_Frame_TilemapUpdateHandler:
     jp   call_00_088a_HDMA_BackgroundAnimator                                    ;; 00:0bcc $c3 $8a $08
 
 jp_00_0bcf_CopyBlock16BytesLoop:
-; What it does:
 ; A tight copy loop: copies 16 bytes from [HL+] to [DE], decrements counter B, and repeats until zero.
 ; Generic block-copy routine used by the transfer queue.
     ld   A, [HL+]                                      ;; 00:0bcf $2a
@@ -1456,7 +1455,6 @@ jp_00_0bcf_CopyBlock16BytesLoop:
     ret                                                ;; 00:0c02 $c9
     
 call_00_0c03_WaitForVRAMCopyCompletion:
-; What it does:
 ; Polls wD9FD masked with $7F. If zero, returns. Otherwise, 
 ; repeatedly calls call_00_0b92_WaitForInterrupt and loops.
 ; Essentially “wait until VRAM safe period ends.”
@@ -1468,7 +1466,6 @@ call_00_0c03_WaitForVRAMCopyCompletion:
     jr   call_00_0c03_WaitForVRAMCopyCompletion
 
 call_00_0c10_QueueVRAMCopyRequest:
-; What it does:
 ; Ensures only one copy operation is queued at a time.
 ; Takes accumulator A, ORs $80, compares against wD9FD. If same, return. Otherwise mask to 7 bits and write.
 ; Likely a “request VRAM transfer” trigger.
@@ -1543,7 +1540,6 @@ call_00_0c44_LCDInterrupt_Table:
     reti 
 
 call_00_0c6a_HandlePendingHDMATransfers:
-; What it does:
 ; Clears wDB67.
 ; Reads control flags from wDB66.
 ; Depending on bits, it sets up HDMA transfers from different sources:
@@ -1754,7 +1750,6 @@ call_00_0d8b_Palette_UpdateBG:
     db   $00, $00, $e0, $01, $00, $00, $e0, $01
     
 call_00_0dc6_HBlankInterrupt_LoadPaletteSlice:
-; What it does:
 ; Writes a hardcoded set of 8 bytes (.data_00_0df0) into the CGB background palettes 
 ; registers (rBCPS/rBCPD) — two full palette entries.
 ; Then increments a counter at wDB67 (used as a “scanline mark” in the frame loop).
@@ -1789,7 +1784,6 @@ call_00_0dc6_HBlankInterrupt_LoadPaletteSlice:
     db   $ff, $7f, $80, $03, $ff, $03, $ff, $7f, $d9                  ;; 00:0df3 ?????.
 
 call_00_0df9_ProcessVRAMTransferQueue:
-; What it does:
 ; First calls call_00_0c6a_HandlePendingHDMATransfers (HDMA/VRAM copy handler).
 ; Then checks a counter at wDBEF. If nonzero, decrements it and uses wDBF0..wDBF7 
 ; as a state structure to fetch source/destination pointers and a bank.

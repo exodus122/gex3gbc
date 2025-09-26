@@ -769,7 +769,6 @@ call_00_1351_LoadHorizontalBgStrip:
 
 call_00_14e2_ConvertXYToTileCoords:
 ; Coordinate Downscaler
-; Description:
 ; Takes two 16-bit coordinates (BC and DE), right-shifts them four times (divides by 16), 
 ; and stores the resulting low bytes in wDC27 (E → low Y) and wDC28 (C → low X). 
 ; Used to convert pixel positions to tile indices for map lookups.
@@ -801,7 +800,6 @@ call_00_14e2_ConvertXYToTileCoords:
 
 call_00_150f_CheckAndSetLevelTrigger:
 ; Level Event Trigger Checker
-; Description:
 ; Reads wDC8A as an event flag. If not already triggered (bit7 clear), it marks it triggered, 
 ; looks up a table (.data_00_153f) indexed by current level and offset E, and loads a value into wDC69. 
 ; It also sets bit2 of wDB6A. Handles special values $ff (no action) and $fe (conditional on wDCB1).
@@ -868,7 +866,6 @@ call_00_150f_CheckAndSetLevelTrigger:
 
 call_00_1633_HandleLevelWarpOrExit:
 ; Level Transition Loader
-; Description:
 ; Calculates a destination level and coordinates based on current level number (wDC1E) and 
 ; player Y-position. It fetches a pointer from .data_00_16a2_PlayerSpawnPositions, determines the new level ID, 
 ; screen positions (wDC6A/B), and offset vector (wDC6C), ensuring transitions are within bounds.
@@ -1073,7 +1070,6 @@ call_00_1633_HandleLevelWarpOrExit:
 
 call_00_1a22_LoadInitialBgMap:
 ; Initialize Background Map Rows
-; Description:
 ; Loops 22 times ($16), each time calling LoadBgMapInitial2, then increments the map’s Y position by 8 pixels, 
 ; effectively filling the initial BG map rows. After finishing, it subtracts $b0 from Y to restore the pointer.
     ld   [wDC33], A                                    ;; 00:1a22 $ea $33 $dc
@@ -1102,7 +1098,6 @@ call_00_1a22_LoadInitialBgMap:
 
 call_00_1a46_LoadBgMapRow:
 ; Load One BG Map Row
-; Description:
 ; Loads a single horizontal row of background map tiles:
 ; Uses call_00_14e2 to convert pixel X/Y to tile indices.
 ; Computes tile/block pointers, switches to the correct VRAM/map banks, 
@@ -1531,7 +1526,7 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
 
 ; Enters a loop that:
 ; Waits for inputs and updates the map
-; Calls call_00_217f_ApplyCutsceneMovementFlags (movement handler below) and updates objects (entry_02_7152_UpdateObjects).
+; Calls call_00_217f_ProcessCutsceneMovement (movement handler below) and updates objects (entry_02_7152_UpdateObjects).
 ; Spawns any queued objects (call_00_35fa_WaitForLineThenSpawnObject).
 ; Decrements timing counters until the script says to advance or exit.
 
@@ -1628,7 +1623,7 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
     jp   .jp_00_1f9f                                   ;; 00:1f3f $c3 $9f $1f
 .jr_00_1f42:
     call call_00_0b92_WaitForInterrupt                                  ;; 00:1f42 $cd $92 $0b
-    call call_00_217f_ApplyCutsceneMovementFlags                                  ;; 00:1f45 $cd $7f $21
+    call call_00_217f_ProcessCutsceneMovement                                  ;; 00:1f45 $cd $7f $21
     farcall entry_02_7152_UpdateObjects
     call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:1f53 $cd $c8 $11
     call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:1f56 $cd $fa $35
@@ -1754,8 +1749,8 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
     db   $00, $00, $00, $3c, $00, $10, $20, $02        ;; 00:2170 ????????
     db   $50, $40, $00, $00, $3c, $00, $ff             ;; 00:2178 ???????
 
-call_00_217f_ApplyCutsceneMovementFlags:
-; Reads wDC81_CurrentInputs (movement/control flags).
+call_00_217f_ProcessCutsceneMovement:
+; Reads wDC81_CurrentInputs (input flags).
 ; Writes either $10 or $00 to wDCE0, mixes low bits into its second byte, then derives a movement step (C).
 ; Checks bits in wDC81_CurrentInputs to adjust player position:
 ; Bit 4: move player right by C.

@@ -57,7 +57,7 @@ entry_02_708f_InitObjectsAndSpawnPlayer:
     jr   NZ, .jr_02_7115                               ;; 02:7104 $20 $0f
     ld   A, L                                          ;; 02:7106 $7d
     ld   [wDA00_CurrentObjectAddr], A                                    ;; 02:7107 $ea $00 $da
-    farcall entry_02_5bb3
+    farcall entry_02_5bb3_ObjectAction_UpdateBonusStageTimer
 .jr_02_7115:
     call call_00_3252_ResetObjectCounter                                  ;; 02:7115 $cd $52 $32
 .jr_02_7118:

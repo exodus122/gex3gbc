@@ -151,11 +151,11 @@ DEF Object_Gex                                         EQU $0
 DEF Object_BonusCoin                                   EQU $1
 DEF Object_FlyCoinSpawn                                EQU $2
 DEF Object_PawCoin                                     EQU $3
-DEF Object_unk04                                       EQU $4
-DEF Object_unk05                                       EQU $5
-DEF Object_unk06                                       EQU $6
-DEF Object_unk07                                       EQU $7
-DEF Object_unk08                                       EQU $8
+DEF Object_unk04                                       EQU $4 ; probably tv fly
+DEF Object_unk05                                       EQU $5 ; probably tv fly
+DEF Object_unk06                                       EQU $6 ; probably tv fly
+DEF Object_unk07                                       EQU $7 ; probably tv fly
+DEF Object_unk08                                       EQU $8 ; probably tv fly
 DEF Object_GreenFlyTV                                  EQU $9
 DEF Object_PurpleFlyTV                                 EQU $0A
 DEF Object_unk0B                                       EQU $0B
@@ -175,7 +175,7 @@ DEF Object_unk18                                       EQU $18
 DEF Object_unk19                                       EQU $19
 DEF Object_unk1A                                       EQU $1A
 DEF Object_BonusStageTimer                             EQU $1B
-DEF Object_GexCave_Remote                              EQU $1C
+DEF Object_FreestandingRemote                          EQU $1C
 DEF Object_HolidayTV_IceSculpture                      EQU $1D
 DEF Object_HolidayTV_EvilSanta                         EQU $1E
 DEF Object_HolidayTV_EvilSantaProjectile               EQU $1F
