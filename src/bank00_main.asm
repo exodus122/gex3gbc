@@ -316,7 +316,7 @@ call_00_0150_Init:
     call call_00_0513                                  ;; 00:0410 $cd $13 $05
     xor  A, A                                          ;; 00:0413 $af
     ld   [wDB6A], A                                    ;; 00:0414 $ea $6a $db
-    ld   [wDCDB], A                                    ;; 00:0417 $ea $db $dc
+    ld   [wDCDB_EvilSantaHitByProjectileFlag], A                                    ;; 00:0417 $ea $db $dc
     ld   A, $ff                                        ;; 00:041a $3e $ff
     ld   [wDC8A], A                                    ;; 00:041c $ea $8a $dc
     jr   .jp_00_0443                                   ;; 00:041f $18 $22
@@ -417,7 +417,7 @@ call_00_0513:
     ld   A, [HL+]                                      ;; 00:052b $2a
     ld   H, [HL]                                       ;; 00:052c $66
     ld   L, A                                          ;; 00:052d $6f
-    ld   A, [wD80A]                                    ;; 00:052e $fa $0a $d8
+    ld   A, [wD80A_Player_unk0A]                                    ;; 00:052e $fa $0a $d8
     ld   E, A                                          ;; 00:0531 $5f
     ld   D, $00                                        ;; 00:0532 $16 $00
     add  HL, DE                                        ;; 00:0534 $19
@@ -1315,7 +1315,7 @@ call_00_0b25_MainGameLoop_UpdateAndRenderFrame:
     ldh  [rWX], A                                      ;; 00:0b58 $e0 $4b
     ld   A, [wDADC]                                    ;; 00:0b5a $fa $dc $da
     ldh  [rWY], A                                      ;; 00:0b5d $e0 $4a
-    ld   HL, wDC71                                     ;; 00:0b5f $21 $71 $dc
+    ld   HL, wDC71_FrameCounter                                     ;; 00:0b5f $21 $71 $dc
     inc  [HL]                                          ;; 00:0b62 $34
     ld   A, [wDE60]                                    ;; 00:0b63 $fa $60 $de
     add  A, $04                                        ;; 00:0b66 $c6 $04
@@ -1589,7 +1589,7 @@ call_00_0c6a_HandlePendingHDMATransfers:
     call call_00_0f25_AltSwitchBank                                  ;; 00:0cb4 $cd $25 $0f
     ld   H, $d8                                        ;; 00:0cb7 $26 $d8
     ld   A, [wDB61]                                    ;; 00:0cb9 $fa $61 $db
-    or   A, $05                                        ;; 00:0cbc $f6 $05
+    or   A, OBJECT_UNK05_OFFSET                                        ;; 00:0cbc $f6 $05
     ld   L, A                                          ;; 00:0cbe $6f
     bit  5, [HL]                                       ;; 00:0cbf $cb $6e
     jr   NZ, .jr_00_0ceb                               ;; 00:0cc1 $20 $28
@@ -1861,7 +1861,7 @@ call_00_0e3b_ClearGameStateVariables:
     ld   [wDC72], A                                    ;; 00:0e4b $ea $72 $dc
     ld   [wDBE3], A                                    ;; 00:0e4e $ea $e3 $db
     ld   [wDD6B], A                                    ;; 00:0e51 $ea $6b $dd
-    farcall entry_02_7123_ClearObjectSlots
+    farcall entry_02_7123_ClearObjectSlotsExcludingPlayer
     jp   call_00_0b92_WaitForInterrupt                                  ;; 00:0e5f $c3 $92 $0b
 
 call_00_0e62_ResetFlagsAndVRAMState:

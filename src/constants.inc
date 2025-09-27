@@ -147,16 +147,16 @@ DEF Map_ChannelZ4                 EQU $3B
 DEF Map_ChannelZ5                 EQU $3C
 
 ; Objects
-DEF Object_Gex                                         EQU $0
-DEF Object_BonusCoin                                   EQU $1
-DEF Object_FlyCoinSpawn                                EQU $2
-DEF Object_PawCoin                                     EQU $3
-DEF Object_unk04                                       EQU $4 ; probably tv fly
-DEF Object_unk05                                       EQU $5 ; probably tv fly
-DEF Object_unk06                                       EQU $6 ; probably tv fly
-DEF Object_unk07                                       EQU $7 ; probably tv fly
-DEF Object_unk08                                       EQU $8 ; probably tv fly
-DEF Object_GreenFlyTV                                  EQU $9
+DEF Object_Gex                                         EQU $00
+DEF Object_BonusCoin                                   EQU $01
+DEF Object_FlyCoinSpawn                                EQU $02
+DEF Object_PawCoin                                     EQU $03
+DEF Object_unk04                                       EQU $04 ; probably tv fly
+DEF Object_unk05                                       EQU $05 ; probably tv fly
+DEF Object_unk06                                       EQU $06 ; probably tv fly
+DEF Object_unk07                                       EQU $07 ; probably tv fly
+DEF Object_unk08                                       EQU $08 ; probably tv fly
+DEF Object_GreenFlyTV                                  EQU $09
 DEF Object_PurpleFlyTV                                 EQU $0A
 DEF Object_unk0B                                       EQU $0B
 DEF Object_BlueFlyTV                                   EQU $0C
@@ -261,3 +261,34 @@ DEF Object_ChannelZ_Rez                                EQU $6E
 DEF Object_unk6F                                       EQU $6F
 DEF Object_ChannelZ_Meteor                             EQU $70
 DEF Object_ChannelZ_RockProjectile                     EQU $71
+
+; Object Instance Struct
+DEF OBJECT_ID_OFFSET                  EQU $00
+DEF OBJECT_ACTIONID_OFFSET            EQU $01
+DEF OBJECT_ACTIONPTR_OFFSET           EQU $02
+DEF OBJECT_FLAGS_OFFSET               EQU $04
+DEF OBJECT_UNK05_OFFSET               EQU $05
+DEF OBJECT_UNK09_OFFSET               EQU $09
+DEF OBJECT_UNK0A_OFFSET               EQU $0A
+DEF OBJECT_FACINGDIRECTION_OFFSET     EQU $0D
+DEF OBJECT_XPOS_OFFSET                EQU $0E
+DEF OBJECT_YPOS_OFFSET                EQU $10
+DEF OBJECT_WIDTH_OFFSET               EQU $12
+DEF OBJECT_HEIGHT_OFFSET              EQU $13
+DEF OBJECT_UNK14_OFFSET               EQU $14
+DEF OBJECT_UNK15_OFFSET               EQU $15 ; collision related
+DEF OBJECT_UNK16_OFFSET               EQU $16
+DEF OBJECT_UNK19_OFFSET               EQU $19
+DEF OBJECT_UNK1A_OFFSET               EQU $1A
+DEF OBJECT_XVEL_OFFSET                EQU $1B
+DEF OBJECT_YVEL_OFFSET                EQU $1D
+DEF OBJECT_UNK1F_OFFSET               EQU $1F ; collision related
+
+; Object Facing Direction values
+DEF OBJECT_FACING_RIGHT      EQU $00
+DEF OBJECT_FACING_LEFT       EQU $20
+DEF OBJECT_FACING_UNK40      EQU $40
+
+; Object position relative to Gex
+DEF OBJECT_LEFT_OF_GEX       EQU $00
+DEF OBJECT_RIGHT_OF_GEX      EQU $20

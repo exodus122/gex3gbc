@@ -52,46 +52,39 @@ wD579:
     ds 647                                             ;; d579
 
 ; From D800 to D900 is the loaded objects space
-
+; There are 8 instances of 0x20 bytes each. 
+; Object Instance Struct is defined in constants.inc
 wD800_PlayerObject_Id:
     ds 1                                               ;; d800
-
 wD801_PlayerObject_ActionId:
     ds 1                                               ;; d801
-
 wD802_PlayerObject_ActionFunc:
     ds 3                                               ;; d802
-
-wD805:
+wD805_Player_unk05:
     ds 4                                               ;; d805
-
-wD809:
+wD809_Player_unk09:
     ds 1                                               ;; d809
-
-wD80A:
+wD80A_Player_unk0A:
     ds 3                                               ;; d80a
-
 wD80D_PlayerFacingDirection:
     ds 1                                               ;; d80d
-
 wD80E_PlayerXPosition:
     ds 1                                               ;; d80e
-
 wD80F_PlayerXPosition:
     ds 1                                               ;; d80f
-
 wD810_PlayerYPosition:
     ds 1                                               ;; d810
-
 wD811_PlayerYPosition:
     ds 15                                              ;; d811
-
-wD820:
+wD820_ObjectMemoryAfterPlayer:
     ds 32                                              ;; d820
-
-wD840:
-    ds 192                                             ;; d840
-
+wD840: ; why does some code use this and not wDB20? is this a bug? 
+    ds 32                                              ;; d840
+    ds 32 
+    ds 32 
+    ds 32 
+    ds 32 
+    ds 32 
 ; End of Loaded Objects space
 
 wD900:
@@ -103,95 +96,102 @@ wD901:
 wD904:
     ds 156                                             ;; d904
 
+; Graphics/Rendering related memory
 wD9A0:
 ; Interrupt code location?
     ds 93                                              ;; d9a0
-
 wD9FD:
     ds 1                                               ;; d9fd
-
 wD9FE:
     ds 1                                               ;; d9fe
-
 wD9FF:
     ds 1                                               ;; d9ff
 
+; DA00 through DA13 stores temporary information about the currently updating object
 wDA00_CurrentObjectAddr:
     ds 1                                               ;; da00
-
 wDA01:
     ds 8                                               ;; da01
-
 wDA09:
     ds 8                                               ;; da09
-
-wDA11:
+wDA11_ObjectXDistFromPlayer:
+; The distance between the player and the current object
     ds 1                                               ;; da11
-
-wDA12:
+wDA12_ObjectDirectionRelativeToPlayer:
+; The direction of the current object relative to the player
+; 0x00 (OBJECT_LEFT_OF_GEX) = object is to the left of the player
+; 0x20 (OBJECT_RIGHT_OF_GEX) = object is to the right of the player
     ds 1                                               ;; da12
-
-wDA13:
+wDA13_ObjectXVelocityDelta:
+; How much the X Velocity of the current object has changed/(will change?) by
     ds 1                                               ;; da13
 
-wDA14:
+; Camera position
+wDA14_CameraLeftLo:
     ds 1                                               ;; da14
-
-wDA15:
+wDA15_CameraLeftHi:
     ds 1                                               ;; da15
-
-wDA16:
+wDA16_CameraRightLo:
     ds 1                                               ;; da16
-
-wDA17:
+wDA17_CameraRightHi:
     ds 1                                               ;; da17
-
-wDA18:
+wDA18_CameraTopLo:
     ds 1                                               ;; da18
-
-wDA19:
+wDA19_CameraTopHi:
     ds 1                                               ;; da19
-
-wDA1A:
+wDA1A_CameraBottomLo:
     ds 1                                               ;; da1a
-
-wDA1B:
+wDA1B_CameraBottomHi:
     ds 1                                               ;; da1b
 
-wDA1C:
+; DA1C through DA9B is extra object memory (8 instances of size 0x10)
+; 0x0 (wDA1C_ObjectBoundingBoxWidth) - object bounding width
+; 0x2 (wDA1C_ObjectBoundingBoxHeight) - object bounding height
+; 0x4 (wDA20) - ?
+; 0x6 (wDA22) - ?
+; 0x8 (wDA24) - ?
+; 0xA (wDA26) - ?
+; 0xC (wDA28) - unused
+; 0xE (wDA2A) - unused
+wDA1C_ObjectBoundingBoxWidth:
     ds 2                                               ;; da1c
-
-wDA1E:
+wDA1C_ObjectBoundingBoxHeight:
     ds 2                                               ;; da1e
-
 wDA20:
     ds 2                                               ;; da20
-
 wDA22:
     ds 2                                               ;; da22
-
 wDA24:
     ds 2                                               ;; da24
-
 wDA26:
-    ds 118                                             ;; da26
+    ds 2
+    ds 4
+    ds 16                                            ;; da26
+    ds 16
+    ds 16
+    ds 16
+    ds 16
+    ds 16
+    ds 16
+; end extra object memory
 
 wDA9C:
     ds 16                                              ;; da9c
 
-wDAAC:
+wDAAC_CameraXHi:
+; Camera X position related
     ds 1                                               ;; daac
-
-wDAAD:
+wDAAD_CameraYHi:
+; Camera Y position related
     ds 1                                               ;; daad
 
 wDAAE_ObjectPaletteIds:
     ds 8                                               ;; daae
 
-wDAB6:
+wDAB6_SpriteFlags:
     ds 1                                               ;; dab6
 
-wDAB7:
+wDAB7_ParticleVelocity:
     ds 1                                               ;; dab7
 
 wDAB8:
@@ -581,16 +581,16 @@ wDBF7:
 wDBF8:
     ds 1                                               ;; dbf8
 
-wDBF9_XPositionInMap:
+wDBF9_XPositionInMapLo:
     ds 1                                               ;; dbf9
 
-wDBFA_XPositionInMap:
+wDBFA_XPositionInMapHi:
     ds 1                                               ;; dbfa
 
-wDBFB_YPositionInMap:
+wDBFB_YPositionInMapLo:
     ds 1                                               ;; dbfb
 
-wDBFC_YPositionInMap:
+wDBFC_YPositionInMapHi:
     ds 1                                               ;; dbfc
 
 wDBFD_XPositionRelated:
@@ -857,7 +857,7 @@ wDC6F:
 wDC70:
     ds 1                                               ;; dc70
 
-wDC71:
+wDC71_FrameCounter:
     ds 1                                               ;; dc71
 
 wDC72:
@@ -1034,7 +1034,7 @@ wDCC2:
 wDCC3:
     ds 1                                               ;; dcc3
 
-wDCC4:
+wDCC4_EvilSantaHealth:
     ds 1                                               ;; dcc4
 
 wDCC5:
@@ -1103,7 +1103,7 @@ wDCD9:
 wDCDA:
     ds 1                                               ;; dcda
 
-wDCDB:
+wDCDB_EvilSantaHitByProjectileFlag:
     ds 1                                               ;; dcdb
 
 wDCDC:

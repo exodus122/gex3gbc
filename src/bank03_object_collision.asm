@@ -16,7 +16,7 @@ call_03_4c38_UpdateObjectCollision_Dispatch:
     ret  Z                                             ;; 03:4c3c $c8
     ld   H, $d8                                        ;; 03:4c3d $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                  ;; 03:4c3f $fa $00 $da
-    or   A, $15                                        ;; 03:4c42 $f6 $15
+    or   A, OBJECT_UNK15_OFFSET                                        ;; 03:4c42 $f6 $15
     ld   L, A                                          ;; 03:4c44 $6f
     ld   A, [HL]                                       ;; 03:4c45 $7e
     and  A, A                                          ;; 03:4c46 $a7
@@ -146,7 +146,7 @@ call_03_4cea_TriggerPlayerActionChange:
 .jr_03_4cfe:
     ld   H, $d8                                        ;; 03:4cfe $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:4d00 $fa $00 $da
-    or   A, $0e                                        ;; 03:4d03 $f6 $0e
+    or   A, OBJECT_XPOS_OFFSET                                        ;; 03:4d03 $f6 $0e
     ld   L, A                                          ;; 03:4d05 $6f
     ld   A, [wD80E_PlayerXPosition]                                    ;; 03:4d06 $fa $0e $d8
     sub  A, [HL]                                       ;; 03:4d09 $96
@@ -200,7 +200,7 @@ call_03_4d44_Collision_PlayerHit_ActionChangeConditional:
     ld   [wDC7E],a
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   l,a
     ld   a,[wD80E_PlayerXPosition]
     sub  [hl]
@@ -308,7 +308,7 @@ call_03_4e04_Collision_PlayerHit_TriggerPhaseChange:
     call call_00_0624_SetPhase_TimersAndFlags
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$1F
+    or   a,OBJECT_UNK1F_OFFSET
     ld   l,a
     ld   l,[hl]
     ld   h,$D7
@@ -380,7 +380,7 @@ call_03_4e89_Collision_ObjectStateOrTransform:
 ;   .data_03_4efa (a table of progression values), writes it to object state.
 ; If collision A!=01:
 ; - Loads new object data from bank 6, then triggers a player action change.
-    call call_00_28d2_ObjectGet1D                                  ;; 03:4e89 $cd $d2 $28
+    call call_00_28d2_ObjectGetYVelocity                                  ;; 03:4e89 $cd $d2 $28
     bit  7, A                                          ;; 03:4e8c $cb $7f
     ret  NZ                                            ;; 03:4e8e $c0
     call call_00_2962_ObjectGetActionId                                  ;; 03:4e8f $cd $62 $29
@@ -390,7 +390,7 @@ call_03_4e89_Collision_ObjectStateOrTransform:
     ret  NC                                            ;; 03:4e98 $d0
     cp   A, $01                                        ;; 03:4e99 $fe $01
     jr   NZ, .jr_03_4eea                               ;; 03:4e9b $20 $4d
-    call call_00_28d2_ObjectGet1D                                  ;; 03:4e9d $cd $d2 $28
+    call call_00_28d2_ObjectGetYVelocity                                  ;; 03:4e9d $cd $d2 $28
     cpl                                                ;; 03:4ea0 $2f
     inc  A                                             ;; 03:4ea1 $3c
     ld   [HL], A                                       ;; 03:4ea2 $77
@@ -398,10 +398,10 @@ call_03_4e89_Collision_ObjectStateOrTransform:
     call call_00_29ce_ObjectExistsCheck                                  ;; 03:4ea5 $cd $ce $29
     jp   NZ, call_00_2b80_ClearObjectMemoryEntry                              ;; 03:4ea8 $c2 $80 $2b
     ld   A, L                                          ;; 03:4eab $7d
-    or   A, $0e                                        ;; 03:4eac $f6 $0e
+    or   A, OBJECT_XPOS_OFFSET                                        ;; 03:4eac $f6 $0e
     ld   L, A                                          ;; 03:4eae $6f
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:4eaf $fa $00 $da
-    or   A, $0e                                        ;; 03:4eb2 $f6 $0e
+    or   A, OBJECT_XPOS_OFFSET                                        ;; 03:4eb2 $f6 $0e
     ld   E, A                                          ;; 03:4eb4 $5f
     ld   D, $d8                                        ;; 03:4eb5 $16 $d8
     ld   A, [DE]                                       ;; 03:4eb7 $1a
@@ -443,7 +443,7 @@ call_03_4e89_Collision_ObjectStateOrTransform:
     inc  A                                             ;; 03:4ee4 $3c
 .jr_03_4ee5:
     ld   C, A                                          ;; 03:4ee5 $4f
-    call call_00_28c8_ObjectSet1B                                  ;; 03:4ee6 $cd $c8 $28
+    call call_00_28c8_ObjectSetXVelocity                                  ;; 03:4ee6 $cd $c8 $28
     ret                                                ;; 03:4ee9 $c9
 .jr_03_4eea:
     ld   A, $06                                        ;; 03:4eea $3e $06
@@ -638,8 +638,8 @@ label504C:
     call call_00_2962_ObjectGetActionId
     cp   a,$04
     ret  nc
-    call call_00_2a68_ComputePlayerObjectXVector
-    ld   a,[wDA11]
+    call call_00_2a68_Object_ComputePlayerXProximity
+    ld   a,[wDA11_ObjectXDistFromPlayer]
     cp   a,$28
     ret  nc
     ld   a,$05
@@ -874,9 +874,9 @@ call_03_5201_Collision_TransformOrSlotSet:
     call call_03_4cea_TriggerPlayerActionChange
     ld   a,$02
     farcall entry_02_72ac_LoadObjectData
-    jp   call_00_2410_SetDirectionFlag_PlayerLeft
+    jp   call_00_2410_Object_SetFacingRelativeToPlayer
 label5222:
-    call call_00_2410_SetDirectionFlag_PlayerLeft
+    call call_00_2410_Object_SetFacingRelativeToPlayer
     call entry_03_5671_HandleObjectHitOrRespawn
     call call_00_2962_ObjectGetActionId
     cp   a,$03
@@ -1180,7 +1180,7 @@ call_03_5406_Collision_ProximityTransform_Bank6:
     ld   l,a
     ld   d,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   e,a
     ld   a,[de]
     sub  [hl]
@@ -1280,7 +1280,7 @@ call_03_54a8_Collision_PropertyBasedTransform:
     call entry_03_5671_HandleObjectHitOrRespawn
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$15
+    or   a,OBJECT_UNK15_OFFSET
     ld   l,a
     ld   [hl],$00
     call call_00_2995_ObjectGetActionId
@@ -1314,7 +1314,7 @@ call_03_54ee_Collision_TransformBank0AndSetTimer:
 call_03_54f9:
 ; Writes 0x3C to byte at offset 15.
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$15
+    or   a,OBJECT_UNK15_OFFSET
     ld   l,a
     ld   h,$D8
     ld   [hl],$3C
@@ -1336,14 +1336,14 @@ call_03_550e_CheckPlayerObjectInteraction:
 ; So this routine is the core collision handler for player–object interactions, with special cases for springs, breakables, pushables, etc., driven by data_03_55ff_ObjectInteractionFlagsTable.
     ld   B, $d8                                        ;; 03:550e $06 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5510 $fa $00 $da
-    or   A, $15                                        ;; 03:5513 $f6 $15
+    or   A, OBJECT_UNK15_OFFSET                                        ;; 03:5513 $f6 $15
     ld   C, A                                          ;; 03:5515 $4f
     ld   A, [BC]                                       ;; 03:5516 $0a
     and  A, A                                          ;; 03:5517 $a7
     jp   NZ, call_03_55fd_ReturnNoInteraction                                ;; 03:5518 $c2 $fd $55
     ld   H, $d8                                        ;; 03:551b $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:551d $fa $00 $da
-    or   A, $00                                        ;; 03:5520 $f6 $00
+    or   A, OBJECT_ID_OFFSET                                        ;; 03:5520 $f6 $00
     ld   L, A                                          ;; 03:5522 $6f
     ld   L, [HL]                                       ;; 03:5523 $6e
     ld   H, $00                                        ;; 03:5524 $26 $00
@@ -1371,7 +1371,7 @@ call_03_550e_CheckPlayerObjectInteraction:
 .jr_03_554d:
     add  HL, DE                                        ;; 03:554d $19
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:554e $fa $00 $da
-    or   A, $10                                        ;; 03:5551 $f6 $10
+    or   A, OBJECT_YPOS_OFFSET                                        ;; 03:5551 $f6 $10
     ld   C, A                                          ;; 03:5553 $4f
     ld   A, [BC]                                       ;; 03:5554 $0a
     sub  A, L                                          ;; 03:5555 $95
@@ -1383,19 +1383,19 @@ call_03_550e_CheckPlayerObjectInteraction:
     ld   A, C                                          ;; 03:555b $79
     xor  A, $02                                        ;; 03:555c $ee $02
     ld   C, A                                          ;; 03:555e $4f
-    ld   A, [BC]                                       ;; 03:555f $0a
+    ld   A, [BC]                                       ;; 03:555f $0a ; loads OBJECT_HEIGHT_OFFSET
     add  A, E                                          ;; 03:5560 $83
     ld   E, A                                          ;; 03:5561 $5f
     ld   A, $00                                        ;; 03:5562 $3e $00
     adc  A, D                                          ;; 03:5564 $8a
     jp   NZ, call_03_55fd_ReturnNoInteraction                                ;; 03:5565 $c2 $fd $55
-    ld   A, [BC]                                       ;; 03:5568 $0a
+    ld   A, [BC]                                       ;; 03:5568 $0a ; loads OBJECT_HEIGHT_OFFSET
     add  A, A                                          ;; 03:5569 $87
     cp   A, E                                          ;; 03:556a $bb
     jp   C, call_03_55fd_ReturnNoInteraction                                 ;; 03:556b $da $fd $55
     ld   HL, wD80E_PlayerXPosition                                     ;; 03:556e $21 $0e $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5571 $fa $00 $da
-    or   A, $0e                                        ;; 03:5574 $f6 $0e
+    or   A, OBJECT_XPOS_OFFSET                                        ;; 03:5574 $f6 $0e
     ld   C, A                                          ;; 03:5576 $4f
     ld   A, [BC]                                       ;; 03:5577 $0a
     sub  A, [HL]                                       ;; 03:5578 $96
@@ -1408,14 +1408,14 @@ call_03_550e_CheckPlayerObjectInteraction:
     ld   A, C                                          ;; 03:557f $79
     xor  A, $1d                                        ;; 03:5580 $ee $1d
     ld   C, A                                          ;; 03:5582 $4f
-    ld   A, [BC]                                       ;; 03:5583 $0a
+    ld   A, [BC]                                       ;; 03:5583 $0a ; loads OBJECT_WIDTH_OFFSET
     add  A, $08                                        ;; 03:5584 $c6 $08
     add  A, E                                          ;; 03:5586 $83
     ld   E, A                                          ;; 03:5587 $5f
     ld   A, $00                                        ;; 03:5588 $3e $00
     adc  A, D                                          ;; 03:558a $8a
     jr   NZ, call_03_55fd_ReturnNoInteraction                                ;; 03:558b $20 $70
-    ld   A, [BC]                                       ;; 03:558d $0a
+    ld   A, [BC]                                       ;; 03:558d $0a ; loads OBJECT_WIDTH_OFFSET
     add  A, $08                                        ;; 03:558e $c6 $08
     add  A, A                                          ;; 03:5590 $87
     cp   A, E                                          ;; 03:5591 $bb
@@ -1433,7 +1433,7 @@ call_03_550e_CheckPlayerObjectInteraction:
 .jr_03_55a9:
     ld   HL, wD80E_PlayerXPosition                                     ;; 03:55a9 $21 $0e $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:55ac $fa $00 $da
-    or   A, $0e                                        ;; 03:55af $f6 $0e
+    or   A, OBJECT_XPOS_OFFSET                                        ;; 03:55af $f6 $0e
     ld   C, A                                          ;; 03:55b1 $4f
     ld   A, [BC]                                       ;; 03:55b2 $0a
     sub  A, [HL]                                       ;; 03:55b3 $96
@@ -1536,7 +1536,7 @@ call_03_5671_HandleObjectHitOrRespawn:
 ; decrements a counter, and either reloads/respawns the object, spawns particles, or plays sounds depending on conditions.
     ld   H, $d8                                        ;; 03:5671 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5673 $fa $00 $da
-    or   A, $15                                        ;; 03:5676 $f6 $15
+    or   A, OBJECT_UNK15_OFFSET                                        ;; 03:5676 $f6 $15
     ld   L, A                                          ;; 03:5678 $6f
     ld   A, [HL]                                       ;; 03:5679 $7e
     and  A, A                                          ;; 03:567a $a7
@@ -1612,7 +1612,7 @@ label56E3:
     ld   d,a
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$10
+    or   a,OBJECT_YPOS_OFFSET
     ld   l,a
     ld   a,e
     sub  [hl]
@@ -1842,7 +1842,7 @@ call_03_581a_CheckPlayerObjectCollision_Simple:
     jp   Z, call_03_57f8_ClearCollisionForObject                                 ;; 03:582e $ca $f8 $57
     ld   H, $d8                                        ;; 03:5831 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5833 $fa $00 $da
-    or   A, $12                                        ;; 03:5836 $f6 $12
+    or   A, OBJECT_WIDTH_OFFSET                                        ;; 03:5836 $f6 $12
     ld   L, A                                          ;; 03:5838 $6f
     ld   A, [HL+]                                      ;; 03:5839 $2a
     ld   C, A                                          ;; 03:583a $4f
@@ -1926,7 +1926,7 @@ call_03_58a9_ComputeCollisionOffset:
 ; depending on object properties (size/offset) and player facing direction.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$1B
+    or   a,OBJECT_XVEL_OFFSET
     ld   l,a
     ld   b,[hl]
     dec  l

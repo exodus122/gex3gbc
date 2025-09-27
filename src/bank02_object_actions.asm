@@ -35,7 +35,7 @@ label586E:
     bit  7,[hl]
     jr   z,label588C
     ld   c,$00
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     call call_00_2922_ObjectTimer1ACountdown
     ret  nz
     call call_00_298a_ObjectGet19
@@ -46,7 +46,7 @@ label586E:
     jp   call_00_290d_ObjectSetTimer1A
 label588C:
     ld   c,$01
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     call call_00_298a_ObjectGet19
     ld   bc,$0001
     bit  6,[hl]
@@ -55,7 +55,7 @@ label588C:
 label589E:
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   l,a
     ld   a,c
     add  [hl]
@@ -83,7 +83,7 @@ label58CC:
     bit  7,[hl]
     jr   z,label58EA
     ld   c,$00
-    call call_00_28dc_ObjectSet1D
+    call call_00_28dc_ObjectSetYVelocity
     call call_00_2922_ObjectTimer1ACountdown
     ret  nz
     call call_00_298a_ObjectGet19
@@ -94,7 +94,7 @@ label58CC:
     jp   call_00_290d_ObjectSetTimer1A
 label58EA:
     ld   c,$01
-    call call_00_28dc_ObjectSet1D
+    call call_00_28dc_ObjectSetYVelocity
     call call_00_298a_ObjectGet19
     ld   bc,$0001
     bit  6,[hl]
@@ -103,7 +103,7 @@ label58EA:
 label58FC:
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$10
+    or   a,OBJECT_YPOS_OFFSET
     ld   l,a
     ld   a,c
     add  [hl]
@@ -119,7 +119,7 @@ label58FC:
     jp   call_00_290d_ObjectSetTimer1A
 
 call_02_5918:
-    ld   a,[wDC71]
+    ld   a,[wDC71_FrameCounter]
     rrca 
     and  a,$0F
     ld   l,a
@@ -133,7 +133,7 @@ call_02_5918:
     call call_00_2835_Object_GetVector_DA24
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   l,a
     ld   a,[bc]
     add  e
@@ -146,7 +146,7 @@ call_02_5918:
     call call_00_27f3_Object_GetVector_DA26
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$10
+    or   a,OBJECT_YPOS_OFFSET
     ld   l,a
     ld   a,[bc]
     add  e
@@ -224,9 +224,9 @@ call_02_59ed:
     jr   nz,label59FD
     ld   c,$30
 label59FD:
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
 label5A00:
-    call call_00_24c0_Object_IntegrateFractionalVelocity_X
+    call call_00_24c0_Object_IntegrateXVelocity
     ret  
 
 call_02_5a04_ObjectAction_TVButton_unk:
@@ -248,7 +248,7 @@ call_02_5a1c_ObjectAction_TVButton_unk2:
     cp   A, [HL]                                       ;; 02:5a2a $be
     ret  NZ                                            ;; 02:5a2b $c0
     ld   A, $02                                        ;; 02:5a2c $3e $02
-    call call_02_72ac_LoadObjectData                                  ;; 02:5a2e $cd $ac $72
+    call call_02_72ac_SetupNextObjectAction                                  ;; 02:5a2e $cd $ac $72
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:5a31 $fa $6c $db
     cp   A, $07                                        ;; 02:5a34 $fe $07
     ld   A, $2c                                        ;; 02:5a36 $3e $2c
@@ -323,7 +323,7 @@ call_02_5a83_ObjectAction_TVButton_unk4:
     ld   C, $00                                        ;; 02:5ac0 $0e $00
     call call_00_2299_SetObjectStatusLowNibble                                  ;; 02:5ac2 $cd $99 $22
     ld   A, $00                                        ;; 02:5ac5 $3e $00
-    jp   call_02_72ac_LoadObjectData                                  ;; 02:5ac7 $c3 $ac $72
+    jp   call_02_72ac_SetupNextObjectAction                                  ;; 02:5ac7 $c3 $ac $72
 .jr_02_5aca:
     call call_00_2962_ObjectGetActionId                                  ;; 02:5aca $cd $62 $29
     cp   A, $01                                        ;; 02:5acd $fe $01
@@ -331,7 +331,7 @@ call_02_5a83_ObjectAction_TVButton_unk4:
     ld   C, $01                                        ;; 02:5ad0 $0e $01
     call call_00_2299_SetObjectStatusLowNibble                                  ;; 02:5ad2 $cd $99 $22
     ld   A, $01                                        ;; 02:5ad5 $3e $01
-    jp   call_02_72ac_LoadObjectData                                  ;; 02:5ad7 $c3 $ac $72
+    jp   call_02_72ac_SetupNextObjectAction                                  ;; 02:5ad7 $c3 $ac $72
 
 call_02_5ada_ObjectAction_TVRemote_unk:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck                                  ;; 02:5ada $cd $f5 $29
@@ -382,7 +382,7 @@ call_02_5af8_ObjectAction_TVRemote_unk4:
     ld   C, $03                                        ;; 02:5b36 $0e $03
     call call_00_2299_SetObjectStatusLowNibble                                  ;; 02:5b38 $cd $99 $22
     ld   A, $03                                        ;; 02:5b3b $3e $03
-    call call_02_72ac_LoadObjectData                                  ;; 02:5b3d $cd $ac $72
+    call call_02_72ac_SetupNextObjectAction                                  ;; 02:5b3d $cd $ac $72
 .jr_02_5b40:
     call call_00_230f_ResolveObjectListIndex                                  ;; 02:5b40 $cd $0f $23
     ld   B, $00                                        ;; 02:5b43 $06 $00
@@ -391,7 +391,7 @@ call_02_5af8_ObjectAction_TVRemote_unk4:
     ld   C, [HL]                                       ;; 02:5b49 $4e
     ld   H, $d8                                        ;; 02:5b4a $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 02:5b4c $fa $00 $da
-    or   A, $0a                                        ;; 02:5b4f $f6 $0a
+    or   A, OBJECT_UNK0A_OFFSET                                        ;; 02:5b4f $f6 $0a
     ld   L, A                                          ;; 02:5b51 $6f
     ld   A, C                                          ;; 02:5b52 $79
     add  A, $40                                        ;; 02:5b53 $c6 $40
@@ -416,7 +416,7 @@ call_02_5af8_ObjectAction_TVRemote_unk4:
     ld   C, $01                                        ;; 02:5b74 $0e $01
     call call_00_2299_SetObjectStatusLowNibble                                  ;; 02:5b76 $cd $99 $22
     ld   A, $01                                        ;; 02:5b79 $3e $01
-    jp   call_02_72ac_LoadObjectData                                  ;; 02:5b7b $c3 $ac $72
+    jp   call_02_72ac_SetupNextObjectAction                                  ;; 02:5b7b $c3 $ac $72
 .data_02_5b7e:
     db   $00, $00, $01, $02, $03, $05, $07, $09        ;; 02:5b7e ?.......
     db   $0a, $04, $06, $08                            ;; 02:5b86 ....
@@ -429,11 +429,11 @@ call_02_5b9a_ObjectAction_UpdateGoalCounter:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck                                  ;; 02:5b9a $cd $f5 $29
     jr   Z, .jr_02_5ba9                                ;; 02:5b9d $28 $0a
     ld   C, $30                                        ;; 02:5b9f $0e $30
-    call call_00_28dc_ObjectSet1D                                  ;; 02:5ba1 $cd $dc $28
+    call call_00_28dc_ObjectSetYVelocity                                  ;; 02:5ba1 $cd $dc $28
     ld   C, $3c                                        ;; 02:5ba4 $0e $3c
     call call_00_290d_ObjectSetTimer1A                                  ;; 02:5ba6 $cd $0d $29
 .jr_02_5ba9:
-    call call_00_244a_Object_ApplyClampedVerticalVelocity                                  ;; 02:5ba9 $cd $4a $24
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped                                  ;; 02:5ba9 $cd $4a $24
     call call_00_2922_ObjectTimer1ACountdown                                  ;; 02:5bac $cd $22 $29
     jp   Z, call_00_2b80_ClearObjectMemoryEntry                               ;; 02:5baf $ca $80 $2b
     ret                                                ;; 02:5bb2 $c9
@@ -442,18 +442,18 @@ entry_02_5bb3_ObjectAction_UpdateBonusStageTimer:
 call_02_5bb3_ObjectAction_UpdateBonusStageTimer:
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   l,a
-    ld   a,[wDBF9_XPositionInMap]
+    ld   a,[wDBF9_XPositionInMapLo]
     add  a,$50
     ldi  [hl],a
-    ld   a,[wDBFA_XPositionInMap]
+    ld   a,[wDBFA_XPositionInMapHi]
     adc  a,$00
     ldi  [hl],a
-    ld   a,[wDBFB_YPositionInMap]
+    ld   a,[wDBFB_YPositionInMapLo]
     add  a,$08
     ldi  [hl],a
-    ld   a,[wDBFC_YPositionInMap]
+    ld   a,[wDBFC_YPositionInMapHi]
     adc  a,$00
     ld   [hl],a
     ret  
@@ -465,20 +465,20 @@ call_02_5bd4_ObjectAction_Remote_unk:
     ld   A, [wDCD2]                                    ;; 02:5bda $fa $d2 $dc
     and  A, A                                          ;; 02:5bdd $a7
     ld   A, $01                                        ;; 02:5bde $3e $01
-    jp   NZ, call_02_72ac_LoadObjectData                              ;; 02:5be0 $c2 $ac $72
+    jp   NZ, call_02_72ac_SetupNextObjectAction                              ;; 02:5be0 $c2 $ac $72
     ret                                                ;; 02:5be3 $c9
 .jr_02_5be4:
     ld   HL, wDC5C                                     ;; 02:5be4 $21 $5c $dc
     bit  0, [HL]                                       ;; 02:5be7 $cb $46
     ld   A, $01                                        ;; 02:5be9 $3e $01
-    jp   Z, call_02_72ac_LoadObjectData                               ;; 02:5beb $ca $ac $72
+    jp   Z, call_02_72ac_SetupNextObjectAction                               ;; 02:5beb $ca $ac $72
     ret                                                ;; 02:5bee $c9
 
 call_02_5bef_ObjectAction_Remote_unk3:
     ld   A, [wDCD2]                                    ;; 02:5bef $fa $d2 $dc
     cp   A, $81                                        ;; 02:5bf2 $fe $81
     ld   A, $02                                        ;; 02:5bf4 $3e $02
-    jp   Z, call_02_72ac_LoadObjectData                               ;; 02:5bf6 $ca $ac $72
+    jp   Z, call_02_72ac_SetupNextObjectAction                               ;; 02:5bf6 $ca $ac $72
     ret                                                ;; 02:5bf9 $c9
 
 call_02_5bfa_ObjectAction_Remote_unk2:
@@ -513,107 +513,107 @@ call_02_5bfa_ObjectAction_Remote_unk2:
 .data_02_5c3b:
     db   $00, $00, $08, $02, $04, $01, $ff, $7f        ;; 02:5c3b ........
 
-call_02_5c43:
+call_02_5c43_ObjectAction_EvilSanta_Init:
     ld   A, $03                                        ;; 02:5c43 $3e $03
-    ld   [wDCC4], A                                    ;; 02:5c45 $ea $c4 $dc
-    call call_02_5d02                                  ;; 02:5c48 $cd $02 $5d
+    ld   [wDCC4_EvilSantaHealth], A                                    ;; 02:5c45 $ea $c4 $dc
+    call call_02_5d02_LoadEvilSantaPalette                                  ;; 02:5c48 $cd $02 $5d
     ld   A, $01                                        ;; 02:5c4b $3e $01
-    jp   call_02_72ac_LoadObjectData                                  ;; 02:5c4d $c3 $ac $72
+    jp   call_02_72ac_SetupNextObjectAction                                  ;; 02:5c4d $c3 $ac $72
 
-call_02_5c50:
+call_02_5c50_ObjectAction_EvilSanta_Jumping:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck                                  ;; 02:5c50 $cd $f5 $29
     jr   Z, .jr_02_5c62                                ;; 02:5c53 $28 $0d
-    call call_02_5d02                                  ;; 02:5c55 $cd $02 $5d
+    call call_02_5d02_LoadEvilSantaPalette                                  ;; 02:5c55 $cd $02 $5d
     ld   C, $20                                        ;; 02:5c58 $0e $20
-    call call_00_28c8_ObjectSet1B                                  ;; 02:5c5a $cd $c8 $28
+    call call_00_28c8_ObjectSetXVelocity                                  ;; 02:5c5a $cd $c8 $28
     ld   C, $28                                        ;; 02:5c5d $0e $28
-    call call_00_28dc_ObjectSet1D                                  ;; 02:5c5f $cd $dc $28
+    call call_00_28dc_ObjectSetYVelocity                                  ;; 02:5c5f $cd $dc $28
 .jr_02_5c62:
-    call call_00_251c_Object_CheckRegionAndSetFlag                                  ;; 02:5c62 $cd $1c $25
-    call call_00_244a_Object_ApplyClampedVerticalVelocity                                  ;; 02:5c65 $cd $4a $24
+    call call_00_251c_Object_CheckRegion_UpdateFacing                                  ;; 02:5c62 $cd $1c $25
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped                                  ;; 02:5c65 $cd $4a $24
     call call_00_2766_Object_UpdateXPositionFromVector                                  ;; 02:5c68 $cd $66 $27
     ret  C                                             ;; 02:5c6b $d8
-    call call_00_299f_ObjectFlipFacingDirection                                  ;; 02:5c6c $cd $9f $29
+    call call_00_299f_ObjectTurnAround                                  ;; 02:5c6c $cd $9f $29
     ld   A, $02                                        ;; 02:5c6f $3e $02
-    jp   call_02_72ac_LoadObjectData                                  ;; 02:5c71 $c3 $ac $72
+    jp   call_02_72ac_SetupNextObjectAction                                  ;; 02:5c71 $c3 $ac $72
 
-call_02_5c74:
+call_02_5c74_ObjectAction_EvilSanta_PrepareThrow:
     call call_00_2a5d_ObjectCheckFlag2                                  ;; 02:5c74 $cd $5d $2a
     ret  Z                                             ;; 02:5c77 $c8
     ld   C, $05                                        ;; 02:5c78 $0e $05
     call call_00_3792_PrepareRelativeObjectSpawn                                  ;; 02:5c7a $cd $92 $37
     ld   A, $03                                        ;; 02:5c7d $3e $03
-    jp   call_02_72ac_LoadObjectData                                  ;; 02:5c7f $c3 $ac $72
+    jp   call_02_72ac_SetupNextObjectAction                                  ;; 02:5c7f $c3 $ac $72
 
-call_02_5c82:
-    ld   A, [wDCDB]                                    ;; 02:5c82 $fa $db $dc
+call_02_5c82_ObjectAction_EvilSanta_Stand:
+    ld   A, [wDCDB_EvilSantaHitByProjectileFlag]                                    ;; 02:5c82 $fa $db $dc
     and  A, A                                          ;; 02:5c85 $a7
     jr   NZ, .jr_02_5c93                               ;; 02:5c86 $20 $0b
     ld   C, $1f                                        ;; 02:5c88 $0e $1f
     call call_00_2b10_VerifyObjectPairExists                                  ;; 02:5c8a $cd $10 $2b
     ld   A, $01                                        ;; 02:5c8d $3e $01
-    jp   Z, call_02_72ac_LoadObjectData                               ;; 02:5c8f $ca $ac $72
+    jp   Z, call_02_72ac_SetupNextObjectAction                               ;; 02:5c8f $ca $ac $72
     ret                                                ;; 02:5c92 $c9
 .jr_02_5c93:
     xor  A, A                                          ;; 02:5c93 $af
-    ld   [wDCDB], A                                    ;; 02:5c94 $ea $db $dc
-    ld   HL, wDCC4                                     ;; 02:5c97 $21 $c4 $dc
+    ld   [wDCDB_EvilSantaHitByProjectileFlag], A                                    ;; 02:5c94 $ea $db $dc
+    ld   HL, wDCC4_EvilSantaHealth                                     ;; 02:5c97 $21 $c4 $dc
     dec  [HL]                                          ;; 02:5c9a $35
     ld   A, $05                                        ;; 02:5c9b $3e $05
-    jp   NZ, call_02_72ac_LoadObjectData                              ;; 02:5c9d $c2 $ac $72
+    jp   NZ, call_02_72ac_SetupNextObjectAction                              ;; 02:5c9d $c2 $ac $72
     ld   A, $06                                        ;; 02:5ca0 $3e $06
-    jp   call_02_72ac_LoadObjectData                                  ;; 02:5ca2 $c3 $ac $72
+    jp   call_02_72ac_SetupNextObjectAction                                  ;; 02:5ca2 $c3 $ac $72
 
-call_02_5ca5:
+call_02_5ca5_ObjectAction_EvilSanta_Damaged:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   a,$19
     call nz,call_00_0ff5_QueueSoundEffectWithPriority
-    ld   a,[wDC71]
+    ld   a,[wDC71_FrameCounter]
     and  a,$0F
     cp   a,$0C
-    ld   hl,.data_02_5cc8
+    ld   hl,.data_02_5cc8_EvilSantaDamagedPalette2
     jp   c,call_00_2c20_ObjectPalette_CopyToBuffer
-    ld   hl,.data_02_5cc0
+    ld   hl,.data_02_5cc0_EvilSantaDamagedPalette1
     jp   call_00_2c20_ObjectPalette_CopyToBuffer
-.data_02_5cc0:
+.data_02_5cc0_EvilSantaDamagedPalette1:
     db   $00, $00, $00, $00, $1f, $00, $ff, $7f
-.data_02_5cc8:
+.data_02_5cc8_EvilSantaDamagedPalette2:
     db   $00, $00, $84, $10, $08, $21, $8c, $31
     
-call_02_5cd0:
+call_02_5cd0_ObjectAction_EvilSanta_Death:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label5CF0
     ld   a,$1A
     call call_00_0ff5_QueueSoundEffectWithPriority
-    call call_02_5d02
+    call call_02_5d02_LoadEvilSantaPalette
     call call_00_2976_ObjectGetFacingDirection
     ld   c,$F2
     bit  5,a
     jr   nz,label5CE8
     ld   c,$0E
 label5CE8:
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     ld   c,$05
-    call call_00_28dc_ObjectSet1D
+    call call_00_28dc_ObjectSetYVelocity
 label5CF0:
-    call call_00_24c0_Object_IntegrateFractionalVelocity_X
-    call call_00_24ee_Object_IntegrateFractionalVelocity_Y
+    call call_00_24c0_Object_IntegrateXVelocity
+    call call_00_24ee_Object_IntegrateYVelocity
     call call_00_2a5d_ObjectCheckFlag2
     ret  z
     ld   c,$03
     call call_00_21ef_PlaySound_1E
     jp   call_00_2b7a_ClearObjectThenJump
 
-call_02_5d02:
-    ld   HL, .data_02_5d08                             ;; 02:5d02 $21 $08 $5d
+call_02_5d02_LoadEvilSantaPalette:
+    ld   HL, .data_02_5d08_EvilSantaPalette                             ;; 02:5d02 $21 $08 $5d
     jp   call_00_2c20_ObjectPalette_CopyToBuffer                                  ;; 02:5d05 $c3 $20 $2c
-.data_02_5d08:
+.data_02_5d08_EvilSantaPalette:
     db   $00, $00, $00, $00, $1f, $00, $ff, $7f        ;; 02:5d08 ........
 
-call_02_5d10:
+call_02_5d10_ObjectAction_EvilSantaProjectile_Init:
     ld   H, $d8                                        ;; 02:5d10 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 02:5d12 $fa $00 $da
-    or   A, $0e                                        ;; 02:5d15 $f6 $0e
+    or   A, OBJECT_XPOS_OFFSET                                        ;; 02:5d15 $f6 $0e
     ld   L, A                                          ;; 02:5d17 $6f
     ld   A, [wD80E_PlayerXPosition]                                    ;; 02:5d18 $fa $0e $d8
     sub  A, [HL]                                       ;; 02:5d1b $96
@@ -653,11 +653,11 @@ call_02_5d10:
     inc  A                                             ;; 02:5d48 $3c
 .jr_02_5d49:
     ld   C, A                                          ;; 02:5d49 $4f
-    call call_00_28c8_ObjectSet1B                                  ;; 02:5d4a $cd $c8 $28
+    call call_00_28c8_ObjectSetXVelocity                                  ;; 02:5d4a $cd $c8 $28
     ld   C, $10                                        ;; 02:5d4d $0e $10
-    call call_00_28dc_ObjectSet1D                                  ;; 02:5d4f $cd $dc $28
+    call call_00_28dc_ObjectSetYVelocity                                  ;; 02:5d4f $cd $dc $28
     ld   A, $01                                        ;; 02:5d52 $3e $01
-    jp   call_02_72ac_LoadObjectData                                  ;; 02:5d54 $c3 $ac $72
+    jp   call_02_72ac_SetupNextObjectAction                                  ;; 02:5d54 $c3 $ac $72
 .data_02_5d57:
     db   $00, $01, $02, $03, $04, $05, $06, $07        ;; 02:5d57 ??.....?
     db   $08, $09, $0a, $0b, $0d, $0e, $0f, $10        ;; 02:5d5f ??.?.??.
@@ -666,14 +666,14 @@ call_02_5d10:
     db   $22, $23, $24, $25, $27, $28, $29, $2a        ;; 02:5d77 ???.????
     db   $2b                                           ;; 02:5d7f ?
 
-call_02_5d80:
-    call call_00_24c0_Object_IntegrateFractionalVelocity_X                                  ;; 02:5d80 $cd $c0 $24
-    call call_00_24ee_Object_IntegrateFractionalVelocity_Y                                  ;; 02:5d83 $cd $ee $24
-    call call_00_28d2_ObjectGet1D                                  ;; 02:5d86 $cd $d2 $28
+call_02_5d80_ObjectAction_EvilSantaProjectile_UpdateTrajectory:
+    call call_00_24c0_Object_IntegrateXVelocity                                  ;; 02:5d80 $cd $c0 $24
+    call call_00_24ee_Object_IntegrateYVelocity                                  ;; 02:5d83 $cd $ee $24
+    call call_00_28d2_ObjectGetYVelocity                                  ;; 02:5d86 $cd $d2 $28
     ld   C, A                                          ;; 02:5d89 $4f
     ld   H, $d8                                        ;; 02:5d8a $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 02:5d8c $fa $00 $da
-    or   A, $10                                        ;; 02:5d8f $f6 $10
+    or   A, OBJECT_YPOS_OFFSET                                        ;; 02:5d8f $f6 $10
     ld   L, A                                          ;; 02:5d91 $6f
     ld   A, [HL]                                       ;; 02:5d92 $7e
     sub  A, $88                                        ;; 02:5d93 $d6 $88
@@ -708,61 +708,61 @@ call_02_5d80:
     ld   C, $04                                        ;; 02:5dc7 $0e $04
 .jr_02_5dc9:
     ld   A, C                                          ;; 02:5dc9 $79
-    jp   call_02_72ac_LoadObjectData                                  ;; 02:5dca $c3 $ac $72
+    jp   call_02_72ac_SetupNextObjectAction                                  ;; 02:5dca $c3 $ac $72
 .jr_02_5dcd:
     ld   A, $01                                        ;; 02:5dcd $3e $01
-    ld   [wDCDB], A                                    ;; 02:5dcf $ea $db $dc
+    ld   [wDCDB_EvilSantaHitByProjectileFlag], A                                    ;; 02:5dcf $ea $db $dc
     ld   A, $05                                        ;; 02:5dd2 $3e $05
-    jp   call_02_72ac_LoadObjectData                                  ;; 02:5dd4 $c3 $ac $72
+    jp   call_02_72ac_SetupNextObjectAction                                  ;; 02:5dd4 $c3 $ac $72
 
-call_02_5dd7:
+call_02_5dd7_ObjectAction_EvilSantaProjectile_Destroy:
     call call_00_2a5d_ObjectCheckFlag2                                  ;; 02:5dd7 $cd $5d $2a
     jp   NZ, call_00_2b80_ClearObjectMemoryEntry                              ;; 02:5dda $c2 $80 $2b
     ret                                                ;; 02:5ddd $c9
 
-call_02_5dde:
+call_02_5dde_ObjectAction_SkatingElf_Skate:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck                                  ;; 02:5dde $cd $f5 $29
     ld   C, $20                                        ;; 02:5de1 $0e $20
-    call NZ, call_00_28c8_ObjectSet1B                              ;; 02:5de3 $c4 $c8 $28
-    ld   A, [wDC71]                                    ;; 02:5de6 $fa $71 $dc
+    call NZ, call_00_28c8_ObjectSetXVelocity                              ;; 02:5de3 $c4 $c8 $28
+    ld   A, [wDC71_FrameCounter]                                    ;; 02:5de6 $fa $71 $dc
     and  A, $07                                        ;; 02:5de9 $e6 $07
     ld   C, $10                                        ;; 02:5deb $0e $10
-    call Z, call_00_2588_Object_ApproachTargetValue_Byte                               ;; 02:5ded $cc $88 $25
-    call call_00_251c_Object_CheckRegionAndSetFlag                                  ;; 02:5df0 $cd $1c $25
+    call Z, call_00_2588_Object_ApproachXVelocity                               ;; 02:5ded $cc $88 $25
+    call call_00_251c_Object_CheckRegion_UpdateFacing                                  ;; 02:5df0 $cd $1c $25
     call call_00_2722_Player_IsWithinObjectYRange                                  ;; 02:5df3 $cd $22 $27
     ret  Z                                             ;; 02:5df6 $c8
-    call call_00_2a68_ComputePlayerObjectXVector                                  ;; 02:5df7 $cd $68 $2a
+    call call_00_2a68_Object_ComputePlayerXProximity                                  ;; 02:5df7 $cd $68 $2a
     call call_00_2976_ObjectGetFacingDirection                                  ;; 02:5dfa $cd $76 $29
-    ld   HL, wDA12                                     ;; 02:5dfd $21 $12 $da
+    ld   HL, wDA12_ObjectDirectionRelativeToPlayer                                     ;; 02:5dfd $21 $12 $da
     cp   A, [HL]                                       ;; 02:5e00 $be
     ret  NZ                                            ;; 02:5e01 $c0
-    ld   A, [wDA11]                                    ;; 02:5e02 $fa $11 $da
+    ld   A, [wDA11_ObjectXDistFromPlayer]                                    ;; 02:5e02 $fa $11 $da
     cp   A, $40                                        ;; 02:5e05 $fe $40
     ld   A, $02                                        ;; 02:5e07 $3e $02
-    jp   C, call_02_72ac_LoadObjectData                               ;; 02:5e09 $da $ac $72
+    jp   C, call_02_72ac_SetupNextObjectAction                               ;; 02:5e09 $da $ac $72
     ret                                                ;; 02:5e0c $c9
 
-call_02_5e0d:
+call_02_5e0d_ObjectAction_SkatingElf_PrepareJump:
     ld   C, $20                                        ;; 02:5e0d $0e $20
-    call call_00_28dc_ObjectSet1D                                  ;; 02:5e0f $cd $dc $28
+    call call_00_28dc_ObjectSetYVelocity                                  ;; 02:5e0f $cd $dc $28
     ld   C, $28                                        ;; 02:5e12 $0e $28
-    call call_00_2588_Object_ApproachTargetValue_Byte                                  ;; 02:5e14 $cd $88 $25
-    call call_00_251c_Object_CheckRegionAndSetFlag                                  ;; 02:5e17 $cd $1c $25
-    call call_00_28be_ObjectGet1B                                  ;; 02:5e1a $cd $be $28
+    call call_00_2588_Object_ApproachXVelocity                                  ;; 02:5e14 $cd $88 $25
+    call call_00_251c_Object_CheckRegion_UpdateFacing                                  ;; 02:5e17 $cd $1c $25
+    call call_00_28be_ObjectGetXVelocity                                  ;; 02:5e1a $cd $be $28
     cp   A, $28                                        ;; 02:5e1d $fe $28
     ld   A, $03                                        ;; 02:5e1f $3e $03
-    jp   Z, call_02_72ac_LoadObjectData                               ;; 02:5e21 $ca $ac $72
+    jp   Z, call_02_72ac_SetupNextObjectAction                               ;; 02:5e21 $ca $ac $72
     ret                                                ;; 02:5e24 $c9
 
-call_02_5e25:
-    call call_00_251c_Object_CheckRegionAndSetFlag                                  ;; 02:5e25 $cd $1c $25
-    call call_00_244a_Object_ApplyClampedVerticalVelocity                                  ;; 02:5e28 $cd $4a $24
+call_02_5e25_ObjectAction_SkatingElf_Jump:
+    call call_00_251c_Object_CheckRegion_UpdateFacing                                  ;; 02:5e25 $cd $1c $25
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped                                  ;; 02:5e28 $cd $4a $24
     call call_00_2766_Object_UpdateXPositionFromVector                                  ;; 02:5e2b $cd $66 $27
     ld   A, $00                                        ;; 02:5e2e $3e $00
-    jp   NC, call_02_72ac_LoadObjectData                              ;; 02:5e30 $d2 $ac $72
+    jp   NC, call_02_72ac_SetupNextObjectAction                              ;; 02:5e30 $d2 $ac $72
     ret                                                ;; 02:5e33 $c9
 
-call_02_5e34:
+call_02_5e34_ObjectAction_SkatingElf_Damaged:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck                                  ;; 02:5e34 $cd $f5 $29
     jr   Z, .jr_02_5e45                                ;; 02:5e37 $28 $0c
     call call_00_2766_Object_UpdateXPositionFromVector                                  ;; 02:5e39 $cd $66 $27
@@ -774,11 +774,11 @@ call_02_5e34:
 .jr_02_5e45:
     call call_00_298a_ObjectGet19                                  ;; 02:5e45 $cd $8a $29
     jr   Z, .jr_02_5e6d                                ;; 02:5e48 $28 $23
-    ld   A, [wDC71]                                    ;; 02:5e4a $fa $71 $dc
+    ld   A, [wDC71_FrameCounter]                                    ;; 02:5e4a $fa $71 $dc
     and  A, $07                                        ;; 02:5e4d $e6 $07
     ld   C, $10                                        ;; 02:5e4f $0e $10
-    call Z, call_00_2588_Object_ApproachTargetValue_Byte                               ;; 02:5e51 $cc $88 $25
-    call call_00_251c_Object_CheckRegionAndSetFlag                                  ;; 02:5e54 $cd $1c $25
+    call Z, call_00_2588_Object_ApproachXVelocity                               ;; 02:5e51 $cc $88 $25
+    call call_00_251c_Object_CheckRegion_UpdateFacing                                  ;; 02:5e54 $cd $1c $25
     ret  Z                                             ;; 02:5e57 $c8
     call call_00_230f_ResolveObjectListIndex                                  ;; 02:5e58 $cd $0f $23
     ld   B, $00                                        ;; 02:5e5b $06 $00
@@ -787,61 +787,62 @@ call_02_5e34:
     ld   A, [HL]                                       ;; 02:5e61 $7e
     and  A, A                                          ;; 02:5e62 $a7
     ld   A, $00                                        ;; 02:5e63 $3e $00
-    jp   NZ, call_02_72ac_LoadObjectData                              ;; 02:5e65 $c2 $ac $72
+    jp   NZ, call_02_72ac_SetupNextObjectAction                              ;; 02:5e65 $c2 $ac $72
     ld   A, $05                                        ;; 02:5e68 $3e $05
-    jp   call_02_72ac_LoadObjectData                                  ;; 02:5e6a $c3 $ac $72
+    jp   call_02_72ac_SetupNextObjectAction                                  ;; 02:5e6a $c3 $ac $72
 .jr_02_5e6d:
-    call call_00_251c_Object_CheckRegionAndSetFlag                                  ;; 02:5e6d $cd $1c $25
-    call call_00_244a_Object_ApplyClampedVerticalVelocity                                  ;; 02:5e70 $cd $4a $24
+    call call_00_251c_Object_CheckRegion_UpdateFacing                                  ;; 02:5e6d $cd $1c $25
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped                                  ;; 02:5e70 $cd $4a $24
     call call_00_2766_Object_UpdateXPositionFromVector                                  ;; 02:5e73 $cd $66 $27
     ld   C, $01                                        ;; 02:5e76 $0e $01
     call NC, call_00_2980_ObjectSet19                              ;; 02:5e78 $d4 $80 $29
     ret                                                ;; 02:5e7b $c9
 
-call_02_5e7c:
-    call call_00_2a68_ComputePlayerObjectXVector                                  ;; 02:5e7c $cd $68 $2a
-    ld   A, [wDA11]                                    ;; 02:5e7f $fa $11 $da
+call_02_5e7c_ObjectAction_Penguin_WalkOrRun:
+; if player and object distance is <(or equal?) 30, run, else walk
+    call call_00_2a68_Object_ComputePlayerXProximity                                  ;; 02:5e7c $cd $68 $2a
+    ld   A, [wDA11_ObjectXDistFromPlayer]                                    ;; 02:5e7f $fa $11 $da
     cp   A, $30                                        ;; 02:5e82 $fe $30
     jr   C, .jr_02_5e8e                                ;; 02:5e84 $38 $08
     ld   C, $04                                        ;; 02:5e86 $0e $04
-    call call_00_2588_Object_ApproachTargetValue_Byte                                  ;; 02:5e88 $cd $88 $25
-    jp   call_00_251c_Object_CheckRegionAndSetFlag                                  ;; 02:5e8b $c3 $1c $25
+    call call_00_2588_Object_ApproachXVelocity                                  ;; 02:5e88 $cd $88 $25
+    jp   call_00_251c_Object_CheckRegion_UpdateFacing                                  ;; 02:5e8b $c3 $1c $25
 .jr_02_5e8e:
-    ld   A, [wDA12]                                    ;; 02:5e8e $fa $12 $da
+    ld   A, [wDA12_ObjectDirectionRelativeToPlayer]                                    ;; 02:5e8e $fa $12 $da
     xor  A, $20                                        ;; 02:5e91 $ee $20
     ld   C, A                                          ;; 02:5e93 $4f
     call call_00_2958_ObjectSetFacingDirection                                  ;; 02:5e94 $cd $58 $29
     ld   C, $1e                                        ;; 02:5e97 $0e $1e
-    call call_00_2588_Object_ApproachTargetValue_Byte                                  ;; 02:5e99 $cd $88 $25
-    call call_00_251c_Object_CheckRegionAndSetFlag                                  ;; 02:5e9c $cd $1c $25
+    call call_00_2588_Object_ApproachXVelocity                                  ;; 02:5e99 $cd $88 $25
+    call call_00_251c_Object_CheckRegion_UpdateFacing                                  ;; 02:5e9c $cd $1c $25
     jr   NZ, .jr_02_5eae                               ;; 02:5e9f $20 $0d
-    ld   A, [wDA11]                                    ;; 02:5ea1 $fa $11 $da
+    ld   A, [wDA11_ObjectXDistFromPlayer]                                    ;; 02:5ea1 $fa $11 $da
     cp   A, $18                                        ;; 02:5ea4 $fe $18
     ret  NC                                            ;; 02:5ea6 $d0
-    ld   HL, wDA12                                     ;; 02:5ea7 $21 $12 $da
+    ld   HL, wDA12_ObjectDirectionRelativeToPlayer                                     ;; 02:5ea7 $21 $12 $da
     ld   C, [HL]                                       ;; 02:5eaa $4e
     call call_00_2958_ObjectSetFacingDirection                                  ;; 02:5eab $cd $58 $29
 .jr_02_5eae:
     ld   C, $30                                        ;; 02:5eae $0e $30
-    call call_00_28dc_ObjectSet1D                                  ;; 02:5eb0 $cd $dc $28
+    call call_00_28dc_ObjectSetYVelocity                                  ;; 02:5eb0 $cd $dc $28
     ld   A, $01                                        ;; 02:5eb3 $3e $01
-    jp   call_02_72ac_LoadObjectData                                  ;; 02:5eb5 $c3 $ac $72
+    jp   call_02_72ac_SetupNextObjectAction                                  ;; 02:5eb5 $c3 $ac $72
 
-call_02_5eb8:
+call_02_5eb8_ObjectAction_Penguin_Jump:
     ld   C, $10                                        ;; 02:5eb8 $0e $10
-    call call_00_2588_Object_ApproachTargetValue_Byte                                  ;; 02:5eba $cd $88 $25
-    call call_00_251c_Object_CheckRegionAndSetFlag                                  ;; 02:5ebd $cd $1c $25
-    call call_00_244a_Object_ApplyClampedVerticalVelocity                                  ;; 02:5ec0 $cd $4a $24
+    call call_00_2588_Object_ApproachXVelocity                                  ;; 02:5eba $cd $88 $25
+    call call_00_251c_Object_CheckRegion_UpdateFacing                                  ;; 02:5ebd $cd $1c $25
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped                                  ;; 02:5ec0 $cd $4a $24
     call call_00_2766_Object_UpdateXPositionFromVector                                  ;; 02:5ec3 $cd $66 $27
     ld   A, $00                                        ;; 02:5ec6 $3e $00
-    jp   NC, call_02_72ac_LoadObjectData                              ;; 02:5ec8 $d2 $ac $72
+    jp   NC, call_02_72ac_SetupNextObjectAction                              ;; 02:5ec8 $d2 $ac $72
     ret                                                ;; 02:5ecb $c9
 
 call_02_5ecc:
     ld   c,$14
-    call call_00_28c8_ObjectSet1B
-    call call_00_2410_SetDirectionFlag_PlayerLeft
-    call call_00_254a_Object_UpdateDeltaAndAdvancePosition
+    call call_00_28c8_ObjectSetXVelocity
+    call call_00_2410_Object_SetFacingRelativeToPlayer
+    call call_00_254a_Object_AdvancePosition_XDelta
     jp   call_00_2617_SnapPositionAndUpdateDelta
 
 call_02_5eda:
@@ -856,21 +857,21 @@ call_02_5edc:
 call_02_5edd:
     call call_00_2722_Player_IsWithinObjectYRange
     jr   z,label5EF1
-    call call_00_2a68_ComputePlayerObjectXVector
+    call call_00_2a68_Object_ComputePlayerXProximity
     call call_00_2976_ObjectGetFacingDirection
-    ld   hl,wDA12
+    ld   hl,wDA12_ObjectDirectionRelativeToPlayer
     cp   [hl]
     ld   a,$01
     jp   z,entry_02_72ac_LoadObjectData
 label5EF1:
     ld   c,$08
-    call call_00_2588_Object_ApproachTargetValue_Byte
-    jp   call_00_251c_Object_CheckRegionAndSetFlag
+    call call_00_2588_Object_ApproachXVelocity
+    jp   call_00_251c_Object_CheckRegion_UpdateFacing
 
 call_02_5ef9:
     ld   c,$20
-    call call_00_2588_Object_ApproachTargetValue_Byte
-    jp   call_00_251c_Object_CheckRegionAndSetFlag
+    call call_00_2588_Object_ApproachXVelocity
+    jp   call_00_251c_Object_CheckRegion_UpdateFacing
 
 call_02_5f01:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
@@ -878,18 +879,18 @@ call_02_5f01:
     call nz,call_00_290d_ObjectSetTimer1A
     call call_00_2722_Player_IsWithinObjectYRange
     jr   z,label5F22
-    call call_00_2a68_ComputePlayerObjectXVector
+    call call_00_2a68_Object_ComputePlayerXProximity
     call call_00_2976_ObjectGetFacingDirection
-    ld   hl,wDA12
+    ld   hl,wDA12_ObjectDirectionRelativeToPlayer
     cp   [hl]
     jr   z,label5F22
-    ld   a,[wDA11]
+    ld   a,[wDA11_ObjectXDistFromPlayer]
     cp   a,$40
-    call c,call_00_2410_SetDirectionFlag_PlayerLeft
+    call c,call_00_2410_Object_SetFacingRelativeToPlayer
 label5F22:
     ld   c,$06
-    call call_00_28c8_ObjectSet1B
-    call call_00_251c_Object_CheckRegionAndSetFlag
+    call call_00_28c8_ObjectSetXVelocity
+    call call_00_251c_Object_CheckRegion_UpdateFacing
     ld   c,$27
     call call_00_2b10_VerifyObjectPairExists
     ret  nz
@@ -907,8 +908,8 @@ call_02_5f39:
 call_02_5f42:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$30
-    call nz,call_00_28dc_ObjectSet1D
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call nz,call_00_28dc_ObjectSetYVelocity
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     jp   call_00_2766_Object_UpdateXPositionFromVector
 
 call_02_5f50:
@@ -917,9 +918,9 @@ call_02_5f50:
     ld   c,$F0
     call call_00_290d_ObjectSetTimer1A
     ld   c,$0A
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
 .label5F5F:
-    call call_00_254a_Object_UpdateDeltaAndAdvancePosition
+    call call_00_254a_Object_AdvancePosition_XDelta
     call call_00_2922_ObjectTimer1ACountdown
     jp   z,call_00_2b80_ClearObjectMemoryEntry
     ret  
@@ -965,7 +966,7 @@ call_02_5F9B:
     add  hl,de
     ld   d,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   e,a
     ld   b,$04
 .label5FB8:
@@ -1032,16 +1033,16 @@ call_02_60c7:
     add  hl,de
     ld   c,[hl]
     push hl
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     pop  hl
     inc  hl
     ld   c,[hl]
-    call call_00_28dc_ObjectSet1D
+    call call_00_28dc_ObjectSetYVelocity
     ld   c,$5A
     call call_00_290d_ObjectSetTimer1A
 .label60F2:
-    call call_00_24c0_Object_IntegrateFractionalVelocity_X
-    call call_00_24ee_Object_IntegrateFractionalVelocity_Y
+    call call_00_24c0_Object_IntegrateXVelocity
+    call call_00_24ee_Object_IntegrateYVelocity
     call call_00_2922_ObjectTimer1ACountdown
     jp   z,call_00_2b7a_ClearObjectThenJump
     ret  
@@ -1058,8 +1059,8 @@ call_02_60c7:
 
 call_02_613f:
     ld   c,$04
-    call call_00_28c8_ObjectSet1B
-    call call_00_251c_Object_CheckRegionAndSetFlag
+    call call_00_28c8_ObjectSetXVelocity
+    call call_00_251c_Object_CheckRegion_UpdateFacing
     ld   a,$01
     jp   nz,entry_02_72ac_LoadObjectData
     ret  
@@ -1067,17 +1068,17 @@ call_02_613f:
 call_02_614d:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$38
-    call nz,call_00_28dc_ObjectSet1D
+    call nz,call_00_28dc_ObjectSetYVelocity
 label6155:
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
-    call call_00_28d2_ObjectGet1D
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
+    call call_00_28d2_ObjectGetYVelocity
     bit  7,a
     ld   a,$02
     jp   nz,entry_02_72ac_LoadObjectData
     ret  
 
 call_02_6163:
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_UpdateXPositionFromVector
     ld   a,$03
     jp   nc,entry_02_72ac_LoadObjectData
@@ -1089,10 +1090,10 @@ call_02_616f:
     ld   a,$19
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   c,$10
-    call call_00_28dc_ObjectSet1D
+    call call_00_28dc_ObjectSetYVelocity
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   l,a
     ldi  a,[hl]
     sub  a,$B0
@@ -1112,7 +1113,7 @@ call_02_616f:
     ld   a,$01
     ld   [wDCDC],a
 .label61A1:
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_UpdateXPositionFromVector
     ret  c
     ld   a,$19
@@ -1121,7 +1122,7 @@ call_02_616f:
     jp   entry_02_72ac_LoadObjectData
 
 call_02_61b2:
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     jp   call_00_2766_Object_UpdateXPositionFromVector
 
 call_02_61b8:
@@ -1132,29 +1133,29 @@ call_02_61b8:
 
 call_02_61c6:
     ld   c,04
-    call call_00_28c8_ObjectSet1B
-    call call_00_251c_Object_CheckRegionAndSetFlag
-    call call_00_2a68_ComputePlayerObjectXVector
+    call call_00_28c8_ObjectSetXVelocity
+    call call_00_251c_Object_CheckRegion_UpdateFacing
+    call call_00_2a68_Object_ComputePlayerXProximity
     call call_00_2976_ObjectGetFacingDirection
-    ld   hl,wDA12
+    ld   hl,wDA12_ObjectDirectionRelativeToPlayer
     cp   [hl]
     ret  nz
-    ld   a,[wDA11]
+    ld   a,[wDA11_ObjectXDistFromPlayer]
     cp   a,$30
     ret  nc
     ld   c,$20
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     ld   c,$30
-    call call_00_28dc_ObjectSet1D
+    call call_00_28dc_ObjectSetYVelocity
     ld   a,$01
     jp   entry_02_72ac_LoadObjectData
 
 call_02_61ee:
-    call call_00_251c_Object_CheckRegionAndSetFlag
-    call call_00_2475_Object_MoveAndClampVerticalPosition
+    call call_00_251c_Object_CheckRegion_UpdateFacing
+    call call_00_2475_Object_MoveYWithClampAndSnap
     ld   c,$00
     jr   nc,.label620B
-    call call_00_28d2_ObjectGet1D
+    call call_00_28d2_ObjectGetYVelocity
     bit  7,a
     jr   nz,.label6206
     ld   c,$02
@@ -1180,7 +1181,7 @@ call_02_6214:
     ld   c,$40
     call call_00_2980_ObjectSet19
     ld   c,$00
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     ld   c,$00
     call call_00_2958_ObjectSetFacingDirection
     ld   bc,$0028
@@ -1188,7 +1189,7 @@ call_02_6214:
     ld   c,$28
     call call_00_290d_ObjectSetTimer1A
 .label6239:
-    ld   a,[wDC71]
+    ld   a,[wDC71_FrameCounter]
     and  a,$03
     ret  nz
     ld   bc,$FFFF
@@ -1199,30 +1200,30 @@ call_02_6214:
     ret  
 
 call_02_624e:
-    ld   a,[wDC71]
+    ld   a,[wDC71_FrameCounter]
     and  a,$01
     ld   c,$00
-    jp   z,call_00_28c8_ObjectSet1B
+    jp   z,call_00_28c8_ObjectSetXVelocity
     ld   c,$01
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     ld   bc,$0001
     call $24DF
     call call_00_26c9_Object_HandleXCollisionOrSectorCheck
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   l,a
     ldi  a,[hl]
     ld   d,[hl]
     ld   e,a
-    ld   hl,wDA14
+    ld   hl,wDA14_CameraLeftLo
     ld   a,e
     sub  [hl]
     inc  hl
     ld   a,d
     sbc  [hl]
     jr   c,.label6285
-    ld   hl,wDA16
+    ld   hl,wDA16_CameraRightLo
     ld   a,e
     sub  [hl]
     inc  hl
@@ -1242,13 +1243,13 @@ call_02_6293:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,.label62A7
     ld   c,$00
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     ld   c,$00
     call call_00_2958_ObjectSetFacingDirection
     ld   c,$28
     call call_00_290d_ObjectSetTimer1A
 .label62A7:
-    ld   a,[wDC71]
+    ld   a,[wDC71_FrameCounter]
     and  a,$03
     ret  nz
     ld   bc,$0001
@@ -1262,7 +1263,7 @@ call_02_62bc:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,.label62D0
     ld   c,$08
-    call call_00_2944_ObjectSet12
+    call call_00_2944_ObjectSetWidth
     call call_00_293a_ObjectGetId
     cp   a,$31
     ld   c,$20
@@ -1270,9 +1271,9 @@ call_02_62bc:
 .label62D0:
     call call_00_2a5d_ObjectCheckFlag2
     ret  z
-    call call_00_2a68_ComputePlayerObjectXVector
+    call call_00_2a68_Object_ComputePlayerXProximity
     call call_00_2976_ObjectGetFacingDirection
-    ld   hl,wDA12
+    ld   hl,wDA12_ObjectDirectionRelativeToPlayer
     cp   [hl]
     ret  nz
     call call_00_293a_ObjectGetId
@@ -1283,7 +1284,7 @@ call_02_62bc:
 .label62EA:
     call call_00_2b10_VerifyObjectPairExists
     ret  nz
-    ld   a,[wDA11]
+    ld   a,[wDA11_ObjectXDistFromPlayer]
     cp   a,$40
     ld   a,$01
     jp   c,entry_02_72ac_LoadObjectData
@@ -1293,7 +1294,7 @@ call_02_62f9:
     call call_00_2a5d_ObjectCheckFlag2
     ret  z
     ld   c,$10
-    call call_00_2944_ObjectSet12
+    call call_00_2944_ObjectSetWidth
     call call_00_293a_ObjectGetId
     ld   c,$0E
     cp   a,$30
@@ -1306,17 +1307,17 @@ call_02_62f9:
 
 call_02_6315:
     ld   c,$08
-    jp   call_00_2944_ObjectSet12
+    jp   call_00_2944_ObjectSetWidth
 
 call_02_631a:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,.label6329
     ld   c,$20
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     ld   c,$40
     call call_00_290d_ObjectSetTimer1A
 .label6329:
-    call call_00_24c0_Object_IntegrateFractionalVelocity_X
+    call call_00_24c0_Object_IntegrateXVelocity
     call call_00_2922_ObjectTimer1ACountdown
     jp   z,call_00_2b7a_ClearObjectThenJump
     ret  
@@ -1325,11 +1326,11 @@ call_02_6333:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,.label6342
     ld   c,$E0
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     ld   c,$40
     call call_00_290d_ObjectSetTimer1A
 .label6342:
-    call call_00_24c0_Object_IntegrateFractionalVelocity_X
+    call call_00_24c0_Object_IntegrateXVelocity
     call call_00_2922_ObjectTimer1ACountdown
     jp   z,call_00_2b7a_ClearObjectThenJump
     ret  
@@ -1357,8 +1358,8 @@ call_02_6361:
     db   $20, $22, $e4, $20, $02
 
 call_02_6399:
-    call call_00_24c0_Object_IntegrateFractionalVelocity_X
-    call call_00_24ee_Object_IntegrateFractionalVelocity_Y
+    call call_00_24c0_Object_IntegrateXVelocity
+    call call_00_24ee_Object_IntegrateYVelocity
     call call_00_2922_ObjectTimer1ACountdown
     ld   a,$00
     jp   z,entry_02_72ac_LoadObjectData
@@ -1391,9 +1392,9 @@ call_02_63d3:
 
 call_02_63db:
     ld   c,$28
-    call call_00_28c8_ObjectSet1B
-    call call_00_2a68_ComputePlayerObjectXVector
-    ld   a,[wDA12]
+    call call_00_28c8_ObjectSetXVelocity
+    call call_00_2a68_Object_ComputePlayerXProximity
+    ld   a,[wDA12_ObjectDirectionRelativeToPlayer]
     ld   hl,wD80D_PlayerFacingDirection
     cp   [hl]
     ld   a,$01
@@ -1405,15 +1406,15 @@ call_02_63f0:
     jr   z,.label63FD
     ld   c,$3C
     call call_00_290d_ObjectSetTimer1A
-    call call_00_2410_SetDirectionFlag_PlayerLeft
+    call call_00_2410_Object_SetFacingRelativeToPlayer
 .label63FD:
     call call_00_2922_ObjectTimer1ACountdown
     ld   a,$02
     jp   z,entry_02_72ac_LoadObjectData
 
 call_02_6405:
-    call call_00_2a68_ComputePlayerObjectXVector
-    ld   a,[wDA12]
+    call call_00_2a68_Object_ComputePlayerXProximity
+    ld   a,[wDA12_ObjectDirectionRelativeToPlayer]
     ld   hl,wD80D_PlayerFacingDirection
     cp   [hl]
     ld   a,$00
@@ -1423,9 +1424,9 @@ call_02_6405:
 call_02_6415:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$20
-    call nz,call_00_28dc_ObjectSet1D
-    call call_00_251c_Object_CheckRegionAndSetFlag
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call nz,call_00_28dc_ObjectSetYVelocity
+    call call_00_251c_Object_CheckRegion_UpdateFacing
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_UpdateXPositionFromVector
     ret  c
     ld   a,$03
@@ -1438,7 +1439,7 @@ call_02_642e:
     ld   c,$00
     call call_00_290d_ObjectSetTimer1A
     ld   c,$10
-    call call_00_294e_ObjectSet13
+    call call_00_294e_ObjectSetHeight
 .label643D:
     call call_00_2917_ObjectCheckIfTimer1AIsZero
     jr   nz,.label6450
@@ -1461,7 +1462,7 @@ call_02_6459:
     ld   de,.data_02_6467
     add  hl,de
     ld   c,[hl]
-    jp   call_00_294e_ObjectSet13
+    jp   call_00_294e_ObjectSetHeight
 .data_02_6467:
     db   $10, $0e, $0c, $0a, $08, $06, $04, $02
 
@@ -1476,7 +1477,7 @@ call_02_647b:
     ld   de,call_02_6489
     add  hl,de
     ld   c,[hl]
-    jp   call_00_294e_ObjectSet13
+    jp   call_00_294e_ObjectSetHeight
 
 call_02_6489:
     ld   [bc],a
@@ -1488,27 +1489,27 @@ call_02_6489:
 call_02_6491:
     call call_00_2722_Player_IsWithinObjectYRange
     jr   z,.label64A0
-    call call_00_2a68_ComputePlayerObjectXVector
-    ld   a,[wDA11]
+    call call_00_2a68_Object_ComputePlayerXProximity
+    ld   a,[wDA11_ObjectXDistFromPlayer]
     cp   a,$30
     jr   c,.label64A8
 .label64A0:
     ld   c,$04
-    call call_00_2588_Object_ApproachTargetValue_Byte
-    jp   call_00_251c_Object_CheckRegionAndSetFlag
+    call call_00_2588_Object_ApproachXVelocity
+    jp   call_00_251c_Object_CheckRegion_UpdateFacing
 .label64A8:
-    ld   a,[wDA12]
+    ld   a,[wDA12_ObjectDirectionRelativeToPlayer]
     xor  a,$20
     ld   c,a
     call call_00_2958_ObjectSetFacingDirection
     ld   c,$1E
-    call call_00_2588_Object_ApproachTargetValue_Byte
-    call call_00_251c_Object_CheckRegionAndSetFlag
+    call call_00_2588_Object_ApproachXVelocity
+    call call_00_251c_Object_CheckRegion_UpdateFacing
     jr   nz,.label64C8
-    ld   a,[wDA11]
+    ld   a,[wDA11_ObjectXDistFromPlayer]
     cp   a,$20
     ret  nc
-    ld   hl,wDA12
+    ld   hl,wDA12_ObjectDirectionRelativeToPlayer
     ld   c,[hl]
     call call_00_2958_ObjectSetFacingDirection
 .label64C8:
@@ -1518,11 +1519,11 @@ call_02_6491:
 call_02_64cd:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$20
-    call nz,call_00_28dc_ObjectSet1D
+    call nz,call_00_28dc_ObjectSetYVelocity
     ld   c,$10
-    call call_00_2588_Object_ApproachTargetValue_Byte
-    call call_00_251c_Object_CheckRegionAndSetFlag
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call call_00_2588_Object_ApproachXVelocity
+    call call_00_251c_Object_CheckRegion_UpdateFacing
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_UpdateXPositionFromVector
     ld   a,$00
     jp   nc,entry_02_72ac_LoadObjectData
@@ -1534,8 +1535,8 @@ call_02_64e9:
     call call_00_2826_Object_SetXFromDA24
     call call_00_27e4_Object_SetYPosFromDA26
 .label64F4:
-    call call_00_2a68_ComputePlayerObjectXVector
-    ld   a,[wDA11]
+    call call_00_2a68_Object_ComputePlayerXProximity
+    ld   a,[wDA11_ObjectXDistFromPlayer]
     cp   a,$10
     ld   a,$01
     jp   c,entry_02_72ac_LoadObjectData
@@ -1544,28 +1545,28 @@ call_02_64e9:
 call_02_6502:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,.label651D
-    call call_00_2410_SetDirectionFlag_PlayerLeft
+    call call_00_2410_Object_SetFacingRelativeToPlayer
     call call_00_2976_ObjectGetFacingDirection
     ld   c,$10
     cp   a,$00
     jr   z,.label6515
     ld   c,$F0
 .label6515:
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     ld   c,$20
-    call call_00_28dc_ObjectSet1D
+    call call_00_28dc_ObjectSetYVelocity
 .label651D:
-    call call_00_24c0_Object_IntegrateFractionalVelocity_X
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
-    call call_00_28f1_ObjectCheckIf1DIsZero
+    call call_00_24c0_Object_IntegrateXVelocity
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
+    call call_00_28f1_ObjectCheckIfYVelocityIsZero
     bit  7,a
     ld   a,$03
     jp   nz,entry_02_72ac_LoadObjectData
     ret  
 
 call_02_652e:
-    call call_00_24c0_Object_IntegrateFractionalVelocity_X
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call call_00_24c0_Object_IntegrateXVelocity
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2780_Object_ComputeMapYDelta
     ld   a,$00
     jp   nc,entry_02_72ac_LoadObjectData
@@ -1608,7 +1609,7 @@ call_02_6569:
 call_02_6577:
     call call_00_2917_ObjectCheckIfTimer1AIsZero
     inc  [hl]
-    ld   hl,wDC71
+    ld   hl,wDC71_FrameCounter
     and  [hl]
     and  a,$1F
     jr   z,.label6589
@@ -1674,7 +1675,7 @@ call_02_65d7:
     ld   bc,$FFFF
     jp   call_00_250d_Object_UpdateYPosition
 .label65F8:
-    ld   a,[wDC71]
+    ld   a,[wDC71_FrameCounter]
     and  a,$03
     ret  nz
     call call_00_2917_ObjectCheckIfTimer1AIsZero
@@ -1717,13 +1718,13 @@ call_02_6633:
 
 call_02_6641:
     ld   c,$10
-    call call_00_28c8_ObjectSet1B
-    call call_00_251c_Object_CheckRegionAndSetFlag
+    call call_00_28c8_ObjectSetXVelocity
+    call call_00_251c_Object_CheckRegion_UpdateFacing
     call call_00_2722_Player_IsWithinObjectYRange
     ret  z
-    call call_00_2410_SetDirectionFlag_PlayerLeft
-    call call_00_2a68_ComputePlayerObjectXVector
-    ld   a,[wDA11]
+    call call_00_2410_Object_SetFacingRelativeToPlayer
+    call call_00_2a68_Object_ComputePlayerXProximity
+    ld   a,[wDA11_ObjectXDistFromPlayer]
     cp   a,$18
     jr   c,.label6662
     cp   a,$40
@@ -1745,7 +1746,7 @@ call_02_6641:
     ld   a,[hl]
     push af
     cp   a,$04
-    call z,call_00_242d_SetDirectionFlag_PlayerRight
+    call z,call_00_242d_Object_SetFacingRelativeToPlayer_Inverse
     pop  af
     jp   entry_02_72ac_LoadObjectData
 
@@ -1755,11 +1756,11 @@ call_02_667e:
     inc  b
     ld   b,$04
 call_02_6687:
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     jp   call_00_2766_Object_UpdateXPositionFromVector
 
 call_02_668d:
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_UpdateXPositionFromVector
     ret  c
     call call_00_2a5d_ObjectCheckFlag2
@@ -1771,21 +1772,21 @@ call_02_669d:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,.label66AC
     ld   c,$18
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     ld   c,$28
-    call call_00_28dc_ObjectSet1D
+    call call_00_28dc_ObjectSetYVelocity
 .label66AC:
-    call call_00_251c_Object_CheckRegionAndSetFlag
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call call_00_251c_Object_CheckRegion_UpdateFacing
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_UpdateXPositionFromVector
     ld   a,$00
     jp   nc,entry_02_72ac_LoadObjectData
     ret  
 
 call_02_66bb:
-    call call_00_2410_SetDirectionFlag_PlayerLeft
-    call call_00_2a68_ComputePlayerObjectXVector
-    ld   a,[wDA11]
+    call call_00_2410_Object_SetFacingRelativeToPlayer
+    call call_00_2a68_Object_ComputePlayerXProximity
+    ld   a,[wDA11_ObjectXDistFromPlayer]
     cp   a,$38
     ld   a,$01
     jp   c,entry_02_72ac_LoadObjectData
@@ -1793,8 +1794,8 @@ call_02_66bb:
 
 call_02_66cc:
     ld   c,$10
-    call call_00_28c8_ObjectSet1B
-    call call_00_251c_Object_CheckRegionAndSetFlag
+    call call_00_28c8_ObjectSetXVelocity
+    call call_00_251c_Object_CheckRegion_UpdateFacing
     ret  z
     call call_00_2976_ObjectGetFacingDirection
     xor  a,$20
@@ -1817,39 +1818,39 @@ call_02_66ef:
     ret  
 
 call_02_66f6:
-    call call_00_2a68_ComputePlayerObjectXVector
-    ld   a,[wDA11]
+    call call_00_2a68_Object_ComputePlayerXProximity
+    ld   a,[wDA11_ObjectXDistFromPlayer]
     cp   a,$38
     jr   c,.label6708
     ld   c,$06
-    call call_00_2588_Object_ApproachTargetValue_Byte
-    jp   call_00_251c_Object_CheckRegionAndSetFlag
+    call call_00_2588_Object_ApproachXVelocity
+    jp   call_00_251c_Object_CheckRegion_UpdateFacing
 .label6708:
-    ld   a,[wDA12]
+    ld   a,[wDA12_ObjectDirectionRelativeToPlayer]
     xor  a,$20
     ld   c,a
     call call_00_2958_ObjectSetFacingDirection
     ld   c,$10
-    call call_00_2588_Object_ApproachTargetValue_Byte
-    call call_00_251c_Object_CheckRegionAndSetFlag
+    call call_00_2588_Object_ApproachXVelocity
+    call call_00_251c_Object_CheckRegion_UpdateFacing
     jr   nz,.label6728
-    ld   a,[wDA11]
+    ld   a,[wDA11_ObjectXDistFromPlayer]
     cp   a,$28
     ret  nc
-    ld   hl,wDA12
+    ld   hl,wDA12_ObjectDirectionRelativeToPlayer
     ld   c,[hl]
     call call_00_2958_ObjectSetFacingDirection
 .label6728:
     ld   c,$30
-    call call_00_28dc_ObjectSet1D
+    call call_00_28dc_ObjectSetYVelocity
     ld   a,$01
     jp   entry_02_72ac_LoadObjectData
 
 call_02_6732:
     ld   c,$02
-    call call_00_2588_Object_ApproachTargetValue_Byte
-    call call_00_251c_Object_CheckRegionAndSetFlag
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call call_00_2588_Object_ApproachXVelocity
+    call call_00_251c_Object_CheckRegion_UpdateFacing
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_UpdateXPositionFromVector
     ld   a,$00
     jp   nc,entry_02_72ac_LoadObjectData
@@ -1860,8 +1861,8 @@ call_02_6746:
     ld   c,$00
     call nz,call_00_290d_ObjectSetTimer1A
     ld   c,$04
-    call call_00_28c8_ObjectSet1B
-    call call_00_251c_Object_CheckRegionAndSetFlag
+    call call_00_28c8_ObjectSetXVelocity
+    call call_00_251c_Object_CheckRegion_UpdateFacing
     ld   c,$02
     call nz,call_00_290d_ObjectSetTimer1A
     call call_00_29ac_ObjectFacingMatchesStoredDirection
@@ -1883,8 +1884,8 @@ call_02_6768:
     ld   c,$00
     call nz,call_00_290d_ObjectSetTimer1A
     ld   c,$10
-    call call_00_28c8_ObjectSet1B
-    call call_00_251c_Object_CheckRegionAndSetFlag
+    call call_00_28c8_ObjectSetXVelocity
+    call call_00_251c_Object_CheckRegion_UpdateFacing
     ld   c,$C1
     call nz,call_00_290d_ObjectSetTimer1A
     call call_00_29ac_ObjectFacingMatchesStoredDirection
@@ -1905,14 +1906,14 @@ call_02_679b:
     jr   z,.label67AB
     ld   c,$E8
 .label67AB:
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     ld   c,$B4
     call call_00_290d_ObjectSetTimer1A
 .label67B3:
     call call_00_2922_ObjectTimer1ACountdown
     jp   z,call_00_2b7a_ClearObjectThenJump
-    call call_00_24c0_Object_IntegrateFractionalVelocity_X
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call call_00_24c0_Object_IntegrateXVelocity
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     jp   call_00_2766_Object_UpdateXPositionFromVector
 
 call_02_67c2:
@@ -1926,7 +1927,7 @@ call_02_67c2:
     add  hl,de
     ld   d,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$10
+    or   a,OBJECT_YPOS_OFFSET
     ld   e,a
     ldi  a,[hl]
     ld   [de],a
@@ -1948,7 +1949,7 @@ call_02_67c2:
     jr   nz,.label6805
     ld   d,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   e,a
     ld   a,[de]
     sub  [hl]
@@ -1989,7 +1990,7 @@ call_02_67c2:
     add  hl,de
     ld   d,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$10
+    or   a,OBJECT_YPOS_OFFSET
     ld   e,a
     ld   a,[de]
     ldi  [hl],a
@@ -2013,7 +2014,7 @@ call_02_67c2:
     jp   nz,entry_02_54f9_SwitchPlayerAction
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   l,a
     ld   a,[wD80E_PlayerXPosition]
     sub  [hl]
@@ -2035,7 +2036,7 @@ call_02_688E:
     ld   hl,.data_02_68A9
     ld   d,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   e,a
     ld   c,$FF
 .label689B:
@@ -2064,7 +2065,7 @@ call_02_68b2:
     ld   hl,.data_02_68e5
     call call_00_2c20_ObjectPalette_CopyToBuffer
     call call_00_2826_Object_SetXFromDA24
-    ld   a,[wDC71]
+    ld   a,[wDC71_FrameCounter]
     and  a,$0F
     ld   c,a
     ld   b,$00
@@ -2076,16 +2077,16 @@ call_02_68b2:
     ld   c,$04
     call call_00_290d_ObjectSetTimer1A
     ld   c,$00
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     ld   c,$00
-    call call_00_28dc_ObjectSet1D
+    call call_00_28dc_ObjectSetYVelocity
     ret  
 .data_02_68e5:    
     db   $00, $00, $00, $00, $ff, $03, $ff, $7f
 
 call_02_68ed:
-    call call_00_24c0_Object_IntegrateFractionalVelocity_X
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call call_00_24c0_Object_IntegrateXVelocity
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_UpdateXPositionFromVector
     ret  c
     call call_00_2922_ObjectTimer1ACountdown
@@ -2096,10 +2097,10 @@ call_02_68ed:
     ld   de,.data_02_6924
     add  hl,de
     ld   c,[hl]
-    call call_00_28dc_ObjectSet1D
-    call call_00_28e6_ObjectCheckIf1BIsZero
+    call call_00_28dc_ObjectSetYVelocity
+    call call_00_28e6_ObjectCheckIfXVelocityIsZero
     ret  nz
-    ld   a,[wDC71]
+    ld   a,[wDC71_FrameCounter]
     swap a
     and  a,$03
     ld   l,a
@@ -2107,7 +2108,7 @@ call_02_68ed:
     ld   de,.data_02_6920
     add  hl,de
     ld   c,[hl]
-    jp   call_00_28c8_ObjectSet1B
+    jp   call_00_28c8_ObjectSetXVelocity
 .data_02_6920:
     db   $08, $f8, $04, $fc
 .data_02_6924:
@@ -2167,7 +2168,7 @@ call_02_697e:
     add  hl,de
     ld   d,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   e,a
     ldi  a,[hl]
     ld   [de],a
@@ -2197,28 +2198,28 @@ call_02_69af:
     ld   de,.data_02_69fc
     add  hl,de
     ld   c,[hl]
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     ld   c,$20
-    call call_00_28dc_ObjectSet1D
+    call call_00_28dc_ObjectSetYVelocity
 .label69CB:
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     ld   de,$0068
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$10
+    or   a,OBJECT_YPOS_OFFSET
     ld   l,a
     ldi  a,[hl]
     sub  e
     ld   a,[hl]
     sbc  d
-    jp   c,call_00_24c0_Object_IntegrateFractionalVelocity_X
+    jp   c,call_00_24c0_Object_IntegrateXVelocity
     ld   [hl],d
     dec  l
     ld   [hl],e
     ld   c,$00
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     ld   c,$00
-    call call_00_28dc_ObjectSet1D
+    call call_00_28dc_ObjectSetYVelocity
     ld   c,$2D
     call call_00_290d_ObjectSetTimer1A
     ld   a,$1C
@@ -2229,7 +2230,7 @@ call_02_69af:
     db   $10, $f0, $08, $f8, $10, $f0, $04, $fc
     
 call_02_6a04:
-    ld   a,[wDC71]
+    ld   a,[wDC71_FrameCounter]
     and  a,$03
     ret  nz
     call call_00_2922_ObjectTimer1ACountdown
@@ -2242,7 +2243,7 @@ call_02_6a13:
     jr   z,.label6A38
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   l,a
     ld   a,[hl]
     ld   hl,.data_02_6a40
@@ -2257,12 +2258,12 @@ call_02_6a13:
 .label6A2E:
     inc  hl
     ld   c,[hl]
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     ld   c,$D8
-    call call_00_28dc_ObjectSet1D
+    call call_00_28dc_ObjectSetYVelocity
 .label6A38:
-    call call_00_24c0_Object_IntegrateFractionalVelocity_X
-    call call_00_24ee_Object_IntegrateFractionalVelocity_Y
+    call call_00_24c0_Object_IntegrateXVelocity
+    call call_00_24ee_Object_IntegrateYVelocity
     jr   call_02_6a04
 .data_02_6a40:
     db   $17, $26, $35, $17, $44, $0f, $62        ;; 02:6a3f ????????
@@ -2283,7 +2284,7 @@ call_02_6a4c:
     ret  nc
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   l,a
     ld   a,[hl]
     sub  a,$60
@@ -2309,7 +2310,7 @@ call_02_6a91:
     ld   bc,$FFD0
     call call_00_250d_Object_UpdateYPosition
     ld   c,$28
-    call call_00_294e_ObjectSet13
+    call call_00_294e_ObjectSetHeight
 label6AA1:
     call call_00_22d4_CheckObjectSlotFlag
     ret  z
@@ -2323,8 +2324,8 @@ label6AA1:
 call_02_6ab4:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$10
-    call nz,call_00_294e_ObjectSet13
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call nz,call_00_294e_ObjectSetHeight
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_UpdateXPositionFromVector
     ret  c
     ld   a,$19
@@ -2334,7 +2335,7 @@ call_02_6ab4:
 
 call_02_6acd:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
-    jp   nz,call_00_2410_SetDirectionFlag_PlayerLeft
+    jp   nz,call_00_2410_Object_SetFacingRelativeToPlayer
     ret  
 
 call_02_6ad4:    
@@ -2352,15 +2353,15 @@ call_02_6add:
     jr   z,label6AED
     ld   c,$E0
 label6AED:
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     ld   c,$78
     call call_00_290d_ObjectSetTimer1A
 label6AF5:
     call call_00_2922_ObjectTimer1ACountdown
     jp   z,call_00_2b7a_ClearObjectThenJump
     cp   a,$3C
-    call c,call_00_244a_Object_ApplyClampedVerticalVelocity
-    jp   call_00_24c0_Object_IntegrateFractionalVelocity_X
+    call c,call_00_2475_Object_ApplyVerticalVelocity_Clamped
+    jp   call_00_24c0_Object_IntegrateXVelocity
 
 call_02_6b03:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
@@ -2393,12 +2394,12 @@ call_02_6b35:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label6B47
     ld   c,$20
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     ld   c,$08
     call call_00_290d_ObjectSetTimer1A
-    call call_00_2410_SetDirectionFlag_PlayerLeft
+    call call_00_2410_Object_SetFacingRelativeToPlayer
 label6B47:
-    call call_00_251c_Object_CheckRegionAndSetFlag
+    call call_00_251c_Object_CheckRegion_UpdateFacing
     call call_00_2922_ObjectTimer1ACountdown
     ld   a,$00
     jp   z,entry_02_72ac_LoadObjectData
@@ -2406,10 +2407,10 @@ label6B47:
 
 call_02_6b53:
     ld   c,$02
-    call call_00_28c8_ObjectSet1B
-    call call_00_251c_Object_CheckRegionAndSetFlag
-    call call_00_2a68_ComputePlayerObjectXVector
-    ld   a,[wDA11]
+    call call_00_28c8_ObjectSetXVelocity
+    call call_00_251c_Object_CheckRegion_UpdateFacing
+    call call_00_2a68_Object_ComputePlayerXProximity
+    ld   a,[wDA11_ObjectXDistFromPlayer]
     cp   a,$28
     ld   a,$01
     jp   c,entry_02_72ac_LoadObjectData
@@ -2418,14 +2419,14 @@ call_02_6b53:
 call_02_6b69:
     call call_00_2722_Player_IsWithinObjectYRange
     jr   z,label6B78
-    call call_00_2a68_ComputePlayerObjectXVector
-    ld   a,[wDA11]
+    call call_00_2a68_Object_ComputePlayerXProximity
+    ld   a,[wDA11_ObjectXDistFromPlayer]
     cp   a,$0E
     jr   c,label6B8B
 label6B78:
     ld   c,$08
-    call call_00_28c8_ObjectSet1B
-    call call_00_251c_Object_CheckRegionAndSetFlag
+    call call_00_28c8_ObjectSetXVelocity
+    call call_00_251c_Object_CheckRegion_UpdateFacing
     ret  z
     call call_00_2922_ObjectTimer1ACountdown
     jr   z,label6B8B
@@ -2435,24 +2436,24 @@ label6B8B:
     call call_00_2917_ObjectCheckIfTimer1AIsZero
     ld   [hl],$03
     call call_00_2722_Player_IsWithinObjectYRange
-    call nz,call_00_2410_SetDirectionFlag_PlayerLeft
+    call nz,call_00_2410_Object_SetFacingRelativeToPlayer
     ld   a,$02
     jp   entry_02_72ac_LoadObjectData
 
 call_02_6b9b:
     ld   c,$10
-    call call_00_28c8_ObjectSet1B
-    jp   call_00_251c_Object_CheckRegionAndSetFlag
+    call call_00_28c8_ObjectSetXVelocity
+    jp   call_00_251c_Object_CheckRegion_UpdateFacing
 
 call_02_6ba3:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label6BB3
     ld   c,$04
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     call call_00_230f_ResolveObjectListIndex
     call call_00_290d_ObjectSetTimer1A
 label6BB3:
-    call call_00_251c_Object_CheckRegionAndSetFlag
+    call call_00_251c_Object_CheckRegion_UpdateFacing
     ld   bc,$0002
     call call_00_250d_Object_UpdateYPosition
     call call_00_2917_ObjectCheckIfTimer1AIsZero
@@ -2464,7 +2465,7 @@ label6BB3:
 
 call_02_6bc8:
     call call_00_2917_ObjectCheckIfTimer1AIsZero
-    ld   a,[wDC71]
+    ld   a,[wDC71_FrameCounter]
     and  [hl]
     and  a,$3F
     jr   nz,label6BDC
@@ -2474,8 +2475,8 @@ call_02_6bc8:
     call call_00_2958_ObjectSetFacingDirection
 label6BDC:
     ld   c,$10
-    call call_00_28c8_ObjectSet1B
-    call call_00_251c_Object_CheckRegionAndSetFlag
+    call call_00_28c8_ObjectSetXVelocity
+    call call_00_251c_Object_CheckRegion_UpdateFacing
 
 call_02_6be4:
     call call_00_230f_ResolveObjectListIndex
@@ -2499,7 +2500,7 @@ call_02_6bfb:
 
 call_02_6c08:
     farcall entry_03_57f8_ClearCollisionForObject
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2780_Object_ComputeMapYDelta
     jp   nc,call_00_2b7a_ClearObjectThenJump
     ret  
@@ -2507,20 +2508,20 @@ call_02_6c08:
 call_02_6c1d:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$20
-    call nz,call_00_28c8_ObjectSet1B
-    ld   a,[wDC71]
+    call nz,call_00_28c8_ObjectSetXVelocity
+    ld   a,[wDC71_FrameCounter]
     and  a,$07
     ld   c,$10
-    call z,call_00_2588_Object_ApproachTargetValue_Byte
-    call call_00_251c_Object_CheckRegionAndSetFlag
+    call z,call_00_2588_Object_ApproachXVelocity
+    call call_00_251c_Object_CheckRegion_UpdateFacing
     call call_00_2722_Player_IsWithinObjectYRange
     ret  z
-    call call_00_2a68_ComputePlayerObjectXVector
+    call call_00_2a68_Object_ComputePlayerXProximity
     call call_00_2976_ObjectGetFacingDirection
-    ld   hl,wDA12
+    ld   hl,wDA12_ObjectDirectionRelativeToPlayer
     cp   [hl]
     ret  nz
-    ld   a,[wDA11]
+    ld   a,[wDA11_ObjectXDistFromPlayer]
     cp   a,$40
     ld   a,$02
     jp   c,entry_02_72ac_LoadObjectData
@@ -2528,19 +2529,19 @@ call_02_6c1d:
 
 call_02_6c4c:
     ld   c,$20
-    call call_00_28dc_ObjectSet1D
+    call call_00_28dc_ObjectSetYVelocity
     ld   c,$28
-    call call_00_2588_Object_ApproachTargetValue_Byte
-    call call_00_251c_Object_CheckRegionAndSetFlag
-    call call_00_28be_ObjectGet1B
+    call call_00_2588_Object_ApproachXVelocity
+    call call_00_251c_Object_CheckRegion_UpdateFacing
+    call call_00_28be_ObjectGetXVelocity
     cp   a,$28
     ld   a,$03
     jp   z,entry_02_72ac_LoadObjectData
     ret  
 
 call_02_6c64:
-    call call_00_251c_Object_CheckRegionAndSetFlag
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call call_00_251c_Object_CheckRegion_UpdateFacing
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_UpdateXPositionFromVector
     ld   a,$00
     jp   nc,entry_02_72ac_LoadObjectData
@@ -2558,11 +2559,11 @@ label6C81:
 label6C84:
     call call_00_298a_ObjectGet19
     jr   z,label6CAC
-    ld   a,[wDC71]
+    ld   a,[wDC71_FrameCounter]
     and  a,$07
     ld   c,$10
-    call z,call_00_2588_Object_ApproachTargetValue_Byte
-    call call_00_251c_Object_CheckRegionAndSetFlag
+    call z,call_00_2588_Object_ApproachXVelocity
+    call call_00_251c_Object_CheckRegion_UpdateFacing
     ret  z
     call call_00_230f_ResolveObjectListIndex
     ld   b,$00
@@ -2575,8 +2576,8 @@ label6C84:
     ld   a,$05
     jp   entry_02_72ac_LoadObjectData
 label6CAC:
-    call call_00_251c_Object_CheckRegionAndSetFlag
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call call_00_251c_Object_CheckRegion_UpdateFacing
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_UpdateXPositionFromVector
     ld   c,$01
     call nc,call_00_2980_ObjectSet19
@@ -2609,12 +2610,12 @@ call_02_6cdd:
     jr   z,label6CED
     ld   c,$EC
 label6CED:
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     ld   c,$03
     call call_00_290d_ObjectSetTimer1A
 label6CF5:
-    call call_00_24c0_Object_IntegrateFractionalVelocity_X
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call call_00_24c0_Object_IntegrateXVelocity
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_27f3_Object_GetVector_DA26
     call call_00_2917_ObjectCheckIfTimer1AIsZero
     ld   l,[hl]
@@ -2630,7 +2631,7 @@ label6CF5:
     ld   d,a
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$10
+    or   a,OBJECT_YPOS_OFFSET
     ld   l,a
     ldi  a,[hl]
     sub  e
@@ -2644,7 +2645,7 @@ label6CF5:
     call call_00_0ff5_QueueSoundEffectWithPriority
     call call_00_2922_ObjectTimer1ACountdown
     ld   c,$20
-    jp   nz,call_00_28dc_ObjectSet1D
+    jp   nz,call_00_28dc_ObjectSetYVelocity
     ld   a,$01
     jp   entry_02_72ac_LoadObjectData
 .data_02_6d31:
@@ -2761,11 +2762,11 @@ call_02_6ddd:
     jp   call_00_3792_PrepareRelativeObjectSpawn
 
 call_02_6dee:
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     ld   de,$0068
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$10
+    or   a,OBJECT_YPOS_OFFSET
     ld   l,a
     ldi  a,[hl]
     sub  e
@@ -2807,31 +2808,31 @@ call_02_6e44:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label6E53
     ld   c,$00
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     ld   c,$10
-    call call_00_28dc_ObjectSet1D
+    call call_00_28dc_ObjectSetYVelocity
 label6E53:
-    call call_00_2a68_ComputePlayerObjectXVector
-    ld   a,[wDA12]
+    call call_00_2a68_Object_ComputePlayerXProximity
+    ld   a,[wDA12_ObjectDirectionRelativeToPlayer]
     cp   a,$20
     jr   z,label6E67
-    call call_00_28be_ObjectGet1B
+    call call_00_28be_ObjectGetXVelocity
     cp   a,$10
     jr   z,label6E6F
     inc  [hl]
     jr   label6E6F
 label6E67:
-    call call_00_28be_ObjectGet1B
+    call call_00_28be_ObjectGetXVelocity
     cp   a,$F0
     jr   z,label6E6F
     dec  [hl]
 label6E6F:
-    call call_00_24c0_Object_IntegrateFractionalVelocity_X
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call call_00_24c0_Object_IntegrateXVelocity
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     ld   de,$0088
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$10
+    or   a,OBJECT_YPOS_OFFSET
     ld   l,a
     ldi  a,[hl]
     sub  e
@@ -2847,7 +2848,7 @@ call_02_6e88:
     ld   [hl],$00
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   l,a
     ld   de,$0078
     ld   [hl],e
@@ -2878,7 +2879,7 @@ call_02_6eb9:
 call_02_6ec7:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$3C
-    call nz,call_00_28dc_ObjectSet1D
+    call nz,call_00_28dc_ObjectSetYVelocity
     ld   c,$67
     call call_00_29ce_ObjectExistsCheck
     ret  nz
@@ -2888,14 +2889,14 @@ call_02_6ec7:
     ld   a,[hl]
     cp   a,$06
     jr   nc,label6EFA
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
-    call call_00_28f1_ObjectCheckIf1DIsZero
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
+    call call_00_28f1_ObjectCheckIfYVelocityIsZero
     bit  7,[hl]
     ret  z
     ld   de,$0038
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$10
+    or   a,OBJECT_YPOS_OFFSET
     ld   l,a
     ldi  a,[hl]
     sub  e
@@ -2924,9 +2925,9 @@ call_02_6f0f:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ret  z
     ld   c,$20
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     ld   c,$00
-    call call_00_28dc_ObjectSet1D
+    call call_00_28dc_ObjectSetYVelocity
     call call_00_2917_ObjectCheckIfTimer1AIsZero
     inc  [hl]
     cp   a,$0A
@@ -2935,10 +2936,10 @@ call_02_6f0f:
     ret  
 
 call_02_6f29:
-    call call_00_251c_Object_CheckRegionAndSetFlag
+    call call_00_251c_Object_CheckRegion_UpdateFacing
     call label7002
     ld   c,$38
-    jp   nc,call_00_28dc_ObjectSet1D
+    jp   nc,call_00_28dc_ObjectSetYVelocity
     ret  
 
 call_02_6f35:
@@ -2950,7 +2951,7 @@ call_02_6f35:
 call_02_6f3e:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   c,$00
-    call nz,call_00_28dc_ObjectSet1D
+    call nz,call_00_28dc_ObjectSetYVelocity
     call label6FD3
     ret  nc
     ld   c,$00
@@ -2978,7 +2979,7 @@ call_02_6f64:
 label6F74:
     call call_00_2917_ObjectCheckIfTimer1AIsZero
     jr   z,label6F93
-    ld   a,[wDC71]
+    ld   a,[wDC71_FrameCounter]
     and  a,$3F
     ret  nz
     call call_00_2922_ObjectTimer1ACountdown
@@ -3013,7 +3014,7 @@ call_02_6faa:
     ld   c,$B4
     call call_00_290d_ObjectSetTimer1A
     ld   c,$30
-    call call_00_28dc_ObjectSet1D
+    call call_00_28dc_ObjectSetYVelocity
 label6FBE:
     call label7002
     ret  c
@@ -3025,7 +3026,7 @@ label6FBE:
     set  4,[hl]
     jp   call_00_2b7a_ClearObjectThenJump
 label6FD3:
-    call call_00_28f1_ObjectCheckIf1DIsZero
+    call call_00_28f1_ObjectCheckIfYVelocityIsZero
     bit  7,a
     jr   nz,label6FE0
     cp   a,$20
@@ -3036,11 +3037,11 @@ label6FE0:
     add  a,$04
 label6FE3:
     ld   [hl],a
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     ld   de,$0024
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$10
+    or   a,OBJECT_YPOS_OFFSET
     ld   l,a
     ldi  a,[hl]
     sub  e
@@ -3052,15 +3053,15 @@ label6FE3:
     dec  l
     ld   [hl],e
     ld   c,$00
-    call call_00_28dc_ObjectSet1D
+    call call_00_28dc_ObjectSetYVelocity
     pop  af
     ret  
 label7002:
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     ld   de,isrSerial
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$10
+    or   a,OBJECT_YPOS_OFFSET
     ld   l,a
     ldi  a,[hl]
     sub  e
@@ -3079,7 +3080,7 @@ call_02_701a:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     ld   a,$13
     call nz,call_00_0ff5_QueueSoundEffectWithPriority
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_UpdateXPositionFromVector
     ld   a,$02
     jp   nc,entry_02_72ac_LoadObjectData
@@ -3109,19 +3110,19 @@ call_02_702e:
     sub  [hl]
     ld   c,a
 .label704F:
-    call call_00_28c8_ObjectSet1B
+    call call_00_28c8_ObjectSetXVelocity
     pop  bc
-    call call_00_28dc_ObjectSet1D
+    call call_00_28dc_ObjectSetYVelocity
 .label7056:
-    call call_00_24c0_Object_IntegrateFractionalVelocity_X
-    call call_00_244a_Object_ApplyClampedVerticalVelocity
-    call call_00_28f1_ObjectCheckIf1DIsZero
+    call call_00_24c0_Object_IntegrateXVelocity
+    call call_00_2475_Object_ApplyVerticalVelocity_Clamped
+    call call_00_28f1_ObjectCheckIfYVelocityIsZero
     bit  7,a
     ret  z
     ld   de,$0070
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$10
+    or   a,OBJECT_YPOS_OFFSET
     ld   l,a
     ldi  a,[hl]
     sub  e

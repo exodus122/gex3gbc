@@ -295,31 +295,31 @@ data_02_4000:
     dw   call_02_582e_ObjectAction_None, data_02_76b1
     dw   call_02_582e_ObjectAction_None, data_02_76b7
 .data_02_4360:
-    dw   call_02_5c43, data_02_76bd
-    dw   call_02_5c50, data_02_76c3
-    dw   call_02_5c74, data_02_76ca
+    dw   call_02_5c43_ObjectAction_EvilSanta_Init, data_02_76bd
+    dw   call_02_5c50_ObjectAction_EvilSanta_Jumping, data_02_76c3
+    dw   call_02_5c74_ObjectAction_EvilSanta_PrepareThrow, data_02_76ca
     dw   call_02_582e_ObjectAction_None, data_02_76d9
-    dw   call_02_5c82, data_02_76df
-    dw   call_02_5ca5, data_02_76e5
-    dw   call_02_5cd0, data_02_76f2
+    dw   call_02_5c82_ObjectAction_EvilSanta_Stand, data_02_76df
+    dw   call_02_5ca5_ObjectAction_EvilSanta_Damaged, data_02_76e5
+    dw   call_02_5cd0_ObjectAction_EvilSanta_Death, data_02_76f2
 .data_02_437c:
-    dw   call_02_5d10, data_02_7701
-    dw   call_02_5d80, data_02_7701
-    dw   call_02_5d80, data_02_7707
-    dw   call_02_5d80, data_02_770d
-    dw   call_02_5d80, data_02_7713
-    dw   call_02_5dd7, data_02_7719
-    dw   call_02_5dd7, data_02_7721
+    dw   call_02_5d10_ObjectAction_EvilSantaProjectile_Init, data_02_7701
+    dw   call_02_5d80_ObjectAction_EvilSantaProjectile_UpdateTrajectory, data_02_7701
+    dw   call_02_5d80_ObjectAction_EvilSantaProjectile_UpdateTrajectory, data_02_7707
+    dw   call_02_5d80_ObjectAction_EvilSantaProjectile_UpdateTrajectory, data_02_770d
+    dw   call_02_5d80_ObjectAction_EvilSantaProjectile_UpdateTrajectory, data_02_7713
+    dw   call_02_5dd7_ObjectAction_EvilSantaProjectile_Destroy, data_02_7719
+    dw   call_02_5dd7_ObjectAction_EvilSantaProjectile_Destroy, data_02_7721
 .data_02_4398:
-    dw   call_02_5dde, data_02_7729
-    dw   call_02_5dde, data_02_7738
-    dw   call_02_5e0d, data_02_7747
-    dw   call_02_5e25, data_02_7756
-    dw   call_02_5e34, data_02_775c
+    dw   call_02_5dde_ObjectAction_SkatingElf_Skate, data_02_7729
+    dw   call_02_5dde_ObjectAction_SkatingElf_Skate, data_02_7738
+    dw   call_02_5e0d_ObjectAction_SkatingElf_PrepareJump, data_02_7747
+    dw   call_02_5e25_ObjectAction_SkatingElf_Jump, data_02_7756
+    dw   call_02_5e34_ObjectAction_SkatingElf_Damaged, data_02_775c
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_43b0:
-    dw   call_02_5e7c, data_02_7763
-    dw   call_02_5eb8, data_02_776e
+    dw   call_02_5e7c_ObjectAction_Penguin_WalkOrRun, data_02_7763
+    dw   call_02_5eb8_ObjectAction_Penguin_Jump, data_02_776e
     dw   call_02_582e_ObjectAction_None, data_02_7774
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_43c0:

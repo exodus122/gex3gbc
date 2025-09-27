@@ -185,7 +185,7 @@ call_03_687c_AssignObjectPalette:
 ; Usage: Ensures each on-screen object uses the correct colors.
     ld   H, $d8                                        ;; 03:687c $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:687e $fa $00 $da
-    or   A, $05                                        ;; 03:6881 $f6 $05
+    or   A, OBJECT_UNK05_OFFSET                                        ;; 03:6881 $f6 $05
     ld   L, A                                          ;; 03:6883 $6f
     ld   C, $00                                        ;; 03:6884 $0e $00
     bit  7, [HL]                                       ;; 03:6886 $cb $7e
@@ -218,7 +218,7 @@ call_03_687c_AssignObjectPalette:
     ld   D, H                                          ;; 03:68ae $54
     ld   H, $d8                                        ;; 03:68af $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:68b1 $fa $00 $da
-    or   A, $00                                        ;; 03:68b4 $f6 $00
+    or   A, OBJECT_ID_OFFSET                                        ;; 03:68b4 $f6 $00
     ld   L, A                                          ;; 03:68b6 $6f
     ld   L, [HL]                                       ;; 03:68b7 $6e
     ld   H, $00                                        ;; 03:68b8 $26 $00
@@ -261,7 +261,7 @@ entry_03_68d9_AssignAllObjectPalettes:
     ld   A, $40                                        ;; 03:68d9 $3e $40
 .jr_03_68db:
     ld   [wDA00_CurrentObjectAddr], A                                    ;; 03:68db $ea $00 $da
-    or   A, $00                                        ;; 03:68de $f6 $00
+    or   A, OBJECT_ID_OFFSET                                        ;; 03:68de $f6 $00
     ld   L, A                                          ;; 03:68e0 $6f
     ld   H, $d8                                        ;; 03:68e1 $26 $d8
     ld   A, [HL]                                       ;; 03:68e3 $7e

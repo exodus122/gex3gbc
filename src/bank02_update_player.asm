@@ -119,7 +119,7 @@ label4E65:
 label4E6A:
     ld   hl,wDCA4
     add  [hl]
-    ld   hl,wD80A
+    ld   hl,wD80A_Player_unk0A
     cp   [hl]
     ret  z
     ld   [hl],a
@@ -305,7 +305,7 @@ call_02_4f32_PlayerUpdateMain:
     ld   A, [HL]                                       ;; 02:4fd4 $7e
     ld   [HL], $ff                                     ;; 02:4fd5 $36 $ff
     cp   A, $ff                                        ;; 02:4fd7 $fe $ff
-    call NZ, call_02_72ac_LoadObjectData                              ;; 02:4fd9 $c4 $ac $72
+    call NZ, call_02_72ac_SetupNextObjectAction                              ;; 02:4fd9 $c4 $ac $72
     ld   HL, wD802_PlayerObject_ActionFunc                                     ;; 02:4fdc $21 $02 $d8
     ld   A, [HL+]                                      ;; 02:4fdf $2a
     ld   H, [HL]                                       ;; 02:4fe0 $66
@@ -319,7 +319,7 @@ call_02_4f32_PlayerUpdateMain:
 .jr_02_4fed:
     call call_02_5100_Player_HorizontalMovementHandler                                  ;; 02:4fed $cd $00 $51
     call call_02_5047_CachePlayerTileCoords                                  ;; 02:4ff0 $cd $47 $50
-    ld   HL, wD805                                     ;; 02:4ff3 $21 $05 $d8
+    ld   HL, wD805_Player_unk05                                     ;; 02:4ff3 $21 $05 $d8
     res  4, [HL]                                       ;; 02:4ff6 $cb $a6
     jp   call_02_724d_ProcessObjectTimerAndState                                  ;; 02:4ff8 $c3 $4d $72
 
@@ -646,7 +646,7 @@ call_02_51cb_CheckLeftCollisionAndStoreOffset:
 ; Compares the player’s X position to stored tile edge positions.
 ; If overlap exists, calls ResolveLeftwardTilePushback.
 ; Stores the corrected offset between player and solid edge back into the object table.
-    or   A, $14                                        ;; 02:51cb $f6 $14
+    or   A, OBJECT_UNK14_OFFSET                                        ;; 02:51cb $f6 $14
     ld   L, A                                          ;; 02:51cd $6f
     ld   H, $d8                                        ;; 02:51ce $26 $d8
     bit  7, [HL]                                       ;; 02:51d0 $cb $7e
@@ -739,7 +739,7 @@ call_02_5238_CheckRightCollisionAndStoreOffset:
 ; Performs the same operations but for movement to the right.
 ; Calls ResolveRightwardTilePushback when needed.
 ; Updates the tile offset table after adjustment.
-    or   A, $14                                        ;; 02:5238 $f6 $14
+    or   A, OBJECT_UNK14_OFFSET                                        ;; 02:5238 $f6 $14
     ld   L, A                                          ;; 02:523a $6f
     ld   H, $d8                                        ;; 02:523b $26 $d8
     bit  7, [HL]                                       ;; 02:523d $cb $7e

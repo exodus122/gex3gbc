@@ -149,7 +149,7 @@ call_00_233e_UpdateObjectMotionFromVectorTable:
 ; Purpose: Generate and apply a predefined movement pattern (probably a curve or wave) over time to move an object.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$1B
+    or   a,OBJECT_XVEL_OFFSET
     ld   l,a
     inc  [hl]
     ld   a,[hl]
@@ -227,7 +227,7 @@ call_00_233e_UpdateObjectMotionFromVectorTable:
     pop  de
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   l,a
     ld   a,e
     ldi  [hl],a
@@ -252,7 +252,7 @@ call_00_233e_UpdateObjectMotionFromVectorTable:
     db   $1f, $fc, $1f, $fd, $1f, $fe, $1f, $ff        ;; 00:2406 ????????
     db   $1f, $00
 
-call_00_2410_SetDirectionFlag_PlayerLeft:
+call_00_2410_Object_SetFacingRelativeToPlayer:
 ; Loads the current object’s position ($0E/$0F).
 ; Compares it with the player’s X position (wD80E/F).
 ; Sets a nearby state byte (L xor $02) to $20 if the player is 
@@ -260,16 +260,16 @@ call_00_2410_SetDirectionFlag_PlayerLeft:
 ; Purpose: A left/right proximity flag to influence AI.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   l,a
-    ld   c,$20
+    ld   c,OBJECT_RIGHT_OF_GEX
     ld   a,[wD80E_PlayerXPosition]
     sub  [hl]
     inc  hl
     ld   a,[wD80F_PlayerXPosition]
     sbc  [hl]
     jr   c,label2427
-    ld   c,$00
+    ld   c,OBJECT_LEFT_OF_GEX
 label2427:
     ld   a,l
     xor  a,$02
@@ -277,22 +277,22 @@ label2427:
     ld   [hl],c
     ret  
     
-call_00_242d_SetDirectionFlag_PlayerRight:
+call_00_242d_Object_SetFacingRelativeToPlayer_Inverse:
 ; Same comparison as 2410 but reversed:
 ; Sets the flag to $20 if the player is right of the object, otherwise $00.
 ; Purpose: Mirror of the above for right-side checking.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   l,a
-    ld   c,$00
+    ld   c,OBJECT_LEFT_OF_GEX
     ld   a,[wD80E_PlayerXPosition]
     sub  [hl]
     inc  hl
     ld   a,[wD80F_PlayerXPosition]
     sbc  [hl]
     jr   c,label2444
-    ld   c,$20
+    ld   c,OBJECT_RIGHT_OF_GEX
 label2444:
     ld   a,l
     xor  a,$02
@@ -300,15 +300,12 @@ label2444:
     ld   [hl],c
     ret  
 
-call_00_244a_Object_ApplyClampedVerticalVelocity:
-; Gets a value from $1D (likely vertical velocity). Subtracts 2, clamps negative values to at least $C0.
-; Stores the result back.
-; Computes a small step (cpl/inc + four sra) to get a signed delta (C,B).
-; Jumps to call_00_250d_Object_UpdateYPosition to apply the delta to object position.
-; Purpose: Reduces velocity, clamps it, and applies movement on Y-axis.
+call_00_2475_Object_ApplyVerticalVelocity_Clamped:
+; Updates vertical velocity with a clamp (min cap at $C0), then derives a fractional 
+; step (shifted velocity), and finally applies it to Y position.
     ld   H, $d8                                        ;; 00:244a $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:244c $fa $00 $da
-    or   A, $1d                                        ;; 00:244f $f6 $1d
+    or   A, OBJECT_YVEL_OFFSET                                        ;; 00:244f $f6 $1d
     ld   L, A                                          ;; 00:2451 $6f
     ld   A, [HL]                                       ;; 00:2452 $7e
     sub  A, $02                                        ;; 00:2453 $d6 $02
@@ -332,17 +329,13 @@ call_00_244a_Object_ApplyClampedVerticalVelocity:
     ld   B, A                                          ;; 00:2471 $47
     jp   call_00_250d_Object_UpdateYPosition                                    ;; 00:2472 $c3 $0d $25
 
-call_00_2475_Object_MoveAndClampVerticalPosition:
-; Similar to 244A: subtracts 2 from $1D, clamps to $C0.
-; Computes step (C,B) by shifting four times.
-; Adds the delta directly to position at $0D/$0E.
-; Calls 27F3_Object_GetVector_DA26 (likely gets a reference vector).
-; Compares the result (E,D) to another position vector at $10.
-; If overshooting, snaps the object back to (D,E) and clears $0D.
-; Purpose: Applies vertical movement with boundary checking and snapping.
+call_00_2475_Object_MoveYWithClampAndSnap:
+; Similar clamp on vertical velocity as call_00_2475_Object_ApplyVerticalVelocity_Clamped, 
+; but directly adjusts Y position with subpixel integration, checks against a reference 
+; vector (collision/limit), and snaps position if exceeded.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$1D
+    or   a,OBJECT_YVEL_OFFSET
     ld   l,a
     ld   a,[hl]
     sub  a,$02
@@ -374,7 +367,7 @@ label248A:
     call call_00_27f3_Object_GetVector_DA26
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$10
+    or   a,OBJECT_YPOS_OFFSET
     ld   l,a
     ld   a,e
     sub  [hl]
@@ -392,14 +385,11 @@ label248A:
     ld   [hl],a
     ret  
 
-call_00_24c0_Object_IntegrateFractionalVelocity_X:
-; Reads two velocity bytes at offset $1B, accumulates them, 
-; keeps the lower nibble for fractional remainder.
-; Arithmetic right-shifts the sum to get a signed step (C,B).
-; Adds this step to the object’s position vector at $0E.
+call_00_24c0_Object_IntegrateXVelocity:
+; Accumulates subpixels from X velocity, shifts them into actual pixel delta, and updates X position.
     ld   H, $d8                                        ;; 00:24c0 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:24c2 $fa $00 $da
-    or   A, $1b                                        ;; 00:24c5 $f6 $1b
+    or   A, OBJECT_XVEL_OFFSET                                        ;; 00:24c5 $f6 $1b
     ld   L, A                                          ;; 00:24c7 $6f
     ld   A, [HL+]                                      ;; 00:24c8 $2a
     add  A, [HL]                                       ;; 00:24c9 $86
@@ -418,7 +408,7 @@ call_00_24c0_Object_IntegrateFractionalVelocity_X:
     ld   B, A                                          ;; 00:24de $47
     ld   H, $d8                                        ;; 00:24df $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:24e1 $fa $00 $da
-    or   A, $0e                                        ;; 00:24e4 $f6 $0e
+    or   A, OBJECT_XPOS_OFFSET                                        ;; 00:24e4 $f6 $0e
     ld   L, A                                          ;; 00:24e6 $6f
     ld   A, [HL]                                       ;; 00:24e7 $7e
     add  A, C                                          ;; 00:24e8 $81
@@ -428,12 +418,12 @@ call_00_24c0_Object_IntegrateFractionalVelocity_X:
     ld   [HL], A                                       ;; 00:24ec $77
     ret                                                ;; 00:24ed $c9
 
-call_00_24ee_Object_IntegrateFractionalVelocity_Y:
-; Same pattern as call_00_24c0_Object_IntegrateFractionalVelocity_X but works on 
-; $1D and updates position at $10.
+call_00_24ee_Object_IntegrateYVelocity:
+; Same logic as call_00_24c0_Object_IntegrateXVelocity but for Y axis. 
+; Calls into the common Y position updater (250d).
     ld   H, $d8                                        ;; 00:24ee $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:24f0 $fa $00 $da
-    or   A, $1d                                        ;; 00:24f3 $f6 $1d
+    or   A, OBJECT_YVEL_OFFSET                                        ;; 00:24f3 $f6 $1d
     ld   L, A                                          ;; 00:24f5 $6f
     ld   A, [HL+]                                      ;; 00:24f6 $2a
     add  A, [HL]                                       ;; 00:24f7 $86
@@ -453,7 +443,7 @@ call_00_24ee_Object_IntegrateFractionalVelocity_Y:
 call_00_250d_Object_UpdateYPosition:
     ld   H, $d8                                        ;; 00:250d $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:250f $fa $00 $da
-    or   A, $10                                        ;; 00:2512 $f6 $10
+    or   A, OBJECT_YPOS_OFFSET                                        ;; 00:2512 $f6 $10
     ld   L, A                                          ;; 00:2514 $6f
     ld   A, [HL]                                       ;; 00:2515 $7e
     add  A, C                                          ;; 00:2516 $81
@@ -463,25 +453,24 @@ call_00_250d_Object_UpdateYPosition:
     ld   [HL], A                                       ;; 00:251a $77
     ret                                                ;; 00:251b $c9
 
-call_00_251c_Object_CheckRegionAndSetFlag:
-; Uses 254A to update velocity, then compares object’s tile vector (wDA1C table)
-; against (E,D) to decide if the object is inside a region.
-; Updates a flag at $0D or returns zero if outside
-    call call_00_254a_Object_UpdateDeltaAndAdvancePosition                                  ;; 00:251c $cd $4a $25
+call_00_251c_Object_CheckRegion_UpdateFacing:
+; After moving, checks if object’s position falls inside a “region” (from wDA1C_ObjectBoundingBoxWidth table). 
+; Updates its facing-direction flag accordingly. Returns if facing changed.
+    call call_00_254a_Object_AdvancePosition_XDelta                                  ;; 00:251c $cd $4a $25
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:251f $fa $00 $da
     rrca                                               ;; 00:2522 $0f
     and  A, $70                                        ;; 00:2523 $e6 $70
     ld   L, A                                          ;; 00:2525 $6f
     ld   H, $00                                        ;; 00:2526 $26 $00
-    ld   BC, wDA1C                                     ;; 00:2528 $01 $1c $da
+    ld   BC, wDA1C_ObjectBoundingBoxWidth                                     ;; 00:2528 $01 $1c $da
     add  HL, BC                                        ;; 00:252b $09
-    ld   C, $20                                        ;; 00:252c $0e $20
+    ld   C, OBJECT_FACING_LEFT                                        ;; 00:252c $0e $20
     ld   A, [HL+]                                      ;; 00:252e $2a
     sub  A, E                                          ;; 00:252f $93
     ld   A, [HL+]                                      ;; 00:2530 $2a
     sbc  A, D                                          ;; 00:2531 $9a
     jr   C, .jr_00_253e                                ;; 00:2532 $38 $0a
-    ld   C, $00                                        ;; 00:2534 $0e $00
+    ld   C, OBJECT_FACING_RIGHT                                        ;; 00:2534 $0e $00
     ld   A, [HL+]                                      ;; 00:2536 $2a
     sub  A, E                                          ;; 00:2537 $93
     ld   A, [HL]                                       ;; 00:2538 $7e
@@ -492,25 +481,24 @@ call_00_251c_Object_CheckRegionAndSetFlag:
 .jr_00_253e:
     ld   H, $d8                                        ;; 00:253e $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2540 $fa $00 $da
-    or   A, $0d                                        ;; 00:2543 $f6 $0d
+    or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 00:2543 $f6 $0d
     ld   L, A                                          ;; 00:2545 $6f
     ld   A, [HL]                                       ;; 00:2546 $7e
     ld   [HL], C                                       ;; 00:2547 $71
     cp   A, C                                          ;; 00:2548 $b9
     ret                                                ;; 00:2549 $c9
 
-call_00_254a_Object_UpdateDeltaAndAdvancePosition:
-; Helper: computes a signed velocity delta from $1B and the current $0D state, 
-; preserves fractional nibble, shifts for step size, and adds to position at $12.
-; Stores intermediate delta in wDA13.
+call_00_254a_Object_AdvancePosition_XDelta:
+; Calculates X delta based on facing direction and velocity, 
+; saves it to wDA13_ObjectXVelocityDelta, and advances object position.
     ld   H, $d8                                        ;; 00:254a $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:254c $fa $00 $da
-    or   A, $0d                                        ;; 00:254f $f6 $0d
+    or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 00:254f $f6 $0d
     ld   L, A                                          ;; 00:2551 $6f
     ld   C, [HL]                                       ;; 00:2552 $4e
     ld   H, $d8                                        ;; 00:2553 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2555 $fa $00 $da
-    or   A, $1b                                        ;; 00:2558 $f6 $1b
+    or   A, OBJECT_XVEL_OFFSET                                        ;; 00:2558 $f6 $1b
     ld   L, A                                          ;; 00:255a $6f
     ld   A, [HL+]                                      ;; 00:255b $2a
     bit  5, C                                          ;; 00:255c $cb $69
@@ -528,7 +516,7 @@ call_00_254a_Object_UpdateDeltaAndAdvancePosition:
     sra  A                                             ;; 00:256c $cb $2f
     sra  A                                             ;; 00:256e $cb $2f
     ld   C, A                                          ;; 00:2570 $4f
-    ld   [wDA13], A                                    ;; 00:2571 $ea $13 $da
+    ld   [wDA13_ObjectXVelocityDelta], A                                    ;; 00:2571 $ea $13 $da
     cp   A, $80                                        ;; 00:2574 $fe $80
     ld   A, $ff                                        ;; 00:2576 $3e $ff
     adc  A, $00                                        ;; 00:2578 $ce $00
@@ -546,12 +534,11 @@ call_00_254a_Object_UpdateDeltaAndAdvancePosition:
     ld   D, A                                          ;; 00:2586 $57
     ret                                                ;; 00:2587 $c9
 
-call_00_2588_Object_ApproachTargetValue_Byte:
-; Compares the value at $1B with C.
-; Increments or decrements $1B by 1 toward C.
+call_00_2588_Object_ApproachXVelocity:
+; Increments/decrements the object’s X velocity by 1 until it equals a target C.
     ld   H, $d8                                        ;; 00:2588 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:258a $fa $00 $da
-    or   A, $1b                                        ;; 00:258d $f6 $1b
+    or   A, OBJECT_XVEL_OFFSET                                        ;; 00:258d $f6 $1b
     ld   L, A                                          ;; 00:258f $6f
     ld   A, [HL]                                       ;; 00:2590 $7e
     cp   A, C                                          ;; 00:2591 $b9
@@ -571,7 +558,7 @@ call_00_259d_Object_CheckRegionAndUpdateState:
 ; Calls 25CB to update velocity/position.
 ; Compares two position ranges in wDA20 with (E,D).
 ; If outside bounds, sets $0D to $40 or $00.
-    call call_00_25CB_Object_IntegrateFractionalVelocity_Helper
+    call call_00_25CB_Object_IntegrateVelocity_Helper
     ld   a,[wDA00_CurrentObjectAddr]
     rrca 
     and  a,$70
@@ -585,7 +572,7 @@ call_00_259d_Object_CheckRegionAndUpdateState:
     ldi  a,[hl]
     sbc  d
     jr   c,call_00_25BF_Object_SetAndCompareState
-    ld   c,$40
+    ld   c,OBJECT_FACING_UNK40
     ldi  a,[hl]
     sub  e
     ld   a,[hl]
@@ -595,22 +582,22 @@ call_00_259d_Object_CheckRegionAndUpdateState:
     ret  
 
 call_00_25BF_Object_SetAndCompareState:
-; Stores a new state value C into $0D and compares previous value.
+; Writes a new state flag into object and returns whether it changed.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0D
+    or   a,OBJECT_FACINGDIRECTION_OFFSET
     ld   l,a
     ld   a,[hl]
     ld   [hl],c
     cp   c
     ret  
 
-call_00_25CB_Object_IntegrateFractionalVelocity_Helper:
-; Computes signed delta from $0D and $10, masks the lower nibble, shifts, and adds to position.
-; Produces (D,E) as updated position deltas.
+call_00_25CB_Object_IntegrateVelocity_Helper:
+; Internal helper for fractional velocity integration (handles facing, 
+; subpixel carry, writes X position + velocity delta to DE).
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0D
+    or   a,OBJECT_FACINGDIRECTION_OFFSET
     ld   l,a
     ld   c,[hl]
     ld   a,l
@@ -649,11 +636,11 @@ label25DF:
     ld   d,a
     ret  
 
-call_00_2602_Object_ApproachTargetValue_Y:
-; Adjusts the value at $1D up or down until it equals C.
+call_00_2602_Object_ApproachYVelocity:
+; Same as 2588 but for Y velocity. Adjusts by +/-1 until equal to C.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$1D
+    or   a,OBJECT_YVEL_OFFSET
     ld   l,a
     ld   a,[hl]
     cp   c
@@ -673,21 +660,21 @@ call_00_2613:
 call_00_2617_SnapPositionAndUpdateDelta:
 ; Compares two object vectors (DA1E and DA1C) against current position; 
 ; if behind boundary, decrements DE.
-; Snaps the stored position to (E,D) and adjusts global delta wDA13.
-    call call_00_2857_Object_GetVector_DA1E
+; Snaps the stored position to (E,D) and adjusts global delta wDA13_ObjectXVelocityDelta.
+    call call_00_2857_Object_GetBoundingBoxHeight
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   l,a
     ldi  a,[hl]
     sub  e
     ldd  a,[hl]
     sbc  d
     jr   c,label2639
-    call call_00_2846_Object_GetVector_DA1C
+    call call_00_2846_Object_GetBoundingBoxWidth
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   l,a
     ldi  a,[hl]
     sub  e
@@ -701,7 +688,7 @@ label2639:
     ld   [hl],e
     inc  hl
     ld   [hl],d
-    ld   hl,wDA13
+    ld   hl,wDA13_ObjectXVelocityDelta
     add  [hl]
     ld   [hl],a
     xor  a
@@ -715,7 +702,7 @@ call_00_2645_Object_SelectNearestVector_DA1C_DA1E:
     bit  $7,a
     jr   nz,label265B
     ld   b,$00
-    call call_00_2846_Object_GetVector_DA1C
+    call call_00_2846_Object_GetBoundingBoxWidth
     call call_00_2678_Vector_AddObjectXPos
     ld   a,c
     sub  e
@@ -730,7 +717,7 @@ label265B:
     sub  c
     ld   c,a
     ld   b,$FF
-    call call_00_2857_Object_GetVector_DA1E
+    call call_00_2857_Object_GetBoundingBoxHeight
     call call_00_2678_Vector_AddObjectXPos
     ld   a,e
     sub  c
@@ -756,7 +743,7 @@ call_00_2678_Vector_AddObjectXPos:
 ; Loads the object’s X position ($D8:xx0E/$D8:xx0F) and adds it to C,B. 
 ; Used to convert local offsets into world coordinates.
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   l,a
     ld   h,$D8
     ldi  a,[hl]
@@ -814,7 +801,7 @@ call_00_26BA_Vector_AddObjectYPos:
 ; Offset Vector By Object Y
 ; Loads the object’s Y position ($D8:xx10) and adds it to C,B
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$10
+    or   a,OBJECT_YPOS_OFFSET
     ld   l,a
     ld   h,$D8
     ldi  a,[hl]
@@ -832,7 +819,7 @@ call_00_26c9_Object_HandleXCollisionOrSectorCheck:
 ; and if equal calls call_00_26F1_Player_UpdateXFromObject. Finally stores the horizontal delta (C) to wDC85.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$1B
+    or   a,OBJECT_XVEL_OFFSET
     ld   l,a
     ld   c,[hl]
     xor  a,$02
@@ -866,7 +853,7 @@ call_00_26F1_Player_UpdateXFromObject:
     ret  nz
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$12
+    or   a,OBJECT_WIDTH_OFFSET
     ld   l,a
     ld   a,[wD80E_PlayerXPosition]
     sub  e
@@ -904,7 +891,7 @@ call_00_2722_Player_IsWithinObjectYRange:
 ; else returns zero.
     ld   HL, wD810_PlayerYPosition                                     ;; 00:2722 $21 $10 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2725 $fa $00 $da
-    or   A, $10                                        ;; 00:2728 $f6 $10
+    or   A, OBJECT_YPOS_OFFSET                                        ;; 00:2728 $f6 $10
     ld   C, A                                          ;; 00:272a $4f
     ld   B, $d8                                        ;; 00:272b $06 $d8
     ld   A, [BC]                                       ;; 00:272d $0a
@@ -928,13 +915,13 @@ call_00_2722_Player_IsWithinObjectYRange:
     add  A, A                                          ;; 00:2742 $87
     cp   A, E                                          ;; 00:2743 $bb
     jr   C, .jr_00_2764                                ;; 00:2744 $38 $1e
-    call call_00_2857_Object_GetVector_DA1E                                  ;; 00:2746 $cd $57 $28
+    call call_00_2857_Object_GetBoundingBoxHeight                                  ;; 00:2746 $cd $57 $28
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2749 $fa $0e $d8
     sub  A, E                                          ;; 00:274c $93
     ld   A, [wD80F_PlayerXPosition]                                    ;; 00:274d $fa $0f $d8
     sbc  A, D                                          ;; 00:2750 $9a
     jr   C, .jr_00_2764                                ;; 00:2751 $38 $11
-    call call_00_2846_Object_GetVector_DA1C                                  ;; 00:2753 $cd $46 $28
+    call call_00_2846_Object_GetBoundingBoxWidth                                  ;; 00:2753 $cd $46 $28
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2756 $fa $0e $d8
     sub  A, E                                          ;; 00:2759 $93
     ld   A, [wD80F_PlayerXPosition]                                    ;; 00:275a $fa $0f $d8
@@ -955,7 +942,7 @@ call_00_2766_Object_UpdateXPositionFromVector:
     call call_00_27f3_Object_GetVector_DA26                                  ;; 00:2766 $cd $f3 $27
     ld   H, $d8                                        ;; 00:2769 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:276b $fa $00 $da
-    or   A, $10                                        ;; 00:276e $f6 $10
+    or   A, OBJECT_YPOS_OFFSET                                        ;; 00:276e $f6 $10
     ld   L, A                                          ;; 00:2770 $6f
     ld   A, [HL+]                                      ;; 00:2771 $2a
     sub  A, E                                          ;; 00:2772 $93
@@ -974,10 +961,10 @@ call_00_2766_Object_UpdateXPositionFromVector:
 
 call_00_2780_Object_ComputeMapYDelta:
 ; Compute Object-to-Map Y Delta
-; Loads the map’s Y base (wDBFB_YPositionInMap), adds an offset ($B0), then 
+; Loads the map’s Y base (wDBFB_YPositionInMapLo), adds an offset ($B0), then 
 ; computes the difference between that and the object’s stored Y to get a signed 
 ; vertical distance.
-    ld   hl,wDBFB_YPositionInMap
+    ld   hl,wDBFB_YPositionInMapLo
     ldi  a,[hl]
     ld   h,[hl]
     ld   l,a
@@ -987,7 +974,7 @@ call_00_2780_Object_ComputeMapYDelta:
     ld   d,h
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$10
+    or   a,OBJECT_YPOS_OFFSET
     ld   l,a
     ldi  a,[hl]
     sub  e
@@ -1004,7 +991,7 @@ call_00_2799_Object_InterpolateTowardVector:
     call call_00_2835_Object_GetVector_DA24
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   l,a
     ldi  a,[hl]
     sub  e
@@ -1028,7 +1015,7 @@ label27B3:
     add  hl,de
     ld   d,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$10
+    or   a,OBJECT_YPOS_OFFSET
     ld   e,a
     ld   a,l
     ld   [de],a
@@ -1044,12 +1031,12 @@ call_00_27cb_Object_SetYFromMap:
 ; relative to the map’s scrolling.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$10
+    or   a,OBJECT_YPOS_OFFSET
     ld   l,a
-    ld   a,[wDBFB_YPositionInMap]
+    ld   a,[wDBFB_YPositionInMapLo]
     sub  a,$14
     ldi  [hl],a
-    ld   a,[wDBFC_YPositionInMap]
+    ld   a,[wDBFC_YPositionInMapHi]
     sbc  a,$00
     ld   [hl],a
     ret  nc
@@ -1065,7 +1052,7 @@ call_00_27e4_Object_SetYPosFromDA26:
     call call_00_27f3_Object_GetVector_DA26
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$10
+    or   a,OBJECT_YPOS_OFFSET
     ld   l,a
     ld   a,e
     ldi  [hl],a
@@ -1120,7 +1107,7 @@ call_00_2826_Object_SetXFromDA24:
     call call_00_2835_Object_GetVector_DA24
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0E
+    or   a,OBJECT_XPOS_OFFSET
     ld   l,a
     ld   a,e
     ldi  [hl],a
@@ -1141,56 +1128,56 @@ call_00_2835_Object_GetVector_DA24:
     ld   d,[hl]
     ret  
 
-call_00_2846_Object_GetVector_DA1C:
-; Reads a vector from wDA1C
+call_00_2846_Object_GetBoundingBoxWidth:
+; Reads a vector from wDA1C_ObjectBoundingBoxWidth
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2846 $fa $00 $da
     rrca                                               ;; 00:2849 $0f
     and  A, $70                                        ;; 00:284a $e6 $70
     ld   L, A                                          ;; 00:284c $6f
     ld   H, $00                                        ;; 00:284d $26 $00
-    ld   DE, wDA1C                                     ;; 00:284f $11 $1c $da
+    ld   DE, wDA1C_ObjectBoundingBoxWidth                                     ;; 00:284f $11 $1c $da
     add  HL, DE                                        ;; 00:2852 $19
     ld   A, [HL+]                                      ;; 00:2853 $2a
     ld   E, A                                          ;; 00:2854 $5f
     ld   D, [HL]                                       ;; 00:2855 $56
     ret                                                ;; 00:2856 $c9
 
-call_00_2857_Object_GetVector_DA1E:
-; Reads a vector from wDA1E
+call_00_2857_Object_GetBoundingBoxHeight:
+; Reads a vector from wDA1C_ObjectBoundingBoxHeight
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2857 $fa $00 $da
     rrca                                               ;; 00:285a $0f
     and  A, $70                                        ;; 00:285b $e6 $70
     ld   L, A                                          ;; 00:285d $6f
     ld   H, $00                                        ;; 00:285e $26 $00
-    ld   DE, wDA1E                                     ;; 00:2860 $11 $1e $da
+    ld   DE, wDA1C_ObjectBoundingBoxHeight                                     ;; 00:2860 $11 $1e $da
     add  HL, DE                                        ;; 00:2863 $19
     ld   A, [HL+]                                      ;; 00:2864 $2a
     ld   E, A                                          ;; 00:2865 $5f
     ld   D, [HL]                                       ;; 00:2866 $56
     ret                                                ;; 00:2867 $c9
 
-call_00_2868_Object_SetVector_DA1C:
-; Writes DE into wDA1C entry for the current object.
+call_00_2868_Object_SetBoundingBoxWidth:
+; Writes DE into wDA1C_ObjectBoundingBoxWidth entry for the current object.
     ld   a,[wDA00_CurrentObjectAddr]
     rrca 
     and  a,$70
     ld   l,a
     ld   h,$00
-    ld   bc,wDA1C
+    ld   bc,wDA1C_ObjectBoundingBoxWidth
     add  hl,bc
     ld   a,e
     ldi  [hl],a
     ld   [hl],d
     ret  
 
-call_00_2879_Object_SetVector_DA1E:
-; Writes DE into wDA1E entry for the current object.
+call_00_2879_Object_SetBoundingBoxHeight:
+; Writes DE into wDA1C_ObjectBoundingBoxHeight entry for the current object.
     ld   a,[wDA00_CurrentObjectAddr]
     rrca 
     and  a,$70
     ld   l,a
     ld   h,$00
-    ld   bc,wDA1E
+    ld   bc,wDA1C_ObjectBoundingBoxHeight
     add  hl,bc
     ld   a,e
     ldi  [hl],a
@@ -1205,7 +1192,7 @@ call_00_288c_Object_Clear14:
 call_00_288c_Object_Set14:
     ld   H, $d8                                        ;; 00:288c $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:288e $fa $00 $da
-    or   A, $14                                        ;; 00:2891 $f6 $14
+    or   A, OBJECT_UNK14_OFFSET                                        ;; 00:2891 $f6 $14
     ld   L, A                                          ;; 00:2893 $6f
     ld   [HL], C                                       ;; 00:2894 $71
     ret                                                ;; 00:2895 $c9
@@ -1214,7 +1201,7 @@ call_00_2896_Object_Set15:
 ; Writes C into the object’s $D8:xx15 slot—another per-object state byte.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$15
+    or   a,OBJECT_UNK15_OFFSET
     ld   l,a
     ld   [hl],c
     ret  
@@ -1222,7 +1209,7 @@ call_00_2896_Object_Set15:
 call_00_28a0_ObjectGet15:
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$15
+    or   a,OBJECT_UNK15_OFFSET
     ld   l,a
     ld   a,[hl]
     ret  
@@ -1230,7 +1217,7 @@ call_00_28a0_ObjectGet15:
 call_00_28aa_ObjectSet16:
     ld   H, $d8                                        ;; 00:28aa $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:28ac $fa $00 $da
-    or   A, $16                                        ;; 00:28af $f6 $16
+    or   A, OBJECT_UNK16_OFFSET                                        ;; 00:28af $f6 $16
     ld   L, A                                          ;; 00:28b1 $6f
     ld   [HL], C                                       ;; 00:28b2 $71
     ret                                                ;; 00:28b3 $c9
@@ -1238,56 +1225,56 @@ call_00_28aa_ObjectSet16:
 call_00_28b4_ObjectGet16:
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$16
+    or   a,OBJECT_UNK16_OFFSET
     ld   l,a
     ld   a,[hl]
     ret  
 
-call_00_28be_ObjectGet1B:
+call_00_28be_ObjectGetXVelocity:
     ld   H, $d8                                        ;; 00:28be $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:28c0 $fa $00 $da
-    or   A, $1b                                        ;; 00:28c3 $f6 $1b
+    or   A, OBJECT_XVEL_OFFSET                                        ;; 00:28c3 $f6 $1b
     ld   L, A                                          ;; 00:28c5 $6f
     ld   A, [HL]                                       ;; 00:28c6 $7e
     ret                                                ;; 00:28c7 $c9
 
-call_00_28c8_ObjectSet1B:
+call_00_28c8_ObjectSetXVelocity:
     ld   H, $d8                                        ;; 00:28c8 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:28ca $fa $00 $da
-    or   A, $1b                                        ;; 00:28cd $f6 $1b
+    or   A, OBJECT_XVEL_OFFSET                                        ;; 00:28cd $f6 $1b
     ld   L, A                                          ;; 00:28cf $6f
     ld   [HL], C                                       ;; 00:28d0 $71
     ret                                                ;; 00:28d1 $c9
 
-call_00_28d2_ObjectGet1D:
+call_00_28d2_ObjectGetYVelocity:
     ld   H, $d8                                        ;; 00:28d2 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:28d4 $fa $00 $da
-    or   A, $1d                                        ;; 00:28d7 $f6 $1d
+    or   A, OBJECT_YVEL_OFFSET                                        ;; 00:28d7 $f6 $1d
     ld   L, A                                          ;; 00:28d9 $6f
     ld   A, [HL]                                       ;; 00:28da $7e
     ret                                                ;; 00:28db $c9
 
-call_00_28dc_ObjectSet1D:
+call_00_28dc_ObjectSetYVelocity:
     ld   H, $d8                                        ;; 00:28dc $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:28de $fa $00 $da
-    or   A, $1d                                        ;; 00:28e1 $f6 $1d
+    or   A, OBJECT_YVEL_OFFSET                                        ;; 00:28e1 $f6 $1d
     ld   L, A                                          ;; 00:28e3 $6f
     ld   [HL], C                                       ;; 00:28e4 $71
     ret                                                ;; 00:28e5 $c9
 
-call_00_28e6_ObjectCheckIf1BIsZero:
+call_00_28e6_ObjectCheckIfXVelocityIsZero:
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$1B
+    or   a,OBJECT_XVEL_OFFSET
     ld   l,a
     ld   a,[hl]
     and  a
     ret  
 
-call_00_28f1_ObjectCheckIf1DIsZero:
+call_00_28f1_ObjectCheckIfYVelocityIsZero:
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$1D
+    or   a,OBJECT_YVEL_OFFSET
     ld   l,a
     ld   a,[hl]
     and  a
@@ -1296,7 +1283,7 @@ call_00_28f1_ObjectCheckIf1DIsZero:
 call_00_28fc_ObjectUpdate19:
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$19
+    or   a,OBJECT_UNK19_OFFSET
     ld   l,a
     ld   a,[hl]
     inc  [hl]
@@ -1309,7 +1296,7 @@ call_00_28fc_ObjectUpdate19:
 call_00_290d_ObjectSetTimer1A:
     ld   H, $d8                                        ;; 00:290d $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:290f $fa $00 $da
-    or   A, $1a                                        ;; 00:2912 $f6 $1a
+    or   A, OBJECT_UNK1A_OFFSET                                        ;; 00:2912 $f6 $1a
     ld   L, A                                          ;; 00:2914 $6f
     ld   [HL], C                                       ;; 00:2915 $71
     ret                                                ;; 00:2916 $c9
@@ -1317,7 +1304,7 @@ call_00_290d_ObjectSetTimer1A:
 call_00_2917_ObjectCheckIfTimer1AIsZero:
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$1A
+    or   a,OBJECT_UNK1A_OFFSET
     ld   l,a
     ld   a,[hl]
     and  a
@@ -1326,7 +1313,7 @@ call_00_2917_ObjectCheckIfTimer1AIsZero:
 call_00_2922_ObjectTimer1ACountdown:
     ld   H, $d8                                        ;; 00:2922 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2924 $fa $00 $da
-    or   A, $1a                                        ;; 00:2927 $f6 $1a
+    or   A, OBJECT_UNK1A_OFFSET                                        ;; 00:2927 $f6 $1a
     ld   L, A                                          ;; 00:2929 $6f
     ld   A, [HL]                                       ;; 00:292a $7e
     and  A, A                                          ;; 00:292b $a7
@@ -1338,7 +1325,7 @@ call_00_2922_ObjectTimer1ACountdown:
 call_00_2930_ObjectSetId:
     ld   H, $d8                                        ;; 00:2930 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2932 $fa $00 $da
-    or   A, $00                                        ;; 00:2935 $f6 $00
+    or   A, OBJECT_ID_OFFSET                                        ;; 00:2935 $f6 $00
     ld   L, A                                          ;; 00:2937 $6f
     ld   [HL], C                                       ;; 00:2938 $71
     ret                                                ;; 00:2939 $c9
@@ -1346,23 +1333,23 @@ call_00_2930_ObjectSetId:
 call_00_293a_ObjectGetId:
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$00
+    or   a,OBJECT_ID_OFFSET
     ld   l,a
     ld   a,[hl]
     ret  
 
-call_00_2944_ObjectSet12:
+call_00_2944_ObjectSetWidth:
     ld   H, $d8                                        ;; 00:2944 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2946 $fa $00 $da
-    or   A, $12                                        ;; 00:2949 $f6 $12
+    or   A, OBJECT_WIDTH_OFFSET                                        ;; 00:2949 $f6 $12
     ld   L, A                                          ;; 00:294b $6f
     ld   [HL], C                                       ;; 00:294c $71
     ret                                                ;; 00:294d $c9
 
-call_00_294e_ObjectSet13:
+call_00_294e_ObjectSetHeight:
     ld   H, $d8                                        ;; 00:294e $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2950 $fa $00 $da
-    or   A, $13                                        ;; 00:2953 $f6 $13
+    or   A, OBJECT_HEIGHT_OFFSET                                        ;; 00:2953 $f6 $13
     ld   L, A                                          ;; 00:2955 $6f
     ld   [HL], C                                       ;; 00:2956 $71
     ret                                                ;; 00:2957 $c9
@@ -1370,7 +1357,7 @@ call_00_294e_ObjectSet13:
 call_00_2958_ObjectSetFacingDirection:
     ld   H, $d8                                        ;; 00:2958 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:295a $fa $00 $da
-    or   A, $0d                                        ;; 00:295d $f6 $0d
+    or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 00:295d $f6 $0d
     ld   L, A                                          ;; 00:295f $6f
     ld   [HL], C                                       ;; 00:2960 $71
     ret                                                ;; 00:2961 $c9
@@ -1378,7 +1365,7 @@ call_00_2958_ObjectSetFacingDirection:
 call_00_2962_ObjectGetActionId:
     ld   H, $d8                                        ;; 00:2962 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2964 $fa $00 $da
-    or   A, $01                                        ;; 00:2967 $f6 $01
+    or   A, OBJECT_ACTIONID_OFFSET                                        ;; 00:2967 $f6 $01
     ld   L, A                                          ;; 00:2969 $6f
     ld   A, [HL]                                       ;; 00:296a $7e
     ret                                                ;; 00:296b $c9
@@ -1386,7 +1373,7 @@ call_00_2962_ObjectGetActionId:
 call_00_296c_ObjectGet9:
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$09
+    or   a,OBJECT_UNK09_OFFSET
     ld   l,a
     ld   a,[hl]
     ret  
@@ -1394,7 +1381,7 @@ call_00_296c_ObjectGet9:
 call_00_2976_ObjectGetFacingDirection:
     ld   H, $d8                                        ;; 00:2976 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2978 $fa $00 $da
-    or   A, $0d                                        ;; 00:297b $f6 $0d
+    or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 00:297b $f6 $0d
     ld   L, A                                          ;; 00:297d $6f
     ld   A, [HL]                                       ;; 00:297e $7e
     ret                                                ;; 00:297f $c9
@@ -1402,7 +1389,7 @@ call_00_2976_ObjectGetFacingDirection:
 call_00_2980_ObjectSet19:
     ld   H, $d8                                        ;; 00:2980 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2982 $fa $00 $da
-    or   A, $19                                        ;; 00:2985 $f6 $19
+    or   A, OBJECT_UNK19_OFFSET                                        ;; 00:2985 $f6 $19
     ld   L, A                                          ;; 00:2987 $6f
     ld   [HL], C                                       ;; 00:2988 $71
     ret                                                ;; 00:2989 $c9
@@ -1410,7 +1397,7 @@ call_00_2980_ObjectSet19:
 call_00_298a_ObjectGet19:
     ld   H, $d8                                        ;; 00:298a $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:298c $fa $00 $da
-    or   A, $19                                        ;; 00:298f $f6 $19
+    or   A, OBJECT_UNK19_OFFSET                                        ;; 00:298f $f6 $19
     ld   L, A                                          ;; 00:2991 $6f
     ld   A, [HL]                                       ;; 00:2992 $7e
     and  A, A                                          ;; 00:2993 $a7
@@ -1419,30 +1406,32 @@ call_00_298a_ObjectGet19:
 call_00_2995_ObjectGetActionId:
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$01
+    or   a,OBJECT_ACTIONID_OFFSET
     ld   l,a
     ld   a,[hl]
     ret  
 
-call_00_299f_ObjectFlipFacingDirection:
+call_00_299f_ObjectTurnAround:
+; flips facing direction from $00 to $20 or $20 to $00
     ld   H, $d8                                        ;; 00:299f $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:29a1 $fa $00 $da
-    or   A, $0d                                        ;; 00:29a4 $f6 $0d
+    or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 00:29a4 $f6 $0d
     ld   L, A                                          ;; 00:29a6 $6f
     ld   A, [HL]                                       ;; 00:29a7 $7e
-    xor  A, $20                                        ;; 00:29a8 $ee $20
+    xor  A, OBJECT_FACING_LEFT                                        ;; 00:29a8 $ee $20
     ld   [HL], A                                       ;; 00:29aa $77
     ret                                                ;; 00:29ab $c9
 
 call_00_29ac_ObjectFacingMatchesStoredDirection:
-; Calls call_00_2a68_ComputePlayerObjectXVector (unknown, likely updates or computes something about the current object).
+; Calls call_00_2a68_Object_ComputePlayerXProximity (updates distance of object from player, 
+; and direction of object relative to the player).
 ; Calls call_00_2976_ObjectGetFacingDirection (gets the object's facing direction).
-; Compares A (direction) to [wDA12] (a stored reference direction/state).
+; Compares A (direction) to [wDA12_ObjectDirectionRelativeToPlayer] (a stored reference direction/state).
 ; Returns if equal/different.
 ; Summary: Checks if an object's current facing direction matches a stored direction after updating.
-    call call_00_2a68_ComputePlayerObjectXVector
+    call call_00_2a68_Object_ComputePlayerXProximity
     call call_00_2976_ObjectGetFacingDirection
-    ld   hl,wDA12
+    ld   hl,wDA12_ObjectDirectionRelativeToPlayer
     cp   [hl]
     ret  
 
@@ -1497,7 +1486,7 @@ call_00_29df_ObjectSetActiveFlag:
 ; Sets bit 7 of [HL] (marking object as “active,” “visible,” or “flagged”).
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0D
+    or   a,OBJECT_FACINGDIRECTION_OFFSET
     ld   l,a
     set  7,[hl]
     ret  
@@ -1506,7 +1495,7 @@ call_00_29ea_ObjectClearActiveFlag:
 ; Same indexing, but clears bit 7 instead of setting it.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$0D
+    or   a,OBJECT_FACINGDIRECTION_OFFSET
     ld   l,a
     res  7,[hl]
     ret  
@@ -1517,7 +1506,7 @@ call_00_29f5_ObjectClearCollisionFlagAndCheck:
 ; Returns with carry based on the old bit 4 state (bit 4,A).
     ld   H, $d8                                        ;; 00:29f5 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:29f7 $fa $00 $da
-    or   A, $05                                        ;; 00:29fa $f6 $05
+    or   A, OBJECT_UNK05_OFFSET                                        ;; 00:29fa $f6 $05
     ld   L, A                                          ;; 00:29fc $6f
     ld   A, [HL]                                       ;; 00:29fd $7e
     res  4, [HL]                                       ;; 00:29fe $cb $a6
@@ -1542,16 +1531,16 @@ call_00_2a03_ResetObjectTempSlot:
 
 call_00_2a15_CheckObjectBoundingBoxCollision:
 ; Derives an index from wDA00_CurrentObjectAddr (right rotate + mask).
-; Loads a 4-byte rectangle (E,D,C,B) from wDA1C.
-; Compares against another rectangle at wDA14 (x,y pairs) → first collision check.
-; If no carry (no fail), repeats with another rectangle from wDA20 vs wDA18.
+; Loads a 4-byte rectangle (E,D,C,B) from wDA1C_ObjectBoundingBoxWidth.
+; Compares against another rectangle at wDA14_CameraLeftLo (x,y pairs) → first collision check.
+; If no carry (no fail), repeats with another rectangle from wDA20 vs wDA18_CameraTopLo.
 ; Returns carry if overlap fails, else returns normally.
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2a15 $fa $00 $da
     rrca                                               ;; 00:2a18 $0f
     and  A, $70                                        ;; 00:2a19 $e6 $70
     ld   L, A                                          ;; 00:2a1b $6f
     ld   H, $00                                        ;; 00:2a1c $26 $00
-    ld   DE, wDA1C                                     ;; 00:2a1e $11 $1c $da
+    ld   DE, wDA1C_ObjectBoundingBoxWidth                                     ;; 00:2a1e $11 $1c $da
     add  HL, DE                                        ;; 00:2a21 $19
     ld   A, [HL+]                                      ;; 00:2a22 $2a
     ld   E, A                                          ;; 00:2a23 $5f
@@ -1561,7 +1550,7 @@ call_00_2a15_CheckObjectBoundingBoxCollision:
     ld   C, A                                          ;; 00:2a27 $4f
     ld   A, [HL+]                                      ;; 00:2a28 $2a
     ld   B, A                                          ;; 00:2a29 $47
-    ld   HL, wDA14                                     ;; 00:2a2a $21 $14 $da
+    ld   HL, wDA14_CameraLeftLo                                     ;; 00:2a2a $21 $14 $da
     ld   A, E                                          ;; 00:2a2d $7b
     sub  A, [HL]                                       ;; 00:2a2e $96
     inc  HL                                            ;; 00:2a2f $23
@@ -1589,7 +1578,7 @@ call_00_2a15_CheckObjectBoundingBoxCollision:
     ld   C, A                                          ;; 00:2a4b $4f
     ld   A, [HL+]                                      ;; 00:2a4c $2a
     ld   B, A                                          ;; 00:2a4d $47
-    ld   HL, wDA18                                     ;; 00:2a4e $21 $18 $da
+    ld   HL, wDA18_CameraTopLo                                     ;; 00:2a4e $21 $18 $da
     ld   A, E                                          ;; 00:2a51 $7b
     sub  A, [HL]                                       ;; 00:2a52 $96
     inc  HL                                            ;; 00:2a53 $23
@@ -1609,20 +1598,21 @@ call_00_2a5d_ObjectCheckFlag2:
 ; Purpose: Checks a particular state flag (likely “grounded,” “active,” or similar).
     ld   H, $d8                                        ;; 00:2a5d $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2a5f $fa $00 $da
-    or   A, $05                                        ;; 00:2a62 $f6 $05
+    or   A, OBJECT_UNK05_OFFSET                                        ;; 00:2a62 $f6 $05
     ld   L, A                                          ;; 00:2a64 $6f
     bit  2, [HL]                                       ;; 00:2a65 $cb $56
     ret                                                ;; 00:2a67 $c9
 
-call_00_2a68_ComputePlayerObjectXVector:
+call_00_2a68_Object_ComputePlayerXProximity:
 ; Calculates the X-distance vector between the player (wD80E/F) and the current object’s position (D80E + offset).
 ; Normalizes the sign: if negative, flips and sets C=$20 to indicate direction.
-; Stores the horizontal difference or direction in wDA11/wDA12, and returns.
+; Stores the horizontal difference in wDA11_ObjectXDistFromPlayer
+; and direction in wDA12_ObjectDirectionRelativeToPlayer, and returns.
 ; Purpose: Prepares relative X-direction info for later checks.
-    ld   C, $00                                        ;; 00:2a68 $0e $00
+    ld   C, OBJECT_LEFT_OF_GEX                                        ;; 00:2a68 $0e $00
     ld   H, $d8                                        ;; 00:2a6a $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2a6c $fa $00 $da
-    or   A, $0e                                        ;; 00:2a6f $f6 $0e
+    or   A, OBJECT_XPOS_OFFSET                                        ;; 00:2a6f $f6 $0e
     ld   L, A                                          ;; 00:2a71 $6f
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2a72 $fa $0e $d8
     sub  A, [HL]                                       ;; 00:2a75 $96
@@ -1638,7 +1628,7 @@ call_00_2a68_ComputePlayerObjectXVector:
     ld   A, $00                                        ;; 00:2a82 $3e $00
     sbc  A, D                                          ;; 00:2a84 $9a
     ld   D, A                                          ;; 00:2a85 $57
-    ld   C, $20                                        ;; 00:2a86 $0e $20
+    ld   C, OBJECT_RIGHT_OF_GEX                                        ;; 00:2a86 $0e $20
 .jr_00_2a88:
     ld   A, D                                          ;; 00:2a88 $7a
     and  A, A                                          ;; 00:2a89 $a7
@@ -1646,10 +1636,10 @@ call_00_2a68_ComputePlayerObjectXVector:
     jr   Z, .jr_00_2a8f                                ;; 00:2a8b $28 $02
     ld   A, $ff                                        ;; 00:2a8d $3e $ff
 .jr_00_2a8f:
-    ld   [wDA11], A                                    ;; 00:2a8f $ea $11 $da
+    ld   [wDA11_ObjectXDistFromPlayer], A                                    ;; 00:2a8f $ea $11 $da
     ld   B, A                                          ;; 00:2a92 $47
     ld   A, C                                          ;; 00:2a93 $79
-    ld   [wDA12], A                                    ;; 00:2a94 $ea $12 $da
+    ld   [wDA12_ObjectDirectionRelativeToPlayer], A                                    ;; 00:2a94 $ea $12 $da
     ret                                                ;; 00:2a97 $c9
 
 call_00_2a98_HandlePlayerObjectInteraction:
@@ -1712,7 +1702,7 @@ call_00_2a98_HandlePlayerObjectInteraction:
     ret  nc
     ld   d,$D8
     ld   a,[wDA00_CurrentObjectAddr]
-    or   a,$1A
+    or   a,OBJECT_UNK1A_OFFSET
     ld   e,a
     ldi  a,[hl]
     ld   [de],a
@@ -1805,7 +1795,7 @@ call_00_2b3d_SweepAndClearActiveObjects:
     ld   A, $20                                        ;; 00:2b41 $3e $20
 .jr_00_2b43:
     ld   [wDA00_CurrentObjectAddr], A                                    ;; 00:2b43 $ea $00 $da
-    or   A, $00                                        ;; 00:2b46 $f6 $00
+    or   A, OBJECT_ID_OFFSET                                        ;; 00:2b46 $f6 $00
     ld   L, A                                          ;; 00:2b48 $6f
     ld   H, $d8                                        ;; 00:2b49 $26 $d8
     ld   A, [HL]                                       ;; 00:2b4b $7e
@@ -1823,7 +1813,7 @@ call_00_2b5d_DeactivateObjectSlot:
 ; from the slot address to access another table (wDA01 → wD7xx) and clears bit 6 of its status 
 ; byte—likely removing an “active” or “visible” flag for that object.
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2b5d $fa $00 $da
-    or   A, $00                                        ;; 00:2b60 $f6 $00
+    or   A, OBJECT_ID_OFFSET                                        ;; 00:2b60 $f6 $00
     ld   L, A                                          ;; 00:2b62 $6f
     ld   H, $d8                                        ;; 00:2b63 $26 $d8
     ld   [HL], $ff                                     ;; 00:2b65 $36 $ff
@@ -1852,7 +1842,7 @@ call_00_2b80_ClearObjectMemoryEntry:
 ; of call_00_2b5d without touching flags.
     ld   H, $d8                                        ;; 00:2b80 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:2b82 $fa $00 $da
-    or   A, $00                                        ;; 00:2b85 $f6 $00
+    or   A, OBJECT_ID_OFFSET                                        ;; 00:2b85 $f6 $00
     ld   L, A                                          ;; 00:2b87 $6f
     ld   [HL], $ff                                     ;; 00:2b88 $36 $ff
     ret                                                ;; 00:2b8a $c9
@@ -1918,10 +1908,10 @@ call_00_2bbe_SpawnCollectibleObject:
     ld   C, $08                                        ;; 00:2bce $0e $08
     call call_00_288c_Object_Set14                                  ;; 00:2bd0 $cd $8c $28
     ld   C, $12                                        ;; 00:2bd3 $0e $12
-    call call_00_2944_ObjectSet12                                  ;; 00:2bd5 $cd $44 $29
+    call call_00_2944_ObjectSetWidth                                  ;; 00:2bd5 $cd $44 $29
     ld   C, $12                                        ;; 00:2bd8 $0e $12
-    call call_00_294e_ObjectSet13                                  ;; 00:2bda $cd $4e $29
-    ld   C, $00                                        ;; 00:2bdd $0e $00
+    call call_00_294e_ObjectSetHeight                                  ;; 00:2bda $cd $4e $29
+    ld   C, OBJECT_FACING_RIGHT                                        ;; 00:2bdd $0e $00
     call call_00_2958_ObjectSetFacingDirection                                  ;; 00:2bdf $cd $58 $29
     ld   C, $01                                        ;; 00:2be2 $0e $01
     call call_00_28aa_ObjectSet16                                  ;; 00:2be4 $cd $aa $28

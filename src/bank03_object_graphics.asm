@@ -264,7 +264,7 @@ entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     ld   A, $20                                        ;; 03:5ed8 $3e $20
 .jr_03_5eda:
     ld   [wDA00_CurrentObjectAddr], A                                    ;; 03:5eda $ea $00 $da
-    or   A, $00                                        ;; 03:5edd $f6 $00
+    or   A, OBJECT_ID_OFFSET                                        ;; 03:5edd $f6 $00
     ld   L, A                                          ;; 03:5edf $6f
     ld   H, $d8                                        ;; 03:5ee0 $26 $d8
     ld   A, [HL]                                       ;; 03:5ee2 $7e
@@ -282,7 +282,7 @@ entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     ld   A, $20                                        ;; 03:5efb $3e $20
 .jr_03_5efd:
     ld   [wDA00_CurrentObjectAddr], A                                    ;; 03:5efd $ea $00 $da
-    or   A, $00                                        ;; 03:5f00 $f6 $00
+    or   A, OBJECT_ID_OFFSET                                        ;; 03:5f00 $f6 $00
     ld   L, A                                          ;; 03:5f02 $6f
     ld   H, $d8                                        ;; 03:5f03 $26 $d8
     ld   A, [HL]                                       ;; 03:5f05 $7e
@@ -300,7 +300,7 @@ entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     ld   A, $20                                        ;; 03:5f1d $3e $20
 .jr_03_5f1f:
     ld   [wDA00_CurrentObjectAddr], A                                    ;; 03:5f1f $ea $00 $da
-    or   A, $00                                        ;; 03:5f22 $f6 $00
+    or   A, OBJECT_ID_OFFSET                                        ;; 03:5f22 $f6 $00
     ld   L, A                                          ;; 03:5f24 $6f
     ld   H, $d8                                        ;; 03:5f25 $26 $d8
     ld   A, [HL]                                       ;; 03:5f27 $7e
@@ -389,7 +389,7 @@ entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     ld   [wDA00_CurrentObjectAddr], A                                    ;; 03:5f9f $ea $00 $da
     and  A, A                                          ;; 03:5fa2 $a7
     jr   Z, .jr_03_5fb2                                ;; 03:5fa3 $28 $0d
-    or   A, $00                                        ;; 03:5fa5 $f6 $00
+    or   A, OBJECT_ID_OFFSET                                        ;; 03:5fa5 $f6 $00
     ld   L, A                                          ;; 03:5fa7 $6f
     ld   H, $d8                                        ;; 03:5fa8 $26 $d8
     ld   A, [HL]                                       ;; 03:5faa $7e
@@ -430,16 +430,16 @@ call_03_5fc2_SetupObjectSprite:
     ld   E, [HL]                                       ;; 03:5fd1 $5e
     ld   H, $d8                                        ;; 03:5fd2 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5fd4 $fa $00 $da
-    or   A, $0d                                        ;; 03:5fd7 $f6 $0d
+    or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 03:5fd7 $f6 $0d
     ld   L, A                                          ;; 03:5fd9 $6f
     ld   A, [HL]                                       ;; 03:5fda $7e
     or   A, E                                          ;; 03:5fdb $b3
-    ld   [wDAB6], A                                    ;; 03:5fdc $ea $b6 $da
+    ld   [wDAB6_SpriteFlags], A                                    ;; 03:5fdc $ea $b6 $da
     ld   D, $d8                                        ;; 03:5fdf $16 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5fe1 $fa $00 $da
-    or   A, $0e                                        ;; 03:5fe4 $f6 $0e
+    or   A, OBJECT_XPOS_OFFSET                                        ;; 03:5fe4 $f6 $0e
     ld   E, A                                          ;; 03:5fe6 $5f
-    ld   HL, wDBF9_XPositionInMap                                     ;; 03:5fe7 $21 $f9 $db
+    ld   HL, wDBF9_XPositionInMapLo                                     ;; 03:5fe7 $21 $f9 $db
     ld   A, [DE]                                       ;; 03:5fea $1a
     sub  A, [HL]                                       ;; 03:5feb $96
     ld   C, A                                          ;; 03:5fec $4f
@@ -462,7 +462,7 @@ call_03_5fc2_SetupObjectSprite:
     jr   C, .jr_03_6026                                ;; 03:6004 $38 $20
 .jr_03_6006:
     inc  E                                             ;; 03:6006 $1c
-    ld   HL, wDBFB_YPositionInMap                                     ;; 03:6007 $21 $fb $db
+    ld   HL, wDBFB_YPositionInMapLo                                     ;; 03:6007 $21 $fb $db
     ld   A, [DE]                                       ;; 03:600a $1a
     sub  A, [HL]                                       ;; 03:600b $96
     ld   B, A                                          ;; 03:600c $47
@@ -499,13 +499,13 @@ call_03_5fc2_SetupObjectSprite:
     ret                                                ;; 03:603d $c9
 .jr_03_603e:
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:603e $fa $00 $da
-    or   A, $15                                        ;; 03:6041 $f6 $15
+    or   A, OBJECT_UNK15_OFFSET                                        ;; 03:6041 $f6 $15
     ld   L, A                                          ;; 03:6043 $6f
     ld   H, $d8                                        ;; 03:6044 $26 $d8
     ld   A, [HL]                                       ;; 03:6046 $7e
     and  A, A                                          ;; 03:6047 $a7
     jr   Z, .jr_03_6050                                ;; 03:6048 $28 $06
-    ld   A, [wDC71]                                    ;; 03:604a $fa $71 $dc
+    ld   A, [wDC71_FrameCounter]                                    ;; 03:604a $fa $71 $dc
     and  A, $07                                        ;; 03:604d $e6 $07
     ret  NZ                                            ;; 03:604f $c0
 .jr_03_6050:
@@ -544,7 +544,7 @@ call_03_5fc2_SetupObjectSprite:
     ld   [wDC70], A                                    ;; 03:6083 $ea $70 $dc
     ld   H, $d8                                        ;; 03:6086 $26 $d8
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:6088 $fa $00 $da
-    or   A, $0d                                        ;; 03:608b $f6 $0d
+    or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 03:608b $f6 $0d
     ld   L, A                                          ;; 03:608d $6f
     ld   A, [HL]                                       ;; 03:608e $7e
     swap A                                             ;; 03:608f $cb $37
@@ -569,7 +569,7 @@ call_03_5fc2_SetupObjectSprite:
     bit  7, [HL]                                       ;; 03:60a9 $cb $7e
     jr   Z, .jr_03_60b4                                ;; 03:60ab $28 $07
     and  A, $fe                                        ;; 03:60ad $e6 $fe
-    ld   HL, wDAB6                                     ;; 03:60af $21 $b6 $da
+    ld   HL, wDAB6_SpriteFlags                                     ;; 03:60af $21 $b6 $da
     res  5, [HL]                                       ;; 03:60b2 $cb $ae
 .jr_03_60b4:
     ld   DE, data_03_59ea_SpriteData                              ;; 03:60b4 $11 $ea $59
@@ -596,7 +596,7 @@ call_03_5fc2_SetupObjectSprite:
     ld   [DE], A                                       ;; 03:60d3 $12
     inc  HL                                            ;; 03:60d4 $23
     inc  E                                             ;; 03:60d5 $1c
-    ld   A, [wDAB6]                                    ;; 03:60d6 $fa $b6 $da
+    ld   A, [wDAB6_SpriteFlags]                                    ;; 03:60d6 $fa $b6 $da
     or   A, [HL]                                       ;; 03:60d9 $b6
     ld   [DE], A                                       ;; 03:60da $12
     inc  HL                                            ;; 03:60db $23
@@ -615,7 +615,7 @@ call_03_60e6_SetupParticleSprite:
 ; Handles special case when the object’s data marks it as a particle effect:
 ; Gets particle buffer pointer (ParticleSlot_GetBufferPtr).
 ; Converts a velocity/magnitude value into a frame index using .data_03_6140.
-; Updates wDAB6 flags and writes three small sprite entries for the particle effect.
+; Updates wDAB6_SpriteFlags flags and writes three small sprite entries for the particle effect.
     call call_00_2c53_ParticleSlot_GetBufferPtr                                  ;; 03:60e6 $cd $53 $2c
     ld   L, E                                          ;; 03:60e9 $6b
     ld   H, D                                          ;; 03:60ea $62
@@ -633,11 +633,11 @@ call_03_60e6_SetupParticleSprite:
     ld   HL, .data_03_6140                             ;; 03:60fc $21 $40 $61
     add  HL, DE                                        ;; 03:60ff $19
     ld   A, [HL]                                       ;; 03:6100 $7e
-    ld   [wDAB7], A                                    ;; 03:6101 $ea $b7 $da
+    ld   [wDAB7_ParticleVelocity], A                                    ;; 03:6101 $ea $b7 $da
     pop  HL                                            ;; 03:6104 $e1
-    ld   A, [wDAB6]                                    ;; 03:6105 $fa $b6 $da
+    ld   A, [wDAB6_SpriteFlags]                                    ;; 03:6105 $fa $b6 $da
     or   A, $08                                        ;; 03:6108 $f6 $08
-    ld   [wDAB6], A                                    ;; 03:610a $ea $b6 $da
+    ld   [wDAB6_SpriteFlags], A                                    ;; 03:610a $ea $b6 $da
     ld   A, [wDC6F]                                    ;; 03:610d $fa $6f $dc
     ld   E, A                                          ;; 03:6110 $5f
     ld   D, $d9                                        ;; 03:6111 $16 $d9
@@ -663,10 +663,10 @@ call_03_60e6_SetupParticleSprite:
     add  A, C                                          ;; 03:612a $81
     ld   [DE], A                                       ;; 03:612b $12
     inc  E                                             ;; 03:612c $1c
-    ld   A, [wDAB7]                                    ;; 03:612d $fa $b7 $da
+    ld   A, [wDAB7_ParticleVelocity]                                    ;; 03:612d $fa $b7 $da
     ld   [DE], A                                       ;; 03:6130 $12
     inc  E                                             ;; 03:6131 $1c
-    ld   A, [wDAB6]                                    ;; 03:6132 $fa $b6 $da
+    ld   A, [wDAB6_SpriteFlags]                                    ;; 03:6132 $fa $b6 $da
     ld   [DE], A                                       ;; 03:6135 $12
     inc  E                                             ;; 03:6136 $1c
 .jr_03_6137:
@@ -709,19 +709,19 @@ call_03_615d_SetupCollectibleSprites:
 ; into sprite memory.
 ; Updates tracking variables to prevent re-drawing already collected items.
 ; Summary: Determines which collectible items should be visible and spawns their sprites.
-    ld   A, [wDBF9_XPositionInMap]                                    ;; 03:615d $fa $f9 $db
+    ld   A, [wDBF9_XPositionInMapLo]                                    ;; 03:615d $fa $f9 $db
     and  A, $0f                                        ;; 03:6160 $e6 $0f
     ld   B, A                                          ;; 03:6162 $47
     ld   A, $10                                        ;; 03:6163 $3e $10
     sub  A, B                                          ;; 03:6165 $90
     ld   [wDB70], A                                    ;; 03:6166 $ea $70 $db
-    ld   A, [wDBFB_YPositionInMap]                                    ;; 03:6169 $fa $fb $db
+    ld   A, [wDBFB_YPositionInMapLo]                                    ;; 03:6169 $fa $fb $db
     and  A, $0f                                        ;; 03:616c $e6 $0f
     ld   B, A                                          ;; 03:616e $47
     ld   A, $18                                        ;; 03:616f $3e $18
     sub  A, B                                          ;; 03:6171 $90
     ld   [wDB71], A                                    ;; 03:6172 $ea $71 $db
-    ld   HL, wDAAC                                     ;; 03:6175 $21 $ac $da
+    ld   HL, wDAAC_CameraXHi                                     ;; 03:6175 $21 $ac $da
     ld   L, [HL]                                       ;; 03:6178 $6e
     ld   H, $d3                                        ;; 03:6179 $26 $d3
     ld   A, [HL]                                       ;; 03:617b $7e
@@ -729,9 +729,9 @@ call_03_615d_SetupCollectibleSprites:
     ret  Z                                             ;; 03:617d $c8
     dec  H                                             ;; 03:617e $25
     ld   E, [HL]                                       ;; 03:617f $5e
-    ld   HL, wDAAC                                     ;; 03:6180 $21 $ac $da
+    ld   HL, wDAAC_CameraXHi                                     ;; 03:6180 $21 $ac $da
     ld   B, [HL]                                       ;; 03:6183 $46
-    ld   HL, wDAAD                                     ;; 03:6184 $21 $ad $da
+    ld   HL, wDAAD_CameraYHi                                     ;; 03:6184 $21 $ad $da
     ld   C, [HL]                                       ;; 03:6187 $4e
 .jr_03_6188:
     push AF                                            ;; 03:6188 $f5

@@ -190,7 +190,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     ld   A, [HL+]                                      ;; 00:2d09 $2a
     ld   H, [HL]                                       ;; 00:2d0a $66
     ld   L, A                                          ;; 00:2d0b $6f
-    ld   A, [wD80A]                                    ;; 00:2d0c $fa $0a $d8
+    ld   A, [wD80A_Player_unk0A]                                    ;; 00:2d0c $fa $0a $d8
     ld   E, A                                          ;; 00:2d0f $5f
     ld   D, $00                                        ;; 00:2d10 $16 $00
     add  HL, DE                                        ;; 00:2d12 $19
@@ -227,14 +227,14 @@ call_00_2ce2_BuildGexSpriteDrawList:
     jp   NZ, .jp_00_2e0b                               ;; 00:2d49 $c2 $0b $2e
     bit  5, A                                          ;; 00:2d4c $cb $6f
     jp   NZ, .jp_00_2dac                               ;; 00:2d4e $c2 $ac $2d
-    ld   A, [wDBF9_XPositionInMap]                                    ;; 00:2d51 $fa $f9 $db
+    ld   A, [wDBF9_XPositionInMapLo]                                    ;; 00:2d51 $fa $f9 $db
     ld   C, A                                          ;; 00:2d54 $4f
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2d55 $fa $0e $d8
     sub  A, C                                          ;; 00:2d58 $91
     add  A, $08                                        ;; 00:2d59 $c6 $08
     ld   [wDC90], A                                    ;; 00:2d5b $ea $90 $dc
     ld   C, A                                          ;; 00:2d5e $4f
-    ld   A, [wDBFB_YPositionInMap]                                    ;; 00:2d5f $fa $fb $db
+    ld   A, [wDBFB_YPositionInMapLo]                                    ;; 00:2d5f $fa $fb $db
     ld   B, A                                          ;; 00:2d62 $47
     ld   A, [wD810_PlayerYPosition]                                    ;; 00:2d63 $fa $10 $d8
     sub  A, B                                          ;; 00:2d66 $90
@@ -250,7 +250,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     ld   A, [wDC7E]                                    ;; 00:2d79 $fa $7e $dc
     and  A, A                                          ;; 00:2d7c $a7
     jr   Z, .jr_00_2d87                                ;; 00:2d7d $28 $08
-    ld   A, [wDC71]                                    ;; 00:2d7f $fa $71 $dc
+    ld   A, [wDC71_FrameCounter]                                    ;; 00:2d7f $fa $71 $dc
     and  A, $07                                        ;; 00:2d82 $e6 $07
     jp   NZ, .jp_00_2ece                               ;; 00:2d84 $c2 $ce $2e
 .jr_00_2d87:
@@ -281,14 +281,14 @@ call_00_2ce2_BuildGexSpriteDrawList:
     jr   NZ, .jr_00_2d8a                               ;; 00:2da7 $20 $e1
     jp   .jp_00_2ece                                   ;; 00:2da9 $c3 $ce $2e
 .jp_00_2dac:
-    ld   A, [wDBF9_XPositionInMap]                                    ;; 00:2dac $fa $f9 $db
+    ld   A, [wDBF9_XPositionInMapLo]                                    ;; 00:2dac $fa $f9 $db
     ld   C, A                                          ;; 00:2daf $4f
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2db0 $fa $0e $d8
     sub  A, C                                          ;; 00:2db3 $91
     add  A, $08                                        ;; 00:2db4 $c6 $08
     ld   [wDC90], A                                    ;; 00:2db6 $ea $90 $dc
     ld   C, A                                          ;; 00:2db9 $4f
-    ld   A, [wDBFB_YPositionInMap]                                    ;; 00:2dba $fa $fb $db
+    ld   A, [wDBFB_YPositionInMapLo]                                    ;; 00:2dba $fa $fb $db
     ld   B, A                                          ;; 00:2dbd $47
     ld   A, [wD810_PlayerYPosition]                                    ;; 00:2dbe $fa $10 $d8
     sub  A, B                                          ;; 00:2dc1 $90
@@ -304,7 +304,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     ld   A, [wDC7E]                                    ;; 00:2dd4 $fa $7e $dc
     and  A, A                                          ;; 00:2dd7 $a7
     jr   Z, .jr_00_2de2                                ;; 00:2dd8 $28 $08
-    ld   A, [wDC71]                                    ;; 00:2dda $fa $71 $dc
+    ld   A, [wDC71_FrameCounter]                                    ;; 00:2dda $fa $71 $dc
     and  A, $07                                        ;; 00:2ddd $e6 $07
     jp   NZ, .jp_00_2ece                               ;; 00:2ddf $c2 $ce $2e
 .jr_00_2de2:
@@ -340,14 +340,14 @@ call_00_2ce2_BuildGexSpriteDrawList:
 .jp_00_2e0b:
     bit  5, A                                          ;; 00:2e0b $cb $6f
     jp   NZ, .jp_00_2e6f                               ;; 00:2e0d $c2 $6f $2e
-    ld   A, [wDBF9_XPositionInMap]                                    ;; 00:2e10 $fa $f9 $db
+    ld   A, [wDBF9_XPositionInMapLo]                                    ;; 00:2e10 $fa $f9 $db
     ld   C, A                                          ;; 00:2e13 $4f
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2e14 $fa $0e $d8
     sub  A, C                                          ;; 00:2e17 $91
     add  A, $08                                        ;; 00:2e18 $c6 $08
     ld   [wDC90], A                                    ;; 00:2e1a $ea $90 $dc
     ld   C, A                                          ;; 00:2e1d $4f
-    ld   A, [wDBFB_YPositionInMap]                                    ;; 00:2e1e $fa $fb $db
+    ld   A, [wDBFB_YPositionInMapLo]                                    ;; 00:2e1e $fa $fb $db
     ld   B, A                                          ;; 00:2e21 $47
     ld   A, [wD810_PlayerYPosition]                                    ;; 00:2e22 $fa $10 $d8
     sub  A, B                                          ;; 00:2e25 $90
@@ -363,7 +363,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     ld   A, [wDC7E]                                    ;; 00:2e38 $fa $7e $dc
     and  A, A                                          ;; 00:2e3b $a7
     jr   Z, .jr_00_2e46                                ;; 00:2e3c $28 $08
-    ld   A, [wDC71]                                    ;; 00:2e3e $fa $71 $dc
+    ld   A, [wDC71_FrameCounter]                                    ;; 00:2e3e $fa $71 $dc
     and  A, $07                                        ;; 00:2e41 $e6 $07
     jp   NZ, .jp_00_2ece                               ;; 00:2e43 $c2 $ce $2e
 .jr_00_2e46:
@@ -397,14 +397,14 @@ call_00_2ce2_BuildGexSpriteDrawList:
     jr   NZ, .jr_00_2e49                               ;; 00:2e6a $20 $dd
     jp   .jp_00_2ece                                   ;; 00:2e6c $c3 $ce $2e
 .jp_00_2e6f:
-    ld   A, [wDBF9_XPositionInMap]                                    ;; 00:2e6f $fa $f9 $db
+    ld   A, [wDBF9_XPositionInMapLo]                                    ;; 00:2e6f $fa $f9 $db
     ld   C, A                                          ;; 00:2e72 $4f
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2e73 $fa $0e $d8
     sub  A, C                                          ;; 00:2e76 $91
     add  A, $08                                        ;; 00:2e77 $c6 $08
     ld   [wDC90], A                                    ;; 00:2e79 $ea $90 $dc
     ld   C, A                                          ;; 00:2e7c $4f
-    ld   A, [wDBFB_YPositionInMap]                                    ;; 00:2e7d $fa $fb $db
+    ld   A, [wDBFB_YPositionInMapLo]                                    ;; 00:2e7d $fa $fb $db
     ld   B, A                                          ;; 00:2e80 $47
     ld   A, [wD810_PlayerYPosition]                                    ;; 00:2e81 $fa $10 $d8
     sub  A, B                                          ;; 00:2e84 $90
@@ -420,7 +420,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     ld   A, [wDC7E]                                    ;; 00:2e97 $fa $7e $dc
     and  A, A                                          ;; 00:2e9a $a7
     jr   Z, .jr_00_2ea4                                ;; 00:2e9b $28 $07
-    ld   A, [wDC71]                                    ;; 00:2e9d $fa $71 $dc
+    ld   A, [wDC71_FrameCounter]                                    ;; 00:2e9d $fa $71 $dc
     and  A, $07                                        ;; 00:2ea0 $e6 $07
     jr   NZ, .jp_00_2ece                               ;; 00:2ea2 $20 $2a
 .jr_00_2ea4:
@@ -459,7 +459,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     ld   A, [wDC51]                                    ;; 00:2ece $fa $51 $dc
     and  A, A                                          ;; 00:2ed1 $a7
     jr   Z, .jr_00_2ef9                                ;; 00:2ed2 $28 $25
-    ld   A, [wDC71]                                    ;; 00:2ed4 $fa $71 $dc
+    ld   A, [wDC71_FrameCounter]                                    ;; 00:2ed4 $fa $71 $dc
     rrca                                               ;; 00:2ed7 $0f
     and  A, $0f                                        ;; 00:2ed8 $e6 $0f
     add  A, A                                          ;; 00:2eda $87
@@ -1082,8 +1082,8 @@ call_00_3618_HandleObjectSpawn:
 ; If a slot is found:
 ; Calculates an offset into the object spawn table using wDAB8 and the bank offset.
 ; Checks for $FF sentinel and level ID match.
-; Performs collision-distance checks against player position (wDA14–wDA1B).
-; If within range, copies multiple fields from the spawn table into working object memory (wDA24, wDA1C, etc.).
+; Performs collision-distance checks against player position (wDA14_CameraLeftLo–wDA1B_CameraBottomHi).
+; If within range, copies multiple fields from the spawn table into working object memory (wDA24, wDA1C_ObjectBoundingBoxWidth, etc.).
 ; Sets up animation/state data, calls alt-bank functions to finish initialization.
 ; Usage: Core routine that validates and copies object-spawn data into live object RAM.
     call call_00_2afc_FindFreeObjectSlot                                  ;; 00:3618 $cd $fc $2a
@@ -1167,7 +1167,7 @@ call_00_3618_HandleObjectSpawn:
     add  HL, DE                                        ;; 00:3696 $19
     ld   C, L                                          ;; 00:3697 $4d
     ld   B, H                                          ;; 00:3698 $44
-    ld   HL, wDA14                                     ;; 00:3699 $21 $14 $da
+    ld   HL, wDA14_CameraLeftLo                                     ;; 00:3699 $21 $14 $da
     ld   A, [BC]                                       ;; 00:369c $0a
     sub  A, [HL]                                       ;; 00:369d $96
     inc  HL                                            ;; 00:369e $23
@@ -1178,16 +1178,16 @@ call_00_3618_HandleObjectSpawn:
     inc  BC                                            ;; 00:36a3 $03
     ld   L, C                                          ;; 00:36a4 $69
     ld   H, B                                          ;; 00:36a5 $60
-    ld   A, [wDA16]                                    ;; 00:36a6 $fa $16 $da
+    ld   A, [wDA16_CameraRightLo]                                    ;; 00:36a6 $fa $16 $da
     sub  A, [HL]                                       ;; 00:36a9 $96
     inc  HL                                            ;; 00:36aa $23
-    ld   A, [wDA17]                                    ;; 00:36ab $fa $17 $da
+    ld   A, [wDA17_CameraRightHi]                                    ;; 00:36ab $fa $17 $da
     sbc  A, [HL]                                       ;; 00:36ae $9e
     ret  C                                             ;; 00:36af $d8
     inc  HL                                            ;; 00:36b0 $23
     ld   C, L                                          ;; 00:36b1 $4d
     ld   B, H                                          ;; 00:36b2 $44
-    ld   HL, wDA18                                     ;; 00:36b3 $21 $18 $da
+    ld   HL, wDA18_CameraTopLo                                     ;; 00:36b3 $21 $18 $da
     ld   A, [BC]                                       ;; 00:36b6 $0a
     sub  A, [HL]                                       ;; 00:36b7 $96
     inc  HL                                            ;; 00:36b8 $23
@@ -1198,10 +1198,10 @@ call_00_3618_HandleObjectSpawn:
     inc  BC                                            ;; 00:36bd $03
     ld   L, C                                          ;; 00:36be $69
     ld   H, B                                          ;; 00:36bf $60
-    ld   A, [wDA1A]                                    ;; 00:36c0 $fa $1a $da
+    ld   A, [wDA1A_CameraBottomLo]                                    ;; 00:36c0 $fa $1a $da
     sub  A, [HL]                                       ;; 00:36c3 $96
     inc  HL                                            ;; 00:36c4 $23
-    ld   A, [wDA1B]                                    ;; 00:36c5 $fa $1b $da
+    ld   A, [wDA1B_CameraBottomHi]                                    ;; 00:36c5 $fa $1b $da
     sbc  A, [HL]                                       ;; 00:36c8 $9e
     ret  C                                             ;; 00:36c9 $d8
     ld   HL, wDAB9                                     ;; 00:36ca $21 $b9 $da
@@ -1245,7 +1245,7 @@ call_00_3618_HandleObjectSpawn:
     add  HL, HL                                        ;; 00:36fc $29
     add  HL, HL                                        ;; 00:36fd $29
     add  HL, HL                                        ;; 00:36fe $29
-    ld   BC, wDA1C                                     ;; 00:36ff $01 $1c $da
+    ld   BC, wDA1C_ObjectBoundingBoxWidth                                     ;; 00:36ff $01 $1c $da
     add  HL, BC                                        ;; 00:3702 $09
     ld   A, [DE]                                       ;; 00:3703 $1a
     ld   [HL+], A                                      ;; 00:3704 $22
@@ -1280,7 +1280,7 @@ call_00_3618_HandleObjectSpawn:
     add  HL, BC                                        ;; 00:3726 $09
     ld   A, [HL+]                                      ;; 00:3727 $2a
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:3728 $fa $00 $da
-    or   A, $00                                        ;; 00:372b $f6 $00
+    or   A, OBJECT_ID_OFFSET                                        ;; 00:372b $f6 $00
     ld   E, A                                          ;; 00:372d $5f
     ld   D, $d8                                        ;; 00:372e $16 $d8
     ld   A, [wDABB]                                    ;; 00:3730 $fa $bb $da
@@ -1393,12 +1393,12 @@ call_00_37a0_SpawnObjectRelative:
     ld   A, [HL+]                                      ;; 00:37d1 $2a
     ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:37d2 $fa $00 $da
     push AF                                            ;; 00:37d5 $f5
-    or   A, $0d                                        ;; 00:37d6 $f6 $0d
+    or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 00:37d6 $f6 $0d
     ld   C, A                                          ;; 00:37d8 $4f
     ld   B, $d8                                        ;; 00:37d9 $06 $d8
     ld   A, D                                          ;; 00:37db $7a
     ld   [wDA00_CurrentObjectAddr], A                                    ;; 00:37dc $ea $00 $da
-    or   A, $0d                                        ;; 00:37df $f6 $0d
+    or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 00:37df $f6 $0d
     ld   E, A                                          ;; 00:37e1 $5f
     ld   D, B                                          ;; 00:37e2 $50
     ld   A, [BC]                                       ;; 00:37e3 $0a
@@ -1511,7 +1511,7 @@ call_00_37a0_SpawnObjectRelative:
     and  A, $70                                        ;; 00:3870 $e6 $70
     ld   L, A                                          ;; 00:3872 $6f
     ld   H, $00                                        ;; 00:3873 $26 $00
-    ld   DE, wDA1C                                     ;; 00:3875 $11 $1c $da
+    ld   DE, wDA1C_ObjectBoundingBoxWidth                                     ;; 00:3875 $11 $1c $da
     add  HL, DE                                        ;; 00:3878 $19
     ld   E, L                                          ;; 00:3879 $5d
     ld   D, H                                          ;; 00:387a $54
@@ -1520,7 +1520,7 @@ call_00_37a0_SpawnObjectRelative:
     and  A, $70                                        ;; 00:387d $e6 $70
     ld   L, A                                          ;; 00:387f $6f
     ld   H, $00                                        ;; 00:3880 $26 $00
-    ld   BC, wDA1C                                     ;; 00:3882 $01 $1c $da
+    ld   BC, wDA1C_ObjectBoundingBoxWidth                                     ;; 00:3882 $01 $1c $da
     add  HL, BC                                        ;; 00:3885 $09
     ld   A, [DE]                                       ;; 00:3886 $1a
     ld   [HL+], A                                      ;; 00:3887 $22
