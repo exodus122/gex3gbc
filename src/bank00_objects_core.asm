@@ -1,141 +1,3 @@
-call_00_21ef_PlaySound_1E:
-; Pushes BC (preserve), loads A=1E, calls QueueSoundEffectWithPriority, restores BC.
-; Just plays a fixed sound effect.
-    push BC                                            ;; 00:21ef $c5
-    ld   A, $1e                                        ;; 00:21f0 $3e $1e
-    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 00:21f2 $cd $f5 $0f
-    pop  BC                                            ;; 00:21f5 $c1
-
-call_00_21f6_FindAndMarkObjectInList:
-; Switches to the bank containing the object list (wDC16_ObjectListBank).
-; Reads the start of the object list (wDC17_ObjectListBankOffset).
-; Iterates through 16-byte object records, searching for objects of type $11 
-; whose parameter matches C.
-; When found, it updates a D7xx structure at index B:
-; Sets a nibble/flag ([DE] = ([DE] & $F0) | value).
-; Uses a small table (db $00,$01,$02,$04 at $225C) and level mask (wDC1E_CurrentLevelNumber) 
-; to decide which flag (1 or 2) to apply.
-; Exits by restoring the previous bank. 
-; Usage:
-; Marks specific objects (e.g., collectibles, triggers, or doors) as “active” or “visited” 
-; for the current level. This is typical of collectible or progression flags.
-    push BC                                            ;; 00:21f6 $c5
-    ld   A, [wDC16_ObjectListBank]                                    ;; 00:21f7 $fa $16 $dc
-    call call_00_0eee_SwitchBank                                  ;; 00:21fa $cd $ee $0e
-    pop  BC                                            ;; 00:21fd $c1
-    ld   HL, wDC17_ObjectListBankOffset                                     ;; 00:21fe $21 $17 $dc
-    ld   A, [HL+]                                      ;; 00:2201 $2a
-    ld   H, [HL]                                       ;; 00:2202 $66
-    ld   L, A                                          ;; 00:2203 $6f
-    ld   A, [HL]                                       ;; 00:2204 $7e
-    cp   A, $ff                                        ;; 00:2205 $fe $ff
-    jp   Z, call_00_0f08_RestoreBank                               ;; 00:2207 $ca $08 $0f
-    ld   B, $01                                        ;; 00:220a $06 $01
-.jr_00_220c:
-    push HL                                            ;; 00:220c $e5
-    ld   A, [HL]                                       ;; 00:220d $7e
-    cp   A, $11                                        ;; 00:220e $fe $11
-    jr   NZ, .jr_00_221a                               ;; 00:2210 $20 $08
-    ld   DE, $0d                                       ;; 00:2212 $11 $0d $00
-    add  HL, DE                                        ;; 00:2215 $19
-    ld   A, [HL]                                       ;; 00:2216 $7e
-    cp   A, C                                          ;; 00:2217 $b9
-    jr   Z, .jr_00_2228                                ;; 00:2218 $28 $0e
-.jr_00_221a:
-    inc  B                                             ;; 00:221a $04
-    pop  HL                                            ;; 00:221b $e1
-    ld   DE, $10                                       ;; 00:221c $11 $10 $00
-    add  HL, DE                                        ;; 00:221f $19
-    ld   A, [HL]                                       ;; 00:2220 $7e
-    cp   A, $ff                                        ;; 00:2221 $fe $ff
-    jr   NZ, .jr_00_220c                               ;; 00:2223 $20 $e7
-    jp   call_00_0f08_RestoreBank                                  ;; 00:2225 $c3 $08 $0f
-.jr_00_2228:
-    pop  HL                                            ;; 00:2228 $e1
-    ld   E, B                                          ;; 00:2229 $58
-    ld   D, $d7                                        ;; 00:222a $16 $d7
-    ld   A, [DE]                                       ;; 00:222c $1a
-    and  A, $f0                                        ;; 00:222d $e6 $f0
-    or   A, $01                                        ;; 00:222f $f6 $01
-    ld   [DE], A                                       ;; 00:2231 $12
-    inc  E                                             ;; 00:2232 $1c
-    ld   L, C                                          ;; 00:2233 $69
-    ld   H, $00                                        ;; 00:2234 $26 $00
-    ld   BC, $225c                                     ;; 00:2236 $01 $5c $22
-    add  HL, BC                                        ;; 00:2239 $09
-    ld   A, [HL]                                       ;; 00:223a $7e
-    push AF                                            ;; 00:223b $f5
-    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:223c $21 $1e $dc
-    ld   L, [HL]                                       ;; 00:223f $6e
-    ld   H, $00                                        ;; 00:2240 $26 $00
-    ld   BC, wDC5C                                     ;; 00:2242 $01 $5c $dc
-    add  HL, BC                                        ;; 00:2245 $09
-    pop  AF                                            ;; 00:2246 $f1
-    ld   C, $01                                        ;; 00:2247 $0e $01
-    and  A, [HL]                                       ;; 00:2249 $a6
-    jr   Z, .jr_00_2254                                ;; 00:224a $28 $08
-    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:224c $fa $1e $dc
-    and  A, A                                          ;; 00:224f $a7
-    jr   Z, .jr_00_2254                                ;; 00:2250 $28 $02
-    ld   C, $02                                        ;; 00:2252 $0e $02
-.jr_00_2254:
-    ld   A, [DE]                                       ;; 00:2254 $1a
-    and  A, $f0                                        ;; 00:2255 $e6 $f0
-    or   A, C                                          ;; 00:2257 $b1
-    ld   [DE], A                                       ;; 00:2258 $12
-    jp   call_00_0f08_RestoreBank                                  ;; 00:2259 $c3 $08 $0f
-    db   $00, $01, $02, $04                            ;; 00:225c ?...
-
-call_00_2260_FindAndFlagObjectType12:
-; Switches to the object list bank and scans through object entries starting 
-; from wDC17_ObjectListBankOffset.
-; For each entry, checks if the type byte is $12. If found, jumps 13 bytes 
-; forward and compares that value to C.
-; When a match is found, modifies a status nibble in the object’s status table ($D7xx) 
-; to set bits $04 while preserving upper bits.
-; If no match is found and a $FF terminator is reached, exits by restoring the bank.
-; Purpose: Search for an object of type $12 linked to a particular identifier C and 
-; flag it as active/triggered.
-    push BC                                            ;; 00:2260 $c5
-    ld   A, [wDC16_ObjectListBank]                                    ;; 00:2261 $fa $16 $dc
-    call call_00_0eee_SwitchBank                                  ;; 00:2264 $cd $ee $0e
-    pop  BC                                            ;; 00:2267 $c1
-    ld   HL, wDC17_ObjectListBankOffset                                     ;; 00:2268 $21 $17 $dc
-    ld   A, [HL+]                                      ;; 00:226b $2a
-    ld   H, [HL]                                       ;; 00:226c $66
-    ld   L, A                                          ;; 00:226d $6f
-    ld   B, $01                                        ;; 00:226e $06 $01
-.jr_00_2270:
-    push HL                                            ;; 00:2270 $e5
-    ld   A, [HL]                                       ;; 00:2271 $7e
-    cp   A, $12                                        ;; 00:2272 $fe $12
-    jr   NZ, .jr_00_227e                               ;; 00:2274 $20 $08
-    ld   DE, $0d                                       ;; 00:2276 $11 $0d $00
-    add  HL, DE                                        ;; 00:2279 $19
-    ld   A, [HL]                                       ;; 00:227a $7e
-    cp   A, C                                          ;; 00:227b $b9
-    jr   Z, .jr_00_228c                                ;; 00:227c $28 $0e
-.jr_00_227e:
-    inc  B                                             ;; 00:227e $04
-    pop  HL                                            ;; 00:227f $e1
-    ld   DE, $10                                       ;; 00:2280 $11 $10 $00
-    add  HL, DE                                        ;; 00:2283 $19
-    ld   A, [HL]                                       ;; 00:2284 $7e
-    cp   A, $ff                                        ;; 00:2285 $fe $ff
-    jr   NZ, .jr_00_2270                               ;; 00:2287 $20 $e7
-    jp   call_00_0f08_RestoreBank                                  ;; 00:2289 $c3 $08 $0f
-.jr_00_228c:
-    pop  HL                                            ;; 00:228c $e1
-    ld   E, B                                          ;; 00:228d $58
-    ld   D, $d7                                        ;; 00:228e $16 $d7
-    ld   A, [DE]                                       ;; 00:2290 $1a
-    and  A, $f0                                        ;; 00:2291 $e6 $f0
-    or   A, $04                                        ;; 00:2293 $f6 $04
-    ld   [DE], A                                       ;; 00:2295 $12
-    jp   call_00_0f08_RestoreBank                                  ;; 00:2296 $c3 $08 $0f
-
-INCLUDE "bank00_object_utils.asm"
-
 call_00_2cbf_LoadObjectPalettes:
     ld   A, $7f                                        ;; 00:2cbf $3e $7f
     call call_00_0eee_SwitchBank                                  ;; 00:2cc1 $cd $ee $0e
@@ -157,7 +19,7 @@ call_00_2cbf_LoadObjectPalettes:
 
 call_00_2ce2_BuildGexSpriteDrawList:
 ; This is a complex sprite/OAM population routine. It:
-; Sets wDAC2=1 and combines the player’s facing direction with a state byte (wDC7A) into wDC53.
+; Sets wDAC2_DMATransferLength=1 and combines the player’s facing direction with a state byte (wDC7A) into wDC53.
 ; Switches banks to retrieve sprite graphics metadata based on the current level (wDB6C_CurrentMapId).
 ; Computes the address of Gex’s sprite frame data (using offsets and increments).
 ; Reads sprite tiles, positions, and attributes, adjusting for the player’s position 
@@ -170,7 +32,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
 ; Populates the hardware sprite list for Gex’s current animation frame, handling mirroring, flipping, 
 ; and level-specific offsets.
     ld   A, $01                                        ;; 00:2ce2 $3e $01
-    ld   [wDAC2], A                                    ;; 00:2ce4 $ea $c2 $da
+    ld   [wDAC2_DMATransferLength], A                                    ;; 00:2ce4 $ea $c2 $da
     ld   A, [wD80D_PlayerFacingDirection]                                    ;; 00:2ce7 $fa $0d $d8
     ld   HL, wDC7A                                     ;; 00:2cea $21 $7a $dc
     or   A, [HL]                                       ;; 00:2ced $b6
@@ -210,13 +72,13 @@ call_00_2ce2_BuildGexSpriteDrawList:
     call call_00_0eee_SwitchBank                                  ;; 00:2d28 $cd $ee $0e
     pop  HL                                            ;; 00:2d2b $e1
     ld   A, [HL+]                                      ;; 00:2d2c $2a
-    ld   [wDAC2], A                                    ;; 00:2d2d $ea $c2 $da
+    ld   [wDAC2_DMATransferLength], A                                    ;; 00:2d2d $ea $c2 $da
     inc  HL                                            ;; 00:2d30 $23
     inc  HL                                            ;; 00:2d31 $23
     ld   A, [HL+]                                      ;; 00:2d32 $2a
-    ld   [wDAC0], A                                    ;; 00:2d33 $ea $c0 $da
+    ld   [wDAC0_GeneralPurposeDMASourceAddressLo], A                                    ;; 00:2d33 $ea $c0 $da
     ld   A, [HL+]                                      ;; 00:2d36 $2a
-    ld   [wDAC1], A                                    ;; 00:2d37 $ea $c1 $da
+    ld   [wDAC1_GeneralPurposeDMASourceAddressHi], A                                    ;; 00:2d37 $ea $c1 $da
     xor  A, A                                          ;; 00:2d3a $af
     ld   [wDC52], A                                    ;; 00:2d3b $ea $52 $dc
     ld   A, [wDC6F]                                    ;; 00:2d3e $fa $6f $dc
@@ -254,7 +116,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     and  A, $07                                        ;; 00:2d82 $e6 $07
     jp   NZ, .jp_00_2ece                               ;; 00:2d84 $c2 $ce $2e
 .jr_00_2d87:
-    ld   A, [wDAC2]                                    ;; 00:2d87 $fa $c2 $da
+    ld   A, [wDAC2_DMATransferLength]                                    ;; 00:2d87 $fa $c2 $da
 .jr_00_2d8a:
     push AF                                            ;; 00:2d8a $f5
     ld   A, [HL+]                                      ;; 00:2d8b $2a
@@ -308,7 +170,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     and  A, $07                                        ;; 00:2ddd $e6 $07
     jp   NZ, .jp_00_2ece                               ;; 00:2ddf $c2 $ce $2e
 .jr_00_2de2:
-    ld   A, [wDAC2]                                    ;; 00:2de2 $fa $c2 $da
+    ld   A, [wDAC2_DMATransferLength]                                    ;; 00:2de2 $fa $c2 $da
 .jr_00_2de5:
     push AF                                            ;; 00:2de5 $f5
     ld   A, [HL+]                                      ;; 00:2de6 $2a
@@ -367,7 +229,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     and  A, $07                                        ;; 00:2e41 $e6 $07
     jp   NZ, .jp_00_2ece                               ;; 00:2e43 $c2 $ce $2e
 .jr_00_2e46:
-    ld   A, [wDAC2]                                    ;; 00:2e46 $fa $c2 $da
+    ld   A, [wDAC2_DMATransferLength]                                    ;; 00:2e46 $fa $c2 $da
 .jr_00_2e49:
     push AF                                            ;; 00:2e49 $f5
     ld   A, [HL+]                                      ;; 00:2e4a $2a
@@ -424,7 +286,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     and  A, $07                                        ;; 00:2ea0 $e6 $07
     jr   NZ, .jp_00_2ece                               ;; 00:2ea2 $20 $2a
 .jr_00_2ea4:
-    ld   A, [wDAC2]                                    ;; 00:2ea4 $fa $c2 $da
+    ld   A, [wDAC2_DMATransferLength]                                    ;; 00:2ea4 $fa $c2 $da
 .jr_00_2ea7:
     push AF                                            ;; 00:2ea7 $f5
     ld   A, [HL+]                                      ;; 00:2ea8 $2a
@@ -658,7 +520,7 @@ call_00_2f85_LoadAndSortCollectibleData:
 
 call_00_2ff8_InitLevelObjectsAndConfig:
 ; Initialize Level State
-; Behavior: Switches to the object list bank, resets wDAB8 counter, clears a large block 
+; Behavior: Switches to the object list bank, resets wDAB8_ObjectCounter counter, clears a large block 
 ; of level state variables (wDCC5–wDCDA), copies level-specific configuration tables 
 ; (.data_00_30ba and .data_00_317a) into RAM, sets default timers (wDCD5–wDCD9), adjusts 
 ; special-case values for level 07/08, and calls setup routines 3180, 31d9, 320d, and 3252.
@@ -675,7 +537,7 @@ call_00_2ff8_InitLevelObjectsAndConfig:
     jr   Z, .jr_00_3021                                ;; 00:300a $28 $15
 .jr_00_300c:
     push HL                                            ;; 00:300c $e5
-    ld   HL, wDAB8                                     ;; 00:300d $21 $b8 $da
+    ld   HL, wDAB8_ObjectCounter                                     ;; 00:300d $21 $b8 $da
     ld   A, [HL]                                       ;; 00:3010 $7e
     inc  [HL]                                          ;; 00:3011 $34
     ld   L, A                                          ;; 00:3012 $6f
@@ -747,8 +609,8 @@ call_00_2ff8_InitLevelObjectsAndConfig:
     ld   [wDB6F], A                                    ;; 00:30a8 $ea $6f $db
 .jr_00_30ab:
     call call_00_3180_MarkInitialLevelObjects                                  ;; 00:30ab $cd $80 $31
-    call call_00_31d9_CheckFlag4_ResetObjectType1                                  ;; 00:30ae $cd $d9 $31
-    call call_00_320d_ApplyLevelMaskToType3Objects                                  ;; 00:30b1 $cd $0d $32
+    call call_00_31d9_CheckAndClearBonusCoinObjectFlags                                  ;; 00:30ae $cd $d9 $31
+    call call_00_320d_CheckAndClearPawCoinObjectFlags                                  ;; 00:30b1 $cd $0d $32
     call call_00_3252_ResetObjectCounter                                  ;; 00:30b4 $cd $52 $32
     jp   call_00_0f08_RestoreBank                                  ;; 00:30b7 $c3 $08 $0f
 .data_00_30ba:
@@ -797,7 +659,7 @@ call_00_3180_MarkInitialLevelObjects:
 .jr_00_3190:
     push BC                                            ;; 00:3190 $c5
     bit  0, B                                          ;; 00:3191 $cb $40
-    call NZ, call_00_21f6_FindAndMarkObjectInList                              ;; 00:3193 $c4 $f6 $21
+    call NZ, call_00_21f6_FindAndMarkObjectInList_TVButton                              ;; 00:3193 $c4 $f6 $21
     pop  BC                                            ;; 00:3196 $c1
     rr   B                                             ;; 00:3197 $cb $18
     inc  C                                             ;; 00:3199 $0c
@@ -815,7 +677,7 @@ call_00_3180_MarkInitialLevelObjects:
     ld   HL, $31cd                                     ;; 00:31b1 $21 $cd $31
     add  HL, BC                                        ;; 00:31b4 $09
     cp   A, [HL]                                       ;; 00:31b5 $be
-    call NC, call_00_21f6_FindAndMarkObjectInList                              ;; 00:31b6 $d4 $f6 $21
+    call NC, call_00_21f6_FindAndMarkObjectInList_TVButton                              ;; 00:31b6 $d4 $f6 $21
     pop  BC                                            ;; 00:31b9 $c1
     inc  C                                             ;; 00:31ba $0c
     ld   A, C                                          ;; 00:31bb $79
@@ -826,7 +688,7 @@ call_00_3180_MarkInitialLevelObjects:
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:31c9 ????????
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:31d1 ????????
 
-call_00_31d9_CheckFlag4_ResetObjectType1:
+call_00_31d9_CheckAndClearBonusCoinObjectFlags:
 ; Handle Level Flag 4 Special Object
 ; Behavior: Uses level number + wDC5C as a flag table, checks bit-4; if set, 
 ; searches object list for type 01 and clears a RAM byte (wD7??) to zero.
@@ -848,7 +710,7 @@ call_00_31d9_CheckFlag4_ResetObjectType1:
     ld   C, $01                                        ;; 00:31f5 $0e $01
     ld   A, [HL]                                       ;; 00:31f7 $7e
 .jr_00_31f8:
-    cp   A, $01                                        ;; 00:31f8 $fe $01
+    cp   A, Object_BonusCoin                                        ;; 00:31f8 $fe $01
     jr   Z, .jr_00_3206                                ;; 00:31fa $28 $0a
     add  HL, DE                                        ;; 00:31fc $19
     inc  C                                             ;; 00:31fd $0c
@@ -862,7 +724,7 @@ call_00_31d9_CheckFlag4_ResetObjectType1:
     ld   [BC], A                                       ;; 00:3209 $02
     jp   call_00_0f08_RestoreBank                                  ;; 00:320a $c3 $08 $0f
 
-call_00_320d_ApplyLevelMaskToType3Objects:
+call_00_320d_CheckAndClearPawCoinObjectFlags:
 ; Mask Object Flags by Level Setting
 ; Behavior: Gets a bitmask (C) from wDC5C + level, scans the object list for type 03. 
 ; For each, uses its 13th byte as an index into $324E (00,20,40,80), ANDs with C; if nonzero, 
@@ -884,7 +746,7 @@ call_00_320d_ApplyLevelMaskToType3Objects:
 .jr_00_3226:
     push HL                                            ;; 00:3226 $e5
     ld   A, [HL]                                       ;; 00:3227 $7e
-    cp   A, $03                                        ;; 00:3228 $fe $03
+    cp   A, Object_PawCoin                                        ;; 00:3228 $fe $03
     jr   NZ, .jr_00_3240                               ;; 00:322a $20 $14
     ld   DE, $0d                                       ;; 00:322c $11 $0d $00
     add  HL, DE                                        ;; 00:322f $19
@@ -911,10 +773,10 @@ call_00_320d_ApplyLevelMaskToType3Objects:
 
 call_00_3252_ResetObjectCounter:
 ; Reset Object Counter
-; Behavior: Simply sets wDAB8 = 1 and returns.
+; Behavior: Simply sets wDAB8_ObjectCounter = 1 and returns.
 ; Purpose: Initializes the object counter used by other routines.
     ld   A, $01                                        ;; 00:3252 $3e $01
-    ld   [wDAB8], A                                    ;; 00:3254 $ea $b8 $da
+    ld   [wDAB8_ObjectCounter], A                                    ;; 00:3254 $ea $b8 $da
     ret                                                ;; 00:3257 $c9
 
 data_00_3258:
@@ -1080,10 +942,10 @@ call_00_3618_HandleObjectSpawn:
 ; Finds a free object slot.
 ; If none free, resets the object counter (3252).
 ; If a slot is found:
-; Calculates an offset into the object spawn table using wDAB8 and the bank offset.
+; Calculates an offset into the object spawn table using wDAB8_ObjectCounter and the bank offset.
 ; Checks for $FF sentinel and level ID match.
 ; Performs collision-distance checks against player position (wDA14_CameraLeftLo–wDA1B_CameraBottomHi).
-; If within range, copies multiple fields from the spawn table into working object memory (wDA24, wDA1C_ObjectBoundingBoxXMax, etc.).
+; If within range, copies multiple fields from the spawn table into working object memory (wDA24_ObjectInitialXPos, wDA1C_ObjectBoundingBoxXMax, etc.).
 ; Sets up animation/state data, calls alt-bank functions to finish initialization.
 ; Usage: Core routine that validates and copies object-spawn data into live object RAM.
     call call_00_2afc_FindFreeObjectSlot                                  ;; 00:3618 $cd $fc $2a
@@ -1096,7 +958,7 @@ call_00_3618_HandleObjectSpawn:
     add  HL, DE                                        ;; 00:3626 $19
     ld   E, L                                          ;; 00:3627 $5d
     ld   D, H                                          ;; 00:3628 $54
-    ld   HL, wDAB8                                     ;; 00:3629 $21 $b8 $da
+    ld   HL, wDAB8_ObjectCounter                                     ;; 00:3629 $21 $b8 $da
     ld   L, [HL]                                       ;; 00:362c $6e
     ld   H, $00                                        ;; 00:362d $26 $00
     add  HL, HL                                        ;; 00:362f $29
@@ -1109,7 +971,7 @@ call_00_3618_HandleObjectSpawn:
     ld   A, [DE]                                       ;; 00:3636 $1a
     cp   A, $ff                                        ;; 00:3637 $fe $ff
     jp   Z, call_00_3252_ResetObjectCounter                               ;; 00:3639 $ca $52 $32
-    ld   HL, wDAB8                                     ;; 00:363c $21 $b8 $da
+    ld   HL, wDAB8_ObjectCounter                                     ;; 00:363c $21 $b8 $da
     inc  [HL]                                          ;; 00:363f $34
     ret                                                ;; 00:3640 $c9
 .jr_00_3641:
@@ -1117,7 +979,7 @@ call_00_3618_HandleObjectSpawn:
     rlca                                               ;; 00:3644 $07
     rlca                                               ;; 00:3645 $07
     rlca                                               ;; 00:3646 $07
-    ld   [wDAB9], A                                    ;; 00:3647 $ea $b9 $da
+    ld   [wDAB9_NextAvailableObjectSlot], A                                    ;; 00:3647 $ea $b9 $da
     ld   HL, wDC17_ObjectListBankOffset                                     ;; 00:364a $21 $17 $dc
     ld   A, [HL+]                                      ;; 00:364d $2a
     ld   H, [HL]                                       ;; 00:364e $66
@@ -1126,7 +988,7 @@ call_00_3618_HandleObjectSpawn:
     add  HL, DE                                        ;; 00:3653 $19
     ld   E, L                                          ;; 00:3654 $5d
     ld   D, H                                          ;; 00:3655 $54
-    ld   HL, wDAB8                                     ;; 00:3656 $21 $b8 $da
+    ld   HL, wDAB8_ObjectCounter                                     ;; 00:3656 $21 $b8 $da
     ld   L, [HL]                                       ;; 00:3659 $6e
     ld   H, $00                                        ;; 00:365a $26 $00
     add  HL, HL                                        ;; 00:365c $29
@@ -1139,8 +1001,8 @@ call_00_3618_HandleObjectSpawn:
     ld   A, [DE]                                       ;; 00:3663 $1a
     cp   A, $ff                                        ;; 00:3664 $fe $ff
     jp   Z, call_00_3252_ResetObjectCounter                               ;; 00:3666 $ca $52 $32
-    ld   [wDABB], A                                    ;; 00:3669 $ea $bb $da
-    ld   HL, wDAB8                                     ;; 00:366c $21 $b8 $da
+    ld   [wDABB_CurrentObjectId], A                                    ;; 00:3669 $ea $bb $da
+    ld   HL, wDAB8_ObjectCounter                                     ;; 00:366c $21 $b8 $da
     ld   C, [HL]                                       ;; 00:366f $4e
     inc  [HL]                                          ;; 00:3670 $34
     ld   B, $d7                                        ;; 00:3671 $06 $d7
@@ -1149,14 +1011,14 @@ call_00_3618_HandleObjectSpawn:
     ret  Z                                             ;; 00:3675 $c8
     bit  6, A                                          ;; 00:3676 $cb $77
     ret  NZ                                            ;; 00:3678 $c0
-    ld   [wDABC], A                                    ;; 00:3679 $ea $bc $da
+    ld   [wDABC_CurrentObjectFlags], A                                    ;; 00:3679 $ea $bc $da
     bit  4, A                                          ;; 00:367c $cb $67
     jr   Z, .jr_00_3685                                ;; 00:367e $28 $05
     ld   A, $02                                        ;; 00:3680 $3e $02
-    ld   [wDABB], A                                    ;; 00:3682 $ea $bb $da
+    ld   [wDABB_CurrentObjectId], A                                    ;; 00:3682 $ea $bb $da
 .jr_00_3685:
     ld   A, C                                          ;; 00:3685 $79
-    ld   [wDABA], A                                    ;; 00:3686 $ea $ba $da
+    ld   [wDABA_ObjectCounterRelated], A                                    ;; 00:3686 $ea $ba $da
     ld   HL, $0f                                       ;; 00:3689 $21 $0f $00
     add  HL, DE                                        ;; 00:368c $19
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:368d $fa $6c $db
@@ -1204,14 +1066,14 @@ call_00_3618_HandleObjectSpawn:
     ld   A, [wDA1B_CameraBottomHi]                                    ;; 00:36c5 $fa $1b $da
     sbc  A, [HL]                                       ;; 00:36c8 $9e
     ret  C                                             ;; 00:36c9 $d8
-    ld   HL, wDAB9                                     ;; 00:36ca $21 $b9 $da
+    ld   HL, wDAB9_NextAvailableObjectSlot                                     ;; 00:36ca $21 $b9 $da
     ld   L, [HL]                                       ;; 00:36cd $6e
     ld   H, $00                                        ;; 00:36ce $26 $00
     add  HL, HL                                        ;; 00:36d0 $29
     add  HL, HL                                        ;; 00:36d1 $29
     add  HL, HL                                        ;; 00:36d2 $29
     add  HL, HL                                        ;; 00:36d3 $29
-    ld   BC, wDA24                                     ;; 00:36d4 $01 $24 $da
+    ld   BC, wDA24_ObjectInitialXPos                                     ;; 00:36d4 $01 $24 $da
     add  HL, BC                                        ;; 00:36d7 $09
     ld   C, L                                          ;; 00:36d8 $4d
     ld   B, H                                          ;; 00:36d9 $44
@@ -1238,7 +1100,7 @@ call_00_3618_HandleObjectSpawn:
     ld   [HL], A                                       ;; 00:36f2 $77
     ld   [BC], A                                       ;; 00:36f3 $02
     inc  DE                                            ;; 00:36f4 $13
-    ld   HL, wDAB9                                     ;; 00:36f5 $21 $b9 $da
+    ld   HL, wDAB9_NextAvailableObjectSlot                                     ;; 00:36f5 $21 $b9 $da
     ld   L, [HL]                                       ;; 00:36f8 $6e
     ld   H, $00                                        ;; 00:36f9 $26 $00
     add  HL, HL                                        ;; 00:36fb $29
@@ -1270,7 +1132,7 @@ call_00_3618_HandleObjectSpawn:
     inc  DE                                            ;; 00:3717 $13
     ld   A, [DE]                                       ;; 00:3718 $1a
     ld   [HL], A                                       ;; 00:3719 $77
-    ld   HL, wDABB                                     ;; 00:371a $21 $bb $da
+    ld   HL, wDABB_CurrentObjectId                                     ;; 00:371a $21 $bb $da
     ld   L, [HL]                                       ;; 00:371d $6e
     ld   H, $00                                        ;; 00:371e $26 $00
     add  HL, HL                                        ;; 00:3720 $29
@@ -1283,7 +1145,7 @@ call_00_3618_HandleObjectSpawn:
     or   A, OBJECT_ID_OFFSET                                        ;; 00:372b $f6 $00
     ld   E, A                                          ;; 00:372d $5f
     ld   D, $d8                                        ;; 00:372e $16 $d8
-    ld   A, [wDABB]                                    ;; 00:3730 $fa $bb $da
+    ld   A, [wDABB_CurrentObjectId]                                    ;; 00:3730 $fa $bb $da
     ld   [DE], A                                       ;; 00:3733 $12
     ld   A, E                                          ;; 00:3734 $7b
     xor  A, $12                                        ;; 00:3735 $ee $12
@@ -1328,16 +1190,16 @@ call_00_3618_HandleObjectSpawn:
     ld   E, A                                          ;; 00:375e $5f
     ld   A, $00                                        ;; 00:375f $3e $00
     ld   [DE], A                                       ;; 00:3761 $12
-    ld   HL, wDAB9                                     ;; 00:3762 $21 $b9 $da
+    ld   HL, wDAB9_NextAvailableObjectSlot                                     ;; 00:3762 $21 $b9 $da
     ld   L, [HL]                                       ;; 00:3765 $6e
     ld   H, $00                                        ;; 00:3766 $26 $00
-    ld   DE, wDA01                                     ;; 00:3768 $11 $01 $da
+    ld   DE, wDA01_ObjectPairRelated                                     ;; 00:3768 $11 $01 $da
     add  HL, DE                                        ;; 00:376b $19
-    ld   A, [wDABA]                                    ;; 00:376c $fa $ba $da
+    ld   A, [wDABA_ObjectCounterRelated]                                    ;; 00:376c $fa $ba $da
     ld   [HL], A                                       ;; 00:376f $77
     ld   L, A                                          ;; 00:3770 $6f
     ld   H, $d7                                        ;; 00:3771 $26 $d7
-    ld   A, [wDABC]                                    ;; 00:3773 $fa $bc $da
+    ld   A, [wDABC_CurrentObjectFlags]                                    ;; 00:3773 $fa $bc $da
     or   A, $40                                        ;; 00:3776 $f6 $40
     ld   [HL], A                                       ;; 00:3778 $77
     and  A, $0f                                        ;; 00:3779 $e6 $0f
@@ -1378,7 +1240,7 @@ call_00_37a0_SpawnObjectRelative:
     and  A, $07                                        ;; 00:37b9 $e6 $07
     ld   L, A                                          ;; 00:37bb $6f
     ld   H, $00                                        ;; 00:37bc $26 $00
-    ld   DE, wDA01                                     ;; 00:37be $11 $01 $da
+    ld   DE, wDA01_ObjectPairRelated                                     ;; 00:37be $11 $01 $da
     add  HL, DE                                        ;; 00:37c1 $19
     ld   A, [HL]                                       ;; 00:37c2 $7e
     ld   [wDCE8], A                                    ;; 00:37c3 $ea $e8 $dc

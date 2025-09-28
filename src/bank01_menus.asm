@@ -990,7 +990,7 @@ call_01_467b_MenuState_UpdateLevelCursor:
     add  A, $04                                        ;; 01:46bd $c6 $04
     ld   [wDBDB], A                                    ;; 01:46bf $ea $db $db
     ld   BC, $202                                      ;; 01:46c2 $01 $02 $02
-    call call_01_4c7e_CopyTileBlockToBuffer                                  ;; 01:46c5 $cd $7e $4c
+    call call_01_4c7e_CopyTextBlockToBuffer                                  ;; 01:46c5 $cd $7e $4c
     ld   A, [wDBA7]                                    ;; 01:46c8 $fa $a7 $db
     call call_01_4b32_GetLevelDataSubsectionPtr                                  ;; 01:46cb $cd $32 $4b
     jp   call_01_4cfa_SetStreamPointerHL                                  ;; 01:46ce $c3 $fa $4c
@@ -1095,7 +1095,7 @@ call_01_4760_MenuState_SubmenuHandler:
     ld   A, [wDBA7]                                    ;; 01:476f $fa $a7 $db
     ld   DE, data_01_5b61                              ;; 01:4772 $11 $61 $5b
     call call_00_0777                                  ;; 01:4775 $cd $77 $07
-    jp   call_01_4c45_ParseAndPlaceSpriteRecords                                  ;; 01:4778 $c3 $45 $4c
+    jp   call_01_4c45_ParseAndLoadTextIntoBuffer                                  ;; 01:4778 $c3 $45 $4c
 
 call_01_477b_MenuState_NoOp:
 ; Description: Empty ret. Likely a placeholder or unused state.
@@ -1222,7 +1222,7 @@ call_01_4826_MenuState_UpdateCursorAlt:
     add  a,$04
     ld   [wDBDB],a
     ld   bc,$0202
-    jp   call_01_4c7e_CopyTileBlockToBuffer
+    jp   call_01_4c7e_CopyTextBlockToBuffer
 .data_01_4871:
     db   $01, $02, $04, $08             ;; 01:486e ???????
 
@@ -1908,7 +1908,7 @@ call_01_4bb8_UpdateInterpolationStep:
     jr   NZ, .jr_01_4c01                               ;; 01:4c03 $20 $fc
     ld   [wDBC1], A                                    ;; 01:4c05 $ea $c1 $db
     ld   HL, wDBBF                                     ;; 01:4c08 $21 $bf $db
-    call call_01_4c45_ParseAndPlaceSpriteRecords                                  ;; 01:4c0b $cd $45 $4c
+    call call_01_4c45_ParseAndLoadTextIntoBuffer                                  ;; 01:4c0b $cd $45 $4c
     ld   A, [wDBC7]                                    ;; 01:4c0e $fa $c7 $db
     cp   A, $01                                        ;; 01:4c11 $fe $01
     ret  NZ                                            ;; 01:4c13 $c0
@@ -1946,11 +1946,11 @@ call_01_4bb8_UpdateInterpolationStep:
     ld   [HL], A                                       ;; 01:4c43 $77
     ret                                                ;; 01:4c44 $c9
 
-call_01_4c45_ParseAndPlaceSpriteRecords:
+call_01_4c45_ParseAndLoadTextIntoBuffer:
 ; Description:
-; Reads a sequence of sprite or tile-placement records from memory until a $FF terminator. 
+; Reads a sequence text records from memory until a $FF terminator. 
 ; For each record, extracts an ID, X/Y offsets (adjusted by $10/$08), attribute flags 
-; (with optional lookup in wDAE1), and a size (C,B). Calls call_01_4c7e_CopyTileBlockToBuffer to copy tile entries 
+; (with optional lookup in wDAE1_TextBuffer), and a size (C,B). Calls call_01_4c7e_CopyTextBlockToBuffer to copy tile entries 
 ; into the staging buffer at wD900.
     ld   A, [HL+]                                      ;; 01:4c45 $2a
     cp   A, $ff                                        ;; 01:4c46 $fe $ff
@@ -1972,7 +1972,7 @@ call_01_4c45_ParseAndPlaceSpriteRecords:
     srl  A                                             ;; 01:4c61 $cb $3f
     ld   E, A                                          ;; 01:4c63 $5f
     ld   D, $00                                        ;; 01:4c64 $16 $00
-    ld   HL, wDAE1                                     ;; 01:4c66 $21 $e1 $da
+    ld   HL, wDAE1_TextBuffer                                     ;; 01:4c66 $21 $e1 $da
     add  HL, DE                                        ;; 01:4c69 $19
     ld   A, [HL]                                       ;; 01:4c6a $7e
     pop  HL                                            ;; 01:4c6b $e1
@@ -1985,11 +1985,11 @@ call_01_4c45_ParseAndPlaceSpriteRecords:
     ld   B, [HL]                                       ;; 01:4c75 $46
     inc  HL                                            ;; 01:4c76 $23
     push HL                                            ;; 01:4c77 $e5
-    call call_01_4c7e_CopyTileBlockToBuffer                                  ;; 01:4c78 $cd $7e $4c
+    call call_01_4c7e_CopyTextBlockToBuffer                                  ;; 01:4c78 $cd $7e $4c
     pop  HL                                            ;; 01:4c7b $e1
     jr   .jr_01_4c4c                                   ;; 01:4c7c $18 $ce
 
-call_01_4c7e_CopyTileBlockToBuffer:
+call_01_4c7e_CopyTextBlockToBuffer:
 ; Description:
 ; Copies a rectangular block of sprite/tile data into wD900. Uses wDBDB as a tile index, 
 ; increments coordinates, and fills multiple rows/columns according to width (B) and height (C).

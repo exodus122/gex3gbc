@@ -130,7 +130,7 @@ call_02_5918:
     add  hl,bc
     ld   c,l
     ld   b,h
-    call call_00_2835_Object_GetVector_DA24
+    call call_00_2835_Object_GetInitialXPos
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
@@ -143,7 +143,7 @@ call_02_5918:
     adc  d
     ld   [hl],a
     inc  bc
-    call call_00_27f3_Object_GetVector_DA26
+    call call_00_27f3_Object_GetInitialYPos
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YPOS_OFFSET
@@ -278,11 +278,11 @@ call_02_5a1c_ObjectAction_TVButton_unk2:
     or   A, C                                          ;; 02:5a64 $b1
     ld   [HL], A                                       ;; 02:5a65 $77
     pop  BC                                            ;; 02:5a66 $c1
-    jp   call_00_2260_FindAndFlagObjectType12                                    ;; 02:5a67 $c3 $60 $22
+    jp   call_00_2260_FindAndFlagObject_TVRemote                                    ;; 02:5a67 $c3 $60 $22
 .jr_02_5a6a:
     ld   HL, wDC5B                                     ;; 02:5a6a $21 $5b $dc
     ld   [HL], C                                       ;; 02:5a6d $71
-    jp   call_00_2260_FindAndFlagObjectType12                                    ;; 02:5a6e $c3 $60 $22
+    jp   call_00_2260_FindAndFlagObject_TVRemote                                    ;; 02:5a6e $c3 $60 $22
 .data_02_5a71:
     db   $00, $01, $02, $04                            ;; 02:5a71 ????
 
@@ -1176,8 +1176,8 @@ call_02_61ee_ObjectAction_Bee_Unk1:
 call_02_6214_ObjectAction_Raft_Unk0:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,.label6239
-    call call_00_2826_Object_SetXFromDA24
-    call call_00_27e4_Object_SetYPosFromDA26
+    call call_00_2826_Object_ResetToInitialXPos
+    call call_00_27e4_Object_ResetToInitialYPos
     ld   c,$40
     call call_00_2980_ObjectSet19
     ld   c,$00
@@ -1340,8 +1340,8 @@ call_02_634c_ObjectAction_RaStatue_Unk0:
     cp   a,$36
     ld   c,$20
     call z,call_00_2958_ObjectSetFacingDirection
-    call call_00_2826_Object_SetXFromDA24
-    call call_00_27e4_Object_SetYPosFromDA26
+    call call_00_2826_Object_ResetToInitialXPos
+    call call_00_27e4_Object_ResetToInitialYPos
     ld   a,$01
     jp   entry_02_72ac_SetupNewAction
 
@@ -1532,8 +1532,8 @@ call_02_64cd_ObjectAction_HardHat_Unk1:
 call_02_64e9_ObjectAction_Bat_Unk0:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,.label64F4
-    call call_00_2826_Object_SetXFromDA24
-    call call_00_27e4_Object_SetYPosFromDA26
+    call call_00_2826_Object_ResetToInitialXPos
+    call call_00_27e4_Object_ResetToInitialYPos
 .label64F4:
     call call_00_2a68_Object_ComputePlayerXProximity
     ld   a,[wDA11_ObjectXDistFromPlayer]
@@ -1716,7 +1716,7 @@ call_02_6633_ObjectAction_OffSwitch_Unk1:
     ld   a,$00
     jp   entry_02_72ac_SetupNewAction
 
-call_02_6641_ObjectAction_PinkGirl_Unk0:
+call_02_6641_ObjectAction_SailorToonGirl_Unk0:
     ld   c,$10
     call call_00_28c8_ObjectSetXVelocity
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
@@ -1755,11 +1755,11 @@ call_02_667e:
     ld   bc,$0104
     inc  b
     ld   b,$04
-call_02_6687_ObjectAction_PinkGirl_Unk2:
+call_02_6687_ObjectAction_SailorToonGirl_Unk2:
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     jp   call_00_2766_Object_UpdateXPositionFromVector
 
-call_02_668d_ObjectAction_PinkGirl_Unk3:
+call_02_668d_ObjectAction_SailorToonGirl_Unk3:
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_UpdateXPositionFromVector
     ret  c
@@ -1768,7 +1768,7 @@ call_02_668d_ObjectAction_PinkGirl_Unk3:
     jp   nz,entry_02_72ac_SetupNewAction
     ret  
 
-call_02_669d_ObjectAction_PinkGirl_Unk5:
+call_02_669d_ObjectAction_SailorToonGirl_Unk5:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,.label66AC
     ld   c,$18
@@ -2064,13 +2064,13 @@ call_02_68b2:
     ret  z
     ld   hl,.data_02_68e5
     call call_00_2c20_ObjectPalette_CopyToBuffer
-    call call_00_2826_Object_SetXFromDA24
+    call call_00_2826_Object_ResetToInitialXPos
     ld   a,[wDC71_FrameCounter]
     and  a,$0F
     ld   c,a
     ld   b,$00
     call $24DF
-    call call_00_27e4_Object_SetYPosFromDA26
+    call call_00_27e4_Object_ResetToInitialYPos
     call call_00_230f_ResolveObjectListIndex
     ld   b,$FF
     call call_00_250d_Object_UpdateYPosition
@@ -2589,7 +2589,7 @@ call_02_6cbb:
     call call_00_230f_ResolveObjectListIndex
     call call_00_2958_ObjectSetFacingDirection
 label6CC6:
-    call call_00_27f3_Object_GetVector_DA26
+    call call_00_27f3_Object_GetInitialYPos
     ld   a,[wD810_PlayerYPosition]
     sub  e
     ld   a,[wD811_PlayerYPosition]
@@ -2616,7 +2616,7 @@ label6CED:
 label6CF5:
     call call_00_24c0_Object_IntegrateXVelocity
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
-    call call_00_27f3_Object_GetVector_DA26
+    call call_00_27f3_Object_GetInitialYPos
     call call_00_2917_ObjectCheckIfTimer1AIsZero
     ld   l,[hl]
     ld   h,00
@@ -2972,8 +2972,8 @@ call_02_6f54:
 call_02_6f64:
     call call_00_29f5_ObjectClearCollisionFlagAndCheck
     jr   z,label6F74
-    call call_00_2826_Object_SetXFromDA24
-    call call_00_27e4_Object_SetYPosFromDA26
+    call call_00_2826_Object_ResetToInitialXPos
+    call call_00_27e4_Object_ResetToInitialYPos
     ld   c,$06
     call call_00_290d_ObjectSetTimer1A
 label6F74:

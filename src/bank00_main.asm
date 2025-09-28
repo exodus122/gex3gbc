@@ -66,10 +66,10 @@ call_00_0150_Init:
     ldh  [rSCX], A                                     ;; 00:017f $e0 $43
     ldh  [rSCY], A                                     ;; 00:0181 $e0 $42
     ld   A, $07                                        ;; 00:0183 $3e $07
-    ld   [wDADB], A                                    ;; 00:0185 $ea $db $da
+    ld   [wDADA_WindowX], A                                    ;; 00:0185 $ea $db $da
     ldh  [rWX], A                                      ;; 00:0188 $e0 $4b
     ld   A, $80                                        ;; 00:018a $3e $80
-    ld   [wDADC], A                                    ;; 00:018c $ea $dc $da
+    ld   [wDADC_WindowY], A                                    ;; 00:018c $ea $dc $da
     ldh  [rWY], A                                      ;; 00:018f $e0 $4a
     pop  AF                                            ;; 00:0191 $f1
     cp   A, $11                                        ;; 00:0192 $fe $11
@@ -128,13 +128,13 @@ call_00_0150_Init:
     dec  A                                             ;; 00:01f9 $3d
     bit  7, A                                          ;; 00:01fa $cb $7f
     jr   Z, .jr_00_01e7                                ;; 00:01fc $28 $e9
-    ld   HL, wDAD3                                     ;; 00:01fe $21 $d3 $da
-    ld   DE, wDAC3                                     ;; 00:0201 $11 $c3 $da
+    ld   HL, wDAD3_PtrToBankStackPosition                                     ;; 00:01fe $21 $d3 $da
+    ld   DE, wDAC3_BankStack                                     ;; 00:0201 $11 $c3 $da
     ld   A, $01                                        ;; 00:0204 $3e $01
     ld   [HL], E                                       ;; 00:0206 $73
     inc  HL                                            ;; 00:0207 $23
     ld   [HL], D                                       ;; 00:0208 $72
-    ld   [wDAD5], A                                    ;; 00:0209 $ea $d5 $da
+    ld   [wDAD5_CurrentROMBank], A                                    ;; 00:0209 $ea $d5 $da
     ld   [DE], A                                       ;; 00:020c $12
     call call_00_0f25_AltSwitchBank                                  ;; 00:020d $cd $25 $0f
     ld   HL, rKEY1                                     ;; 00:0210 $21 $4d $ff
@@ -437,13 +437,13 @@ call_00_0513:
     call call_00_0eee_SwitchBank                                  ;; 00:054a $cd $ee $0e
     pop  HL                                            ;; 00:054d $e1
     ld   A, [HL+]                                      ;; 00:054e $2a
-    ld   [wDAC2], A                                    ;; 00:054f $ea $c2 $da
+    ld   [wDAC2_DMATransferLength], A                                    ;; 00:054f $ea $c2 $da
     inc  HL                                            ;; 00:0552 $23
     inc  HL                                            ;; 00:0553 $23
     ld   A, [HL+]                                      ;; 00:0554 $2a
-    ld   [wDAC0], A                                    ;; 00:0555 $ea $c0 $da
+    ld   [wDAC0_GeneralPurposeDMASourceAddressLo], A                                    ;; 00:0555 $ea $c0 $da
     ld   A, [HL+]                                      ;; 00:0558 $2a
-    ld   [wDAC1], A                                    ;; 00:0559 $ea $c1 $da
+    ld   [wDAC1_GeneralPurposeDMASourceAddressHi], A                                    ;; 00:0559 $ea $c1 $da
     call call_00_0f08_RestoreBank                                  ;; 00:055c $cd $08 $0f
     ld   HL, wDB66                                     ;; 00:055f $21 $66 $db
     set  0, [HL]                                       ;; 00:0562 $cb $c6
@@ -604,7 +604,7 @@ label0682:
     ret  
 
 jp_00_0693:
-    ld   HL, wDABE                                     ;; 00:0693 $21 $be $da
+    ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 00:0693 $21 $be $da
     bit  7, [HL]                                       ;; 00:0696 $cb $7e
     jr   NZ, .jr_00_06ba                               ;; 00:0698 $20 $20
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:069a $fa $6c $db
@@ -900,7 +900,7 @@ call_00_0865_LoadFromTextBank1C:
     ldi  a,[hl]
     ld   h,[hl]
     ld   l,a
-    ld   de,wDADC
+    ld   de,wDADC_WindowY
 label087A:
     inc  de
     ld   a,[de]
@@ -1307,13 +1307,13 @@ call_00_0b25_MainGameLoop_UpdateAndRenderFrame:
     call call_00_0e81_LoadPalettesToHardware                                  ;; 00:0b43 $cd $81 $0e
     ld   A, [wDAD8_LCDControlMirror]                                    ;; 00:0b46 $fa $d8 $da
     ldh  [rLCDC], A                                    ;; 00:0b49 $e0 $40
-    ld   A, [wDAD9]                                    ;; 00:0b4b $fa $d9 $da
+    ld   A, [wDAD9_ScrollX]                                    ;; 00:0b4b $fa $d9 $da
     ldh  [rSCX], A                                     ;; 00:0b4e $e0 $43
-    ld   A, [wDADA]                                    ;; 00:0b50 $fa $da $da
+    ld   A, [wDADA_ScrollY]                                    ;; 00:0b50 $fa $da $da
     ldh  [rSCY], A                                     ;; 00:0b53 $e0 $42
-    ld   A, [wDADB]                                    ;; 00:0b55 $fa $db $da
+    ld   A, [wDADA_WindowX]                                    ;; 00:0b55 $fa $db $da
     ldh  [rWX], A                                      ;; 00:0b58 $e0 $4b
-    ld   A, [wDADC]                                    ;; 00:0b5a $fa $dc $da
+    ld   A, [wDADC_WindowY]                                    ;; 00:0b5a $fa $dc $da
     ldh  [rWY], A                                      ;; 00:0b5d $e0 $4a
     ld   HL, wDC71_FrameCounter                                     ;; 00:0b5f $21 $71 $dc
     inc  [HL]                                          ;; 00:0b62 $34
@@ -1321,7 +1321,7 @@ call_00_0b25_MainGameLoop_UpdateAndRenderFrame:
     add  A, $04                                        ;; 00:0b66 $c6 $04
     call call_00_0f25_AltSwitchBank                                  ;; 00:0b68 $cd $25 $0f
     call call_04_4009                                  ;; 00:0b6b $cd $09 $40
-    ld   A, [wDAD5]                                    ;; 00:0b6e $fa $d5 $da
+    ld   A, [wDAD5_CurrentROMBank]                                    ;; 00:0b6e $fa $d5 $da
     call call_00_0f25_AltSwitchBank                                  ;; 00:0b71 $cd $25 $0f
     ld   A, $01                                        ;; 00:0b74 $3e $01
     ld   [wDB6B_InterruptFlag], A                                    ;; 00:0b76 $ea $6b $db
@@ -1543,7 +1543,7 @@ call_00_0c6a_HandlePendingHDMATransfers:
 ; Clears wDB67.
 ; Reads control flags from wDB66.
 ; Depending on bits, it sets up HDMA transfers from different sources:
-; Bit 0 → copy tiles from wDAC0–wDAC2.
+; Bit 0 → copy tiles from wDAC0_GeneralPurposeDMASourceAddressLo–wDAC2_DMATransferLength.
 ; Bit 1 → copy tiles from wDB64–wDB65.
 ; Bit 2 → perform a variable-length transfer using wDC2B–wDC32.
 ; Manages VBK for VRAM bank selection when needed.
@@ -1564,15 +1564,15 @@ call_00_0c6a_HandlePendingHDMATransfers:
 .jr_00_0c84:
     ld   A, [wDABF_GexSpriteBank]                                    ;; 00:0c84 $fa $bf $da
     call call_00_0f25_AltSwitchBank                                  ;; 00:0c87 $cd $25 $0f
-    ld   A, [wDAC1]                                    ;; 00:0c8a $fa $c1 $da
+    ld   A, [wDAC1_GeneralPurposeDMASourceAddressHi]                                    ;; 00:0c8a $fa $c1 $da
     ldh  [rHDMA1], A                                   ;; 00:0c8d $e0 $51
-    ld   A, [wDAC0]                                    ;; 00:0c8f $fa $c0 $da
+    ld   A, [wDAC0_GeneralPurposeDMASourceAddressLo]                                    ;; 00:0c8f $fa $c0 $da
     ldh  [rHDMA2], A                                   ;; 00:0c92 $e0 $52
     ld   A, $80                                        ;; 00:0c94 $3e $80
     ldh  [rHDMA3], A                                   ;; 00:0c96 $e0 $53
     xor  A, A                                          ;; 00:0c98 $af
     ldh  [rHDMA4], A                                   ;; 00:0c99 $e0 $54
-    ld   A, [wDAC2]                                    ;; 00:0c9b $fa $c2 $da
+    ld   A, [wDAC2_DMATransferLength]                                    ;; 00:0c9b $fa $c2 $da
     add  A, A                                          ;; 00:0c9e $87
     sub  A, $01                                        ;; 00:0c9f $d6 $01
     ldh  [rHDMA5], A                                   ;; 00:0ca1 $e0 $55
@@ -1865,15 +1865,15 @@ call_00_0e3b_ClearGameStateVariables:
     jp   call_00_0b92_WaitForInterrupt                                  ;; 00:0e5f $c3 $92 $0b
 
 call_00_0e62_ResetFlagsAndVRAMState:
-; Purpose: Resets some RAM variables (wDD6A, wDAD9, wDADA) and clears a chunk of RAM (wD900 to wD99F).
+; Purpose: Resets some RAM variables (wDD6A, wDAD9_ScrollX, wDADA_ScrollY) and clears a chunk of RAM (wD900 to wD99F).
 ; Then: Waits for interrupts at key points.
 ; Use Case: VRAM/object state reset before loading new assets or scenes.
     xor  A, A                                          ;; 00:0e62 $af
     ld   [wDD6A], A                                    ;; 00:0e63 $ea $6a $dd
     call call_00_0b92_WaitForInterrupt                                  ;; 00:0e66 $cd $92 $0b
     xor  A, A                                          ;; 00:0e69 $af
-    ld   [wDAD9], A                                    ;; 00:0e6a $ea $d9 $da
-    ld   [wDADA], A                                    ;; 00:0e6d $ea $da $da
+    ld   [wDAD9_ScrollX], A                                    ;; 00:0e6a $ea $d9 $da
+    ld   [wDADA_ScrollY], A                                    ;; 00:0e6d $ea $da $da
     ld   HL, wD900                                     ;; 00:0e70 $21 $00 $d9
     ld   DE, wD901                                     ;; 00:0e73 $11 $01 $d9
     ld   BC, $9f                                       ;; 00:0e76 $01 $9f $00
@@ -1960,9 +1960,9 @@ call_00_0edd_FarCall:
     ret                                                ;; 00:0eed $c9
 
 call_00_0eee_SwitchBank:
-; Core bank-switch: stores new bank in wDAD5 and MBC1RomBank, 
-; updates bookkeeping pointers (wDAD3), sets SRAM bank.
-    ld   HL, wDAD3                                     ;; 00:0eee $21 $d3 $da
+; Core bank-switch: stores new bank in wDAD5_CurrentROMBank and MBC1RomBank, 
+; updates bookkeeping pointers (wDAD3_PtrToBankStackPosition), sets SRAM bank.
+    ld   HL, wDAD3_PtrToBankStackPosition                                     ;; 00:0eee $21 $d3 $da
     ld   E, [HL]                                       ;; 00:0ef1 $5e
     inc  HL                                            ;; 00:0ef2 $23
     ld   D, [HL]                                       ;; 00:0ef3 $56
@@ -1971,7 +1971,7 @@ call_00_0eee_SwitchBank:
     ld   [HL], D                                       ;; 00:0ef6 $72
     dec  HL                                            ;; 00:0ef7 $2b
     ld   [HL], E                                       ;; 00:0ef8 $73
-    ld   [wDAD5], A                                    ;; 00:0ef9 $ea $d5 $da
+    ld   [wDAD5_CurrentROMBank], A                                    ;; 00:0ef9 $ea $d5 $da
     ld   [MBC1RomBank], A                                    ;; 00:0efc $ea $01 $20
     swap A                                             ;; 00:0eff $cb $37
     rrca                                               ;; 00:0f01 $0f
@@ -1981,8 +1981,8 @@ call_00_0eee_SwitchBank:
 
 call_00_0f08_RestoreBank:
 ; Restores the previously saved ROM bank by reading from 
-; wDAD3 bookkeeping pointers and writing to MBC1RomBank.
-    ld   HL, wDAD3                                     ;; 00:0f08 $21 $d3 $da
+; wDAD3_PtrToBankStackPosition bookkeeping pointers and writing to MBC1RomBank.
+    ld   HL, wDAD3_PtrToBankStackPosition                                     ;; 00:0f08 $21 $d3 $da
     ld   E, [HL]                                       ;; 00:0f0b $5e
     inc  HL                                            ;; 00:0f0c $23
     ld   D, [HL]                                       ;; 00:0f0d $56
@@ -1991,7 +1991,7 @@ call_00_0f08_RestoreBank:
     ld   [HL], D                                       ;; 00:0f10 $72
     dec  HL                                            ;; 00:0f11 $2b
     ld   [HL], E                                       ;; 00:0f12 $73
-    ld   [wDAD5], A                                    ;; 00:0f13 $ea $d5 $da
+    ld   [wDAD5_CurrentROMBank], A                                    ;; 00:0f13 $ea $d5 $da
     ld   [MBC1RomBank], A                                    ;; 00:0f16 $ea $01 $20
     swap A                                             ;; 00:0f19 $cb $37
     rrca                                               ;; 00:0f1b $0f

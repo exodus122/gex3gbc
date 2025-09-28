@@ -1,11 +1,11 @@
 entry_02_708f_InitObjectsAndSpawnPlayer:
 ; Purpose: Initializes core object-related state when entering a level or respawning the player.
 ; Details:
-; Clears many object/flag variables (wDC84–wDC8F, wDABD–wDABE, etc.).
+; Clears many object/flag variables (wDC84–wDC8F, wDABD_UnkBGCollisionFlags–wDABE_UnkBGCollisionFlags2, etc.).
 ; If a pending object ID exists in wDC78, spawns it using call_02_72ac_SetupNewAction.
 ; Resets player-facing direction and flags, calls entry_02_7123_ClearObjectSlotsExcludingPlayer to clear object slots, 
 ; and spawns required relative objects.
-; Loops through call_00_360c_SpawnObjectOnceImmediate until the player object (wDAB8 == 1) is spawned.
+; Loops through call_00_360c_SpawnObjectOnceImmediate until the player object (wDAB8_ObjectCounter == 1) is spawned.
     xor  A, A                                          ;; 02:708f $af
     ld   [wDB6A], A                                    ;; 02:7090 $ea $6a $db
     ld   A, [wDC78]                                    ;; 02:7093 $fa $78 $dc
@@ -36,8 +36,8 @@ entry_02_708f_InitObjectsAndSpawnPlayer:
     xor  A, A                                          ;; 02:70d1 $af
     ld   [wDC85], A                                    ;; 02:70d2 $ea $85 $dc
     ld   [wDC84], A                                    ;; 02:70d5 $ea $84 $dc
-    ld   [wDABE], A                                    ;; 02:70d8 $ea $be $da
-    ld   [wDABD], A                                    ;; 02:70db $ea $bd $da
+    ld   [wDABE_UnkBGCollisionFlags2], A                                    ;; 02:70d8 $ea $be $da
+    ld   [wDABD_UnkBGCollisionFlags], A                                    ;; 02:70db $ea $bd $da
     ld   A, $ff                                        ;; 02:70de $3e $ff
     ld   [wDC79], A                                    ;; 02:70e0 $ea $79 $dc
     xor  A, A                                          ;; 02:70e3 $af
@@ -62,7 +62,7 @@ entry_02_708f_InitObjectsAndSpawnPlayer:
     call call_00_3252_ResetObjectCounter                                  ;; 02:7115 $cd $52 $32
 .jr_02_7118:
     call call_00_360c_SpawnObjectOnceImmediate                                  ;; 02:7118 $cd $0c $36
-    ld   A, [wDAB8]                                    ;; 02:711b $fa $b8 $da
+    ld   A, [wDAB8_ObjectCounter]                                    ;; 02:711b $fa $b8 $da
     cp   A, $01                                        ;; 02:711e $fe $01
     jr   NZ, .jr_02_7118                               ;; 02:7120 $20 $f6
     ret                                                ;; 02:7122 $c9
@@ -83,11 +83,12 @@ call_02_7123_ClearObjectSlotsExcludingPlayer:
     ret                                                ;; 02:7131 $c9
 
 entry_02_7132_BackupObjectTable:
-; Purpose: Copies all current object table entries from working memory (wD800) to a backup buffer (wDA09).
+; Purpose: Copies all current object table entries from working memory (wD800) to a backup buffer 
+; (wDA09_LoadedObjectIdsBackupBuffer).
 ; Details:
 ; Iterates through object slots in steps of $20, copying each byte until wrap-around.
     ld   HL, wD800_PlayerObject_Id                                     ;; 02:7132 $21 $00 $d8
-    ld   DE, wDA09                                     ;; 02:7135 $11 $09 $da
+    ld   DE, wDA09_LoadedObjectIdsBackupBuffer                                     ;; 02:7135 $11 $09 $da
 .jr_02_7138:
     ld   A, [HL]                                       ;; 02:7138 $7e
     ld   [DE], A                                       ;; 02:7139 $12
@@ -101,9 +102,9 @@ entry_02_7132_BackupObjectTable:
 entry_02_7142_RestoreObjectTable:
 ; Purpose: Restores object table entries from the backup buffer back to working memory.
 ; Details:
-; Reverse of BackupObjectTable, writing from wDA09 back to wD800.
+; Reverse of BackupObjectTable, writing from wDA09_LoadedObjectIdsBackupBuffer back to wD800.
     ld   HL, wD800_PlayerObject_Id                                     ;; 02:7142 $21 $00 $d8
-    ld   DE, wDA09                                     ;; 02:7145 $11 $09 $da
+    ld   DE, wDA09_LoadedObjectIdsBackupBuffer                                     ;; 02:7145 $11 $09 $da
 .jr_02_7148:
     ld   A, [DE]                                       ;; 02:7148 $1a
     ld   [HL], A                                       ;; 02:7149 $77
@@ -427,13 +428,13 @@ call_02_72fb_UpdateMapWindow:
 call_02_7305_CheckVerticalMapScroll:
 ; Purpose: Compares current Y-position against previous to determine vertical scrolling needs.
 ; Details:
-; Stores the fine Y-position (wDADA).
+; Stores the fine Y-position (wDADA_ScrollY).
 ; Shifts and subtracts to compute movement delta.
 ; Sets flags in wDC20 for upward or downward scroll events.
     ld   HL, wDBFB_YPositionInMapLo                                     ;; 02:7305 $21 $fb $db
     ld   A, [HL+]                                      ;; 02:7308 $2a
     ld   D, [HL]                                       ;; 02:7309 $56
-    ld   [wDADA], A                                    ;; 02:730a $ea $da $da
+    ld   [wDADA_ScrollY], A                                    ;; 02:730a $ea $da $da
     srl  D                                             ;; 02:730d $cb $3a
     rra                                                ;; 02:730f $1f
     srl  D                                             ;; 02:7310 $cb $3a
@@ -474,7 +475,7 @@ call_02_7337_CheckHorizontalMapScroll:
     ld   HL, wDBF9_XPositionInMapLo                                     ;; 02:7337 $21 $f9 $db
     ld   A, [HL+]                                      ;; 02:733a $2a
     ld   D, [HL]                                       ;; 02:733b $56
-    ld   [wDAD9], A                                    ;; 02:733c $ea $d9 $da
+    ld   [wDAD9_ScrollX], A                                    ;; 02:733c $ea $d9 $da
     srl  D                                             ;; 02:733f $cb $3a
     rra                                                ;; 02:7341 $1f
     srl  D                                             ;; 02:7342 $cb $3a

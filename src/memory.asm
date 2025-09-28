@@ -49,7 +49,12 @@ wD578:
     ds 1                                               ;; d578
 
 wD579:
-    ds 647                                             ;; d579
+    ds 391                                             ;; d579
+
+; D700:
+; This is the "object flags" section. Each byte stores the current flags 
+; for each object in the object list for the level
+    ds 256
 
 ; From D800 to D900 is the loaded objects space
 ; There are 8 instances of 0x20 bytes each. 
@@ -107,13 +112,13 @@ wD9FE:
 wD9FF:
     ds 1                                               ;; d9ff
 
-; DA00 through DA13 stores temporary information about the currently updating object
+; DA00 through DA13 stores temporary information about the currently updating object, or used by that object
 wDA00_CurrentObjectAddrLo:
 ; if the object instance starts at $D8E0, this value is E0, for example
     ds 1                                               ;; da00
-wDA01:
+wDA01_ObjectPairRelated:
     ds 8                                               ;; da01
-wDA09:
+wDA09_LoadedObjectIdsBackupBuffer:
     ds 8                                               ;; da09
 wDA11_ObjectXDistFromPlayer:
 ; The distance between the player and the current object
@@ -145,16 +150,16 @@ wDA1A_CameraBottomLo:
 wDA1B_CameraBottomHi:
     ds 1                                               ;; da1b
 
-; DA1C through DA9B is extra object memory (8 instances of size 0x10)
-; the first 8 bytes are a copy from the object spawn data
+; DA1C through DA9B is memory storing constants for each loaded object (8 instances of size 0x10)
+; 12 bytes are copied from the object spawn data, but in a different order
 ; 0x0 wDA1C_ObjectBoundingBoxXMax
 ; 0x2 wDA1E_ObjectBoundingBoxXMin
 ; 0x4 wDA20_ObjectBoundingBoxYMin
 ; 0x6 wDA22_ObjectBoundingBoxYMax
-; 0x8 (wDA24) - ?
-; 0xA (wDA26) - ?
-; 0xC (wDA28) - unused
-; 0xE (wDA2A) - unused
+; 0x8 wDA24_ObjectInitialXPos
+; 0xA wDA26_ObjectInitialYPos
+; 0xC DA28 - unused
+; 0xE DA2A - unused
 wDA1C_ObjectBoundingBoxXMax:
     ds 2                                               ;; da1c
 wDA1E_ObjectBoundingBoxXMin:
@@ -163,12 +168,12 @@ wDA20_ObjectBoundingBoxYMin:
     ds 2                                               ;; da20
 wDA22_ObjectBoundingBoxYMax:
     ds 2                                               ;; da22
-wDA24:
+wDA24_ObjectInitialXPos:
     ds 2                                               ;; da24
-wDA26:
+wDA26_ObjectInitialYPos:
     ds 2
-
     ds 4
+
     ds 16                                            ;; da26
     ds 16
     ds 16
@@ -190,55 +195,46 @@ wDAAD_CameraYHi:
 
 wDAAE_ObjectPaletteIds:
     ds 8                                               ;; daae
-
 wDAB6_SpriteFlags:
     ds 1                                               ;; dab6
-
 wDAB7_ParticleVelocity:
     ds 1                                               ;; dab7
-
-wDAB8:
+wDAB8_ObjectCounter:
+; this starts at 1 and goes up by 1 for each object in the object list for this level
     ds 1                                               ;; dab8
-
-wDAB9:
+wDAB9_NextAvailableObjectSlot:
+; starts at 7 if no objects are currently loaded, then goes to 6 if one is, and so on
     ds 1                                               ;; dab9
-
-wDABA:
+wDABA_ObjectCounterRelated:
     ds 1                                               ;; daba
-
-wDABB:
+wDABB_CurrentObjectId:
     ds 1                                               ;; dabb
-
-wDABC:
+wDABC_CurrentObjectFlags:
+; from table at $D700(-$D7FF?)
+; default value is $80 on initialization
     ds 1                                               ;; dabc
 
-wDABD:
+wDABD_UnkBGCollisionFlags:
     ds 1                                               ;; dabd
-
-wDABE:
+wDABE_UnkBGCollisionFlags2:
     ds 1                                               ;; dabe
 
 wDABF_GexSpriteBank:
     ds 1                                               ;; dabf
 
-wDAC0:
+wDAC0_GeneralPurposeDMASourceAddressLo:
     ds 1                                               ;; dac0
-
-wDAC1:
+wDAC1_GeneralPurposeDMASourceAddressHi:
     ds 1                                               ;; dac1
-
-wDAC2:
+wDAC2_DMATransferLength:
     ds 1                                               ;; dac2
 
-wDAC3:
+wDAC3_BankStack:
     ds 16                                              ;; dac3
-
-wDAD3:
+wDAD3_PtrToBankStackPosition:
     ds 2                                               ;; dad3
-
-wDAD5:
+wDAD5_CurrentROMBank:
     ds 1                                               ;; dad5
-
 wDAD6_ReturnBank:
     ds 1                                               ;; dad6
 
@@ -247,20 +243,16 @@ wDAD7_CurrentInputs:
 
 wDAD8_LCDControlMirror:
     ds 1                                               ;; dad8
-
-wDAD9:
+wDAD9_ScrollX:
     ds 1                                               ;; dad9
-
-wDADA:
+wDADA_ScrollY:
     ds 1                                               ;; dada
-
-wDADB:
+wDADA_WindowX:
     ds 1                                               ;; dadb
-
-wDADC:
+wDADC_WindowY:
     ds 1                                               ;; dadc
 
-wDADD: ; text buffer
+wDADD: ; menu related
     ds 1                                               ;; dadd
 
 wDADE:
@@ -272,7 +264,7 @@ wDADF:
 wDAE0:
     ds 1                                               ;; dae0
 
-wDAE1:
+wDAE1_TextBuffer:
     ds 128                                             ;; dae1
 
 wDB61:

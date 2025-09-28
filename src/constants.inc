@@ -183,7 +183,7 @@ DEF Object_HolidayTV_SkatingElf                        EQU $20
 DEF Object_HolidayTV_Penguin                           EQU $21
 DEF Object_MysteryTV_Rezling                           EQU $22
 DEF Object_MysteryTV_BloodCooler                       EQU $23
-DEF Object_MysteryTV_Fish                         EQU $24
+DEF Object_MysteryTV_Fish                              EQU $24
 DEF Object_MysteryTV_MagicSword                        EQU $25
 DEF Object_MysteryTV_SafariSam                         EQU $26
 DEF Object_MysteryTV_SafariSamProjectile               EQU $27
@@ -223,7 +223,7 @@ DEF Object_AnimeChannel_BlueBeamBarrier                EQU $48
 DEF Object_AnimeChannel_RisingPlatform                 EQU $49
 DEF Object_AnimeChannel_OnSwitch                       EQU $4A
 DEF Object_AnimeChannel_OffSwitch                      EQU $4B
-DEF Object_AnimeChannel_SailorToonGirl                       EQU $4C
+DEF Object_AnimeChannel_SailorToonGirl                 EQU $4C
 DEF Object_AnimeChannel_BigSilverRobot                 EQU $4D
 DEF Object_AnimeChannel_SmallBlueRobot                 EQU $4E
 DEF Object_AnimeChannel_TankPlane                      EQU $4F

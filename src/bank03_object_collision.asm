@@ -749,7 +749,7 @@ call_03_50f4_Collision_SlotIncrementTransform:
     
 call_03_5116_Collision_ConditionalTransform_Sound18or1B:
 ; For action 00 only.
-; On collision: requires certain global flags (wDABE, wDC81_CurrentInputs) and player action between 01–02.
+; On collision: requires certain global flags (wDABE_UnkBGCollisionFlags2, wDC81_CurrentInputs) and player action between 01–02.
 ; Checks object slot flag; plays sound 1B if not set, else sound 18.
 ; Loads new object data (bank 1).
     call call_00_2962_ObjectGetActionId
@@ -757,7 +757,7 @@ call_03_5116_Collision_ConditionalTransform_Sound18or1B:
     ret  nz
     call call_03_550e_CheckPlayerObjectInteraction
     ret  nc
-    ld   hl,wDABE
+    ld   hl,wDABE_UnkBGCollisionFlags2
     bit  7,[hl]
     ret  z
     ld   hl,wDC81_CurrentInputs
@@ -788,7 +788,7 @@ call_03_5156_Collision_ConditionalTransform_Bank3:
     ret  nz
     call call_03_550e_CheckPlayerObjectInteraction
     ret  nc
-    ld   hl,wDABE
+    ld   hl,wDABE_UnkBGCollisionFlags2
     bit  7,[hl]
     ret  z
     ld   hl,wDC81_CurrentInputs

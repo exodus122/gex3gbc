@@ -196,15 +196,15 @@ call_02_4ee7_MapCollisionFlags:
     db   $60, $07, $a0, $05, $50, $01, $90, $03
 
 call_02_4f11_ChooseNextActionBasedOnLevel:
-; Reads two state flags (wDABD and wDABE) and ORs them together. 
+; Reads two state flags (wDABD_UnkBGCollisionFlags and wDABE_UnkBGCollisionFlags2) and ORs them together. 
 ; If bit 7 is set (likely “player busy/disabled”), it returns immediately. 
 ; Otherwise, it checks the current level ID (wDB6C_CurrentMapId) to pick an action ID:
 ; If level is 07h → $28.
 ; If level is 08h → $35.
 ; Otherwise → $11.
 ; It then jumps to call_02_54f9_SwitchPlayerAction to switch the player's action/animation.
-    ld   A, [wDABD]                                    ;; 02:4f11 $fa $bd $da
-    ld   HL, wDABE                                     ;; 02:4f14 $21 $be $da
+    ld   A, [wDABD_UnkBGCollisionFlags]                                    ;; 02:4f11 $fa $bd $da
+    ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 02:4f14 $21 $be $da
     or   A, [HL]                                       ;; 02:4f17 $b6
     bit  7, A                                          ;; 02:4f18 $cb $7f
     ret  NZ                                            ;; 02:4f1a $c0
@@ -561,7 +561,7 @@ call_02_5100_Player_HorizontalMovementHandler:
     add  A, [HL]                                       ;; 02:516c $86
     ret  Z                                             ;; 02:516d $c8
     push AF                                            ;; 02:516e $f5
-    ld   A, [wDABE]                                    ;; 02:516f $fa $be $da
+    ld   A, [wDABE_UnkBGCollisionFlags2]                                    ;; 02:516f $fa $be $da
     and  A, $0f                                        ;; 02:5172 $e6 $0f
     jr   Z, .jr_02_517e                                ;; 02:5174 $28 $08
     cpl                                                ;; 02:5176 $2f
@@ -818,13 +818,13 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     dec  B                                             ;; 02:52af $05
     jp   call_02_53e7_ApplyVerticalMovementAndClamp                                  ;; 02:52b0 $c3 $e7 $53
 .jr_02_52b3:
-    ld   A, [wDABE]                                    ;; 02:52b3 $fa $be $da
+    ld   A, [wDABE_UnkBGCollisionFlags2]                                    ;; 02:52b3 $fa $be $da
     and  A, $80                                        ;; 02:52b6 $e6 $80
     jr   Z, .jr_02_52cf                                ;; 02:52b8 $28 $15
     ld   A, [wDC8D]                                    ;; 02:52ba $fa $8d $dc
     and  A, A                                          ;; 02:52bd $a7
     jr   Z, .jr_02_52f8                                ;; 02:52be $28 $38
-    ld   HL, wDABD                                     ;; 02:52c0 $21 $bd $da
+    ld   HL, wDABD_UnkBGCollisionFlags                                     ;; 02:52c0 $21 $bd $da
     bit  7, [HL]                                       ;; 02:52c3 $cb $7e
     jr   NZ, .jr_02_529b                               ;; 02:52c5 $20 $d4
     ld   HL, wDC8C                                     ;; 02:52c7 $21 $8c $dc
@@ -832,7 +832,7 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     jr   NC, .jr_02_529b                               ;; 02:52cb $30 $ce
     jr   .jp_02_5283                                   ;; 02:52cd $18 $b4
 .jr_02_52cf:
-    ld   A, [wDABD]                                    ;; 02:52cf $fa $bd $da
+    ld   A, [wDABD_UnkBGCollisionFlags]                                    ;; 02:52cf $fa $bd $da
     and  A, $80                                        ;; 02:52d2 $e6 $80
     jr   NZ, .jr_02_52de                               ;; 02:52d4 $20 $08
     ld   A, [wDC8F]                                    ;; 02:52d6 $fa $8f $dc

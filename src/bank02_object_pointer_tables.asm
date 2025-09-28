@@ -485,12 +485,12 @@ data_02_4000:
     dw   call_02_6617_ObjectAction_OffSwitch_Unk0, data_02_7ada
     dw   call_02_6633_ObjectAction_OffSwitch_Unk1, data_02_7ae0
 .data_02_45a8:
-    dw   call_02_6641_ObjectAction_PinkGirl_Unk0, data_02_7ae6
+    dw   call_02_6641_ObjectAction_SailorToonGirl_Unk0, data_02_7ae6
     dw   call_02_582e_ObjectAction_None, data_02_7aef
-    dw   call_02_6687_ObjectAction_PinkGirl_Unk2, data_02_7afb
-    dw   call_02_668d_ObjectAction_PinkGirl_Unk3, data_02_7b07
+    dw   call_02_6687_ObjectAction_SailorToonGirl_Unk2, data_02_7afb
+    dw   call_02_668d_ObjectAction_SailorToonGirl_Unk3, data_02_7b07
     dw   call_02_582e_ObjectAction_None, data_02_7b0d
-    dw   call_02_669d_ObjectAction_PinkGirl_Unk5, data_02_7b14
+    dw   call_02_669d_ObjectAction_SailorToonGirl_Unk5, data_02_7b14
     dw   call_02_582e_ObjectAction_None, data_02_7b1c
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_45c8:

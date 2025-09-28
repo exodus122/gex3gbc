@@ -1,3 +1,139 @@
+call_00_21ef_PlaySound_1E:
+; Pushes BC (preserve), loads A=1E, calls QueueSoundEffectWithPriority, restores BC.
+; Just plays a fixed sound effect.
+    push BC                                            ;; 00:21ef $c5
+    ld   A, $1e                                        ;; 00:21f0 $3e $1e
+    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 00:21f2 $cd $f5 $0f
+    pop  BC                                            ;; 00:21f5 $c1
+
+call_00_21f6_FindAndMarkObjectInList_TVButton:
+; Switches to the bank containing the object list (wDC16_ObjectListBank).
+; Reads the start of the object list (wDC17_ObjectListBankOffset).
+; Iterates through 16-byte object records, searching for objects of type $11 (Object_TVButton)
+; whose parameter matches C.
+; When found, it updates a D7xx structure at index B:
+; Sets a nibble/flag ([DE] = ([DE] & $F0) | value).
+; Uses a small table (db $00,$01,$02,$04 at $225C) and level mask (wDC1E_CurrentLevelNumber) 
+; to decide which flag (1 or 2) to apply.
+; Exits by restoring the previous bank. 
+; Usage:
+; Marks specific objects (e.g., collectibles, triggers, or doors) as “active” or “visited” 
+; for the current level. This is typical of collectible or progression flags.
+    push BC                                            ;; 00:21f6 $c5
+    ld   A, [wDC16_ObjectListBank]                                    ;; 00:21f7 $fa $16 $dc
+    call call_00_0eee_SwitchBank                                  ;; 00:21fa $cd $ee $0e
+    pop  BC                                            ;; 00:21fd $c1
+    ld   HL, wDC17_ObjectListBankOffset                                     ;; 00:21fe $21 $17 $dc
+    ld   A, [HL+]                                      ;; 00:2201 $2a
+    ld   H, [HL]                                       ;; 00:2202 $66
+    ld   L, A                                          ;; 00:2203 $6f
+    ld   A, [HL]                                       ;; 00:2204 $7e
+    cp   A, $ff                                        ;; 00:2205 $fe $ff
+    jp   Z, call_00_0f08_RestoreBank                               ;; 00:2207 $ca $08 $0f
+    ld   B, $01                                        ;; 00:220a $06 $01
+.jr_00_220c:
+    push HL                                            ;; 00:220c $e5
+    ld   A, [HL]                                       ;; 00:220d $7e
+    cp   A, Object_TVButton                                        ;; 00:220e $fe $11
+    jr   NZ, .jr_00_221a                               ;; 00:2210 $20 $08
+    ld   DE, $0d                                       ;; 00:2212 $11 $0d $00
+    add  HL, DE                                        ;; 00:2215 $19
+    ld   A, [HL]                                       ;; 00:2216 $7e
+    cp   A, C                                          ;; 00:2217 $b9
+    jr   Z, .jr_00_2228                                ;; 00:2218 $28 $0e
+.jr_00_221a:
+    inc  B                                             ;; 00:221a $04
+    pop  HL                                            ;; 00:221b $e1
+    ld   DE, $10                                       ;; 00:221c $11 $10 $00
+    add  HL, DE                                        ;; 00:221f $19
+    ld   A, [HL]                                       ;; 00:2220 $7e
+    cp   A, $ff                                        ;; 00:2221 $fe $ff
+    jr   NZ, .jr_00_220c                               ;; 00:2223 $20 $e7
+    jp   call_00_0f08_RestoreBank                                  ;; 00:2225 $c3 $08 $0f
+.jr_00_2228:
+    pop  HL                                            ;; 00:2228 $e1
+    ld   E, B                                          ;; 00:2229 $58
+    ld   D, $d7                                        ;; 00:222a $16 $d7
+    ld   A, [DE]                                       ;; 00:222c $1a
+    and  A, $f0                                        ;; 00:222d $e6 $f0
+    or   A, $01                                        ;; 00:222f $f6 $01
+    ld   [DE], A                                       ;; 00:2231 $12
+    inc  E                                             ;; 00:2232 $1c
+    ld   L, C                                          ;; 00:2233 $69
+    ld   H, $00                                        ;; 00:2234 $26 $00
+    ld   BC, $225c                                     ;; 00:2236 $01 $5c $22
+    add  HL, BC                                        ;; 00:2239 $09
+    ld   A, [HL]                                       ;; 00:223a $7e
+    push AF                                            ;; 00:223b $f5
+    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:223c $21 $1e $dc
+    ld   L, [HL]                                       ;; 00:223f $6e
+    ld   H, $00                                        ;; 00:2240 $26 $00
+    ld   BC, wDC5C                                     ;; 00:2242 $01 $5c $dc
+    add  HL, BC                                        ;; 00:2245 $09
+    pop  AF                                            ;; 00:2246 $f1
+    ld   C, $01                                        ;; 00:2247 $0e $01
+    and  A, [HL]                                       ;; 00:2249 $a6
+    jr   Z, .jr_00_2254                                ;; 00:224a $28 $08
+    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:224c $fa $1e $dc
+    and  A, A                                          ;; 00:224f $a7
+    jr   Z, .jr_00_2254                                ;; 00:2250 $28 $02
+    ld   C, $02                                        ;; 00:2252 $0e $02
+.jr_00_2254:
+    ld   A, [DE]                                       ;; 00:2254 $1a
+    and  A, $f0                                        ;; 00:2255 $e6 $f0
+    or   A, C                                          ;; 00:2257 $b1
+    ld   [DE], A                                       ;; 00:2258 $12
+    jp   call_00_0f08_RestoreBank                                  ;; 00:2259 $c3 $08 $0f
+    db   $00, $01, $02, $04                            ;; 00:225c ?...
+
+call_00_2260_FindAndFlagObject_TVRemote:
+; Switches to the object list bank and scans through object entries starting 
+; from wDC17_ObjectListBankOffset.
+; For each entry, checks if the type byte is $12 (Object_TVRemote). If found, jumps 13 bytes 
+; forward and compares that value to C.
+; When a match is found, modifies a status nibble in the object’s status table ($D7xx) 
+; to set bits $04 while preserving upper bits.
+; If no match is found and a $FF terminator is reached, exits by restoring the bank.
+; Purpose: Search for an object of type $12 linked to a particular identifier C and 
+; flag it as active/triggered.
+    push BC                                            ;; 00:2260 $c5
+    ld   A, [wDC16_ObjectListBank]                                    ;; 00:2261 $fa $16 $dc
+    call call_00_0eee_SwitchBank                                  ;; 00:2264 $cd $ee $0e
+    pop  BC                                            ;; 00:2267 $c1
+    ld   HL, wDC17_ObjectListBankOffset                                     ;; 00:2268 $21 $17 $dc
+    ld   A, [HL+]                                      ;; 00:226b $2a
+    ld   H, [HL]                                       ;; 00:226c $66
+    ld   L, A                                          ;; 00:226d $6f
+    ld   B, $01                                        ;; 00:226e $06 $01
+.jr_00_2270:
+    push HL                                            ;; 00:2270 $e5
+    ld   A, [HL]                                       ;; 00:2271 $7e
+    cp   A, Object_TVRemote                                        ;; 00:2272 $fe $12
+    jr   NZ, .jr_00_227e                               ;; 00:2274 $20 $08
+    ld   DE, $0d                                       ;; 00:2276 $11 $0d $00
+    add  HL, DE                                        ;; 00:2279 $19
+    ld   A, [HL]                                       ;; 00:227a $7e
+    cp   A, C                                          ;; 00:227b $b9
+    jr   Z, .jr_00_228c                                ;; 00:227c $28 $0e
+.jr_00_227e:
+    inc  B                                             ;; 00:227e $04
+    pop  HL                                            ;; 00:227f $e1
+    ld   DE, $10                                       ;; 00:2280 $11 $10 $00
+    add  HL, DE                                        ;; 00:2283 $19
+    ld   A, [HL]                                       ;; 00:2284 $7e
+    cp   A, $ff                                        ;; 00:2285 $fe $ff
+    jr   NZ, .jr_00_2270                               ;; 00:2287 $20 $e7
+    jp   call_00_0f08_RestoreBank                                  ;; 00:2289 $c3 $08 $0f
+.jr_00_228c:
+    pop  HL                                            ;; 00:228c $e1
+    ld   E, B                                          ;; 00:228d $58
+    ld   D, $d7                                        ;; 00:228e $16 $d7
+    ld   A, [DE]                                       ;; 00:2290 $1a
+    and  A, $f0                                        ;; 00:2291 $e6 $f0
+    or   A, $04                                        ;; 00:2293 $f6 $04
+    ld   [DE], A                                       ;; 00:2295 $12
+    jp   call_00_0f08_RestoreBank                                  ;; 00:2296 $c3 $08 $0f
+
 call_00_2299_SetObjectStatusLowNibble:
 ; Uses the current object’s ID (wDA00_CurrentObjectAddrLo) to compute a pointer 
 ; into $D7xx status table.
@@ -10,7 +146,7 @@ call_00_2299_SetObjectStatusLowNibble:
     and  A, $07                                        ;; 00:229f $e6 $07
     ld   L, A                                          ;; 00:22a1 $6f
     ld   H, $00                                        ;; 00:22a2 $26 $00
-    ld   DE, wDA01                                     ;; 00:22a4 $11 $01 $da
+    ld   DE, wDA01_ObjectPairRelated                                     ;; 00:22a4 $11 $01 $da
     add  HL, DE                                        ;; 00:22a7 $19
     ld   L, [HL]                                       ;; 00:22a8 $6e
     ld   H, $d7                                        ;; 00:22a9 $26 $d7
@@ -34,7 +170,7 @@ call_00_22b1_HandleObjectStateChange:
     and  A, $07                                        ;; 00:22b7 $e6 $07
     ld   L, A                                          ;; 00:22b9 $6f
     ld   H, $00                                        ;; 00:22ba $26 $00
-    ld   DE, wDA01                                     ;; 00:22bc $11 $01 $da
+    ld   DE, wDA01_ObjectPairRelated                                     ;; 00:22bc $11 $01 $da
     add  HL, DE                                        ;; 00:22bf $19
     ld   L, [HL]                                       ;; 00:22c0 $6e
     ld   H, $d7                                        ;; 00:22c1 $26 $d7
@@ -120,7 +256,7 @@ call_00_230f_ResolveObjectListIndex:
     and  A, $07                                        ;; 00:2321 $e6 $07
     ld   L, A                                          ;; 00:2323 $6f
     ld   H, $00                                        ;; 00:2324 $26 $00
-    ld   DE, wDA01                                     ;; 00:2326 $11 $01 $da
+    ld   DE, wDA01_ObjectPairRelated                                     ;; 00:2326 $11 $01 $da
     add  HL, DE                                        ;; 00:2329 $19
     ld   L, [HL]                                       ;; 00:232a $6e
     dec  L                                             ;; 00:232b $2d
@@ -144,7 +280,7 @@ call_00_233e_UpdateObjectMotionFromVectorTable:
 ; Uses the counters to pick a two-byte vector from .data_00_23B4_Velocities (a table of X/Y velocities).
 ; Depending on the counter value, inverts and reorders components to get (e,c) velocity pair.
 ; Converts those velocities into signed words (d,b) and (e,c).
-; Calls 2835_Object_GetVector_DA24 and 27F3_Object_GetVector_DA26 to adjust positions.
+; Calls call_00_2835_Object_GetInitialXPos and call_00_27F3_Object_GetInitialYPos to adjust positions.
 ; Stores the computed 4-byte vector back into the object’s data block at $0E.
 ; Purpose: Generate and apply a predefined movement pattern (probably a curve or wave) over time to move an object.
     ld   h,$D8
@@ -209,7 +345,7 @@ call_00_233e_UpdateObjectMotionFromVectorTable:
     adc  a,$00
     ld   d,a
     push de
-    call call_00_2835_Object_GetVector_DA24
+    call call_00_2835_Object_GetInitialXPos
     pop  hl
     add  hl,de
     push hl
@@ -219,7 +355,7 @@ call_00_233e_UpdateObjectMotionFromVectorTable:
     adc  a,$00
     ld   b,a
     push bc
-    call call_00_27f3_Object_GetVector_DA26
+    call call_00_27f3_Object_GetInitialYPos
     pop  hl
     add  hl,de
     push hl
@@ -364,7 +500,7 @@ label248A:
     ld   a,[hl]
     adc  b
     ld   [hl],a
-    call call_00_27f3_Object_GetVector_DA26
+    call call_00_27f3_Object_GetInitialYPos
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YPOS_OFFSET
@@ -942,7 +1078,7 @@ call_00_2766_Object_UpdateXPositionFromVector:
 ; Uses GetDA26 (probably retrieves the object’s movement vector), compares it to the 
 ; player’s relative position. If the player is not in front, writes a new object 
 ; position (E,D) into the object’s slot and clears a state flag.
-    call call_00_27f3_Object_GetVector_DA26                                  ;; 00:2766 $cd $f3 $27
+    call call_00_27f3_Object_GetInitialYPos                                  ;; 00:2766 $cd $f3 $27
     ld   H, $d8                                        ;; 00:2769 $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:276b $fa $00 $da
     or   A, OBJECT_YPOS_OFFSET                                        ;; 00:276e $f6 $10
@@ -991,7 +1127,7 @@ call_00_2799_Object_InterpolateTowardVector:
 ; and the vector, halves the delta (srl d / rr e), then adds it back to the current 
 ; stored vector (GetDA26). Finally, writes the interpolated position back into the 
 ; object’s position slot. This looks like smooth following or homing movement.
-    call call_00_2835_Object_GetVector_DA24
+    call call_00_2835_Object_GetInitialXPos
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
@@ -1013,7 +1149,7 @@ label27B3:
     srl  d
     rr   e
     push de
-    call call_00_27f3_Object_GetVector_DA26
+    call call_00_27f3_Object_GetInitialYPos
     pop  hl
     add  hl,de
     ld   d,$D8
@@ -1048,11 +1184,8 @@ call_00_27cb_Object_SetYFromMap:
     ld   [hl],a
     ret  
 
-call_00_27e4_Object_SetYPosFromDA26:
-; Write DA26 Vector to Object Y Pos
-; Calls GetDA26 to fetch a two-byte vector from table wDA26 and writes it 
-; into the current object’s position slot at $D8:xx10.
-    call call_00_27f3_Object_GetVector_DA26
+call_00_27e4_Object_ResetToInitialYPos:
+    call call_00_27f3_Object_GetInitialYPos
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YPOS_OFFSET
@@ -1062,15 +1195,13 @@ call_00_27e4_Object_SetYPosFromDA26:
     ld   [hl],d
     ret  
 
-call_00_27f3_Object_GetVector_DA26:
-; Uses wDA00_CurrentObjectAddrLo to compute an index, reads a two-byte 
-; vector from table wDA26 into DE.
+call_00_27f3_Object_GetInitialYPos:
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:27f3 $fa $00 $da
     rrca                                               ;; 00:27f6 $0f
     and  A, $70                                        ;; 00:27f7 $e6 $70
     ld   L, A                                          ;; 00:27f9 $6f
     ld   H, $00                                        ;; 00:27fa $26 $00
-    ld   DE, wDA26                                     ;; 00:27fc $11 $26 $da
+    ld   DE, wDA26_ObjectInitialYPos                                     ;; 00:27fc $11 $26 $da
     add  HL, DE                                        ;; 00:27ff $19
     ld   A, [HL+]                                      ;; 00:2800 $2a
     ld   E, A                                          ;; 00:2801 $5f
@@ -1105,9 +1236,9 @@ call_00_2815_Object_GetBoundingBoxYMax:
     ld   d,[hl]
     ret  
 
-call_00_2826_Object_SetXFromDA24:
-; Gets DA24 vector and stores it in the object’s $D8:xx0E slot (X position).
-    call call_00_2835_Object_GetVector_DA24
+call_00_2826_Object_ResetToInitialXPos:
+; Gets object's initial x pos and stores it in the object’s $D8:xx0E slot (X position).
+    call call_00_2835_Object_GetInitialXPos
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
@@ -1117,14 +1248,13 @@ call_00_2826_Object_SetXFromDA24:
     ld   [hl],d
     ret  
 
-call_00_2835_Object_GetVector_DA24:
-; Reads a vector from wDA24
+call_00_2835_Object_GetInitialXPos:
     ld   a,[wDA00_CurrentObjectAddrLo]
     rrca 
     and  a,$70
     ld   l,a
     ld   h,$00
-    ld   de,wDA24
+    ld   de,wDA24_ObjectInitialXPos
     add  hl,de
     ldi  a,[hl]
     ld   e,a
@@ -1518,7 +1648,7 @@ call_00_29f5_ObjectClearCollisionFlagAndCheck:
 
 call_00_2a03_ResetObjectTempSlot:
 ; Derives a small index from wDA00_CurrentObjectAddrLo by rotating left and masking.
-; Writes 0 to wDA01 + index.
+; Writes 0 to wDA01_ObjectPairRelated + index.
 ; Likely clears a small per-object temporary slot.
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2a03 $fa $00 $da
     rlca                                               ;; 00:2a06 $07
@@ -1527,7 +1657,7 @@ call_00_2a03_ResetObjectTempSlot:
     and  A, $07                                        ;; 00:2a09 $e6 $07
     ld   L, A                                          ;; 00:2a0b $6f
     ld   H, $00                                        ;; 00:2a0c $26 $00
-    ld   DE, wDA01                                     ;; 00:2a0e $11 $01 $da
+    ld   DE, wDA01_ObjectPairRelated                                     ;; 00:2a0e $11 $01 $da
     add  HL, DE                                        ;; 00:2a11 $19
     ld   [HL], $00                                     ;; 00:2a12 $36 $00
     ret                                                ;; 00:2a14 $c9
@@ -1746,7 +1876,7 @@ call_00_2afc_FindFreeObjectSlot:
 
 call_00_2b10_VerifyObjectPairExists:
 ; Derives a per-object small index from wDA00_CurrentObjectAddrLo.
-; Loads a saved value B from wDA01 + index.
+; Loads a saved value B from wDA01_ObjectPairRelated + index.
 ; Scans the object table comparing:
 ; Primary ID ([HL] vs C), then
 ; A secondary ID ([HL|1F] vs B).
@@ -1759,7 +1889,7 @@ call_00_2b10_VerifyObjectPairExists:
     and  A, $07                                        ;; 00:2b16 $e6 $07
     ld   L, A                                          ;; 00:2b18 $6f
     ld   H, $00                                        ;; 00:2b19 $26 $00
-    ld   DE, wDA01                                     ;; 00:2b1b $11 $01 $da
+    ld   DE, wDA01_ObjectPairRelated                                     ;; 00:2b1b $11 $01 $da
     add  HL, DE                                        ;; 00:2b1e $19
     ld   B, [HL]                                       ;; 00:2b1f $46
     ld   H, $d8                                        ;; 00:2b20 $26 $d8
@@ -1810,7 +1940,7 @@ call_00_2b3d_SweepAndClearActiveObjects:
 
 call_00_2b5d_DeactivateObjectSlot:
 ; Marks the current object slot as inactive by writing $FF to wD8xx. Then computes a related index 
-; from the slot address to access another table (wDA01 → wD7xx) and clears bit 6 of its status 
+; from the slot address to access another table (wDA01_ObjectPairRelated → wD7xx) and clears bit 6 of its status 
 ; byte—likely removing an “active” or “visible” flag for that object.
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2b5d $fa $00 $da
     or   A, OBJECT_ID_OFFSET                                        ;; 00:2b60 $f6 $00
@@ -1824,7 +1954,7 @@ call_00_2b5d_DeactivateObjectSlot:
     and  A, $07                                        ;; 00:2b6b $e6 $07
     ld   L, A                                          ;; 00:2b6d $6f
     ld   H, $00                                        ;; 00:2b6e $26 $00
-    ld   DE, wDA01                                     ;; 00:2b70 $11 $01 $da
+    ld   DE, wDA01_ObjectPairRelated                                     ;; 00:2b70 $11 $01 $da
     add  HL, DE                                        ;; 00:2b73 $19
     ld   L, [HL]                                       ;; 00:2b74 $6e
     ld   H, $d7                                        ;; 00:2b75 $26 $d7
@@ -1866,7 +1996,7 @@ call_00_2b94_ZeroObjectStatusEntry:
     and  A, $07                                        ;; 00:2b9a $e6 $07
     ld   L, A                                          ;; 00:2b9c $6f
     ld   H, $00                                        ;; 00:2b9d $26 $00
-    ld   DE, wDA01                                     ;; 00:2b9f $11 $01 $da
+    ld   DE, wDA01_ObjectPairRelated                                     ;; 00:2b9f $11 $01 $da
     add  HL, DE                                        ;; 00:2ba2 $19
     ld   L, [HL]                                       ;; 00:2ba3 $6e
     ld   H, $d7                                        ;; 00:2ba4 $26 $d7
@@ -1883,7 +2013,7 @@ call_00_2ba9_SetObjectStatusTo50:
     and  A, $07                                        ;; 00:2baf $e6 $07
     ld   L, A                                          ;; 00:2bb1 $6f
     ld   H, $00                                        ;; 00:2bb2 $26 $00
-    ld   DE, wDA01                                     ;; 00:2bb4 $11 $01 $da
+    ld   DE, wDA01_ObjectPairRelated                                     ;; 00:2bb4 $11 $01 $da
     add  HL, DE                                        ;; 00:2bb7 $19
     ld   L, [HL]                                       ;; 00:2bb8 $6e
     ld   H, $d7                                        ;; 00:2bb9 $26 $d7

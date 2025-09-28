@@ -9,6 +9,7 @@ INCLUDE "memory.asm"
 SECTION "bank00", ROM0[$0000]
 INCLUDE "bank00_main.asm"
 INCLUDE "bank00_maps_core.asm"
+INCLUDE "bank00_object_utils.asm"
 INCLUDE "bank00_objects_core.asm"
 
 INCLUDE "bank01_menus.asm"

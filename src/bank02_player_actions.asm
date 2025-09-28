@@ -227,13 +227,13 @@ call_02_4911:
     ret  Z                                             ;; 02:492f $c8
     xor  A, A                                          ;; 02:4930 $af
     ld   [wDC7F], A                                    ;; 02:4931 $ea $7f $dc
-    ld   HL, wDABE                                     ;; 02:4934 $21 $be $da
+    ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 02:4934 $21 $be $da
     bit  7, [HL]                                       ;; 02:4937 $cb $7e
     ret  Z                                             ;; 02:4939 $c8
     ld   HL, wDC80                                     ;; 02:493a $21 $80 $dc
     set  6, [HL]                                       ;; 02:493d $cb $f6
     ld   C, $11                                        ;; 02:493f $0e $11
-    ld   HL, wDABE                                     ;; 02:4941 $21 $be $da
+    ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 02:4941 $21 $be $da
     bit  7, [HL]                                       ;; 02:4944 $cb $7e
     jr   Z, .jr_02_4953                                ;; 02:4946 $28 $0b
     ld   C, $01                                        ;; 02:4948 $0e $01
@@ -731,7 +731,7 @@ call_02_4ce3:
     ld   a,$31
     call entry_02_54f9_SwitchPlayerAction
     call call_02_4df6_FlagCollisionActive
-    ld   hl,wDABE
+    ld   hl,wDABE_UnkBGCollisionFlags2
     bit  7,[hl]
     jr   z,call_02_4d02
     ld   a,$1E
@@ -754,7 +754,7 @@ call_02_4d14:
     ld   a,$33
     call entry_02_54f9_SwitchPlayerAction
     call call_02_4df6_FlagCollisionActive
-    ld   hl,wDABE
+    ld   hl,wDABE_UnkBGCollisionFlags2
     bit  7,[hl]
     jr   z,call_02_4d33
     ld   a,$36

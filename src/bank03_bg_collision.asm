@@ -25,23 +25,23 @@ call_03_46e0_UpdateBgCollision_MainDispatcher:
 
 call_03_4708_CollisionHandler_Sidescroller:
 ; Handles sidescrolling collision detection for the player.
-; Clears and updates collision flags in wDABE/wDABD.
+; Clears and updates collision flags in wDABE_UnkBGCollisionFlags2/wDABD_UnkBGCollisionFlags.
 ; Calculates collision offsets relative to player X/Y position.
 ; Probes tilemap for solid tiles, adjusts player position, and sets collision response flags.
 ; Handles edge cases (walls, floor, ceiling, slopes, special interactions).
 ; Proposed name: CollisionHandler_Sidescroller
 
-; Performs detailed collision checks in side-scrolling levels: clears and stores collision flags (wDABE, wDABD), 
+; Performs detailed collision checks in side-scrolling levels: clears and stores collision flags (wDABE_UnkBGCollisionFlags2, wDABD_UnkBGCollisionFlags), 
 ; clamps vertical velocity, probes the tilemap (call_03_4b37_AccumulateMovementBias/call_03_4b4c_TileCollisionCheck), sets flags for wall/floor hits, 
 ; adjusts horizontal/vertical movement masks, and updates collision state variables (wDC84–wDC8D).
-    ld   HL, wDABE                                     ;; 03:4708 $21 $be $da
+    ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 03:4708 $21 $be $da
     ld   A, [HL]                                       ;; 03:470b $7e
     ld   [HL], $00                                     ;; 03:470c $36 $00
-    ld   [wDABD], A                                    ;; 03:470e $ea $bd $da
+    ld   [wDABD_UnkBGCollisionFlags], A                                    ;; 03:470e $ea $bd $da
     ld   A, [wDC7B]                                    ;; 03:4711 $fa $7b $dc
     and  A, A                                          ;; 03:4714 $a7
     jr   Z, .jr_03_471c                                ;; 03:4715 $28 $05
-    ld   HL, wDABE                                     ;; 03:4717 $21 $be $da
+    ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 03:4717 $21 $be $da
     set  7, [HL]                                       ;; 03:471a $cb $fe
 .jr_03_471c:
     ld   A, [wDC8C]                                    ;; 03:471c $fa $8c $dc
@@ -131,10 +131,10 @@ call_03_4708_CollisionHandler_Sidescroller:
     ld   [wDC86], A                                    ;; 03:47a2 $ea $86 $dc
     ld   [wDC85], A                                    ;; 03:47a5 $ea $85 $dc
     ld   [wDC84], A                                    ;; 03:47a8 $ea $84 $dc
-    ld   HL, wDABE                                     ;; 03:47ab $21 $be $da
+    ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 03:47ab $21 $be $da
     set  6, [HL]                                       ;; 03:47ae $cb $f6
 .jr_03_47b0:
-    ld   HL, wDABE                                     ;; 03:47b0 $21 $be $da
+    ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 03:47b0 $21 $be $da
     bit  7, [HL]                                       ;; 03:47b3 $cb $7e
     jr   NZ, .jp_03_47f6                               ;; 03:47b5 $20 $3f
     call call_03_4b37_AccumulateMovementBias                                  ;; 03:47b7 $cd $37 $4b
@@ -177,7 +177,7 @@ call_03_4708_CollisionHandler_Sidescroller:
     ld   A, B                                          ;; 03:47e8 $78
     cpl                                                ;; 03:47e9 $2f
     inc  A                                             ;; 03:47ea $3c
-    ld   HL, wDABE                                     ;; 03:47eb $21 $be $da
+    ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 03:47eb $21 $be $da
     or   A, [HL]                                       ;; 03:47ee $b6
     ld   [HL], A                                       ;; 03:47ef $77
     and  A, $0f                                        ;; 03:47f0 $e6 $0f
@@ -186,7 +186,7 @@ call_03_4708_CollisionHandler_Sidescroller:
 .jp_03_47f6:
     xor  A, A                                          ;; 03:47f6 $af
     ld   [wDC8D], A                                    ;; 03:47f7 $ea $8d $dc
-    ld   HL, wDABE                                     ;; 03:47fa $21 $be $da
+    ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 03:47fa $21 $be $da
     bit  7, [HL]                                       ;; 03:47fd $cb $7e
     ret  NZ                                            ;; 03:47ff $c0
     ld   A, [wDC8C]                                    ;; 03:4800 $fa $8c $dc
@@ -258,7 +258,7 @@ call_03_4708_CollisionHandler_Sidescroller:
     ld   A, $04                                        ;; 03:4864 $3e $04
     jr   .jr_03_486e                                   ;; 03:4866 $18 $06
 .jr_03_4868:
-    ld   HL, wDABE                                     ;; 03:4868 $21 $be $da
+    ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 03:4868 $21 $be $da
     set  7, [HL]                                       ;; 03:486b $cb $fe
     ld   A, B                                          ;; 03:486d $78
 .jr_03_486e:
@@ -301,15 +301,15 @@ call_03_4708_CollisionHandler_Sidescroller:
 
 call_03_48ad_CollisionHandler_TopDown:
 ; Handles top-down movement collisions.
-; Always sets collision-active bit (set 7,[wDABE]).
+; Always sets collision-active bit (set 7,[wDABE_UnkBGCollisionFlags2]).
 ; Uses wDC86 and wDC89 to determine direction/attempted movement.
 ; Dispatches to one of several routines for checking walls/diagonals (.call_03_48E1_ResetDirectionState, .call_03_496B_CheckMove_UpLeft, etc.).
 ; Updates collision status (wDC81_CurrentInputs, wDC86, wDC89) depending on blocked directions.
-    ld   hl,wDABE
+    ld   hl,wDABE_UnkBGCollisionFlags2
     ld   a,[hl]
     ld   [hl],00
-    ld   [wDABD],a
-    ld   hl,wDABE
+    ld   [wDABD_UnkBGCollisionFlags],a
+    ld   hl,wDABE_UnkBGCollisionFlags2
     set  7,[hl]
     ld   a,[wDC86]
     and  a
@@ -556,10 +556,10 @@ call_03_4a3f_CollisionHandler_ByAction:
 ; Looks at the player’s current action ID (wD801_PlayerObject_ActionId) to pick a rule set.
 ; Uses lookup tables (.data_03_4a98) for bitmasks and allowed transitions.
 ; Updates wDC81_CurrentInputs depending on what collisions are valid for that action (e.g. standing, climbing, swimming).
-    ld   HL, wDABE                                     ;; 03:4a3f $21 $be $da
+    ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 03:4a3f $21 $be $da
     ld   A, [HL]                                       ;; 03:4a42 $7e
     ld   [HL], $00                                     ;; 03:4a43 $36 $00
-    ld   [wDABD], A                                    ;; 03:4a45 $ea $bd $da
+    ld   [wDABD_UnkBGCollisionFlags], A                                    ;; 03:4a45 $ea $bd $da
     set  7, [HL]                                       ;; 03:4a48 $cb $fe
     ld   A, [wD801_PlayerObject_ActionId]                                    ;; 03:4a4a $fa $01 $d8
     ld   L, $03                                        ;; 03:4a4d $2e $03
@@ -629,15 +629,15 @@ call_03_4a3f_CollisionHandler_ByAction:
 
 call_03_4ae4_CollisionMask_LookupAndDispatch:
 ; CollisionMaskHandler
-; Moves the current collision byte (wDABE) to wDABD, clears wDABE, then sets bit7 of the (now zeroed) wDABE.
+; Moves the current collision byte (wDABE_UnkBGCollisionFlags2) to wDABD_UnkBGCollisionFlags, clears wDABE_UnkBGCollisionFlags2, then sets bit7 of the (now zeroed) wDABE_UnkBGCollisionFlags2.
 ; Uses .data_03_4b1b as a mask/lookup table: ANDs the current collision flags (wDC81_CurrentInputs) with the mask.
 ; If a match is found, loads a parameter block (B=counter, DE=step size, etc.), loops through entries comparing tiles.
 ; If none match, clears high bits of wDC81_CurrentInputs. If a match, calls call_03_4c12_FetchTileValue to probe a specific tile, checks bit3, 
 ; and conditionally returns.
-    ld   HL, wDABE                                     ;; 03:4ae4 $21 $be $da
+    ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 03:4ae4 $21 $be $da
     ld   A, [HL]                                       ;; 03:4ae7 $7e
     ld   [HL], $00                                     ;; 03:4ae8 $36 $00
-    ld   [wDABD], A                                    ;; 03:4aea $ea $bd $da
+    ld   [wDABD_UnkBGCollisionFlags], A                                    ;; 03:4aea $ea $bd $da
     set  7, [HL]                                       ;; 03:4aed $cb $fe
     ld   HL, .data_03_4b1b                             ;; 03:4aef $21 $1b $4b
     ld   A, [wDC81_CurrentInputs]                                    ;; 03:4af2 $fa $81 $dc
