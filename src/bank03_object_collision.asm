@@ -371,7 +371,7 @@ call_03_4e4b_Collision_PlayerHit_MultiStageCollectible:
     ld   C, $01                                        ;; 03:4e7e $0e $01
     call Z, call_00_21ef_PlaySound_1E                               ;; 03:4e80 $cc $ef $21
     ld   A, [wDCC3]                                    ;; 03:4e83 $fa $c3 $dc
-    jp   call_00_2c09_DispatchOffsetAction                                  ;; 03:4e86 $c3 $09 $2c
+    jp   call_00_2c09_Object_SpawnRelativeWithOffset6                                  ;; 03:4e86 $c3 $09 $2c
 
 call_03_4e89_Collision_ObjectStateOrTransform:
 ; Rejects if object “inactive” (bit 7 of property set) or action ≥ 5.
@@ -483,7 +483,7 @@ call_03_4f23_Collision_ObjectCounterDecrement:
     ld   HL, wDCC8                                     ;; 03:4f4d $21 $c8 $dc
     inc  [HL]                                          ;; 03:4f50 $34
     ld   A, [HL]                                       ;; 03:4f51 $7e
-    call call_00_2c09_DispatchOffsetAction                                  ;; 03:4f52 $cd $09 $2c
+    call call_00_2c09_Object_SpawnRelativeWithOffset6                                  ;; 03:4f52 $cd $09 $2c
     ld   HL, wDCD5                                     ;; 03:4f55 $21 $d5 $dc
     ld   A, [HL+]                                      ;; 03:4f58 $2a
     or   A, [HL]                                       ;; 03:4f59 $b6
@@ -516,7 +516,7 @@ call_03_4f60_Collision_TripleCollectible_Counter:
     ld   c,$02
     call z,call_00_21ef_PlaySound_1E
     ld   a,[wDCC5]
-    jp   call_00_2c09_DispatchOffsetAction
+    jp   call_00_2c09_Object_SpawnRelativeWithOffset6
 
 call_03_4f8c_Collision_PlaySoundAndRemove:
 ; On any collision: plays sound 1E with parameter 3, then respawns/removes object.
@@ -576,7 +576,7 @@ call_03_4fca_Collision_TripleCollectible_TypeB:
     ld   c,$02
     call z,call_00_21ef_PlaySound_1E
     ld   a,[wDCC6]
-    jp   call_00_2c09_DispatchOffsetAction
+    jp   call_00_2c09_Object_SpawnRelativeWithOffset6
     
 call_03_4ff1_Collision_TripleCollectible_TypeC:
 ; On collision A==01:
@@ -595,7 +595,7 @@ call_03_4ff1_Collision_TripleCollectible_TypeC:
     ld   c,$01
     call z,call_00_21ef_PlaySound_1E
     ld   a,[wDCC7]
-    jp   call_00_2c09_DispatchOffsetAction
+    jp   call_00_2c09_Object_SpawnRelativeWithOffset6
     
 call_03_500d_Collision_IdleToLoadedTransform:
 ; For action 00 only.
@@ -663,7 +663,7 @@ call_03_5069_Collision_QuintCollectible:
     ld   c,$02
     call z,call_00_21ef_PlaySound_1E
     ld   a,[wDCCF]
-    jp   call_00_2c09_DispatchOffsetAction
+    jp   call_00_2c09_Object_SpawnRelativeWithOffset6
 
 call_03_5085_Collision_TransformOrRespawnSwitch:
 ; On collision:
@@ -713,7 +713,7 @@ call_03_50b6_Collision_TripleCollectible_WithSlot:
     ld   c,$01
     call z,call_00_21ef_PlaySound_1E
     ld   a,[wDCC9]
-    jp   call_00_2c09_DispatchOffsetAction
+    jp   call_00_2c09_Object_SpawnRelativeWithOffset6
 
 call_03_50e0_Collision_ActivateSlot:
 ; On collision A==01: marks object slot active.
@@ -918,7 +918,7 @@ label5258:
     ld   c,$03
     call z,call_00_21ef_PlaySound_1E
     ld   a,[wDCCB]
-    jp   call_00_2c09_DispatchOffsetAction
+    jp   call_00_2c09_Object_SpawnRelativeWithOffset6
     call call_03_550e_CheckPlayerObjectInteraction
     ret  nc
     cp   a,$00
@@ -956,7 +956,7 @@ call_03_528c_Collision_TripleCollectible_Counter2:
     ld   c,$02
     call z,call_00_21ef_PlaySound_1E
     ld   a,[wDCCA]
-    jp   call_00_2c09_DispatchOffsetAction
+    jp   call_00_2c09_Object_SpawnRelativeWithOffset6
     
 call_03_52aa_Collision_QuintCollectible_Counter3:
 ; On collision (interaction=1):
@@ -975,7 +975,7 @@ call_03_52aa_Collision_QuintCollectible_Counter3:
     ld   c,$03
     call z,call_00_21ef_PlaySound_1E
     ld   a,[wDCCD]
-    jp   call_00_2c09_DispatchOffsetAction
+    jp   call_00_2c09_Object_SpawnRelativeWithOffset6
     
 call_03_52c8_Collision_FacingSensitiveHit:
 ; On collision (interaction=1):
@@ -985,7 +985,7 @@ call_03_52c8_Collision_FacingSensitiveHit:
     ret  nc
     cp   a,$01
     jp   nz,call_03_4cea_TriggerPlayerActionChange
-    call call_00_29ac_ObjectFacingMatchesStoredDirection
+    call call_00_29ac_Object_CheckFacingPlayer
     jp   z,call_03_4cea_TriggerPlayerActionChange
     jp   entry_03_5671_HandleObjectHitOrRespawn
     
@@ -1067,7 +1067,7 @@ call_03_532f_Collision_DecrementCounterBank4:
     ld   hl,wDCC8
     inc  [hl]
     ld   a,[hl]
-    call call_00_2c09_DispatchOffsetAction
+    call call_00_2c09_Object_SpawnRelativeWithOffset6
     ld   hl,wDCD5
     ld   b,$05
     xor  a
@@ -1110,7 +1110,7 @@ call_03_538e_Collision_HeptCollectibleToBank1:
     ld   hl,wDCCC
     inc  [hl]
     ld   a,[hl]
-    call call_00_2c09_DispatchOffsetAction
+    call call_00_2c09_Object_SpawnRelativeWithOffset6
     ld   a,[wDCCC]
     cp   a,$07
     jr   nz,label53B0
@@ -1259,7 +1259,7 @@ call_03_5483_Collision_YMapTransform:
     jp   z,call_03_4cea_TriggerPlayerActionChange
     ret  
 .jr_03_5497:
-    call call_00_27cb_Object_SetYFromMap
+    call call_00_27cb_Object_PositionAboveViewport
     ld   a,$01
     farcall entry_02_72ac_SetupNewAction
     ret                                          ;; 03:5482 $c9

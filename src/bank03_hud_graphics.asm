@@ -200,18 +200,18 @@ call_03_757e_LoadHUDSprites_HDMA:
     ld   E, A                                          ;; 03:75a0 $5f
     push DE                                            ;; 03:75a1 $d5
     push DE                                            ;; 03:75a2 $d5
-    ld   DE, $8400                                     ;; 03:75a3 $11 $00 $84
+    ld   DE, _VRAM+$0400                                     ;; 03:75a3 $11 $00 $84
     call call_03_75be_HDMA_CopyNumberTileBlock                                  ;; 03:75a6 $cd $be $75
     ld   C, $0a                                        ;; 03:75a9 $0e $0a
-    ld   DE, $8420                                     ;; 03:75ab $11 $20 $84
+    ld   DE, _VRAM+$0420                                     ;; 03:75ab $11 $20 $84
     call call_03_75be_HDMA_CopyNumberTileBlock                                  ;; 03:75ae $cd $be $75
     pop  DE                                            ;; 03:75b1 $d1
     ld   C, D                                          ;; 03:75b2 $4a
-    ld   DE, $8440                                     ;; 03:75b3 $11 $40 $84
+    ld   DE, _VRAM+$0440                                     ;; 03:75b3 $11 $40 $84
     call call_03_75be_HDMA_CopyNumberTileBlock                                  ;; 03:75b6 $cd $be $75
     pop  DE                                            ;; 03:75b9 $d1
     ld   C, E                                          ;; 03:75ba $4b
-    ld   DE, $8460                                     ;; 03:75bb $11 $60 $84
+    ld   DE, _VRAM+$0460                                     ;; 03:75bb $11 $60 $84
 
 call_03_75be_HDMA_CopyNumberTileBlock:
 ; Core routine for jp_03_757e. Calculates tile source address in image_003_4580 based 
@@ -387,7 +387,7 @@ call_03_7664_Tilemap_UpdateColumnFromBuffer:
     ld   A, [wDC23]                                    ;; 03:767a $fa $23 $dc
     and  A, $1f                                        ;; 03:767d $e6 $1f
     ld   L, A                                          ;; 03:767f $6f
-    ld   H, $98                                        ;; 03:7680 $26 $98
+    ld   H, HIGH(_SCRN0)                                        ;; 03:7680 $26 $98
     ld   DE, wCF40                                     ;; 03:7682 $11 $40 $cf
 
 call_03_7685_MemCopyColumn16:

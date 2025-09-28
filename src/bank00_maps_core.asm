@@ -952,7 +952,8 @@ call_00_1633_HandleLevelWarpOrExit:
     db   $e2, $19
 .data_00_16ba:
     db   $00, $00, $00, $00        ;; 00:16b6 ????????
-    db   $00, $00, $00, $00, $00, $b0, $01             ;; 00:16be ????w..
+    db   $00, $00, $00, $00
+    db   $00, $b0, $01             ;; 00:16be ????w..
     dw   $00f0                                         ;; 00:16c5 wW
     db   $ff, $00, $00, $00, $50, $00                  ;; 00:16c7 .??w..
     dw   $0070                                         ;; 00:16cd wW
@@ -1627,7 +1628,7 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
     farcall entry_02_7152_UpdateObjects
     call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:1f53 $cd $c8 $11
     call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:1f56 $cd $fa $35
-    call call_00_08f8_HandleObjectInteractionOrTriggerEvent                                  ;; 00:1f59 $cd $f8 $08
+    call call_00_08f8_SetupObjectVRAMTransfer                                  ;; 00:1f59 $cd $f8 $08
     ld   HL, wDCDE                                     ;; 00:1f5c $21 $de $dc
     ld   A, [HL]                                       ;; 00:1f5f $7e
     sub  A, $01                                        ;; 00:1f60 $d6 $01
@@ -1657,7 +1658,7 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
     farcall entry_02_7152_UpdateObjects
     call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:1f89 $cd $c8 $11
     call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:1f8c $cd $fa $35
-    call call_00_08f8_HandleObjectInteractionOrTriggerEvent                                  ;; 00:1f8f $cd $f8 $08
+    call call_00_08f8_SetupObjectVRAMTransfer                                  ;; 00:1f8f $cd $f8 $08
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:1f92 $fa $d7 $da
     and  A, A                                          ;; 00:1f95 $a7
     jr   Z, .jr_00_1f9b                                ;; 00:1f96 $28 $03

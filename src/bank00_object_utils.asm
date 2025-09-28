@@ -13,7 +13,7 @@ call_00_21f6_FindAndMarkObjectInList_TVButton:
 ; whose parameter matches C.
 ; When found, it updates a D7xx structure at index B:
 ; Sets a nibble/flag ([DE] = ([DE] & $F0) | value).
-; Uses a small table (db $00,$01,$02,$04 at $225C) and level mask (wDC1E_CurrentLevelNumber) 
+; Uses a small table (db $00,$01,$02,$04 at .data_00_225c) and level mask (wDC1E_CurrentLevelNumber) 
 ; to decide which flag (1 or 2) to apply.
 ; Exits by restoring the previous bank. 
 ; Usage:
@@ -61,7 +61,7 @@ call_00_21f6_FindAndMarkObjectInList_TVButton:
     inc  E                                             ;; 00:2232 $1c
     ld   L, C                                          ;; 00:2233 $69
     ld   H, $00                                        ;; 00:2234 $26 $00
-    ld   BC, $225c                                     ;; 00:2236 $01 $5c $22
+    ld   BC, .data_00_225c                                     ;; 00:2236 $01 $5c $22
     add  HL, BC                                        ;; 00:2239 $09
     ld   A, [HL]                                       ;; 00:223a $7e
     push AF                                            ;; 00:223b $f5
@@ -84,6 +84,7 @@ call_00_21f6_FindAndMarkObjectInList_TVButton:
     or   A, C                                          ;; 00:2257 $b1
     ld   [DE], A                                       ;; 00:2258 $12
     jp   call_00_0f08_RestoreBank                                  ;; 00:2259 $c3 $08 $0f
+.data_00_225c:
     db   $00, $01, $02, $04                            ;; 00:225c ?...
 
 call_00_2260_FindAndFlagObject_TVRemote:
@@ -146,7 +147,7 @@ call_00_2299_SetObjectStatusLowNibble:
     and  A, $07                                        ;; 00:229f $e6 $07
     ld   L, A                                          ;; 00:22a1 $6f
     ld   H, $00                                        ;; 00:22a2 $26 $00
-    ld   DE, wDA01_ObjectPairRelated                                     ;; 00:22a4 $11 $01 $da
+    ld   DE, wDA01_ObjectListIndexesForCurrentObjects                                     ;; 00:22a4 $11 $01 $da
     add  HL, DE                                        ;; 00:22a7 $19
     ld   L, [HL]                                       ;; 00:22a8 $6e
     ld   H, $d7                                        ;; 00:22a9 $26 $d7
@@ -170,7 +171,7 @@ call_00_22b1_HandleObjectStateChange:
     and  A, $07                                        ;; 00:22b7 $e6 $07
     ld   L, A                                          ;; 00:22b9 $6f
     ld   H, $00                                        ;; 00:22ba $26 $00
-    ld   DE, wDA01_ObjectPairRelated                                     ;; 00:22bc $11 $01 $da
+    ld   DE, wDA01_ObjectListIndexesForCurrentObjects                                     ;; 00:22bc $11 $01 $da
     add  HL, DE                                        ;; 00:22bf $19
     ld   L, [HL]                                       ;; 00:22c0 $6e
     ld   H, $d7                                        ;; 00:22c1 $26 $d7
@@ -256,7 +257,7 @@ call_00_230f_ResolveObjectListIndex:
     and  A, $07                                        ;; 00:2321 $e6 $07
     ld   L, A                                          ;; 00:2323 $6f
     ld   H, $00                                        ;; 00:2324 $26 $00
-    ld   DE, wDA01_ObjectPairRelated                                     ;; 00:2326 $11 $01 $da
+    ld   DE, wDA01_ObjectListIndexesForCurrentObjects                                     ;; 00:2326 $11 $01 $da
     add  HL, DE                                        ;; 00:2329 $19
     ld   L, [HL]                                       ;; 00:232a $6e
     dec  L                                             ;; 00:232b $2d
@@ -274,15 +275,14 @@ call_00_230f_ResolveObjectListIndex:
     pop  BC                                            ;; 00:233c $c1
     ret                                                ;; 00:233d $c9
 
-call_00_233e_UpdateObjectMotionFromVectorTable:
-; Increments an object timer ($1B/$1C fields).
-; Every $2E ticks, rolls over and increments a secondary counter while clearing a bit.
-; Uses the counters to pick a two-byte vector from .data_00_23B4_Velocities (a table of X/Y velocities).
-; Depending on the counter value, inverts and reorders components to get (e,c) velocity pair.
-; Converts those velocities into signed words (d,b) and (e,c).
-; Calls call_00_2835_Object_GetInitialXPos and call_00_27F3_Object_GetInitialYPos to adjust positions.
-; Stores the computed 4-byte vector back into the object’s data block at $0E.
-; Purpose: Generate and apply a predefined movement pattern (probably a curve or wave) over time to move an object.
+call_00_233e_Object_UpdatePatternedPositionFromVelocityTable:
+; Updates an object’s velocity counter, uses it as an index into a 
+; velocity lookup table (.data_00_23B4_Velocities).
+; Depending on a “motion type” flag (0, 1, or 2), it interprets table entries 
+; differently (normal, flipped X, flipped Y).
+; Computes a signed (Δx, Δy) vector, adds it to the object’s initial position, 
+; and stores the new position into the object’s X/Y position fields.
+; Effectively produces oscillating or patterned movement along a predefined velocity curve.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XVEL_OFFSET
@@ -542,6 +542,7 @@ call_00_24c0_Object_IntegrateXVelocity:
     ld   A, $ff                                        ;; 00:24da $3e $ff
     adc  A, $00                                        ;; 00:24dc $ce $00
     ld   B, A                                          ;; 00:24de $47
+call_00_24df_Object_UpdateXPosition:
     ld   H, $d8                                        ;; 00:24df $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:24e1 $fa $00 $da
     or   A, OBJECT_XPOS_OFFSET                                        ;; 00:24e4 $f6 $0e
@@ -773,7 +774,9 @@ label25DF:
     ret  
 
 call_00_2602_Object_ApproachYVelocity:
-; Same as 2588 but for Y velocity. Adjusts by +/-1 until equal to C.
+; Compares current Y velocity against a target (C).
+; Increments or decrements the Y velocity by 1 until it matches.
+; This gives smooth acceleration/deceleration to the desired speed.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YVEL_OFFSET
@@ -781,13 +784,12 @@ call_00_2602_Object_ApproachYVelocity:
     ld   a,[hl]
     cp   c
     ret  z
-    jr   c,call_00_2613
+    jr   c,.jr_00_2613
     dec  [hl]
     ld   a,[hl]
     cp   c
     ret  
-
-call_00_2613:
+.jr_00_2613:
     inc  [hl]
     ld   a,[hl]
     cp   c
@@ -829,14 +831,16 @@ label2639:
     xor  a
     ret  
 
-call_00_2645_Object_AdjustXPositionVelocity:
-; Checks the bounding box and adjusts the object's X position and velocity accordingly, 
-; handling both the left and right sides of the bounding box.
+call_00_2645_Object_AdjustXAgainstBounds:
+; Adjusts an object’s X velocity or position against bounding box edges.
+; Depending on facing bit 7 (a), it computes whether the object should 
+; clamp its movement using XMin or XMax bounds.
+; Writes the corrected position and adjusts velocity deltas accordingly.
     bit  $7,a
     jr   nz,label265B
     ld   b,$00
     call call_00_2846_Object_GetBoundingBoxXMax
-    call call_00_2678_Vector_AddObjectXPos
+    call call_00_2678_Object_AddOffsetToXPos
     ld   a,c
     sub  e
     ld   a,b
@@ -851,7 +855,7 @@ label265B:
     ld   c,a
     ld   b,$FF
     call call_00_2857_Object_GetBoundingBoxXMin
-    call call_00_2678_Vector_AddObjectXPos
+    call call_00_2678_Object_AddOffsetToXPos
     ld   a,e
     sub  c
     ld   a,d
@@ -871,10 +875,9 @@ label266E:
     or   c
     ret  
 
-call_00_2678_Vector_AddObjectXPos:
-; Offset Vector By Object X
-; Loads the object’s X position ($D8:xx0E/$D8:xx0F) and adds it to C,B. 
-; Used to convert local offsets into world coordinates.
+call_00_2678_Object_AddOffsetToXPos:
+; Helper: adds (c,b) offset to the object’s current X position.
+; Used by the bounding adjustment routines.
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
     ld   l,a
@@ -887,15 +890,15 @@ call_00_2678_Vector_AddObjectXPos:
     ld   b,a
     ret  
 
-call_00_2687_Object_SelectNearestVector_DA20_DA22:
-; Select Closest Vector From DA20/DA22
-; Same selection pattern but for tables DA20 and DA22 and uses call_00_26BA_Vector_AddObjectYPos 
-; to offset with Y.
+call_00_2687_Object_AdjustYAgainstBounds:
+; Y-axis version of 2645.
+; Uses YMin / YMax bounding box depending on facing bit 7, applies corrections, 
+; updates object position, and checks velocity deltas.
     bit  $7,a
     jr   nz,label269D
     ld   b,$00
     call call_00_2804_Object_GetBoundingBoxYMin
-    call call_00_26BA_Vector_AddObjectYPos
+    call call_00_26BA_Object_AddOffsetToYPos
     ld   a,c
     sub  e
     ld   a,b
@@ -910,7 +913,7 @@ label269D:
     ld   c,a
     ld   b,$FF
     call call_00_2815_Object_GetBoundingBoxYMax
-    call call_00_26BA_Vector_AddObjectYPos
+    call call_00_26BA_Object_AddOffsetToYPos
     ld   a,e
     sub  c
     ld   a,d
@@ -930,9 +933,9 @@ label26B0:
     or   c
     ret  
 
-call_00_26BA_Vector_AddObjectYPos:
-; Offset Vector By Object Y
-; Loads the object’s Y position ($D8:xx10) and adds it to C,B
+call_00_26BA_Object_AddOffsetToYPos:
+; Helper: adds (c,b) offset to the object’s current Y position.
+; Parallel to 2678.
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YPOS_OFFSET
     ld   l,a
@@ -945,20 +948,20 @@ call_00_26BA_Vector_AddObjectYPos:
     ld   b,a
     ret  
 
-call_00_26c9_Object_HandleXCollisionOrSectorCheck:
-; Handle Object State / X Collision Probe
-; Reads a couple of object bytes at offsets $1B, $02, $17 into C,B,DE, checks a flag 
-; bit, possibly negates C, compares an upper-bits mask to wDC7B (tilemap or sector ID), 
-; and if equal calls call_00_26F1_Player_UpdateXFromObject. Finally stores the horizontal delta (C) to wDC85.
+call_00_26c9_Object_InfluencePlayerX:
+; Complex: Reads object’s X velocity, some state flags, and bounding values.
+; Compares against global state vars (wDC7B, wDC7D).
+; If conditions match, applies an adjustment to the player’s X position relative to the object (e.g. conveyor belts, pushers).
+; Appears to handle environmental effects that “move the player.”
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XVEL_OFFSET
     ld   l,a
     ld   c,[hl]
-    xor  a,$02
+    xor  a,OBJECT_ACTIONPTR_OFFSET
     ld   l,a
     ld   b,[hl]
-    xor  a,$17
+    xor  a,OBJECT_UNK17_OFFSET
     ld   l,a
     ldi  a,[hl]
     ld   e,a
@@ -1073,11 +1076,11 @@ call_00_2722_IsPlayerNearObject:
     xor  A, A                                          ;; 00:2764 $af
     ret                                                ;; 00:2765 $c9
 
-call_00_2766_Object_UpdateXPositionFromVector:
-; Update Object Position if Player Behind
-; Uses GetDA26 (probably retrieves the object’s movement vector), compares it to the 
-; player’s relative position. If the player is not in front, writes a new object 
-; position (E,D) into the object’s slot and clears a state flag.
+call_00_2766_Object_ResetYIfAboveStart:
+; Gets object’s initial Y position and compares it to current.
+; If object has moved above its starting point, snaps it back to that initial Y and 
+; clears a related state flag.
+; Used to “reset” vertical displacement (like platforms that return).
     call call_00_27f3_Object_GetInitialYPos                                  ;; 00:2766 $cd $f3 $27
     ld   H, $d8                                        ;; 00:2769 $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:276b $fa $00 $da
@@ -1098,11 +1101,9 @@ call_00_2766_Object_UpdateXPositionFromVector:
     ld   [HL], A                                       ;; 00:277e $77
     ret                                                ;; 00:277f $c9
 
-call_00_2780_Object_ComputeMapYDelta:
-; Compute Object-to-Map Y Delta
-; Loads the map’s Y base (wDBFB_YPositionInMapLo), adds an offset ($B0), then 
-; computes the difference between that and the object’s stored Y to get a signed 
-; vertical distance.
+call_00_2780_Object_CheckBelowMapViewport:
+; Loads current map scroll position + offset, compares against object’s Y position.
+; Likely used for despawning when off-screen below the camera.
     ld   hl,wDBFB_YPositionInMapLo
     ldi  a,[hl]
     ld   h,[hl]
@@ -1121,12 +1122,11 @@ call_00_2780_Object_ComputeMapYDelta:
     sbc  d
     ret  
 
-call_00_2799_Object_InterpolateTowardVector:
-; Move Object Toward Target Vector
-; Gets a vector from GetDA24, computes the difference between the object’s position 
-; and the vector, halves the delta (srl d / rr e), then adds it back to the current 
-; stored vector (GetDA26). Finally, writes the interpolated position back into the 
-; object’s position slot. This looks like smooth following or homing movement.
+call_00_2799_Object_UpdateYFromXDisplacement:
+; Computes horizontal distance between object’s initial and current X.
+; If negative, takes absolute value. Then halves that distance.
+; Uses it as an offset to add to the object’s initial Y position, and updates the current Y accordingly.
+; Looks like it enforces an arc/trajectory path (parabola-like).
     call call_00_2835_Object_GetInitialXPos
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddrLo]
@@ -1163,11 +1163,10 @@ label27B3:
     ld   [de],a
     ret  
 
-call_00_27cb_Object_SetYFromMap:
-; Store Map Y Position Into Object
-; Copies the map’s Y position minus $14 into the object’s Y slot, with carry handling:
-; if subtraction underflows, it zeros both low and high bytes. This anchors an object 
-; relative to the map’s scrolling.
+call_00_27cb_Object_PositionAboveViewport:
+; Sets object’s Y position relative to the map scroll (YPositionInMap - 0x14).
+; If underflows, clamps to zero.
+; Likely spawns or aligns the object a bit above the current viewport.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YPOS_OFFSET
@@ -1555,13 +1554,10 @@ call_00_299f_ObjectTurnAround:
     ld   [HL], A                                       ;; 00:29aa $77
     ret                                                ;; 00:29ab $c9
 
-call_00_29ac_ObjectFacingMatchesStoredDirection:
-; Calls call_00_2a68_Object_ComputePlayerXProximity (updates distance of object from player, 
-; and direction of object relative to the player).
-; Calls call_00_2976_ObjectGetFacingDirection (gets the object's facing direction).
-; Compares A (direction) to [wDA12_ObjectDirectionRelativeToPlayer] (a stored reference direction/state).
-; Returns if equal/different.
-; Summary: Checks if an object's current facing direction matches a stored direction after updating.
+call_00_29ac_Object_CheckFacingPlayer:
+; Compares object’s facing direction with the direction relative to the player.
+; Returns if they match.
+; Used for checks like “is the object facing the player?”
     call call_00_2a68_Object_ComputePlayerXProximity
     call call_00_2976_ObjectGetFacingDirection
     ld   hl,wDA12_ObjectDirectionRelativeToPlayer
@@ -1633,7 +1629,7 @@ call_00_29ea_ObjectClearActiveFlag:
     res  7,[hl]
     ret  
 
-call_00_29f5_ObjectClearCollisionFlagAndCheck:
+call_00_29f5_ObjectClearActiveFlagAndCheck:
 ; Gets object entry byte at $D805+index.
 ; Clears bit 4 in memory.
 ; Returns with carry based on the old bit 4 state (bit 4,A).
@@ -1648,7 +1644,7 @@ call_00_29f5_ObjectClearCollisionFlagAndCheck:
 
 call_00_2a03_ResetObjectTempSlot:
 ; Derives a small index from wDA00_CurrentObjectAddrLo by rotating left and masking.
-; Writes 0 to wDA01_ObjectPairRelated + index.
+; Writes 0 to wDA01_ObjectListIndexesForCurrentObjects + index.
 ; Likely clears a small per-object temporary slot.
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2a03 $fa $00 $da
     rlca                                               ;; 00:2a06 $07
@@ -1657,7 +1653,7 @@ call_00_2a03_ResetObjectTempSlot:
     and  A, $07                                        ;; 00:2a09 $e6 $07
     ld   L, A                                          ;; 00:2a0b $6f
     ld   H, $00                                        ;; 00:2a0c $26 $00
-    ld   DE, wDA01_ObjectPairRelated                                     ;; 00:2a0e $11 $01 $da
+    ld   DE, wDA01_ObjectListIndexesForCurrentObjects                                     ;; 00:2a0e $11 $01 $da
     add  HL, DE                                        ;; 00:2a11 $19
     ld   [HL], $00                                     ;; 00:2a12 $36 $00
     ret                                                ;; 00:2a14 $c9
@@ -1874,14 +1870,11 @@ call_00_2afc_FindFreeObjectSlot:
     and  A, A                                          ;; 00:2b0e $a7
     ret                                                ;; 00:2b0f $c9
 
-call_00_2b10_VerifyObjectPairExists:
-; Derives a per-object small index from wDA00_CurrentObjectAddrLo.
-; Loads a saved value B from wDA01_ObjectPairRelated + index.
-; Scans the object table comparing:
-; Primary ID ([HL] vs C), then
-; A secondary ID ([HL|1F] vs B).
-; Returns carry if none, or sets A=1 if a match is found.
-; Purpose: Check whether an object with a given ID pair exists in the object table.
+call_00_2b10_Object_FindDuplicateInstance:
+; Iterates through a block of object slots in WRAM.
+; Compares each entry’s ID and list index against the current object.
+; If a match is found, returns success (A=1).
+; Basically: “does another instance of this object already exist?”
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2b10 $fa $00 $da
     rlca                                               ;; 00:2b13 $07
     rlca                                               ;; 00:2b14 $07
@@ -1889,7 +1882,7 @@ call_00_2b10_VerifyObjectPairExists:
     and  A, $07                                        ;; 00:2b16 $e6 $07
     ld   L, A                                          ;; 00:2b18 $6f
     ld   H, $00                                        ;; 00:2b19 $26 $00
-    ld   DE, wDA01_ObjectPairRelated                                     ;; 00:2b1b $11 $01 $da
+    ld   DE, wDA01_ObjectListIndexesForCurrentObjects                                     ;; 00:2b1b $11 $01 $da
     add  HL, DE                                        ;; 00:2b1e $19
     ld   B, [HL]                                       ;; 00:2b1f $46
     ld   H, $d8                                        ;; 00:2b20 $26 $d8
@@ -1940,7 +1933,7 @@ call_00_2b3d_SweepAndClearActiveObjects:
 
 call_00_2b5d_DeactivateObjectSlot:
 ; Marks the current object slot as inactive by writing $FF to wD8xx. Then computes a related index 
-; from the slot address to access another table (wDA01_ObjectPairRelated → wD7xx) and clears bit 6 of its status 
+; from the slot address to access another table (wDA01_ObjectListIndexesForCurrentObjects → wD7xx) and clears bit 6 of its status 
 ; byte—likely removing an “active” or “visible” flag for that object.
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2b5d $fa $00 $da
     or   A, OBJECT_ID_OFFSET                                        ;; 00:2b60 $f6 $00
@@ -1954,7 +1947,7 @@ call_00_2b5d_DeactivateObjectSlot:
     and  A, $07                                        ;; 00:2b6b $e6 $07
     ld   L, A                                          ;; 00:2b6d $6f
     ld   H, $00                                        ;; 00:2b6e $26 $00
-    ld   DE, wDA01_ObjectPairRelated                                     ;; 00:2b70 $11 $01 $da
+    ld   DE, wDA01_ObjectListIndexesForCurrentObjects                                     ;; 00:2b70 $11 $01 $da
     add  HL, DE                                        ;; 00:2b73 $19
     ld   L, [HL]                                       ;; 00:2b74 $6e
     ld   H, $d7                                        ;; 00:2b75 $26 $d7
@@ -1996,7 +1989,7 @@ call_00_2b94_ZeroObjectStatusEntry:
     and  A, $07                                        ;; 00:2b9a $e6 $07
     ld   L, A                                          ;; 00:2b9c $6f
     ld   H, $00                                        ;; 00:2b9d $26 $00
-    ld   DE, wDA01_ObjectPairRelated                                     ;; 00:2b9f $11 $01 $da
+    ld   DE, wDA01_ObjectListIndexesForCurrentObjects                                     ;; 00:2b9f $11 $01 $da
     add  HL, DE                                        ;; 00:2ba2 $19
     ld   L, [HL]                                       ;; 00:2ba3 $6e
     ld   H, $d7                                        ;; 00:2ba4 $26 $d7
@@ -2013,7 +2006,7 @@ call_00_2ba9_SetObjectStatusTo50:
     and  A, $07                                        ;; 00:2baf $e6 $07
     ld   L, A                                          ;; 00:2bb1 $6f
     ld   H, $00                                        ;; 00:2bb2 $26 $00
-    ld   DE, wDA01_ObjectPairRelated                                     ;; 00:2bb4 $11 $01 $da
+    ld   DE, wDA01_ObjectListIndexesForCurrentObjects                                     ;; 00:2bb4 $11 $01 $da
     add  HL, DE                                        ;; 00:2bb7 $19
     ld   L, [HL]                                       ;; 00:2bb8 $6e
     ld   H, $d7                                        ;; 00:2bb9 $26 $d7
@@ -2055,9 +2048,10 @@ call_00_2bbe_SpawnCollectibleObject:
 .data_02_2c01:
     db   $00, $00, $00, $00, $60, $02, $9c, $03        ;; 00:2c01 ........
 
-call_00_2c09_DispatchOffsetAction:
-; Adds $06 to A, moves it to C, and jumps to call_00_3792_PrepareRelativeObjectSpawn. 
-; Likely an offset-based action dispatcher or table index calculation.
+call_00_2c09_Object_SpawnRelativeWithOffset6:
+; Adds +6 to A, stores in C.
+; Then immediately jumps into PrepareRelativeObjectSpawn routine.
+; Used for spawning a related/sub-object with offset index.
     add  A, $06                                        ;; 00:2c09 $c6 $06
     ld   C, A                                          ;; 00:2c0b $4f
     jp   call_00_3792_PrepareRelativeObjectSpawn                                  ;; 00:2c0c $c3 $92 $37

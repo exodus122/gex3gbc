@@ -346,7 +346,7 @@ call_02_49b3:
     cp   [hl]
     ret  z
     ld   [hl],a
-    ld   hl,wDB66
+    ld   hl,wDB66_HDMATransferFlags
     set  0,[hl]
     ret  
 .data_02_4a15:
@@ -500,7 +500,7 @@ call_02_4adb:
     cp   [hl]
     jr   z,.label4B26
     ld   [hl],a
-    ld   hl,wDB66
+    ld   hl,wDB66_HDMATransferFlags
     set  0,[hl]
 .label4B26:
     ld   a,[wDC81_CurrentInputs]
@@ -559,7 +559,7 @@ label4B7F:
     ld   [wD80D_PlayerFacingDirection],a
     ld   a,$00
     ld   [wDC7A],a
-    ld   hl,wDB66
+    ld   hl,wDB66_HDMATransferFlags
     set  0,[hl]
     ld   a,[wDC9F]
     cp   a,$08

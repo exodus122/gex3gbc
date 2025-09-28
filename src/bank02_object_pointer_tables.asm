@@ -380,9 +380,9 @@ data_02_4000:
     dw   call_02_61ee_ObjectAction_Bee_Unk1, data_02_78b4
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_4470:
-    dw   call_02_6214_ObjectAction_Raft_Unk0, data_02_78ba
-    dw   call_02_624e_ObjectAction_Raft_Unk1, data_02_78ba
-    dw   call_02_6293_ObjectAction_Raft_Unk2, data_02_78ba
+    dw   call_02_6214_ObjectAction_Raft_ResetAndWait, data_02_78ba
+    dw   call_02_624e_ObjectAction_Raft_MoveRightAndCarryPlayer, data_02_78ba
+    dw   call_02_6293_ObjectAction_Raft_DriftDown, data_02_78ba
 .data_02_447c:
     dw   call_02_62bc_ObjectAction_Snake_Unk0, data_02_78c0
     dw   call_02_62f9_ObjectAction_Snake_Unk1, data_02_78c6

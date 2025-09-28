@@ -822,4 +822,4 @@ INCBIN "data/sprite_data/bank_07d.bin"
 SECTION "bank7e", ROMX[$4000], BANK[$7e]
 INCBIN "data/sprite_data/bank_07e.bin"
 SECTION "bank7f", ROMX[$4000], BANK[$7f]
-INCBIN "data/sprite_data/bank_07f.bin"
+INCLUDE "data/sprite_data/bank7F.asm"

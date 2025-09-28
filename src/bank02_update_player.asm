@@ -66,7 +66,7 @@ call_02_4E0C_UpdateActionSequence:
 ; Updates counters (wDCA2–wDCA6) for a repeating animation or scripted sequence. 
 ; Uses call_02_4E7A_LookupFrameData to fetch frame data from tables at $4EA1/$4EC3. Handles two cases: 
 ; when the player’s action ID is $27 (special move) or any other action. Sets flags (wDC7F, wDC80), 
-; triggers sound/action (entry_02_54f9_SwitchPlayerAction) when counters overflow, and sets wDB66 to signal a redraw.
+; triggers sound/action (entry_02_54f9_SwitchPlayerAction) when counters overflow, and sets wDB66_HDMATransferFlags to signal a redraw.
 ; Purpose: Manage complex animation or event sequences based on timers and player state.
     ld   a,[wDCA5]
     ld   [wDCA6],a
@@ -123,7 +123,7 @@ label4E6A:
     cp   [hl]
     ret  z
     ld   [hl],a
-    ld   hl,wDB66
+    ld   hl,wDB66_HDMATransferFlags
     set  0,[hl]
     ret  
 
@@ -132,19 +132,19 @@ call_02_4E7A_LookupFrameData:
 ; byte based on facing direction. Stores result in wDCA4.
 ; Purpose: Table-driven frame or pattern lookup for 4E0C.
     ld   d,$00
-    ld   hl,$4EC3
+    ld   hl,.data_02_4EC3
     ld   a,[wD801_PlayerObject_ActionId]
     cp   a,$27
-    jr   z,label4E89
-    ld   hl,$4EA1
-label4E89:
+    jr   z,.label4E89
+    ld   hl,.data_02_4EA3-2
+.label4E89:
     inc  hl
     inc  hl
     ldi  a,[hl]
     cp   a,$FF
     ret  z
     cp   e
-    jr   nz,label4E89
+    jr   nz,.label4E89
     ld   d,e
     ld   c,[hl]
     inc  hl
@@ -152,17 +152,19 @@ label4E89:
     ld   a,[wD80D_PlayerFacingDirection]
     cp   a,$00
     ld   a,c
-    jr   z,label4E9F
+    jr   z,.label4E9F
     ld   a,b
-label4E9F:
+.label4E9F:
     ld   [wDCA4],a
     ret  
-    
+.data_02_4EA3:
     db   $01        ;; 02:4e9c ????????
     db   $05, $05, $06, $09, $01, $0d, $09, $01        ;; 02:4ea4 ????????
     db   $05, $01, $09, $0e, $01, $09, $09, $07        ;; 02:4eac ????????
     db   $03, $0a, $07, $03, $0b, $03, $07, $0c        ;; 02:4eb4 ????????
-    db   $03, $07, $0f, $03, $07, $10, $03, $07        ;; 02:4ebc ????????
+    db   $03, $07, $0f, $03, $07, $10, $03
+.data_02_4EC3:
+    db   $07        ;; 02:4ebc ????????
     db   $ff, $01, $0b, $0b, $06, $1b, $13, $0d        ;; 02:4ec4 ????????
     db   $1b, $13, $05, $13, $1b, $0e, $13, $1b        ;; 02:4ecc ????????
     db   $09, $2b, $23, $0a, $2b, $23, $0b, $23        ;; 02:4ed4 ????????

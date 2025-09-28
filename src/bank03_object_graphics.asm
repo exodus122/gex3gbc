@@ -31,12 +31,12 @@ data_03_58d3:
     db   $02, $05, $02, $91, $1c, $09, $01, $04        ;; 03:59ab ????????
     db   $01, $05, $02                                 ;; 03:59b3 ???
 
-entry_03_59b6_GetObjectPropertyFromDB61:
+entry_03_59b6_LookupObjectPropertyFromType:
 ; Object Property Lookup (DB61-based)
 ; Description:
-; Uses the byte at wDB61 as an index into a two-byte table at data_03_58d3 to return an object property byte. 
+; Uses the byte at wDB61_ActiveObjectSlot as an index into a two-byte table at data_03_58d3 to return an object property byte. 
 ; Likely retrieves a behavior or sprite index based on some game state or object slot.
-    ld   HL, wDB61                                     ;; 03:59b6 $21 $61 $db
+    ld   HL, wDB61_ActiveObjectSlot                                     ;; 03:59b6 $21 $61 $db
     ld   L, [HL]                                       ;; 03:59b9 $6e
     ld   H, $d8                                        ;; 03:59ba $26 $d8
     ld   L, [HL]                                       ;; 03:59bc $6e

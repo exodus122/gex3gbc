@@ -87,6 +87,7 @@ entry_02_7132_BackupObjectTable:
 ; (wDA09_LoadedObjectIdsBackupBuffer).
 ; Details:
 ; Iterates through object slots in steps of $20, copying each byte until wrap-around.
+; This is used when pausing
     ld   HL, wD800_PlayerObject_Id                                     ;; 02:7132 $21 $00 $d8
     ld   DE, wDA09_LoadedObjectIdsBackupBuffer                                     ;; 02:7135 $11 $09 $da
 .jr_02_7138:
@@ -103,6 +104,7 @@ entry_02_7142_RestoreObjectTable:
 ; Purpose: Restores object table entries from the backup buffer back to working memory.
 ; Details:
 ; Reverse of BackupObjectTable, writing from wDA09_LoadedObjectIdsBackupBuffer back to wD800.
+; This is used when unpausing
     ld   HL, wD800_PlayerObject_Id                                     ;; 02:7142 $21 $00 $d8
     ld   DE, wDA09_LoadedObjectIdsBackupBuffer                                     ;; 02:7145 $11 $09 $da
 .jr_02_7148:
@@ -333,11 +335,11 @@ call_02_72a1_CheckIfPlayerActorUpdatedAction:
 ; Mark Object Slot Active
 ; Description:
 ; Checks if wDA00_CurrentObjectAddrLo is zero (no active object). If so, sets bit0 of 
-; wDB66, likely to indicate that the player actor has changed it's action.
+; wDB66_HDMATransferFlags, likely to indicate that the player actor has changed it's action.
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:72a1 $fa $00 $da
     and  A, A                                          ;; 02:72a4 $a7
     ret  NZ                                            ;; 02:72a5 $c0
-    ld   HL, wDB66                                     ;; 02:72a6 $21 $66 $db
+    ld   HL, wDB66_HDMATransferFlags                                     ;; 02:72a6 $21 $66 $db
     set  0, [HL]                                       ;; 02:72a9 $cb $c6
     ret                                                ;; 02:72ab $c9
 
@@ -348,7 +350,7 @@ call_02_72ac_SetupNewAction:
 ; Details:
 ; Uses the object ID (masked with $7F) as an index into the object data table.
 ; Copies attributes like behavior pointers and timers into the object's memory slot.
-; Sets auxiliary values and flags (wDB66 bit 0) to indicate a new object was loaded.
+; Sets auxiliary values and flags (wDB66_HDMATransferFlags bit 0) to indicate a new object was loaded.
     and  A, $7f                                        ;; 02:72ac $e6 $7f
     ld   HL, wDA00_CurrentObjectAddrLo                   ;; 02:72ae $21 $00 $da
     ld   L, [HL]                                       ;; 02:72b1 $6e

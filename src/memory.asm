@@ -83,7 +83,7 @@ wD811_PlayerYPosition:
     ds 15                                              ;; d811
 wD820_ObjectMemoryAfterPlayer:
     ds 32                                              ;; d820
-wD840: ; why does some code use this and not wDB20? is this a bug? 
+wD840_ObjectMemoryAfterPlayer: ; why does some code use this and not wDB20? is this a bug? 
     ds 32                                              ;; d840
     ds 32 
     ds 32 
@@ -116,7 +116,8 @@ wD9FF:
 wDA00_CurrentObjectAddrLo:
 ; if the object instance starts at $D8E0, this value is E0, for example
     ds 1                                               ;; da00
-wDA01_ObjectPairRelated:
+wDA01_ObjectListIndexesForCurrentObjects:
+; stores the entry number in the object list, of all the currently loaded objects
     ds 8                                               ;; da01
 wDA09_LoadedObjectIdsBackupBuffer:
     ds 8                                               ;; da09
@@ -267,22 +268,36 @@ wDAE0:
 wDAE1_TextBuffer:
     ds 128                                             ;; dae1
 
-wDB61:
+; HDMA Transfer related ram
+wDB61_ActiveObjectSlot:
     ds 2                                               ;; db61
-
-wDB63:
+wDB63_ActiveObjectType:
     ds 1                                               ;; db63
-
-wDB64:
+wDB64_VRAMTransferSourceLo:
     ds 1                                               ;; db64
-
-wDB65:
+wDB64_VRAMTransferSourceHi:
     ds 1                                               ;; db65
-
-wDB66:
+wDB66_HDMATransferFlags:
+; Bit 0 set →
+; Copy a fixed number of tiles from a general-purpose buffer (wDAC0–wDAC2).
+; - Source bank = wDABF_GexSpriteBank.
+; - Transfer length = wDAC2_DMATransferLength.
+; - Always writes to VRAM bank 0.
+; Bit 1 set →
+; Copy tiles for the current interaction object.
+; - Uses wDB64/65 as the source pointer.
+; - Source bank depends on the object’s data (OBJECT_UNK05_OFFSET, plus a VBK = 1 path if “extended” graphics).
+; - Length depends on the object’s type (wDB63_ActiveObjectType).
+; - This looks like sprite/animation tiles for NPCs or items.
+; Bit 2 set →
+; Perform a variable-length streaming transfer.
+; - Uses wDC2B–wDC32 as a little “DMA job struct”: source address, destination, length, VRAM bank, and continuation fields.
+; - After copying, it updates the struct so the next frame continues where this left off until finished.
+; - When finished, clears bit 2.
+; - Looks like it’s used for big transfers (maybe level backgrounds, cutscene art, or font pages).
     ds 1                                               ;; db66
 
-wDB67:
+wDB67_HDMATempScratch:
     ds 2                                               ;; db67
 
 wDB69:

@@ -2043,7 +2043,7 @@ call_01_4cc3_GetVramTilePtrFromIndex:
     add  hl,hl
     add  hl,hl
     add  hl,hl
-    ld   de,$8000
+    ld   de,_VRAM
     add  hl,de
     ld   e,l
     ld   d,h
@@ -2214,7 +2214,7 @@ call_01_4d6e_PrepareStreamingPointers:
     add  HL, HL                                        ;; 01:4da2 $29
     add  HL, HL                                        ;; 01:4da3 $29
     add  HL, HL                                        ;; 01:4da4 $29
-    ld   DE, $8000                                     ;; 01:4da5 $11 $00 $80
+    ld   DE, _VRAM                                     ;; 01:4da5 $11 $00 $80
     add  HL, DE                                        ;; 01:4da8 $19
     ld   A, L                                          ;; 01:4da9 $7d
     ld   [wDBF4], A                                    ;; 01:4daa $ea $f4 $db

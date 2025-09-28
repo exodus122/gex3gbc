@@ -4,10 +4,10 @@ call_00_2cbf_LoadObjectPalettes:
     ld   HL, wDB6C_CurrentMapId                                     ;; 00:2cc4 $21 $6c $db
     ld   E, [HL]                                       ;; 00:2cc7 $5e
     ld   D, $00                                        ;; 00:2cc8 $16 $00
-    ld   HL, $4000                                     ;; 00:2cca $21 $00 $40
+    ld   HL, data_7f_4000                                     ;; 00:2cca $21 $00 $40
     add  HL, DE                                        ;; 00:2ccd $19
     ld   E, [HL]                                       ;; 00:2cce $5e
-    ld   HL, $4040                                     ;; 00:2ccf $21 $40 $40
+    ld   HL, data_7f_4040                                     ;; 00:2ccf $21 $40 $40
     add  HL, DE                                        ;; 00:2cd2 $19
     ld   A, [HL+]                                      ;; 00:2cd3 $2a
     ld   H, [HL]                                       ;; 00:2cd4 $66
@@ -42,10 +42,10 @@ call_00_2ce2_BuildGexSpriteDrawList:
     ld   HL, wDB6C_CurrentMapId                                     ;; 00:2cf6 $21 $6c $db
     ld   E, [HL]                                       ;; 00:2cf9 $5e
     ld   D, $00                                        ;; 00:2cfa $16 $00
-    ld   HL, $4000                                     ;; 00:2cfc $21 $00 $40
+    ld   HL, data_7f_4000                                     ;; 00:2cfc $21 $00 $40
     add  HL, DE                                        ;; 00:2cff $19
     ld   E, [HL]                                       ;; 00:2d00 $5e
-    ld   HL, $403d                                     ;; 00:2d01 $21 $3d $40
+    ld   HL, data_7f_403d                                     ;; 00:2d01 $21 $3d $40
     add  HL, DE                                        ;; 00:2d04 $19
     ld   A, [HL+]                                      ;; 00:2d05 $2a
     ld   [wDABF_GexSpriteBank], A                                    ;; 00:2d06 $ea $bf $da
@@ -643,16 +643,16 @@ call_00_2ff8_InitLevelObjectsAndConfig:
 
 call_00_3180_MarkInitialLevelObjects:
 ; Mark Starting Objects for Level
-; Behavior: If level number ≠ 0, looks up a bitmask table ($31C1+level) and, 
+; Behavior: If level number ≠ 0, looks up a bitmask table (.data_00_31c1+level) and, 
 ; for each bit set, calls FindAndMarkObjectInList. For level 0, performs a banked 
-; call comparison loop using entry_01_4ab9_CountSetBitsInFlags and thresholds in $31CD.
+; call comparison loop using entry_01_4ab9_CountSetBitsInFlags and thresholds in .data_00_31cd.
 ; Purpose: Ensures certain objects are flagged or activated when the level begins.
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:3180 $fa $1e $dc
     and  A, A                                          ;; 00:3183 $a7
     jr   Z, .jr_00_31a0                                ;; 00:3184 $28 $1a
     ld   L, A                                          ;; 00:3186 $6f
     ld   H, $00                                        ;; 00:3187 $26 $00
-    ld   DE, $31c1                                     ;; 00:3189 $11 $c1 $31
+    ld   DE, .data_00_31c1                                     ;; 00:3189 $11 $c1 $31
     add  HL, DE                                        ;; 00:318c $19
     ld   B, [HL]                                       ;; 00:318d $46
     ld   C, $01                                        ;; 00:318e $0e $01
@@ -674,7 +674,7 @@ call_00_3180_MarkInitialLevelObjects:
     push BC                                            ;; 00:31a4 $c5
     farcall entry_01_4ab9_CountSetBitsInFlags
     pop  BC                                            ;; 00:31b0 $c1
-    ld   HL, $31cd                                     ;; 00:31b1 $21 $cd $31
+    ld   HL, .data_00_31cd                                     ;; 00:31b1 $21 $cd $31
     add  HL, BC                                        ;; 00:31b4 $09
     cp   A, [HL]                                       ;; 00:31b5 $be
     call NC, call_00_21f6_FindAndMarkObjectInList_TVButton                              ;; 00:31b6 $d4 $f6 $21
@@ -684,8 +684,11 @@ call_00_3180_MarkInitialLevelObjects:
     cp   A, $0c                                        ;; 00:31bc $fe $0c
     jr   C, .jr_00_31a3                                ;; 00:31be $38 $e3
     ret                                                ;; 00:31c0 $c9
+.data_00_31c1:
     db   $00, $00, $01, $04, $05, $00, $00, $00        ;; 00:31c1 ?.??????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:31c9 ????????
+    db   $00, $00, $00, $00
+.data_00_31cd:
+    db   $00, $00, $00, $00        ;; 00:31c9 ????????
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:31d1 ????????
 
 call_00_31d9_CheckAndClearBonusCoinObjectFlags:
@@ -727,7 +730,7 @@ call_00_31d9_CheckAndClearBonusCoinObjectFlags:
 call_00_320d_CheckAndClearPawCoinObjectFlags:
 ; Mask Object Flags by Level Setting
 ; Behavior: Gets a bitmask (C) from wDC5C + level, scans the object list for type 03. 
-; For each, uses its 13th byte as an index into $324E (00,20,40,80), ANDs with C; if nonzero, 
+; For each, uses its 13th byte as an index into .data_00_324e (00,20,40,80), ANDs with C; if nonzero, 
 ; clears the corresponding entry in RAM (wD7xx).
 ; Purpose: Applies level-specific masking to object type 3 spawns.
     ld   A, [wDC16_ObjectListBank]                                    ;; 00:320d $fa $16 $dc
@@ -752,7 +755,7 @@ call_00_320d_CheckAndClearPawCoinObjectFlags:
     add  HL, DE                                        ;; 00:322f $19
     ld   L, [HL]                                       ;; 00:3230 $6e
     ld   H, $00                                        ;; 00:3231 $26 $00
-    ld   DE, $324e                                     ;; 00:3233 $11 $4e $32
+    ld   DE, .data_00_324e                                     ;; 00:3233 $11 $4e $32
     add  HL, DE                                        ;; 00:3236 $19
     ld   A, [HL]                                       ;; 00:3237 $7e
     and  A, C                                          ;; 00:3238 $a1
@@ -769,6 +772,7 @@ call_00_320d_CheckAndClearPawCoinObjectFlags:
     cp   A, $ff                                        ;; 00:3247 $fe $ff
     jr   NZ, .jr_00_3226                               ;; 00:3249 $20 $db
     jp   call_00_0f08_RestoreBank                                  ;; 00:324b $c3 $08 $0f
+.data_00_324e:
     db   $00, $20, $40, $80                            ;; 00:324e ?...
 
 call_00_3252_ResetObjectCounter:
@@ -1193,7 +1197,7 @@ call_00_3618_HandleObjectSpawn:
     ld   HL, wDAB9_NextAvailableObjectSlot                                     ;; 00:3762 $21 $b9 $da
     ld   L, [HL]                                       ;; 00:3765 $6e
     ld   H, $00                                        ;; 00:3766 $26 $00
-    ld   DE, wDA01_ObjectPairRelated                                     ;; 00:3768 $11 $01 $da
+    ld   DE, wDA01_ObjectListIndexesForCurrentObjects                                     ;; 00:3768 $11 $01 $da
     add  HL, DE                                        ;; 00:376b $19
     ld   A, [wDABA_ObjectCounterRelated]                                    ;; 00:376c $fa $ba $da
     ld   [HL], A                                       ;; 00:376f $77
@@ -1240,7 +1244,7 @@ call_00_37a0_SpawnObjectRelative:
     and  A, $07                                        ;; 00:37b9 $e6 $07
     ld   L, A                                          ;; 00:37bb $6f
     ld   H, $00                                        ;; 00:37bc $26 $00
-    ld   DE, wDA01_ObjectPairRelated                                     ;; 00:37be $11 $01 $da
+    ld   DE, wDA01_ObjectListIndexesForCurrentObjects                                     ;; 00:37be $11 $01 $da
     add  HL, DE                                        ;; 00:37c1 $19
     ld   A, [HL]                                       ;; 00:37c2 $7e
     ld   [wDCE8], A                                    ;; 00:37c3 $ea $e8 $dc

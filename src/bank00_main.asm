@@ -74,18 +74,18 @@ call_00_0150_Init:
     pop  AF                                            ;; 00:0191 $f1
     cp   A, $11                                        ;; 00:0192 $fe $11
     jr   Z, .jr_00_01d2                                ;; 00:0194 $28 $3c
-    ld   A, $07                                        ;; 00:0196 $3e $07
+    ld   A, Bank07                                        ;; 00:0196 $3e $07
     ld   [MBC1RomBank], A                                    ;; 00:0198 $ea $01 $20
     swap A                                             ;; 00:019b $cb $37
     rrca                                               ;; 00:019d $0f
     and  A, $00                                        ;; 00:019e $e6 $00
     ld   [MBC1SRamBank], A                                    ;; 00:01a0 $ea $01 $40
-    ld   HL, $5b00                                     ;; 00:01a3 $21 $00 $5b
-    ld   DE, $8000                                     ;; 00:01a6 $11 $00 $80
+    ld   HL, image_007_5b00                                     ;; 00:01a3 $21 $00 $5b
+    ld   DE, _VRAM                                     ;; 00:01a6 $11 $00 $80
     ld   BC, $a00                                      ;; 00:01a9 $01 $00 $0a
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:01ac $cd $6e $07
-    ld   HL, $9800                                     ;; 00:01af $21 $00 $98
-    ld   DE, $6500                                     ;; 00:01b2 $11 $00 $65
+    ld   HL, _SCRN0                                     ;; 00:01af $21 $00 $98
+    ld   DE, image_007_5b00_bgmap_tile_ids                                     ;; 00:01b2 $11 $00 $65
     ld   C, $12                                        ;; 00:01b5 $0e $12
 .jr_00_01b7:
     ld   B, $14                                        ;; 00:01b7 $06 $14
@@ -119,8 +119,8 @@ call_00_0150_Init:
 .jr_00_01e7:
     push AF                                            ;; 00:01e7 $f5
     ldh  [rVBK], A                                     ;; 00:01e8 $e0 $4f
-    ld   HL, $8000                                     ;; 00:01ea $21 $00 $80
-    ld   DE, $8001                                     ;; 00:01ed $11 $01 $80
+    ld   HL, _VRAM                                     ;; 00:01ea $21 $00 $80
+    ld   DE, _VRAM+$0001                                     ;; 00:01ed $11 $01 $80
     ld   BC, $1fff                                     ;; 00:01f0 $01 $ff $1f
     ld   [HL], $00                                     ;; 00:01f3 $36 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:01f5 $cd $6e $07
@@ -386,7 +386,7 @@ call_00_0150_Init:
     call call_00_0fc8_ProcessQueuedSoundEffect                                  ;; 00:04ec $cd $c8 $0f
     call call_00_150f_CheckAndSetLevelTrigger                                  ;; 00:04ef $cd $0f $15
     call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:04f2 $cd $fa $35
-    call call_00_08f8_HandleObjectInteractionOrTriggerEvent                                  ;; 00:04f5 $cd $f8 $08
+    call call_00_08f8_SetupObjectVRAMTransfer                                  ;; 00:04f5 $cd $f8 $08
     jp   .jp_00_0443                                   ;; 00:04f8 $c3 $43 $04
 
 call_00_04fb:
@@ -407,10 +407,10 @@ call_00_0513:
     ld   HL, wDB6C_CurrentMapId                                     ;; 00:0518 $21 $6c $db
     ld   E, [HL]                                       ;; 00:051b $5e
     ld   D, $00                                        ;; 00:051c $16 $00
-    ld   HL, $4000                                     ;; 00:051e $21 $00 $40
+    ld   HL, data_7f_4000                                     ;; 00:051e $21 $00 $40
     add  HL, DE                                        ;; 00:0521 $19
     ld   E, [HL]                                       ;; 00:0522 $5e
-    ld   HL, $403d                                     ;; 00:0523 $21 $3d $40
+    ld   HL, data_7f_403d                                     ;; 00:0523 $21 $3d $40
     add  HL, DE                                        ;; 00:0526 $19
     ld   A, [HL+]                                      ;; 00:0527 $2a
     ld   [wDABF_GexSpriteBank], A                                    ;; 00:0528 $ea $bf $da
@@ -445,7 +445,7 @@ call_00_0513:
     ld   A, [HL+]                                      ;; 00:0558 $2a
     ld   [wDAC1_GeneralPurposeDMASourceAddressHi], A                                    ;; 00:0559 $ea $c1 $da
     call call_00_0f08_RestoreBank                                  ;; 00:055c $cd $08 $0f
-    ld   HL, wDB66                                     ;; 00:055f $21 $66 $db
+    ld   HL, wDB66_HDMATransferFlags                                     ;; 00:055f $21 $66 $db
     set  0, [HL]                                       ;; 00:0562 $cb $c6
     ld   A, $05                                        ;; 00:0564 $3e $05
     call call_00_0c10_QueueVRAMCopyRequest                                  ;; 00:0566 $cd $10 $0c
@@ -453,8 +453,8 @@ call_00_0513:
     ld   [HL], $17                                     ;; 00:056c $36 $17
 .jr_00_056e:
     call call_00_0b92_WaitForInterrupt                                  ;; 00:056e $cd $92 $0b
-    call call_00_08f8_HandleObjectInteractionOrTriggerEvent                                  ;; 00:0571 $cd $f8 $08
-    ld   A, [wDB66]                                    ;; 00:0574 $fa $66 $db
+    call call_00_08f8_SetupObjectVRAMTransfer                                  ;; 00:0571 $cd $f8 $08
+    ld   A, [wDB66_HDMATransferFlags]                                    ;; 00:0574 $fa $66 $db
     and  A, $ff                                        ;; 00:0577 $e6 $ff
     jr   NZ, .jr_00_056e                               ;; 00:0579 $20 $f3
     ld   A, [wDB69]                                    ;; 00:057b $fa $69 $db
@@ -989,28 +989,21 @@ call_00_088a_HDMA_BackgroundAnimator:
     dw   wDBE7                                         ;; 00:08f1 pP
     db   $08, $20, $4d, $40, $8f                       ;; 00:08f3 .....
 
-call_00_08f8_HandleObjectInteractionOrTriggerEvent:
-; This function appears to poll a status byte (wDB66) and processes a set of objects or entities to determine 
-; whether an event, trigger, or interaction should occur. It does so by checking and modifying various bits 
-; in memory, resolving object properties, and calculating function pointers.
-;
-; Key Actions:
-; - Waits for bit 7 of wDB66 to clear (a "ready" or "idle" flag).
-; - Checks bits 0, 1, and 2 to see if specific subroutines should be jumped to.
-; - Loops through object slots at wD840, checking status bits (bit 1 and 5), and acts on qualifying objects.
-; - Resolves function pointers using a table (.data_00_0a58_ObjectPropertyJumpTable) and object data from wDB61.
-; - Sets up memory locations for function execution.
-; - Marks the object slot as active again by setting bits 1 and 7 in wDB66.
-    ld   HL, wDB66                                     ;; 00:08f8 $21 $66 $db
+call_00_08f8_SetupObjectVRAMTransfer:
+; Prepares an object’s graphics for VRAM upload.
+; Resolves the active object’s type and data pointer, stores the source address in wDB64/65, 
+; and sets the appropriate wDB66_HDMATransferFlags so that HandlePendingHDMATransfers will 
+; stream the tiles into VRAM on the next frame.
+    ld   HL, wDB66_HDMATransferFlags                                     ;; 00:08f8 $21 $66 $db
     bit  7, [HL]                                       ;; 00:08fb $cb $7e
-    jr   NZ, call_00_08f8_HandleObjectInteractionOrTriggerEvent                              ;; 00:08fd $20 $f9
+    jr   NZ, call_00_08f8_SetupObjectVRAMTransfer                              ;; 00:08fd $20 $f9
     bit  2, [HL]                                       ;; 00:08ff $cb $56
     jp   NZ, .jp_00_0a52                               ;; 00:0901 $c2 $52 $0a
     bit  0, [HL]                                       ;; 00:0904 $cb $46
     jp   NZ, .jp_00_0a52                               ;; 00:0906 $c2 $52 $0a
     bit  1, [HL]                                       ;; 00:0909 $cb $4e
     ret  NZ                                            ;; 00:090b $c0
-    ld   HL, wD840                                     ;; 00:090c $21 $40 $d8
+    ld   HL, wD840_ObjectMemoryAfterPlayer                                     ;; 00:090c $21 $40 $d8
 .jr_00_090f:
     push HL                                            ;; 00:090f $e5
     ld   A, [HL]                                       ;; 00:0910 $7e
@@ -1035,7 +1028,7 @@ call_00_08f8_HandleObjectInteractionOrTriggerEvent:
     res  1, [HL]                                       ;; 00:092a $cb $8e
     pop  HL                                            ;; 00:092c $e1
     ld   A, L                                          ;; 00:092d $7d
-    ld   [wDB61], A                                    ;; 00:092e $ea $61 $db
+    ld   [wDB61_ActiveObjectSlot], A                                    ;; 00:092e $ea $61 $db
     or   A, $0a                                        ;; 00:0931 $f6 $0a
     ld   L, A                                          ;; 00:0933 $6f
     ld   C, [HL]                                       ;; 00:0934 $4e
@@ -1066,12 +1059,12 @@ call_00_08f8_HandleObjectInteractionOrTriggerEvent:
     dec  C                                             ;; 00:0952 $0d
     jr   NZ, .jr_00_0951                               ;; 00:0953 $20 $fc
     ld   A, L                                          ;; 00:0955 $7d
-    ld   [wDB64], A                                    ;; 00:0956 $ea $64 $db
+    ld   [wDB64_VRAMTransferSourceLo], A                                    ;; 00:0956 $ea $64 $db
     ld   A, H                                          ;; 00:0959 $7c
-    ld   [wDB65], A                                    ;; 00:095a $ea $65 $db
-    farcall entry_03_59b6_GetObjectPropertyFromDB61
-    ld   [wDB63], A                                    ;; 00:0968 $ea $63 $db
-    ld   HL, wDB66                                     ;; 00:096b $21 $66 $db
+    ld   [wDB64_VRAMTransferSourceHi], A                                    ;; 00:095a $ea $65 $db
+    farcall entry_03_59b6_LookupObjectPropertyFromType
+    ld   [wDB63_ActiveObjectType], A                                    ;; 00:0968 $ea $63 $db
+    ld   HL, wDB66_HDMATransferFlags                                     ;; 00:096b $21 $66 $db
 .jr_00_096e:
     set  1, [HL]                                       ;; 00:096e $cb $ce
     set  7, [HL]                                       ;; 00:0970 $cb $fe
@@ -1084,21 +1077,22 @@ call_00_08f8_HandleObjectInteractionOrTriggerEvent:
     db   $80, $01, $80, $3e, $3a, $80, $01, $80        ;; 00:0988 ????????
     db   $3e, $6e, $80, $03, $80, $3c, $66, $00        ;; 00:0990 ????????
     db   $02, $00, $3e, $ff                            ;; 00:0998 ????
+
 .jr_00_099c:
     res  1, [HL]                                       ;; 00:099c $cb $8e
     pop  HL                                            ;; 00:099e $e1
     ld   A, L                                          ;; 00:099f $7d
-    ld   [wDB61], A                                    ;; 00:09a0 $ea $61 $db
+    ld   [wDB61_ActiveObjectSlot], A                                    ;; 00:09a0 $ea $61 $db
     or   A, $0a                                        ;; 00:09a3 $f6 $0a
     ld   L, A                                          ;; 00:09a5 $6f
     ld   A, [HL]                                       ;; 00:09a6 $7e
     push AF                                            ;; 00:09a7 $f5
-    farcall entry_03_59b6_GetObjectPropertyFromDB61
-    ld   [wDB63], A                                    ;; 00:09b3 $ea $63 $db
+    farcall entry_03_59b6_LookupObjectPropertyFromType
+    ld   [wDB63_ActiveObjectType], A                                    ;; 00:09b3 $ea $63 $db
     ld   L, A                                          ;; 00:09b6 $6f
     ld   H, $00                                        ;; 00:09b7 $26 $00
     add  HL, HL                                        ;; 00:09b9 $29
-    ld   DE, .data_00_0a58_ObjectPropertyJumpTable                                      ;; 00:09ba $11 $58 $0a
+    ld   DE, .data_00_0a58_ObjectVRAMSourceResolvers                                      ;; 00:09ba $11 $58 $0a
     add  HL, DE                                        ;; 00:09bd $19
     ld   A, [HL+]                                      ;; 00:09be $2a
     ld   H, [HL]                                       ;; 00:09bf $66
@@ -1107,6 +1101,7 @@ call_00_08f8_HandleObjectInteractionOrTriggerEvent:
     ld   D, A                                          ;; 00:09c2 $57
     ld   E, $00                                        ;; 00:09c3 $1e $00
     jp   HL                                            ;; 00:09c5 $e9
+
 .jr_00_09c6:
     srl  d
     rr   e
@@ -1141,7 +1136,7 @@ call_00_08f8_HandleObjectInteractionOrTriggerEvent:
     srl  D                                             ;; 00:09f6 $cb $3a
     rr   E                                             ;; 00:09f8 $cb $1b
     add  HL, DE                                        ;; 00:09fa $19
-    ld   DE, entry_01_4000_MenuHandler_LoadAndProcess                              ;; 00:09fb $11 $00 $40
+    ld   DE, $4000                              ;; 00:09fb $11 $00 $40
     add  HL, DE                                        ;; 00:09fe $19
     jr   .jr_00_0a45                                   ;; 00:09ff $18 $44
 .jr_00_0a01:
@@ -1165,7 +1160,7 @@ call_00_08f8_HandleObjectInteractionOrTriggerEvent:
     rr   E                                             ;; 00:0a1d $cb $1b
     srl  D                                             ;; 00:0a1f $cb $3a
     rr   E                                             ;; 00:0a21 $cb $1b
-    ld   HL, entry_01_4000_MenuHandler_LoadAndProcess                              ;; 00:0a23 $21 $00 $40
+    ld   HL, $4000                              ;; 00:0a23 $21 $00 $40
     add  HL, DE                                        ;; 00:0a26 $19
     jr   .jr_00_0a45                                   ;; 00:0a27 $18 $1c
 .jr_00_0a29:
@@ -1179,40 +1174,40 @@ call_00_08f8_HandleObjectInteractionOrTriggerEvent:
 .jr_00_0a37:
     srl  d
     rr   e
-    ld   hl,data_02_4000
+    ld   hl, $4000
     add  hl,de
     jr   .jr_00_0a45
 .jr_00_0a41:
-    ld   HL, entry_01_4000_MenuHandler_LoadAndProcess                              ;; 00:0a41 $21 $00 $40
+    ld   HL, $4000                              ;; 00:0a41 $21 $00 $40
     add  HL, DE                                        ;; 00:0a44 $19
 .jr_00_0a45:
     ld   A, L                                          ;; 00:0a45 $7d
-    ld   [wDB64], A                                    ;; 00:0a46 $ea $64 $db
+    ld   [wDB64_VRAMTransferSourceLo], A                                    ;; 00:0a46 $ea $64 $db
     ld   A, H                                          ;; 00:0a49 $7c
-    ld   [wDB65], A                                    ;; 00:0a4a $ea $65 $db
-    ld   HL, wDB66                                     ;; 00:0a4d $21 $66 $db
+    ld   [wDB64_VRAMTransferSourceHi], A                                    ;; 00:0a4a $ea $65 $db
+    ld   HL, wDB66_HDMATransferFlags                                     ;; 00:0a4d $21 $66 $db
     set  1, [HL]                                       ;; 00:0a50 $cb $ce
 .jp_00_0a52:
-    ld   HL, wDB66                                     ;; 00:0a52 $21 $66 $db
+    ld   HL, wDB66_HDMATransferFlags                                     ;; 00:0a52 $21 $66 $db
     set  7, [HL]                                       ;; 00:0a55 $cb $fe
     ret                                                ;; 00:0a57 $c9
-.data_00_0a58_ObjectPropertyJumpTable:
-; Used to resolve which object function to run based on object type (wDB63).
+.data_00_0a58_ObjectVRAMSourceResolvers:
+; Used to resolve which function to run based on object type (wDB63_ActiveObjectType).
     dw   .jr_00_0a17, .jr_00_0a17, .jr_00_0a29        ;; 00:0a58 ??
     dw   .jr_00_09c6, .jr_00_0a37, .jr_00_09db        ;; 00:0a5e ??????
     dw   .jr_00_09f0, .jr_00_0a01, .jr_00_0a41        ;; 00:0a64 pP
 
 call_00_0a6a_LoadMapConfigAndWaitVBlank:
 ; This function loads configuration data for a map or scene, stores it in working memory (wDC2B), 
-; adjusts tile bank offsets if needed, and waits for bit 2 of wDB66 to clear, 
+; adjusts tile bank offsets if needed, and waits for bit 2 of wDB66_HDMATransferFlags to clear, 
 ; likely indicating VBlank or scene loading finished.
 ;
 ; Key Actions:
 ; - Indexes into .data_00_0aa9_TilesetLoadConfigTable using a value in register C to get map/scene config.
 ; - Copies 8 bytes of data to wDC2B.
 ; - If a certain flag is unset (wDC31 == $FF), calculates and writes tile offsets and assigns tile bank (wDC07).
-; - Sets bits 2 and 7 in wDB66.
-; - Waits for VBlank or completion signal (bit 2 of wDB66 cleared).
+; - Sets bits 2 and 7 in wDB66_HDMATransferFlags.
+; - Waits for VBlank or completion signal (bit 2 of wDB66_HDMATransferFlags cleared).
     ld   L, C                                          ;; 00:0a6a $69
     ld   H, $00                                        ;; 00:0a6b $26 $00
     add  HL, HL                                        ;; 00:0a6d $29
@@ -1236,12 +1231,12 @@ call_00_0a6a_LoadMapConfigAndWaitVBlank:
     ld   A, [wDC07_TilesetBank]                                    ;; 00:0a91 $fa $07 $dc
 .jr_00_0a94:
     ld   [wDC31], A                                    ;; 00:0a94 $ea $31 $dc
-    ld   HL, wDB66                                     ;; 00:0a97 $21 $66 $db
+    ld   HL, wDB66_HDMATransferFlags                                     ;; 00:0a97 $21 $66 $db
     set  2, [HL]                                       ;; 00:0a9a $cb $d6
     set  7, [HL]                                       ;; 00:0a9c $cb $fe
 .jr_00_0a9e:
     call call_00_0b92_WaitForInterrupt                                  ;; 00:0a9e $cd $92 $0b
-    ld   HL, wDB66                                     ;; 00:0aa1 $21 $66 $db
+    ld   HL, wDB66_HDMATransferFlags                                     ;; 00:0aa1 $21 $66 $db
     bit  2, [HL]                                       ;; 00:0aa4 $cb $56
     jr   NZ, .jr_00_0a9e                               ;; 00:0aa6 $20 $f6
     ret                                                ;; 00:0aa8 $c9
@@ -1252,17 +1247,17 @@ call_00_0a6a_LoadMapConfigAndWaitVBlank:
 ; - Size
 ; - Mode/flags
 ; Likely defines how to load a tileset.
-    dw   $7800, $8000, $03c0, $010c                    ;; 00:0aa9 $78 $00
-    dw   $7c00, $9c00, $0040, $010c                    ;; 00:0ab1 $00 $0c
-    dw   $7bc0, $9c00, $0040, $000c                    ;; 00:0ab9 $00 $0c
-    dw   $0000, $9000, $0800, $00ff                    ;; 00:0ac1 ........
-    dw   $0800, $8800, $0800, $00ff                    ;; 00:0ac9 ........
-    dw   $1000, $9000, $0800, $01ff                    ;; 00:0ad1 ........
-    dw   $1800, $8800, $0800, $01ff                    ;; 00:0ad9 ........
-    dw   $c000, $9800, $0400, $0101                    ;; 00:0ae1 ........
-    dw   $c000, $9800, $0400, $0001                    ;; 00:0ae9 ........
-    dw   $c000, $8000, $1000, $0001                    ;; 00:0af1 ........
-    dw   $c000, $8000, $1000, $0101                    ;; 00:0af9 .???????
+    dw   $7800, _VRAM, $03c0, $010c                    ;; 00:0aa9 $78 $00
+    dw   $7c00, _SCRN1, $0040, $010c                    ;; 00:0ab1 $00 $0c
+    dw   $7bc0, _SCRN1, $0040, $000c                    ;; 00:0ab9 $00 $0c
+    dw   $0000, _VRAM+$1000, $0800, $00ff                    ;; 00:0ac1 ........
+    dw   $0800, _VRAM+$800, $0800, $00ff                    ;; 00:0ac9 ........
+    dw   $1000, _VRAM+$1000, $0800, $01ff                    ;; 00:0ad1 ........
+    dw   $1800, _VRAM+$800, $0800, $01ff                    ;; 00:0ad9 ........
+    dw   $c000, _SCRN0, $0400, $0101                    ;; 00:0ae1 ........
+    dw   $c000, _SCRN0, $0400, $0001                    ;; 00:0ae9 ........
+    dw   $c000, _VRAM, $1000, $0001                    ;; 00:0af1 ........
+    dw   $c000, _VRAM, $1000, $0101                    ;; 00:0af9 .???????
     dw   $4000, $4000, $4350, $46a0                    ;; 00:0b01 .???????
     dw   $49f0, $4d40, $5090, $53e0                    ;; 00:0b09 .???????
     dw   $53e0, $5730, $5a80, $5dd0                    ;; 00:0b11 .???????
@@ -1333,7 +1328,7 @@ call_00_0b25_MainGameLoop_UpdateAndRenderFrame:
     ldh  A, [rLY]                                      ;; 00:0b80 $f0 $44
     cp   A, C                                          ;; 00:0b82 $b9
     jr   Z, .jr_00_0b80                                ;; 00:0b83 $28 $fb
-    ld   [wDB67], A                                    ;; 00:0b85 $ea $67 $db
+    ld   [wDB67_HDMATempScratch], A                                    ;; 00:0b85 $ea $67 $db
 .jr_00_0b88:
     ld   HL, rIF                                       ;; 00:0b88 $21 $0f $ff
     res  1, [HL]                                       ;; 00:0b8b $cb $8e
@@ -1513,44 +1508,37 @@ call_00_0c1b_LCDInterrupt_Setup:
 
 call_00_0c44_LCDInterrupt_Table:
 ; Table of interrupt handlers and parameters.
-; Contains a dispatcher that increments wDB67 and calls routines like 0d8b, 0dc6.
+; Contains a dispatcher that increments wDB67_HDMATempScratch and calls routines like 0d8b, 0dc6.
 ; Purpose: This is a vector table and handler dispatcher for the STAT/LYC interrupts.
 ; Different entries configure palette changes, etc.
-    ld   [entry],sp
-    ld   d,e
-    inc  c
-    ld   [$1500],sp
-    ld   d,l
-    inc  c
-    ld   [entry],sp
-    ld   hl,sp+$0D
-    reti 
-    ret  
-    push af
+    db   $08, $00, $01, $53, $0c, $08, $00, $15
+    db   $55, $0c, $08, $00, $01, $f8, $0d, $d9
+    db   $c9, $f5
+
     push hl
-    ld   a,[wDB67]
+    ld   a,[wDB67_HDMATempScratch]
     sub  a,$7F
     jp   z,call_00_0d8b_Palette_UpdateBG
     dec  a
     jp   z,call_00_0dc6_HBlankInterrupt_LoadPaletteSlice
-    ld   hl,wDB67
+    ld   hl,wDB67_HDMATempScratch
     inc  [hl]
     pop  hl
     pop  af
     reti 
 
 call_00_0c6a_HandlePendingHDMATransfers:
-; Clears wDB67.
-; Reads control flags from wDB66.
+; Clears wDB67_HDMATempScratch.
+; Reads control flags from wDB66_HDMATransferFlags.
 ; Depending on bits, it sets up HDMA transfers from different sources:
 ; Bit 0 → copy tiles from wDAC0_GeneralPurposeDMASourceAddressLo–wDAC2_DMATransferLength.
-; Bit 1 → copy tiles from wDB64–wDB65.
+; Bit 1 → copy tiles from wDB64_VRAMTransferSourceLo–wDB64_VRAMTransferSourceHi.
 ; Bit 2 → perform a variable-length transfer using wDC2B–wDC32.
 ; Manages VBK for VRAM bank selection when needed.
 ; Clears the trigger bits after performing the transfer.
     xor  A, A                                          ;; 00:0c6a $af
-    ld   [wDB67], A                                    ;; 00:0c6b $ea $67 $db
-    ld   HL, wDB66                                     ;; 00:0c6e $21 $66 $db
+    ld   [wDB67_HDMATempScratch], A                                    ;; 00:0c6b $ea $67 $db
+    ld   HL, wDB66_HDMATransferFlags                                     ;; 00:0c6e $21 $66 $db
     bit  7, [HL]                                       ;; 00:0c71 $cb $7e
     ret  Z                                             ;; 00:0c73 $c8
     bit  2, [HL]                                       ;; 00:0c74 $cb $56
@@ -1576,28 +1564,28 @@ call_00_0c6a_HandlePendingHDMATransfers:
     add  A, A                                          ;; 00:0c9e $87
     sub  A, $01                                        ;; 00:0c9f $d6 $01
     ldh  [rHDMA5], A                                   ;; 00:0ca1 $e0 $55
-    ld   HL, wDB66                                     ;; 00:0ca3 $21 $66 $db
+    ld   HL, wDB66_HDMATransferFlags                                     ;; 00:0ca3 $21 $66 $db
     res  0, [HL]                                       ;; 00:0ca6 $cb $86
     res  7, [HL]                                       ;; 00:0ca8 $cb $be
     ret                                                ;; 00:0caa $c9
 .jr_00_0cab:
     ld   H, $d8                                        ;; 00:0cab $26 $d8
-    ld   A, [wDB61]                                    ;; 00:0cad $fa $61 $db
+    ld   A, [wDB61_ActiveObjectSlot]                                    ;; 00:0cad $fa $61 $db
     or   A, $17                                        ;; 00:0cb0 $f6 $17
     ld   L, A                                          ;; 00:0cb2 $6f
     ld   A, [HL]                                       ;; 00:0cb3 $7e
     call call_00_0f25_AltSwitchBank                                  ;; 00:0cb4 $cd $25 $0f
     ld   H, $d8                                        ;; 00:0cb7 $26 $d8
-    ld   A, [wDB61]                                    ;; 00:0cb9 $fa $61 $db
+    ld   A, [wDB61_ActiveObjectSlot]                                    ;; 00:0cb9 $fa $61 $db
     or   A, OBJECT_UNK05_OFFSET                                        ;; 00:0cbc $f6 $05
     ld   L, A                                          ;; 00:0cbe $6f
     bit  5, [HL]                                       ;; 00:0cbf $cb $6e
     jr   NZ, .jr_00_0ceb                               ;; 00:0cc1 $20 $28
-    ld   A, [wDB65]                                    ;; 00:0cc3 $fa $65 $db
+    ld   A, [wDB64_VRAMTransferSourceHi]                                    ;; 00:0cc3 $fa $65 $db
     ldh  [rHDMA1], A                                   ;; 00:0cc6 $e0 $51
-    ld   A, [wDB64]                                    ;; 00:0cc8 $fa $64 $db
+    ld   A, [wDB64_VRAMTransferSourceLo]                                    ;; 00:0cc8 $fa $64 $db
     ldh  [rHDMA2], A                                   ;; 00:0ccb $e0 $52
-    ld   A, [wDB61]                                    ;; 00:0ccd $fa $61 $db
+    ld   A, [wDB61_ActiveObjectSlot]                                    ;; 00:0ccd $fa $61 $db
     rlca                                               ;; 00:0cd0 $07
     rlca                                               ;; 00:0cd1 $07
     rlca                                               ;; 00:0cd2 $07
@@ -1606,32 +1594,32 @@ call_00_0c6a_HandlePendingHDMATransfers:
     ldh  [rHDMA3], A                                   ;; 00:0cd7 $e0 $53
     xor  A, A                                          ;; 00:0cd9 $af
     ldh  [rHDMA4], A                                   ;; 00:0cda $e0 $54
-    ld   A, [wDB63]                                    ;; 00:0cdc $fa $63 $db
+    ld   A, [wDB63_ActiveObjectType]                                    ;; 00:0cdc $fa $63 $db
     add  A, A                                          ;; 00:0cdf $87
     dec  A                                             ;; 00:0ce0 $3d
     ldh  [rHDMA5], A                                   ;; 00:0ce1 $e0 $55
-    ld   HL, wDB66                                     ;; 00:0ce3 $21 $66 $db
+    ld   HL, wDB66_HDMATransferFlags                                     ;; 00:0ce3 $21 $66 $db
     res  1, [HL]                                       ;; 00:0ce6 $cb $8e
     res  7, [HL]                                       ;; 00:0ce8 $cb $be
     ret                                                ;; 00:0cea $c9
 .jr_00_0ceb:
     ld   A, $01                                        ;; 00:0ceb $3e $01
     ldh  [rVBK], A                                     ;; 00:0ced $e0 $4f
-    ld   A, [wDB65]                                    ;; 00:0cef $fa $65 $db
+    ld   A, [wDB64_VRAMTransferSourceHi]                                    ;; 00:0cef $fa $65 $db
     ldh  [rHDMA1], A                                   ;; 00:0cf2 $e0 $51
-    ld   A, [wDB64]                                    ;; 00:0cf4 $fa $64 $db
+    ld   A, [wDB64_VRAMTransferSourceLo]                                    ;; 00:0cf4 $fa $64 $db
     ldh  [rHDMA2], A                                   ;; 00:0cf7 $e0 $52
     ld   A, $84                                        ;; 00:0cf9 $3e $84
     ldh  [rHDMA3], A                                   ;; 00:0cfb $e0 $53
     ld   A, $00                                        ;; 00:0cfd $3e $00
     ldh  [rHDMA4], A                                   ;; 00:0cff $e0 $54
-    ld   A, [wDB63]                                    ;; 00:0d01 $fa $63 $db
+    ld   A, [wDB63_ActiveObjectType]                                    ;; 00:0d01 $fa $63 $db
     add  A, A                                          ;; 00:0d04 $87
     dec  A                                             ;; 00:0d05 $3d
     ldh  [rHDMA5], A                                   ;; 00:0d06 $e0 $55
     ld   A, $00                                        ;; 00:0d08 $3e $00
     ldh  [rVBK], A                                     ;; 00:0d0a $e0 $4f
-    ld   HL, wDB66                                     ;; 00:0d0c $21 $66 $db
+    ld   HL, wDB66_HDMATransferFlags                                     ;; 00:0d0c $21 $66 $db
     res  1, [HL]                                       ;; 00:0d0f $cb $8e
     res  7, [HL]                                       ;; 00:0d11 $cb $be
     ret                                                ;; 00:0d13 $c9
@@ -1706,7 +1694,7 @@ call_00_0c6a_HandlePendingHDMATransfers:
     ld   [HL], A                                       ;; 00:0d80 $77
     or   A, C                                          ;; 00:0d81 $b1
     ret  NZ                                            ;; 00:0d82 $c0
-    ld   HL, wDB66                                     ;; 00:0d83 $21 $66 $db
+    ld   HL, wDB66_HDMATransferFlags                                     ;; 00:0d83 $21 $66 $db
     res  2, [HL]                                       ;; 00:0d86 $cb $96
     res  7, [HL]                                       ;; 00:0d88 $cb $be
     ret                                                ;; 00:0d8a $c9
@@ -1741,7 +1729,7 @@ call_00_0d8b_Palette_UpdateBG:
     and  a,$FD
     or   a,$10
     ldh  [rLCDC],a
-    ld   hl,wDB67
+    ld   hl,wDB67_HDMATempScratch
     inc  [hl]
     pop  hl
     pop  af
@@ -1752,7 +1740,7 @@ call_00_0d8b_Palette_UpdateBG:
 call_00_0dc6_HBlankInterrupt_LoadPaletteSlice:
 ; Writes a hardcoded set of 8 bytes (.data_00_0df0) into the CGB background palettes 
 ; registers (rBCPS/rBCPD) — two full palette entries.
-; Then increments a counter at wDB67 (used as a “scanline mark” in the frame loop).
+; Then increments a counter at wDB67_HDMATempScratch (used as a “scanline mark” in the frame loop).
 ; Pops registers and reti. Clearly an interrupt handler, specifically updating palettes.
     ld   hl,.data_00_0df0
     ld   a,$84
@@ -1775,7 +1763,7 @@ call_00_0dc6_HBlankInterrupt_LoadPaletteSlice:
     ldh  [rBCPD],a
     ldi  a,[hl]
     ldh  [rBCPD],a
-    ld   hl,wDB67
+    ld   hl,wDB67_HDMATempScratch
     inc  [hl]
     pop  hl
     pop  af
@@ -1855,7 +1843,7 @@ call_00_0e3b_ClearGameStateVariables:
     xor  A, A                                          ;; 00:0e3b $af
     ld   [wDC7E], A                                    ;; 00:0e3c $ea $7e $dc
     ld   [wDC20], A                                    ;; 00:0e3f $ea $20 $dc
-    ld   [wDB66], A                                    ;; 00:0e42 $ea $66 $db
+    ld   [wDB66_HDMATransferFlags], A                                    ;; 00:0e42 $ea $66 $db
     ld   [wDB69], A                                    ;; 00:0e45 $ea $69 $db
     ld   [wDBEF], A                                    ;; 00:0e48 $ea $ef $db
     ld   [wDC72], A                                    ;; 00:0e4b $ea $72 $dc
