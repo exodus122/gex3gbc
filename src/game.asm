@@ -249,30 +249,30 @@ ChannelZ_collectible_list.bin:
     INCBIN "data/maps/ChannelZ/ChannelZ_collectible_list.bin"
 
 SECTION "bank22", ROMX[$4000], BANK[$22]
-GexCave_object_list.bin:
-    INCBIN "data/maps/GexCave/GexCave_object_list.bin"
-HolidayTV_object_list.bin:
-    INCBIN "data/maps/HolidayTV/HolidayTV_object_list.bin"
-MysteryTV_object_list.bin:
-    INCBIN "data/maps/MysteryTV/MysteryTV_object_list.bin"
-TutTV_object_list.bin:
-    INCBIN "data/maps/TutTV/TutTV_object_list.bin"
-WesternStation_object_list.bin:
-    INCBIN "data/maps/WesternStation/WesternStation_object_list.bin"
-AnimeChannel_object_list.bin:
-    INCBIN "data/maps/AnimeChannel/AnimeChannel_object_list.bin"
-SuperheroShow_object_list.bin:
-    INCBIN "data/maps/SuperheroShow/SuperheroShow_object_list.bin"
-GextremeSports_object_list.bin:
-    INCBIN "data/maps/GextremeSports/GextremeSports_object_list.bin"
-MarsupialMadness_object_list.bin:
-    INCBIN "data/maps/MarsupialMadness/MarsupialMadness_object_list.bin"
-WWGexWrestling_object_list.bin:
-    INCBIN "data/maps/WWGexWrestling/WWGexWrestling_object_list.bin"
-LizardOfOz_object_list.bin:
-    INCBIN "data/maps/LizardOfOz/LizardOfOz_object_list.bin"
-ChannelZ_object_list.bin:
-    INCBIN "data/maps/ChannelZ/ChannelZ_object_list.bin"
+GexCave_object_list.asm:
+    INCLUDE "data/maps/GexCave/GexCave_object_list.asm"
+HolidayTV_object_list.asm:
+    INCLUDE "data/maps/HolidayTV/HolidayTV_object_list.asm"
+MysteryTV_object_list.asm:
+    INCLUDE "data/maps/MysteryTV/MysteryTV_object_list.asm"
+TutTV_object_list.asm:
+    INCLUDE "data/maps/TutTV/TutTV_object_list.asm"
+WesternStation_object_list.asm:
+    INCLUDE "data/maps/WesternStation/WesternStation_object_list.asm"
+AnimeChannel_object_list.asm:
+    INCLUDE "data/maps/AnimeChannel/AnimeChannel_object_list.asm"
+SuperheroShow_object_list.asm:
+    INCLUDE "data/maps/SuperheroShow/SuperheroShow_object_list.asm"
+GextremeSports_object_list.asm:
+    INCLUDE "data/maps/GextremeSports/GextremeSports_object_list.asm"
+MarsupialMadness_object_list.asm:
+    INCLUDE "data/maps/MarsupialMadness/MarsupialMadness_object_list.asm"
+WWGexWrestling_object_list.asm:
+    INCLUDE "data/maps/WWGexWrestling/WWGexWrestling_object_list.asm"
+LizardOfOz_object_list.asm:
+    INCLUDE "data/maps/LizardOfOz/LizardOfOz_object_list.asm"
+ChannelZ_object_list.asm:
+    INCLUDE "data/maps/ChannelZ/ChannelZ_object_list.asm"
 
 SECTION "bank23", ROMX[$4000], BANK[$23]
 INCBIN "data/bank_023_collision_blocksets.bin"

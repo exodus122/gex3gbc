@@ -226,8 +226,8 @@ DEF Object_AnimeChannel_OffSwitch                      EQU $4B
 DEF Object_AnimeChannel_SailorToonGirl                 EQU $4C
 DEF Object_AnimeChannel_BigSilverRobot                 EQU $4D
 DEF Object_AnimeChannel_SmallBlueRobot                 EQU $4E
-DEF Object_AnimeChannel_TankPlane                      EQU $4F
-DEF Object_AnimeChannel_TankPlaneProjectile            EQU $50
+DEF Object_AnimeChannel_Secbot                         EQU $4F
+DEF Object_AnimeChannel_SecbotProjectile               EQU $50
 DEF Object_AnimeChannel_Elevator                       EQU $51
 DEF Object_AnimeChannel_FireWallEnemy                  EQU $52
 DEF Object_AnimeChannel_FallingYellowEnemy             EQU $53
@@ -261,6 +261,7 @@ DEF Object_ChannelZ_Rez                                EQU $6E
 DEF Object_unk6F                                       EQU $6F
 DEF Object_ChannelZ_Meteor                             EQU $70
 DEF Object_ChannelZ_RockProjectile                     EQU $71
+DEF ObjectListTerminator                               EQU $FF
 
 ; Object Instance Struct
 DEF OBJECT_ID_OFFSET                  EQU $00
@@ -294,8 +295,7 @@ DEF OBJECTSPAWN_BOUNDINGBOX_XMAX_OFFSET     EQU $05
 DEF OBJECTSPAWN_BOUNDINGBOX_XMIN_OFFSET     EQU $07
 DEF OBJECTSPAWN_BOUNDINGBOX_YMIN_OFFSET     EQU $09
 DEF OBJECTSPAWN_BOUNDINGBOX_YMAX_OFFSET     EQU $0B
-DEF OBJECTSPAWN_UNK0D_OFFSET                EQU $0D ; seems like collectible flag?
-DEF OBJECTSPAWN_UNK0E_OFFSET                EQU $0E
+DEF OBJECTSPAWN_INSTANCEID_OFFSET           EQU $0D
 DEF OBJECTSPAWN_MAP_OFFSET                  EQU $0F
 
 ; Object Facing Direction values

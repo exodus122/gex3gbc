@@ -5,6 +5,123 @@ import struct
 import os
 import math
 
+object_names = [
+    "Object_Gex",
+    "Object_BonusCoin",
+    "Object_FlyCoinSpawn",
+    "Object_PawCoin",
+    "Object_unk04",
+    "Object_unk05",
+    "Object_unk06",
+    "Object_unk07",
+    "Object_unk08",
+    "Object_GreenFlyTV",
+    "Object_PurpleFlyTV",
+    "Object_unk0B",
+    "Object_BlueFlyTV",
+    "Object_unk0D",
+    "Object_unk0E",
+    "Object_unk0F",
+    "Object_unk10",
+    "Object_TVButton",
+    "Object_TVRemote",
+    "Object_unk13",
+    "Object_GoalCounter",
+    "Object_unk15",
+    "Object_unk16",
+    "Object_unk17",
+    "Object_unk18",
+    "Object_unk19",
+    "Object_unk1A",
+    "Object_BonusStageTimer",
+    "Object_FreestandingRemote",
+    "Object_HolidayTV_IceSculpture",
+    "Object_HolidayTV_EvilSanta",
+    "Object_HolidayTV_EvilSantaProjectile",
+    "Object_HolidayTV_SkatingElf",
+    "Object_HolidayTV_Penguin",
+    "Object_MysteryTV_Rezling",
+    "Object_MysteryTV_BloodCooler",
+    "Object_MysteryTV_Fish",
+    "Object_MysteryTV_MagicSword",
+    "Object_MysteryTV_SafariSam",
+    "Object_MysteryTV_SafariSamProjectile",
+    "Object_MysteryTV_GhostKnight",
+    "Object_MysteryTV_GhostKnightProjectile",
+    "Object_TutTV_Hand",
+    "Object_TutTV_LostArk",
+    "Object_TutTV_RisingPlatform",
+    "Object_TutTV_SidewaysPlatform",
+    "Object_TutTV_Bee",
+    "Object_TutTV_Raft",
+    "Object_TutTV_SnakeFacingRight",
+    "Object_TutTV_SnakeFacingLeft",
+    "Object_TutTV_SnakeRightProjectile",
+    "Object_TutTV_SnakeLeftProjectile",
+    "Object_TutTV_RaStaff",
+    "Object_TutTV_RaStatueHorizontalProjectile",
+    "Object_TutTV_RaStatueDiagonalProjectile",
+    "Object_TutTV_BreakableBlock",
+    "Object_TutTV_Coffin",
+    "Object_WesternStation_Cactus",
+    "Object_unk3A",
+    "Object_WesternStation_RockPlatform",
+    "Object_WesternStation_HardHat",
+    "Object_WesternStation_PlayingCard",
+    "Object_WesternStation_Bat",
+    "Object_WesternStation_RisingPlatform",
+    "Object_AnimeChannel_Door",
+    "Object_AnimeChannel_Door2",
+    "Object_AnimeChannel_FanLift",
+    "Object_AnimeChannel_MechFacingRight",
+    "Object_AnimeChannel_MechFacingLeft",
+    "Object_AnimeChannel_DisappearingFloor",
+    "Object_AnimeChannel_OnSwitch2",
+    "Object_AnimeChannel_AlienCultureTube",
+    "Object_AnimeChannel_BlueBeamBarrier",
+    "Object_AnimeChannel_RisingPlatform",
+    "Object_AnimeChannel_OnSwitch",
+    "Object_AnimeChannel_OffSwitch",
+    "Object_AnimeChannel_SailorToonGirl",
+    "Object_AnimeChannel_BigSilverRobot",
+    "Object_AnimeChannel_SmallBlueRobot",
+    "Object_AnimeChannel_Secbot",
+    "Object_AnimeChannel_SecbotProjectile",
+    "Object_AnimeChannel_Elevator",
+    "Object_AnimeChannel_FireWallEnemy",
+    "Object_AnimeChannel_FallingYellowEnemy",
+    "Object_AnimeChannel_PlanetOBlastWeapon",
+    "Object_SuperheroShow_MadBomber",
+    "Object_SuperheroShow_Bomb",
+    "Object_SuperheroShow_WaterTowerTank",
+    "Object_SuperheroShow_WaterTowerStand",
+    "Object_SuperheroShow_Convict",
+    "Object_SuperheroShow_Spider",
+    "Object_SuperheroShow_StrayCat",
+    "Object_SuperheroShow_YellowGoon",
+    "Object_SuperheroShow_Rat",
+    "Object_SuperheroShow_FlyingRobotHead",
+    "Object_SuperheroShow_FalseFloor",
+    "Object_SuperheroShow_GreyConvictProjectile",
+    "Object_GextremeSports_Elf",
+    "Object_GextremeSports_BonusTimeCoin",
+    "Object_MarsupialMadness_Bell",
+    "Object_MarsupialMadness_Bird",
+    "Object_MarsupialMadness_BirdProjectile",
+    "Object_WWGexWrestling_RockHard",
+    "Object_LizardOfOz_BrainOfOz",
+    "Object_LizardOfOz_CannonProjectile",
+    "Object_LizardOfOz_Cannon",
+    "Object_LizardOfOz_RockProjectile",
+    "Object_unk6B",
+    "Object_unk6C",
+    "Object_unk6D",
+    "Object_ChannelZ_Rez",
+    "Object_unk6F",
+    "Object_ChannelZ_Meteor",
+    "Object_ChannelZ_RockProjectile"
+]
+
 def get_next_offset(arr, entry):
     for i, (a, b) in enumerate(arr):
         if [a, b] == entry:
@@ -179,9 +296,9 @@ sorted_collision_blockset_offsets = sorted(collision_blockset_offsets, key=lambd
 #for b in collision_blockset_offsets:
 #    print(f"{b[0]:0{2}x}"+": "+f"{b[1]:0{4}x}")
 
-split_map_data = False
-generate_regular_maps = True
-draw_objects_and_collectibles = True
+split_map_data = True
+generate_regular_maps = False
+draw_objects_and_collectibles = False
 generate_collision_maps = False
 
 if draw_objects_and_collectibles:
@@ -236,7 +353,7 @@ if split_map_data:
         level_numbers[level_data[LEVEL_ID]] += 1
         channel_map_number = str(level_numbers[level_data[LEVEL_ID]])
 
-        print(level_name+str(level_numbers[level_data[LEVEL_ID]]))
+        print("Starting: "+level_name+str(level_numbers[level_data[LEVEL_ID]]))
         if map_data not in maps:
             maps.append(map_data)
             
@@ -307,6 +424,23 @@ if split_map_data:
             out = open('extracted_map_data/'+level_name+'/'+level_name+'_object_list.bin', "wb")
             out.write(object_list_data)
             out.close()
+            
+            os.system('mkdir -p extracted_map_data/object_lists')
+            # create the object list asm file
+            out = open('extracted_map_data/object_lists/'+level_name+'_object_list.asm', "w")
+            
+            for i in range(0, len(object_list_data)-1, 0x10):
+                try:
+                    objectId, xPosition, yPosition, xMax, xMin, yMin, yMax, instanceId, map = struct.unpack('<BHHHHHHHB',object_list_data[i:i+0x10])
+                    object_name = object_names[objectId]
+                    object_string = "    db   {}\n    dw   ${:04x}, ${:04x}\n    dw   ${:04x}, ${:04x}, ${:04x}, ${:04x}\n    dw   ${:04x}\n    db   ${:02x}\n\n".format(object_name, xPosition, yPosition, xMax, xMin, yMin, yMax, instanceId, map)
+                    out.write(object_string)
+                except:
+                    break
+            
+            out.write("    db   ObjectListTerminator\n")
+            out.close()
+
 
             # collision blockset
             collision_blockset_file = "../banks/bank_0"+f"{level_data[COLLISION_BLOCKSET_BANK]:x}"+".bin"
