@@ -1038,10 +1038,10 @@ data_00_325F:
     db   $01, $0a, $0a, $04, $02, $00, $ff, $81        ;; 00:35e0 ????????
 
 call_00_35e8_GetObjectTypeIndex:
-; Follows a chain of lookups based on the current object address (wDA00_CurrentObjectAddr) to compute an index into data_00_325F.
+; Follows a chain of lookups based on the current object address (wDA00_CurrentObjectAddrLo) to compute an index into data_00_325F.
 ; Shifts HL left three times (×8), adds the table base, and returns the byte at that location.
 ; Usage: Fetches an object-type ID or pointer index for the active object.
-    ld   HL, wDA00_CurrentObjectAddr                                     ;; 00:35e8 $21 $00 $da
+    ld   HL, wDA00_CurrentObjectAddrLo                                     ;; 00:35e8 $21 $00 $da
     ld   L, [HL]                                       ;; 00:35eb $6e
     ld   H, $d8                                        ;; 00:35ec $26 $d8
     ld   L, [HL]                                       ;; 00:35ee $6e
@@ -1083,7 +1083,7 @@ call_00_3618_HandleObjectSpawn:
 ; Calculates an offset into the object spawn table using wDAB8 and the bank offset.
 ; Checks for $FF sentinel and level ID match.
 ; Performs collision-distance checks against player position (wDA14_CameraLeftLo–wDA1B_CameraBottomHi).
-; If within range, copies multiple fields from the spawn table into working object memory (wDA24, wDA1C_ObjectBoundingBoxWidth, etc.).
+; If within range, copies multiple fields from the spawn table into working object memory (wDA24, wDA1C_ObjectBoundingBoxXMax, etc.).
 ; Sets up animation/state data, calls alt-bank functions to finish initialization.
 ; Usage: Core routine that validates and copies object-spawn data into live object RAM.
     call call_00_2afc_FindFreeObjectSlot                                  ;; 00:3618 $cd $fc $2a
@@ -1113,7 +1113,7 @@ call_00_3618_HandleObjectSpawn:
     inc  [HL]                                          ;; 00:363f $34
     ret                                                ;; 00:3640 $c9
 .jr_00_3641:
-    ld   [wDA00_CurrentObjectAddr], A                                    ;; 00:3641 $ea $00 $da
+    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 00:3641 $ea $00 $da
     rlca                                               ;; 00:3644 $07
     rlca                                               ;; 00:3645 $07
     rlca                                               ;; 00:3646 $07
@@ -1216,7 +1216,7 @@ call_00_3618_HandleObjectSpawn:
     ld   C, L                                          ;; 00:36d8 $4d
     ld   B, H                                          ;; 00:36d9 $44
     ld   H, $d8                                        ;; 00:36da $26 $d8
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:36dc $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:36dc $fa $00 $da
     or   A, $0e                                        ;; 00:36df $f6 $0e
     ld   L, A                                          ;; 00:36e1 $6f
     ld   A, [DE]                                       ;; 00:36e2 $1a
@@ -1245,7 +1245,7 @@ call_00_3618_HandleObjectSpawn:
     add  HL, HL                                        ;; 00:36fc $29
     add  HL, HL                                        ;; 00:36fd $29
     add  HL, HL                                        ;; 00:36fe $29
-    ld   BC, wDA1C_ObjectBoundingBoxWidth                                     ;; 00:36ff $01 $1c $da
+    ld   BC, wDA1C_ObjectBoundingBoxXMax                                     ;; 00:36ff $01 $1c $da
     add  HL, BC                                        ;; 00:3702 $09
     ld   A, [DE]                                       ;; 00:3703 $1a
     ld   [HL+], A                                      ;; 00:3704 $22
@@ -1279,7 +1279,7 @@ call_00_3618_HandleObjectSpawn:
     ld   BC, data_00_3258                                     ;; 00:3723 $01 $58 $32
     add  HL, BC                                        ;; 00:3726 $09
     ld   A, [HL+]                                      ;; 00:3727 $2a
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:3728 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:3728 $fa $00 $da
     or   A, OBJECT_ID_OFFSET                                        ;; 00:372b $f6 $00
     ld   E, A                                          ;; 00:372d $5f
     ld   D, $d8                                        ;; 00:372e $16 $d8
@@ -1341,7 +1341,7 @@ call_00_3618_HandleObjectSpawn:
     or   A, $40                                        ;; 00:3776 $f6 $40
     ld   [HL], A                                       ;; 00:3778 $77
     and  A, $0f                                        ;; 00:3779 $e6 $0f
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     farcall entry_03_687c_AssignObjectPalette
     ret                                                ;; 00:3791 $c9
 
@@ -1371,7 +1371,7 @@ call_00_37a0_SpawnObjectRelative:
     push DE                                            ;; 00:37a4 $d5
     farcall entry_03_59c6_IsObjectFlaggedHighBit
     ld   [wDCE9], A                                    ;; 00:37b0 $ea $e9 $dc
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:37b3 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:37b3 $fa $00 $da
     rlca                                               ;; 00:37b6 $07
     rlca                                               ;; 00:37b7 $07
     rlca                                               ;; 00:37b8 $07
@@ -1391,13 +1391,13 @@ call_00_37a0_SpawnObjectRelative:
     ld   BC, .data_00_38b6                                     ;; 00:37cd $01 $b6 $38
     add  HL, BC                                        ;; 00:37d0 $09
     ld   A, [HL+]                                      ;; 00:37d1 $2a
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 00:37d2 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:37d2 $fa $00 $da
     push AF                                            ;; 00:37d5 $f5
     or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 00:37d6 $f6 $0d
     ld   C, A                                          ;; 00:37d8 $4f
     ld   B, $d8                                        ;; 00:37d9 $06 $d8
     ld   A, D                                          ;; 00:37db $7a
-    ld   [wDA00_CurrentObjectAddr], A                                    ;; 00:37dc $ea $00 $da
+    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 00:37dc $ea $00 $da
     or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 00:37df $f6 $0d
     ld   E, A                                          ;; 00:37e1 $5f
     ld   D, B                                          ;; 00:37e2 $50
@@ -1501,17 +1501,17 @@ call_00_37a0_SpawnObjectRelative:
     ld   [DE], A                                       ;; 00:384e $12
     call call_00_2a03_ResetObjectTempSlot                                  ;; 00:384f $cd $03 $2a
     xor  A, A                                          ;; 00:3852 $af
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     farcall entry_03_687c_AssignObjectPalette
     pop  AF                                            ;; 00:3869 $f1
-    ld   HL, wDA00_CurrentObjectAddr                                     ;; 00:386a $21 $00 $da
+    ld   HL, wDA00_CurrentObjectAddrLo                                     ;; 00:386a $21 $00 $da
     ld   C, [HL]                                       ;; 00:386d $4e
     ld   [HL], A                                       ;; 00:386e $77
     rrca                                               ;; 00:386f $0f
     and  A, $70                                        ;; 00:3870 $e6 $70
     ld   L, A                                          ;; 00:3872 $6f
     ld   H, $00                                        ;; 00:3873 $26 $00
-    ld   DE, wDA1C_ObjectBoundingBoxWidth                                     ;; 00:3875 $11 $1c $da
+    ld   DE, wDA1C_ObjectBoundingBoxXMax                                     ;; 00:3875 $11 $1c $da
     add  HL, DE                                        ;; 00:3878 $19
     ld   E, L                                          ;; 00:3879 $5d
     ld   D, H                                          ;; 00:387a $54
@@ -1520,7 +1520,7 @@ call_00_37a0_SpawnObjectRelative:
     and  A, $70                                        ;; 00:387d $e6 $70
     ld   L, A                                          ;; 00:387f $6f
     ld   H, $00                                        ;; 00:3880 $26 $00
-    ld   BC, wDA1C_ObjectBoundingBoxWidth                                     ;; 00:3882 $01 $1c $da
+    ld   BC, wDA1C_ObjectBoundingBoxXMax                                     ;; 00:3882 $01 $1c $da
     add  HL, BC                                        ;; 00:3885 $09
     ld   A, [DE]                                       ;; 00:3886 $1a
     ld   [HL+], A                                      ;; 00:3887 $22

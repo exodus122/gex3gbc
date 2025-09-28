@@ -50,9 +50,9 @@ entry_03_59b6_GetObjectPropertyFromDB61:
 entry_03_59c6_IsObjectFlaggedHighBit:
 ; Check High-Bit Flag for Current Object
 ; Description:
-; Fetches the current object’s index from wDA00_CurrentObjectAddr, looks it up in data_03_58d2, 
+; Fetches the current object’s index from wDA00_CurrentObjectAddrLo, looks it up in data_03_58d2, 
 ; masks bit 7 ($80), and returns it. Used as a quick “is flagged?” test for the object (e.g., active/inactive, hidden).
-    ld   HL, wDA00_CurrentObjectAddr                                     ;; 03:59c6 $21 $00 $da
+    ld   HL, wDA00_CurrentObjectAddrLo                                     ;; 03:59c6 $21 $00 $da
     ld   L, [HL]                                       ;; 03:59c9 $6e
     ld   H, $d8                                        ;; 03:59ca $26 $d8
     ld   L, [HL]                                       ;; 03:59cc $6e
@@ -69,7 +69,7 @@ call_03_59d8_IsObjectRenderableFlag:
 ; Description:
 ; Very similar to the above but masks bit 6 ($40). Returns whether the object has that mid-bit set—likely 
 ; another state flag such as “should render” or “has sprite.”
-    ld   HL, wDA00_CurrentObjectAddr                                     ;; 03:59d8 $21 $00 $da
+    ld   HL, wDA00_CurrentObjectAddrLo                                     ;; 03:59d8 $21 $00 $da
     ld   L, [HL]                                       ;; 03:59db $6e
     ld   H, $d8                                        ;; 03:59dc $26 $d8
     ld   L, [HL]                                       ;; 03:59de $6e
@@ -263,7 +263,7 @@ entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
 .jr_03_5ed8:
     ld   A, $20                                        ;; 03:5ed8 $3e $20
 .jr_03_5eda:
-    ld   [wDA00_CurrentObjectAddr], A                                    ;; 03:5eda $ea $00 $da
+    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 03:5eda $ea $00 $da
     or   A, OBJECT_ID_OFFSET                                        ;; 03:5edd $f6 $00
     ld   L, A                                          ;; 03:5edf $6f
     ld   H, $d8                                        ;; 03:5ee0 $26 $d8
@@ -273,7 +273,7 @@ entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     call call_03_59d8_IsObjectRenderableFlag                                  ;; 03:5ee7 $cd $d8 $59
     call NZ, call_03_5fc2_SetupObjectSprite                              ;; 03:5eea $c4 $c2 $5f
 .jr_03_5eed:
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5eed $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5eed $fa $00 $da
     add  A, $20                                        ;; 03:5ef0 $c6 $20
     jr   NZ, .jr_03_5eda                               ;; 03:5ef2 $20 $e6
     ld   A, [wDCA7]                                    ;; 03:5ef4 $fa $a7 $dc
@@ -281,7 +281,7 @@ entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     call NZ, call_00_2ce2_BuildGexSpriteDrawList                              ;; 03:5ef8 $c4 $e2 $2c
     ld   A, $20                                        ;; 03:5efb $3e $20
 .jr_03_5efd:
-    ld   [wDA00_CurrentObjectAddr], A                                    ;; 03:5efd $ea $00 $da
+    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 03:5efd $ea $00 $da
     or   A, OBJECT_ID_OFFSET                                        ;; 03:5f00 $f6 $00
     ld   L, A                                          ;; 03:5f02 $6f
     ld   H, $d8                                        ;; 03:5f03 $26 $d8
@@ -291,7 +291,7 @@ entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     call call_03_59d8_IsObjectRenderableFlag                                  ;; 03:5f0a $cd $d8 $59
     call Z, call_03_5fc2_SetupObjectSprite                               ;; 03:5f0d $cc $c2 $5f
 .jr_03_5f10:
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5f10 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5f10 $fa $00 $da
     add  A, $20                                        ;; 03:5f13 $c6 $20
     jr   NZ, .jr_03_5efd                               ;; 03:5f15 $20 $e6
 .jp_03_5f17:
@@ -299,14 +299,14 @@ entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     call call_03_6148_ClearUnusedSpriteSlots                                  ;; 03:5f1a $cd $48 $61
     ld   A, $20                                        ;; 03:5f1d $3e $20
 .jr_03_5f1f:
-    ld   [wDA00_CurrentObjectAddr], A                                    ;; 03:5f1f $ea $00 $da
+    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 03:5f1f $ea $00 $da
     or   A, OBJECT_ID_OFFSET                                        ;; 03:5f22 $f6 $00
     ld   L, A                                          ;; 03:5f24 $6f
     ld   H, $d8                                        ;; 03:5f25 $26 $d8
     ld   A, [HL]                                       ;; 03:5f27 $7e
     cp   A, $ff                                        ;; 03:5f28 $fe $ff
     call NZ, call_03_4c38_UpdateObjectCollision_Dispatch                              ;; 03:5f2a $c4 $38 $4c
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5f2d $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5f2d $fa $00 $da
     add  A, $20                                        ;; 03:5f30 $c6 $20
     jr   NZ, .jr_03_5f1f                               ;; 03:5f32 $20 $eb
     ret                                                ;; 03:5f34 $c9
@@ -386,7 +386,7 @@ entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     push BC                                            ;; 03:5f9c $c5
     push HL                                            ;; 03:5f9d $e5
     ld   A, [HL]                                       ;; 03:5f9e $7e
-    ld   [wDA00_CurrentObjectAddr], A                                    ;; 03:5f9f $ea $00 $da
+    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 03:5f9f $ea $00 $da
     and  A, A                                          ;; 03:5fa2 $a7
     jr   Z, .jr_03_5fb2                                ;; 03:5fa3 $28 $0d
     or   A, OBJECT_ID_OFFSET                                        ;; 03:5fa5 $f6 $00
@@ -418,7 +418,7 @@ call_03_5fc2_SetupObjectSprite:
 ; Handles bounding-box collision tests.
 ; Prepares OAM (sprite) entries: calculates tile indices, attributes, flips, and writes to the sprite buffer (wDC6F pointer).
 ; Has a branch for special particle effects (call_03_60e6_SetupParticleSprite).
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5fc2 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5fc2 $fa $00 $da
     rlca                                               ;; 03:5fc5 $07
     rlca                                               ;; 03:5fc6 $07
     rlca                                               ;; 03:5fc7 $07
@@ -429,14 +429,14 @@ call_03_5fc2_SetupObjectSprite:
     add  HL, DE                                        ;; 03:5fd0 $19
     ld   E, [HL]                                       ;; 03:5fd1 $5e
     ld   H, $d8                                        ;; 03:5fd2 $26 $d8
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5fd4 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5fd4 $fa $00 $da
     or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 03:5fd7 $f6 $0d
     ld   L, A                                          ;; 03:5fd9 $6f
     ld   A, [HL]                                       ;; 03:5fda $7e
     or   A, E                                          ;; 03:5fdb $b3
     ld   [wDAB6_SpriteFlags], A                                    ;; 03:5fdc $ea $b6 $da
     ld   D, $d8                                        ;; 03:5fdf $16 $d8
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5fe1 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5fe1 $fa $00 $da
     or   A, OBJECT_XPOS_OFFSET                                        ;; 03:5fe4 $f6 $0e
     ld   E, A                                          ;; 03:5fe6 $5f
     ld   HL, wDBF9_XPositionInMapLo                                     ;; 03:5fe7 $21 $f9 $db
@@ -484,7 +484,7 @@ call_03_5fc2_SetupObjectSprite:
     cp   A, $f0                                        ;; 03:6022 $fe $f0
     jr   NC, .jr_03_603e                               ;; 03:6024 $30 $18
 .jr_03_6026:
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:6026 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:6026 $fa $00 $da
     swap A                                             ;; 03:6029 $cb $37
     and  A, $0e                                        ;; 03:602b $e6 $0e
     ld   L, A                                          ;; 03:602d $6f
@@ -494,11 +494,11 @@ call_03_5fc2_SetupObjectSprite:
     xor  A, A                                          ;; 03:6034 $af
     ld   [HL+], A                                      ;; 03:6035 $22
     ld   [HL], A                                       ;; 03:6036 $77
-    call call_00_2a15_CheckObjectBoundingBoxCollision                                  ;; 03:6037 $cd $15 $2a
+    call call_00_2a15_CheckCameraOverlapBoundingBox                                  ;; 03:6037 $cd $15 $2a
     call C, call_00_2b5d_DeactivateObjectSlot                               ;; 03:603a $dc $5d $2b
     ret                                                ;; 03:603d $c9
 .jr_03_603e:
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:603e $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:603e $fa $00 $da
     or   A, OBJECT_UNK15_OFFSET                                        ;; 03:6041 $f6 $15
     ld   L, A                                          ;; 03:6043 $6f
     ld   H, $d8                                        ;; 03:6044 $26 $d8
@@ -510,7 +510,7 @@ call_03_5fc2_SetupObjectSprite:
     ret  NZ                                            ;; 03:604f $c0
 .jr_03_6050:
     push BC                                            ;; 03:6050 $c5
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:6051 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:6051 $fa $00 $da
     swap A                                             ;; 03:6054 $cb $37
     and  A, $0e                                        ;; 03:6056 $e6 $0e
     ld   L, A                                          ;; 03:6058 $6f
@@ -537,13 +537,13 @@ call_03_5fc2_SetupObjectSprite:
     bit  5, A                                          ;; 03:6077 $cb $6f
     ld   A, $40                                        ;; 03:6079 $3e $40
     jr   NZ, .jr_03_6083                               ;; 03:607b $20 $06
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:607d $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:607d $fa $00 $da
     rrca                                               ;; 03:6080 $0f
     and  A, $70                                        ;; 03:6081 $e6 $70
 .jr_03_6083:
     ld   [wDC70], A                                    ;; 03:6083 $ea $70 $dc
     ld   H, $d8                                        ;; 03:6086 $26 $d8
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:6088 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:6088 $fa $00 $da
     or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 03:608b $f6 $0d
     ld   L, A                                          ;; 03:608d $6f
     ld   A, [HL]                                       ;; 03:608e $7e

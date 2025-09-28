@@ -284,7 +284,7 @@ call_02_4989:
     ld   a,$0B
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$14
-    call entry_02_72ac_LoadObjectData
+    call entry_02_72ac_SetupNewAction
 
 call_02_49a8:
     ld   a,[wDC8E]

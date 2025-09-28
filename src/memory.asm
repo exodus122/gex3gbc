@@ -108,7 +108,8 @@ wD9FF:
     ds 1                                               ;; d9ff
 
 ; DA00 through DA13 stores temporary information about the currently updating object
-wDA00_CurrentObjectAddr:
+wDA00_CurrentObjectAddrLo:
+; if the object instance starts at $D8E0, this value is E0, for example
     ds 1                                               ;; da00
 wDA01:
     ds 8                                               ;; da01
@@ -145,26 +146,28 @@ wDA1B_CameraBottomHi:
     ds 1                                               ;; da1b
 
 ; DA1C through DA9B is extra object memory (8 instances of size 0x10)
-; 0x0 (wDA1C_ObjectBoundingBoxWidth) - object bounding width
-; 0x2 (wDA1C_ObjectBoundingBoxHeight) - object bounding height
-; 0x4 (wDA20) - ?
-; 0x6 (wDA22) - ?
+; the first 8 bytes are a copy from the object spawn data
+; 0x0 wDA1C_ObjectBoundingBoxXMax
+; 0x2 wDA1E_ObjectBoundingBoxXMin
+; 0x4 wDA20_ObjectBoundingBoxYMin
+; 0x6 wDA22_ObjectBoundingBoxYMax
 ; 0x8 (wDA24) - ?
 ; 0xA (wDA26) - ?
 ; 0xC (wDA28) - unused
 ; 0xE (wDA2A) - unused
-wDA1C_ObjectBoundingBoxWidth:
+wDA1C_ObjectBoundingBoxXMax:
     ds 2                                               ;; da1c
-wDA1C_ObjectBoundingBoxHeight:
+wDA1E_ObjectBoundingBoxXMin:
     ds 2                                               ;; da1e
-wDA20:
+wDA20_ObjectBoundingBoxYMin:
     ds 2                                               ;; da20
-wDA22:
+wDA22_ObjectBoundingBoxYMax:
     ds 2                                               ;; da22
 wDA24:
     ds 2                                               ;; da24
 wDA26:
     ds 2
+
     ds 4
     ds 16                                            ;; da26
     ds 16
@@ -297,6 +300,7 @@ wDB6A:
     ds 1                                               ;; db6a
 
 wDB6B_InterruptFlag:
+; gets set when an interrupt occurs. used when waiting for an interrupt
     ds 1                                               ;; db6b
 
 wDB6C_CurrentMapId: ; can freeze and enter level to get to another level
@@ -620,7 +624,8 @@ wDC08_TilesetBankOffset:
 wDC09_TilesetBankOffset:
     ds 1                                               ;; dc09
 
-wDC0A_BlocksetBank: ; also contains palette ids for each block, and some other unknown flags?
+wDC0A_BlocksetBank: 
+; also contains palette ids for each block and flags to flip tiles horizontally, vertically, or use second vRAM bank
     ds 1                                               ;; dc0a
 
 wDC0B_BlocksetBankOffset:

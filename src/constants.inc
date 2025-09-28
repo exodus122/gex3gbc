@@ -181,14 +181,14 @@ DEF Object_HolidayTV_EvilSanta                         EQU $1E
 DEF Object_HolidayTV_EvilSantaProjectile               EQU $1F
 DEF Object_HolidayTV_SkatingElf                        EQU $20
 DEF Object_HolidayTV_Penguin                           EQU $21
-DEF Object_MysteryTV_TVEnemy                           EQU $22
+DEF Object_MysteryTV_Rezling                           EQU $22
 DEF Object_MysteryTV_BloodCooler                       EQU $23
-DEF Object_MysteryTV_FishEnemy                         EQU $24
+DEF Object_MysteryTV_Fish                         EQU $24
 DEF Object_MysteryTV_MagicSword                        EQU $25
-DEF Object_MysteryTV_GunnerEnemy                       EQU $26
-DEF Object_MysteryTV_GunnerBullet                      EQU $27
-DEF Object_MysteryTV_KnightBoss                        EQU $28
-DEF Object_MysteryTV_KnightBossProjectile              EQU $29
+DEF Object_MysteryTV_SafariSam                         EQU $26
+DEF Object_MysteryTV_SafariSamProjectile               EQU $27
+DEF Object_MysteryTV_GhostKnight                       EQU $28
+DEF Object_MysteryTV_GhostKnightProjectile             EQU $29
 DEF Object_TutTV_Hand                                  EQU $2A
 DEF Object_TutTV_LostArk                               EQU $2B
 DEF Object_TutTV_RisingPlatform                        EQU $2C
@@ -207,7 +207,7 @@ DEF Object_TutTV_Coffin                                EQU $38
 DEF Object_WesternStation_Cactus                       EQU $39
 DEF Object_unk3A                                       EQU $3A
 DEF Object_WesternStation_RockPlatform                 EQU $3B
-DEF Object_WesternStation_WalkerEnemy                  EQU $3C
+DEF Object_WesternStation_HardHat                      EQU $3C
 DEF Object_WesternStation_PlayingCard                  EQU $3D
 DEF Object_WesternStation_Bat                          EQU $3E
 DEF Object_WesternStation_RisingPlatform               EQU $3F
@@ -223,7 +223,7 @@ DEF Object_AnimeChannel_BlueBeamBarrier                EQU $48
 DEF Object_AnimeChannel_RisingPlatform                 EQU $49
 DEF Object_AnimeChannel_OnSwitch                       EQU $4A
 DEF Object_AnimeChannel_OffSwitch                      EQU $4B
-DEF Object_AnimeChannel_PinkGirl                       EQU $4C
+DEF Object_AnimeChannel_SailorToonGirl                       EQU $4C
 DEF Object_AnimeChannel_BigSilverRobot                 EQU $4D
 DEF Object_AnimeChannel_SmallBlueRobot                 EQU $4E
 DEF Object_AnimeChannel_TankPlane                      EQU $4F
@@ -270,6 +270,7 @@ DEF OBJECT_FLAGS_OFFSET               EQU $04
 DEF OBJECT_UNK05_OFFSET               EQU $05
 DEF OBJECT_UNK09_OFFSET               EQU $09
 DEF OBJECT_UNK0A_OFFSET               EQU $0A
+DEF OBJECT_END_OF_OBJECT_DATA_PTR_OFFSET EQU $0B
 DEF OBJECT_FACINGDIRECTION_OFFSET     EQU $0D
 DEF OBJECT_XPOS_OFFSET                EQU $0E
 DEF OBJECT_YPOS_OFFSET                EQU $10
@@ -278,11 +279,24 @@ DEF OBJECT_HEIGHT_OFFSET              EQU $13
 DEF OBJECT_UNK14_OFFSET               EQU $14
 DEF OBJECT_UNK15_OFFSET               EQU $15 ; collision related
 DEF OBJECT_UNK16_OFFSET               EQU $16
+DEF OBJECT_UNK17_OFFSET               EQU $16
 DEF OBJECT_UNK19_OFFSET               EQU $19
 DEF OBJECT_UNK1A_OFFSET               EQU $1A
 DEF OBJECT_XVEL_OFFSET                EQU $1B
 DEF OBJECT_YVEL_OFFSET                EQU $1D
 DEF OBJECT_UNK1F_OFFSET               EQU $1F ; collision related
+
+; Object Spawn Struct
+DEF OBJECTSPAWN_ID_OFFSET                   EQU $00
+DEF OBJECTSPAWN_XPOS_OFFSET                 EQU $01
+DEF OBJECTSPAWN_YPOS_OFFSET                 EQU $03
+DEF OBJECTSPAWN_BOUNDINGBOX_XMAX_OFFSET     EQU $05
+DEF OBJECTSPAWN_BOUNDINGBOX_XMIN_OFFSET     EQU $07
+DEF OBJECTSPAWN_BOUNDINGBOX_YMIN_OFFSET     EQU $09
+DEF OBJECTSPAWN_BOUNDINGBOX_YMAX_OFFSET     EQU $0B
+DEF OBJECTSPAWN_UNK0D_OFFSET                EQU $0D ; seems like collectible flag?
+DEF OBJECTSPAWN_UNK0E_OFFSET                EQU $0E
+DEF OBJECTSPAWN_MAP_OFFSET                  EQU $0F
 
 ; Object Facing Direction values
 DEF OBJECT_FACING_RIGHT      EQU $00
@@ -292,3 +306,7 @@ DEF OBJECT_FACING_UNK40      EQU $40
 ; Object position relative to Gex
 DEF OBJECT_LEFT_OF_GEX       EQU $00
 DEF OBJECT_RIGHT_OF_GEX      EQU $20
+
+; Object Action Ids
+DEF OBJECTACTION_PENGUIN_WALK_OR_RUN           EQU $00
+DEF OBJECTACTION_PENGUIN_JUMP                  EQU $01

@@ -15,7 +15,7 @@ call_03_4c38_UpdateObjectCollision_Dispatch:
     and  A, A                                          ;; 03:4c3b $a7
     ret  Z                                             ;; 03:4c3c $c8
     ld   H, $d8                                        ;; 03:4c3d $26 $d8
-    ld   A, [wDA00_CurrentObjectAddr]                  ;; 03:4c3f $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                  ;; 03:4c3f $fa $00 $da
     or   A, OBJECT_UNK15_OFFSET                                        ;; 03:4c42 $f6 $15
     ld   L, A                                          ;; 03:4c44 $6f
     ld   A, [HL]                                       ;; 03:4c45 $7e
@@ -145,7 +145,7 @@ call_03_4cea_TriggerPlayerActionChange:
     call NZ, call_00_06f6_HandleGenericHitResponse                              ;; 03:4cfb $c4 $f6 $06
 .jr_03_4cfe:
     ld   H, $d8                                        ;; 03:4cfe $26 $d8
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:4d00 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:4d00 $fa $00 $da
     or   A, OBJECT_XPOS_OFFSET                                        ;; 03:4d03 $f6 $0e
     ld   L, A                                          ;; 03:4d05 $6f
     ld   A, [wD80E_PlayerXPosition]                                    ;; 03:4d06 $fa $0e $d8
@@ -199,7 +199,7 @@ call_03_4d44_Collision_PlayerHit_ActionChangeConditional:
     ld   a,$3C
     ld   [wDC7E],a
     ld   h,$D8
-    ld   a,[wDA00_CurrentObjectAddr]
+    ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
     ld   l,a
     ld   a,[wD80E_PlayerXPosition]
@@ -307,7 +307,7 @@ call_03_4e04_Collision_PlayerHit_TriggerPhaseChange:
     ld   a,[hl]
     call call_00_0624_SetPhase_TimersAndFlags
     ld   h,$D8
-    ld   a,[wDA00_CurrentObjectAddr]
+    ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_UNK1F_OFFSET
     ld   l,a
     ld   l,[hl]
@@ -360,7 +360,7 @@ call_03_4e4b_Collision_PlayerHit_MultiStageCollectible:
     ld   C, A                                          ;; 03:4e63 $4f
     call call_00_2299_SetObjectStatusLowNibble                                  ;; 03:4e64 $cd $99 $22
     pop  AF                                            ;; 03:4e67 $f1
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     pop  AF                                            ;; 03:4e73 $f1
     cp   A, $02                                        ;; 03:4e74 $fe $02
     ret  NZ                                            ;; 03:4e76 $c0
@@ -400,7 +400,7 @@ call_03_4e89_Collision_ObjectStateOrTransform:
     ld   A, L                                          ;; 03:4eab $7d
     or   A, OBJECT_XPOS_OFFSET                                        ;; 03:4eac $f6 $0e
     ld   L, A                                          ;; 03:4eae $6f
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:4eaf $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:4eaf $fa $00 $da
     or   A, OBJECT_XPOS_OFFSET                                        ;; 03:4eb2 $f6 $0e
     ld   E, A                                          ;; 03:4eb4 $5f
     ld   D, $d8                                        ;; 03:4eb5 $16 $d8
@@ -447,7 +447,7 @@ call_03_4e89_Collision_ObjectStateOrTransform:
     ret                                                ;; 03:4ee9 $c9
 .jr_03_4eea:
     ld   A, $06                                        ;; 03:4eea $3e $06
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     jp   call_03_4cea_TriggerPlayerActionChange                                   ;; 03:4ef7 $c3 $ea $4c
 .data_03_4efa:
     db   $00, $01, $02, $03, $04, $05, $06, $07        ;; 03:4efa ???.????
@@ -468,7 +468,7 @@ call_03_4f23_Collision_ObjectCounterDecrement:
     cp   A, $01                                        ;; 03:4f27 $fe $01
     jp   NZ, call_03_4cea_TriggerPlayerActionChange                               ;; 03:4f29 $c2 $ea $4c
     ld   A, $04                                        ;; 03:4f2c $3e $04
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     call call_00_230f_ResolveObjectListIndex                                  ;; 03:4f39 $cd $0f $23
     ld   B, $00                                        ;; 03:4f3c $06 $00
     ld   HL, wDCD5                                     ;; 03:4f3e $21 $d5 $dc
@@ -550,7 +550,7 @@ call_03_4fad_Collision_TransformIfIdle:
     cp   a,$00
     ret  nz
     ld   a,$01
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     ret  
     
 call_03_4fca_Collision_TripleCollectible_TypeB:
@@ -608,7 +608,7 @@ call_03_500d_Collision_IdleToLoadedTransform:
     cp   a,$01
     ret  nz
     ld   a,$01
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     ret  
    
 call_03_5028_Collision_ConditionalTransformByDistance:
@@ -643,7 +643,7 @@ label504C:
     cp   a,$28
     ret  nc
     ld   a,$05
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     ret  
 
 call_03_5069_Collision_QuintCollectible:
@@ -682,11 +682,11 @@ call_03_5085_Collision_TransformOrRespawnSwitch:
     cp   a,$01
     jp   z,entry_03_5671_HandleObjectHitOrRespawn
     ld   a,$02
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     ret  
 label50A8:
     ld   a,$01
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     ret  
 
 call_03_50b6_Collision_TripleCollectible_WithSlot:
@@ -744,7 +744,7 @@ call_03_50f4_Collision_SlotIncrementTransform:
     ld   c,$01
     call call_00_2299_SetObjectStatusLowNibble
     ld   a,$01
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     jp   call_00_22e0_IncrementObjectSlot
     
 call_03_5116_Collision_ConditionalTransform_Sound18or1B:
@@ -778,7 +778,7 @@ label5143:
     ld   a,$18
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$01
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     ret  
 
 call_03_5156_Collision_ConditionalTransform_Bank3:
@@ -809,7 +809,7 @@ label5183:
     ld   a,$18
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$03
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     ret  
     
 call_03_5196_Collision_RespawnOrActivateSlot:
@@ -825,7 +825,7 @@ call_03_5196_Collision_RespawnOrActivateSlot:
     cp   a,$00
     jp   nz,call_00_22ef_SetObjectSlotActive
     ld   a,$02
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     ret  
     
 call_03_51b8_Collision_TransformOrSlotBurst:
@@ -847,7 +847,7 @@ call_03_51b8_Collision_TransformOrSlotBurst:
     ld   c,$02
     jp   z,call_00_2299_SetObjectStatusLowNibble
     ld   a,$03
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     ret  
 label51E3:
     call call_00_22ef_SetObjectSlotActive
@@ -857,7 +857,7 @@ label51E3:
     call call_00_2958_ObjectSetFacingDirection
     call call_00_2c67_Particle_InitBurst
     ld   a,$07
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     ret  
     
 call_03_5201_Collision_TransformOrSlotSet:
@@ -873,7 +873,7 @@ call_03_5201_Collision_TransformOrSlotSet:
     jr   z,label5222
     call call_03_4cea_TriggerPlayerActionChange
     ld   a,$02
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     jp   call_00_2410_Object_SetFacingRelativeToPlayer
 label5222:
     call call_00_2410_Object_SetFacingRelativeToPlayer
@@ -1002,7 +1002,7 @@ call_03_52da_Collision_RespawnOrTransform:
     cp   a,$03
     ret  z
     ld   a,$02
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     ret  
     
 call_03_52fa_Collision_ActionSwitchOrTransform:
@@ -1018,7 +1018,7 @@ call_03_52fa_Collision_ActionSwitchOrTransform:
     cp   a,$01
     ret  nz
     ld   a,$03
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     ret  
     
 call_03_531a_Collision_SlotSetIfFlags:
@@ -1052,7 +1052,7 @@ call_03_532f_Collision_DecrementCounterBank4:
     cp   a,$01
     jp   nz,call_03_4cea_TriggerPlayerActionChange
     ld   a,$04
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     call call_00_230f_ResolveObjectListIndex
     ld   b,$00
     ld   hl,wDCD5
@@ -1118,7 +1118,7 @@ call_03_538e_Collision_HeptCollectibleToBank1:
     ld   [wDCD2],a
 label53B0:
     ld   a,$01
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     ld   c,$02
     jp   call_00_2299_SetObjectStatusLowNibble
 
@@ -1141,7 +1141,7 @@ label53D6:
     and  a
     ret  nz
     ld   a,$01
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     jp   call_03_4cea_TriggerPlayerActionChange
     
 call_03_53eb_Collision_Action2Transform:
@@ -1155,7 +1155,7 @@ call_03_53eb_Collision_Action2Transform:
     cp   a,$01
     ret  nz
     ld   a,$03
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     ret  
     
 call_03_5406_Collision_ProximityTransform_Bank6:
@@ -1179,7 +1179,7 @@ call_03_5406_Collision_ProximityTransform_Bank6:
     xor  a,$13
     ld   l,a
     ld   d,$D8
-    ld   a,[wDA00_CurrentObjectAddr]
+    ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
     ld   e,a
     ld   a,[de]
@@ -1223,7 +1223,7 @@ call_03_5406_Collision_ProximityTransform_Bank6:
     cp   a,$07
     ret  z
     ld   a,$06
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     ret  
     
 call_03_5469_Collision_ClearObjectAlways:
@@ -1261,7 +1261,7 @@ call_03_5483_Collision_YMapTransform:
 .jr_03_5497:
     call call_00_27cb_Object_SetYFromMap
     ld   a,$01
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     ret                                          ;; 03:5482 $c9
     
 call_03_54a8_Collision_PropertyBasedTransform:
@@ -1279,7 +1279,7 @@ call_03_54a8_Collision_PropertyBasedTransform:
     jp   nz,call_03_4cea_TriggerPlayerActionChange
     call entry_03_5671_HandleObjectHitOrRespawn
     ld   h,$D8
-    ld   a,[wDA00_CurrentObjectAddr]
+    ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_UNK15_OFFSET
     ld   l,a
     ld   [hl],$00
@@ -1299,7 +1299,7 @@ call_03_54a8_Collision_PropertyBasedTransform:
     ld   c,$09
 label54E1:
     ld   a,c
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     ret  
     
 call_03_54ee_Collision_TransformBank0AndSetTimer:
@@ -1308,12 +1308,12 @@ call_03_54ee_Collision_TransformBank0AndSetTimer:
     ret  nc
     call call_03_4cea_TriggerPlayerActionChange
     ld   a,$00
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     ret  
 
 call_03_54f9:
 ; Writes 0x3C to byte at offset 15.
-    ld   a,[wDA00_CurrentObjectAddr]
+    ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_UNK15_OFFSET
     ld   l,a
     ld   h,$D8
@@ -1335,14 +1335,14 @@ call_03_550e_CheckPlayerObjectInteraction:
 ; - Otherwise calls call_00_0759 (probably a more general collision/interaction handler). If that succeeds, returns $FF+1.
 ; So this routine is the core collision handler for player–object interactions, with special cases for springs, breakables, pushables, etc., driven by data_03_55ff_ObjectInteractionFlagsTable.
     ld   B, $d8                                        ;; 03:550e $06 $d8
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5510 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5510 $fa $00 $da
     or   A, OBJECT_UNK15_OFFSET                                        ;; 03:5513 $f6 $15
     ld   C, A                                          ;; 03:5515 $4f
     ld   A, [BC]                                       ;; 03:5516 $0a
     and  A, A                                          ;; 03:5517 $a7
     jp   NZ, call_03_55fd_ReturnNoInteraction                                ;; 03:5518 $c2 $fd $55
     ld   H, $d8                                        ;; 03:551b $26 $d8
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:551d $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:551d $fa $00 $da
     or   A, OBJECT_ID_OFFSET                                        ;; 03:5520 $f6 $00
     ld   L, A                                          ;; 03:5522 $6f
     ld   L, [HL]                                       ;; 03:5523 $6e
@@ -1370,7 +1370,7 @@ call_03_550e_CheckPlayerObjectInteraction:
     dec  D                                             ;; 03:554c $15
 .jr_03_554d:
     add  HL, DE                                        ;; 03:554d $19
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:554e $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:554e $fa $00 $da
     or   A, OBJECT_YPOS_OFFSET                                        ;; 03:5551 $f6 $10
     ld   C, A                                          ;; 03:5553 $4f
     ld   A, [BC]                                       ;; 03:5554 $0a
@@ -1394,7 +1394,7 @@ call_03_550e_CheckPlayerObjectInteraction:
     cp   A, E                                          ;; 03:556a $bb
     jp   C, call_03_55fd_ReturnNoInteraction                                 ;; 03:556b $da $fd $55
     ld   HL, wD80E_PlayerXPosition                                     ;; 03:556e $21 $0e $d8
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5571 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5571 $fa $00 $da
     or   A, OBJECT_XPOS_OFFSET                                        ;; 03:5574 $f6 $0e
     ld   C, A                                          ;; 03:5576 $4f
     ld   A, [BC]                                       ;; 03:5577 $0a
@@ -1432,7 +1432,7 @@ call_03_550e_CheckPlayerObjectInteraction:
     ret                                                ;; 03:55a8 $c9
 .jr_03_55a9:
     ld   HL, wD80E_PlayerXPosition                                     ;; 03:55a9 $21 $0e $d8
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:55ac $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:55ac $fa $00 $da
     or   A, OBJECT_XPOS_OFFSET                                        ;; 03:55af $f6 $0e
     ld   C, A                                          ;; 03:55b1 $4f
     ld   A, [BC]                                       ;; 03:55b2 $0a
@@ -1525,7 +1525,7 @@ call_03_5671_HandleObjectHitOrRespawn:
 ; - If valid:
 ;   - If high bit set → sets facing direction, initializes particles (burst effect), 
 ;     sets object param $14, plays effect.
-;   - Stores low 6 bits into wDAD6_ReturnBank, then calls entry_02_72ac_LoadObjectData 
+;   - Stores low 6 bits into wDAD6_ReturnBank, then calls entry_02_72ac_SetupNewAction 
 ;     from bank 2 (reloads object definition).
 ;   - Plays sound effect $10.
 ; - If $16 didn’t reach 0:
@@ -1535,7 +1535,7 @@ call_03_5671_HandleObjectHitOrRespawn:
 ; So this is an object interaction lifecycle handler: triggered when the player collides with certain objects, 
 ; decrements a counter, and either reloads/respawns the object, spawns particles, or plays sounds depending on conditions.
     ld   H, $d8                                        ;; 03:5671 $26 $d8
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5673 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5673 $fa $00 $da
     or   A, OBJECT_UNK15_OFFSET                                        ;; 03:5676 $f6 $15
     ld   L, A                                          ;; 03:5678 $6f
     ld   A, [HL]                                       ;; 03:5679 $7e
@@ -1566,7 +1566,7 @@ call_03_5671_HandleObjectHitOrRespawn:
     pop  AF                                            ;; 03:56a5 $f1
 .jr_03_56a6:
     and  A, $3f                                        ;; 03:56a6 $e6 $3f
-    farcall entry_02_72ac_LoadObjectData
+    farcall entry_02_72ac_SetupNewAction
     ld   A, $10                                        ;; 03:56b3 $3e $10
     jp   call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 03:56b5 $c3 $f5 $0f
 .jr_03_56b8:
@@ -1581,7 +1581,7 @@ call_03_56c1_CheckPlayerObjectCollision_Main:
 ; (1A, 2E, 3B, 1B = probably cutscenes, knockback, death, or other “don’t collide” states).
 ; Otherwise, it takes the player’s Y position + vertical offset (wDC88, which looks like a 
 ; per-frame Y delta or velocity), then compares against the current object’s bounding box 
-; stored at $D8xx (using wDA00_CurrentObjectAddr).
+; stored at $D8xx (using wDA00_CurrentObjectAddrLo).
 ; Performs bounding-box intersection checks for both vertical and horizontal overlap.
 ; Splits into several cases depending on whether the player is above, below, or inside the object.
 ; If overlap is valid, it calls into call_03_58a9_ComputeCollisionOffset for fine-grained offset adjustment and then either:
@@ -1611,7 +1611,7 @@ label56E3:
     adc  d
     ld   d,a
     ld   h,$D8
-    ld   a,[wDA00_CurrentObjectAddr]
+    ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YPOS_OFFSET
     ld   l,a
     ld   a,e
@@ -1777,14 +1777,14 @@ label57AE:
 
 call_03_57e6_ResolveCollision_Reset:
 ; Clears wDC88 (the player’s vertical delta).
-; Stores the current object ID (wDA00_CurrentObjectAddr) into wDC7B.
+; Stores the current object ID (wDA00_CurrentObjectAddrLo) into wDC7B.
 ; If that ID was already in wDC7D, resets it to zero.
 ; Role: This looks like a collision resolution / reset routine. 
 ; It wipes motion and registers the colliding object as "current collision", 
 ; while clearing old records.
     xor  A, A                                          ;; 03:57e6 $af
     ld   [wDC88], A                                    ;; 03:57e7 $ea $88 $dc
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:57ea $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:57ea $fa $00 $da
     ld   [wDC7B], A                                    ;; 03:57ed $ea $7b $dc
     ld   HL, wDC7D                                     ;; 03:57f0 $21 $7d $dc
     cp   A, [HL]                                       ;; 03:57f3 $be
@@ -1798,7 +1798,7 @@ call_03_57f8_ClearCollisionForObject:
 ; If it matches, clears those slots.
 ; Effectively means: “This object is no longer colliding with the player, remove it from tracking.”
 ; Role: Collision cleanup when no intersection occurs.
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:57f8 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:57f8 $fa $00 $da
     ld   HL, wDC7B                                     ;; 03:57fb $21 $7b $dc
     cp   A, [HL]                                       ;; 03:57fe $be
     jr   NZ, .jr_03_5803                               ;; 03:57ff $20 $02
@@ -1814,7 +1814,7 @@ call_03_580b_RegisterSecondaryCollision:
 ; Marks the current object as the “secondary” collision slot (wDC7D).
 ; If it was in wDC7B, clears that first.
 ; Role: Assigns the object as the active secondary collision candidate.
-    ld   a,[wDA00_CurrentObjectAddr]
+    ld   a,[wDA00_CurrentObjectAddrLo]
     ld   hl,wDC7B
     cp   [hl]
     jr   nz,label5816
@@ -1841,7 +1841,7 @@ call_03_581a_CheckPlayerObjectCollision_Simple:
     cp   A, $1b                                        ;; 03:582c $fe $1b
     jp   Z, call_03_57f8_ClearCollisionForObject                                 ;; 03:582e $ca $f8 $57
     ld   H, $d8                                        ;; 03:5831 $26 $d8
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 03:5833 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5833 $fa $00 $da
     or   A, OBJECT_WIDTH_OFFSET                                        ;; 03:5836 $f6 $12
     ld   L, A                                          ;; 03:5838 $6f
     ld   A, [HL+]                                      ;; 03:5839 $2a
@@ -1925,7 +1925,7 @@ call_03_58a9_ComputeCollisionOffset:
 ; Role: This is a collision offset calculator: adjusts collision testing 
 ; depending on object properties (size/offset) and player facing direction.
     ld   h,$D8
-    ld   a,[wDA00_CurrentObjectAddr]
+    ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XVEL_OFFSET
     ld   l,a
     ld   b,[hl]

@@ -305,7 +305,7 @@ call_02_4f32_PlayerUpdateMain:
     ld   A, [HL]                                       ;; 02:4fd4 $7e
     ld   [HL], $ff                                     ;; 02:4fd5 $36 $ff
     cp   A, $ff                                        ;; 02:4fd7 $fe $ff
-    call NZ, call_02_72ac_SetupNextObjectAction                              ;; 02:4fd9 $c4 $ac $72
+    call NZ, call_02_72ac_SetupNewAction                              ;; 02:4fd9 $c4 $ac $72
     ld   HL, wD802_PlayerObject_ActionFunc                                     ;; 02:4fdc $21 $02 $d8
     ld   A, [HL+]                                      ;; 02:4fdf $2a
     ld   H, [HL]                                       ;; 02:4fe0 $66

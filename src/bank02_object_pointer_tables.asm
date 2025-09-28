@@ -33,14 +33,14 @@ data_02_4000:
     dw   .data_02_437c ; Object_HolidayTV_EvilSantaProjectile
     dw   .data_02_4398 ; Object_HolidayTV_SkatingElf
     dw   .data_02_43b0 ; Object_HolidayTV_Penguin
-    dw   .data_02_43c0 ; Object_MysteryTV_TVEnemy
+    dw   .data_02_43c0 ; Object_MysteryTV_Rezling
     dw   .data_02_43d8 ; Object_MysteryTV_BloodCooler
-    dw   .data_02_43e0 ; Object_MysteryTV_FishEnemy
+    dw   .data_02_43e0 ; Object_MysteryTV_Fish
     dw   .data_02_43e8 ; Object_MysteryTV_MagicSword
-    dw   .data_02_43f4 ; Object_MysteryTV_GunnerEnemy
-    dw   .data_02_4408 ; Object_MysteryTV_GunnerBullet
-    dw   .data_02_440c ; Object_MysteryTV_KnightBoss
-    dw   .data_02_4424 ; Object_MysteryTV_KnightBossProjectile
+    dw   .data_02_43f4 ; Object_MysteryTV_SafariSam
+    dw   .data_02_4408 ; Object_MysteryTV_SafariSamProjectile
+    dw   .data_02_440c ; Object_MysteryTV_GhostKnight
+    dw   .data_02_4424 ; Object_MysteryTV_GhostKnightProjectile
     dw   .data_02_4428 ; Object_TutTV_Hand
     dw   .data_02_4440 ; Object_TutTV_LostArk
     dw   .data_02_4454 ; Object_TutTV_RisingPlatform
@@ -59,7 +59,7 @@ data_02_4000:
     dw   .data_02_44cc ; Object_WesternStation_Cactus
     dw   .data_02_44e8 ; Object_unk3A
     dw   .data_02_44ec ; Object_WesternStation_RockPlatform
-    dw   .data_02_44fc ; Object_WesternStation_WalkerEnemy
+    dw   .data_02_44fc ; Object_WesternStation_HardHat
     dw   .data_02_4510 ; Object_WesternStation_PlayingCard
     dw   .data_02_4518 ; Object_WesternStation_Bat
     dw   .data_02_452c ; Object_WesternStation_RisingPlatform
@@ -75,11 +75,11 @@ data_02_4000:
     dw   .data_02_4594 ; Object_AnimeChannel_RisingPlatform
     dw   .data_02_4598 ; Object_AnimeChannel_OnSwitch
     dw   .data_02_45a0 ; Object_AnimeChannel_OffSwitch
-    dw   .data_02_45a8 ; Object_AnimeChannel_PinkGirl
+    dw   .data_02_45a8 ; Object_AnimeChannel_SailorToonGirl
     dw   .data_02_45c8 ; Object_AnimeChannel_BigSilverRobot
     dw   .data_02_45d8 ; Object_AnimeChannel_SmallBlueRobot
-    dw   .data_02_45e4 ; Object_AnimeChannel_TransformerEnemy
-    dw   .data_02_45f8 ; Object_AnimeChannel_TransformerEnemyProjectile
+    dw   .data_02_45e4 ; Object_AnimeChannel_Secbot
+    dw   .data_02_45f8 ; Object_AnimeChannel_SecbotProjectile
     dw   .data_02_45fc ; Object_AnimeChannel_Elevator
     dw   .data_02_4600 ; Object_AnimeChannel_FireWallEnemy
     dw   .data_02_4604 ; Object_AnimeChannel_FallingYellowEnemy
@@ -323,50 +323,50 @@ data_02_4000:
     dw   call_02_582e_ObjectAction_None, data_02_7774
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_43c0:
-    dw   call_02_5ecc, data_02_777b
-    dw   call_02_5eda, data_02_7788
-    dw   call_02_5edb, data_02_7790
-    dw   call_02_5edc, data_02_7796
+    dw   call_02_5ecc_ObjectAction_Rezling_Walk, data_02_777b
+    dw   call_02_5eda_ObjectAction_Rezling_None, data_02_7788
+    dw   call_02_5edb_ObjectAction_Rezling_None, data_02_7790
+    dw   call_02_5edc_ObjectAction_Rezling_None, data_02_7796
     dw   call_02_582e_ObjectAction_None, data_02_779c
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_43d8:
     dw   call_02_582e_ObjectAction_None, data_02_77ad
     dw   call_02_582e_ObjectAction_None, data_02_77b6
 .data_02_43e0:
-    dw   call_02_5edd, data_02_77bc
-    dw   call_02_5ef9, data_02_77c5
+    dw   call_02_5edd_ObjectAction_Fish_Unk0, data_02_77bc
+    dw   call_02_5ef9_ObjectAction_Fish_Unk1, data_02_77c5
 .data_02_43e8:
     dw   call_02_582e_ObjectAction_None, data_02_77cb
     dw   call_02_582e_ObjectAction_None, data_02_77d8
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_43f4:
-    dw   call_02_5f01, data_02_77de
+    dw   call_02_5f01_ObjectAction_SafariSam_Unk0, data_02_77de
     dw   call_02_582e_ObjectAction_None, data_02_77f0
-    dw   call_02_5f39, data_02_77fb
-    dw   call_02_5f42, data_02_7806
+    dw   call_02_5f39_ObjectAction_SafariSam_Unk2, data_02_77fb
+    dw   call_02_5f42_ObjectAction_SafariSam_Unk3, data_02_7806
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_4408:
-    dw   call_02_5f50, data_02_780c
+    dw   call_02_5f50_ObjectAction_SafariSamProjectile_Update, data_02_780c
 .data_02_440c:
-    dw   call_02_5f69, data_02_7812
-    dw   call_02_5f78, data_02_7818
+    dw   call_02_5f69_ObjectAction_GhostKnight_Unk0, data_02_7812
+    dw   call_02_5f78_ObjectAction_GhostKnight_Unk1, data_02_7818
     dw   call_02_582e_ObjectAction_None, data_02_7821
-    dw   call_02_5f91, data_02_782a
+    dw   call_02_5f91_ObjectAction_GhostKnight_Unk3, data_02_782a
     dw   call_02_582e_ObjectAction_None, data_02_7830
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_4424:
-    dw   call_02_60c7, data_02_7838
+    dw   call_02_60c7_ObjectAction_GhostKnightProjectile_Update, data_02_7838
 .data_02_4428:
-    dw   call_02_613f, data_02_783e
-    dw   call_02_614d, data_02_7849
-    dw   call_02_6163, data_02_7852
-    dw   call_02_616f, data_02_785b
+    dw   call_02_613f_ObjectAction_Hand_Unk0, data_02_783e
+    dw   call_02_614d_ObjectAction_Hand_Unk1, data_02_7849
+    dw   call_02_6163_ObjectAction_Hand_Unk2, data_02_7852
+    dw   call_02_616f_ObjectAction_Hand_Unk3, data_02_785b
     dw   call_02_582e_ObjectAction_None, data_02_7861
-    dw   call_02_61b2, data_02_7867
+    dw   call_02_61b2_ObjectAction_Hand_Unk5, data_02_7867
 .data_02_4440:
     dw   call_02_582e_ObjectAction_None, data_02_7874
     dw   call_02_582e_ObjectAction_None, data_02_787a
-    dw   call_02_61b8, data_02_7883
+    dw   call_02_61b8_ObjectAction_LostArk_Unk2, data_02_7883
     dw   call_02_582e_ObjectAction_None, data_02_7889
     dw   call_02_582e_ObjectAction_None, data_02_7895
 .data_02_4454:
@@ -374,60 +374,60 @@ data_02_4000:
 .data_02_4458:
     dw   call_02_585f_ObjectAction_MovePlatformHorizontally, data_02_789b
 .data_02_445c:
-    dw   call_02_61c6, data_02_78a1
-    dw   call_02_61ee, data_02_78a8
-    dw   call_02_61ee, data_02_78ae
-    dw   call_02_61ee, data_02_78b4
+    dw   call_02_61c6_ObjectAction_Bee_Unk0, data_02_78a1
+    dw   call_02_61ee_ObjectAction_Bee_Unk1, data_02_78a8
+    dw   call_02_61ee_ObjectAction_Bee_Unk1, data_02_78ae
+    dw   call_02_61ee_ObjectAction_Bee_Unk1, data_02_78b4
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_4470:
-    dw   call_02_6214, data_02_78ba
-    dw   call_02_624e, data_02_78ba
-    dw   call_02_6293, data_02_78ba
+    dw   call_02_6214_ObjectAction_Raft_Unk0, data_02_78ba
+    dw   call_02_624e_ObjectAction_Raft_Unk1, data_02_78ba
+    dw   call_02_6293_ObjectAction_Raft_Unk2, data_02_78ba
 .data_02_447c:
-    dw   call_02_62bc, data_02_78c0
-    dw   call_02_62f9, data_02_78c6
-    dw   call_02_6315, data_02_78ce
+    dw   call_02_62bc_ObjectAction_Snake_Unk0, data_02_78c0
+    dw   call_02_62f9_ObjectAction_Snake_Unk1, data_02_78c6
+    dw   call_02_6315_ObjectAction_Snake_Unk2, data_02_78ce
     dw   call_02_582e_ObjectAction_None, data_02_78db
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_4490:
-    dw   call_02_631a, data_02_78e1
+    dw   call_02_631a_ObjectAction_SnakeRightProjectile_Update, data_02_78e1
 .data_02_4494:
-    dw   call_02_6333, data_02_78e1
+    dw   call_02_6333_ObjectAction_SnakeLeftProjectile_Update, data_02_78e1
 .data_02_4498:
     dw   call_02_582e_ObjectAction_None, data_02_78e7
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_44a0:
-    dw   call_02_634c, data_02_78f4
-    dw   call_02_6361, data_02_78fa
+    dw   call_02_634c_ObjectAction_RaStatue_Unk0, data_02_78f4
+    dw   call_02_6361_ObjectAction_RaStatue_Unk1, data_02_78fa
     dw   call_02_582e_ObjectAction_None, data_02_7913
-    dw   call_02_6399, data_02_7926
+    dw   call_02_6399_ObjectAction_RaStatue_Unk3, data_02_7926
 .data_02_44b0:
-    dw   call_02_63a8, data_02_792d
-    dw   call_02_63a8, data_02_7933
-    dw   call_02_63a8, data_02_7939
-    dw   call_02_63c0, data_02_793f
+    dw   call_02_63a8_ObjectAction_BreakableBlock_Unk0, data_02_792d
+    dw   call_02_63a8_ObjectAction_BreakableBlock_Unk0, data_02_7933
+    dw   call_02_63a8_ObjectAction_BreakableBlock_Unk0, data_02_7939
+    dw   call_02_63c0_ObjectAction_BreakableBlock_Unk3, data_02_793f
 .data_02_44c0:
     dw   call_02_582e_ObjectAction_None, data_02_7945
     dw   call_02_582e_ObjectAction_None, data_02_794b
-    dw   call_02_63d3, data_02_7952
+    dw   call_02_63d3_ObjectAction_Coffin_Unk2, data_02_7952
 .data_02_44cc:
-    dw   call_02_63db, data_02_7958
-    dw   call_02_63f0, data_02_7961
+    dw   call_02_63db_ObjectAction_Cactus_Unk0, data_02_7958
+    dw   call_02_63f0_ObjectAction_Cactus_Unk1, data_02_7961
     dw   call_02_582e_ObjectAction_None, data_02_796a
     dw   call_02_582e_ObjectAction_None, data_02_7971
-    dw   call_02_6415, data_02_7979
+    dw   call_02_6415_ObjectAction_Cactus_Unk4, data_02_7979
     dw   call_02_582e_ObjectAction_None, data_02_7980
     dw   call_02_582f_ObjectAction_DestroyWithoutParticles, data_02_7986
 .data_02_44e8:
     dw   call_02_582e_ObjectAction_None, data_02_798c
 .data_02_44ec:
-    dw   call_02_642e, data_02_7992
-    dw   call_02_6459, data_02_7998
-    dw   call_02_646f, data_02_79a5
-    dw   call_02_647b, data_02_79ab
+    dw   call_02_642e_ObjectAction_Rock_Unk0, data_02_7992
+    dw   call_02_6459_ObjectAction_Rock_Unk1, data_02_7998
+    dw   call_02_646f_ObjectAction_Rock_Unk2, data_02_79a5
+    dw   call_02_647b_ObjectAction_Rock_Unk3, data_02_79ab
 .data_02_44fc:
-    dw   call_02_6491, data_02_79b8
-    dw   call_02_64cd, data_02_79c3
+    dw   call_02_6491_ObjectAction_HardHat_Unk0, data_02_79b8
+    dw   call_02_64cd_ObjectAction_HardHat_Unk1, data_02_79c3
     dw   call_02_582e_ObjectAction_None, data_02_79c9
     dw   call_02_582e_ObjectAction_None, data_02_79de
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
@@ -435,62 +435,62 @@ data_02_4000:
     dw   call_02_582e_ObjectAction_None, data_02_79e4
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_4518:
-    dw   call_02_64e9, data_02_79f3
+    dw   call_02_64e9_ObjectAction_Bat_Unk0, data_02_79f3
     dw   call_02_582e_ObjectAction_None, data_02_79f9
-    dw   call_02_6502, data_02_7a06
-    dw   call_02_652e, data_02_7a0c
+    dw   call_02_6502_ObjectAction_Bat_Unk2, data_02_7a06
+    dw   call_02_652e_ObjectAction_Bat_Unk3, data_02_7a0c
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_452c:
     dw   call_02_58bd_ObjectAction_MovePlatformVertically, data_02_7a12
 .data_02_4530:
     dw   call_02_582e_ObjectAction_None, data_02_7a18
-    dw   call_02_653d, data_02_7a1e
-    dw   call_02_6549, data_02_7a26
+    dw   call_02_653d_ObjectAction_Door1_Unk1, data_02_7a1e
+    dw   call_02_6549_ObjectAction_Door1_Unk2, data_02_7a26
     dw   call_02_582e_ObjectAction_None, data_02_7a2c
 .data_02_4540:
-    dw   call_02_6553, data_02_7a34
+    dw   call_02_6553_ObjectAction_Door2_Unk0, data_02_7a34
     dw   call_02_582e_ObjectAction_None, data_02_7a3a
     dw   call_02_582e_ObjectAction_None, data_02_7a42
-    dw   call_02_655d, data_02_7a48
+    dw   call_02_655d_ObjectAction_Door2_Unk3, data_02_7a48
 .data_02_4550:
-    dw   call_02_6569, data_02_7a50
+    dw   call_02_6569_ObjectAction_FanLift_Unk0, data_02_7a50
     dw   call_02_582e_ObjectAction_None, data_02_7a56
-    dw   call_02_6577, data_02_7a61
+    dw   call_02_6577_ObjectAction_FanLift_Unk2, data_02_7a61
     dw   call_02_582e_ObjectAction_None, data_02_7a7a
 .data_02_4560:
-    dw   call_02_659c, data_02_7a85
+    dw   call_02_659c_ObjectAction_MechRight_Unk0, data_02_7a85
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_4568:
-    dw   call_02_6597, data_02_7a85
+    dw   call_02_6597_ObjectAction_MechLeft_Unk0, data_02_7a85
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_4570:
-    dw   call_02_659d, data_02_7a91
+    dw   call_02_659d_ObjectAction_AnimeDisappearingFloor_Unk0, data_02_7a91
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_4578:
     dw   call_02_582e_ObjectAction_None, data_02_7a97
-    dw   call_02_65b3, data_02_7a9d
+    dw   call_02_65b3_ObjectAction_Onswitch2_Unk1, data_02_7a9d
 .data_02_4580:
     dw   call_02_582e_ObjectAction_None, data_02_7aa3
     dw   call_02_582e_ObjectAction_None, data_02_7aac
     dw   call_02_582e_ObjectAction_None, data_02_7ab3
 .data_02_458c:
-    dw   call_02_65c9, data_02_7ab9
+    dw   call_02_65c9_ObjectAction_BlueBeamBarrier_Unk0, data_02_7ab9
     dw   call_02_582e_ObjectAction_None, data_02_7ac2
 .data_02_4594:
-    dw   call_02_65d7, data_02_7ac8
+    dw   call_02_65d7_ObjectAction_AnimeRisingPlatform_Update, data_02_7ac8
 .data_02_4598:
-    dw   call_02_6609, data_02_7ace
-    dw   call_02_6617, data_02_7ad4
+    dw   call_02_659d_ObjectAction_OnSwitch_Unk0, data_02_7ace
+    dw   call_02_6617_ObjectAction_OnSwitch_Unk1, data_02_7ad4
 .data_02_45a0:
-    dw   call_02_6625, data_02_7ada
-    dw   call_02_6633, data_02_7ae0
+    dw   call_02_6617_ObjectAction_OffSwitch_Unk0, data_02_7ada
+    dw   call_02_6633_ObjectAction_OffSwitch_Unk1, data_02_7ae0
 .data_02_45a8:
-    dw   call_02_6641, data_02_7ae6
+    dw   call_02_6641_ObjectAction_PinkGirl_Unk0, data_02_7ae6
     dw   call_02_582e_ObjectAction_None, data_02_7aef
-    dw   call_02_6687, data_02_7afb
-    dw   call_02_668d, data_02_7b07
+    dw   call_02_6687_ObjectAction_PinkGirl_Unk2, data_02_7afb
+    dw   call_02_668d_ObjectAction_PinkGirl_Unk3, data_02_7b07
     dw   call_02_582e_ObjectAction_None, data_02_7b0d
-    dw   call_02_669d, data_02_7b14
+    dw   call_02_669d_ObjectAction_PinkGirl_Unk5, data_02_7b14
     dw   call_02_582e_ObjectAction_None, data_02_7b1c
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_45c8:

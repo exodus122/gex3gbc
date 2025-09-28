@@ -2,7 +2,7 @@ entry_02_708f_InitObjectsAndSpawnPlayer:
 ; Purpose: Initializes core object-related state when entering a level or respawning the player.
 ; Details:
 ; Clears many object/flag variables (wDC84–wDC8F, wDABD–wDABE, etc.).
-; If a pending object ID exists in wDC78, spawns it using call_02_72ac_SetupNextObjectAction.
+; If a pending object ID exists in wDC78, spawns it using call_02_72ac_SetupNewAction.
 ; Resets player-facing direction and flags, calls entry_02_7123_ClearObjectSlotsExcludingPlayer to clear object slots, 
 ; and spawns required relative objects.
 ; Loops through call_00_360c_SpawnObjectOnceImmediate until the player object (wDAB8 == 1) is spawned.
@@ -12,11 +12,11 @@ entry_02_708f_InitObjectsAndSpawnPlayer:
     cp   A, $ff                                        ;; 02:7096 $fe $ff
     jr   Z, .jr_02_70d1                                ;; 02:7098 $28 $37
     xor  A, A                                          ;; 02:709a $af
-    ld   [wDA00_CurrentObjectAddr], A                                    ;; 02:709b $ea $00 $da
+    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 02:709b $ea $00 $da
     ld   A, $00                                        ;; 02:709e $3e $00
     ld   [wD800_PlayerObject_Id], A                                    ;; 02:70a0 $ea $00 $d8
     ld   A, [wDC78]                                    ;; 02:70a3 $fa $78 $dc
-    call call_02_72ac_SetupNextObjectAction                                  ;; 02:70a6 $cd $ac $72
+    call call_02_72ac_SetupNewAction                                  ;; 02:70a6 $cd $ac $72
     ld   A, $ff                                        ;; 02:70a9 $3e $ff
     ld   [wDC78], A                                    ;; 02:70ab $ea $78 $dc
     ld   A, $00                                        ;; 02:70ae $3e $00
@@ -49,14 +49,14 @@ entry_02_708f_InitObjectsAndSpawnPlayer:
     and  A, A                                          ;; 02:70f3 $a7
     jr   Z, .jr_02_7115                                ;; 02:70f4 $28 $1f
     xor  A, A                                          ;; 02:70f6 $af
-    ld   [wDA00_CurrentObjectAddr], A                                    ;; 02:70f7 $ea $00 $da
+    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 02:70f7 $ea $00 $da
     ld   C, $19                                        ;; 02:70fa $0e $19
     call call_00_3792_PrepareRelativeObjectSpawn                                  ;; 02:70fc $cd $92 $37
     ld   C, $1b                                        ;; 02:70ff $0e $1b
     call call_00_29ce_ObjectExistsCheck                                  ;; 02:7101 $cd $ce $29
     jr   NZ, .jr_02_7115                               ;; 02:7104 $20 $0f
     ld   A, L                                          ;; 02:7106 $7d
-    ld   [wDA00_CurrentObjectAddr], A                                    ;; 02:7107 $ea $00 $da
+    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 02:7107 $ea $00 $da
     farcall entry_02_5bb3_ObjectAction_UpdateBonusStageTimer
 .jr_02_7115:
     call call_00_3252_ResetObjectCounter                                  ;; 02:7115 $cd $52 $32
@@ -122,7 +122,7 @@ call_02_7152_UpdateObjects:
 ; Handles special cases for player actions/IDs, adjusts player Y-position (wD810/wD811).
 ; Invokes object behavior routines (call_00_0f22_JumpHL) for special objects (wDC7B, wDC7D).
 ; Calls call_02_72fb_UpdateMapWindow to update the scrolling window and environment.
-; Iterates through all objects (wDA00_CurrentObjectAddr) to run their update logic and 
+; Iterates through all objects (wDA00_CurrentObjectAddrLo) to run their update logic and 
 ; finally triggers graphics updates via banked call entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision.
     xor  A, A                                          ;; 02:7152 $af
     ld   [wDC85], A                                    ;; 02:7153 $ea $85 $dc
@@ -172,7 +172,7 @@ call_02_7152_UpdateObjects:
     ld   A, [wDC7B]                                    ;; 02:71a9 $fa $7b $dc
     and  A, A                                          ;; 02:71ac $a7
     jr   Z, .jr_02_71e4                                ;; 02:71ad $28 $35
-    ld   [wDA00_CurrentObjectAddr], A                                    ;; 02:71af $ea $00 $da
+    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 02:71af $ea $00 $da
     or   A, $02                                        ;; 02:71b2 $f6 $02
     ld   L, A                                          ;; 02:71b4 $6f
     ld   H, $d8                                        ;; 02:71b5 $26 $d8
@@ -207,7 +207,7 @@ call_02_7152_UpdateObjects:
     ld   A, [wDC7D]                                    ;; 02:71e4 $fa $7d $dc
     and  A, A                                          ;; 02:71e7 $a7
     jr   Z, .jr_02_71f8                                ;; 02:71e8 $28 $0e
-    ld   [wDA00_CurrentObjectAddr], A                                    ;; 02:71ea $ea $00 $da
+    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 02:71ea $ea $00 $da
     or   A, $02                                        ;; 02:71ed $f6 $02
     ld   L, A                                          ;; 02:71ef $6f
     ld   H, $d8                                        ;; 02:71f0 $26 $d8
@@ -217,20 +217,20 @@ call_02_7152_UpdateObjects:
     call call_00_0f22_JumpHL                                  ;; 02:71f5 $cd $22 $0f
 .jr_02_71f8:
     ld   A, $00                                        ;; 02:71f8 $3e $00
-    ld   [wDA00_CurrentObjectAddr], A                                    ;; 02:71fa $ea $00 $da
+    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 02:71fa $ea $00 $da
     call call_02_4f32_PlayerUpdateMain                                  ;; 02:71fd $cd $32 $4f
 .jp_02_7200:
     call call_02_72fb_UpdateMapWindow                                  ;; 02:7200 $cd $fb $72
     ld   A, $20                                        ;; 02:7203 $3e $20
 .jr_02_7205:
-    ld   [wDA00_CurrentObjectAddr], A                                    ;; 02:7205 $ea $00 $da
+    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 02:7205 $ea $00 $da
     or   A, $00                                        ;; 02:7208 $f6 $00
     ld   L, A                                          ;; 02:720a $6f
     ld   H, $d8                                        ;; 02:720b $26 $d8
     ld   A, [HL]                                       ;; 02:720d $7e
     cp   A, $ff                                        ;; 02:720e $fe $ff
     jr   Z, .jr_02_723a                                ;; 02:7210 $28 $28
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 02:7212 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:7212 $fa $00 $da
     ld   HL, wDC7B                                     ;; 02:7215 $21 $7b $dc
     cp   A, [HL]                                       ;; 02:7218 $be
     jr   Z, .jr_02_722c                                ;; 02:7219 $28 $11
@@ -246,14 +246,14 @@ call_02_7152_UpdateObjects:
     call call_00_0f22_JumpHL                                  ;; 02:7229 $cd $22 $0f
 .jr_02_722c:
     ld   H, $d8                                        ;; 02:722c $26 $d8
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 02:722e $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:722e $fa $00 $da
     or   A, OBJECT_ID_OFFSET                                        ;; 02:7231 $f6 $00
     ld   L, A                                          ;; 02:7233 $6f
     ld   A, [HL]                                       ;; 02:7234 $7e
     cp   A, $ff                                        ;; 02:7235 $fe $ff
     call NZ, call_02_724d_ProcessObjectTimerAndState                              ;; 02:7237 $c4 $4d $72
 .jr_02_723a:
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 02:723a $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:723a $fa $00 $da
     add  A, $20                                        ;; 02:723d $c6 $20
     jr   NZ, .jr_02_7205                               ;; 02:723f $20 $c4
     farcall entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision
@@ -263,9 +263,9 @@ call_02_724d_ProcessObjectTimerAndState:
 ; Purpose: Handles countdown timers, state flags, and transitions for an individual object slot.
 ; Details:
 ; Decrements a timer; when it reaches zero, reloads counters, updates flags (set 2, set 1), and fetches new data from tables.
-; Can trigger reinitialization via call_02_54f9_SwitchPlayerAction or call_02_72ac_SetupNextObjectAction.
+; Can trigger reinitialization via call_02_54f9_SwitchPlayerAction or call_02_72ac_SetupNewAction.
 ; Updates related memory locations with new object state values.
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 02:724d $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:724d $fa $00 $da
     or   A, OBJECT_FLAGS_OFFSET                                        ;; 02:7250 $f6 $04
     ld   L, A                                          ;; 02:7252 $6f
     ld   H, $d8                                        ;; 02:7253 $26 $d8
@@ -291,11 +291,11 @@ call_02_724d_ProcessObjectTimerAndState:
     bit  7, E                                          ;; 02:726b $cb $7b
     jr   Z, .jr_02_727c                                ;; 02:726d $28 $0d
     res  7, E                                          ;; 02:726f $cb $bb
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 02:7271 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:7271 $fa $00 $da
     and  A, A                                          ;; 02:7274 $a7
     ld   A, E                                          ;; 02:7275 $7b
     jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:7276 $ca $f9 $54
-    jp   call_02_72ac_SetupNextObjectAction                                  ;; 02:7279 $c3 $ac $72
+    jp   call_02_72ac_SetupNewAction                                  ;; 02:7279 $c3 $ac $72
 .jr_02_727c:
     bit  3, B                                          ;; 02:727c $cb $58
     jr   Z, .jr_02_7282                                ;; 02:727e $28 $02
@@ -308,7 +308,7 @@ call_02_724d_ProcessObjectTimerAndState:
     dec  L                                             ;; 02:7285 $2d
     set  2, [HL]                                       ;; 02:7286 $cb $d6
 .jr_02_7288:
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 02:7288 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:7288 $fa $00 $da
     or   A, $05                                        ;; 02:728b $f6 $05
     ld   L, A                                          ;; 02:728d $6f
     set  1, [HL]                                       ;; 02:728e $cb $ce
@@ -328,32 +328,32 @@ call_02_724d_ProcessObjectTimerAndState:
     pop  HL                                            ;; 02:729f $e1
     ld   [HL], A                                       ;; 02:72a0 $77
 
-call_02_72a1_SetFirstObjectActive:
+call_02_72a1_CheckIfPlayerActorUpdatedAction:
 ; Mark Object Slot Active
 ; Description:
-; Checks if wDA00_CurrentObjectAddr is zero (no active object). If so, sets bit0 of 
-; wDB66 (likely enabling or flagging the first object slot).
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 02:72a1 $fa $00 $da
+; Checks if wDA00_CurrentObjectAddrLo is zero (no active object). If so, sets bit0 of 
+; wDB66, likely to indicate that the player actor has changed it's action.
+    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:72a1 $fa $00 $da
     and  A, A                                          ;; 02:72a4 $a7
     ret  NZ                                            ;; 02:72a5 $c0
     ld   HL, wDB66                                     ;; 02:72a6 $21 $66 $db
     set  0, [HL]                                       ;; 02:72a9 $cb $c6
     ret                                                ;; 02:72ab $c9
 
-entry_02_72ac_LoadObjectData:
-call_02_72ac_SetupNextObjectAction:
+entry_02_72ac_SetupNewAction:
+call_02_72ac_SetupNewAction:
 ; Purpose: Loads an object's initialization data from a data table 
 ; (data_02_4000) into its slot in working memory.
 ; Details:
 ; Uses the object ID (masked with $7F) as an index into the object data table.
-; Copies attributes like position, behavior pointers, and timers into the object's memory slot.
+; Copies attributes like behavior pointers and timers into the object's memory slot.
 ; Sets auxiliary values and flags (wDB66 bit 0) to indicate a new object was loaded.
     and  A, $7f                                        ;; 02:72ac $e6 $7f
-    ld   HL, wDA00_CurrentObjectAddr                                     ;; 02:72ae $21 $00 $da
+    ld   HL, wDA00_CurrentObjectAddrLo                   ;; 02:72ae $21 $00 $da
     ld   L, [HL]                                       ;; 02:72b1 $6e
     inc  L                                             ;; 02:72b2 $2c
     ld   H, $d8                                        ;; 02:72b3 $26 $d8
-    ld   [HL-], A                                      ;; 02:72b5 $32
+    ld   [HL-], A                                      ;; 02:72b5 $32 ; writes new action id to object instance
     ld   L, [HL]                                       ;; 02:72b6 $6e
     ld   H, $00                                        ;; 02:72b7 $26 $00
     add  HL, HL                                        ;; 02:72b9 $29
@@ -362,29 +362,29 @@ call_02_72ac_SetupNextObjectAction:
     ld   E, [HL]                                       ;; 02:72be $5e
     inc  HL                                            ;; 02:72bf $23
     ld   D, [HL]                                       ;; 02:72c0 $56
-    ld   L, A                                          ;; 02:72c1 $6f
+    ld   L, A                                          ;; 02:72c1 $6f ; at this point, DE = ptr to the object's action table
     ld   H, $00                                        ;; 02:72c2 $26 $00
     add  HL, HL                                        ;; 02:72c4 $29
     add  HL, HL                                        ;; 02:72c5 $29
     add  HL, DE                                        ;; 02:72c6 $19
     ld   C, L                                          ;; 02:72c7 $4d
-    ld   B, H                                          ;; 02:72c8 $44
-    ld   A, [wDA00_CurrentObjectAddr]                                    ;; 02:72c9 $fa $00 $da
-    or   A, $02                                        ;; 02:72cc $f6 $02
+    ld   B, H                                          ;; 02:72c8 $44 ; HL and BC are ptrs to an object action table entry
+    ld   A, [wDA00_CurrentObjectAddrLo]                  ;; 02:72c9 $fa $00 $da 
+    or   A, OBJECT_ACTIONPTR_OFFSET                    ;; 02:72cc $f6 $02
     ld   L, A                                          ;; 02:72ce $6f
     ld   H, $d8                                        ;; 02:72cf $26 $d8
     ld   A, [BC]                                       ;; 02:72d1 $0a
     ld   [HL+], A                                      ;; 02:72d2 $22
     inc  BC                                            ;; 02:72d3 $03
     ld   A, [BC]                                       ;; 02:72d4 $0a
-    ld   [HL+], A                                      ;; 02:72d5 $22
+    ld   [HL+], A                                      ;; 02:72d5 $22 ; updates action func ptr in instance
     inc  BC                                            ;; 02:72d6 $03
     ld   A, [BC]                                       ;; 02:72d7 $0a
     ld   E, A                                          ;; 02:72d8 $5f
     inc  BC                                            ;; 02:72d9 $03
     ld   A, [BC]                                       ;; 02:72da $0a
     ld   D, A                                          ;; 02:72db $57
-    ld   A, [DE]                                       ;; 02:72dc $1a
+    ld   A, [DE]                                       ;; 02:72dc $1a ; at this point, DE is ptr to the data for this action
     ld   C, A                                          ;; 02:72dd $4f
     inc  DE                                            ;; 02:72de $13
     ld   A, [DE]                                       ;; 02:72df $1a
@@ -411,7 +411,7 @@ call_02_72ac_SetupNextObjectAction:
     xor  A, $1b                                        ;; 02:72f4 $ee $1b
     ld   L, A                                          ;; 02:72f6 $6f
     ld   [HL], C                                       ;; 02:72f7 $71
-    jp   call_02_72a1_SetFirstObjectActive                                    ;; 02:72f8 $c3 $a1 $72
+    jp   call_02_72a1_CheckIfPlayerActorUpdatedAction             ;; 02:72f8 $c3 $a1 $72
 
 entry_02_72fb_UpdateMapWindow:
 call_02_72fb_UpdateMapWindow:
