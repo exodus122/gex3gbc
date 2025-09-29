@@ -465,10 +465,10 @@ call_00_2475_Object_ApplyVerticalVelocity_Clamped:
     ld   B, A                                          ;; 00:2471 $47
     jp   call_00_250d_Object_UpdateYPosition                                    ;; 00:2472 $c3 $0d $25
 
-call_00_2475_Object_MoveYWithClampAndSnap:
-; Similar clamp on vertical velocity as call_00_2475_Object_ApplyVerticalVelocity_Clamped, 
-; but directly adjusts Y position with subpixel integration, checks against a reference 
-; vector (collision/limit), and snaps position if exceeded.
+call_00_2475_Object_ApplyGravityAndSnapToGround:
+; Applies gravity to the object’s vertical velocity (with clamp), integrates it into 
+; the object’s Y position using subpixel precision, and compares against a stored ground reference. 
+; If the object falls past this reference, its Y position is snapped back and velocity is reset to zero.
     ld   h,$D8
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YVEL_OFFSET

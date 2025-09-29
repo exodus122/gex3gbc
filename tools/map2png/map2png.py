@@ -431,9 +431,9 @@ if split_map_data:
             
             for i in range(0, len(object_list_data)-1, 0x10):
                 try:
-                    objectId, xPosition, yPosition, xMax, xMin, yMin, yMax, instanceId, map = struct.unpack('<BHHHHHHHB',object_list_data[i:i+0x10])
+                    objectId, xPosition, yPosition, xMax, xMin, yMin, yMax, flags, map = struct.unpack('<BHHHHHHHB',object_list_data[i:i+0x10])
                     object_name = object_names[objectId]
-                    object_string = "    db   {}\n    dw   ${:04x}, ${:04x}\n    dw   ${:04x}, ${:04x}, ${:04x}, ${:04x}\n    dw   ${:04x}\n    db   ${:02x}\n\n".format(object_name, xPosition, yPosition, xMax, xMin, yMin, yMax, instanceId, map)
+                    object_string = "    db   {}\n    dw   ${:04x}, ${:04x}\n    dw   ${:04x}, ${:04x}, ${:04x}, ${:04x}\n    dw   ${:04x}\n    db   ${:02x}\n\n".format(object_name, xPosition, yPosition, xMax, xMin, yMin, yMax, flags, map)
                     out.write(object_string)
                 except:
                     break
@@ -549,10 +549,12 @@ if generate_regular_maps:
 
         os.system('mkdir -p map_images')
         os.system('mkdir -p map_images/'+level_name)
-        os.system('mkdir -p map_images/with_objects')
-        os.system('mkdir -p map_images/with_objects/'+level_name)
+        os.system('mkdir -p map_images_with_objects')
+        os.system('mkdir -p map_images_with_objects/'+level_name)
 
         map_image_path = "./map_images/"
+        if draw_objects_and_collectibles:
+            map_image_path = "./map_images_with_objects/"
 
         map_file = "../banks/bank_0"+f"{level_data[MAP_BANK]:x}"+".bin"
         map_data = open(map_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
@@ -603,8 +605,6 @@ if generate_regular_maps:
                     #print(f"x={x}, y={y}, map={map_}")
 
         output_path = map_image_path+level_name+"/"+level_name+"_"+f"{channel_map_number:0{2}}"+"_map.png"
-        if draw_objects_and_collectibles:
-            output_path = map_image_path+"with_objects/"+level_name+"/"+level_name+"_"+f"{channel_map_number:0{2}}"+"_map.png"
         img.save(output_path)
 
         os.system('rm -r tile_bins')

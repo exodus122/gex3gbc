@@ -44,7 +44,7 @@ DEF Bank32_MapData            EQU $32 ; MysteryTV, HolidayTV, TutTV, GextremeSpo
 DEF Bank33_MapCollision       EQU $33
 DEF Bank34_ExtendedMapData    EQU $34
 DEF Bank35_MapData            EQU $35 ; HolidayTV, MarsupialMadness, WWGexWrestling
-DEF Bank36_MapCollision        EQU $36
+DEF Bank36_MapCollision       EQU $36
 DEF Bank37_ExtendedMapData    EQU $37
 DEF Bank38_MapData            EQU $38 ; AnimeChannel, LizardOfOz
 DEF Bank39_MapCollision       EQU $39
@@ -295,7 +295,7 @@ DEF OBJECTSPAWN_BOUNDINGBOX_XMAX_OFFSET     EQU $05
 DEF OBJECTSPAWN_BOUNDINGBOX_XMIN_OFFSET     EQU $07
 DEF OBJECTSPAWN_BOUNDINGBOX_YMIN_OFFSET     EQU $09
 DEF OBJECTSPAWN_BOUNDINGBOX_YMAX_OFFSET     EQU $0B
-DEF OBJECTSPAWN_INSTANCEID_OFFSET           EQU $0D
+DEF OBJECTSPAWN_FLAGS_OFFSET                EQU $0D ; usually instance id, but sometimes contains other data
 DEF OBJECTSPAWN_MAP_OFFSET                  EQU $0F
 
 ; Object Facing Direction values
@@ -308,5 +308,34 @@ DEF OBJECT_LEFT_OF_GEX       EQU $00
 DEF OBJECT_RIGHT_OF_GEX      EQU $20
 
 ; Object Action Ids
-DEF OBJECTACTION_PENGUIN_WALK_OR_RUN           EQU $00
-DEF OBJECTACTION_PENGUIN_JUMP                  EQU $01
+DEF OBJECTACTION_PENGUIN_WALK_OR_RUN      EQU $00
+DEF OBJECTACTION_PENGUIN_JUMP             EQU $01
+
+; Menu Types
+DEF MENU_TITLE_SCREEN                     EQU $00
+DEF MENU_ENTER_PASSWORD                   EQU $01
+DEF MENU_SEE_PASSWORD                     EQU $02
+DEF MENU_GAME_OVER                        EQU $03
+DEF MENU_BAD_PASSWORD                     EQU $04
+DEF MENU_MISSION_SELECT_1_REMOTE          EQU $05
+DEF MENU_UNK06                            EQU $06
+DEF MENU_MISSION_SELECT_3_REMOTES         EQU $07
+DEF MENU_TOTALS                           EQU $08
+DEF MENU_UNK09                            EQU $09
+DEF MENU_UNK0A                            EQU $0A
+DEF MENU_PAUSE_GEX_CAVE                   EQU $0B
+DEF MENU_QUIT_GAME                        EQU $0C
+DEF MENU_PAUSE_IN_LEVEL                   EQU $0D
+DEF MENU_GO_TO_MAP                        EQU $0E
+DEF MENU_DAVID_A_PALMER                   EQU $0F
+DEF MENU_UNK10                            EQU $10
+DEF MENU_OPENING_CREDITS_1                EQU $11
+DEF MENU_OPENING_CREDITS_2                EQU $12
+DEF MENU_OPENING_CRYSTAL_DYNAMICS         EQU $13
+DEF MENU_EIDOS_INTERACTIVE                EQU $14
+DEF MENU_END_CREDITS_1                    EQU $15
+DEF MENU_END_CREDITS_2                    EQU $16
+DEF MENU_END_CREDITS_3                    EQU $17
+DEF MENU_END_CREDITS_4                    EQU $18
+DEF MENU_END_CREDITS_5                    EQU $19
+DEF MENU_END_CREDITS_6                    EQU $1A

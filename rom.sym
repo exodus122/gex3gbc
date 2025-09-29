@@ -270,7 +270,7 @@
 00:2444 label2444
 00:244a call_00_2475_Object_ApplyVerticalVelocity_Clamped
 00:245f call_00_2475_Object_ApplyVerticalVelocity_Clamped.jr_00_245f
-00:2475 call_00_2475_Object_MoveYWithClampAndSnap
+00:2475 call_00_2475_Object_ApplyGravityAndSnapToGround
 00:248a label248A
 00:24c0 call_00_24c0_Object_IntegrateXVelocity
 00:24df call_00_24df_Object_UpdateXPosition

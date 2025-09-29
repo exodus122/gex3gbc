@@ -1152,7 +1152,7 @@ call_02_61c6_ObjectAction_Bee_Unk0:
 
 call_02_61ee_ObjectAction_Bee_Unk1:
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
-    call call_00_2475_Object_MoveYWithClampAndSnap
+    call call_00_2475_Object_ApplyGravityAndSnapToGround
     ld   c,$00
     jr   nc,.label620B
     call call_00_28d2_ObjectGetYVelocity
