@@ -53,7 +53,7 @@ call_00_21f6_FindAndMarkObjectInList_TVButton:
 .jr_00_2228:
     pop  HL                                            ;; 00:2228 $e1
     ld   E, B                                          ;; 00:2229 $58
-    ld   D, $d7                                        ;; 00:222a $16 $d7
+    ld   D, HIGH(wD700_ObjectFlags)                                        ;; 00:222a $16 $d7
     ld   A, [DE]                                       ;; 00:222c $1a
     and  A, $f0                                        ;; 00:222d $e6 $f0
     or   A, $01                                        ;; 00:222f $f6 $01
@@ -128,7 +128,7 @@ call_00_2260_FindAndFlagObject_TVRemote:
 .jr_00_228c:
     pop  HL                                            ;; 00:228c $e1
     ld   E, B                                          ;; 00:228d $58
-    ld   D, $d7                                        ;; 00:228e $16 $d7
+    ld   D, HIGH(wD700_ObjectFlags)                                        ;; 00:228e $16 $d7
     ld   A, [DE]                                       ;; 00:2290 $1a
     and  A, $f0                                        ;; 00:2291 $e6 $f0
     or   A, $04                                        ;; 00:2293 $f6 $04
@@ -150,7 +150,7 @@ call_00_2299_SetObjectStatusLowNibble:
     ld   DE, wDA01_ObjectListIndexesForCurrentObjects                                     ;; 00:22a4 $11 $01 $da
     add  HL, DE                                        ;; 00:22a7 $19
     ld   L, [HL]                                       ;; 00:22a8 $6e
-    ld   H, $d7                                        ;; 00:22a9 $26 $d7
+    ld   H, HIGH(wD700_ObjectFlags)                                        ;; 00:22a9 $26 $d7
     ld   A, [HL]                                       ;; 00:22ab $7e
     and  A, $f0                                        ;; 00:22ac $e6 $f0
     or   A, C                                          ;; 00:22ae $b1
@@ -174,7 +174,7 @@ call_00_22b1_HandleObjectStateChange:
     ld   DE, wDA01_ObjectListIndexesForCurrentObjects                                     ;; 00:22bc $11 $01 $da
     add  HL, DE                                        ;; 00:22bf $19
     ld   L, [HL]                                       ;; 00:22c0 $6e
-    ld   H, $d7                                        ;; 00:22c1 $26 $d7
+    ld   H, HIGH(wD700_ObjectFlags)                                        ;; 00:22c1 $26 $d7
     ld   A, [HL]                                       ;; 00:22c3 $7e
     and  A, $0f                                        ;; 00:22c4 $e6 $0f
     cp   A, C                                          ;; 00:22c6 $b9

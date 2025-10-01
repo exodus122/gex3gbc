@@ -243,8 +243,8 @@ call_03_75be_HDMA_CopyNumberTileBlock:
 
 call_03_75e3_Tilemap_UpdateBlockFromBuffer:
 ; Sets VRAM bank 1, reads tilemap pointer from wDC21,
-; copies a 32-byte metatile chunk (block) of data from scratch buffer (wCF80) into VRAM.
-; Then repeats for VRAM bank 0 with a different buffer (wCF00).
+; copies a 32-byte metatile chunk (block) of data from scratch buffer (wCF80_MetatileScratchBuffer2) into VRAM.
+; Then repeats for VRAM bank 0 with a different buffer (wCF00_MetatileScratchBuffer).
 ; This routine sets up a destination in VRAM (DE) based on wDC21 (likely current tile update coordinates) 
 ; and uses call_03_7604 to copy a fixed-size block of data from a RAM staging area into VRAM.
 ; It does this once for VRAM bank 1 (attributes) and again for bank 0 (tile indices).
@@ -255,7 +255,7 @@ call_03_75e3_Tilemap_UpdateBlockFromBuffer:
     and  A, $e0                                        ;; 03:75eb $e6 $e0
     ld   D, [HL]                                       ;; 03:75ed $56
     ld   E, A                                          ;; 03:75ee $5f
-    ld   HL, wCF80                                     ;; 03:75ef $21 $80 $cf
+    ld   HL, wCF80_MetatileScratchBuffer2                                     ;; 03:75ef $21 $80 $cf
     call call_03_7604_MemCopy32Bytes                                  ;; 03:75f2 $cd $04 $76
     ld   A, $00                                        ;; 03:75f5 $3e $00
     ldh  [rVBK], A                                     ;; 03:75f7 $e0 $4f
@@ -264,7 +264,7 @@ call_03_75e3_Tilemap_UpdateBlockFromBuffer:
     and  A, $e0                                        ;; 03:75fd $e6 $e0
     ld   D, [HL]                                       ;; 03:75ff $56
     ld   E, A                                          ;; 03:7600 $5f
-    ld   HL, wCF00                                     ;; 03:7601 $21 $00 $cf
+    ld   HL, wCF00_MetatileScratchBuffer                                     ;; 03:7601 $21 $00 $cf
 
 call_03_7604_MemCopy32Bytes:
 ; Copies 32 bytes sequentially from HL -> DE (VRAM).
@@ -369,8 +369,8 @@ call_03_7604_MemCopy32Bytes:
 
 call_03_7664_Tilemap_UpdateColumnFromBuffer:
 ; Sets VRAM bank 1, computes tilemap address from wDC23,
-; copies a vertical strip from scratch buffer (wCFC0) into VRAM.
-; Repeats for VRAM bank 0 with wCF40.
+; copies a vertical strip from scratch buffer (wCFC0_TileColumnScratchBuffer2) into VRAM.
+; Repeats for VRAM bank 0 with wCF40_TileColumnScratchBuffer.
 ; This one differs from 75e3: instead of a block copy, it writes values 
 ; spaced 32 tiles apart (adds BC=$20 after each).
 ; That means it’s writing a vertical column of tiles/attributes into the tilemap at $9800 (BG map).
@@ -380,7 +380,7 @@ call_03_7664_Tilemap_UpdateColumnFromBuffer:
     and  A, $1f                                        ;; 03:766b $e6 $1f
     ld   L, A                                          ;; 03:766d $6f
     ld   H, $98                                        ;; 03:766e $26 $98
-    ld   DE, wCFC0                                     ;; 03:7670 $11 $c0 $cf
+    ld   DE, wCFC0_TileColumnScratchBuffer2                                     ;; 03:7670 $11 $c0 $cf
     call call_03_7685_MemCopyColumn16                                  ;; 03:7673 $cd $85 $76
     ld   A, $00                                        ;; 03:7676 $3e $00
     ldh  [rVBK], A                                     ;; 03:7678 $e0 $4f
@@ -388,7 +388,7 @@ call_03_7664_Tilemap_UpdateColumnFromBuffer:
     and  A, $1f                                        ;; 03:767d $e6 $1f
     ld   L, A                                          ;; 03:767f $6f
     ld   H, HIGH(_SCRN0)                                        ;; 03:7680 $26 $98
-    ld   DE, wCF40                                     ;; 03:7682 $11 $40 $cf
+    ld   DE, wCF40_TileColumnScratchBuffer                                     ;; 03:7682 $11 $40 $cf
 
 call_03_7685_MemCopyColumn16:
 ; Core routine: copy 16 bytes from DE -> HL,

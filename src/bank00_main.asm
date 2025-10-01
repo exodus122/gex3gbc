@@ -782,24 +782,24 @@ jp_00_0781:
     ld   A, [HL+]                                      ;; 00:07bb $2a
     ld   H, [HL]                                       ;; 00:07bc $66
     ld   L, A                                          ;; 00:07bd $6f
-    ld   DE, wD400                                     ;; 00:07be $11 $00 $d4
+    ld   DE, wD400_TileBuffer                                     ;; 00:07be $11 $00 $d4
     ld   BC, $168                                      ;; 00:07c1 $01 $68 $01
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:07c4 $cd $6e $07
     ld   A, [wDBB1]                                    ;; 00:07c7 $fa $b1 $db
     and  A, A                                          ;; 00:07ca $a7
     jr   Z, .jr_00_07d9                                ;; 00:07cb $28 $0c
-    ld   DE, wD578                                     ;; 00:07cd $11 $78 $d5
+    ld   DE, wD578_TileBuffer2                                     ;; 00:07cd $11 $78 $d5
     ld   BC, $168                                      ;; 00:07d0 $01 $68 $01
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:07d3 $cd $6e $07
     jp   call_00_0f08_RestoreBank                                  ;; 00:07d6 $c3 $08 $0f
 .jr_00_07d9:
     push HL                                            ;; 00:07d9 $e5
-    ld   HL, wD400                                     ;; 00:07da $21 $00 $d4
-    ld   DE, wD578                                     ;; 00:07dd $11 $78 $d5
+    ld   HL, wD400_TileBuffer                                     ;; 00:07da $21 $00 $d4
+    ld   DE, wD578_TileBuffer2                                     ;; 00:07dd $11 $78 $d5
     ld   BC, $168                                      ;; 00:07e0 $01 $68 $01
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:07e3 $cd $6e $07
     pop  DE                                            ;; 00:07e6 $d1
-    ld   HL, wD578                                     ;; 00:07e7 $21 $78 $d5
+    ld   HL, wD578_TileBuffer2                                     ;; 00:07e7 $21 $78 $d5
     ld   BC, $168                                      ;; 00:07ea $01 $68 $01
 .jr_00_07ed:
     push DE                                            ;; 00:07ed $d5

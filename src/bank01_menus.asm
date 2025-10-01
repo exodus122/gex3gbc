@@ -761,7 +761,7 @@ call_01_446b_ExecuteMenuCommand:
     add  HL, HL                                        ;; 01:44f2 $29
     add  HL, BC                                        ;; 01:44f3 $09
     add  HL, DE                                        ;; 01:44f4 $19
-    ld   DE, wD400                                     ;; 01:44f5 $11 $00 $d4
+    ld   DE, wD400_TileBuffer                                     ;; 01:44f5 $11 $00 $d4
     add  HL, DE                                        ;; 01:44f8 $19
     ld   A, [wDBAA]                                    ;; 01:44f9 $fa $aa $db
     and  A, $04                                        ;; 01:44fc $e6 $04
@@ -1102,7 +1102,7 @@ call_01_477b_MenuState_NoOp:
     ret                                           ;; 01:477b ?
 
 call_01_477c_DrawMenuNumberSprite:
-; Description: Uses wDBA7 to compute sprite data offsets into wC980_NumbersSprites, 
+; Description: Uses wDBA7 to compute sprite data offsets into wC980_NumberSprites, 
 ;then uses wDB7E to pick a number graphic, combines with data_01_66f9, and jumps to jp_00_0bcf_CopyBlock16BytesLoop (sprite draw). Likely draws a numeric value (e.g., score).
     ld   HL, wDBA7                                     ;; 01:477c $21 $a7 $db
     ld   L, [HL]                                       ;; 01:477f $6e
@@ -1113,7 +1113,7 @@ call_01_477c_DrawMenuNumberSprite:
     add  HL, HL                                        ;; 01:4785 $29
     add  HL, HL                                        ;; 01:4786 $29
     add  HL, HL                                        ;; 01:4787 $29
-    ld   DE, wC980_NumbersSprites                                     ;; 01:4788 $11 $80 $c9
+    ld   DE, wC980_NumberSprites                                     ;; 01:4788 $11 $80 $c9
     add  HL, DE                                        ;; 01:478b $19
     ld   E, L                                          ;; 01:478c $5d
     ld   D, H                                          ;; 01:478d $54
@@ -2325,36 +2325,36 @@ data_01_4e97:
 
 call_01_4f27_ClearBgAndTileBuffers:
 ; Description:
-; Clears and initializes background map (wC000), tile buffers (wD400, wD578) 
+; Clears and initializes background map (wC000), tile buffers (wD400_TileBuffer, wD578_TileBuffer2) 
 ; by filling them with zeros or $01. Uses CopyBCBytesFromHLToDE to perform block clears.
     ld   HL, wC000_BgMapTileIds                                     ;; 01:4f27 $21 $00 $c0
     ld   DE, wC001_BgMapTileIds                                     ;; 01:4f2a $11 $01 $c0 ; wC000_BgMapTileIds
     ld   [HL], $00                                     ;; 01:4f2d $36 $00
     ld   BC, $0f                                       ;; 01:4f2f $01 $0f $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4f32 $cd $6e $07
-    ld   HL, wD400                                     ;; 01:4f35 $21 $00 $d4
-    ld   DE, wD401                                     ;; 01:4f38 $11 $01 $d4
+    ld   HL, wD400_TileBuffer                                     ;; 01:4f35 $21 $00 $d4
+    ld   DE, wD401_TileBuffer                                     ;; 01:4f38 $11 $01 $d4
     ld   [HL], $00                                     ;; 01:4f3b $36 $00
     ld   BC, $167                                      ;; 01:4f3d $01 $67 $01
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4f40 $cd $6e $07
-    ld   HL, wD578                                     ;; 01:4f43 $21 $78 $d5
-    ld   DE, wD579                                     ;; 01:4f46 $11 $79 $d5
+    ld   HL, wD578_TileBuffer2                                     ;; 01:4f43 $21 $78 $d5
+    ld   DE, wD579_TileBuffer2                                     ;; 01:4f46 $11 $79 $d5
     ld   [HL], $01                                     ;; 01:4f49 $36 $01
     ld   BC, $167                                      ;; 01:4f4b $01 $67 $01
     jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4f4e $c3 $6e $07
 
 call_01_4f51_UploadSecondaryTileLayer:
-; Copies the contents of wD578 into the background tilemap using call_01_4f67_CopyTileBufferToBgMap, 
+; Copies the contents of wD578_TileBuffer2 into the background tilemap using call_01_4f67_CopyTileBufferToBgMap, 
 ; then calls call_00_0a6a_LoadMapConfigAndWaitVBlank with C=$07 (likely triggers VRAM transfer).
-    ld   DE, wD578                                     ;; 01:4f51 $11 $78 $d5
+    ld   DE, wD578_TileBuffer2                                     ;; 01:4f51 $11 $78 $d5
     call call_01_4f67_CopyTileBufferToBgMap                                  ;; 01:4f54 $cd $67 $4f
     ld   C, $07                                        ;; 01:4f57 $0e $07
     jp   call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 01:4f59 $c3 $6a $0a
 
 call_01_4f5c_UploadPrimaryTileLayer:
 ; Description:
-; Same as above but copies from wD400 instead of wD578 and uses C=$08.
-    ld   DE, wD400                                     ;; 01:4f5c $11 $00 $d4
+; Same as above but copies from wD400_TileBuffer instead of wD578_TileBuffer2 and uses C=$08.
+    ld   DE, wD400_TileBuffer                                     ;; 01:4f5c $11 $00 $d4
     call call_01_4f67_CopyTileBufferToBgMap                                  ;; 01:4f5f $cd $67 $4f
     ld   C, $08                                        ;; 01:4f62 $0e $08
     jp   call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 01:4f64 $c3 $6a $0a

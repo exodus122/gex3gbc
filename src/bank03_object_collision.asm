@@ -311,7 +311,7 @@ call_03_4e04_Collision_PlayerHit_TriggerPhaseChange:
     or   a,OBJECT_UNK1F_OFFSET
     ld   l,a
     ld   l,[hl]
-    ld   h,$D7
+    ld   h,HIGH(wD700_ObjectFlags)
     ld   a,[hl]
     and  a,$F0
     or   a,$03

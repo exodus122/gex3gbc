@@ -432,17 +432,17 @@ label2F7E:
     ret  
 
 call_00_2f85_LoadAndSortCollectibleData:
-; Behavior: Clears collectible state tables (wD100–wD2FF), loads entries from the 
-; collectible list bank into working memory, sorts/organizes them (wD200, wD300), 
+; Behavior: Clears collectible state tables (wD100_CollectibleXPositions–wD2FF), loads entries from the 
+; collectible list bank into working memory, sorts/organizes them (wD200_CollectiblesOrderedByX, wD300_CollectibleBucketLookupTable), 
 ; then returns to original bank.
 ; Purpose: Initializes and sorts collectible positions for the current level.
     xor  A, A                                          ;; 00:2f85 $af
     ld   [wDC68], A                                    ;; 00:2f86 $ea $68 $dc
     ld   A, [wDC19_CollectibleListBank]                                    ;; 00:2f89 $fa $19 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:2f8c $cd $ee $0e
-    ld   L, $00                                        ;; 00:2f8f $2e $00
+    ld   L, LOW(wD100_CollectibleXPositions)                                        ;; 00:2f8f $2e $00
 .jr_00_2f91:
-    ld   H, $d1                                        ;; 00:2f91 $26 $d1
+    ld   H, HIGH(wD100_CollectibleXPositions)                                        ;; 00:2f91 $26 $d1
     ld   A, $ff                                        ;; 00:2f93 $3e $ff
     bit  7, L                                          ;; 00:2f95 $cb $7d
     jr   Z, .jr_00_2f9a                                ;; 00:2f97 $28 $01
@@ -458,16 +458,16 @@ call_00_2f85_LoadAndSortCollectibleData:
     ld   A, [HL+]                                      ;; 00:2fa5 $2a
     ld   H, [HL]                                       ;; 00:2fa6 $66
     ld   L, A                                          ;; 00:2fa7 $6f
-    ld   E, $00                                        ;; 00:2fa8 $1e $00
+    ld   E, LOW(wD100_CollectibleXPositions)                                        ;; 00:2fa8 $1e $00
 .jr_00_2faa:
-    ld   D, $d1                                        ;; 00:2faa $16 $d1
+    ld   D, HIGH(wD100_CollectibleXPositions)                                        ;; 00:2faa $16 $d1
     ld   A, [HL+]                                      ;; 00:2fac $2a
     ld   [DE], A                                       ;; 00:2fad $12
     set  7, E                                          ;; 00:2fae $cb $fb
     ld   A, [HL+]                                      ;; 00:2fb0 $2a
     ld   [DE], A                                       ;; 00:2fb1 $12
     push AF                                            ;; 00:2fb2 $f5
-    ld   D, $d0                                        ;; 00:2fb3 $16 $d0
+    ld   D, HIGH(wD000_CollectibleUnusedMemory)                                        ;; 00:2fb3 $16 $d0
     ld   A, [HL+]                                      ;; 00:2fb5 $2a
     ld   [DE], A                                       ;; 00:2fb6 $12
     pop  AF                                            ;; 00:2fb7 $f1
@@ -475,9 +475,9 @@ call_00_2f85_LoadAndSortCollectibleData:
     inc  E                                             ;; 00:2fba $1c
     and  A, A                                          ;; 00:2fbb $a7
     jr   NZ, .jr_00_2faa                               ;; 00:2fbc $20 $ec
-    ld   DE, wD200                                     ;; 00:2fbe $11 $00 $d2
+    ld   DE, wD200_CollectiblesOrderedByX                                     ;; 00:2fbe $11 $00 $d2
 .jr_00_2fc1:
-    ld   HL, wD100                                     ;; 00:2fc1 $21 $00 $d1
+    ld   HL, wD100_CollectibleXPositions                                     ;; 00:2fc1 $21 $00 $d1
 .jr_00_2fc4:
     ld   A, [HL+]                                      ;; 00:2fc4 $2a
     cp   A, $ff                                        ;; 00:2fc5 $fe $ff
@@ -490,12 +490,12 @@ call_00_2f85_LoadAndSortCollectibleData:
     ld   [DE], A                                       ;; 00:2fce $12
     inc  E                                             ;; 00:2fcf $1c
     jr   NZ, .jr_00_2fc1                               ;; 00:2fd0 $20 $ef
-    ld   E, $00                                        ;; 00:2fd2 $1e $00
+    ld   E, LOW(wD200_CollectiblesOrderedByX)                                        ;; 00:2fd2 $1e $00
 .jr_00_2fd4:
-    ld   D, $d2                                        ;; 00:2fd4 $16 $d2
+    ld   D, HIGH(wD200_CollectiblesOrderedByX)                                        ;; 00:2fd4 $16 $d2
     ld   A, [DE]                                       ;; 00:2fd6 $1a
     ld   L, A                                          ;; 00:2fd7 $6f
-    ld   H, $d1                                        ;; 00:2fd8 $26 $d1
+    ld   H, HIGH(wD100_CollectibleXPositions)                                        ;; 00:2fd8 $26 $d1
     ld   B, $00                                        ;; 00:2fda $06 $00
     ld   C, $ff                                        ;; 00:2fdc $0e $ff
     ld   A, E                                          ;; 00:2fde $7b
@@ -510,7 +510,7 @@ call_00_2f85_LoadAndSortCollectibleData:
     cp   A, C                                          ;; 00:2fea $b9
     jr   C, .jr_00_2fe4                                ;; 00:2feb $38 $f7
 .jr_00_2fed:
-    ld   D, $d3                                        ;; 00:2fed $16 $d3
+    ld   D, HIGH(wD300_CollectibleBucketLookupTable)                                        ;; 00:2fed $16 $d3
     ld   A, B                                          ;; 00:2fef $78
     dec  A                                             ;; 00:2ff0 $3d
     ld   [DE], A                                       ;; 00:2ff1 $12
@@ -541,7 +541,7 @@ call_00_2ff8_InitLevelObjectsAndConfig:
     ld   A, [HL]                                       ;; 00:3010 $7e
     inc  [HL]                                          ;; 00:3011 $34
     ld   L, A                                          ;; 00:3012 $6f
-    ld   H, $d7                                        ;; 00:3013 $26 $d7
+    ld   H, HIGH(wD700_ObjectFlags)                                        ;; 00:3013 $26 $d7
     ld   [HL], $80                                     ;; 00:3015 $36 $80
     pop  HL                                            ;; 00:3017 $e1
     ld   DE, $10                                       ;; 00:3018 $11 $10 $00
@@ -722,7 +722,7 @@ call_00_31d9_CheckAndClearBonusCoinObjectFlags:
     jr   NZ, .jr_00_31f8                               ;; 00:3201 $20 $f5
     jp   call_00_0f08_RestoreBank                                  ;; 00:3203 $c3 $08 $0f
 .jr_00_3206:
-    ld   B, $d7                                        ;; 00:3206 $06 $d7
+    ld   B, HIGH(wD700_ObjectFlags)                                        ;; 00:3206 $06 $d7
     xor  A, A                                          ;; 00:3208 $af
     ld   [BC], A                                       ;; 00:3209 $02
     jp   call_00_0f08_RestoreBank                                  ;; 00:320a $c3 $08 $0f
@@ -760,7 +760,7 @@ call_00_320d_CheckAndClearPawCoinObjectFlags:
     ld   A, [HL]                                       ;; 00:3237 $7e
     and  A, C                                          ;; 00:3238 $a1
     jr   Z, .jr_00_3240                                ;; 00:3239 $28 $05
-    ld   H, $d7                                        ;; 00:323b $26 $d7
+    ld   H, HIGH(wD700_ObjectFlags)                                        ;; 00:323b $26 $d7
     ld   L, B                                          ;; 00:323d $68
     ld   [HL], $00                                     ;; 00:323e $36 $00
 .jr_00_3240:
@@ -1009,7 +1009,7 @@ call_00_3618_HandleObjectSpawn:
     ld   HL, wDAB8_ObjectCounter                                     ;; 00:366c $21 $b8 $da
     ld   C, [HL]                                       ;; 00:366f $4e
     inc  [HL]                                          ;; 00:3670 $34
-    ld   B, $d7                                        ;; 00:3671 $06 $d7
+    ld   B, HIGH(wD700_ObjectFlags)                                        ;; 00:3671 $06 $d7
     ld   A, [BC]                                       ;; 00:3673 $0a
     and  A, A                                          ;; 00:3674 $a7
     ret  Z                                             ;; 00:3675 $c8
@@ -1202,7 +1202,7 @@ call_00_3618_HandleObjectSpawn:
     ld   A, [wDABA_ObjectCounterRelated]                                    ;; 00:376c $fa $ba $da
     ld   [HL], A                                       ;; 00:376f $77
     ld   L, A                                          ;; 00:3770 $6f
-    ld   H, $d7                                        ;; 00:3771 $26 $d7
+    ld   H, HIGH(wD700_ObjectFlags)                                        ;; 00:3771 $26 $d7
     ld   A, [wDABC_CurrentObjectFlags]                                    ;; 00:3773 $fa $bc $da
     or   A, $40                                        ;; 00:3776 $f6 $40
     ld   [HL], A                                       ;; 00:3778 $77

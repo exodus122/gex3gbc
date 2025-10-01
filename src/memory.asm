@@ -8,52 +8,50 @@ wC001_BgMapTileIds:
 wC400_CollisionTilesetData: ; C400-CC00 is a copy of 03:4100-03:48FF but in a different order
 ; that is the collision tileset data, collectible sprites, and number sprites, and some code
     ds 1408                                            ;; c400
-
-wC980_NumbersSprites: ; this is the start of the number sprites from bank 3
+wC980_NumberSprites: ; this is the start of the number sprites from bank 3
     ds 896                                             ;; c980
 
 wCD00_RowOffsetTableForMap:
     ds 512                                             ;; cd00
 
-wCF00: ; where block ids from the map data get written temporarily. also where the extended map data is handled
+wCF00_MetatileScratchBuffer: ; where block ids from the map data get written temporarily. also where the extended map data is handled
     ds 64                                              ;; cf00
-
-wCF40:
+wCF40_TileColumnScratchBuffer:
     ds 64                                              ;; cf40
-
-wCF80:
+wCF80_MetatileScratchBuffer2:
     ds 64                                              ;; cf80
-
-wCFC0:
+wCFC0_TileColumnScratchBuffer2:
     ds 64                                              ;; cfc0
 
-; $D000-$D07F seems unused?
-    ds 128 
-
-wD080: ; Collectible Map numbers
+wD000_CollectibleUnusedMemory: ; seems unused?
+    ds 128                                             ;; d000
+wD080_CollectibleMapNumbers: ; Collectible Map numbers
+    ds 128                                             ;; d080
+wD100_CollectibleXPositions:
+    ds 128                                             ;; d100
+wD180_CollectibleYPositions: ; Y coords are replaced by FF when collected
     ds 128
+wD200_CollectiblesOrderedByX:
+;Scans through wD100 (X table).
+; Collectibles are sorted by X coordinate.
+; Writes the indices (offsets back into wD100/wD180/wD000_CollectibleUnusedMemory) into wD200.
+    ds 256                                             ;; d200
+wD300_CollectibleBucketLookupTable:
+; Groups collectibles into spatial buckets (~11 X units wide).
+; So wD300 = quick lookup of “which collectibles live in this horizontal slice.”
+    ds 256                                             ;; d300
 
-wD100: ; Collectible X and Y coordinates. 128 bytes of X, then 128 bytes of Y. Y coords are set to FF when collected
-    ds 256                                             ;; d100
-
-wD200:
-    ds 512                                             ;; d200
-
-wD400:
+wD400_TileBuffer:
     ds 1                                               ;; d400
-
-wD401:
+wD401_TileBuffer:
     ds 375                                             ;; d401
-
-wD578:
+wD578_TileBuffer2:
     ds 1                                               ;; d578
-
-wD579:
+wD579_TileBuffer2:
     ds 391                                             ;; d579
 
-; D700:
-; This is the "object flags" section. Each byte stores the current flags 
-; for each object in the object list for the level
+wD700_ObjectFlags:
+; Each byte stores the current flags for each object in the object list for the level
     ds 256
 
 ; From D800 to D900 is the loaded objects space
@@ -296,7 +294,6 @@ wDB66_HDMATransferFlags:
 ; - When finished, clears bit 2.
 ; - Looks like it’s used for big transfers (maybe level backgrounds, cutscene art, or font pages).
     ds 1                                               ;; db66
-
 wDB67_HDMATempScratch:
     ds 2                                               ;; db67
 
