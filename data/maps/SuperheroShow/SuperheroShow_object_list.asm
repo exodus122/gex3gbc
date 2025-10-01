@@ -148,13 +148,13 @@
     dw   $0000
     db   $06
 
-    db   Object_SuperheroShow_FlyingRobotHead
+    db   Object_SuperheroShow_ChomperTV
     dw   $0518, $0078
     dw   $0540, $04f0, $0088, $0068
     dw   $0030
     db   $06
 
-    db   Object_SuperheroShow_FlyingRobotHead
+    db   Object_SuperheroShow_ChomperTV
     dw   $05d8, $0078
     dw   $0600, $05b0, $0088, $0068
     dw   $0030
@@ -310,79 +310,79 @@
     dw   $0000
     db   $31
 
-    db   Object_SuperheroShow_FalseFloor
+    db   Object_SuperheroShow_CrumblingFloor
     dw   $0788, $0068
     dw   $0798, $0778, $0078, $0058
     dw   $0000
     db   $31
 
-    db   Object_SuperheroShow_FalseFloor
+    db   Object_SuperheroShow_CrumblingFloor
     dw   $07e8, $0068
     dw   $07f8, $07d8, $0078, $0058
     dw   $0000
     db   $31
 
-    db   Object_SuperheroShow_FalseFloor
+    db   Object_SuperheroShow_CrumblingFloor
     dw   $0768, $0128
     dw   $0778, $0758, $0138, $0118
     dw   $0000
     db   $31
 
-    db   Object_SuperheroShow_FalseFloor
+    db   Object_SuperheroShow_CrumblingFloor
     dw   $07c8, $0128
     dw   $07d8, $07b8, $0138, $0118
     dw   $0000
     db   $31
 
-    db   Object_SuperheroShow_FalseFloor
+    db   Object_SuperheroShow_CrumblingFloor
     dw   $0828, $0128
     dw   $0838, $0818, $0138, $0118
     dw   $0000
     db   $31
 
-    db   Object_SuperheroShow_FalseFloor
+    db   Object_SuperheroShow_CrumblingFloor
     dw   $0758, $01e8
     dw   $0768, $0748, $01f8, $01d8
     dw   $0000
     db   $31
 
-    db   Object_SuperheroShow_FalseFloor
+    db   Object_SuperheroShow_CrumblingFloor
     dw   $07b8, $01e8
     dw   $07c8, $07a8, $01f8, $01d8
     dw   $0000
     db   $31
 
-    db   Object_SuperheroShow_FalseFloor
+    db   Object_SuperheroShow_CrumblingFloor
     dw   $0818, $01e8
     dw   $0828, $0808, $01f8, $01d8
     dw   $0000
     db   $31
 
-    db   Object_SuperheroShow_FalseFloor
+    db   Object_SuperheroShow_CrumblingFloor
     dw   $0768, $02a8
     dw   $0778, $0758, $02b8, $0298
     dw   $0000
     db   $31
 
-    db   Object_SuperheroShow_FalseFloor
+    db   Object_SuperheroShow_CrumblingFloor
     dw   $0808, $02a8
     dw   $0818, $07f8, $02b8, $0298
     dw   $0000
     db   $31
 
-    db   Object_SuperheroShow_FalseFloor
+    db   Object_SuperheroShow_CrumblingFloor
     dw   $09c8, $0068
     dw   $09d8, $09b8, $0078, $0058
     dw   $0000
     db   $31
 
-    db   Object_SuperheroShow_FalseFloor
+    db   Object_SuperheroShow_CrumblingFloor
     dw   $0a28, $0068
     dw   $0a38, $0a18, $0078, $0058
     dw   $0000
     db   $31
 
-    db   Object_SuperheroShow_FalseFloor
+    db   Object_SuperheroShow_CrumblingFloor
     dw   $0a88, $0068
     dw   $0a98, $0a78, $0078, $0058
     dw   $0000
@@ -430,7 +430,7 @@
     dw   $0000
     db   $33
 
-    db   Object_SuperheroShow_FlyingRobotHead
+    db   Object_SuperheroShow_ChomperTV
     dw   $0368, $0128
     dw   $0390, $0340, $0138, $0118
     dw   $0030
@@ -448,7 +448,7 @@
     dw   $0040
     db   $33
 
-    db   Object_SuperheroShow_FlyingRobotHead
+    db   Object_SuperheroShow_ChomperTV
     dw   $0368, $00a8
     dw   $0390, $0340, $00b8, $0098
     dw   $0030
@@ -490,19 +490,19 @@
     dw   $0000
     db   $33
 
-    db   Object_SuperheroShow_FalseFloor
+    db   Object_SuperheroShow_CrumblingFloor
     dw   $0348, $0068
     dw   $0358, $0338, $0078, $0058
     dw   $0000
     db   $33
 
-    db   Object_SuperheroShow_FalseFloor
+    db   Object_SuperheroShow_CrumblingFloor
     dw   $03b8, $0068
     dw   $03c8, $03a8, $0078, $0058
     dw   $0000
     db   $33
 
-    db   Object_SuperheroShow_FalseFloor
+    db   Object_SuperheroShow_CrumblingFloor
     dw   $04f8, $0098
     dw   $0508, $04e8, $00a8, $0088
     dw   $0000

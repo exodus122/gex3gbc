@@ -801,7 +801,7 @@ call_00_14e2_ConvertXYToTileCoords:
 call_00_150f_CheckAndSetLevelTrigger:
 ; Level Event Trigger Checker
 ; Reads wDC8A as an event flag. If not already triggered (bit7 clear), it marks it triggered, 
-; looks up a table (.data_00_153f) indexed by current level and offset E, and loads a value into wDC69. 
+; looks up a table (.data_00_153f) indexed by current level and offset E, and loads a value into wDC69_PlayerSpawnIdInLevel. 
 ; It also sets bit2 of wDB6A. Handles special values $ff (no action) and $fe (conditional on wDCB1).
     ld   HL, wDC8A                                     ;; 00:150f $21 $8a $dc
     ld   E, [HL]                                       ;; 00:1512 $5e
@@ -827,7 +827,7 @@ call_00_150f_CheckAndSetLevelTrigger:
     ret  Z                                             ;; 00:1533 $c8
     ld   A, $10                                        ;; 00:1534 $3e $10
 .jr_00_1536:
-    ld   [wDC69], A                                    ;; 00:1536 $ea $69 $dc
+    ld   [wDC69_PlayerSpawnIdInLevel], A                                    ;; 00:1536 $ea $69 $dc
     ld   HL, wDB6A                                     ;; 00:1539 $21 $6a $db
     set  2, [HL]                                       ;; 00:153c $cb $d6
     ret                                                ;; 00:153e $c9
@@ -878,7 +878,7 @@ call_00_1633_HandleLevelWarpOrExit:
     ld   A, [HL+]                                      ;; 00:163e $2a
     ld   D, [HL]                                       ;; 00:163f $56
     ld   E, A                                          ;; 00:1640 $5f
-    ld   HL, wDC69                                     ;; 00:1641 $21 $69 $dc
+    ld   HL, wDC69_PlayerSpawnIdInLevel                                     ;; 00:1641 $21 $69 $dc
     ld   L, [HL]                                       ;; 00:1644 $6e
     ld   H, $00                                        ;; 00:1645 $26 $00
     add  HL, HL                                        ;; 00:1647 $29
@@ -1354,7 +1354,7 @@ call_00_1a46_LoadBgMapRow:
 call_00_1bbc_CheckForDoorAndEnter:
 ; Using the current level number (wDC1E_CurrentLevelNumber) and position (wD80E/wD810), 
 ; scans a table (.data_00_1c33_DoorLocationsByMap) for proximity to door trigger points. If within a bounding box, 
-; writes trigger data to wDCC1/wDCC2, sets wDC69, and marks wDB6A flag. 
+; writes trigger data to wDCC1/wDCC2, sets wDC69_PlayerSpawnIdInLevel, and marks wDB6A flag. 
 ; Skips special levels $05 and $0B.
 ; Purpose: Used to enter doors after pressing Up on Dpad
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:1bbc $fa $1e $dc
@@ -1430,7 +1430,7 @@ call_00_1bbc_CheckForDoorAndEnter:
     ret  Z                                             ;; 00:1c26 $c8
 .jr_00_1c27:
     ld   A, [wDCC1]                                    ;; 00:1c27 $fa $c1 $dc
-    ld   [wDC69], A                                    ;; 00:1c2a $ea $69 $dc
+    ld   [wDC69_PlayerSpawnIdInLevel], A                                    ;; 00:1c2a $ea $69 $dc
     ld   HL, wDB6A                                     ;; 00:1c2d $21 $6a $db
     set  2, [HL]                                       ;; 00:1c30 $cb $d6
     ret                                                ;; 00:1c32 $c9

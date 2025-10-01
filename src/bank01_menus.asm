@@ -959,7 +959,7 @@ call_01_467b_MenuState_UpdateLevelCursor:
     ld   HL, wDB6C_CurrentMapId                                     ;; 01:4686 $21 $6c $db
     ld   L, [HL]                                       ;; 01:4689 $6e
     ld   H, $00                                        ;; 01:468a $26 $00
-    ld   DE, wDC5C                                     ;; 01:468c $11 $5c $dc
+    ld   DE, wDC5C_ProgressFlags                                     ;; 01:468c $11 $5c $dc
     add  HL, DE                                        ;; 01:468f $19
     ld   A, [HL]                                       ;; 01:4690 $7e
     and  A, C                                          ;; 01:4691 $a1
@@ -1060,7 +1060,7 @@ call_01_4722_MenuStateHandlerTable:
     dw   .call_01_475c                                 ;; 01:4740 pP
     dw   call_00_2f34_CountActiveCollectibles                                      ;; 01:4742 ??
 .call_01_4744:
-    ld   A, [wDC68]                                    ;; 01:4744 $fa $68 $dc
+    ld   A, [wDC68_CollectibleCount]                                    ;; 01:4744 $fa $68 $dc
     ret                                                ;; 01:4747 $c9
 .call_01_4748:
     ld   A, [wDCAF]                                    ;; 01:4748 $fa $af $dc
@@ -1192,7 +1192,7 @@ call_01_4826_MenuState_UpdateCursorAlt:
     ld   hl,wDB6C_CurrentMapId
     ld   l,[hl]
     ld   h,$00
-    ld   de,wDC5C
+    ld   de,wDC5C_ProgressFlags
     add  hl,de
     ld   a,[hl]
     and  c
@@ -1640,9 +1640,9 @@ call_01_4a7f_GetCharTileAddress:
 entry_01_4ab9_CountSetBitsInFlags:
 call_01_4ab9_CountSetBitsInFlags:
 ; Description:
-; Counts the total number of set bits (1s) in the 12 bytes at wDC5C. 
+; Counts the total number of set bits (1s) in the 12 bytes at wDC5C_ProgressFlags. 
 ; Likely used to count collected items or flags.
-    ld   HL, wDC5C                                     ;; 01:4ab9 $21 $5c $dc
+    ld   HL, wDC5C_ProgressFlags                                     ;; 01:4ab9 $21 $5c $dc
     ld   B, $0c                                        ;; 01:4abc $06 $0c
     ld   C, $00                                        ;; 01:4abe $0e $00
 .jr_01_4ac0:
@@ -1662,12 +1662,12 @@ call_01_4ab9_CountSetBitsInFlags:
 
 call_01_4acf_CountCollectedBitsForLevel:
 ; Description:
-; For the current level number, reads a byte from wDC5C + level, 
+; For the current level number, reads a byte from wDC5C_ProgressFlags + level, 
 ; counts how many of its low 4 bits are set.
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 01:4acf $21 $1e $dc
     ld   L, [HL]                                       ;; 01:4ad2 $6e
     ld   H, $00                                        ;; 01:4ad3 $26 $00
-    ld   DE, wDC5C                                     ;; 01:4ad5 $11 $5c $dc
+    ld   DE, wDC5C_ProgressFlags                                     ;; 01:4ad5 $11 $5c $dc
     add  HL, DE                                        ;; 01:4ad8 $19
     ld   A, [HL]                                       ;; 01:4ad9 $7e
     ld   C, $00                                        ;; 01:4ada $0e $00
@@ -1685,9 +1685,9 @@ call_01_4acf_CountCollectedBitsForLevel:
 entry_01_4ae7_CountLevelsWithFlag4:
 call_01_4ae7_CountLevelsWithFlag4:
 ; Description:
-; Counts how many of the first seven bytes in wDC5C have bit 4 set,
+; Counts how many of the first seven bytes in wDC5C_ProgressFlags have bit 4 set,
 ; probably counts levels with a specific completion flag.
-    ld   HL, wDC5C                                     ;; 01:4ae7 $21 $5c $dc
+    ld   HL, wDC5C_ProgressFlags                                     ;; 01:4ae7 $21 $5c $dc
     ld   B, $07                                        ;; 01:4aea $06 $07
     ld   C, $00                                        ;; 01:4aec $0e $00
 .jr_01_4aee:
@@ -1703,11 +1703,11 @@ call_01_4ae7_CountLevelsWithFlag4:
 
 call_01_4af9_IsLevelFlag4Set:
 ; Description:
-; Checks if the current level’s flag byte at wDC5C + level has bit 4 set, returning 1 if so.
+; Checks if the current level’s flag byte at wDC5C_ProgressFlags + level has bit 4 set, returning 1 if so.
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 01:4af9 $21 $1e $dc
     ld   L, [HL]                                       ;; 01:4afc $6e
     ld   H, $00                                        ;; 01:4afd $26 $00
-    ld   DE, wDC5C                                     ;; 01:4aff $11 $5c $dc
+    ld   DE, wDC5C_ProgressFlags                                     ;; 01:4aff $11 $5c $dc
     add  HL, DE                                        ;; 01:4b02 $19
     ld   A, [HL]                                       ;; 01:4b03 $7e
     and  A, $10                                        ;; 01:4b04 $e6 $10
@@ -1721,7 +1721,7 @@ call_01_4b0a_CountLowBitsForLevel:
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 01:4b0a $21 $1e $dc
     ld   L, [HL]                                       ;; 01:4b0d $6e
     ld   H, $00                                        ;; 01:4b0e $26 $00
-    ld   DE, wDC5C                                     ;; 01:4b10 $11 $5c $dc
+    ld   DE, wDC5C_ProgressFlags                                     ;; 01:4b10 $11 $5c $dc
     add  HL, DE                                        ;; 01:4b13 $19
     ld   A, [HL]                                       ;; 01:4b14 $7e
     ld   C, $00                                        ;; 01:4b15 $0e $00
@@ -2418,7 +2418,7 @@ call_01_4f8c_BuildCollisionBitfieldAndChecksum:
     ld   DE, $00                                       ;; 01:4fb0 $11 $00 $00
 .jr_01_4fb3:
     push DE                                            ;; 01:4fb3 $d5
-    ld   HL, wDC5C                                     ;; 01:4fb4 $21 $5c $dc
+    ld   HL, wDC5C_ProgressFlags                                     ;; 01:4fb4 $21 $5c $dc
     add  HL, DE                                        ;; 01:4fb7 $19
     ld   C, [HL]                                       ;; 01:4fb8 $4e
     ld   HL, .data_01_5013                             ;; 01:4fb9 $21 $13 $50
@@ -2587,9 +2587,9 @@ call_01_505a_ValidateTileBufferAndRebuildCollisionData:
 
 call_01_50b5_GenerateCollisionTableFromMasks:
 ; Description:
-; Builds a collision lookup table (wDC5C) from static mask tables .data_01_511a_CollisionColumnMaskTable and .data_01_5126_BitMaskLut_80to01. 
+; Builds a collision lookup table (wDC5C_ProgressFlags) from static mask tables .data_01_511a_CollisionColumnMaskTable and .data_01_5126_BitMaskLut_80to01. 
 ; It iterates through each mask byte, rotates bits, checks wDB76 bitfields, and sets collision bits 
-; in a temporary register (C). Once a row is processed, it stores the result into wDC5C, repeating 
+; in a temporary register (C). Once a row is processed, it stores the result into wDC5C_ProgressFlags, repeating 
 ; for 12 entries. Finally, it updates wDC4E/AF/4F with values from wDB73–wDB75.
     xor  A, A                                          ;; 01:50b5 $af
     ld   [wDB90], A                                    ;; 01:50b6 $ea $90 $db
@@ -2635,7 +2635,7 @@ call_01_50b5_GenerateCollisionTableFromMasks:
     dec  A                                             ;; 01:50f8 $3d
     jr   NZ, .jr_01_50c6                               ;; 01:50f9 $20 $cb
     pop  DE                                            ;; 01:50fb $d1
-    ld   HL, wDC5C                                     ;; 01:50fc $21 $5c $dc
+    ld   HL, wDC5C_ProgressFlags                                     ;; 01:50fc $21 $5c $dc
     add  HL, DE                                        ;; 01:50ff $19
     ld   [HL], C                                       ;; 01:5100 $71
     inc  E                                             ;; 01:5101 $1c

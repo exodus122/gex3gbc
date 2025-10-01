@@ -82,7 +82,7 @@ data_02_4000:
     dw   .data_02_45f8 ; Object_AnimeChannel_SecbotProjectile
     dw   .data_02_45fc ; Object_AnimeChannel_Elevator
     dw   .data_02_4600 ; Object_AnimeChannel_FireWallEnemy
-    dw   .data_02_4604 ; Object_AnimeChannel_FallingYellowEnemy
+    dw   .data_02_4604 ; Object_AnimeChannel_Grenade
     dw   .data_02_4610 ; Object_AnimeChannel_PlanetOBlastWeapon
     dw   .data_02_4618 ; Object_SuperheroShow_MadBomber
     dw   .data_02_4630 ; Object_SuperheroShow_Bomb
@@ -93,9 +93,9 @@ data_02_4000:
     dw   .data_02_4678 ; Object_SuperheroShow_StrayCat
     dw   .data_02_4690 ; Object_SuperheroShow_YellowGoon
     dw   .data_02_46a0 ; Object_SuperheroShow_Rat
-    dw   .data_02_46ac ; Object_SuperheroShow_FlyingRobotHead
-    dw   .data_02_46bc ; Object_SuperheroShow_FalseFloor
-    dw   .data_02_46c8 ; Object_SuperheroShow_GreyConvictProjectile
+    dw   .data_02_46ac ; Object_SuperheroShow_ChomperTV
+    dw   .data_02_46bc ; Object_SuperheroShow_CrumblingFloor
+    dw   .data_02_46c8 ; Object_SuperheroShow_ConvictProjectile
     dw   .data_02_46cc ; Object_GextremeSports_Elf
     dw   .data_02_46e4 ; Object_GextremeSports_BonusTimeCoin
     dw   .data_02_46ec ; Object_MarsupialMadness_Bell
@@ -105,14 +105,14 @@ data_02_4000:
     dw   .data_02_4720 ; Object_LizardOfOz_BrainOfOz
     dw   .data_02_4744 ; Object_LizardOfOz_CannonProjectile
     dw   .data_02_4748 ; Object_LizardOfOz_Cannon
-    dw   .data_02_475c ; Object_LizardOfOz_RockProjectile
+    dw   .data_02_475c ; Object_LizardOfOz_BrainOfOzProjectile
     dw   .data_02_4760 ; Object_unk6B
     dw   .data_02_4764 ; Object_unk6C
     dw   .data_02_4768 ; Object_unk6D
     dw   .data_02_476c ; Object_ChannelZ_Rez
     dw   .data_02_479c ; Object_unk6F
     dw   .data_02_47a0 ; Object_ChannelZ_Meteor
-    dw   .data_02_47ac ; Object_ChannelZ_RockProjectile
+    dw   .data_02_47ac ; Object_ChannelZ_RezProjectile
 .data_02_40e4:
     dw   call_02_47b4_PlayerAction_Spawn, data_02_739b
     dw   call_02_47ce_PlayerAction_Idle, data_02_73ab
@@ -494,96 +494,96 @@ data_02_4000:
     dw   call_02_582e_ObjectAction_None, data_02_7b1c
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_45c8:
-    dw   call_02_66bb, data_02_7b22
-    dw   call_02_66cc, data_02_7b28
-    dw   call_02_66e0, data_02_7b33
-    dw   call_02_66ef, data_02_7b5a
+    dw   call_02_66bb_ObjectAction_BigSilverRobot_Unk0, data_02_7b22
+    dw   call_02_66cc_ObjectAction_BigSilverRobot_Unk1, data_02_7b28
+    dw   call_02_66e0_ObjectAction_BigSilverRobot_Unk2, data_02_7b33
+    dw   call_02_66ef_ObjectAction_BigSilverRobot_Unk3, data_02_7b5a
 .data_02_45d8:
-    dw   call_02_66f6, data_02_7b6a
-    dw   call_02_6732, data_02_7b77
+    dw   call_02_66f6_ObjectAction_SmallBlueRobot_Unk0, data_02_7b6a
+    dw   call_02_6732_ObjectAction_SmallBlueRobot_Unk1, data_02_7b77
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_45e4:
-    dw   call_02_6746, data_02_7b80
-    dw   call_02_6768, data_02_7b89
+    dw   call_02_6746_ObjectAction_Secbot_Unk0, data_02_7b80
+    dw   call_02_6768_ObjectAction_Secbot_Unk1, data_02_7b89
     dw   call_02_582e_ObjectAction_None, data_02_7b8f
     dw   call_02_582e_ObjectAction_None, data_02_7b98
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_45f8:
-    dw   call_02_679b, data_02_7ba1
+    dw   call_02_679b_ObjectAction_SecbotProjectile_Update, data_02_7ba1
 .data_02_45fc:
-    dw   call_02_67c2, data_02_7ba7
+    dw   call_02_67c2_ObjectAction_Elevator_Update, data_02_7ba7
 .data_02_4600:
-    dw   call_02_68af, data_02_7bad
+    dw   call_02_68af_ObjectAction_FireWallEnemy_Update, data_02_7bad
 .data_02_4604:
-    dw   call_02_68b2, data_02_7bb8
-    dw   call_02_68ed, data_02_7bbe
-    dw   call_02_6928, data_02_7bcd
+    dw   call_02_68b2_ObjectAction_Grenade_Unk0, data_02_7bb8
+    dw   call_02_68ed_ObjectAction_Grenade_Unk1, data_02_7bbe
+    dw   call_02_6928_ObjectAction_Grenade_Unk2, data_02_7bcd
 .data_02_4610:
     dw   call_02_582e_ObjectAction_None, data_02_7bd8
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_4618:
-    dw   call_02_6947, data_02_7be3
-    dw   call_02_6947, data_02_7bf8
-    dw   call_02_693f, data_02_7c02
-    dw   call_02_6947, data_02_7c0b
+    dw   call_02_6947_ObjectAction_MadBomber_Unk0, data_02_7be3
+    dw   call_02_6947_ObjectAction_MadBomber_Unk0, data_02_7bf8
+    dw   call_02_693f_ObjectAction_MadBomber_Unk2, data_02_7c02
+    dw   call_02_6947_ObjectAction_MadBomber_Unk0, data_02_7c0b
     dw   call_02_582e_ObjectAction_None, data_02_7c13
-    dw   call_02_6965, data_02_7c19
+    dw   call_02_6965_ObjectAction_MadBomber_Unk5, data_02_7c19
 .data_02_4630:
-    dw   call_02_6971, data_02_7c1f
-    dw   call_02_69af, data_02_7c1f
-    dw   call_02_6a04, data_02_7c1f
-    dw   call_02_6a13, data_02_7c1f
-    dw   call_02_6a4c, data_02_7c27
+    dw   call_02_6971_ObjectAction_Bomb_Unk0, data_02_7c1f
+    dw   call_02_69af_ObjectAction_Bomb_Unk1, data_02_7c1f
+    dw   call_02_6a04_ObjectAction_Bomb_Unk2, data_02_7c1f
+    dw   call_02_6a13_ObjectAction_Bomb_Unk3, data_02_7c1f
+    dw   call_02_6a4c_ObjectAction_Bomb_Unk4, data_02_7c27
 .data_02_4644:
-    dw   call_02_6a91, data_02_7c32
-    dw   call_02_6ab4, data_02_7c32
+    dw   call_02_6a91_ObjectAction_WaterTowerTank_Unk0, data_02_7c32
+    dw   call_02_6ab4_ObjectAction_WaterTowerTank_Unk1, data_02_7c32
     dw   call_02_582e_ObjectAction_None, data_02_7c32
 .data_02_4650:
     dw   call_02_582e_ObjectAction_None, data_02_7c38
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_4658:
-    dw   call_02_6acd, data_02_7c3e
+    dw   call_02_6acd_ObjectAction_Convict_Unk0, data_02_7c3e
     dw   call_02_582e_ObjectAction_None, data_02_7c51
-    dw   call_02_6ad4, data_02_7c5e
+    dw   call_02_6ad4_ObjectAction_Convict_Unk2, data_02_7c5e
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_4668:
-    dw   call_02_6b03, data_02_7c6a
-    dw   call_02_6b20, data_02_7c6a
-    dw   call_02_6b35, data_02_7c6a
+    dw   call_02_6b03_ObjectAction_Spider_Unk0, data_02_7c6a
+    dw   call_02_6b20_ObjectAction_Spider_Unk1, data_02_7c6a
+    dw   call_02_6b35_ObjectAction_Spider_Unk2, data_02_7c6a
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_4678:
-    dw   call_02_6b53, data_02_7c72
+    dw   call_02_6b53_ObjectAction_StrayCat_Unk0, data_02_7c72
     dw   call_02_582e_ObjectAction_None, data_02_7c79
     dw   call_02_582e_ObjectAction_None, data_02_7c7f
     dw   call_02_582e_ObjectAction_None, data_02_7c8b
     dw   call_02_582e_ObjectAction_None, data_02_7c92
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_4690:
-    dw   call_02_6b69, data_02_7ca1
+    dw   call_02_6b69_ObjectAction_YellowGoon_Unk0, data_02_7ca1
     dw   call_02_582e_ObjectAction_None, data_02_7caa
     dw   call_02_582e_ObjectAction_None, data_02_7cb4
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_46a0:
-    dw   call_02_6b9b, data_02_7cc4
+    dw   call_02_6b9b_ObjectAction_Rat_Unk0, data_02_7cc4
     dw   call_02_582e_ObjectAction_None, data_02_7ccd
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_46ac:
-    dw   call_02_6ba3, data_02_7cd6
-    dw   call_02_6be4, data_02_7cd6
-    dw   call_02_6bc8, data_02_7cdf
+    dw   call_02_6ba3_ObjectAction_ChomperTV_Unk0, data_02_7cd6
+    dw   call_02_6be4_ObjectAction_ChomperTV_Unk1, data_02_7cd6
+    dw   call_02_6bc8_ObjectAction_ChomperTV_Unk2, data_02_7cdf
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_46bc:
-    dw   call_02_6bfb, data_02_7ce6
+    dw   call_02_6bfb_ObjectAction_CrumblingFloor_Unk0, data_02_7ce6
     dw   call_02_582e_ObjectAction_None, data_02_7cec
-    dw   call_02_6c08, data_02_7cf3
+    dw   call_02_6c08_ObjectAction_CrumblingFloor_Unk2, data_02_7cf3
 .data_02_46c8:
-    dw   call_02_6add, data_02_7cf9
+    dw   call_02_6add_ObjectAction_ConvictProjectile_Update, data_02_7cf9
 .data_02_46cc:
-    dw   call_02_6c1d, data_02_7d08
-    dw   call_02_6c1d, data_02_7d17
-    dw   call_02_6c4c, data_02_7d26
-    dw   call_02_6c64, data_02_7d35
-    dw   call_02_6c73, data_02_7d3b
+    dw   call_02_6c1d_ObjectAction_GextremeSportsElf_Unk0, data_02_7d08
+    dw   call_02_6c1d_ObjectAction_GextremeSportsElf_Unk0, data_02_7d17
+    dw   call_02_6c4c_ObjectAction_GextremeSportsElf_Unk2, data_02_7d26
+    dw   call_02_6c64_ObjectAction_GextremeSportsElf_Unk3, data_02_7d35
+    dw   call_02_6c73_ObjectAction_GextremeSportsElf_Unk4, data_02_7d3b
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_46e4:
     dw   call_02_582e_ObjectAction_None, data_02_7d42
@@ -593,63 +593,63 @@ data_02_4000:
     dw   call_02_582e_ObjectAction_None, data_02_7d55
     dw   call_02_582e_ObjectAction_None, data_02_7d4f
 .data_02_46f8:
-    dw   call_02_6cbb, data_02_7d65
+    dw   call_02_6cbb_ObjectAction_Bird_Update, data_02_7d65
 .data_02_46fc:
-    dw   call_02_6cdd, data_02_7d73
+    dw   call_02_6cdd_ObjectAction_BirdProjectile_Update, data_02_7d73
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_4704:
-    dw   call_02_6d3a, data_02_7d9a
-    dw   call_02_6d39, data_02_7d7c
-    dw   call_02_6d3b, data_02_7da3
+    dw   call_02_6d3a_ObjectAction_RockHard_Unk0, data_02_7d9a
+    dw   call_02_6d39_ObjectAction_RockHard_Unk1, data_02_7d7c
+    dw   call_02_6d3b_ObjectAction_RockHard_Unk2, data_02_7da3
     dw   call_02_582e_ObjectAction_None, data_02_7db1
     dw   call_02_582e_ObjectAction_None, data_02_7db7
-    dw   call_02_6d49, data_02_7dc3
-    dw   call_02_6d52, data_02_7dcd
+    dw   call_02_6d49_ObjectAction_RockHard_Unk5, data_02_7dc3
+    dw   call_02_6d52_ObjectAction_RockHard_Unk6, data_02_7dcd
 .data_02_4720:
-    dw   call_02_6d6d, data_02_7dd5
-    dw   call_02_6d6d, data_02_7ddb
-    dw   call_02_6d85, data_02_7de1
-    dw   call_02_6dba, data_02_7deb
-    dw   call_02_6dda, data_02_7df9
-    dw   call_02_6ddd, data_02_7e00
+    dw   call_02_6d6d_ObjectAction_BrainOfOz_Unk0, data_02_7dd5
+    dw   call_02_6d6d_ObjectAction_BrainOfOz_Unk0, data_02_7ddb
+    dw   call_02_6d85_ObjectAction_BrainOfOz_Unk2, data_02_7de1
+    dw   call_02_6dba_ObjectAction_BrainOfOz_Unk3, data_02_7deb
+    dw   call_02_6dda_ObjectAction_BrainOfOz_Unk4, data_02_7df9
+    dw   call_02_6ddd_ObjectAction_BrainOfOz_Unk5, data_02_7e00
     dw   call_02_582e_ObjectAction_None, data_02_7e09
-    dw   call_02_6dee, data_02_7e0f
-    dw   call_02_6e09, data_02_75c2
+    dw   call_02_6dee_ObjectAction_BrainOfOz_Unk7, data_02_7e0f
+    dw   call_02_6e09_ObjectAction_BrainOfOz_Unk8, data_02_75c2
 .data_02_4744:
-    dw   call_02_6ec7, data_02_7e15
+    dw   call_02_6ec7_ObjectAction_CannonProjectile_Update, data_02_7e15
 .data_02_4748:
-    dw   call_02_6e88, data_02_7e1b
+    dw   call_02_6e88_ObjectAction_Cannon_Unk0, data_02_7e1b
     dw   call_02_582e_ObjectAction_None, data_02_7e21
-    dw   call_02_6ea8, data_02_7e34
-    dw   call_02_6eb9, data_02_7e3a
+    dw   call_02_6ea8_ObjectAction_Cannon_Unk2, data_02_7e34
+    dw   call_02_6eb9_ObjectAction_Cannon_Unk3, data_02_7e3a
     dw   call_02_582e_ObjectAction_None, data_02_7e40
 .data_02_475c:
-    dw   call_02_6e44, data_02_7e53
+    dw   call_02_6e44_ObjectAction_BrainOfOzProjectile_Update, data_02_7e53
 .data_02_4760:
     dw   call_02_6f07, data_02_7e5e
 .data_02_4764:
-    dw   call_02_6f0e, data_02_7e67
+    dw   call_02_6f0e_ObjectAction_Unk_None, data_02_7e67
 .data_02_4768:
-    dw   call_02_6f0e, data_02_7e6d
+    dw   call_02_6f0e_ObjectAction_Unk_None, data_02_7e6d
 .data_02_476c:
-    dw   call_02_6f0f, data_02_7e73
-    dw   call_02_6f0f, data_02_7e79
-    dw   call_02_6f29, data_02_7e7f
-    dw   call_02_6f35, data_02_7e8a
+    dw   call_02_6f0f_ObjectAction_Rez_Unk0, data_02_7e73
+    dw   call_02_6f0f_ObjectAction_Rez_Unk0, data_02_7e79
+    dw   call_02_6f29_ObjectAction_Rez_Unk2, data_02_7e7f
+    dw   call_02_6f35_ObjectAction_Rez_Unk3, data_02_7e8a
     dw   call_02_582e_ObjectAction_None, data_02_7e95
-    dw   call_02_6f3e, data_02_7e9b
-    dw   call_02_6f54, data_02_7ea4
-    dw   call_02_6f54, data_02_7eaa
-    dw   call_02_6f64, data_02_7eb0
-    dw   call_02_6f9e, data_02_7eb6
-    dw   call_02_6fa1, data_02_7ec2
-    dw   call_02_6faa, data_02_7ecb
+    dw   call_02_6f3e_ObjectAction_Rez_Unk5, data_02_7e9b
+    dw   call_02_6f54_ObjectAction_Rez_Unk6, data_02_7ea4
+    dw   call_02_6f54_ObjectAction_Rez_Unk6, data_02_7eaa
+    dw   call_02_6f64_ObjectAction_Rez_Unk8, data_02_7eb0
+    dw   call_02_6f9e_ObjectAction_Rez_Unk9, data_02_7eb6
+    dw   call_02_6fa1_ObjectAction_Rez_Unk10, data_02_7ec2
+    dw   call_02_6faa_ObjectAction_Rez_Unk11, data_02_7ecb
 .data_02_479c:
-    dw   call_02_7019, data_02_7ed1
+    dw   call_02_7019_ObjectAction_Unk_None, data_02_7ed1
 .data_02_47a0:
     dw   call_02_582e_ObjectAction_None, data_02_7eda
-    dw   call_02_701a, data_02_7ee0
+    dw   call_02_701a_ObjectAction_Meteor_Update, data_02_7ee0
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_47ac:
-    dw   call_02_702e, data_02_7bad
+    dw   call_02_702e_ObjectAction_RezProjectile_Update, data_02_7bad
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2

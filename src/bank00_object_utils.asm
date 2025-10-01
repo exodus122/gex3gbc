@@ -68,7 +68,7 @@ call_00_21f6_FindAndMarkObjectInList_TVButton:
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:223c $21 $1e $dc
     ld   L, [HL]                                       ;; 00:223f $6e
     ld   H, $00                                        ;; 00:2240 $26 $00
-    ld   BC, wDC5C                                     ;; 00:2242 $01 $5c $dc
+    ld   BC, wDC5C_ProgressFlags                                     ;; 00:2242 $01 $5c $dc
     add  HL, BC                                        ;; 00:2245 $09
     pop  AF                                            ;; 00:2246 $f1
     ld   C, $01                                        ;; 00:2247 $0e $01
@@ -1950,7 +1950,7 @@ call_00_2b5d_DeactivateObjectSlot:
     ld   DE, wDA01_ObjectListIndexesForCurrentObjects                                     ;; 00:2b70 $11 $01 $da
     add  HL, DE                                        ;; 00:2b73 $19
     ld   L, [HL]                                       ;; 00:2b74 $6e
-    ld   H, $d7                                        ;; 00:2b75 $26 $d7
+    ld   H, HIGH(wD700_ObjectFlags)                                        ;; 00:2b75 $26 $d7
     res  6, [HL]                                       ;; 00:2b77 $cb $b6
     ret                                                ;; 00:2b79 $c9
 
@@ -1992,7 +1992,7 @@ call_00_2b94_ZeroObjectStatusEntry:
     ld   DE, wDA01_ObjectListIndexesForCurrentObjects                                     ;; 00:2b9f $11 $01 $da
     add  HL, DE                                        ;; 00:2ba2 $19
     ld   L, [HL]                                       ;; 00:2ba3 $6e
-    ld   H, $d7                                        ;; 00:2ba4 $26 $d7
+    ld   H, HIGH(wD700_ObjectFlags)                                        ;; 00:2ba4 $26 $d7
     ld   [HL], $00                                     ;; 00:2ba6 $36 $00
     ret                                                ;; 00:2ba8 $c9
 
@@ -2009,7 +2009,7 @@ call_00_2ba9_SetObjectStatusTo50:
     ld   DE, wDA01_ObjectListIndexesForCurrentObjects                                     ;; 00:2bb4 $11 $01 $da
     add  HL, DE                                        ;; 00:2bb7 $19
     ld   L, [HL]                                       ;; 00:2bb8 $6e
-    ld   H, $d7                                        ;; 00:2bb9 $26 $d7
+    ld   H, HIGH(wD700_ObjectFlags)                                        ;; 00:2bb9 $26 $d7
     ld   [HL], $50                                     ;; 00:2bbb $36 $50
     ret                                                ;; 00:2bbd $c9
 
@@ -2019,7 +2019,7 @@ call_00_2bbe_SpawnCollectibleObject:
 ; If not $FF and bit 6 is set, sets up multiple object parameters 
 ; (ObjectSetId, Object_Set14, palette, facing direction, etc.).
 ; Updates its status to $50, resets return bank, calls an alternate bank function (entry_02_72ac_SetupNewAction), 
-; and copies a palette (call_00_2c20_ObjectPalette_CopyToBuffer).
+; and copies a palette (call_00_2c20_Object_CopyPaletteToBuffer).
 ; This is the main “spawn/setup object” function.
     call call_00_35e8_GetObjectTypeIndex                                  ;; 00:2bbe $cd $e8 $35
     cp   A, $ff                                        ;; 00:2bc1 $fe $ff
@@ -2044,7 +2044,7 @@ call_00_2bbe_SpawnCollectibleObject:
     xor  A, A                                          ;; 00:2bef $af
     farcall entry_02_72ac_SetupNewAction
     ld   HL, .data_02_2c01                                     ;; 00:2bfb $21 $01 $2c
-    jp   call_00_2c20_ObjectPalette_CopyToBuffer                                  ;; 00:2bfe $c3 $20 $2c
+    jp   call_00_2c20_Object_CopyPaletteToBuffer                                  ;; 00:2bfe $c3 $20 $2c
 .data_02_2c01:
     db   $00, $00, $00, $00, $60, $02, $9c, $03        ;; 00:2c01 ........
 
@@ -2071,7 +2071,7 @@ call_00_2c0f_AssignObjectPaletteId:
     ld   [hl],c
     ret  
 
-call_00_2c20_ObjectPalette_CopyToBuffer:
+call_00_2c20_Object_CopyPaletteToBuffer:
 ; Looks up the palette slot previously stored in wDAAE for the current object.
 ; Multiplies that index by 8 to get a byte offset into wDD2A_ObjectPalettes.
 ; Copies 8 bytes from whatever source HL pointed to into that palette slot.

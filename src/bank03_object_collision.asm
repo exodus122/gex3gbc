@@ -232,7 +232,7 @@ call_03_4d9b_Collision_PlayerHit_SetLevelFlag:
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 03:4d9f $21 $1e $dc
     ld   L, [HL]                                       ;; 03:4da2 $6e
     ld   H, $00                                        ;; 03:4da3 $26 $00
-    ld   DE, wDC5C                                     ;; 03:4da5 $11 $5c $dc
+    ld   DE, wDC5C_ProgressFlags                                     ;; 03:4da5 $11 $5c $dc
     add  HL, DE                                        ;; 03:4da8 $19
     set  4, [HL]                                       ;; 03:4da9 $cb $e6
     ld   A, $02                                        ;; 03:4dab $3e $02
@@ -243,7 +243,7 @@ call_03_4db3_Collision_PlayerHit_IncrementCounter:
 ; If collision: calls IncrementProgressCounter, plays sound 02, then handles respawn/hit.
     call call_03_550e_CheckPlayerObjectInteraction                                  ;; 03:4db3 $cd $0e $55
     ret  NC                                            ;; 03:4db6 $d0
-    call call_00_0723_IncrementProgressCounter                                  ;; 03:4db7 $cd $23 $07
+    call call_00_0723_IncrementCollectibleCount                                  ;; 03:4db7 $cd $23 $07
     ld   A, $02                                        ;; 03:4dba $3e $02
     call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 03:4dbc $cd $f5 $0f
     jp   call_03_5671_HandleObjectHitOrRespawn                                    ;; 03:4dbf $c3 $71 $56
@@ -266,7 +266,7 @@ call_03_4dc2_Collision_PlayerHit_CollectibleTracker:
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 03:4dd0 $21 $1e $dc
     ld   L, [HL]                                       ;; 03:4dd3 $6e
     ld   H, $00                                        ;; 03:4dd4 $26 $00
-    ld   DE, wDC5C                                     ;; 03:4dd6 $11 $5c $dc
+    ld   DE, wDC5C_ProgressFlags                                     ;; 03:4dd6 $11 $5c $dc
     add  HL, DE                                        ;; 03:4dd9 $19
     ld   A, [HL]                                       ;; 03:4dda $7e
     or   A, C                                          ;; 03:4ddb $b1

@@ -830,22 +830,20 @@ wDC5A:
 wDC5B:
     ds 1                                               ;; dc5b
 
-wDC5C:
-    ds 9                                              ;; dc5c
-
-wDC65:
+wDC5C_ProgressFlags:
+; these keep track of which remotes, paw coins, and bonus coins you've gotten
+    ds 9                                               ;; dc5c
+wDC65_ProgressFlags_WWGex:
     ds 1                                               ;; dc65
-
-wDC66:
+wDC66_ProgressFlags_LizardOfOz:
     ds 1                                               ;; dc66
-
-wDC67:
+wDC67_ProgressFlags_ChannelZ:
     ds 1                                               ;; dc67
 
-wDC68:
+wDC68_CollectibleCount:
     ds 1                                               ;; dc68
 
-wDC69:
+wDC69_PlayerSpawnIdInLevel:
     ds 1                                               ;; dc69
 
 wDC6A:

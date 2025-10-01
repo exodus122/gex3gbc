@@ -437,7 +437,7 @@ call_00_2f85_LoadAndSortCollectibleData:
 ; then returns to original bank.
 ; Purpose: Initializes and sorts collectible positions for the current level.
     xor  A, A                                          ;; 00:2f85 $af
-    ld   [wDC68], A                                    ;; 00:2f86 $ea $68 $dc
+    ld   [wDC68_CollectibleCount], A                                    ;; 00:2f86 $ea $68 $dc
     ld   A, [wDC19_CollectibleListBank]                                    ;; 00:2f89 $fa $19 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:2f8c $cd $ee $0e
     ld   L, LOW(wD100_CollectibleXPositions)                                        ;; 00:2f8f $2e $00
@@ -693,13 +693,13 @@ call_00_3180_MarkInitialLevelObjects:
 
 call_00_31d9_CheckAndClearBonusCoinObjectFlags:
 ; Handle Level Flag 4 Special Object
-; Behavior: Uses level number + wDC5C as a flag table, checks bit-4; if set, 
+; Behavior: Uses level number + wDC5C_ProgressFlags as a flag table, checks bit-4; if set, 
 ; searches object list for type 01 and clears a RAM byte (wD7??) to zero.
 ; Purpose: Disables or resets a specific object type when a special flag is set.
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:31d9 $21 $1e $dc
     ld   L, [HL]                                       ;; 00:31dc $6e
     ld   H, $00                                        ;; 00:31dd $26 $00
-    ld   DE, wDC5C                                     ;; 00:31df $11 $5c $dc
+    ld   DE, wDC5C_ProgressFlags                                     ;; 00:31df $11 $5c $dc
     add  HL, DE                                        ;; 00:31e2 $19
     bit  4, [HL]                                       ;; 00:31e3 $cb $66
     ret  Z                                             ;; 00:31e5 $c8
@@ -729,7 +729,7 @@ call_00_31d9_CheckAndClearBonusCoinObjectFlags:
 
 call_00_320d_CheckAndClearPawCoinObjectFlags:
 ; Mask Object Flags by Level Setting
-; Behavior: Gets a bitmask (C) from wDC5C + level, scans the object list for type 03. 
+; Behavior: Gets a bitmask (C) from wDC5C_ProgressFlags + level, scans the object list for type 03. 
 ; For each, uses its 13th byte as an index into .data_00_324e (00,20,40,80), ANDs with C; if nonzero, 
 ; clears the corresponding entry in RAM (wD7xx).
 ; Purpose: Applies level-specific masking to object type 3 spawns.
@@ -738,7 +738,7 @@ call_00_320d_CheckAndClearPawCoinObjectFlags:
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:3213 $21 $1e $dc
     ld   L, [HL]                                       ;; 00:3216 $6e
     ld   H, $00                                        ;; 00:3217 $26 $00
-    ld   DE, wDC5C                                     ;; 00:3219 $11 $5c $dc
+    ld   DE, wDC5C_ProgressFlags                                     ;; 00:3219 $11 $5c $dc
     add  HL, DE                                        ;; 00:321c $19
     ld   C, [HL]                                       ;; 00:321d $4e
     ld   HL, wDC17_ObjectListBankOffset                                     ;; 00:321e $21 $17 $dc

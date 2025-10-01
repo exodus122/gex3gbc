@@ -10,7 +10,7 @@ call_03_747d_StatusBar_UpdateOrTiles:
     ld   HL, $9c02                                     ;; 03:7489 $21 $02 $9c
     ld   DE, $9c22                                     ;; 03:748c $11 $22 $9c
     call call_03_74f5_DrawTwoDigitNumber                                  ;; 03:748f $cd $f5 $74
-    ld   A, [wDC68]                                    ;; 03:7492 $fa $68 $dc
+    ld   A, [wDC68_CollectibleCount]                                    ;; 03:7492 $fa $68 $dc
     ld   HL, $9c11                                     ;; 03:7495 $21 $11 $9c
     ld   DE, $9c31                                     ;; 03:7498 $11 $31 $9c
     jr   call_03_74f5_DrawTwoDigitNumber                                  ;; 03:749b $18 $58

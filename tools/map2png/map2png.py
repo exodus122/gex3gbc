@@ -89,7 +89,7 @@ object_names = [
     "Object_AnimeChannel_SecbotProjectile",
     "Object_AnimeChannel_Elevator",
     "Object_AnimeChannel_FireWallEnemy",
-    "Object_AnimeChannel_FallingYellowEnemy",
+    "Object_AnimeChannel_Grenade",
     "Object_AnimeChannel_PlanetOBlastWeapon",
     "Object_SuperheroShow_MadBomber",
     "Object_SuperheroShow_Bomb",
@@ -100,9 +100,9 @@ object_names = [
     "Object_SuperheroShow_StrayCat",
     "Object_SuperheroShow_YellowGoon",
     "Object_SuperheroShow_Rat",
-    "Object_SuperheroShow_FlyingRobotHead",
-    "Object_SuperheroShow_FalseFloor",
-    "Object_SuperheroShow_GreyConvictProjectile",
+    "Object_SuperheroShow_ChomperTV",
+    "Object_SuperheroShow_CrumblingFloor",
+    "Object_SuperheroShow_ConvictProjectile",
     "Object_GextremeSports_Elf",
     "Object_GextremeSports_BonusTimeCoin",
     "Object_MarsupialMadness_Bell",
@@ -112,14 +112,14 @@ object_names = [
     "Object_LizardOfOz_BrainOfOz",
     "Object_LizardOfOz_CannonProjectile",
     "Object_LizardOfOz_Cannon",
-    "Object_LizardOfOz_RockProjectile",
+    "Object_LizardOfOz_BrainOfOzProjectile",
     "Object_unk6B",
     "Object_unk6C",
     "Object_unk6D",
     "Object_ChannelZ_Rez",
     "Object_unk6F",
     "Object_ChannelZ_Meteor",
-    "Object_ChannelZ_RockProjectile"
+    "Object_ChannelZ_RezProjectile"
 ]
 
 def get_next_offset(arr, entry):

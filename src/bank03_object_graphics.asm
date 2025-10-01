@@ -776,7 +776,7 @@ call_03_615d_SetupCollectibleSprites:
     set  7, E                                          ;; 03:61cb $cb $fb
     ld   A, $ff                                        ;; 03:61cd $3e $ff
     ld   [DE], A                                       ;; 03:61cf $12
-    call call_00_0723_IncrementProgressCounter                                  ;; 03:61d0 $cd $23 $07
+    call call_00_0723_IncrementCollectibleCount                                  ;; 03:61d0 $cd $23 $07
     pop  DE                                            ;; 03:61d3 $d1
 .jr_03_61d4:
     inc  E                                             ;; 03:61d4 $1c

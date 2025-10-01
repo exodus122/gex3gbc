@@ -203,7 +203,7 @@ call_00_0150_Init:
     xor  A, A                                          ;; 00:02d1 $af
     ld   [wDCAF], A                                    ;; 00:02d2 $ea $af $dc
     ld   [wDC4F], A                                    ;; 00:02d5 $ea $4f $dc
-    ld   HL, wDC5C                                     ;; 00:02d8 $21 $5c $dc
+    ld   HL, wDC5C_ProgressFlags                                     ;; 00:02d8 $21 $5c $dc
     ld   B, $0c                                        ;; 00:02db $06 $0c
     xor  A, A                                          ;; 00:02dd $af
 .jr_00_02de:
@@ -215,7 +215,7 @@ call_00_0150_Init:
     xor  A, A                                          ;; 00:02ed $af
     ld   [wDB6C_CurrentMapId], A                                    ;; 00:02ee $ea $6c $db
     ld   [wDC5B], A                                    ;; 00:02f1 $ea $5b $dc
-    ld   [wDC69], A                                    ;; 00:02f4 $ea $69 $dc
+    ld   [wDC69_PlayerSpawnIdInLevel], A                                    ;; 00:02f4 $ea $69 $dc
     ld   [wDB6A], A                                    ;; 00:02f7 $ea $6a $db
     call call_00_0e3b_ClearGameStateVariables                                  ;; 00:02fa $cd $3b $0e
     call call_00_0e62_ResetFlagsAndVRAMState                                  ;; 00:02fd $cd $62 $0e
@@ -244,7 +244,7 @@ call_00_0150_Init:
     call call_00_0595_PlaySongBasedOnLevel                                  ;; 00:034d $cd $95 $05
     call call_00_1ea0_LoadAndRunMissionPreviewCutscene                                  ;; 00:0350 $cd $a0 $1e
     xor  A, A                                          ;; 00:0353 $af
-    ld   [wDC69], A                                    ;; 00:0354 $ea $69 $dc
+    ld   [wDC69_PlayerSpawnIdInLevel], A                                    ;; 00:0354 $ea $69 $dc
 .jp_00_0357:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:0357 $fa $1e $dc
     ld   [wDB6C_CurrentMapId], A                                    ;; 00:035a $ea $6c $db
@@ -553,7 +553,7 @@ call_00_0624_SetPhase_TimersAndFlags:
     cp   a,$03
     jr   z,label0682
     cp   a,$04
-    jp   z,call_00_0723_IncrementProgressCounter.jr_00_074b
+    jp   z,call_00_0723_IncrementCollectibleCount.jr_00_074b
     cp   a,$01
     jr   z,label066C
     cp   a,$05
@@ -673,9 +673,9 @@ call_00_06f6_HandleGenericHitResponse:
     jp   Z, jp_00_0693                                 ;; 00:071f $ca $93 $06
     ret                                                ;; 00:0722 $c9
 
-call_00_0723_IncrementProgressCounter:
+call_00_0723_IncrementCollectibleCount:
 ; Sets flag bit0 in wDB69, plays sound 02.
-; Increments counter wDC68, triggers sound effects and sets a per-level 
+; Increments counter wDC68_CollectibleCount, triggers sound effects and sets a per-level 
 ; completion flag when it reaches 0x32 or 0x64.
 ; Also increments wDC4E but caps at 63.
 ; Looks like it manages collectible counters / progress milestones.
@@ -683,7 +683,7 @@ call_00_0723_IncrementProgressCounter:
     set  0, [HL]                                       ;; 00:0726 $cb $c6
     ld   A, $02                                        ;; 00:0728 $3e $02
     call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 00:072a $cd $f5 $0f
-    ld   HL, wDC68                                     ;; 00:072d $21 $68 $dc
+    ld   HL, wDC68_CollectibleCount                                     ;; 00:072d $21 $68 $dc
     inc  [HL]                                          ;; 00:0730 $34
     ld   A, [HL]                                       ;; 00:0731 $7e
     cp   A, $32                                        ;; 00:0732 $fe $32
@@ -695,7 +695,7 @@ call_00_0723_IncrementProgressCounter:
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:073e $21 $1e $dc
     ld   L, [HL]                                       ;; 00:0741 $6e
     ld   H, $00                                        ;; 00:0742 $26 $00
-    ld   DE, wDC5C                                     ;; 00:0744 $11 $5c $dc
+    ld   DE, wDC5C_ProgressFlags                                     ;; 00:0744 $11 $5c $dc
     add  HL, DE                                        ;; 00:0747 $19
     set  3, [HL]                                       ;; 00:0748 $cb $de
     ret                                                ;; 00:074a $c9

@@ -148,25 +148,25 @@
     dw   $0000
     db   $2c
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $0cf0, $0088
     dw   $0d00, $0ce0, $0098, $0078
     dw   $00d0
     db   $2c
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $0d40, $0088
     dw   $0d50, $0d30, $0098, $0078
     dw   $00d0
     db   $2c
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $0d80, $0088
     dw   $0d90, $0d70, $0098, $0078
     dw   $00d0
     db   $2c
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $0dc0, $0088
     dw   $0dd0, $0db0, $0098, $0078
     dw   $00d0
@@ -298,7 +298,7 @@
     dw   $0005
     db   $2c
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $0170, $0148
     dw   $0180, $0160, $0158, $0138
     dw   $0090
@@ -514,91 +514,91 @@
     dw   $0000
     db   $2b
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $0230, $0148
     dw   $0240, $0220, $0158, $0138
     dw   $00d0
     db   $2b
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $0278, $0148
     dw   $0288, $0268, $0158, $0138
     dw   $00d0
     db   $2b
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $02c0, $0148
     dw   $02d0, $02b0, $0158, $0138
     dw   $00d0
     db   $2b
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $03e0, $01c8
     dw   $03f0, $03d0, $01d8, $01b8
     dw   $00a0
     db   $2b
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $0430, $01c8
     dw   $0440, $0420, $01d8, $01b8
     dw   $00a0
     db   $2b
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $03e0, $01c8
     dw   $03f0, $03d0, $01d8, $01b8
     dw   $00a0
     db   $2b
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $04d0, $01c8
     dw   $04e0, $04c0, $01d8, $01b8
     dw   $00a0
     db   $2b
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $0520, $01c8
     dw   $0530, $0510, $01d8, $01b8
     dw   $00a0
     db   $2b
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $03a0, $0248
     dw   $03b0, $0390, $0258, $0238
     dw   $00a0
     db   $2b
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $03e0, $0248
     dw   $03f0, $03d0, $0258, $0238
     dw   $00a0
     db   $2b
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $0420, $0248
     dw   $0430, $0410, $0258, $0238
     dw   $00a0
     db   $2b
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $0460, $0248
     dw   $0470, $0450, $0258, $0238
     dw   $00a0
     db   $2b
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $04a0, $0248
     dw   $04b0, $0490, $0258, $0238
     dw   $00a0
     db   $2b
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $04e0, $0248
     dw   $04f0, $04d0, $0258, $0238
     dw   $00a0
     db   $2b
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $0520, $0248
     dw   $0530, $0510, $0258, $0238
     dw   $00a0
@@ -628,7 +628,7 @@
     dw   $00ff
     db   $29
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $0070, $0088
     dw   $0080, $0060, $0098, $0078
     dw   $0090
@@ -640,7 +640,7 @@
     dw   $00ff
     db   $29
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $0280, $0088
     dw   $0290, $0270, $0098, $0078
     dw   $0090
@@ -670,7 +670,7 @@
     dw   $00ff
     db   $2a
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $0070, $0088
     dw   $0080, $0060, $0098, $0078
     dw   $0090
@@ -682,7 +682,7 @@
     dw   $0007
     db   $2a
 
-    db   Object_AnimeChannel_FallingYellowEnemy
+    db   Object_AnimeChannel_Grenade
     dw   $0310, $0088
     dw   $0320, $0300, $0098, $0078
     dw   $0090

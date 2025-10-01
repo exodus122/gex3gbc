@@ -230,7 +230,7 @@ DEF Object_AnimeChannel_Secbot                         EQU $4F
 DEF Object_AnimeChannel_SecbotProjectile               EQU $50
 DEF Object_AnimeChannel_Elevator                       EQU $51
 DEF Object_AnimeChannel_FireWallEnemy                  EQU $52
-DEF Object_AnimeChannel_FallingYellowEnemy             EQU $53
+DEF Object_AnimeChannel_Grenade                        EQU $53
 DEF Object_AnimeChannel_PlanetOBlastWeapon             EQU $54
 DEF Object_SuperheroShow_MadBomber                     EQU $55
 DEF Object_SuperheroShow_Bomb                          EQU $56
@@ -241,8 +241,8 @@ DEF Object_SuperheroShow_Spider                        EQU $5A
 DEF Object_SuperheroShow_StrayCat                      EQU $5B
 DEF Object_SuperheroShow_YellowGoon                    EQU $5C
 DEF Object_SuperheroShow_Rat                           EQU $5D
-DEF Object_SuperheroShow_FlyingRobotHead               EQU $5E
-DEF Object_SuperheroShow_FalseFloor                    EQU $5F
+DEF Object_SuperheroShow_ChomperTV                     EQU $5E
+DEF Object_SuperheroShow_CrumblingFloor                EQU $5F
 DEF Object_SuperheroShow_ConvictProjectile             EQU $60
 DEF Object_GextremeSports_Elf                          EQU $61
 DEF Object_GextremeSports_BonusTimeCoin                EQU $62
@@ -253,14 +253,14 @@ DEF Object_WWGexWrestling_RockHard                     EQU $66
 DEF Object_LizardOfOz_BrainOfOz                        EQU $67
 DEF Object_LizardOfOz_CannonProjectile                 EQU $68
 DEF Object_LizardOfOz_Cannon                           EQU $69
-DEF Object_LizardOfOz_RockProjectile                   EQU $6A
+DEF Object_LizardOfOz_BrainOfOzProjectile              EQU $6A
 DEF Object_unk6B                                       EQU $6B
 DEF Object_unk6C                                       EQU $6C
 DEF Object_unk6D                                       EQU $6D
 DEF Object_ChannelZ_Rez                                EQU $6E
 DEF Object_unk6F                                       EQU $6F
 DEF Object_ChannelZ_Meteor                             EQU $70
-DEF Object_ChannelZ_RockProjectile                     EQU $71
+DEF Object_ChannelZ_RezProjectile                      EQU $71
 DEF ObjectListTerminator                               EQU $FF
 
 ; Object Instance Struct
