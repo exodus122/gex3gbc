@@ -339,3 +339,37 @@ DEF MENU_END_CREDITS_3                    EQU $17
 DEF MENU_END_CREDITS_4                    EQU $18
 DEF MENU_END_CREDITS_5                    EQU $19
 DEF MENU_END_CREDITS_6                    EQU $1A
+
+; Sound Effects
+DEF SFX_UNK00                              EQU $00
+DEF SFX_UNK01                              EQU $01
+DEF SFX_UNK02                              EQU $02
+DEF SFX_UNK03                              EQU $03
+DEF SFX_UNK04                              EQU $04
+DEF SFX_UNK05                              EQU $05
+DEF SFX_UNK06                              EQU $06
+DEF SFX_UNK07                              EQU $07
+DEF SFX_UNK08                              EQU $08
+DEF SFX_UNK09                              EQU $09
+DEF SFX_UNK0A                              EQU $0A
+DEF SFX_UNK0B                              EQU $0B
+DEF SFX_UNK0C                              EQU $0C
+DEF SFX_UNK0D                              EQU $0D
+DEF SFX_UNK0E                              EQU $0E
+DEF SFX_UNK0F                              EQU $0F
+DEF SFX_UNK10                              EQU $10
+DEF SFX_UNK11                              EQU $11
+DEF SFX_UNK12                              EQU $12
+DEF SFX_UNK13                              EQU $13
+DEF SFX_UNK14                              EQU $14
+DEF SFX_UNK15                              EQU $15
+DEF SFX_UNK16                              EQU $16
+DEF SFX_UNK17                              EQU $17
+DEF SFX_UNK18                              EQU $18
+DEF SFX_UNK19                              EQU $19
+DEF SFX_BOSS_DEATH                         EQU $1A ; evil santa, ?
+DEF SFX_UNK1B                              EQU $1B
+DEF SFX_UNK1C                              EQU $1C
+DEF SFX_UNK1D                              EQU $1D
+DEF SFX_REMOTE                             EQU $1E
+DEF SFX_UNK1F                              EQU $1F

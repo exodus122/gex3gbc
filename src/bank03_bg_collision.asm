@@ -248,7 +248,7 @@ call_03_4708_CollisionHandler_Sidescroller:
     ld   A, H                                          ;; 03:4856 $7c
     cp   A, $cc                                        ;; 03:4857 $fe $cc
     jr   NZ, .jr_03_485e                               ;; 03:4859 $20 $03
-    ld   H, $c4                                        ;; 03:485b $26 $c4
+    ld   H, HIGH(wC400_CollisionTilesetData)                                        ;; 03:485b $26 $c4
     ld   L, D                                          ;; 03:485d $6a
 .jr_03_485e:
     inc  B                                             ;; 03:485e $04

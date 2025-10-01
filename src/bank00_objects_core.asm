@@ -909,7 +909,7 @@ call_00_35e8_GetObjectTypeIndex:
 ; Usage: Fetches an object-type ID or pointer index for the active object.
     ld   HL, wDA00_CurrentObjectAddrLo                                     ;; 00:35e8 $21 $00 $da
     ld   L, [HL]                                       ;; 00:35eb $6e
-    ld   H, $d8                                        ;; 00:35ec $26 $d8
+    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:35ec $26 $d8
     ld   L, [HL]                                       ;; 00:35ee $6e
     ld   H, $00                                        ;; 00:35ef $26 $00
     add  HL, HL                                        ;; 00:35f1 $29
@@ -1081,7 +1081,7 @@ call_00_3618_HandleObjectSpawn:
     add  HL, BC                                        ;; 00:36d7 $09
     ld   C, L                                          ;; 00:36d8 $4d
     ld   B, H                                          ;; 00:36d9 $44
-    ld   H, $d8                                        ;; 00:36da $26 $d8
+    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:36da $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:36dc $fa $00 $da
     or   A, $0e                                        ;; 00:36df $f6 $0e
     ld   L, A                                          ;; 00:36e1 $6f
@@ -1148,7 +1148,7 @@ call_00_3618_HandleObjectSpawn:
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:3728 $fa $00 $da
     or   A, OBJECT_ID_OFFSET                                        ;; 00:372b $f6 $00
     ld   E, A                                          ;; 00:372d $5f
-    ld   D, $d8                                        ;; 00:372e $16 $d8
+    ld   D, HIGH(wD800_ObjectMemory)                                        ;; 00:372e $16 $d8
     ld   A, [wDABB_CurrentObjectId]                                    ;; 00:3730 $fa $bb $da
     ld   [DE], A                                       ;; 00:3733 $12
     ld   A, E                                          ;; 00:3734 $7b
@@ -1261,7 +1261,7 @@ call_00_37a0_SpawnObjectRelative:
     push AF                                            ;; 00:37d5 $f5
     or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 00:37d6 $f6 $0d
     ld   C, A                                          ;; 00:37d8 $4f
-    ld   B, $d8                                        ;; 00:37d9 $06 $d8
+    ld   B, HIGH(wD800_ObjectMemory)                                        ;; 00:37d9 $06 $d8
     ld   A, D                                          ;; 00:37db $7a
     ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 00:37dc $ea $00 $da
     or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 00:37df $f6 $0d

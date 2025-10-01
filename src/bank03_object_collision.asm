@@ -14,7 +14,7 @@ call_03_4c38_UpdateObjectCollision_Dispatch:
     ld   A, [wDCA7]                                    ;; 03:4c38 $fa $a7 $dc
     and  A, A                                          ;; 03:4c3b $a7
     ret  Z                                             ;; 03:4c3c $c8
-    ld   H, $d8                                        ;; 03:4c3d $26 $d8
+    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:4c3d $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                  ;; 03:4c3f $fa $00 $da
     or   A, OBJECT_UNK15_OFFSET                                        ;; 03:4c42 $f6 $15
     ld   L, A                                          ;; 03:4c44 $6f
@@ -144,7 +144,7 @@ call_03_4cea_TriggerPlayerActionChange:
     cp   A, $45                                        ;; 03:4cf9 $fe $45
     call NZ, call_00_06f6_HandleGenericHitResponse                              ;; 03:4cfb $c4 $f6 $06
 .jr_03_4cfe:
-    ld   H, $d8                                        ;; 03:4cfe $26 $d8
+    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:4cfe $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:4d00 $fa $00 $da
     or   A, OBJECT_XPOS_OFFSET                                        ;; 03:4d03 $f6 $0e
     ld   L, A                                          ;; 03:4d05 $6f
@@ -198,7 +198,7 @@ call_03_4d44_Collision_PlayerHit_ActionChangeConditional:
     jp   z,entry_03_5671_HandleObjectHitOrRespawn
     ld   a,$3C
     ld   [wDC7E],a
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
     ld   l,a
@@ -306,7 +306,7 @@ call_03_4e04_Collision_PlayerHit_TriggerPhaseChange:
     add  hl,de
     ld   a,[hl]
     call call_00_0624_SetPhase_TimersAndFlags
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_UNK1F_OFFSET
     ld   l,a
@@ -369,7 +369,7 @@ call_03_4e4b_Collision_PlayerHit_MultiStageCollectible:
     ld   A, [HL]                                       ;; 03:4e7b $7e
     cp   A, $05                                        ;; 03:4e7c $fe $05
     ld   C, $01                                        ;; 03:4e7e $0e $01
-    call Z, call_00_21ef_PlaySound_1E                               ;; 03:4e80 $cc $ef $21
+    call Z, call_00_21ef_PlayRemoteSpawnSFX                               ;; 03:4e80 $cc $ef $21
     ld   A, [wDCC3]                                    ;; 03:4e83 $fa $c3 $dc
     jp   call_00_2c09_Object_SpawnRelativeWithOffset6                                  ;; 03:4e86 $c3 $09 $2c
 
@@ -403,7 +403,7 @@ call_03_4e89_Collision_ObjectStateOrTransform:
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:4eaf $fa $00 $da
     or   A, OBJECT_XPOS_OFFSET                                        ;; 03:4eb2 $f6 $0e
     ld   E, A                                          ;; 03:4eb4 $5f
-    ld   D, $d8                                        ;; 03:4eb5 $16 $d8
+    ld   D, HIGH(wD800_ObjectMemory)                                        ;; 03:4eb5 $16 $d8
     ld   A, [DE]                                       ;; 03:4eb7 $1a
     sub  A, [HL]                                       ;; 03:4eb8 $96
     ld   C, A                                          ;; 03:4eb9 $4f
@@ -489,7 +489,7 @@ call_03_4f23_Collision_ObjectCounterDecrement:
     or   A, [HL]                                       ;; 03:4f59 $b6
     ret  NZ                                            ;; 03:4f5a $c0
     ld   C, $02                                        ;; 03:4f5b $0e $02
-    jp   call_00_21ef_PlaySound_1E                                  ;; 03:4f5d $c3 $ef $21
+    jp   call_00_21ef_PlayRemoteSpawnSFX                                  ;; 03:4f5d $c3 $ef $21
 
 call_03_4f60_Collision_TripleCollectible_Counter:
 ; Only for objects in action 00.
@@ -514,7 +514,7 @@ call_03_4f60_Collision_TripleCollectible_Counter:
     ld   a,[hl]
     cp   a,$03
     ld   c,$02
-    call z,call_00_21ef_PlaySound_1E
+    call z,call_00_21ef_PlayRemoteSpawnSFX
     ld   a,[wDCC5]
     jp   call_00_2c09_Object_SpawnRelativeWithOffset6
 
@@ -523,7 +523,7 @@ call_03_4f8c_Collision_PlaySoundAndRemove:
     call call_03_550e_CheckPlayerObjectInteraction
     ret  nc
     ld   c,$03
-    call call_00_21ef_PlaySound_1E
+    call call_00_21ef_PlayRemoteSpawnSFX
     jp   entry_03_5671_HandleObjectHitOrRespawn
 
 call_03_4f98_Collision_ObjectActivateIfAction5:
@@ -574,7 +574,7 @@ call_03_4fca_Collision_TripleCollectible_TypeB:
     ld   a,[hl]
     cp   a,$03
     ld   c,$02
-    call z,call_00_21ef_PlaySound_1E
+    call z,call_00_21ef_PlayRemoteSpawnSFX
     ld   a,[wDCC6]
     jp   call_00_2c09_Object_SpawnRelativeWithOffset6
     
@@ -593,7 +593,7 @@ call_03_4ff1_Collision_TripleCollectible_TypeC:
     ld   a,[hl]
     cp   a,$03
     ld   c,$01
-    call z,call_00_21ef_PlaySound_1E
+    call z,call_00_21ef_PlayRemoteSpawnSFX
     ld   a,[wDCC7]
     jp   call_00_2c09_Object_SpawnRelativeWithOffset6
     
@@ -661,7 +661,7 @@ call_03_5069_Collision_QuintCollectible:
     ld   a,[hl]
     cp   a,$05
     ld   c,$02
-    call z,call_00_21ef_PlaySound_1E
+    call z,call_00_21ef_PlayRemoteSpawnSFX
     ld   a,[wDCCF]
     jp   call_00_2c09_Object_SpawnRelativeWithOffset6
 
@@ -711,7 +711,7 @@ call_03_50b6_Collision_TripleCollectible_WithSlot:
     ld   a,[hl]
     cp   a,$03
     ld   c,$01
-    call z,call_00_21ef_PlaySound_1E
+    call z,call_00_21ef_PlayRemoteSpawnSFX
     ld   a,[wDCC9]
     jp   call_00_2c09_Object_SpawnRelativeWithOffset6
 
@@ -916,7 +916,7 @@ label5258:
     ld   a,[hl]
     cp   a,$04
     ld   c,$03
-    call z,call_00_21ef_PlaySound_1E
+    call z,call_00_21ef_PlayRemoteSpawnSFX
     ld   a,[wDCCB]
     jp   call_00_2c09_Object_SpawnRelativeWithOffset6
     call call_03_550e_CheckPlayerObjectInteraction
@@ -937,7 +937,7 @@ call_03_5274_Collision_ClearSlot_OnType2:
     cp   a,$01
     ret  nz
     ld   c,$02
-    call call_00_21ef_PlaySound_1E
+    call call_00_21ef_PlayRemoteSpawnSFX
     jp   call_00_22ff_ClearObjectSlot
     
 call_03_528c_Collision_TripleCollectible_Counter2:
@@ -954,7 +954,7 @@ call_03_528c_Collision_TripleCollectible_Counter2:
     ld   a,[hl]
     cp   a,$03
     ld   c,$02
-    call z,call_00_21ef_PlaySound_1E
+    call z,call_00_21ef_PlayRemoteSpawnSFX
     ld   a,[wDCCA]
     jp   call_00_2c09_Object_SpawnRelativeWithOffset6
     
@@ -973,7 +973,7 @@ call_03_52aa_Collision_QuintCollectible_Counter3:
     ld   a,[hl]
     cp   a,$05
     ld   c,$03
-    call z,call_00_21ef_PlaySound_1E
+    call z,call_00_21ef_PlayRemoteSpawnSFX
     ld   a,[wDCCD]
     jp   call_00_2c09_Object_SpawnRelativeWithOffset6
     
@@ -1178,7 +1178,7 @@ call_03_5406_Collision_ProximityTransform_Bank6:
     ld   a,l
     xor  a,$13
     ld   l,a
-    ld   d,$D8
+    ld   d,HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
     ld   e,a
@@ -1278,7 +1278,7 @@ call_03_54a8_Collision_PropertyBasedTransform:
     cp   a,$01
     jp   nz,call_03_4cea_TriggerPlayerActionChange
     call entry_03_5671_HandleObjectHitOrRespawn
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_UNK15_OFFSET
     ld   l,a
@@ -1316,7 +1316,7 @@ call_03_54f9:
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_UNK15_OFFSET
     ld   l,a
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   [hl],$3C
     ret  
 
@@ -1334,14 +1334,14 @@ call_03_550e_CheckPlayerObjectInteraction:
 ; - Bit 2 case: only triggers if the player is in certain action IDs ($0E,$0F,$25,$26), and if vertical velocity (wDC8C) is negative (jump/falling). Then sets wDC8C = $2A and returns $FF+3. This looks like a bounce effect (spring/booster tile).
 ; - Otherwise calls call_00_0759 (probably a more general collision/interaction handler). If that succeeds, returns $FF+1.
 ; So this routine is the core collision handler for player–object interactions, with special cases for springs, breakables, pushables, etc., driven by data_03_55ff_ObjectInteractionFlagsTable.
-    ld   B, $d8                                        ;; 03:550e $06 $d8
+    ld   B, HIGH(wD800_ObjectMemory)                                        ;; 03:550e $06 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5510 $fa $00 $da
     or   A, OBJECT_UNK15_OFFSET                                        ;; 03:5513 $f6 $15
     ld   C, A                                          ;; 03:5515 $4f
     ld   A, [BC]                                       ;; 03:5516 $0a
     and  A, A                                          ;; 03:5517 $a7
     jp   NZ, call_03_55fd_ReturnNoInteraction                                ;; 03:5518 $c2 $fd $55
-    ld   H, $d8                                        ;; 03:551b $26 $d8
+    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:551b $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:551d $fa $00 $da
     or   A, OBJECT_ID_OFFSET                                        ;; 03:5520 $f6 $00
     ld   L, A                                          ;; 03:5522 $6f
@@ -1534,7 +1534,7 @@ call_03_5671_HandleObjectHitOrRespawn:
 ;   - Plays sound effect $0F.
 ; So this is an object interaction lifecycle handler: triggered when the player collides with certain objects, 
 ; decrements a counter, and either reloads/respawns the object, spawns particles, or plays sounds depending on conditions.
-    ld   H, $d8                                        ;; 03:5671 $26 $d8
+    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:5671 $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5673 $fa $00 $da
     or   A, OBJECT_UNK15_OFFSET                                        ;; 03:5676 $f6 $15
     ld   L, A                                          ;; 03:5678 $6f
@@ -1610,7 +1610,7 @@ label56E3:
     ld   a,[wD811_PlayerYPosition]
     adc  d
     ld   d,a
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YPOS_OFFSET
     ld   l,a
@@ -1840,7 +1840,7 @@ call_03_581a_CheckPlayerObjectCollision_Simple:
     jp   Z, call_03_57f8_ClearCollisionForObject                                 ;; 03:5829 $ca $f8 $57
     cp   A, $1b                                        ;; 03:582c $fe $1b
     jp   Z, call_03_57f8_ClearCollisionForObject                                 ;; 03:582e $ca $f8 $57
-    ld   H, $d8                                        ;; 03:5831 $26 $d8
+    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:5831 $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5833 $fa $00 $da
     or   A, OBJECT_WIDTH_OFFSET                                        ;; 03:5836 $f6 $12
     ld   L, A                                          ;; 03:5838 $6f
@@ -1924,7 +1924,7 @@ call_03_58a9_ComputeCollisionOffset:
 ; Then checks wD80D_PlayerFacingDirection, and if bit 5 is set, flips the result.
 ; Role: This is a collision offset calculator: adjusts collision testing 
 ; depending on object properties (size/offset) and player facing direction.
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XVEL_OFFSET
     ld   l,a

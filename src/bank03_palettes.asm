@@ -183,7 +183,7 @@ call_03_687c_AssignObjectPalette:
 ; Stores the palette ID in wDAAE_ObjectPaletteIds.
 ; Calculates an address into wDD2A_ObjectPalettes, then copies 8 palette bytes from data_03_68f9.
 ; Usage: Ensures each on-screen object uses the correct colors.
-    ld   H, $d8                                        ;; 03:687c $26 $d8
+    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:687c $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:687e $fa $00 $da
     or   A, OBJECT_UNK05_OFFSET                                        ;; 03:6881 $f6 $05
     ld   L, A                                          ;; 03:6883 $6f
@@ -216,7 +216,7 @@ call_03_687c_AssignObjectPalette:
     add  HL, DE                                        ;; 03:68ac $19
     ld   E, L                                          ;; 03:68ad $5d
     ld   D, H                                          ;; 03:68ae $54
-    ld   H, $d8                                        ;; 03:68af $26 $d8
+    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:68af $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:68b1 $fa $00 $da
     or   A, OBJECT_ID_OFFSET                                        ;; 03:68b4 $f6 $00
     ld   L, A                                          ;; 03:68b6 $6f
@@ -263,7 +263,7 @@ entry_03_68d9_AssignAllObjectPalettes:
     ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 03:68db $ea $00 $da
     or   A, OBJECT_ID_OFFSET                                        ;; 03:68de $f6 $00
     ld   L, A                                          ;; 03:68e0 $6f
-    ld   H, $d8                                        ;; 03:68e1 $26 $d8
+    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:68e1 $26 $d8
     ld   A, [HL]                                       ;; 03:68e3 $7e
     cp   A, $ff                                        ;; 03:68e4 $fe $ff
     jr   Z, .jr_03_68f1                                ;; 03:68e6 $28 $09

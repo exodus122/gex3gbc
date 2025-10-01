@@ -296,7 +296,7 @@ call_00_11e5_LoadVerticalBgStrip:
     call call_00_0eee_SwitchBank                                  ;; 00:122d $cd $ee $0e
     ld   HL, wDC28                                     ;; 00:1230 $21 $28 $dc
     ld   L, [HL]                                       ;; 00:1233 $6e
-    ld   H, $cd                                        ;; 00:1234 $26 $cd
+    ld   H, HIGH(wCD00_RowOffsetTableForMap)                                        ;; 00:1234 $26 $cd
     ld   E, [HL]                                       ;; 00:1236 $5e
     inc  H                                             ;; 00:1237 $24
     ld   D, [HL]                                       ;; 00:1238 $56
@@ -315,7 +315,7 @@ call_00_11e5_LoadVerticalBgStrip:
     ld   D, H                                          ;; 00:124a $54
     ld   HL, wDC25                                     ;; 00:124b $21 $25 $dc
     ld   L, [HL]                                       ;; 00:124e $6e
-    ld   H, $cf                                        ;; 00:124f $26 $cf
+    ld   H, HIGH(wCF00_TileScratchBuffers)                                        ;; 00:124f $26 $cf
     ld   B, $0b                                        ;; 00:1251 $06 $0b
 .jr_00_1253:
     ld   A, [DE]                                       ;; 00:1253 $1a
@@ -330,7 +330,7 @@ call_00_11e5_LoadVerticalBgStrip:
     call call_00_0eee_SwitchBank                                  ;; 00:1262 $cd $ee $0e
     ld   HL, wDC28                                     ;; 00:1265 $21 $28 $dc
     ld   L, [HL]                                       ;; 00:1268 $6e
-    ld   H, $cd                                        ;; 00:1269 $26 $cd
+    ld   H, HIGH(wCD00_RowOffsetTableForMap)                                        ;; 00:1269 $26 $cd
     ld   E, [HL]                                       ;; 00:126b $5e
     inc  H                                             ;; 00:126c $24
     ld   D, [HL]                                       ;; 00:126d $56
@@ -350,7 +350,7 @@ call_00_11e5_LoadVerticalBgStrip:
     ld   HL, wDC25                                     ;; 00:1280 $21 $25 $dc
     ld   L, [HL]                                       ;; 00:1283 $6e
     inc  L                                             ;; 00:1284 $2c
-    ld   H, $cf                                        ;; 00:1285 $26 $cf
+    ld   H, HIGH(wCF00_TileScratchBuffers)                                        ;; 00:1285 $26 $cf
     ld   B, $0b                                        ;; 00:1287 $06 $0b
 .jr_00_1289:
     ld   A, [DE]                                       ;; 00:1289 $1a
@@ -365,7 +365,7 @@ call_00_11e5_LoadVerticalBgStrip:
     call call_00_0eee_SwitchBank                                  ;; 00:1298 $cd $ee $0e
     ld   HL, wDC28                                     ;; 00:129b $21 $28 $dc
     ld   L, [HL]                                       ;; 00:129e $6e
-    ld   H, $cd                                        ;; 00:129f $26 $cd
+    ld   H, HIGH(wCD00_RowOffsetTableForMap)                                        ;; 00:129f $26 $cd
     ld   E, [HL]                                       ;; 00:12a1 $5e
     inc  H                                             ;; 00:12a2 $24
     ld   D, [HL]                                       ;; 00:12a3 $56
@@ -409,7 +409,7 @@ call_00_11e5_LoadVerticalBgStrip:
     call call_00_0eee_SwitchBank                                  ;; 00:12d9 $cd $ee $0e
     ld   HL, wDC25                                     ;; 00:12dc $21 $25 $dc
     ld   E, [HL]                                       ;; 00:12df $5e
-    ld   D, $cf                                        ;; 00:12e0 $16 $cf
+    ld   D, HIGH(wCF00_TileScratchBuffers)                                        ;; 00:12e0 $16 $cf
     pop  BC                                            ;; 00:12e2 $c1
     ld   A, [wDC0B_BlocksetBankOffset]                                    ;; 00:12e3 $fa $0b $dc
     add  A, C                                          ;; 00:12e6 $81
@@ -551,7 +551,7 @@ call_00_1351_LoadHorizontalBgStrip:
     call call_00_0eee_SwitchBank                                  ;; 00:139f $cd $ee $0e
     ld   HL, wDC28                                     ;; 00:13a2 $21 $28 $dc
     ld   L, [HL]                                       ;; 00:13a5 $6e
-    ld   H, $cd                                        ;; 00:13a6 $26 $cd
+    ld   H, HIGH(wCD00_RowOffsetTableForMap)                                        ;; 00:13a6 $26 $cd
     ld   E, [HL]                                       ;; 00:13a8 $5e
     inc  H                                             ;; 00:13a9 $24
     ld   D, [HL]                                       ;; 00:13aa $56
@@ -572,7 +572,7 @@ call_00_1351_LoadHorizontalBgStrip:
     ld   B, $00                                        ;; 00:13c0 $06 $00
     ld   HL, wDC26                                     ;; 00:13c2 $21 $26 $dc
     ld   E, [HL]                                       ;; 00:13c5 $5e
-    ld   D, $cf                                        ;; 00:13c6 $16 $cf
+    ld   D, HIGH(wCF00_TileScratchBuffers)                                        ;; 00:13c6 $16 $cf
     pop  HL                                            ;; 00:13c8 $e1
     ld   A, $0b                                        ;; 00:13c9 $3e $0b
 .jr_00_13cb:
@@ -591,7 +591,7 @@ call_00_1351_LoadHorizontalBgStrip:
     call call_00_0eee_SwitchBank                                  ;; 00:13dd $cd $ee $0e
     ld   HL, wDC28                                     ;; 00:13e0 $21 $28 $dc
     ld   L, [HL]                                       ;; 00:13e3 $6e
-    ld   H, $cd                                        ;; 00:13e4 $26 $cd
+    ld   H, HIGH(wCD00_RowOffsetTableForMap)                                        ;; 00:13e4 $26 $cd
     ld   E, [HL]                                       ;; 00:13e6 $5e
     inc  H                                             ;; 00:13e7 $24
     ld   D, [HL]                                       ;; 00:13e8 $56
@@ -613,7 +613,7 @@ call_00_1351_LoadHorizontalBgStrip:
     ld   HL, wDC26                                     ;; 00:1400 $21 $26 $dc
     ld   E, [HL]                                       ;; 00:1403 $5e
     inc  E                                             ;; 00:1404 $1c
-    ld   D, $cf                                        ;; 00:1405 $16 $cf
+    ld   D, HIGH(wCF00_TileScratchBuffers)                                        ;; 00:1405 $16 $cf
     pop  HL                                            ;; 00:1407 $e1
     ld   A, $0b                                        ;; 00:1408 $3e $0b
 .jr_00_140a:
@@ -632,7 +632,7 @@ call_00_1351_LoadHorizontalBgStrip:
     call call_00_0eee_SwitchBank                                  ;; 00:141c $cd $ee $0e
     ld   HL, wDC28                                     ;; 00:141f $21 $28 $dc
     ld   L, [HL]                                       ;; 00:1422 $6e
-    ld   H, $cd                                        ;; 00:1423 $26 $cd
+    ld   H, HIGH(wCD00_RowOffsetTableForMap)                                        ;; 00:1423 $26 $cd
     ld   E, [HL]                                       ;; 00:1425 $5e
     inc  H                                             ;; 00:1426 $24
     ld   D, [HL]                                       ;; 00:1427 $56
@@ -677,7 +677,7 @@ call_00_1351_LoadHorizontalBgStrip:
     call call_00_0eee_SwitchBank                                  ;; 00:1462 $cd $ee $0e
     ld   HL, wDC26                                     ;; 00:1465 $21 $26 $dc
     ld   E, [HL]                                       ;; 00:1468 $5e
-    ld   D, $cf                                        ;; 00:1469 $16 $cf
+    ld   D, HIGH(wCF00_TileScratchBuffers)                                        ;; 00:1469 $16 $cf
     pop  BC                                            ;; 00:146b $c1
     ld   A, [wDC0B_BlocksetBankOffset]                                    ;; 00:146c $fa $0b $dc
     add  A, C                                          ;; 00:146f $81
@@ -1150,7 +1150,7 @@ call_00_1a46_LoadBgMapRow:
     call call_00_0eee_SwitchBank                                  ;; 00:1a90 $cd $ee $0e
     ld   HL, wDC28                                     ;; 00:1a93 $21 $28 $dc
     ld   L, [HL]                                       ;; 00:1a96 $6e
-    ld   H, $cd                                        ;; 00:1a97 $26 $cd
+    ld   H, HIGH(wCD00_RowOffsetTableForMap)                                        ;; 00:1a97 $26 $cd
     ld   E, [HL]                                       ;; 00:1a99 $5e
     inc  H                                             ;; 00:1a9a $24
     ld   D, [HL]                                       ;; 00:1a9b $56
@@ -1169,7 +1169,7 @@ call_00_1a46_LoadBgMapRow:
     ld   D, H                                          ;; 00:1aad $54
     ld   HL, wDC25                                     ;; 00:1aae $21 $25 $dc
     ld   L, [HL]                                       ;; 00:1ab1 $6e
-    ld   H, $cf                                        ;; 00:1ab2 $26 $cf
+    ld   H, HIGH(wCF00_TileScratchBuffers)                                        ;; 00:1ab2 $26 $cf
     ld   B, $0b                                        ;; 00:1ab4 $06 $0b
 .jr_00_1ab6:
     ld   A, [DE]                                       ;; 00:1ab6 $1a
@@ -1184,7 +1184,7 @@ call_00_1a46_LoadBgMapRow:
     call call_00_0eee_SwitchBank                                  ;; 00:1ac5 $cd $ee $0e
     ld   HL, wDC28                                     ;; 00:1ac8 $21 $28 $dc
     ld   L, [HL]                                       ;; 00:1acb $6e
-    ld   H, $cd                                        ;; 00:1acc $26 $cd
+    ld   H, HIGH(wCD00_RowOffsetTableForMap)                                        ;; 00:1acc $26 $cd
     ld   E, [HL]                                       ;; 00:1ace $5e
     inc  H                                             ;; 00:1acf $24
     ld   D, [HL]                                       ;; 00:1ad0 $56
@@ -1204,7 +1204,7 @@ call_00_1a46_LoadBgMapRow:
     ld   HL, wDC25                                     ;; 00:1ae3 $21 $25 $dc
     ld   L, [HL]                                       ;; 00:1ae6 $6e
     inc  L                                             ;; 00:1ae7 $2c
-    ld   H, $cf                                        ;; 00:1ae8 $26 $cf
+    ld   H, HIGH(wCF00_TileScratchBuffers)                                        ;; 00:1ae8 $26 $cf
     ld   B, $0b                                        ;; 00:1aea $06 $0b
 .jr_00_1aec:
     ld   A, [DE]                                       ;; 00:1aec $1a
@@ -1225,7 +1225,7 @@ call_00_1a46_LoadBgMapRow:
     ld   B, A                                          ;; 00:1b07 $47
     ld   HL, wDC25                                     ;; 00:1b08 $21 $25 $dc
     ld   L, [HL]                                       ;; 00:1b0b $6e
-    ld   H, $cf                                        ;; 00:1b0c $26 $cf
+    ld   H, HIGH(wCF00_TileScratchBuffers)                                        ;; 00:1b0c $26 $cf
     pop  DE                                            ;; 00:1b0e $d1
     ld   A, [wDC0B_BlocksetBankOffset]                                    ;; 00:1b0f $fa $0b $dc
     add  A, E                                          ;; 00:1b12 $83
@@ -1271,7 +1271,7 @@ call_00_1a46_LoadBgMapRow:
     call call_00_0eee_SwitchBank                                  ;; 00:1b43 $cd $ee $0e
     ld   HL, wDC28                                     ;; 00:1b46 $21 $28 $dc
     ld   L, [HL]                                       ;; 00:1b49 $6e
-    ld   H, $cd                                        ;; 00:1b4a $26 $cd
+    ld   H, HIGH(wCD00_RowOffsetTableForMap)                                        ;; 00:1b4a $26 $cd
     ld   E, [HL]                                       ;; 00:1b4c $5e
     inc  H                                             ;; 00:1b4d $24
     ld   D, [HL]                                       ;; 00:1b4e $56
@@ -1290,7 +1290,7 @@ call_00_1a46_LoadBgMapRow:
     ld   D, H                                          ;; 00:1b60 $54
     ld   HL, wDC25                                     ;; 00:1b61 $21 $25 $dc
     ld   L, [HL]                                       ;; 00:1b64 $6e
-    ld   H, $cf                                        ;; 00:1b65 $26 $cf
+    ld   H, HIGH(wCF00_TileScratchBuffers)                                        ;; 00:1b65 $26 $cf
     ld   B, $0b                                        ;; 00:1b67 $06 $0b
 .jr_00_1b69:
     ld   A, [DE]                                       ;; 00:1b69 $1a
@@ -1311,7 +1311,7 @@ call_00_1a46_LoadBgMapRow:
     ld   B, A                                          ;; 00:1b84 $47
     ld   HL, wDC25                                     ;; 00:1b85 $21 $25 $dc
     ld   L, [HL]                                       ;; 00:1b88 $6e
-    ld   H, $cf                                        ;; 00:1b89 $26 $cf
+    ld   H, HIGH(wCF00_TileScratchBuffers)                                        ;; 00:1b89 $26 $cf
     pop  DE                                            ;; 00:1b8b $d1
     ld   A, [wDC11_CollisionBlocksetOffset]                                    ;; 00:1b8c $fa $11 $dc
     add  A, E                                          ;; 00:1b8f $83

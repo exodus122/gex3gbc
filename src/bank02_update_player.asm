@@ -650,7 +650,7 @@ call_02_51cb_CheckLeftCollisionAndStoreOffset:
 ; Stores the corrected offset between player and solid edge back into the object table.
     or   A, OBJECT_UNK14_OFFSET                                        ;; 02:51cb $f6 $14
     ld   L, A                                          ;; 02:51cd $6f
-    ld   H, $d8                                        ;; 02:51ce $26 $d8
+    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:51ce $26 $d8
     bit  7, [HL]                                       ;; 02:51d0 $cb $7e
     ret  NZ                                            ;; 02:51d2 $c0
     dec  L                                             ;; 02:51d3 $2d
@@ -743,7 +743,7 @@ call_02_5238_CheckRightCollisionAndStoreOffset:
 ; Updates the tile offset table after adjustment.
     or   A, OBJECT_UNK14_OFFSET                                        ;; 02:5238 $f6 $14
     ld   L, A                                          ;; 02:523a $6f
-    ld   H, $d8                                        ;; 02:523b $26 $d8
+    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:523b $26 $d8
     bit  7, [HL]                                       ;; 02:523d $cb $7e
     ret  NZ                                            ;; 02:523f $c0
     dec  L                                             ;; 02:5240 $2d

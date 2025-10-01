@@ -14,6 +14,7 @@ wC980_NumberSprites: ; this is the start of the number sprites from bank 3
 wCD00_RowOffsetTableForMap:
     ds 512                                             ;; cd00
 
+wCF00_TileScratchBuffers:
 wCF00_MetatileScratchBuffer: ; where block ids from the map data get written temporarily. also where the extended map data is handled
     ds 64                                              ;; cf00
 wCF40_TileColumnScratchBuffer:
@@ -57,6 +58,7 @@ wD700_ObjectFlags:
 ; From D800 to D900 is the loaded objects space
 ; There are 8 instances of 0x20 bytes each. 
 ; Object Instance Struct is defined in constants.inc
+wD800_ObjectMemory:
 wD800_PlayerObject_Id:
     ds 1                                               ;; d800
 wD801_PlayerObject_ActionId:
@@ -831,7 +833,7 @@ wDC5B:
     ds 1                                               ;; dc5b
 
 wDC5C_ProgressFlags:
-; these keep track of which remotes, paw coins, and bonus coins you've gotten
+; these keep track of which remotes, paw coins, and bonus coins have been obtained
     ds 9                                               ;; dc5c
 wDC65_ProgressFlags_WWGex:
     ds 1                                               ;; dc65
@@ -1113,7 +1115,7 @@ wDCDA:
 wDCDB_EvilSantaHitByProjectileFlag:
     ds 1                                               ;; dcdb
 
-wDCDC:
+wDCDC_HandObjectUnkFlag:
     ds 2                                               ;; dcdc
 
 wDCDE:

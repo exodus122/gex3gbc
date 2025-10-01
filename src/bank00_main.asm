@@ -1569,13 +1569,13 @@ call_00_0c6a_HandlePendingHDMATransfers:
     res  7, [HL]                                       ;; 00:0ca8 $cb $be
     ret                                                ;; 00:0caa $c9
 .jr_00_0cab:
-    ld   H, $d8                                        ;; 00:0cab $26 $d8
+    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:0cab $26 $d8
     ld   A, [wDB61_ActiveObjectSlot]                                    ;; 00:0cad $fa $61 $db
     or   A, $17                                        ;; 00:0cb0 $f6 $17
     ld   L, A                                          ;; 00:0cb2 $6f
     ld   A, [HL]                                       ;; 00:0cb3 $7e
     call call_00_0f25_AltSwitchBank                                  ;; 00:0cb4 $cd $25 $0f
-    ld   H, $d8                                        ;; 00:0cb7 $26 $d8
+    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:0cb7 $26 $d8
     ld   A, [wDB61_ActiveObjectSlot]                                    ;; 00:0cb9 $fa $61 $db
     or   A, OBJECT_UNK05_OFFSET                                        ;; 00:0cbc $f6 $05
     ld   L, A                                          ;; 00:0cbe $6f

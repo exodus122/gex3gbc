@@ -38,7 +38,7 @@ entry_03_59b6_LookupObjectPropertyFromType:
 ; Likely retrieves a behavior or sprite index based on some game state or object slot.
     ld   HL, wDB61_ActiveObjectSlot                                     ;; 03:59b6 $21 $61 $db
     ld   L, [HL]                                       ;; 03:59b9 $6e
-    ld   H, $d8                                        ;; 03:59ba $26 $d8
+    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:59ba $26 $d8
     ld   L, [HL]                                       ;; 03:59bc $6e
     ld   H, $00                                        ;; 03:59bd $26 $00
     add  HL, HL                                        ;; 03:59bf $29
@@ -54,7 +54,7 @@ entry_03_59c6_IsObjectFlaggedHighBit:
 ; masks bit 7 ($80), and returns it. Used as a quick “is flagged?” test for the object (e.g., active/inactive, hidden).
     ld   HL, wDA00_CurrentObjectAddrLo                                     ;; 03:59c6 $21 $00 $da
     ld   L, [HL]                                       ;; 03:59c9 $6e
-    ld   H, $d8                                        ;; 03:59ca $26 $d8
+    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:59ca $26 $d8
     ld   L, [HL]                                       ;; 03:59cc $6e
     ld   H, $00                                        ;; 03:59cd $26 $00
     add  HL, HL                                        ;; 03:59cf $29
@@ -71,7 +71,7 @@ call_03_59d8_IsObjectRenderableFlag:
 ; another state flag such as “should render” or “has sprite.”
     ld   HL, wDA00_CurrentObjectAddrLo                                     ;; 03:59d8 $21 $00 $da
     ld   L, [HL]                                       ;; 03:59db $6e
-    ld   H, $d8                                        ;; 03:59dc $26 $d8
+    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:59dc $26 $d8
     ld   L, [HL]                                       ;; 03:59de $6e
     ld   H, $00                                        ;; 03:59df $26 $00
     add  HL, HL                                        ;; 03:59e1 $29
@@ -266,7 +266,7 @@ entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 03:5eda $ea $00 $da
     or   A, OBJECT_ID_OFFSET                                        ;; 03:5edd $f6 $00
     ld   L, A                                          ;; 03:5edf $6f
-    ld   H, $d8                                        ;; 03:5ee0 $26 $d8
+    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:5ee0 $26 $d8
     ld   A, [HL]                                       ;; 03:5ee2 $7e
     cp   A, $ff                                        ;; 03:5ee3 $fe $ff
     jr   Z, .jr_03_5eed                                ;; 03:5ee5 $28 $06
@@ -284,7 +284,7 @@ entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 03:5efd $ea $00 $da
     or   A, OBJECT_ID_OFFSET                                        ;; 03:5f00 $f6 $00
     ld   L, A                                          ;; 03:5f02 $6f
-    ld   H, $d8                                        ;; 03:5f03 $26 $d8
+    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:5f03 $26 $d8
     ld   A, [HL]                                       ;; 03:5f05 $7e
     cp   A, $ff                                        ;; 03:5f06 $fe $ff
     jr   Z, .jr_03_5f10                                ;; 03:5f08 $28 $06
@@ -302,7 +302,7 @@ entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 03:5f1f $ea $00 $da
     or   A, OBJECT_ID_OFFSET                                        ;; 03:5f22 $f6 $00
     ld   L, A                                          ;; 03:5f24 $6f
-    ld   H, $d8                                        ;; 03:5f25 $26 $d8
+    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:5f25 $26 $d8
     ld   A, [HL]                                       ;; 03:5f27 $7e
     cp   A, $ff                                        ;; 03:5f28 $fe $ff
     call NZ, call_03_4c38_UpdateObjectCollision_Dispatch                              ;; 03:5f2a $c4 $38 $4c
@@ -312,7 +312,7 @@ entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     ret                                                ;; 03:5f34 $c9
 .jr_03_5f35:
     ld   HL, wDC44                                     ;; 03:5f35 $21 $44 $dc
-    ld   D, $d8                                        ;; 03:5f38 $16 $d8
+    ld   D, HIGH(wD800_ObjectMemory)                                        ;; 03:5f38 $16 $d8
     ld   B, $00                                        ;; 03:5f3a $06 $00
     ld   A, $00                                        ;; 03:5f3c $3e $00
 .jr_03_5f3e:
@@ -340,7 +340,7 @@ entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     xor  A, A                                          ;; 03:5f5d $af
     ld   [wDC4C], A                                    ;; 03:5f5e $ea $4c $dc
     ld   HL, wDC44                                     ;; 03:5f61 $21 $44 $dc
-    ld   D, $d8                                        ;; 03:5f64 $16 $d8
+    ld   D, HIGH(wD800_ObjectMemory)                                        ;; 03:5f64 $16 $d8
     push BC                                            ;; 03:5f66 $c5
 .jr_03_5f67:
     push HL                                            ;; 03:5f67 $e5
@@ -391,7 +391,7 @@ entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     jr   Z, .jr_03_5fb2                                ;; 03:5fa3 $28 $0d
     or   A, OBJECT_ID_OFFSET                                        ;; 03:5fa5 $f6 $00
     ld   L, A                                          ;; 03:5fa7 $6f
-    ld   H, $d8                                        ;; 03:5fa8 $26 $d8
+    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:5fa8 $26 $d8
     ld   A, [HL]                                       ;; 03:5faa $7e
     cp   A, $ff                                        ;; 03:5fab $fe $ff
     call NZ, call_03_5fc2_SetupObjectSprite                              ;; 03:5fad $c4 $c2 $5f
@@ -428,14 +428,14 @@ call_03_5fc2_SetupObjectSprite:
     ld   DE, wDAAE_ObjectPaletteIds                                     ;; 03:5fcd $11 $ae $da
     add  HL, DE                                        ;; 03:5fd0 $19
     ld   E, [HL]                                       ;; 03:5fd1 $5e
-    ld   H, $d8                                        ;; 03:5fd2 $26 $d8
+    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:5fd2 $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5fd4 $fa $00 $da
     or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 03:5fd7 $f6 $0d
     ld   L, A                                          ;; 03:5fd9 $6f
     ld   A, [HL]                                       ;; 03:5fda $7e
     or   A, E                                          ;; 03:5fdb $b3
     ld   [wDAB6_SpriteFlags], A                                    ;; 03:5fdc $ea $b6 $da
-    ld   D, $d8                                        ;; 03:5fdf $16 $d8
+    ld   D, HIGH(wD800_ObjectMemory)                                        ;; 03:5fdf $16 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5fe1 $fa $00 $da
     or   A, OBJECT_XPOS_OFFSET                                        ;; 03:5fe4 $f6 $0e
     ld   E, A                                          ;; 03:5fe6 $5f
@@ -501,7 +501,7 @@ call_03_5fc2_SetupObjectSprite:
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:603e $fa $00 $da
     or   A, OBJECT_UNK15_OFFSET                                        ;; 03:6041 $f6 $15
     ld   L, A                                          ;; 03:6043 $6f
-    ld   H, $d8                                        ;; 03:6044 $26 $d8
+    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:6044 $26 $d8
     ld   A, [HL]                                       ;; 03:6046 $7e
     and  A, A                                          ;; 03:6047 $a7
     jr   Z, .jr_03_6050                                ;; 03:6048 $28 $06
@@ -542,7 +542,7 @@ call_03_5fc2_SetupObjectSprite:
     and  A, $70                                        ;; 03:6081 $e6 $70
 .jr_03_6083:
     ld   [wDC70], A                                    ;; 03:6083 $ea $70 $dc
-    ld   H, $d8                                        ;; 03:6086 $26 $d8
+    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:6086 $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:6088 $fa $00 $da
     or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 03:608b $f6 $0d
     ld   L, A                                          ;; 03:608d $6f

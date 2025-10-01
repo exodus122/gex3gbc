@@ -53,7 +53,7 @@ label588C:
     jr   nz,label589E
     ld   bc,$FFFF
 label589E:
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
     ld   l,a
@@ -101,7 +101,7 @@ label58EA:
     jr   nz,label58FC
     ld   bc,$FFFF
 label58FC:
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YPOS_OFFSET
     ld   l,a
@@ -131,7 +131,7 @@ call_02_5918:
     ld   c,l
     ld   b,h
     call call_00_2835_Object_GetInitialXPos
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
     ld   l,a
@@ -144,7 +144,7 @@ call_02_5918:
     ld   [hl],a
     inc  bc
     call call_00_27f3_Object_GetInitialYPos
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YPOS_OFFSET
     ld   l,a
@@ -389,7 +389,7 @@ call_02_5af8_ObjectAction_TVRemote_unk4:
     ld   HL, .data_02_5b7e                             ;; 02:5b45 $21 $7e $5b
     add  HL, BC                                        ;; 02:5b48 $09
     ld   C, [HL]                                       ;; 02:5b49 $4e
-    ld   H, $d8                                        ;; 02:5b4a $26 $d8
+    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:5b4a $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:5b4c $fa $00 $da
     or   A, OBJECT_UNK0A_OFFSET                                        ;; 02:5b4f $f6 $0a
     ld   L, A                                          ;; 02:5b51 $6f
@@ -440,7 +440,7 @@ call_02_5b9a_ObjectAction_UpdateGoalCounter:
 
 entry_02_5bb3_ObjectAction_UpdateBonusStageTimer:
 call_02_5bb3_ObjectAction_UpdateBonusStageTimer:
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
     ld   l,a
@@ -601,7 +601,7 @@ label5CF0:
     call call_00_2a5d_ObjectCheckFlag2
     ret  z
     ld   c,$03
-    call call_00_21ef_PlaySound_1E
+    call call_00_21ef_PlayRemoteSpawnSFX
     jp   call_00_2b7a_ClearObjectThenJump
 
 call_02_5d02_LoadEvilSantaPalette:
@@ -611,7 +611,7 @@ call_02_5d02_LoadEvilSantaPalette:
     db   $00, $00, $00, $00, $1f, $00, $ff, $7f        ;; 02:5d08 ........
 
 call_02_5d10_ObjectAction_EvilSantaProjectile_Init:
-    ld   H, $d8                                        ;; 02:5d10 $26 $d8
+    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:5d10 $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:5d12 $fa $00 $da
     or   A, OBJECT_XPOS_OFFSET                                        ;; 02:5d15 $f6 $0e
     ld   L, A                                          ;; 02:5d17 $6f
@@ -671,7 +671,7 @@ call_02_5d80_ObjectAction_EvilSantaProjectile_UpdateTrajectory:
     call call_00_24ee_Object_IntegrateYVelocity                                  ;; 02:5d83 $cd $ee $24
     call call_00_28d2_ObjectGetYVelocity                                  ;; 02:5d86 $cd $d2 $28
     ld   C, A                                          ;; 02:5d89 $4f
-    ld   H, $d8                                        ;; 02:5d8a $26 $d8
+    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:5d8a $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:5d8c $fa $00 $da
     or   A, OBJECT_YPOS_OFFSET                                        ;; 02:5d8f $f6 $10
     ld   L, A                                          ;; 02:5d91 $6f
@@ -964,7 +964,7 @@ call_02_5F9B:
     add  hl,hl
     ld   de,.data_02_5fc7
     add  hl,de
-    ld   d,$D8
+    ld   d, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
     ld   e,a
@@ -1091,7 +1091,7 @@ call_02_616f_ObjectAction_Hand_Unk3:
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   c,$10
     call call_00_28dc_ObjectSetYVelocity
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
     ld   l,a
@@ -1111,7 +1111,7 @@ call_02_616f_ObjectAction_Hand_Unk3:
     cp   a,$18
     jr   nc,.label61A1
     ld   a,$01
-    ld   [wDCDC],a
+    ld   [wDCDC_HandObjectUnkFlag],a
 .label61A1:
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_ResetYIfAboveStart
@@ -1225,7 +1225,7 @@ call_02_624e_ObjectAction_Raft_MoveRightAndCarryPlayer:
     ld   bc,$0001
     call call_00_24df_Object_UpdateXPosition
     call call_00_26c9_Object_InfluencePlayerX
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
     ld   l,a
@@ -1390,9 +1390,9 @@ call_02_63a8_ObjectAction_BreakableBlock_Unk0:
     call call_00_29f5_ObjectClearActiveFlagAndCheck
     jr   z,.label63B1
     xor  a
-    ld   [wDCDC],a
+    ld   [wDCDC_HandObjectUnkFlag],a
 .label63B1:
-    ld   hl,wDCDC
+    ld   hl,wDCDC_HandObjectUnkFlag
     bit  0,[hl]
     ret  z
     ld   [hl],$00
@@ -1946,7 +1946,7 @@ call_02_67c2_ObjectAction_Elevator_Update:
     add  hl,hl
     ld   de,wDCE2
     add  hl,de
-    ld   d,$D8
+    ld   d, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YPOS_OFFSET
     ld   e,a
@@ -1968,7 +1968,7 @@ call_02_67c2_ObjectAction_Elevator_Update:
     ldi  a,[hl]
     cp   c
     jr   nz,.label6805
-    ld   d,$D8
+    ld   d, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
     ld   e,a
@@ -2009,7 +2009,7 @@ call_02_67c2_ObjectAction_Elevator_Update:
     add  hl,hl
     ld   de,wDCE2
     add  hl,de
-    ld   d,$D8
+    ld   d, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YPOS_OFFSET
     ld   e,a
@@ -2033,7 +2033,7 @@ call_02_67c2_ObjectAction_Elevator_Update:
     ld   hl,wD801_PlayerObject_ActionId
     cp   [hl]
     jp   nz,entry_02_54f9_SwitchPlayerAction
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
     ld   l,a
@@ -2055,7 +2055,7 @@ call_02_67c2_ObjectAction_Elevator_Update:
     
 call_02_688E:
     ld   hl,.data_02_68A9
-    ld   d,$D8
+    ld   d, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
     ld   e,a
@@ -2166,7 +2166,7 @@ call_02_6965_ObjectAction_MadBomber_Unk5:
     call call_00_2a5d_ObjectCheckFlag2
     ret  z
     ld   c,$01
-    call call_00_21ef_PlaySound_1E
+    call call_00_21ef_PlayRemoteSpawnSFX
     jp   call_00_2b7a_ClearObjectThenJump
 
 call_02_6971_ObjectAction_Bomb_Unk0:
@@ -2187,7 +2187,7 @@ call_02_697e:
     add  hl,hl
     ld   de,.data_02_699f
     add  hl,de
-    ld   d,$D8
+    ld   d, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
     ld   e,a
@@ -2225,7 +2225,7 @@ call_02_69af_ObjectAction_Bomb_Unk1:
 .label69CB:
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     ld   de,$0068
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YPOS_OFFSET
     ld   l,a
@@ -2262,7 +2262,7 @@ call_02_6a04_ObjectAction_Bomb_Unk2:
 call_02_6a13_ObjectAction_Bomb_Unk3:
     call call_00_29f5_ObjectClearActiveFlagAndCheck
     jr   z,.label6A38
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
     ld   l,a
@@ -2303,7 +2303,7 @@ call_02_6a4c_ObjectAction_Bomb_Unk4:
     ld   a,c
     cp   a,$04
     ret  nc
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
     ld   l,a
@@ -2650,7 +2650,7 @@ call_02_6cdd_ObjectAction_BirdProjectile_Update:
     ld   a,[hl]
     adc  d
     ld   d,a
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YPOS_OFFSET
     ld   l,a
@@ -2785,7 +2785,7 @@ call_02_6ddd_ObjectAction_BrainOfOz_Unk5:
 call_02_6dee_ObjectAction_BrainOfOz_Unk7:
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     ld   de,$0068
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YPOS_OFFSET
     ld   l,a
@@ -2851,7 +2851,7 @@ call_02_6e44_ObjectAction_BrainOfOzProjectile_Update:
     call call_00_24c0_Object_IntegrateXVelocity
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     ld   de,$0088
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YPOS_OFFSET
     ld   l,a
@@ -2867,7 +2867,7 @@ call_02_6e88_ObjectAction_Cannon_Unk0:
     bit  0,[hl]
     ret  z
     ld   [hl],$00
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
     ld   l,a
@@ -2915,7 +2915,7 @@ call_02_6ec7_ObjectAction_CannonProjectile_Update:
     bit  7,[hl]
     ret  z
     ld   de,$0038
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YPOS_OFFSET
     ld   l,a
@@ -3061,7 +3061,7 @@ call_02_6FD3:
     ld   [hl],a
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     ld   de,$0024
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YPOS_OFFSET
     ld   l,a
@@ -3082,7 +3082,7 @@ call_02_6FD3:
 call_02_7002:
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     ld   de,isrSerial
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YPOS_OFFSET
     ld   l,a
@@ -3143,7 +3143,7 @@ call_02_702e_ObjectAction_RezProjectile_Update:
     bit  7,a
     ret  z
     ld   de,$0070
-    ld   h,$D8
+    ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YPOS_OFFSET
     ld   l,a

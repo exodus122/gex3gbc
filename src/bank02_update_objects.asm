@@ -178,7 +178,7 @@ call_02_7152_UpdateObjects:
     ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 02:71af $ea $00 $da
     or   A, $02                                        ;; 02:71b2 $f6 $02
     ld   L, A                                          ;; 02:71b4 $6f
-    ld   H, $d8                                        ;; 02:71b5 $26 $d8
+    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:71b5 $26 $d8
     ld   A, [HL+]                                      ;; 02:71b7 $2a
     ld   H, [HL]                                       ;; 02:71b8 $66
     ld   L, A                                          ;; 02:71b9 $6f
@@ -186,7 +186,7 @@ call_02_7152_UpdateObjects:
     ld   A, [wDC7B]                                    ;; 02:71bd $fa $7b $dc
     and  A, A                                          ;; 02:71c0 $a7
     jr   Z, .jr_02_71e4                                ;; 02:71c1 $28 $21
-    ld   H, $d8                                        ;; 02:71c3 $26 $d8
+    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:71c3 $26 $d8
     ld   A, [wDC7B]                                    ;; 02:71c5 $fa $7b $dc
     and  A, $e0                                        ;; 02:71c8 $e6 $e0
     or   A, $10                                        ;; 02:71ca $f6 $10
@@ -213,7 +213,7 @@ call_02_7152_UpdateObjects:
     ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 02:71ea $ea $00 $da
     or   A, $02                                        ;; 02:71ed $f6 $02
     ld   L, A                                          ;; 02:71ef $6f
-    ld   H, $d8                                        ;; 02:71f0 $26 $d8
+    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:71f0 $26 $d8
     ld   A, [HL+]                                      ;; 02:71f2 $2a
     ld   H, [HL]                                       ;; 02:71f3 $66
     ld   L, A                                          ;; 02:71f4 $6f
@@ -229,7 +229,7 @@ call_02_7152_UpdateObjects:
     ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 02:7205 $ea $00 $da
     or   A, $00                                        ;; 02:7208 $f6 $00
     ld   L, A                                          ;; 02:720a $6f
-    ld   H, $d8                                        ;; 02:720b $26 $d8
+    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:720b $26 $d8
     ld   A, [HL]                                       ;; 02:720d $7e
     cp   A, $ff                                        ;; 02:720e $fe $ff
     jr   Z, .jr_02_723a                                ;; 02:7210 $28 $28
@@ -242,13 +242,13 @@ call_02_7152_UpdateObjects:
     jr   Z, .jr_02_722c                                ;; 02:721f $28 $0b
     or   A, $02                                        ;; 02:7221 $f6 $02
     ld   L, A                                          ;; 02:7223 $6f
-    ld   H, $d8                                        ;; 02:7224 $26 $d8
+    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:7224 $26 $d8
     ld   A, [HL+]                                      ;; 02:7226 $2a
     ld   H, [HL]                                       ;; 02:7227 $66
     ld   L, A                                          ;; 02:7228 $6f
     call call_00_0f22_JumpHL                                  ;; 02:7229 $cd $22 $0f
 .jr_02_722c:
-    ld   H, $d8                                        ;; 02:722c $26 $d8
+    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:722c $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:722e $fa $00 $da
     or   A, OBJECT_ID_OFFSET                                        ;; 02:7231 $f6 $00
     ld   L, A                                          ;; 02:7233 $6f
@@ -271,7 +271,7 @@ call_02_724d_ProcessObjectTimerAndState:
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:724d $fa $00 $da
     or   A, OBJECT_FLAGS_OFFSET                                        ;; 02:7250 $f6 $04
     ld   L, A                                          ;; 02:7252 $6f
-    ld   H, $d8                                        ;; 02:7253 $26 $d8
+    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:7253 $26 $d8
     ld   E, [HL]                                       ;; 02:7255 $5e
     inc  L                                             ;; 02:7256 $2c
     res  2, [HL]                                       ;; 02:7257 $cb $96
@@ -355,7 +355,7 @@ call_02_72ac_SetupNewAction:
     ld   HL, wDA00_CurrentObjectAddrLo                   ;; 02:72ae $21 $00 $da
     ld   L, [HL]                                       ;; 02:72b1 $6e
     inc  L                                             ;; 02:72b2 $2c
-    ld   H, $d8                                        ;; 02:72b3 $26 $d8
+    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:72b3 $26 $d8
     ld   [HL-], A                                      ;; 02:72b5 $32 ; writes new action id to object instance
     ld   L, [HL]                                       ;; 02:72b6 $6e
     ld   H, $00                                        ;; 02:72b7 $26 $00
@@ -375,7 +375,7 @@ call_02_72ac_SetupNewAction:
     ld   A, [wDA00_CurrentObjectAddrLo]                  ;; 02:72c9 $fa $00 $da 
     or   A, OBJECT_ACTIONPTR_OFFSET                    ;; 02:72cc $f6 $02
     ld   L, A                                          ;; 02:72ce $6f
-    ld   H, $d8                                        ;; 02:72cf $26 $d8
+    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:72cf $26 $d8
     ld   A, [BC]                                       ;; 02:72d1 $0a
     ld   [HL+], A                                      ;; 02:72d2 $22
     inc  BC                                            ;; 02:72d3 $03
