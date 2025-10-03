@@ -185,7 +185,7 @@ call_03_687c_AssignObjectPalette:
 ; Usage: Ensures each on-screen object uses the correct colors.
     ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:687c $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:687e $fa $00 $da
-    or   A, OBJECT_UNK05_OFFSET                                        ;; 03:6881 $f6 $05
+    or   A, OBJECT_SPRITE_FLAGS_OFFSET                                        ;; 03:6881 $f6 $05
     ld   L, A                                          ;; 03:6883 $6f
     ld   C, $00                                        ;; 03:6884 $0e $00
     bit  7, [HL]                                       ;; 03:6886 $cb $7e

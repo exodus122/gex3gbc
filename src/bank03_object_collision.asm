@@ -8,10 +8,10 @@
 ; Special flags (wDCD2, wDC88) are level or event triggers.
 
 call_03_4c38_UpdateObjectCollision_Dispatch:
-; Main dispatcher: checks if collisions enabled (wDCA7).
+; Main dispatcher: checks if collisions enabled (wDCA7_DrawGexFlag).
 ; Reads per-object collision type/index, decrements a cooldown if nonzero.
 ; Uses jump table .data_03_4c63_ObjectCollisionJumpTable to call the right handler.
-    ld   A, [wDCA7]                                    ;; 03:4c38 $fa $a7 $dc
+    ld   A, [wDCA7_DrawGexFlag]                                    ;; 03:4c38 $fa $a7 $dc
     and  A, A                                          ;; 03:4c3b $a7
     ret  Z                                             ;; 03:4c3c $c8
     ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:4c3d $26 $d8
@@ -298,7 +298,7 @@ call_03_4e04_Collision_PlayerHit_TriggerPhaseChange:
 ; Looks like a pickup that triggers a phase/state change.
     call call_03_550e_CheckPlayerObjectInteraction
     ret  nc
-    call call_00_293a_ObjectGetId
+    call call_00_293a_Object_GetId
     sub  a,04
     ld   l,a
     ld   h,00
@@ -323,7 +323,7 @@ call_03_4e04_Collision_PlayerHit_TriggerPhaseChange:
 call_03_4e31_Collision_PlayerHit_SetObjectState:
 ; If object action ID==0 and collision detected with A==01: plays sound 03, 
 ; handles respawn, then sets object status low nibble to 02.
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$00
     ret  nz
     call call_03_550e_CheckPlayerObjectInteraction
@@ -344,7 +344,7 @@ call_03_4e4b_Collision_PlayerHit_MultiStageCollectible:
 ; When wDCC3==5, triggers PlaySound_1E.
 ; Then dispatches new offset action.
 ; Basically a multi-stage collectible or progress item (like 5 items → trigger special event).
-    call call_00_2962_ObjectGetActionId                                  ;; 03:4e4b $cd $62 $29
+    call call_00_2962_Object_GetActionId                                  ;; 03:4e4b $cd $62 $29
     cp   A, $02                                        ;; 03:4e4e $fe $02
     ret  NC                                            ;; 03:4e50 $d0
     call call_03_550e_CheckPlayerObjectInteraction                                  ;; 03:4e51 $cd $0e $55
@@ -353,7 +353,7 @@ call_03_4e4b_Collision_PlayerHit_MultiStageCollectible:
     ret  NZ                                            ;; 03:4e57 $c0
     ld   A, $19                                        ;; 03:4e58 $3e $19
     call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 03:4e5a $cd $f5 $0f
-    call call_00_2962_ObjectGetActionId                                  ;; 03:4e5d $cd $62 $29
+    call call_00_2962_Object_GetActionId                                  ;; 03:4e5d $cd $62 $29
     inc  A                                             ;; 03:4e60 $3c
     push AF                                            ;; 03:4e61 $f5
     push AF                                            ;; 03:4e62 $f5
@@ -380,17 +380,17 @@ call_03_4e89_Collision_ObjectStateOrTransform:
 ;   .data_03_4efa (a table of progression values), writes it to object state.
 ; If collision A!=01:
 ; - Loads new object data from bank 6, then triggers a player action change.
-    call call_00_28d2_ObjectGetYVelocity                                  ;; 03:4e89 $cd $d2 $28
+    call call_00_28d2_Object_GetYVelocity                                  ;; 03:4e89 $cd $d2 $28
     bit  7, A                                          ;; 03:4e8c $cb $7f
     ret  NZ                                            ;; 03:4e8e $c0
-    call call_00_2962_ObjectGetActionId                                  ;; 03:4e8f $cd $62 $29
+    call call_00_2962_Object_GetActionId                                  ;; 03:4e8f $cd $62 $29
     cp   A, $05                                        ;; 03:4e92 $fe $05
     ret  NC                                            ;; 03:4e94 $d0
     call call_03_550e_CheckPlayerObjectInteraction                                  ;; 03:4e95 $cd $0e $55
     ret  NC                                            ;; 03:4e98 $d0
     cp   A, $01                                        ;; 03:4e99 $fe $01
     jr   NZ, .jr_03_4eea                               ;; 03:4e9b $20 $4d
-    call call_00_28d2_ObjectGetYVelocity                                  ;; 03:4e9d $cd $d2 $28
+    call call_00_28d2_Object_GetYVelocity                                  ;; 03:4e9d $cd $d2 $28
     cpl                                                ;; 03:4ea0 $2f
     inc  A                                             ;; 03:4ea1 $3c
     ld   [HL], A                                       ;; 03:4ea2 $77
@@ -443,7 +443,7 @@ call_03_4e89_Collision_ObjectStateOrTransform:
     inc  A                                             ;; 03:4ee4 $3c
 .jr_03_4ee5:
     ld   C, A                                          ;; 03:4ee5 $4f
-    call call_00_28c8_ObjectSetXVelocity                                  ;; 03:4ee6 $cd $c8 $28
+    call call_00_28c8_Object_SetXVelocity                                  ;; 03:4ee6 $cd $c8 $28
     ret                                                ;; 03:4ee9 $c9
 .jr_03_4eea:
     ld   A, $06                                        ;; 03:4eea $3e $06
@@ -497,7 +497,7 @@ call_03_4f60_Collision_TripleCollectible_Counter:
 ; - Handles hit/respawn, plays sound 19, sets object status, increments wDCC5.
 ; - When wDCC5==3, plays sound 1E.
 ; - Dispatches offset action.
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$00
     ret  nz
     call call_03_550e_CheckPlayerObjectInteraction
@@ -535,7 +535,7 @@ call_03_4f98_Collision_ObjectActivateIfAction5:
     cp   a,$01
     jp   nz,call_03_4cea_TriggerPlayerActionChange
     call entry_03_5671_HandleObjectHitOrRespawn
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$05
     jp   z,call_00_22ef_SetObjectSlotActive
     ret  
@@ -546,7 +546,7 @@ call_03_4fad_Collision_TransformIfIdle:
     ret  nc
     cp   a,$01
     jp   nz,call_03_4cea_TriggerPlayerActionChange
-    call call_00_2995_ObjectGetActionId
+    call call_00_2995_Object_GetActionId
     cp   a,$00
     ret  nz
     ld   a,$01
@@ -559,7 +559,7 @@ call_03_4fca_Collision_TripleCollectible_TypeB:
 ; Handle hit/respawn, set status nibble 04, increment wDCC6.
 ; On 3rd collected, play sound 1E.
 ; Dispatch offset action.
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$00
     ret  nz
     call call_03_550e_CheckPlayerObjectInteraction
@@ -600,7 +600,7 @@ call_03_4ff1_Collision_TripleCollectible_TypeC:
 call_03_500d_Collision_IdleToLoadedTransform:
 ; For action 00 only.
 ; On collision A==01: transforms object via bank 1 loader.
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$00
     ret  nz
     call call_03_550e_CheckPlayerObjectInteraction
@@ -626,16 +626,16 @@ call_03_5028_Collision_ConditionalTransformByDistance:
     inc  hl
     or   [hl]
     jr   z,label5044
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$05
     call c,entry_03_5671_HandleObjectHitOrRespawn
     jr   label504C
 label5044:
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$05
     call z,call_03_4cea_TriggerPlayerActionChange
 label504C:
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$04
     ret  nc
     call call_00_2a68_Object_ComputePlayerXProximity
@@ -676,7 +676,7 @@ call_03_5085_Collision_TransformOrRespawnSwitch:
     ret  nc
     cp   a,$01
     jp   nz,call_03_4cea_TriggerPlayerActionChange
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$02
     jr   z,label50A8
     cp   a,$01
@@ -695,7 +695,7 @@ call_03_50b6_Collision_TripleCollectible_WithSlot:
 ; - Handle hit/respawn, mark slot active, set status, increment wDCC9.
 ; - On 3rd collected, play sound 1E.
 ; - Dispatch offset action.
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$00
     ret  nz
     call call_03_550e_CheckPlayerObjectInteraction
@@ -734,7 +734,7 @@ call_03_50ea_Collision_ClearSlot:
 call_03_50f4_Collision_SlotIncrementTransform:
 ; For action 00 only.
 ; On collision A==01: sets object status, loads new data (bank 1), increments object slot.
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$00
     ret  nz
     call call_03_550e_CheckPlayerObjectInteraction
@@ -752,7 +752,7 @@ call_03_5116_Collision_ConditionalTransform_Sound18or1B:
 ; On collision: requires certain global flags (wDABE_UnkBGCollisionFlags2, wDC81_CurrentInputs) and player action between 01–02.
 ; Checks object slot flag; plays sound 1B if not set, else sound 18.
 ; Loads new object data (bank 1).
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$00
     ret  nz
     call call_03_550e_CheckPlayerObjectInteraction
@@ -783,7 +783,7 @@ label5143:
 
 call_03_5156_Collision_ConditionalTransform_Bank3:
 ; Same as above, but for action 02, and loads bank 3 data.
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$02
     ret  nz
     call call_03_550e_CheckPlayerObjectInteraction
@@ -821,7 +821,7 @@ call_03_5196_Collision_RespawnOrActivateSlot:
     cp   a,$01
     jp   nz,call_03_4cea_TriggerPlayerActionChange
     call entry_03_5671_HandleObjectHitOrRespawn
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$00
     jp   nz,call_00_22ef_SetObjectSlotActive
     ld   a,$02
@@ -838,11 +838,11 @@ call_03_51b8_Collision_TransformOrSlotBurst:
     ret  nc
     cp   a,$01
     jp   nz,call_03_4cea_TriggerPlayerActionChange
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$02
     jr   z,label51E3
     call entry_03_5671_HandleObjectHitOrRespawn
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$02
     ld   c,$02
     jp   z,call_00_2299_SetObjectStatusLowNibble
@@ -854,7 +854,7 @@ label51E3:
     ld   c,$00
     call call_00_288c_Object_Set14
     ld   c,$00
-    call call_00_2958_ObjectSetFacingDirection
+    call call_00_2958_Object_SetFacingDirection
     call call_00_2c67_Particle_InitBurst
     ld   a,$07
     farcall entry_02_72ac_SetupNewAction
@@ -864,7 +864,7 @@ call_03_5201_Collision_TransformOrSlotSet:
 ; Skips if action ID = 3.
 ; If player collides and interaction = 1 → handle hit/respawn, then if action = 3 → set slot active.
 ; If interaction ≠ 1 → trigger player action change, load new object data (bank 2), face player left.
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$03
     ret  z
     call call_03_550e_CheckPlayerObjectInteraction
@@ -878,7 +878,7 @@ call_03_5201_Collision_TransformOrSlotSet:
 label5222:
     call call_00_2410_Object_SetFacingRelativeToPlayer
     call entry_03_5671_HandleObjectHitOrRespawn
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$03
     jp   z,call_00_22ef_SetObjectSlotActive
     ret  
@@ -901,7 +901,7 @@ call_03_5231_Collision_Counter4_LevelGate:
     or   [hl]
     ret  z
     call entry_03_5671_HandleObjectHitOrRespawn
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$01
     ret  nz
     call call_00_22e0_IncrementObjectSlot
@@ -933,7 +933,7 @@ call_03_5274_Collision_ClearSlot_OnType2:
     cp   a,$02
     ret  nz
     call entry_03_5671_HandleObjectHitOrRespawn
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$01
     ret  nz
     ld   c,$02
@@ -998,7 +998,7 @@ call_03_52da_Collision_RespawnOrTransform:
     cp   a,$01
     jp   nz,call_03_4cea_TriggerPlayerActionChange
     call entry_03_5671_HandleObjectHitOrRespawn
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$03
     ret  z
     ld   a,$02
@@ -1008,7 +1008,7 @@ call_03_52da_Collision_RespawnOrTransform:
 call_03_52fa_Collision_ActionSwitchOrTransform:
 ; If object is action=4 → special hit handler.
 ; If action=2 and collision=1 → load new data (bank 3).
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$04
     jp   z,call_03_4ce1_Collision_PlayerHit_ActionSwitch
     cp   a,$02
@@ -1044,7 +1044,7 @@ call_03_532f_Collision_DecrementCounterBank4:
 ; - Decrements object counter wDCD5.
 ; - If zero → clear object, increment wDCC8, dispatch action.
 ; - If all counters = 0 → set wDCD2=1 (event flag).
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$04
     ret  nc
     call call_03_550e_CheckPlayerObjectInteraction
@@ -1104,7 +1104,7 @@ call_03_538e_Collision_HeptCollectibleToBank1:
     ret  nc
     cp   a,$01
     ret  nz
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$00
     jr   nz,label53B0
     ld   hl,wDCCC
@@ -1126,7 +1126,7 @@ call_03_53c2_Collision_TransformIfFlagClear:
 ; For actions < 5.
 ; If action=3: only transform if wDC88=0.
 ; Else, collision (interaction=1) → handle hit/respawn.
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$05
     ret  nc
     cp   a,$03
@@ -1147,7 +1147,7 @@ label53D6:
 call_03_53eb_Collision_Action2Transform:
 ; For action=2 only.
 ; On collision (interaction=1): loads new data (bank 3).
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$02
     ret  nz
     call call_03_550e_CheckPlayerObjectInteraction
@@ -1164,7 +1164,7 @@ call_03_5406_Collision_ProximityTransform_Bank6:
 ; - Handle hit/respawn.
 ; - If action≠7 → transform to bank 6.
     call call_03_4ce1_Collision_PlayerHit_ActionSwitch
-    call call_00_2995_ObjectGetActionId
+    call call_00_2995_Object_GetActionId
     cp   a,$06
     ret  nc
     ld   c,$68
@@ -1219,7 +1219,7 @@ call_03_5406_Collision_ProximityTransform_Bank6:
     cp   a,$18
     ret  nc
     call entry_03_5671_HandleObjectHitOrRespawn
-    call call_00_2995_ObjectGetActionId
+    call call_00_2995_Object_GetActionId
     cp   a,$07
     ret  z
     ld   a,$06
@@ -1239,7 +1239,7 @@ call_03_5473_Collision_SetEvent81:
     ret  NC                                            ;; 03:5476 $d0
     cp   A, $01                                        ;; 03:5477 $fe $01
     ret  NZ                                            ;; 03:5479 $c0
-    call call_00_2962_ObjectGetActionId                                  ;; 03:547a $cd $62 $29
+    call call_00_2962_Object_GetActionId                                  ;; 03:547a $cd $62 $29
     ld   A, $81                                        ;; 03:547d $3e $81
     ld   [wDCD2], A                                    ;; 03:547f $ea $d2 $dc
     ret                                                ;; 03:5482 $c9
@@ -1252,7 +1252,7 @@ call_03_5483_Collision_YMapTransform:
     ret  nc
     cp   a,$00
     ret  nz
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     cp   a,$00
     jr   z,.jr_03_5497
     cp   a,$01
@@ -1268,9 +1268,9 @@ call_03_54a8_Collision_PropertyBasedTransform:
 ; For actions < 3.
 ; - On collision (interaction=1):
 ; - Handle hit/respawn, zero out byte at offset 15.
-; - Get object property, decide a bank (03/06/09/0C → bank3 else → bank9).
-; - Transform via that bank.
-    call call_00_2995_ObjectGetActionId
+; - Get object property, decide an action (03/06/09/0C → action3 else → action9).
+; - Transform via that action.
+    call call_00_2995_Object_GetActionId
     cp   a,$03
     ret  nc
     call call_03_550e_CheckPlayerObjectInteraction
@@ -1283,21 +1283,21 @@ call_03_54a8_Collision_PropertyBasedTransform:
     or   a,OBJECT_UNK15_OFFSET
     ld   l,a
     ld   [hl],$00
-    call call_00_2995_ObjectGetActionId
+    call call_00_2995_Object_GetActionId
     cp   a,$0A
     ret  z
-    call call_00_28b4_ObjectGet16
+    call call_00_28b4_Object_Get16
     ld   c,$03
     cp   a,$03
-    jr   z,label54E1
+    jr   z,.label54E1
     cp   a,$06
-    jr   z,label54E1
+    jr   z,.label54E1
     cp   a,$09
-    jr   z,label54E1
+    jr   z,.label54E1
     cp   a,$0C
-    jr   z,label54E1
+    jr   z,.label54E1
     ld   c,$09
-label54E1:
+.label54E1:
     ld   a,c
     farcall entry_02_72ac_SetupNewAction
     ret  
@@ -1561,7 +1561,7 @@ call_03_5671_HandleObjectHitOrRespawn:
     ld   C, $00                                        ;; 03:5698 $0e $00
     call call_00_288c_Object_Set14                                  ;; 03:569a $cd $8c $28
     ld   C, $00                                        ;; 03:569d $0e $00
-    call call_00_2958_ObjectSetFacingDirection                                  ;; 03:569f $cd $58 $29
+    call call_00_2958_Object_SetFacingDirection                                  ;; 03:569f $cd $58 $29
     call call_00_2c67_Particle_InitBurst                                  ;; 03:56a2 $cd $67 $2c
     pop  AF                                            ;; 03:56a5 $f1
 .jr_03_56a6:

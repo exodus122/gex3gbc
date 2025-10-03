@@ -121,7 +121,7 @@ entry_02_7152_UpdateObjects:
 call_02_7152_UpdateObjects:
 ; Purpose: Master routine for per-frame object updates and player-related checks.
 ; Details:
-; Resets temporary flags and checks conditions in wDCA7.
+; Resets temporary flags and checks conditions in wDCA7_DrawGexFlag.
 ; Handles special cases for player actions/IDs, adjusts player Y-position (wD810/wD811).
 ; Invokes object behavior routines (call_00_0f22_JumpHL) for special objects (wDC7B, wDC7D).
 ; Calls call_02_72fb_UpdateMapWindow to update the scrolling window and environment.
@@ -132,7 +132,7 @@ call_02_7152_UpdateObjects:
     ld   [wDC84], A                                    ;; 02:7156 $ea $84 $dc
     ld   [wD900], A                                    ;; 02:7159 $ea $00 $d9
     ld   [wD904], A                                    ;; 02:715c $ea $04 $d9
-    ld   A, [wDCA7]                                    ;; 02:715f $fa $a7 $dc
+    ld   A, [wDCA7_DrawGexFlag]                                    ;; 02:715f $fa $a7 $dc
     and  A, A                                          ;; 02:7162 $a7
     jp   Z, .jp_02_7200                                ;; 02:7163 $ca $00 $72
     call call_02_5541_GetActionPropertyByte                                  ;; 02:7166 $cd $41 $55
@@ -254,7 +254,7 @@ call_02_7152_UpdateObjects:
     ld   L, A                                          ;; 02:7233 $6f
     ld   A, [HL]                                       ;; 02:7234 $7e
     cp   A, $ff                                        ;; 02:7235 $fe $ff
-    call NZ, call_02_724d_ProcessObjectTimerAndState                              ;; 02:7237 $c4 $4d $72
+    call NZ, call_02_724d_UpdateObjectAnimationTimersAndSpriteId                              ;; 02:7237 $c4 $4d $72
 .jr_02_723a:
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:723a $fa $00 $da
     add  A, $20                                        ;; 02:723d $c6 $20
@@ -262,37 +262,37 @@ call_02_7152_UpdateObjects:
     farcall entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision
     ret                                                ;; 02:724c $c9
 
-call_02_724d_ProcessObjectTimerAndState:
+call_02_724d_UpdateObjectAnimationTimersAndSpriteId:
 ; Purpose: Handles countdown timers, state flags, and transitions for an individual object slot.
 ; Details:
 ; Decrements a timer; when it reaches zero, reloads counters, updates flags (set 2, set 1), and fetches new data from tables.
 ; Can trigger reinitialization via call_02_54f9_SwitchPlayerAction or call_02_72ac_SetupNewAction.
 ; Updates related memory locations with new object state values.
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:724d $fa $00 $da
-    or   A, OBJECT_FLAGS_OFFSET                                        ;; 02:7250 $f6 $04
+    or   A, OBJECT_SPRITE_FLAGS2_OFFSET                                        ;; 02:7250 $f6 $04
     ld   L, A                                          ;; 02:7252 $6f
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:7253 $26 $d8
-    ld   E, [HL]                                       ;; 02:7255 $5e
+    ld   E, [HL]                                       ;; 02:7255 $5e ; e = flags (04)
     inc  L                                             ;; 02:7256 $2c
-    res  2, [HL]                                       ;; 02:7257 $cb $96
-    ld   B, [HL]                                       ;; 02:7259 $46
+    res  2, [HL]                                       ;; 02:7257 $cb $96 ; unset bit 2 in unk05
+    ld   B, [HL]                                       ;; 02:7259 $46 ; b = unk05
     inc  L                                             ;; 02:725a $2c
-    ld   C, [HL]                                       ;; 02:725b $4e
+    ld   C, [HL]                                       ;; 02:725b $4e ; c = unk06
     inc  L                                             ;; 02:725c $2c
-    ld   A, [HL]                                       ;; 02:725d $7e
+    ld   A, [HL]                                       ;; 02:725d $7e ; a = unk07
     cp   A, $ff                                        ;; 02:725e $fe $ff
-    ret  Z                                             ;; 02:7260 $c8
-    dec  [HL]                                          ;; 02:7261 $35
-    ret  NZ                                            ;; 02:7262 $c0
-    ld   [HL], C                                       ;; 02:7263 $71
+    ret  Z                                             ;; 02:7260 $c8 ; return if unk07 == ff
+    dec  [HL]                                          ;; 02:7261 $35 ; unk07 -= 1
+    ret  NZ                                            ;; 02:7262 $c0 ; return if unk07 != 0
+    ld   [HL], C                                       ;; 02:7263 $71 ; unk07 = unk06
     inc  L                                             ;; 02:7264 $2c
-    ld   A, [HL+]                                      ;; 02:7265 $2a
-    ld   C, A                                          ;; 02:7266 $4f
-    inc  [HL]                                          ;; 02:7267 $34
-    sub  A, [HL]                                       ;; 02:7268 $96
-    jr   NZ, .jr_02_7288                               ;; 02:7269 $20 $1d
-    bit  7, E                                          ;; 02:726b $cb $7b
-    jr   Z, .jr_02_727c                                ;; 02:726d $28 $0d
+    ld   A, [HL+]                                      ;; 02:7265 $2a ; a = unk08
+    ld   C, A                                          ;; 02:7266 $4f ; c = unk08
+    inc  [HL]                                          ;; 02:7267 $34 ; unk09 += 1
+    sub  A, [HL]                                       ;; 02:7268 $96 ; a -= unk09
+    jr   NZ, .jr_02_7288                               ;; 02:7269 $20 $1d ; jump if a != 0
+    bit  7, E                                          ;; 02:726b $cb $7b ; check if bit 7 of flags is set
+    jr   Z, .jr_02_727c                                ;; 02:726d $28 $0d ; if unset, jump
     res  7, E                                          ;; 02:726f $cb $bb
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:7271 $fa $00 $da
     and  A, A                                          ;; 02:7274 $a7
@@ -300,36 +300,36 @@ call_02_724d_ProcessObjectTimerAndState:
     jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:7276 $ca $f9 $54
     jp   call_02_72ac_SetupNewAction                                  ;; 02:7279 $c3 $ac $72
 .jr_02_727c:
-    bit  3, B                                          ;; 02:727c $cb $58
+    bit  3, B                                          ;; 02:727c $cb $58 ; check if bit 3 of unk05 is set
     jr   Z, .jr_02_7282                                ;; 02:727e $28 $02
     ld   A, C                                          ;; 02:7280 $79
-    dec  A                                             ;; 02:7281 $3d
+    dec  A                                             ;; 02:7281 $3d ; a (copy of unk08) -= 1
 .jr_02_7282:
-    ld   [HL-], A                                      ;; 02:7282 $32
+    ld   [HL-], A                                      ;; 02:7282 $32 ; unk09 -= 1
     dec  L                                             ;; 02:7283 $2d
     dec  L                                             ;; 02:7284 $2d
     dec  L                                             ;; 02:7285 $2d
-    set  2, [HL]                                       ;; 02:7286 $cb $d6
+    set  2, [HL]                                       ;; 02:7286 $cb $d6 ; set bit 2 (04) in unk05
 .jr_02_7288:
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:7288 $fa $00 $da
+    ld   A, [wDA00_CurrentObjectAddrLo]                ;; 02:7288 $fa $00 $da
     or   A, $05                                        ;; 02:728b $f6 $05
     ld   L, A                                          ;; 02:728d $6f
-    set  1, [HL]                                       ;; 02:728e $cb $ce
-    ld   A, L                                          ;; 02:7290 $7d
-    xor  A, $0c                                        ;; 02:7291 $ee $0c
+    set  1, [HL]                                       ;; 02:728e $cb $ce ; set bit 1 (02) in unk05
+    ld   A, L                                          ;; 02:7290 $7d ; a = ?5
+    xor  A, $0c                                        ;; 02:7291 $ee $0c ; a = ?9
     ld   L, A                                          ;; 02:7293 $6f
-    ld   E, [HL]                                       ;; 02:7294 $5e
-    ld   D, $00                                        ;; 02:7295 $16 $00
+    ld   E, [HL]                                       ;; 02:7294 $5e ; e = unk09
+    ld   D, $00                                        ;; 02:7295 $16 $00 ; de = 0000 + unk09
     inc  L                                             ;; 02:7297 $2c
-    push HL                                            ;; 02:7298 $e5
+    push HL                                            ;; 02:7298 $e5 ; push d8?a
     inc  L                                             ;; 02:7299 $2c
-    ld   A, [HL+]                                      ;; 02:729a $2a
+    ld   A, [HL+]                                      ;; 02:729a $2a ; a = unk0b (OBJECT_SPRITE_IDS_PTR_OFFSET)
     ld   H, [HL]                                       ;; 02:729b $66
-    ld   L, A                                          ;; 02:729c $6f
-    add  HL, DE                                        ;; 02:729d $19
-    ld   A, [HL]                                       ;; 02:729e $7e
-    pop  HL                                            ;; 02:729f $e1
-    ld   [HL], A                                       ;; 02:72a0 $77
+    ld   L, A                                          ;; 02:729c $6f ; hl = unk0b unk0c (OBJECT_SPRITE_IDS_PTR_OFFSET)
+    add  HL, DE                                        ;; 02:729d $19 ; hl = OBJECT_SPRITE_IDS_PTR_OFFSET + 0000 + unk09
+    ld   A, [HL]                                       ;; 02:729e $7e ; a = [hl]
+    pop  HL                                            ;; 02:729f $e1 ; pop d8?a
+    ld   [HL], A                                       ;; 02:72a0 $77 ; d8?a = a
 
 call_02_72a1_CheckIfPlayerActorUpdatedAction:
 ; Mark Object Slot Active

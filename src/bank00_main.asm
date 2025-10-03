@@ -236,7 +236,7 @@ call_00_0150_Init:
     farcall entry_03_6c89_LoadMapData
     ld   A, [wDC4F]                                    ;; 00:0331 $fa $4f $dc
     add  A, $04                                        ;; 00:0334 $c6 $04
-    ld   [wDC50], A                                    ;; 00:0336 $ea $50 $dc
+    ld   [wDC50_PlayerHealth], A                                    ;; 00:0336 $ea $50 $dc
     farcall entry_01_432b_SetLevelMenuAndPalette
     call call_00_0e3b_ClearGameStateVariables                                  ;; 00:0344 $cd $3b $0e
     call call_00_2f85_LoadAndSortCollectibleData                                  ;; 00:0347 $cd $85 $2f
@@ -257,7 +257,7 @@ call_00_0150_Init:
     ld   [wDC89], A                                    ;; 00:0375 $ea $89 $dc
     ld   A, [wDC4F]                                    ;; 00:0378 $fa $4f $dc
     add  A, $04                                        ;; 00:037b $c6 $04
-    ld   [wDC50], A                                    ;; 00:037d $ea $50 $dc
+    ld   [wDC50_PlayerHealth], A                                    ;; 00:037d $ea $50 $dc
     ld   A, $00                                        ;; 00:0380 $3e $00
     ld   [wDC78], A                                    ;; 00:0382 $ea $78 $dc
     call call_00_0e3b_ClearGameStateVariables                                  ;; 00:0385 $cd $3b $0e
@@ -308,7 +308,7 @@ call_00_0150_Init:
     xor  A, A                                          ;; 00:03eb $af
     ld   [wDC29], A                                    ;; 00:03ec $ea $29 $dc
     ld   A, $01                                        ;; 00:03ef $3e $01
-    ld   [wDCA7], A                                    ;; 00:03f1 $ea $a7 $dc
+    ld   [wDCA7_DrawGexFlag], A                                    ;; 00:03f1 $ea $a7 $dc
     call call_00_04fb                                  ;; 00:03f4 $cd $fb $04
     farcall entry_03_647c_InitPlayerPositionAndLevel
     call call_00_1056_LoadFullMap                                  ;; 00:0402 $cd $56 $10
@@ -595,7 +595,7 @@ label066C:
 label0682:
     ld   a,[wDC4F]
     add  a,$04
-    ld   hl,wDC50
+    ld   hl,wDC50_PlayerHealth
     cp   [hl]
     ret  z
     inc  [hl]
@@ -646,7 +646,7 @@ jp_00_06e8:
 call_00_06f6_HandleGenericHitResponse:
 ; Calls call_00_0759 (a check routine). If it fails, exits.
 ; If passes: sets timer wDC7E=3C, sets flag bit1 in wDB69, plays sound 0A.
-; Then manipulates wDC51 and wDC50 counters, decrementing until zero. If it hits 0, jumps to jp_00_0693.
+; Then manipulates wDC51 and wDC50_PlayerHealth counters, decrementing until zero. If it hits 0, jumps to jp_00_0693.
 ; This is a hit/interaction response handler with timers, sound, and state decrement.
     call call_00_0759                                  ;; 00:06f6 $cd $59 $07
     ret  NZ                                            ;; 00:06f9 $c0
@@ -663,12 +663,12 @@ call_00_06f6_HandleGenericHitResponse:
     ld   [HL], $00                                     ;; 00:0710 $36 $00
     ret                                                ;; 00:0712 $c9
 .jr_00_0713:
-    ld   A, [wDC50]                                    ;; 00:0713 $fa $50 $dc
+    ld   A, [wDC50_PlayerHealth]                                    ;; 00:0713 $fa $50 $dc
     sub  A, $01                                        ;; 00:0716 $d6 $01
     jr   NC, .jr_00_071b                               ;; 00:0718 $30 $01
     xor  A, A                                          ;; 00:071a $af
 .jr_00_071b:
-    ld   [wDC50], A                                    ;; 00:071b $ea $50 $dc
+    ld   [wDC50_PlayerHealth], A                                    ;; 00:071b $ea $50 $dc
     and  A, A                                          ;; 00:071e $a7
     jp   Z, jp_00_0693                                 ;; 00:071f $ca $93 $06
     ret                                                ;; 00:0722 $c9
@@ -1571,13 +1571,13 @@ call_00_0c6a_HandlePendingHDMATransfers:
 .jr_00_0cab:
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:0cab $26 $d8
     ld   A, [wDB61_ActiveObjectSlot]                                    ;; 00:0cad $fa $61 $db
-    or   A, $17                                        ;; 00:0cb0 $f6 $17
+    or   A, OBJECT_SPRITE_BANK_OFFSET                                        ;; 00:0cb0 $f6 $17
     ld   L, A                                          ;; 00:0cb2 $6f
     ld   A, [HL]                                       ;; 00:0cb3 $7e
     call call_00_0f25_AltSwitchBank                                  ;; 00:0cb4 $cd $25 $0f
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:0cb7 $26 $d8
     ld   A, [wDB61_ActiveObjectSlot]                                    ;; 00:0cb9 $fa $61 $db
-    or   A, OBJECT_UNK05_OFFSET                                        ;; 00:0cbc $f6 $05
+    or   A, OBJECT_SPRITE_FLAGS_OFFSET                                        ;; 00:0cbc $f6 $05
     ld   L, A                                          ;; 00:0cbe $6f
     bit  5, [HL]                                       ;; 00:0cbf $cb $6e
     jr   NZ, .jr_00_0ceb                               ;; 00:0cc1 $20 $28

@@ -961,7 +961,7 @@ call_00_26c9_Object_InfluencePlayerX:
     xor  a,OBJECT_ACTIONPTR_OFFSET
     ld   l,a
     ld   b,[hl]
-    xor  a,OBJECT_UNK17_OFFSET
+    xor  a,OBJECT_SPRITE_BANK_OFFSET
     ld   l,a
     ldi  a,[hl]
     ld   e,a
@@ -1338,7 +1338,7 @@ call_00_2896_Object_Set15:
     ld   [hl],c
     ret  
 
-call_00_28a0_ObjectGet15:
+call_00_28a0_Object_Get15:
     ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_UNK15_OFFSET
@@ -1346,7 +1346,7 @@ call_00_28a0_ObjectGet15:
     ld   a,[hl]
     ret  
 
-call_00_28aa_ObjectSet16:
+call_00_28aa_Object_Set16:
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:28aa $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:28ac $fa $00 $da
     or   A, OBJECT_UNK16_OFFSET                                        ;; 00:28af $f6 $16
@@ -1354,7 +1354,7 @@ call_00_28aa_ObjectSet16:
     ld   [HL], C                                       ;; 00:28b2 $71
     ret                                                ;; 00:28b3 $c9
 
-call_00_28b4_ObjectGet16:
+call_00_28b4_Object_Get16:
     ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_UNK16_OFFSET
@@ -1362,7 +1362,7 @@ call_00_28b4_ObjectGet16:
     ld   a,[hl]
     ret  
 
-call_00_28be_ObjectGetXVelocity:
+call_00_28be_Object_GetXVelocity:
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:28be $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:28c0 $fa $00 $da
     or   A, OBJECT_XVEL_OFFSET                                        ;; 00:28c3 $f6 $1b
@@ -1370,7 +1370,7 @@ call_00_28be_ObjectGetXVelocity:
     ld   A, [HL]                                       ;; 00:28c6 $7e
     ret                                                ;; 00:28c7 $c9
 
-call_00_28c8_ObjectSetXVelocity:
+call_00_28c8_Object_SetXVelocity:
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:28c8 $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:28ca $fa $00 $da
     or   A, OBJECT_XVEL_OFFSET                                        ;; 00:28cd $f6 $1b
@@ -1378,7 +1378,7 @@ call_00_28c8_ObjectSetXVelocity:
     ld   [HL], C                                       ;; 00:28d0 $71
     ret                                                ;; 00:28d1 $c9
 
-call_00_28d2_ObjectGetYVelocity:
+call_00_28d2_Object_GetYVelocity:
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:28d2 $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:28d4 $fa $00 $da
     or   A, OBJECT_YVEL_OFFSET                                        ;; 00:28d7 $f6 $1d
@@ -1386,7 +1386,7 @@ call_00_28d2_ObjectGetYVelocity:
     ld   A, [HL]                                       ;; 00:28da $7e
     ret                                                ;; 00:28db $c9
 
-call_00_28dc_ObjectSetYVelocity:
+call_00_28dc_Object_SetYVelocity:
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:28dc $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:28de $fa $00 $da
     or   A, OBJECT_YVEL_OFFSET                                        ;; 00:28e1 $f6 $1d
@@ -1394,7 +1394,7 @@ call_00_28dc_ObjectSetYVelocity:
     ld   [HL], C                                       ;; 00:28e4 $71
     ret                                                ;; 00:28e5 $c9
 
-call_00_28e6_ObjectCheckIfXVelocityIsZero:
+call_00_28e6_Object_CheckIfXVelocityIsZero:
     ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XVEL_OFFSET
@@ -1403,7 +1403,7 @@ call_00_28e6_ObjectCheckIfXVelocityIsZero:
     and  a
     ret  
 
-call_00_28f1_ObjectCheckIfYVelocityIsZero:
+call_00_28f1_Object_CheckIfYVelocityIsZero:
     ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YVEL_OFFSET
@@ -1412,10 +1412,10 @@ call_00_28f1_ObjectCheckIfYVelocityIsZero:
     and  a
     ret  
 
-call_00_28fc_ObjectUpdate19:
+call_00_28fc_Object_UpdateExtraFlags:
     ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_UNK19_OFFSET
+    or   a,OBJECT_EXTRA_FLAGS_OFFSET
     ld   l,a
     ld   a,[hl]
     inc  [hl]
@@ -1425,27 +1425,27 @@ call_00_28fc_ObjectUpdate19:
     add  hl,de
     ld   c,[hl]
 
-call_00_290d_ObjectSetTimer1A:
+call_00_290d_Object_SetTimer1A:
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:290d $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:290f $fa $00 $da
-    or   A, OBJECT_UNK1A_OFFSET                                        ;; 00:2912 $f6 $1a
+    or   A, OBJECT_TIMER1A_OFFSET                                        ;; 00:2912 $f6 $1a
     ld   L, A                                          ;; 00:2914 $6f
     ld   [HL], C                                       ;; 00:2915 $71
     ret                                                ;; 00:2916 $c9
 
-call_00_2917_ObjectCheckIfTimer1AIsZero:
+call_00_2917_Object_CheckIfTimer1AIsZero:
     ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_UNK1A_OFFSET
+    or   a,OBJECT_TIMER1A_OFFSET
     ld   l,a
     ld   a,[hl]
     and  a
     ret  
 
-call_00_2922_ObjectTimer1ACountdown:
+call_00_2922_Object_Timer1ACountdown:
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2922 $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2924 $fa $00 $da
-    or   A, OBJECT_UNK1A_OFFSET                                        ;; 00:2927 $f6 $1a
+    or   A, OBJECT_TIMER1A_OFFSET                                        ;; 00:2927 $f6 $1a
     ld   L, A                                          ;; 00:2929 $6f
     ld   A, [HL]                                       ;; 00:292a $7e
     and  A, A                                          ;; 00:292b $a7
@@ -1454,7 +1454,7 @@ call_00_2922_ObjectTimer1ACountdown:
     ld   A, [HL]                                       ;; 00:292e $7e
     ret                                                ;; 00:292f $c9
 
-call_00_2930_ObjectSetId:
+call_00_2930_Object_SetId:
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2930 $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2932 $fa $00 $da
     or   A, OBJECT_ID_OFFSET                                        ;; 00:2935 $f6 $00
@@ -1462,7 +1462,7 @@ call_00_2930_ObjectSetId:
     ld   [HL], C                                       ;; 00:2938 $71
     ret                                                ;; 00:2939 $c9
 
-call_00_293a_ObjectGetId:
+call_00_293a_Object_GetId:
     ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_ID_OFFSET
@@ -1470,7 +1470,7 @@ call_00_293a_ObjectGetId:
     ld   a,[hl]
     ret  
 
-call_00_2944_ObjectSetWidth:
+call_00_2944_Object_SetWidth:
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2944 $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2946 $fa $00 $da
     or   A, OBJECT_WIDTH_OFFSET                                        ;; 00:2949 $f6 $12
@@ -1478,7 +1478,7 @@ call_00_2944_ObjectSetWidth:
     ld   [HL], C                                       ;; 00:294c $71
     ret                                                ;; 00:294d $c9
 
-call_00_294e_ObjectSetHeight:
+call_00_294e_Object_SetHeight:
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:294e $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2950 $fa $00 $da
     or   A, OBJECT_HEIGHT_OFFSET                                        ;; 00:2953 $f6 $13
@@ -1486,7 +1486,7 @@ call_00_294e_ObjectSetHeight:
     ld   [HL], C                                       ;; 00:2956 $71
     ret                                                ;; 00:2957 $c9
 
-call_00_2958_ObjectSetFacingDirection:
+call_00_2958_Object_SetFacingDirection:
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2958 $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:295a $fa $00 $da
     or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 00:295d $f6 $0d
@@ -1494,7 +1494,7 @@ call_00_2958_ObjectSetFacingDirection:
     ld   [HL], C                                       ;; 00:2960 $71
     ret                                                ;; 00:2961 $c9
 
-call_00_2962_ObjectGetActionId:
+call_00_2962_Object_GetActionId:
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2962 $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2964 $fa $00 $da
     or   A, OBJECT_ACTIONID_OFFSET                                        ;; 00:2967 $f6 $01
@@ -1502,15 +1502,15 @@ call_00_2962_ObjectGetActionId:
     ld   A, [HL]                                       ;; 00:296a $7e
     ret                                                ;; 00:296b $c9
 
-call_00_296c_ObjectGet9:
+call_00_296c_Object_Get9:
     ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_UNK09_OFFSET
+    or   a,OBJECT_SPRITE_COUNTER_OFFSET
     ld   l,a
     ld   a,[hl]
     ret  
 
-call_00_2976_ObjectGetFacingDirection:
+call_00_2976_Object_GetFacingDirection:
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2976 $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2978 $fa $00 $da
     or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 00:297b $f6 $0d
@@ -1518,24 +1518,24 @@ call_00_2976_ObjectGetFacingDirection:
     ld   A, [HL]                                       ;; 00:297e $7e
     ret                                                ;; 00:297f $c9
 
-call_00_2980_ObjectSet19:
+call_00_2980_Object_SetExtraFlags:
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2980 $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2982 $fa $00 $da
-    or   A, OBJECT_UNK19_OFFSET                                        ;; 00:2985 $f6 $19
+    or   A, OBJECT_EXTRA_FLAGS_OFFSET                                        ;; 00:2985 $f6 $19
     ld   L, A                                          ;; 00:2987 $6f
     ld   [HL], C                                       ;; 00:2988 $71
     ret                                                ;; 00:2989 $c9
 
-call_00_298a_ObjectGet19:
+call_00_298a_Object_GetExtraFlags:
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:298a $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:298c $fa $00 $da
-    or   A, OBJECT_UNK19_OFFSET                                        ;; 00:298f $f6 $19
+    or   A, OBJECT_EXTRA_FLAGS_OFFSET                                        ;; 00:298f $f6 $19
     ld   L, A                                          ;; 00:2991 $6f
     ld   A, [HL]                                       ;; 00:2992 $7e
     and  A, A                                          ;; 00:2993 $a7
     ret                                                ;; 00:2994 $c9
 
-call_00_2995_ObjectGetActionId:
+call_00_2995_Object_GetActionId:
     ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_ACTIONID_OFFSET
@@ -1543,7 +1543,7 @@ call_00_2995_ObjectGetActionId:
     ld   a,[hl]
     ret  
 
-call_00_299f_ObjectTurnAround:
+call_00_299f_Object_TurnAround:
 ; flips facing direction from $00 to $20 or $20 to $00
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:299f $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:29a1 $fa $00 $da
@@ -1559,7 +1559,7 @@ call_00_29ac_Object_CheckFacingPlayer:
 ; Returns if they match.
 ; Used for checks like “is the object facing the player?”
     call call_00_2a68_Object_ComputePlayerXProximity
-    call call_00_2976_ObjectGetFacingDirection
+    call call_00_2976_Object_GetFacingDirection
     ld   hl,wDA12_ObjectDirectionRelativeToPlayer
     cp   [hl]
     ret  
@@ -1610,7 +1610,7 @@ call_00_29ce_ObjectExistsCheck:
     and  A, A                                          ;; 00:29dd $a7
     ret                                                ;; 00:29de $c9
     
-call_00_29df_ObjectSetActiveFlag:
+call_00_29df_Object_SetActiveFlag:
 ; Computes HL = $D80D + current object index.
 ; Sets bit 7 of [HL] (marking object as “active,” “visible,” or “flagged”).
     ld   h, HIGH(wD800_ObjectMemory)
@@ -1620,7 +1620,7 @@ call_00_29df_ObjectSetActiveFlag:
     set  7,[hl]
     ret  
 
-call_00_29ea_ObjectClearActiveFlag:
+call_00_29ea_Object_ClearActiveFlag:
 ; Same indexing, but clears bit 7 instead of setting it.
     ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
@@ -1629,13 +1629,13 @@ call_00_29ea_ObjectClearActiveFlag:
     res  7,[hl]
     ret  
 
-call_00_29f5_ObjectClearActiveFlagAndCheck:
+call_00_29f5_Object_ClearActiveFlagAndCheck:
 ; Gets object entry byte at $D805+index.
 ; Clears bit 4 in memory.
 ; Returns with carry based on the old bit 4 state (bit 4,A).
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:29f5 $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:29f7 $fa $00 $da
-    or   A, OBJECT_UNK05_OFFSET                                        ;; 00:29fa $f6 $05
+    or   A, OBJECT_SPRITE_FLAGS_OFFSET                                        ;; 00:29fa $f6 $05
     ld   L, A                                          ;; 00:29fc $6f
     ld   A, [HL]                                       ;; 00:29fd $7e
     res  4, [HL]                                       ;; 00:29fe $cb $a6
@@ -1718,13 +1718,13 @@ call_00_2a15_CheckCameraOverlapBoundingBox:
     sbc  A, B                                          ;; 00:2a5b $98
     ret                                                ;; 00:2a5c $c9
 
-call_00_2a5d_ObjectCheckFlag2:
+call_00_2a5d_Object_Check5Flag2:
 ; Computes HL = D805 + current object index.
 ; Tests bit 2 of the object’s flags.
 ; Purpose: Checks a particular state flag (likely “grounded,” “active,” or similar).
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2a5d $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2a5f $fa $00 $da
-    or   A, OBJECT_UNK05_OFFSET                                        ;; 00:2a62 $f6 $05
+    or   A, OBJECT_SPRITE_FLAGS_OFFSET                                        ;; 00:2a62 $f6 $05
     ld   L, A                                          ;; 00:2a64 $6f
     bit  2, [HL]                                       ;; 00:2a65 $cb $56
     ret                                                ;; 00:2a67 $c9
@@ -1828,7 +1828,7 @@ call_00_2a98_HandlePlayerObjectInteraction:
     ret  nc
     ld   d,HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_UNK1A_OFFSET
+    or   a,OBJECT_TIMER1A_OFFSET
     ld   e,a
     ldi  a,[hl]
     ld   [de],a
@@ -2027,17 +2027,17 @@ call_00_2bbe_SpawnCollectibleObject:
     bit  6, A                                          ;; 00:2bc5 $cb $77
     jr   Z, call_00_2b7a_ClearObjectThenJump                                 ;; 00:2bc7 $28 $b1
     ld   C, $02                                        ;; 00:2bc9 $0e $02
-    call call_00_2930_ObjectSetId                                  ;; 00:2bcb $cd $30 $29
+    call call_00_2930_Object_SetId                                  ;; 00:2bcb $cd $30 $29
     ld   C, $08                                        ;; 00:2bce $0e $08
     call call_00_288c_Object_Set14                                  ;; 00:2bd0 $cd $8c $28
     ld   C, $12                                        ;; 00:2bd3 $0e $12
-    call call_00_2944_ObjectSetWidth                                  ;; 00:2bd5 $cd $44 $29
+    call call_00_2944_Object_SetWidth                                  ;; 00:2bd5 $cd $44 $29
     ld   C, $12                                        ;; 00:2bd8 $0e $12
-    call call_00_294e_ObjectSetHeight                                  ;; 00:2bda $cd $4e $29
+    call call_00_294e_Object_SetHeight                                  ;; 00:2bda $cd $4e $29
     ld   C, OBJECT_FACING_RIGHT                                        ;; 00:2bdd $0e $00
-    call call_00_2958_ObjectSetFacingDirection                                  ;; 00:2bdf $cd $58 $29
+    call call_00_2958_Object_SetFacingDirection                                  ;; 00:2bdf $cd $58 $29
     ld   C, $01                                        ;; 00:2be2 $0e $01
-    call call_00_28aa_ObjectSet16                                  ;; 00:2be4 $cd $aa $28
+    call call_00_28aa_Object_Set16                                  ;; 00:2be4 $cd $aa $28
     ld   C, $00                                        ;; 00:2be7 $0e $00
     call call_00_2299_SetObjectStatusLowNibble                                  ;; 00:2be9 $cd $99 $22
     call call_00_2ba9_SetObjectStatusTo50                                  ;; 00:2bec $cd $a9 $2b

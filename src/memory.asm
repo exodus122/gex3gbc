@@ -286,7 +286,7 @@ wDB66_HDMATransferFlags:
 ; Bit 1 set →
 ; Copy tiles for the current interaction object.
 ; - Uses wDB64/65 as the source pointer.
-; - Source bank depends on the object’s data (OBJECT_UNK05_OFFSET, plus a VBK = 1 path if “extended” graphics).
+; - Source bank depends on the object’s data (OBJECT_SPRITE_FLAGS_OFFSET, plus a VBK = 1 path if “extended” graphics).
 ; - Length depends on the object’s type (wDB63_ActiveObjectType).
 ; - This looks like sprite/animation tiles for NPCs or items.
 ; Bit 2 set →
@@ -802,7 +802,7 @@ wDC4E:
 wDC4F:
     ds 1                                               ;; dc4f
 
-wDC50:
+wDC50_PlayerHealth:
     ds 1                                               ;; dc50
 
 wDC51:
@@ -839,7 +839,7 @@ wDC65_ProgressFlags_WWGex:
     ds 1                                               ;; dc65
 wDC66_ProgressFlags_LizardOfOz:
     ds 1                                               ;; dc66
-wDC67_ProgressFlags_ChannelZ:
+wDC67_ProgressFlags_ChannelZ: ; 1 = got remote
     ds 1                                               ;; dc67
 
 wDC68_CollectibleCount:
@@ -1004,7 +1004,7 @@ wDCA5:
 wDCA6:
     ds 1                                               ;; dca6
 
-wDCA7:
+wDCA7_DrawGexFlag:
     ds 1                                               ;; dca7
 
 wDCA8:

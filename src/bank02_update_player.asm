@@ -323,7 +323,7 @@ call_02_4f32_PlayerUpdateMain:
     call call_02_5047_CachePlayerTileCoords                                  ;; 02:4ff0 $cd $47 $50
     ld   HL, wD805_Player_unk05                                     ;; 02:4ff3 $21 $05 $d8
     res  4, [HL]                                       ;; 02:4ff6 $cb $a6
-    jp   call_02_724d_ProcessObjectTimerAndState                                  ;; 02:4ff8 $c3 $4d $72
+    jp   call_02_724d_UpdateObjectAnimationTimersAndSpriteId                                  ;; 02:4ff8 $c3 $4d $72
 
 call_02_4ffb_DecTimerEveryCycle:
 ; Decrements a timer in [HL] every wDCA8 frames. Resets wDCA8 to 3C when it wraps.

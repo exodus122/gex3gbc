@@ -175,19 +175,25 @@ for i in range(0x00e4, 0x07b4, 0x4):
         print(".data_02_{:04x}:".format(i+0x4000))
     print("    dw   ${:04x}".format(code)+", data_02_{:04x}".format(data))
 
-'''
+
 # print data with labels
 
-data_pointers.append(0x7ef2)
+data_pointers.append(0x7ef2) 
 data_pointers.sort()
+
 for i in range(0, len(data_pointers) - 1):
     data = bank002_data[data_pointers[i] - 0x4000 : data_pointers[i + 1] - 0x4000]
     print("data_02_{:04x}:".format(data_pointers[i]))
-    for j in range(0, len(data), 8):
-        chunk = data[j:j+8]
-        line_string = "    db   " + ", ".join(f"${byte:02x}" for byte in chunk)
-        print(line_string)
-'''
+
+    # first 5 bytes
+    first_chunk = data[:5]
+    if first_chunk:
+        print("    db   " + ", ".join(f"${byte:02x}" for byte in first_chunk))
+
+    # everything else on second line
+    remaining = data[5:]
+    if remaining:
+        print("    db   " + ", ".join(f"${byte:02x}" for byte in remaining))
 
 
 

@@ -4,12 +4,12 @@ call_02_582e_ObjectAction_None:
 call_02_582f_ObjectAction_DestroyWithoutParticles:
     call call_00_288c_Object_Clear14
     call call_00_2b8b_HandleObjectFlag6ClearOrInit
-    call call_00_2a5d_ObjectCheckFlag2
+    call call_00_2a5d_Object_Check5Flag2
     jp   nz,call_00_2bbe_SpawnCollectibleObject
     ret  
 
 call_02_583c_ObjectAction_Destroy:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck                                  ;; 02:583c $cd $f5 $29
+    call call_00_29f5_Object_ClearActiveFlagAndCheck                                  ;; 02:583c $cd $f5 $29
     jr   Z, .jr_02_5850                                ;; 02:583f $28 $0f
     ld   HL, .data_02_5857_ParticlesPalette                             ;; 02:5841 $21 $57 $58
     call call_00_2c20_Object_CopyPaletteToBuffer                                  ;; 02:5844 $cd $20 $2c
@@ -24,30 +24,30 @@ call_02_583c_ObjectAction_Destroy:
     db   $00, $00, $08, $02, $04, $01, $ff, $7f        ;; 02:5857 ........
 
 call_02_585f_ObjectAction_MovePlatformHorizontally:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,label586E
     ld   c,$80
-    call call_00_2980_ObjectSet19
+    call call_00_2980_Object_SetExtraFlags
     ld   c,$F0
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
 label586E:
-    call call_00_298a_ObjectGet19
+    call call_00_298a_Object_GetExtraFlags
     bit  7,[hl]
     jr   z,label588C
     ld   c,$00
-    call call_00_28c8_ObjectSetXVelocity
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_28c8_Object_SetXVelocity
+    call call_00_2922_Object_Timer1ACountdown
     ret  nz
-    call call_00_298a_ObjectGet19
+    call call_00_298a_Object_GetExtraFlags
     and  a,$7F
     xor  a,$40
     ld   [hl],a
     call call_00_230f_ResolveObjectListIndex
-    jp   call_00_290d_ObjectSetTimer1A
+    jp   call_00_290d_Object_SetTimer1A
 label588C:
     ld   c,$01
-    call call_00_28c8_ObjectSetXVelocity
-    call call_00_298a_ObjectGet19
+    call call_00_28c8_Object_SetXVelocity
+    call call_00_298a_Object_GetExtraFlags
     ld   bc,$0001
     bit  6,[hl]
     jr   nz,label589E
@@ -64,38 +64,38 @@ label589E:
     adc  [hl]
     ld   [hl],a
     call call_00_26c9_Object_InfluencePlayerX
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     ret  nz
-    call call_00_298a_ObjectGet19
+    call call_00_298a_Object_GetExtraFlags
     set  7,[hl]
     ld   c,$78
-    jp   call_00_290d_ObjectSetTimer1A
+    jp   call_00_290d_Object_SetTimer1A
 
 call_02_58bd_ObjectAction_MovePlatformVertically:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,label58CC
     ld   c,$80
-    call call_00_2980_ObjectSet19
+    call call_00_2980_Object_SetExtraFlags
     ld   c,$F0
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
 label58CC:
-    call call_00_298a_ObjectGet19
+    call call_00_298a_Object_GetExtraFlags
     bit  7,[hl]
     jr   z,label58EA
     ld   c,$00
-    call call_00_28dc_ObjectSetYVelocity
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_28dc_Object_SetYVelocity
+    call call_00_2922_Object_Timer1ACountdown
     ret  nz
-    call call_00_298a_ObjectGet19
+    call call_00_298a_Object_GetExtraFlags
     and  a,$7F
     xor  a,$40
     ld   [hl],a
     call call_00_230f_ResolveObjectListIndex
-    jp   call_00_290d_ObjectSetTimer1A
+    jp   call_00_290d_Object_SetTimer1A
 label58EA:
     ld   c,$01
-    call call_00_28dc_ObjectSetYVelocity
-    call call_00_298a_ObjectGet19
+    call call_00_28dc_Object_SetYVelocity
+    call call_00_298a_Object_GetExtraFlags
     ld   bc,$0001
     bit  6,[hl]
     jr   nz,label58FC
@@ -111,12 +111,12 @@ label58FC:
     ld   a,b
     adc  [hl]
     ld   [hl],a
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     ret  nz
-    call call_00_298a_ObjectGet19
+    call call_00_298a_Object_GetExtraFlags
     set  7,[hl]
     ld   c,$78
-    jp   call_00_290d_ObjectSetTimer1A
+    jp   call_00_290d_Object_SetTimer1A
 
 call_02_5918:
     ld   a,[wDC71_FrameCounter]
@@ -180,9 +180,9 @@ call_02_598f_ObjectAction_FlyTV_SpawnFly:
     db   $07, $04, $08
 
 call_02_59aa_ObjectAction_FlyTV_Reset:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   c,$78
-    call nz,call_00_290d_ObjectSetTimer1A
+    call nz,call_00_290d_Object_SetTimer1A
     call call_02_59D2_FlyTV_unk
     call call_00_2b10_Object_FindDuplicateInstance
     ret  nz
@@ -190,17 +190,17 @@ call_02_59aa_ObjectAction_FlyTV_Reset:
     ld   a,c
     and  a
     ret  z
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     ret  nz
     ld   c,$01
-    call call_00_28aa_ObjectSet16
+    call call_00_28aa_Object_Set16
     ld   c,$00
     call call_00_2299_SetObjectStatusLowNibble
     ld   a,$04
     jp   entry_02_72ac_SetupNewAction
 
 call_02_59D2_FlyTV_unk:
-    call call_00_293a_ObjectGetId
+    call call_00_293a_Object_GetId
     sub  a,$09
     ld   l,a
     ld   h,$00
@@ -216,21 +216,21 @@ call_02_59D2_FlyTV_unk:
     db   $02, $06, $03, $07, $04, $08
     
 call_02_59ed:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,label5A00
-    call call_00_2976_ObjectGetFacingDirection
+    call call_00_2976_Object_GetFacingDirection
     ld   c,$D0
     and  a,$20
     jr   nz,label59FD
     ld   c,$30
 label59FD:
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
 label5A00:
     call call_00_24c0_Object_IntegrateXVelocity
     ret  
 
 call_02_5a04_ObjectAction_TVButton_unk:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck                                  ;; 02:5a04 $cd $f5 $29
+    call call_00_29f5_Object_ClearActiveFlagAndCheck                                  ;; 02:5a04 $cd $f5 $29
     jr   NZ, call_02_5a83_ObjectAction_TVButton_unk4                                ;; 02:5a07 $20 $7a
     ld   C, $00                                        ;; 02:5a09 $0e $00
     call call_00_22b1_HandleObjectStateChange                                  ;; 02:5a0b $cd $b1 $22
@@ -240,7 +240,7 @@ call_02_5a04_ObjectAction_TVButton_unk:
     db   $00, $00, $00, $00, $73, $4e, $1f, $00        ;; 02:5a14 ........
 
 call_02_5a1c_ObjectAction_TVButton_unk2:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck                                  ;; 02:5a1c $cd $f5 $29
+    call call_00_29f5_Object_ClearActiveFlagAndCheck                                  ;; 02:5a1c $cd $f5 $29
     jr   NZ, call_02_5a83_ObjectAction_TVButton_unk4                                ;; 02:5a1f $20 $62
     call call_02_5a75_ObjectAction_TVButton_unk3                                  ;; 02:5a21 $cd $75 $5a
     ld   A, [wDC7B]                                    ;; 02:5a24 $fa $7b $dc
@@ -317,7 +317,7 @@ call_02_5a83_ObjectAction_TVButton_unk4:
     cp   A, [HL]                                       ;; 02:5ab7 $be
     jr   NC, .jr_02_5aca                               ;; 02:5ab8 $30 $10
 .jr_02_5aba:
-    call call_00_2962_ObjectGetActionId                                  ;; 02:5aba $cd $62 $29
+    call call_00_2962_Object_GetActionId                                  ;; 02:5aba $cd $62 $29
     cp   A, $00                                        ;; 02:5abd $fe $00
     ret  Z                                             ;; 02:5abf $c8
     ld   C, $00                                        ;; 02:5ac0 $0e $00
@@ -325,7 +325,7 @@ call_02_5a83_ObjectAction_TVButton_unk4:
     ld   A, $00                                        ;; 02:5ac5 $3e $00
     jp   call_02_72ac_SetupNewAction                                  ;; 02:5ac7 $c3 $ac $72
 .jr_02_5aca:
-    call call_00_2962_ObjectGetActionId                                  ;; 02:5aca $cd $62 $29
+    call call_00_2962_Object_GetActionId                                  ;; 02:5aca $cd $62 $29
     cp   A, $01                                        ;; 02:5acd $fe $01
     ret  Z                                             ;; 02:5acf $c8
     ld   C, $01                                        ;; 02:5ad0 $0e $01
@@ -334,19 +334,19 @@ call_02_5a83_ObjectAction_TVButton_unk4:
     jp   call_02_72ac_SetupNewAction                                  ;; 02:5ad7 $c3 $ac $72
 
 call_02_5ada_ObjectAction_TVRemote_unk:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck                                  ;; 02:5ada $cd $f5 $29
+    call call_00_29f5_Object_ClearActiveFlagAndCheck                                  ;; 02:5ada $cd $f5 $29
     jr   NZ, call_02_5af8_ObjectAction_TVRemote_unk4                                ;; 02:5add $20 $19
     ld   C, $00                                        ;; 02:5adf $0e $00
     jp   call_00_22b1_HandleObjectStateChange                                  ;; 02:5ae1 $c3 $b1 $22
 
 call_02_5ae4_ObjectAction_TVRemote_unk2:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck                                  ;; 02:5ae4 $cd $f5 $29
+    call call_00_29f5_Object_ClearActiveFlagAndCheck                                  ;; 02:5ae4 $cd $f5 $29
     jr   NZ, call_02_5af8_ObjectAction_TVRemote_unk4                                ;; 02:5ae7 $20 $0f
     ld   C, $01                                        ;; 02:5ae9 $0e $01
     jp   call_00_22b1_HandleObjectStateChange         
 
 call_02_5aee_ObjectAction_TVRemote_unk3:    ;; 02:5aeb $c3 $b1 $22
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   nz,call_02_5af8_ObjectAction_TVRemote_unk4
     ld   c,$02
     jp   call_00_22b1_HandleObjectStateChange
@@ -376,7 +376,7 @@ call_02_5af8_ObjectAction_TVRemote_unk4:
     cp   A, [HL]                                       ;; 02:5b2c $be
     jr   NC, .jr_02_5b6e                               ;; 02:5b2d $30 $3f
 .jr_02_5b2f:
-    call call_00_2962_ObjectGetActionId                                  ;; 02:5b2f $cd $62 $29
+    call call_00_2962_Object_GetActionId                                  ;; 02:5b2f $cd $62 $29
     cp   A, $03                                        ;; 02:5b32 $fe $03
     jr   Z, .jr_02_5b40                                ;; 02:5b34 $28 $0a
     ld   C, $03                                        ;; 02:5b36 $0e $03
@@ -391,7 +391,7 @@ call_02_5af8_ObjectAction_TVRemote_unk4:
     ld   C, [HL]                                       ;; 02:5b49 $4e
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:5b4a $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:5b4c $fa $00 $da
-    or   A, OBJECT_UNK0A_OFFSET                                        ;; 02:5b4f $f6 $0a
+    or   A, OBJECT_SPRITE_ID_OFFSET                                        ;; 02:5b4f $f6 $0a
     ld   L, A                                          ;; 02:5b51 $6f
     ld   A, C                                          ;; 02:5b52 $79
     add  A, $40                                        ;; 02:5b53 $c6 $40
@@ -410,7 +410,7 @@ call_02_5af8_ObjectAction_TVRemote_unk4:
     ld   HL, .data_02_5b92                             ;; 02:5b68 $21 $92 $5b
     jp   call_00_2c20_Object_CopyPaletteToBuffer                                  ;; 02:5b6b $c3 $20 $2c
 .jr_02_5b6e:
-    call call_00_2962_ObjectGetActionId                                  ;; 02:5b6e $cd $62 $29
+    call call_00_2962_Object_GetActionId                                  ;; 02:5b6e $cd $62 $29
     cp   A, $01                                        ;; 02:5b71 $fe $01
     ret  Z                                             ;; 02:5b73 $c8
     ld   C, $01                                        ;; 02:5b74 $0e $01
@@ -426,15 +426,15 @@ call_02_5af8_ObjectAction_TVRemote_unk4:
     db   $00, $00, $00, $00, $1f, $00, $ff, $03        ;; 02:5b92 ........
 
 call_02_5b9a_ObjectAction_UpdateGoalCounter:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck                                  ;; 02:5b9a $cd $f5 $29
+    call call_00_29f5_Object_ClearActiveFlagAndCheck                                  ;; 02:5b9a $cd $f5 $29
     jr   Z, .jr_02_5ba9                                ;; 02:5b9d $28 $0a
     ld   C, $30                                        ;; 02:5b9f $0e $30
-    call call_00_28dc_ObjectSetYVelocity                                  ;; 02:5ba1 $cd $dc $28
+    call call_00_28dc_Object_SetYVelocity                                  ;; 02:5ba1 $cd $dc $28
     ld   C, $3c                                        ;; 02:5ba4 $0e $3c
-    call call_00_290d_ObjectSetTimer1A                                  ;; 02:5ba6 $cd $0d $29
+    call call_00_290d_Object_SetTimer1A                                  ;; 02:5ba6 $cd $0d $29
 .jr_02_5ba9:
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped                                  ;; 02:5ba9 $cd $4a $24
-    call call_00_2922_ObjectTimer1ACountdown                                  ;; 02:5bac $cd $22 $29
+    call call_00_2922_Object_Timer1ACountdown                                  ;; 02:5bac $cd $22 $29
     jp   Z, call_00_2b80_ClearObjectMemoryEntry                               ;; 02:5baf $ca $80 $2b
     ret                                                ;; 02:5bb2 $c9
 
@@ -482,7 +482,7 @@ call_02_5bef_ObjectAction_Remote_unk3:
     ret                                                ;; 02:5bf9 $c9
 
 call_02_5bfa_ObjectAction_Remote_unk2:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck                                  ;; 02:5bfa $cd $f5 $29
+    call call_00_29f5_Object_ClearActiveFlagAndCheck                                  ;; 02:5bfa $cd $f5 $29
     jr   Z, .jr_02_5c23                                ;; 02:5bfd $28 $24
     ld   A, $1e                                        ;; 02:5bff $3e $1e
     call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 02:5c01 $cd $f5 $0f
@@ -492,7 +492,7 @@ call_02_5bfa_ObjectAction_Remote_unk2:
     call call_00_2b8b_HandleObjectFlag6ClearOrInit                                  ;; 02:5c0d $cd $8b $2b
     call call_00_2c67_Particle_InitBurst                                  ;; 02:5c10 $cd $67 $2c
     ld   C, $3c                                        ;; 02:5c13 $0e $3c
-    call call_00_290d_ObjectSetTimer1A                                  ;; 02:5c15 $cd $0d $29
+    call call_00_290d_Object_SetTimer1A                                  ;; 02:5c15 $cd $0d $29
     call call_00_230f_ResolveObjectListIndex                                  ;; 02:5c18 $cd $0f $23
     ld   B, $00                                        ;; 02:5c1b $06 $00
     ld   HL, wDC5C_ProgressFlags                                     ;; 02:5c1d $21 $5c $dc
@@ -501,7 +501,7 @@ call_02_5bfa_ObjectAction_Remote_unk2:
 .jr_02_5c23:
     call call_00_2c89_Particle_UpdateBurst                                  ;; 02:5c23 $cd $89 $2c
     ret  NZ                                            ;; 02:5c26 $c0
-    call call_00_2922_ObjectTimer1ACountdown                                  ;; 02:5c27 $cd $22 $29
+    call call_00_2922_Object_Timer1ACountdown                                  ;; 02:5c27 $cd $22 $29
     ret  NZ                                            ;; 02:5c2a $c0
     call call_00_230f_ResolveObjectListIndex                                  ;; 02:5c2b $cd $0f $23
     inc  C                                             ;; 02:5c2e $0c
@@ -521,24 +521,24 @@ call_02_5c43_ObjectAction_EvilSanta_Init:
     jp   call_02_72ac_SetupNewAction                                  ;; 02:5c4d $c3 $ac $72
 
 call_02_5c50_ObjectAction_EvilSanta_Jumping:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck                                  ;; 02:5c50 $cd $f5 $29
+    call call_00_29f5_Object_ClearActiveFlagAndCheck                                  ;; 02:5c50 $cd $f5 $29
     jr   Z, .jr_02_5c62                                ;; 02:5c53 $28 $0d
     call call_02_5d02_LoadEvilSantaPalette                                  ;; 02:5c55 $cd $02 $5d
     ld   C, $20                                        ;; 02:5c58 $0e $20
-    call call_00_28c8_ObjectSetXVelocity                                  ;; 02:5c5a $cd $c8 $28
+    call call_00_28c8_Object_SetXVelocity                                  ;; 02:5c5a $cd $c8 $28
     ld   C, $28                                        ;; 02:5c5d $0e $28
-    call call_00_28dc_ObjectSetYVelocity                                  ;; 02:5c5f $cd $dc $28
+    call call_00_28dc_Object_SetYVelocity                                  ;; 02:5c5f $cd $dc $28
 .jr_02_5c62:
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing                                  ;; 02:5c62 $cd $1c $25
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped                                  ;; 02:5c65 $cd $4a $24
     call call_00_2766_Object_ResetYIfAboveStart                                  ;; 02:5c68 $cd $66 $27
     ret  C                                             ;; 02:5c6b $d8
-    call call_00_299f_ObjectTurnAround                                  ;; 02:5c6c $cd $9f $29
+    call call_00_299f_Object_TurnAround                                  ;; 02:5c6c $cd $9f $29
     ld   A, $02                                        ;; 02:5c6f $3e $02
     jp   call_02_72ac_SetupNewAction                                  ;; 02:5c71 $c3 $ac $72
 
 call_02_5c74_ObjectAction_EvilSanta_PrepareThrow:
-    call call_00_2a5d_ObjectCheckFlag2                                  ;; 02:5c74 $cd $5d $2a
+    call call_00_2a5d_Object_Check5Flag2                                  ;; 02:5c74 $cd $5d $2a
     ret  Z                                             ;; 02:5c77 $c8
     ld   C, $05                                        ;; 02:5c78 $0e $05
     call call_00_3792_PrepareRelativeObjectSpawn                                  ;; 02:5c7a $cd $92 $37
@@ -565,7 +565,7 @@ call_02_5c82_ObjectAction_EvilSanta_Stand:
     jp   call_02_72ac_SetupNewAction                                  ;; 02:5ca2 $c3 $ac $72
 
 call_02_5ca5_ObjectAction_EvilSanta_Damaged:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   a,$19
     call nz,call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,[wDC71_FrameCounter]
@@ -581,24 +581,24 @@ call_02_5ca5_ObjectAction_EvilSanta_Damaged:
     db   $00, $00, $84, $10, $08, $21, $8c, $31
     
 call_02_5cd0_ObjectAction_EvilSanta_Death:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,label5CF0
     ld   a,$1A
     call call_00_0ff5_QueueSoundEffectWithPriority
     call call_02_5d02_LoadEvilSantaPalette
-    call call_00_2976_ObjectGetFacingDirection
+    call call_00_2976_Object_GetFacingDirection
     ld   c,$F2
     bit  5,a
     jr   nz,label5CE8
     ld   c,$0E
 label5CE8:
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     ld   c,$05
-    call call_00_28dc_ObjectSetYVelocity
+    call call_00_28dc_Object_SetYVelocity
 label5CF0:
     call call_00_24c0_Object_IntegrateXVelocity
     call call_00_24ee_Object_IntegrateYVelocity
-    call call_00_2a5d_ObjectCheckFlag2
+    call call_00_2a5d_Object_Check5Flag2
     ret  z
     ld   c,$03
     call call_00_21ef_PlayRemoteSpawnSFX
@@ -653,9 +653,9 @@ call_02_5d10_ObjectAction_EvilSantaProjectile_Init:
     inc  A                                             ;; 02:5d48 $3c
 .jr_02_5d49:
     ld   C, A                                          ;; 02:5d49 $4f
-    call call_00_28c8_ObjectSetXVelocity                                  ;; 02:5d4a $cd $c8 $28
+    call call_00_28c8_Object_SetXVelocity                                  ;; 02:5d4a $cd $c8 $28
     ld   C, $10                                        ;; 02:5d4d $0e $10
-    call call_00_28dc_ObjectSetYVelocity                                  ;; 02:5d4f $cd $dc $28
+    call call_00_28dc_Object_SetYVelocity                                  ;; 02:5d4f $cd $dc $28
     ld   A, $01                                        ;; 02:5d52 $3e $01
     jp   call_02_72ac_SetupNewAction                                  ;; 02:5d54 $c3 $ac $72
 .data_02_5d57:
@@ -669,7 +669,7 @@ call_02_5d10_ObjectAction_EvilSantaProjectile_Init:
 call_02_5d80_ObjectAction_EvilSantaProjectile_UpdateTrajectory:
     call call_00_24c0_Object_IntegrateXVelocity                                  ;; 02:5d80 $cd $c0 $24
     call call_00_24ee_Object_IntegrateYVelocity                                  ;; 02:5d83 $cd $ee $24
-    call call_00_28d2_ObjectGetYVelocity                                  ;; 02:5d86 $cd $d2 $28
+    call call_00_28d2_Object_GetYVelocity                                  ;; 02:5d86 $cd $d2 $28
     ld   C, A                                          ;; 02:5d89 $4f
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:5d8a $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:5d8c $fa $00 $da
@@ -716,14 +716,14 @@ call_02_5d80_ObjectAction_EvilSantaProjectile_UpdateTrajectory:
     jp   call_02_72ac_SetupNewAction                                  ;; 02:5dd4 $c3 $ac $72
 
 call_02_5dd7_ObjectAction_EvilSantaProjectile_Destroy:
-    call call_00_2a5d_ObjectCheckFlag2                                  ;; 02:5dd7 $cd $5d $2a
+    call call_00_2a5d_Object_Check5Flag2                                  ;; 02:5dd7 $cd $5d $2a
     jp   NZ, call_00_2b80_ClearObjectMemoryEntry                              ;; 02:5dda $c2 $80 $2b
     ret                                                ;; 02:5ddd $c9
 
 call_02_5dde_ObjectAction_SkatingElf_Skate:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck                                  ;; 02:5dde $cd $f5 $29
+    call call_00_29f5_Object_ClearActiveFlagAndCheck                                  ;; 02:5dde $cd $f5 $29
     ld   C, $20                                        ;; 02:5de1 $0e $20
-    call NZ, call_00_28c8_ObjectSetXVelocity                              ;; 02:5de3 $c4 $c8 $28
+    call NZ, call_00_28c8_Object_SetXVelocity                              ;; 02:5de3 $c4 $c8 $28
     ld   A, [wDC71_FrameCounter]                                    ;; 02:5de6 $fa $71 $dc
     and  A, $07                                        ;; 02:5de9 $e6 $07
     ld   C, $10                                        ;; 02:5deb $0e $10
@@ -732,7 +732,7 @@ call_02_5dde_ObjectAction_SkatingElf_Skate:
     call call_00_2722_IsPlayerNearObject                                  ;; 02:5df3 $cd $22 $27
     ret  Z                                             ;; 02:5df6 $c8
     call call_00_2a68_Object_ComputePlayerXProximity                                  ;; 02:5df7 $cd $68 $2a
-    call call_00_2976_ObjectGetFacingDirection                                  ;; 02:5dfa $cd $76 $29
+    call call_00_2976_Object_GetFacingDirection                                  ;; 02:5dfa $cd $76 $29
     ld   HL, wDA12_ObjectDirectionRelativeToPlayer                                     ;; 02:5dfd $21 $12 $da
     cp   A, [HL]                                       ;; 02:5e00 $be
     ret  NZ                                            ;; 02:5e01 $c0
@@ -744,11 +744,11 @@ call_02_5dde_ObjectAction_SkatingElf_Skate:
 
 call_02_5e0d_ObjectAction_SkatingElf_PrepareJump:
     ld   C, $20                                        ;; 02:5e0d $0e $20
-    call call_00_28dc_ObjectSetYVelocity                                  ;; 02:5e0f $cd $dc $28
+    call call_00_28dc_Object_SetYVelocity                                  ;; 02:5e0f $cd $dc $28
     ld   C, $28                                        ;; 02:5e12 $0e $28
     call call_00_2588_Object_ApproachXVelocity                                  ;; 02:5e14 $cd $88 $25
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing                                  ;; 02:5e17 $cd $1c $25
-    call call_00_28be_ObjectGetXVelocity                                  ;; 02:5e1a $cd $be $28
+    call call_00_28be_Object_GetXVelocity                                  ;; 02:5e1a $cd $be $28
     cp   A, $28                                        ;; 02:5e1d $fe $28
     ld   A, $03                                        ;; 02:5e1f $3e $03
     jp   Z, call_02_72ac_SetupNewAction                               ;; 02:5e21 $ca $ac $72
@@ -763,16 +763,16 @@ call_02_5e25_ObjectAction_SkatingElf_Jump:
     ret                                                ;; 02:5e33 $c9
 
 call_02_5e34_ObjectAction_SkatingElf_Damaged:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck                                  ;; 02:5e34 $cd $f5 $29
+    call call_00_29f5_Object_ClearActiveFlagAndCheck                                  ;; 02:5e34 $cd $f5 $29
     jr   Z, .jr_02_5e45                                ;; 02:5e37 $28 $0c
     call call_00_2766_Object_ResetYIfAboveStart                                  ;; 02:5e39 $cd $66 $27
     ld   C, $00                                        ;; 02:5e3c $0e $00
     jr   C, .jr_02_5e42                                ;; 02:5e3e $38 $02
     ld   C, $01                                        ;; 02:5e40 $0e $01
 .jr_02_5e42:
-    call call_00_2980_ObjectSet19                                  ;; 02:5e42 $cd $80 $29
+    call call_00_2980_Object_SetExtraFlags                                  ;; 02:5e42 $cd $80 $29
 .jr_02_5e45:
-    call call_00_298a_ObjectGet19                                  ;; 02:5e45 $cd $8a $29
+    call call_00_298a_Object_GetExtraFlags                                  ;; 02:5e45 $cd $8a $29
     jr   Z, .jr_02_5e6d                                ;; 02:5e48 $28 $23
     ld   A, [wDC71_FrameCounter]                                    ;; 02:5e4a $fa $71 $dc
     and  A, $07                                        ;; 02:5e4d $e6 $07
@@ -795,7 +795,7 @@ call_02_5e34_ObjectAction_SkatingElf_Damaged:
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped                                  ;; 02:5e70 $cd $4a $24
     call call_00_2766_Object_ResetYIfAboveStart                                  ;; 02:5e73 $cd $66 $27
     ld   C, $01                                        ;; 02:5e76 $0e $01
-    call NC, call_00_2980_ObjectSet19                              ;; 02:5e78 $d4 $80 $29
+    call NC, call_00_2980_Object_SetExtraFlags                              ;; 02:5e78 $d4 $80 $29
     ret                                                ;; 02:5e7b $c9
 
 call_02_5e7c_ObjectAction_Penguin_WalkOrRun:
@@ -811,7 +811,7 @@ call_02_5e7c_ObjectAction_Penguin_WalkOrRun:
     ld   A, [wDA12_ObjectDirectionRelativeToPlayer]                                    ;; 02:5e8e $fa $12 $da
     xor  A, $20                                        ;; 02:5e91 $ee $20
     ld   C, A                                          ;; 02:5e93 $4f
-    call call_00_2958_ObjectSetFacingDirection                                  ;; 02:5e94 $cd $58 $29
+    call call_00_2958_Object_SetFacingDirection                                  ;; 02:5e94 $cd $58 $29
     ld   C, $1e                                        ;; 02:5e97 $0e $1e
     call call_00_2588_Object_ApproachXVelocity                                  ;; 02:5e99 $cd $88 $25
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing                                  ;; 02:5e9c $cd $1c $25
@@ -821,10 +821,10 @@ call_02_5e7c_ObjectAction_Penguin_WalkOrRun:
     ret  NC                                            ;; 02:5ea6 $d0
     ld   HL, wDA12_ObjectDirectionRelativeToPlayer                                     ;; 02:5ea7 $21 $12 $da
     ld   C, [HL]                                       ;; 02:5eaa $4e
-    call call_00_2958_ObjectSetFacingDirection                                  ;; 02:5eab $cd $58 $29
+    call call_00_2958_Object_SetFacingDirection                                  ;; 02:5eab $cd $58 $29
 .jr_02_5eae:
     ld   C, $30                                        ;; 02:5eae $0e $30
-    call call_00_28dc_ObjectSetYVelocity                                  ;; 02:5eb0 $cd $dc $28
+    call call_00_28dc_Object_SetYVelocity                                  ;; 02:5eb0 $cd $dc $28
     ld   A, OBJECTACTION_PENGUIN_JUMP                                        ;; 02:5eb3 $3e $01
     jp   call_02_72ac_SetupNewAction                                  ;; 02:5eb5 $c3 $ac $72
 
@@ -840,7 +840,7 @@ call_02_5eb8_ObjectAction_Penguin_Jump:
 
 call_02_5ecc_ObjectAction_Rezling_Walk:
     ld   c,$14
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     call call_00_2410_Object_SetFacingRelativeToPlayer
     call call_00_254a_Object_AdvancePosition_XDelta
     jp   call_00_2879_Object_SnapXPosition
@@ -858,7 +858,7 @@ call_02_5edd_ObjectAction_Fish_Unk0:
     call call_00_2722_IsPlayerNearObject
     jr   z,label5EF1
     call call_00_2a68_Object_ComputePlayerXProximity
-    call call_00_2976_ObjectGetFacingDirection
+    call call_00_2976_Object_GetFacingDirection
     ld   hl,wDA12_ObjectDirectionRelativeToPlayer
     cp   [hl]
     ld   a,$01
@@ -874,13 +874,13 @@ call_02_5ef9_ObjectAction_Fish_Unk1:
     jp   call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
 
 call_02_5f01_ObjectAction_SafariSam_Unk0:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   c,$F0
-    call nz,call_00_290d_ObjectSetTimer1A
+    call nz,call_00_290d_Object_SetTimer1A
     call call_00_2722_IsPlayerNearObject
     jr   z,label5F22
     call call_00_2a68_Object_ComputePlayerXProximity
-    call call_00_2976_ObjectGetFacingDirection
+    call call_00_2976_Object_GetFacingDirection
     ld   hl,wDA12_ObjectDirectionRelativeToPlayer
     cp   [hl]
     jr   z,label5F22
@@ -889,39 +889,39 @@ call_02_5f01_ObjectAction_SafariSam_Unk0:
     call c,call_00_2410_Object_SetFacingRelativeToPlayer
 label5F22:
     ld   c,$06
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
     ld   c,$27
     call call_00_2b10_Object_FindDuplicateInstance
     ret  nz
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     ld   a,$01
     jp   z,entry_02_72ac_SetupNewAction
     ret  
 
 call_02_5f39_ObjectAction_SafariSam_Unk2:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   c,$06
     call nz,call_00_3792_PrepareRelativeObjectSpawn
     ret  
 
 call_02_5f42_ObjectAction_SafariSam_Unk3:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   c,$30
-    call nz,call_00_28dc_ObjectSetYVelocity
+    call nz,call_00_28dc_Object_SetYVelocity
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     jp   call_00_2766_Object_ResetYIfAboveStart
 
 call_02_5f50_ObjectAction_SafariSamProjectile_Update:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label5F5F
     ld   c,$F0
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
     ld   c,$0A
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
 .label5F5F:
     call call_00_254a_Object_AdvancePosition_XDelta
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     jp   z,call_00_2b80_ClearObjectMemoryEntry
     ret  
 
@@ -934,10 +934,10 @@ call_02_5f69_ObjectAction_GhostKnight_Unk0:
     jp   entry_02_72ac_SetupNewAction
 
 call_02_5f78_ObjectAction_GhostKnight_Unk1:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   c,$41
-    call nz,call_00_290d_ObjectSetTimer1A
-    call call_00_2922_ObjectTimer1ACountdown
+    call nz,call_00_290d_Object_SetTimer1A
+    call call_00_2922_Object_Timer1ACountdown
     ld   a,$02
     jp   z,entry_02_72ac_SetupNewAction
     ld   a,[hl]
@@ -947,7 +947,7 @@ call_02_5f78_ObjectAction_GhostKnight_Unk1:
     ret  
 
 call_02_5f91_ObjectAction_GhostKnight_Unk3:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ret  z
     ld   hl,wDCD3
     inc  [hl]
@@ -1015,7 +1015,7 @@ call_02_5F9B:
     db   $00, $5d, $00
     
 call_02_60c7_ObjectAction_GhostKnightProjectile_Update:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label60F2
     ld   a,[wDCD3]
     add  a
@@ -1033,17 +1033,17 @@ call_02_60c7_ObjectAction_GhostKnightProjectile_Update:
     add  hl,de
     ld   c,[hl]
     push hl
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     pop  hl
     inc  hl
     ld   c,[hl]
-    call call_00_28dc_ObjectSetYVelocity
+    call call_00_28dc_Object_SetYVelocity
     ld   c,$5A
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
 .label60F2:
     call call_00_24c0_Object_IntegrateXVelocity
     call call_00_24ee_Object_IntegrateYVelocity
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     jp   z,call_00_2b7a_ClearObjectThenJump
     ret  
 .data_02_60ff:
@@ -1059,19 +1059,19 @@ call_02_60c7_ObjectAction_GhostKnightProjectile_Update:
 
 call_02_613f_ObjectAction_Hand_Unk0:
     ld   c,$04
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
     ld   a,$01
     jp   nz,entry_02_72ac_SetupNewAction
     ret  
 
 call_02_614d_ObjectAction_Hand_Unk1:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   c,$38
-    call nz,call_00_28dc_ObjectSetYVelocity
+    call nz,call_00_28dc_Object_SetYVelocity
 label6155:
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
-    call call_00_28d2_ObjectGetYVelocity
+    call call_00_28d2_Object_GetYVelocity
     bit  7,a
     ld   a,$02
     jp   nz,entry_02_72ac_SetupNewAction
@@ -1085,12 +1085,12 @@ call_02_6163_ObjectAction_Hand_Unk2:
     ret  
     
 call_02_616f_ObjectAction_Hand_Unk3:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label61A1
     ld   a,$19
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   c,$10
-    call call_00_28dc_ObjectSetYVelocity
+    call call_00_28dc_Object_SetYVelocity
     ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_XPOS_OFFSET
@@ -1133,10 +1133,10 @@ call_02_61b8_ObjectAction_LostArk_Unk2:
 
 call_02_61c6_ObjectAction_Bee_Unk0:
     ld   c,04
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
     call call_00_2a68_Object_ComputePlayerXProximity
-    call call_00_2976_ObjectGetFacingDirection
+    call call_00_2976_Object_GetFacingDirection
     ld   hl,wDA12_ObjectDirectionRelativeToPlayer
     cp   [hl]
     ret  nz
@@ -1144,9 +1144,9 @@ call_02_61c6_ObjectAction_Bee_Unk0:
     cp   a,$30
     ret  nc
     ld   c,$20
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     ld   c,$30
-    call call_00_28dc_ObjectSetYVelocity
+    call call_00_28dc_Object_SetYVelocity
     ld   a,$01
     jp   entry_02_72ac_SetupNewAction
 
@@ -1155,7 +1155,7 @@ call_02_61ee_ObjectAction_Bee_Unk1:
     call call_00_2475_Object_ApplyGravityAndSnapToGround
     ld   c,$00
     jr   nc,.label620B
-    call call_00_28d2_ObjectGetYVelocity
+    call call_00_28d2_Object_GetYVelocity
     bit  7,a
     jr   nz,.label6206
     ld   c,$02
@@ -1167,7 +1167,7 @@ call_02_61ee_ObjectAction_Bee_Unk1:
     ret  nc
     ld   c,$03
 .label620B:
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     ld   a,c
     cp   [hl]
     jp   nz,entry_02_72ac_SetupNewAction
@@ -1182,27 +1182,27 @@ call_02_6214_ObjectAction_Raft_ResetAndWait:
 ; Sets a countdown timer (Timer1A = $28).
 ; In its idle loop: every 4 frames it slowly drifts upward (bc=$FFFF → add -1 to Y).
 ; When the timer expires, it switches the raft into the next action (via entry_02_72ac_SetupNewAction).
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label6239
     call call_00_2826_Object_ResetToInitialXPos
     call call_00_27e4_Object_ResetToInitialYPos
     ld   c,$40
-    call call_00_2980_ObjectSet19
+    call call_00_2980_Object_SetExtraFlags
     ld   c,$00
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     ld   c,$00
-    call call_00_2958_ObjectSetFacingDirection
+    call call_00_2958_Object_SetFacingDirection
     ld   bc,$0028
     call call_00_250d_Object_UpdateYPosition
     ld   c,$28
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
 .label6239:
     ld   a,[wDC71_FrameCounter]
     and  a,$03
     ret  nz
     ld   bc,$FFFF
     call call_00_250d_Object_UpdateYPosition
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     ld   a,$01
     jp   z,entry_02_72ac_SetupNewAction
     ret  
@@ -1219,9 +1219,9 @@ call_02_624e_ObjectAction_Raft_MoveRightAndCarryPlayer:
     ld   a,[wDC71_FrameCounter]
     and  a,$01
     ld   c,$00
-    jp   z,call_00_28c8_ObjectSetXVelocity
+    jp   z,call_00_28c8_Object_SetXVelocity
     ld   c,$01
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     ld   bc,$0001
     call call_00_24df_Object_UpdateXPosition
     call call_00_26c9_Object_InfluencePlayerX
@@ -1261,43 +1261,43 @@ call_02_6293_ObjectAction_Raft_DriftDown:
 ; Otherwise, resets facing and X velocity to 0, and sets a timer (Timer1A = $28).
 ; In its loop: every 4 frames, nudges raft downward (bc=$0001 → +1 to Y).
 ; Once the timer expires, transitions raft back to state 0.
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label62A7
     ld   c,$00
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     ld   c,$00
-    call call_00_2958_ObjectSetFacingDirection
+    call call_00_2958_Object_SetFacingDirection
     ld   c,$28
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
 .label62A7:
     ld   a,[wDC71_FrameCounter]
     and  a,$03
     ret  nz
     ld   bc,$0001
     call call_00_250d_Object_UpdateYPosition
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     ld   a,$00
     jp   z,entry_02_72ac_SetupNewAction
     ret  
 
 call_02_62bc_ObjectAction_Snake_Unk0:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label62D0
     ld   c,$08
-    call call_00_2944_ObjectSetWidth
-    call call_00_293a_ObjectGetId
+    call call_00_2944_Object_SetWidth
+    call call_00_293a_Object_GetId
     cp   a,$31
     ld   c,$20
-    call z,call_00_2958_ObjectSetFacingDirection
+    call z,call_00_2958_Object_SetFacingDirection
 .label62D0:
-    call call_00_2a5d_ObjectCheckFlag2
+    call call_00_2a5d_Object_Check5Flag2
     ret  z
     call call_00_2a68_Object_ComputePlayerXProximity
-    call call_00_2976_ObjectGetFacingDirection
+    call call_00_2976_Object_GetFacingDirection
     ld   hl,wDA12_ObjectDirectionRelativeToPlayer
     cp   [hl]
     ret  nz
-    call call_00_293a_ObjectGetId
+    call call_00_293a_Object_GetId
     ld   c,$32
     cp   a,$30
     jr   z,.label62EA
@@ -1312,11 +1312,11 @@ call_02_62bc_ObjectAction_Snake_Unk0:
     ret  
 
 call_02_62f9_ObjectAction_Snake_Unk1:
-    call call_00_2a5d_ObjectCheckFlag2
+    call call_00_2a5d_Object_Check5Flag2
     ret  z
     ld   c,$10
-    call call_00_2944_ObjectSetWidth
-    call call_00_293a_ObjectGetId
+    call call_00_2944_Object_SetWidth
+    call call_00_293a_Object_GetId
     ld   c,$0E
     cp   a,$30
     jr   z,.label630D
@@ -1328,39 +1328,39 @@ call_02_62f9_ObjectAction_Snake_Unk1:
 
 call_02_6315_ObjectAction_Snake_Unk2:
     ld   c,$08
-    jp   call_00_2944_ObjectSetWidth
+    jp   call_00_2944_Object_SetWidth
 
 call_02_631a_ObjectAction_SnakeRightProjectile_Update:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label6329
     ld   c,$20
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     ld   c,$40
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
 .label6329:
     call call_00_24c0_Object_IntegrateXVelocity
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     jp   z,call_00_2b7a_ClearObjectThenJump
     ret  
 
 call_02_6333_ObjectAction_SnakeLeftProjectile_Update:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label6342
     ld   c,$E0
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     ld   c,$40
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
 .label6342:
     call call_00_24c0_Object_IntegrateXVelocity
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     jp   z,call_00_2b7a_ClearObjectThenJump
     ret  
 
 call_02_634c_ObjectAction_RaStatue_Unk0:
-    call call_00_293a_ObjectGetId
+    call call_00_293a_Object_GetId
     cp   a,$36
     ld   c,$20
-    call z,call_00_2958_ObjectSetFacingDirection
+    call z,call_00_2958_Object_SetFacingDirection
     call call_00_2826_Object_ResetToInitialXPos
     call call_00_27e4_Object_ResetToInitialYPos
     ld   a,$01
@@ -1381,13 +1381,13 @@ call_02_6361_ObjectAction_RaStatue_Unk1:
 call_02_6399_ObjectAction_RaStatue_Unk3:
     call call_00_24c0_Object_IntegrateXVelocity
     call call_00_24ee_Object_IntegrateYVelocity
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     ld   a,$00
     jp   z,entry_02_72ac_SetupNewAction
     ret
     
 call_02_63a8_ObjectAction_BreakableBlock_Unk0:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label63B1
     xor  a
     ld   [wDCDC_HandObjectUnkFlag],a
@@ -1396,7 +1396,7 @@ call_02_63a8_ObjectAction_BreakableBlock_Unk0:
     bit  0,[hl]
     ret  z
     ld   [hl],$00
-    call call_00_2962_ObjectGetActionId
+    call call_00_2962_Object_GetActionId
     inc  a
     jp   entry_02_72ac_SetupNewAction
 
@@ -1413,7 +1413,7 @@ call_02_63d3_ObjectAction_Coffin_Unk2:
 
 call_02_63db_ObjectAction_Cactus_Unk0:
     ld   c,$28
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     call call_00_2a68_Object_ComputePlayerXProximity
     ld   a,[wDA12_ObjectDirectionRelativeToPlayer]
     ld   hl,wD80D_PlayerFacingDirection
@@ -1423,13 +1423,13 @@ call_02_63db_ObjectAction_Cactus_Unk0:
     ret  
 
 call_02_63f0_ObjectAction_Cactus_Unk1:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label63FD
     ld   c,$3C
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
     call call_00_2410_Object_SetFacingRelativeToPlayer
 .label63FD:
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     ld   a,$02
     jp   z,entry_02_72ac_SetupNewAction
 
@@ -1443,9 +1443,9 @@ call_02_6405:
     ret  
 
 call_02_6415_ObjectAction_Cactus_Unk4:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   c,$20
-    call nz,call_00_28dc_ObjectSetYVelocity
+    call nz,call_00_28dc_Object_SetYVelocity
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_ResetYIfAboveStart
@@ -1455,35 +1455,35 @@ call_02_6415_ObjectAction_Cactus_Unk4:
     jr   call_02_6405
 
 call_02_642e_ObjectAction_Rock_Unk0:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label643D
     ld   c,$00
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
     ld   c,$10
-    call call_00_294e_ObjectSetHeight
+    call call_00_294e_Object_SetHeight
 .label643D:
-    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    call call_00_2917_Object_CheckIfTimer1AIsZero
     jr   nz,.label6450
     ld   a,[wDC7B]
     ld   hl,wDA00_CurrentObjectAddrLo
     cp   [hl]
     ret  nz
     call call_00_230f_ResolveObjectListIndex
-    jp   call_00_290d_ObjectSetTimer1A
+    jp   call_00_290d_Object_SetTimer1A
 .label6450:
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     ld   a,$01
     jp   z,entry_02_72ac_SetupNewAction
     ret  
 
 call_02_6459_ObjectAction_Rock_Unk1:
-    call call_00_296c_ObjectGet9
+    call call_00_296c_Object_Get9
     ld   l,a
     ld   h,$00
     ld   de,.data_02_6467
     add  hl,de
     ld   c,[hl]
-    jp   call_00_294e_ObjectSetHeight
+    jp   call_00_294e_Object_SetHeight
 .data_02_6467:
     db   $10, $0e, $0c, $0a, $08, $06, $04, $02
 
@@ -1492,13 +1492,13 @@ call_02_646f_ObjectAction_Rock_Unk2:
     ret  
 
 call_02_647b_ObjectAction_Rock_Unk3:
-    call call_00_296c_ObjectGet9
+    call call_00_296c_Object_Get9
     ld   l,a
     ld   h,$00
     ld   de,call_02_6489
     add  hl,de
     ld   c,[hl]
-    jp   call_00_294e_ObjectSetHeight
+    jp   call_00_294e_Object_SetHeight
 
 call_02_6489:
     ld   [bc],a
@@ -1522,7 +1522,7 @@ call_02_6491_ObjectAction_HardHat_Unk0:
     ld   a,[wDA12_ObjectDirectionRelativeToPlayer]
     xor  a,$20
     ld   c,a
-    call call_00_2958_ObjectSetFacingDirection
+    call call_00_2958_Object_SetFacingDirection
     ld   c,$1E
     call call_00_2588_Object_ApproachXVelocity
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
@@ -1532,15 +1532,15 @@ call_02_6491_ObjectAction_HardHat_Unk0:
     ret  nc
     ld   hl,wDA12_ObjectDirectionRelativeToPlayer
     ld   c,[hl]
-    call call_00_2958_ObjectSetFacingDirection
+    call call_00_2958_Object_SetFacingDirection
 .label64C8:
     ld   a,$01
     jp   entry_02_72ac_SetupNewAction
 
 call_02_64cd_ObjectAction_HardHat_Unk1:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   c,$20
-    call nz,call_00_28dc_ObjectSetYVelocity
+    call nz,call_00_28dc_Object_SetYVelocity
     ld   c,$10
     call call_00_2588_Object_ApproachXVelocity
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
@@ -1551,7 +1551,7 @@ call_02_64cd_ObjectAction_HardHat_Unk1:
     ret  
 
 call_02_64e9_ObjectAction_Bat_Unk0:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label64F4
     call call_00_2826_Object_ResetToInitialXPos
     call call_00_27e4_Object_ResetToInitialYPos
@@ -1564,22 +1564,22 @@ call_02_64e9_ObjectAction_Bat_Unk0:
     ret  
 
 call_02_6502_ObjectAction_Bat_Unk2:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label651D
     call call_00_2410_Object_SetFacingRelativeToPlayer
-    call call_00_2976_ObjectGetFacingDirection
+    call call_00_2976_Object_GetFacingDirection
     ld   c,$10
     cp   a,$00
     jr   z,.label6515
     ld   c,$F0
 .label6515:
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     ld   c,$20
-    call call_00_28dc_ObjectSetYVelocity
+    call call_00_28dc_Object_SetYVelocity
 .label651D:
     call call_00_24c0_Object_IntegrateXVelocity
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
-    call call_00_28f1_ObjectCheckIfYVelocityIsZero
+    call call_00_28f1_Object_CheckIfYVelocityIsZero
     bit  7,a
     ld   a,$03
     jp   nz,entry_02_72ac_SetupNewAction
@@ -1594,7 +1594,7 @@ call_02_652e_ObjectAction_Bat_Unk3:
     ret  
 
 call_02_653d_ObjectAction_Door1_Unk1:
-    call call_00_2a5d_ObjectCheckFlag2
+    call call_00_2a5d_Object_Check5Flag2
     ret  z
     call call_00_1bbc_CheckForDoorAndEnter.jr_00_1bce
     ld   c,$02
@@ -1613,7 +1613,7 @@ call_02_6553_ObjectAction_Door2_Unk0:
     jp   entry_02_72ac_SetupNewAction
 
 call_02_655d_ObjectAction_Door2_Unk3:
-    call call_00_2a5d_ObjectCheckFlag2
+    call call_00_2a5d_Object_Check5Flag2
     ret  z
     call call_00_1bbc_CheckForDoorAndEnter.jr_00_1bce
     ld   c,$00
@@ -1628,13 +1628,13 @@ call_02_6569_ObjectAction_FanLift_Unk0:
     jp   entry_02_72ac_SetupNewAction
 
 call_02_6577_ObjectAction_FanLift_Unk2:
-    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    call call_00_2917_Object_CheckIfTimer1AIsZero
     inc  [hl]
     ld   hl,wDC71_FrameCounter
     and  [hl]
     and  a,$1F
     jr   z,.label6589
-    call call_00_2976_ObjectGetFacingDirection
+    call call_00_2976_Object_GetFacingDirection
     xor  a,$20
     ld   [hl],a
 .label6589:
@@ -1647,7 +1647,7 @@ call_02_6577_ObjectAction_FanLift_Unk2:
 
 call_02_6597_ObjectAction_MechLeft_Unk0:
     ld   c,$20
-    call call_00_2958_ObjectSetFacingDirection
+    call call_00_2958_Object_SetFacingDirection
 call_02_659c_ObjectAction_MechRight_Unk0:
     ret  
 
@@ -1680,16 +1680,16 @@ call_02_65c9_ObjectAction_BlueBeamBarrier_Unk0:
     jp   entry_02_72ac_SetupNewAction
 
 call_02_65d7_ObjectAction_AnimeRisingPlatform_Update:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   c,$00
-    call nz,call_00_290d_ObjectSetTimer1A
+    call nz,call_00_290d_Object_SetTimer1A
     ld   a,[wDC7B]
     and  a
     jr   z,.label65F8
     ld   hl,wDA00_CurrentObjectAddrLo
     cp   [hl]
     jr   z,.label65F8
-    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    call call_00_2917_Object_CheckIfTimer1AIsZero
     cp   a,$A8
     ret  nc
     inc  [hl]
@@ -1699,7 +1699,7 @@ call_02_65d7_ObjectAction_AnimeRisingPlatform_Update:
     ld   a,[wDC71_FrameCounter]
     and  a,$03
     ret  nz
-    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    call call_00_2917_Object_CheckIfTimer1AIsZero
     ret  z
     dec  [hl]
     ld   bc,$0001
@@ -1739,7 +1739,7 @@ call_02_6633_ObjectAction_OffSwitch_Unk1:
 
 call_02_6641_ObjectAction_SailorToonGirl_Unk0:
     ld   c,$10
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
     call call_00_2722_IsPlayerNearObject
     ret  z
@@ -1753,7 +1753,7 @@ call_02_6641_ObjectAction_SailorToonGirl_Unk0:
     jp   nc,entry_02_72ac_SetupNewAction
     ret  
 .label6662:
-    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    call call_00_2917_Object_CheckIfTimer1AIsZero
     inc  a
     cp   a,$09
     jr   c,.label666B
@@ -1784,18 +1784,18 @@ call_02_668d_ObjectAction_SailorToonGirl_Unk3:
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_ResetYIfAboveStart
     ret  c
-    call call_00_2a5d_ObjectCheckFlag2
+    call call_00_2a5d_Object_Check5Flag2
     ld   a,$04
     jp   nz,entry_02_72ac_SetupNewAction
     ret  
 
 call_02_669d_ObjectAction_SailorToonGirl_Unk5:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label66AC
     ld   c,$18
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     ld   c,$28
-    call call_00_28dc_ObjectSetYVelocity
+    call call_00_28dc_Object_SetYVelocity
 .label66AC:
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
@@ -1815,26 +1815,26 @@ call_02_66bb_ObjectAction_BigSilverRobot_Unk0:
 
 call_02_66cc_ObjectAction_BigSilverRobot_Unk1:
     ld   c,$10
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
     ret  z
-    call call_00_2976_ObjectGetFacingDirection
+    call call_00_2976_Object_GetFacingDirection
     xor  a,$20
     ld   [hl],a
     ld   a,$02
     jp   entry_02_72ac_SetupNewAction
 
 call_02_66e0_ObjectAction_BigSilverRobot_Unk2:
-    call call_00_2a5d_ObjectCheckFlag2
+    call call_00_2a5d_Object_Check5Flag2
     ret  z
-    call call_00_2976_ObjectGetFacingDirection
+    call call_00_2976_Object_GetFacingDirection
     xor  a,$20
     ld   [hl],a
     ld   a,$01
     jp   entry_02_72ac_SetupNewAction
 
 call_02_66ef_ObjectAction_BigSilverRobot_Unk3:
-    call call_00_2a5d_ObjectCheckFlag2
+    call call_00_2a5d_Object_Check5Flag2
     jp   nz,call_00_2b7a_ClearObjectThenJump
     ret  
 
@@ -1850,7 +1850,7 @@ call_02_66f6_ObjectAction_SmallBlueRobot_Unk0:
     ld   a,[wDA12_ObjectDirectionRelativeToPlayer]
     xor  a,$20
     ld   c,a
-    call call_00_2958_ObjectSetFacingDirection
+    call call_00_2958_Object_SetFacingDirection
     ld   c,$10
     call call_00_2588_Object_ApproachXVelocity
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
@@ -1860,10 +1860,10 @@ call_02_66f6_ObjectAction_SmallBlueRobot_Unk0:
     ret  nc
     ld   hl,wDA12_ObjectDirectionRelativeToPlayer
     ld   c,[hl]
-    call call_00_2958_ObjectSetFacingDirection
+    call call_00_2958_Object_SetFacingDirection
 .label6728:
     ld   c,$30
-    call call_00_28dc_ObjectSetYVelocity
+    call call_00_28dc_Object_SetYVelocity
     ld   a,$01
     jp   entry_02_72ac_SetupNewAction
 
@@ -1878,40 +1878,40 @@ call_02_6732_ObjectAction_SmallBlueRobot_Unk1:
     ret  
 
 call_02_6746_ObjectAction_Secbot_Unk0:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   c,$00
-    call nz,call_00_290d_ObjectSetTimer1A
+    call nz,call_00_290d_Object_SetTimer1A
     ld   c,$04
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
     ld   c,$02
-    call nz,call_00_290d_ObjectSetTimer1A
+    call nz,call_00_290d_Object_SetTimer1A
     call call_00_29ac_Object_CheckFacingPlayer
     ret  nz
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     ld   c,$10
     jp   nz,call_00_3792_PrepareRelativeObjectSpawn
     ret  
 
 call_02_6768_ObjectAction_Secbot_Unk1:
-    call call_00_298a_ObjectGet19
+    call call_00_298a_Object_GetExtraFlags
     cp   a,$50
     jr   z,.label6776
     inc  [hl]
     ld   bc,$FFFF
     call call_00_250d_Object_UpdateYPosition
 .label6776:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   c,$00
-    call nz,call_00_290d_ObjectSetTimer1A
+    call nz,call_00_290d_Object_SetTimer1A
     ld   c,$10
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
     ld   c,$C1
-    call nz,call_00_290d_ObjectSetTimer1A
+    call nz,call_00_290d_Object_SetTimer1A
     call call_00_29ac_Object_CheckFacingPlayer
     ret  nz
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     ret  z
     and  a,$3F
     ld   c,$10
@@ -1919,26 +1919,26 @@ call_02_6768_ObjectAction_Secbot_Unk1:
     ret  
 
 call_02_679b_ObjectAction_SecbotProjectile_Update:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label67B3
-    call call_00_2976_ObjectGetFacingDirection
+    call call_00_2976_Object_GetFacingDirection
     ld   c,$18
     cp   a,$00
     jr   z,.label67AB
     ld   c,$E8
 .label67AB:
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     ld   c,$B4
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
 .label67B3:
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     jp   z,call_00_2b7a_ClearObjectThenJump
     call call_00_24c0_Object_IntegrateXVelocity
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     jp   call_00_2766_Object_ResetYIfAboveStart
 
 call_02_67c2_ObjectAction_Elevator_Update:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label67DF
     call call_02_688E
     ld   l,c
@@ -2081,7 +2081,7 @@ call_02_68af_ObjectAction_FireWallEnemy_Update:
     jp   call_00_233e_Object_UpdatePatternedPositionFromVelocityTable
 
 call_02_68b2_ObjectAction_Grenade_Unk0:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ret  z
     ld   hl,.data_02_68e5
     call call_00_2c20_Object_CopyPaletteToBuffer
@@ -2096,11 +2096,11 @@ call_02_68b2_ObjectAction_Grenade_Unk0:
     ld   b,$FF
     call call_00_250d_Object_UpdateYPosition
     ld   c,$04
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
     ld   c,$00
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     ld   c,$00
-    call call_00_28dc_ObjectSetYVelocity
+    call call_00_28dc_Object_SetYVelocity
     ret  
 .data_02_68e5:    
     db   $00, $00, $00, $00, $ff, $03, $ff, $7f
@@ -2110,7 +2110,7 @@ call_02_68ed_ObjectAction_Grenade_Unk1:
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_ResetYIfAboveStart
     ret  c
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     ld   a,$02
     jp   z,entry_02_72ac_SetupNewAction
     ld   l,[hl]
@@ -2118,8 +2118,8 @@ call_02_68ed_ObjectAction_Grenade_Unk1:
     ld   de,.data_02_6924
     add  hl,de
     ld   c,[hl]
-    call call_00_28dc_ObjectSetYVelocity
-    call call_00_28e6_ObjectCheckIfXVelocityIsZero
+    call call_00_28dc_Object_SetYVelocity
+    call call_00_28e6_Object_CheckIfXVelocityIsZero
     ret  nz
     ld   a,[wDC71_FrameCounter]
     swap a
@@ -2129,14 +2129,14 @@ call_02_68ed_ObjectAction_Grenade_Unk1:
     ld   de,.data_02_6920
     add  hl,de
     ld   c,[hl]
-    jp   call_00_28c8_ObjectSetXVelocity
+    jp   call_00_28c8_Object_SetXVelocity
 .data_02_6920:
     db   $08, $f8, $04, $fc
 .data_02_6924:
     db   $00, $20, $28, $30
 
 call_02_6928_ObjectAction_Grenade_Unk2:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   bc,$0008
     call nz,call_00_250d_Object_UpdateYPosition
     ld   hl,.data_02_6937
@@ -2145,7 +2145,7 @@ call_02_6928_ObjectAction_Grenade_Unk2:
     db   $00, $00, $1b, $00, $5f, $02, $1f, $1b        ;; 02:6937 ????????
 
 call_02_693f_ObjectAction_MadBomber_Unk2:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   c,$15
     call nz,call_00_3792_PrepareRelativeObjectSpawn
 call_02_6947_ObjectAction_MadBomber_Unk0:
@@ -2154,7 +2154,7 @@ call_02_6947_ObjectAction_MadBomber_Unk0:
     and  a
     ret  z
     ld   [hl],$00
-    call call_00_28a0_ObjectGet15
+    call call_00_28a0_Object_Get15
     and  a
     ret  nz
     ld   a,$04
@@ -2163,7 +2163,7 @@ call_02_6947_ObjectAction_MadBomber_Unk0:
     ret  
 
 call_02_6965_ObjectAction_MadBomber_Unk5:
-    call call_00_2a5d_ObjectCheckFlag2
+    call call_00_2a5d_Object_Check5Flag2
     ret  z
     ld   c,$01
     call call_00_21ef_PlayRemoteSpawnSFX
@@ -2208,7 +2208,7 @@ call_02_697e:
     db   $50, $00, $1c, $00, $50, $00, $19, $00        ;; 02:69a7 ????????
 
 call_02_69af_ObjectAction_Bomb_Unk1:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label69CB
     ld   hl,wDCCE
     ld   a,[hl]
@@ -2219,9 +2219,9 @@ call_02_69af_ObjectAction_Bomb_Unk1:
     ld   de,.data_02_69fc
     add  hl,de
     ld   c,[hl]
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     ld   c,$20
-    call call_00_28dc_ObjectSetYVelocity
+    call call_00_28dc_Object_SetYVelocity
 .label69CB:
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     ld   de,$0068
@@ -2238,11 +2238,11 @@ call_02_69af_ObjectAction_Bomb_Unk1:
     dec  l
     ld   [hl],e
     ld   c,$00
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     ld   c,$00
-    call call_00_28dc_ObjectSetYVelocity
+    call call_00_28dc_Object_SetYVelocity
     ld   c,$2D
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
     ld   a,$1C
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$02
@@ -2254,13 +2254,13 @@ call_02_6a04_ObjectAction_Bomb_Unk2:
     ld   a,[wDC71_FrameCounter]
     and  a,$03
     ret  nz
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     ld   a,$04
     jp   z,entry_02_72ac_SetupNewAction
     ret  
 
 call_02_6a13_ObjectAction_Bomb_Unk3:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label6A38
     ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
@@ -2279,9 +2279,9 @@ call_02_6a13_ObjectAction_Bomb_Unk3:
 .label6A2E:
     inc  hl
     ld   c,[hl]
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     ld   c,$D8
-    call call_00_28dc_ObjectSetYVelocity
+    call call_00_28dc_Object_SetYVelocity
 .label6A38:
     call call_00_24c0_Object_IntegrateXVelocity
     call call_00_24ee_Object_IntegrateYVelocity
@@ -2291,12 +2291,12 @@ call_02_6a13_ObjectAction_Bomb_Unk3:
     db   $00, $71, $f9, $8f, $ea
     
 call_02_6a4c_ObjectAction_Bomb_Unk4:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   a,$19
     call nz,call_00_0ff5_QueueSoundEffectWithPriority
     ld   hl,.data_02_6a89
     call call_00_2c20_Object_CopyPaletteToBuffer
-    call call_00_2a5d_ObjectCheckFlag2
+    call call_00_2a5d_Object_Check5Flag2
     jp   nz,call_00_2b7a_ClearObjectThenJump
     ld   c,$55
     call call_00_29b7_FindObjectByID_C
@@ -2326,12 +2326,12 @@ call_02_6a4c_ObjectAction_Bomb_Unk4:
     db   $00, $00, $1b, $00, $5f, $02, $1f, $1b
     
 call_02_6a91_ObjectAction_WaterTowerTank_Unk0:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label6AA1
     ld   bc,$FFD0
     call call_00_250d_Object_UpdateYPosition
     ld   c,$28
-    call call_00_294e_ObjectSetHeight
+    call call_00_294e_Object_SetHeight
 .label6AA1:
     call call_00_22d4_CheckObjectSlotFlag
     ret  z
@@ -2343,9 +2343,9 @@ call_02_6a91_ObjectAction_WaterTowerTank_Unk0:
     jp   entry_02_72ac_SetupNewAction
 
 call_02_6ab4_ObjectAction_WaterTowerTank_Unk1:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   c,$10
-    call nz,call_00_294e_ObjectSetHeight
+    call nz,call_00_294e_Object_SetHeight
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_ResetYIfAboveStart
     ret  c
@@ -2355,44 +2355,44 @@ call_02_6ab4_ObjectAction_WaterTowerTank_Unk1:
     jp   entry_02_72ac_SetupNewAction
 
 call_02_6acd_ObjectAction_Convict_Unk0:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jp   nz,call_00_2410_Object_SetFacingRelativeToPlayer
     ret  
 
 call_02_6ad4_ObjectAction_Convict_Unk2:    
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   c,$14
     jp   nz,call_00_3792_PrepareRelativeObjectSpawn
     ret  
 
 call_02_6add_ObjectAction_ConvictProjectile_Update:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label6AF5
-    call call_00_2976_ObjectGetFacingDirection
+    call call_00_2976_Object_GetFacingDirection
     ld   c,$20
     cp   a,$00
     jr   z,.label6AED
     ld   c,$E0
 .label6AED:
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     ld   c,$78
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
 .label6AF5:
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     jp   z,call_00_2b7a_ClearObjectThenJump
     cp   a,$3C
     call c,call_00_2475_Object_ApplyVerticalVelocity_Clamped
     jp   call_00_24c0_Object_IntegrateXVelocity
 
 call_02_6b03_ObjectAction_Spider_Unk0:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label6B0E
     call call_00_230f_ResolveObjectListIndex
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
 .label6B0E:
     ld   bc,$0002
     call call_00_250d_Object_UpdateYPosition
-    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    call call_00_2917_Object_CheckIfTimer1AIsZero
     sub  a,$02
     ld   [hl],a
     ld   a,$01
@@ -2403,7 +2403,7 @@ call_02_6b20_ObjectAction_Spider_Unk1:
     ld   bc,$FFFF
     call call_00_250d_Object_UpdateYPosition
     call call_00_230f_ResolveObjectListIndex
-    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    call call_00_2917_Object_CheckIfTimer1AIsZero
     inc  a
     ld   [hl],a
     cp   c
@@ -2412,23 +2412,23 @@ call_02_6b20_ObjectAction_Spider_Unk1:
     ret  
 
 call_02_6b35_ObjectAction_Spider_Unk2:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label6B47
     ld   c,$20
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     ld   c,$08
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
     call call_00_2410_Object_SetFacingRelativeToPlayer
 .label6B47:
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     ld   a,$00
     jp   z,entry_02_72ac_SetupNewAction
     ret  
 
 call_02_6b53_ObjectAction_StrayCat_Unk0:
     ld   c,$02
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
     call call_00_2a68_Object_ComputePlayerXProximity
     ld   a,[wDA11_ObjectXDistFromPlayer]
@@ -2446,15 +2446,15 @@ call_02_6b69_ObjectAction_YellowGoon_Unk0:
     jr   c,.label6B8B
 .label6B78:
     ld   c,$08
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
     ret  z
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     jr   z,.label6B8B
     ld   a,$01
     jp   entry_02_72ac_SetupNewAction
 .label6B8B:
-    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    call call_00_2917_Object_CheckIfTimer1AIsZero
     ld   [hl],$03
     call call_00_2722_IsPlayerNearObject
     call nz,call_00_2410_Object_SetFacingRelativeToPlayer
@@ -2463,21 +2463,21 @@ call_02_6b69_ObjectAction_YellowGoon_Unk0:
 
 call_02_6b9b_ObjectAction_Rat_Unk0:
     ld   c,$10
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     jp   call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
 
 call_02_6ba3_ObjectAction_ChomperTV_Unk0:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label6BB3
     ld   c,$04
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     call call_00_230f_ResolveObjectListIndex
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
 .label6BB3:
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
     ld   bc,$0002
     call call_00_250d_Object_UpdateYPosition
-    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    call call_00_2917_Object_CheckIfTimer1AIsZero
     sub  a,$02
     ld   [hl],a
     ld   a,$01
@@ -2485,27 +2485,27 @@ call_02_6ba3_ObjectAction_ChomperTV_Unk0:
     ret  
 
 call_02_6bc8_ObjectAction_ChomperTV_Unk2:
-    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    call call_00_2917_Object_CheckIfTimer1AIsZero
     ld   a,[wDC71_FrameCounter]
     and  [hl]
     and  a,$3F
     jr   nz,.label6BDC
-    call call_00_2976_ObjectGetFacingDirection
+    call call_00_2976_Object_GetFacingDirection
     xor  a,$20
     ld   c,a
-    call call_00_2958_ObjectSetFacingDirection
+    call call_00_2958_Object_SetFacingDirection
 .label6BDC:
     ld   c,$10
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
 
 call_02_6be4_ObjectAction_ChomperTV_Unk1:
     call call_00_230f_ResolveObjectListIndex
-    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    call call_00_2917_Object_CheckIfTimer1AIsZero
     cp   c
     ld   a,$00
     jp   z,entry_02_72ac_SetupNewAction
-    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    call call_00_2917_Object_CheckIfTimer1AIsZero
     inc  a
     ld   [hl],a
     ld   bc,$FFFF
@@ -2527,9 +2527,9 @@ call_02_6c08_ObjectAction_CrumblingFloor_Unk2:
     ret  
 
 call_02_6c1d_ObjectAction_GextremeSportsElf_Unk0:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   c,$20
-    call nz,call_00_28c8_ObjectSetXVelocity
+    call nz,call_00_28c8_Object_SetXVelocity
     ld   a,[wDC71_FrameCounter]
     and  a,$07
     ld   c,$10
@@ -2538,7 +2538,7 @@ call_02_6c1d_ObjectAction_GextremeSportsElf_Unk0:
     call call_00_2722_IsPlayerNearObject
     ret  z
     call call_00_2a68_Object_ComputePlayerXProximity
-    call call_00_2976_ObjectGetFacingDirection
+    call call_00_2976_Object_GetFacingDirection
     ld   hl,wDA12_ObjectDirectionRelativeToPlayer
     cp   [hl]
     ret  nz
@@ -2550,11 +2550,11 @@ call_02_6c1d_ObjectAction_GextremeSportsElf_Unk0:
 
 call_02_6c4c_ObjectAction_GextremeSportsElf_Unk2:
     ld   c,$20
-    call call_00_28dc_ObjectSetYVelocity
+    call call_00_28dc_Object_SetYVelocity
     ld   c,$28
     call call_00_2588_Object_ApproachXVelocity
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
-    call call_00_28be_ObjectGetXVelocity
+    call call_00_28be_Object_GetXVelocity
     cp   a,$28
     ld   a,$03
     jp   z,entry_02_72ac_SetupNewAction
@@ -2569,16 +2569,16 @@ call_02_6c64_ObjectAction_GextremeSportsElf_Unk3:
     ret  
 
 call_02_6c73_ObjectAction_GextremeSportsElf_Unk4:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label6C84
     call call_00_2766_Object_ResetYIfAboveStart
     ld   c,$00
     jr   c,.label6C81
     ld   c,$01
 .label6C81:
-    call call_00_2980_ObjectSet19
+    call call_00_2980_Object_SetExtraFlags
 .label6C84:
-    call call_00_298a_ObjectGet19
+    call call_00_298a_Object_GetExtraFlags
     jr   z,.label6CAC
     ld   a,[wDC71_FrameCounter]
     and  a,$07
@@ -2601,14 +2601,14 @@ call_02_6c73_ObjectAction_GextremeSportsElf_Unk4:
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_ResetYIfAboveStart
     ld   c,$01
-    call nc,call_00_2980_ObjectSet19
+    call nc,call_00_2980_Object_SetExtraFlags
     ret 
     
 call_02_6cbb_ObjectAction_Bird_Update:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label6CC6
     call call_00_230f_ResolveObjectListIndex
-    call call_00_2958_ObjectSetFacingDirection
+    call call_00_2958_Object_SetFacingDirection
 .label6CC6:
     call call_00_27f3_Object_GetInitialYPos
     ld   a,[wD810_PlayerYPosition]
@@ -2623,22 +2623,22 @@ call_02_6cbb_ObjectAction_Bird_Update:
     jp   call_00_3792_PrepareRelativeObjectSpawn
 
 call_02_6cdd_ObjectAction_BirdProjectile_Update:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label6CF5
-    call call_00_2976_ObjectGetFacingDirection
+    call call_00_2976_Object_GetFacingDirection
     ld   c,$14
     cp   a,$00
     jr   z,.label6CED
     ld   c,$EC
 .label6CED:
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     ld   c,$03
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
 .label6CF5:
     call call_00_24c0_Object_IntegrateXVelocity
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_27f3_Object_GetInitialYPos
-    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    call call_00_2917_Object_CheckIfTimer1AIsZero
     ld   l,[hl]
     ld   h,00
     add  hl,hl
@@ -2664,9 +2664,9 @@ call_02_6cdd_ObjectAction_BirdProjectile_Update:
     ld   [hl],e
     ld   a,$19
     call call_00_0ff5_QueueSoundEffectWithPriority
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     ld   c,$20
-    jp   nz,call_00_28dc_ObjectSetYVelocity
+    jp   nz,call_00_28dc_Object_SetYVelocity
     ld   a,$01
     jp   entry_02_72ac_SetupNewAction
 .data_02_6d31:
@@ -2680,7 +2680,7 @@ call_02_6d3a_ObjectAction_RockHard_Unk0:
     ret  
 
 call_02_6d3b_ObjectAction_RockHard_Unk2:
-    call call_00_2a5d_ObjectCheckFlag2
+    call call_00_2a5d_Object_Check5Flag2
     ret  z
     ld   a,$1A
     call call_00_0ff5_QueueSoundEffectWithPriority
@@ -2688,18 +2688,18 @@ call_02_6d3b_ObjectAction_RockHard_Unk2:
     jp   entry_02_72ac_SetupNewAction
 
 call_02_6d49_ObjectAction_RockHard_Unk5:
-    call call_00_2a5d_ObjectCheckFlag2
+    call call_00_2a5d_Object_Check5Flag2
     ld   a,$06
     jp   nz,entry_02_72ac_SetupNewAction
     ret  
 
 call_02_6d52_ObjectAction_RockHard_Unk6:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label6D5C
     ld   c,$78
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
 .label6D5C:
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     ret  nz
     ld   a,$01
     ld   [wDC65_ProgressFlags_WWGex],a
@@ -2708,9 +2708,9 @@ call_02_6d52_ObjectAction_RockHard_Unk6:
     jp   call_00_2b7a_ClearObjectThenJump
 
 call_02_6d6d_ObjectAction_BrainOfOz_Unk0:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label6D82
-    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    call call_00_2917_Object_CheckIfTimer1AIsZero
     inc  [hl]
     cp   a,$0A
     ld   a,$02
@@ -2745,7 +2745,7 @@ label6DA7:
     ld   de,call_02_6db7
     add  hl,de
     ld   c,[hl]
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
     ld   a,$03
     jp   entry_02_72ac_SetupNewAction
 
@@ -2755,7 +2755,7 @@ call_02_6db7:
     add  hl,hl
 call_02_6dba_ObjectAction_BrainOfOz_Unk3:
     call call_00_233e_Object_UpdatePatternedPositionFromVelocityTable
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     jr   nz,.label6DD2
     ld   c,$6A
     call call_00_29ce_ObjectExistsCheck
@@ -2775,7 +2775,7 @@ call_02_6dda_ObjectAction_BrainOfOz_Unk4:
 
 call_02_6ddd_ObjectAction_BrainOfOz_Unk5:
     call call_00_233e_Object_UpdatePatternedPositionFromVelocityTable
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ret  z
     ld   a,$15
     call call_00_0ff5_QueueSoundEffectWithPriority
@@ -2801,7 +2801,7 @@ call_02_6dee_ObjectAction_BrainOfOz_Unk7:
     jp   entry_02_72ac_SetupNewAction
 
 call_02_6e09_ObjectAction_BrainOfOz_Unk8:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label6E27
     ld   a,$1A
     call call_00_0ff5_QueueSoundEffectWithPriority
@@ -2811,11 +2811,11 @@ call_02_6e09_ObjectAction_BrainOfOz_Unk8:
     call call_00_2b8b_HandleObjectFlag6ClearOrInit
     call call_00_2c67_Particle_InitBurst
     ld   c,$3C
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
 .label6E27:
     call call_00_2c89_Particle_UpdateBurst
     ret  nz
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     ret  nz
     ld   a,$01
     ld   [wDC66_ProgressFlags_LizardOfOz],a
@@ -2826,24 +2826,24 @@ call_02_6e09_ObjectAction_BrainOfOz_Unk8:
     db   $00, $00, $08, $02, $04, $01, $ff, $7f
 
 call_02_6e44_ObjectAction_BrainOfOzProjectile_Update:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label6E53
     ld   c,$00
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     ld   c,$10
-    call call_00_28dc_ObjectSetYVelocity
+    call call_00_28dc_Object_SetYVelocity
 .label6E53:
     call call_00_2a68_Object_ComputePlayerXProximity
     ld   a,[wDA12_ObjectDirectionRelativeToPlayer]
     cp   a,$20
     jr   z,.label6E67
-    call call_00_28be_ObjectGetXVelocity
+    call call_00_28be_Object_GetXVelocity
     cp   a,$10
     jr   z,.label6E6F
     inc  [hl]
     jr   .label6E6F
 .label6E67:
-    call call_00_28be_ObjectGetXVelocity
+    call call_00_28be_Object_GetXVelocity
     cp   a,$F0
     jr   z,.label6E6F
     dec  [hl]
@@ -2876,21 +2876,21 @@ call_02_6e88_ObjectAction_Cannon_Unk0:
     inc  l
     ld   [hl],d
     ld   c,$FF
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
     ld   a,$01
     jp   entry_02_72ac_SetupNewAction
 
 call_02_6ea8_ObjectAction_Cannon_Unk2:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   a,$1B
     call nz,call_00_0ff5_QueueSoundEffectWithPriority
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     ld   a,$04
     jp   z,entry_02_72ac_SetupNewAction
     ret  
 
 call_02_6eb9_ObjectAction_Cannon_Unk3:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ret  z
     ld   c,$16
     call call_00_3792_PrepareRelativeObjectSpawn
@@ -2898,9 +2898,9 @@ call_02_6eb9_ObjectAction_Cannon_Unk3:
     jp   call_00_0ff5_QueueSoundEffectWithPriority
 
 call_02_6ec7_ObjectAction_CannonProjectile_Update:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   c,$3C
-    call nz,call_00_28dc_ObjectSetYVelocity
+    call nz,call_00_28dc_Object_SetYVelocity
     ld   c,$67
     call call_00_29ce_ObjectExistsCheck
     ret  nz
@@ -2911,7 +2911,7 @@ call_02_6ec7_ObjectAction_CannonProjectile_Update:
     cp   a,$06
     jr   nc,.label6EFA
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
-    call call_00_28f1_ObjectCheckIfYVelocityIsZero
+    call call_00_28f1_Object_CheckIfYVelocityIsZero
     bit  7,[hl]
     ret  z
     ld   de,$0038
@@ -2935,7 +2935,7 @@ call_02_6ec7_ObjectAction_CannonProjectile_Update:
     jp   call_00_2b7a_ClearObjectThenJump
 
 call_02_6f07:
-    call call_00_2a5d_ObjectCheckFlag2
+    call call_00_2a5d_Object_Check5Flag2
     jp   nz,call_00_2b7a_ClearObjectThenJump
     ret  
 
@@ -2943,13 +2943,13 @@ call_02_6f0e_ObjectAction_Unk_None:
     ret  
 
 call_02_6f0f_ObjectAction_Rez_Unk0:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ret  z
     ld   c,$20
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     ld   c,$00
-    call call_00_28dc_ObjectSetYVelocity
-    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    call call_00_28dc_Object_SetYVelocity
+    call call_00_2917_Object_CheckIfTimer1AIsZero
     inc  [hl]
     cp   a,$0A
     ld   a,$02
@@ -2960,7 +2960,7 @@ call_02_6f29_ObjectAction_Rez_Unk2:
     call call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing
     call call_02_7002
     ld   c,$38
-    jp   nc,call_00_28dc_ObjectSetYVelocity
+    jp   nc,call_00_28dc_Object_SetYVelocity
     ret  
 
 call_02_6f35_ObjectAction_Rez_Unk3:
@@ -2970,20 +2970,20 @@ call_02_6f35_ObjectAction_Rez_Unk3:
     ret  
 
 call_02_6f3e_ObjectAction_Rez_Unk5:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   c,$00
-    call nz,call_00_28dc_ObjectSetYVelocity
+    call nz,call_00_28dc_Object_SetYVelocity
     call call_02_6FD3
     ret  nc
     ld   c,$00
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
     ld   a,$06
     jp   entry_02_72ac_SetupNewAction
 
 call_02_6f54_ObjectAction_Rez_Unk6:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ret  z
-    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    call call_00_2917_Object_CheckIfTimer1AIsZero
     inc  [hl]
     cp   a,$0A
     ld   a,$08
@@ -2991,19 +2991,19 @@ call_02_6f54_ObjectAction_Rez_Unk6:
     ret  
 
 call_02_6f64_ObjectAction_Rez_Unk8:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label6F74
     call call_00_2826_Object_ResetToInitialXPos
     call call_00_27e4_Object_ResetToInitialYPos
     ld   c,$06
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
 .label6F74:
-    call call_00_2917_ObjectCheckIfTimer1AIsZero
+    call call_00_2917_Object_CheckIfTimer1AIsZero
     jr   z,.label6F93
     ld   a,[wDC71_FrameCounter]
     and  a,$3F
     ret  nz
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     jr   z,.label6F93
     ld   a,[wDCDA]
     ld   c,$1D
@@ -3028,18 +3028,18 @@ call_02_6fa1_ObjectAction_Rez_Unk10:
     ret  
 
 call_02_6faa_ObjectAction_Rez_Unk11:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label6FBE
     ld   a,$1A
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   c,$B4
-    call call_00_290d_ObjectSetTimer1A
+    call call_00_290d_Object_SetTimer1A
     ld   c,$30
-    call call_00_28dc_ObjectSetYVelocity
+    call call_00_28dc_Object_SetYVelocity
 .label6FBE:
     call call_02_7002
     ret  c
-    call call_00_2922_ObjectTimer1ACountdown
+    call call_00_2922_Object_Timer1ACountdown
     ret  nz
     ld   a,$01
     ld   [wDC67_ProgressFlags_ChannelZ],a
@@ -3048,7 +3048,7 @@ call_02_6faa_ObjectAction_Rez_Unk11:
     jp   call_00_2b7a_ClearObjectThenJump
 
 call_02_6FD3:
-    call call_00_28f1_ObjectCheckIfYVelocityIsZero
+    call call_00_28f1_Object_CheckIfYVelocityIsZero
     bit  7,a
     jr   nz,.label6FE0
     cp   a,$20
@@ -3075,7 +3075,7 @@ call_02_6FD3:
     dec  l
     ld   [hl],e
     ld   c,$00
-    call call_00_28dc_ObjectSetYVelocity
+    call call_00_28dc_Object_SetYVelocity
     pop  af
     ret  
 
@@ -3100,7 +3100,7 @@ call_02_7019_ObjectAction_Unk_None:
     ret  
 
 call_02_701a_ObjectAction_Meteor_Update:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     ld   a,$13
     call nz,call_00_0ff5_QueueSoundEffectWithPriority
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
@@ -3110,7 +3110,7 @@ call_02_701a_ObjectAction_Meteor_Update:
     ret  
 
 call_02_702e_ObjectAction_RezProjectile_Update:
-    call call_00_29f5_ObjectClearActiveFlagAndCheck
+    call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label7056
     ld   hl,wDCDA
     ld   a,[hl]
@@ -3133,13 +3133,13 @@ call_02_702e_ObjectAction_RezProjectile_Update:
     sub  [hl]
     ld   c,a
 .label704F:
-    call call_00_28c8_ObjectSetXVelocity
+    call call_00_28c8_Object_SetXVelocity
     pop  bc
-    call call_00_28dc_ObjectSetYVelocity
+    call call_00_28dc_Object_SetYVelocity
 .label7056:
     call call_00_24c0_Object_IntegrateXVelocity
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
-    call call_00_28f1_ObjectCheckIfYVelocityIsZero
+    call call_00_28f1_Object_CheckIfYVelocityIsZero
     bit  7,a
     ret  z
     ld   de,$0070

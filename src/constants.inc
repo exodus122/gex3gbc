@@ -264,28 +264,33 @@ DEF Object_ChannelZ_RezProjectile                      EQU $71
 DEF ObjectListTerminator                               EQU $FF
 
 ; Object Instance Struct
-DEF OBJECT_ID_OFFSET                  EQU $00
-DEF OBJECT_ACTIONID_OFFSET            EQU $01
-DEF OBJECT_ACTIONPTR_OFFSET           EQU $02
-DEF OBJECT_FLAGS_OFFSET               EQU $04
-DEF OBJECT_UNK05_OFFSET               EQU $05
-DEF OBJECT_UNK09_OFFSET               EQU $09
-DEF OBJECT_UNK0A_OFFSET               EQU $0A
-DEF OBJECT_END_OF_OBJECT_DATA_PTR_OFFSET EQU $0B
-DEF OBJECT_FACINGDIRECTION_OFFSET     EQU $0D
-DEF OBJECT_XPOS_OFFSET                EQU $0E
-DEF OBJECT_YPOS_OFFSET                EQU $10
-DEF OBJECT_WIDTH_OFFSET               EQU $12
-DEF OBJECT_HEIGHT_OFFSET              EQU $13
-DEF OBJECT_UNK14_OFFSET               EQU $14
-DEF OBJECT_UNK15_OFFSET               EQU $15 ; collision related
-DEF OBJECT_UNK16_OFFSET               EQU $16
-DEF OBJECT_UNK17_OFFSET               EQU $17
-DEF OBJECT_UNK19_OFFSET               EQU $19
-DEF OBJECT_UNK1A_OFFSET               EQU $1A
-DEF OBJECT_XVEL_OFFSET                EQU $1B
-DEF OBJECT_YVEL_OFFSET                EQU $1D
-DEF OBJECT_UNK1F_OFFSET               EQU $1F ; collision related
+DEF OBJECT_ID_OFFSET                        EQU $00
+DEF OBJECT_ACTIONID_OFFSET                  EQU $01
+DEF OBJECT_ACTIONPTR_OFFSET                 EQU $02
+DEF OBJECT_SPRITE_FLAGS2_OFFSET             EQU $04
+DEF OBJECT_SPRITE_FLAGS_OFFSET              EQU $05
+DEF OBJECT_SPRITE_FRAME_COUNTER_MAX_OFFSET  EQU $06 ; how many frames to use this sprite
+DEF OBJECT_SPRITE_FRAME_COUNTER_OFFSET      EQU $07 ; counter for the above
+DEF OBJECT_SPRITE_COUNTER_MAX_OFFSET        EQU $08 ; total sprite frames for current action
+DEF OBJECT_SPRITE_COUNTER_OFFSET            EQU $09 ; counter for above
+DEF OBJECT_SPRITE_ID_OFFSET                 EQU $0A ; current sprite id
+DEF OBJECT_SPRITE_IDS_PTR_OFFSET            EQU $0B ; ptr to sprite data (in object_animation_data.asm)
+DEF OBJECT_FACINGDIRECTION_OFFSET           EQU $0D
+DEF OBJECT_XPOS_OFFSET                      EQU $0E
+DEF OBJECT_YPOS_OFFSET                      EQU $10
+DEF OBJECT_WIDTH_OFFSET                     EQU $12
+DEF OBJECT_HEIGHT_OFFSET                    EQU $13
+DEF OBJECT_UNK14_OFFSET                     EQU $14
+DEF OBJECT_UNK15_OFFSET                     EQU $15 ; collision related
+DEF OBJECT_UNK16_OFFSET                     EQU $16
+DEF OBJECT_SPRITE_BANK_OFFSET               EQU $17
+DEF OBJECT_EXTRA_FLAGS_OFFSET               EQU $19 ; used for moving platforms, skating elf health, and sec bot (?)
+DEF OBJECT_TIMER1A_OFFSET                   EQU $1A
+DEF OBJECT_XVEL_OFFSET                      EQU $1B
+DEF OBJECT_UNK1C_OFFSET                     EQU $1C
+DEF OBJECT_YVEL_OFFSET                      EQU $1D
+DEF OBJECT_UNK1E_OFFSET                     EQU $1E
+DEF OBJECT_UNK1F_OFFSET                     EQU $1F ; collision related
 
 ; Object Spawn Struct
 DEF OBJECTSPAWN_ID_OFFSET                   EQU $00

@@ -1583,7 +1583,7 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
     push BC                                            ;; 00:1edf $c5
     push DE                                            ;; 00:1ee0 $d5
     xor  A, A                                          ;; 00:1ee1 $af
-    ld   [wDCA7], A                                    ;; 00:1ee2 $ea $a7 $dc
+    ld   [wDCA7_DrawGexFlag], A                                    ;; 00:1ee2 $ea $a7 $dc
     ld   A, $00                                        ;; 00:1ee5 $3e $00
     ld   [wDC78], A                                    ;; 00:1ee7 $ea $78 $dc
     call call_00_04fb                                  ;; 00:1eea $cd $fb $04
@@ -1670,7 +1670,7 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
     jr   NZ, .jr_00_1f7a                               ;; 00:1f9d $20 $db
 .jp_00_1f9f:
     ld   A, $01                                        ;; 00:1f9f $3e $01
-    ld   [wDCA7], A                                    ;; 00:1fa1 $ea $a7 $dc
+    ld   [wDCA7_DrawGexFlag], A                                    ;; 00:1fa1 $ea $a7 $dc
     ld   HL, wD811_PlayerYPosition                                     ;; 00:1fa4 $21 $11 $d8
     pop  BC                                            ;; 00:1fa7 $c1
     ld   [HL], B                                       ;; 00:1fa8 $70

@@ -20,7 +20,7 @@ call_03_747d_StatusBar_UpdateOrTiles:
     res  1, [HL]                                       ;; 03:74a2 $cb $8e
     ld   B, $00                                        ;; 03:74a4 $06 $00
 .jr_03_74a6:
-    ld   A, [wDC50]                                    ;; 03:74a6 $fa $50 $dc
+    ld   A, [wDC50_PlayerHealth]                                    ;; 03:74a6 $fa $50 $dc
     sub  A, $04                                        ;; 03:74a9 $d6 $04
     jr   NC, .jr_03_74ae                               ;; 03:74ab $30 $01
     xor  A, A                                          ;; 03:74ad $af
@@ -28,7 +28,7 @@ call_03_747d_StatusBar_UpdateOrTiles:
     ld   D, A                                          ;; 03:74ae $57
     ld   E, $00                                        ;; 03:74af $1e $00
     ld   A, B                                          ;; 03:74b1 $78
-    ld   HL, wDC50                                     ;; 03:74b2 $21 $50 $dc
+    ld   HL, wDC50_PlayerHealth                                     ;; 03:74b2 $21 $50 $dc
     cp   A, [HL]                                       ;; 03:74b5 $be
     jr   NC, .jr_03_74ba                               ;; 03:74b6 $30 $02
     set  0, E                                          ;; 03:74b8 $cb $c3
