@@ -26,7 +26,7 @@ entry_02_708f_InitObjectsAndSpawnPlayer:
     xor  A, A                                          ;; 02:70b8 $af
     ld   [wDC86], A                                    ;; 02:70b9 $ea $86 $dc
     ld   [wDC87], A                                    ;; 02:70bc $ea $87 $dc
-    ld   [wDC8C], A                                    ;; 02:70bf $ea $8c $dc
+    ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:70bf $ea $8c $dc
     ld   [wDC8D], A                                    ;; 02:70c2 $ea $8d $dc
     ld   [wDC8E], A                                    ;; 02:70c5 $ea $8e $dc
     ld   [wDC8F], A                                    ;; 02:70c8 $ea $8f $dc
@@ -166,7 +166,7 @@ call_02_7152_UpdateObjects:
     jr   .jr_02_71a5                                   ;; 02:719c $18 $07
 .jr_02_719e:
     ld   A, $20                                        ;; 02:719e $3e $20
-    ld   [wDC8C], A                                    ;; 02:71a0 $ea $8c $dc
+    ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:71a0 $ea $8c $dc
     jr   .jr_02_71a9                                   ;; 02:71a3 $18 $04
 .jr_02_71a5:
     ld   HL, wDC84                                     ;; 02:71a5 $21 $84 $dc

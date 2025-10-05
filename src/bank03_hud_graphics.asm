@@ -6,7 +6,7 @@ call_03_747d_StatusBar_UpdateOrTiles:
     bit  0, [HL]                                       ;; 03:7480 $cb $46
     jr   Z, .jr_03_749d                                ;; 03:7482 $28 $19
     res  0, [HL]                                       ;; 03:7484 $cb $86
-    ld   A, [wDC4E]                                    ;; 03:7486 $fa $4e $dc
+    ld   A, [wDC4E_PlayerLivesRemaining]                                    ;; 03:7486 $fa $4e $dc
     ld   HL, $9c02                                     ;; 03:7489 $21 $02 $9c
     ld   DE, $9c22                                     ;; 03:748c $11 $22 $9c
     call call_03_74f5_DrawTwoDigitNumber                                  ;; 03:748f $cd $f5 $74

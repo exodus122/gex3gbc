@@ -44,7 +44,7 @@ call_03_4708_CollisionHandler_Sidescroller:
     ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 03:4717 $21 $be $da
     set  7, [HL]                                       ;; 03:471a $cb $fe
 .jr_03_471c:
-    ld   A, [wDC8C]                                    ;; 03:471c $fa $8c $dc
+    ld   A, [wDC8C_PlayerYVelocity]                                    ;; 03:471c $fa $8c $dc
     sub  A, $02                                        ;; 03:471f $d6 $02
     bit  7, A                                          ;; 03:4721 $cb $7f
     jr   Z, .jr_03_472b                                ;; 03:4723 $28 $06
@@ -189,7 +189,7 @@ call_03_4708_CollisionHandler_Sidescroller:
     ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 03:47fa $21 $be $da
     bit  7, [HL]                                       ;; 03:47fd $cb $7e
     ret  NZ                                            ;; 03:47ff $c0
-    ld   A, [wDC8C]                                    ;; 03:4800 $fa $8c $dc
+    ld   A, [wDC8C_PlayerYVelocity]                                    ;; 03:4800 $fa $8c $dc
     and  A, A                                          ;; 03:4803 $a7
     jr   Z, .jr_03_480a                                ;; 03:4804 $28 $04
     bit  7, A                                          ;; 03:4806 $cb $7f
@@ -270,7 +270,7 @@ call_03_4708_CollisionHandler_Sidescroller:
 .jr_03_4876:
     call call_03_4b37_AccumulateMovementBias                                  ;; 03:4876 $cd $37 $4b
     ld   C, A                                          ;; 03:4879 $4f
-    ld   A, [wDC8C]                                    ;; 03:487a $fa $8c $dc
+    ld   A, [wDC8C_PlayerYVelocity]                                    ;; 03:487a $fa $8c $dc
     swap A                                             ;; 03:487d $cb $37
     and  A, $0f                                        ;; 03:487f $e6 $0f
     add  A, $11                                        ;; 03:4881 $c6 $11
@@ -295,7 +295,7 @@ call_03_4708_CollisionHandler_Sidescroller:
     bit  1, [HL]                                       ;; 03:489d $cb $4e
     ret  Z                                             ;; 03:489f $c8
     xor  A, A                                          ;; 03:48a0 $af
-    ld   [wDC8C], A                                    ;; 03:48a1 $ea $8c $dc
+    ld   [wDC8C_PlayerYVelocity], A                                    ;; 03:48a1 $ea $8c $dc
     ret                                                ;; 03:48a4 $c9
     db   $80, $40, $20, $10, $08, $04, $02, $01        ;; 03:48a5 ........
 

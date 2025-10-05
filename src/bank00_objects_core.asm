@@ -565,7 +565,7 @@ call_00_2ff8_InitLevelObjectsAndConfig:
     ld   [wDCCF], A                                    ;; 00:3043 $ea $cf $dc
     ld   [wDCD0], A                                    ;; 00:3046 $ea $d0 $dc
     ld   [wDCD1], A                                    ;; 00:3049 $ea $d1 $dc
-    ld   [wDCD2], A                                    ;; 00:304c $ea $d2 $dc
+    ld   [wDCD2_HitFreestandingRemoteFlags], A                                    ;; 00:304c $ea $d2 $dc
     ld   [wDCDA], A                                    ;; 00:304f $ea $da $dc
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:3052 $21 $1e $dc
     ld   L, [HL]                                       ;; 00:3055 $6e
@@ -784,6 +784,16 @@ call_00_3252_ResetObjectCounter:
     ret                                                ;; 00:3257 $c9
 
 data_00_3258:
+; this table contains widths, heights, collision type, and other unknown data for each object
+; 8 byte entries for each object:
+; 0 = unknown (1 for all objects except player)
+; 1 = width
+; 2 = height
+; 3 = collision type
+; 4 = OBJECT_UNK16_OFFSET
+; 5 = extra flags default value (always 00)
+; 6 = always FF, appears unused?
+; 7 = flags used for collision detection (call_00_35e8_GetObjectTypeIndex)
     db   $00
 data_00_3259:
     db   $00, $00, $00, $00, $00, $00
@@ -904,8 +914,9 @@ data_00_325F:
     db   $01, $0a, $0a, $04, $02, $00, $ff, $81        ;; 00:35e0 ????????
 
 call_00_35e8_GetObjectTypeIndex:
+; loads index*[7] into data_00_3258 table
 ; Follows a chain of lookups based on the current object address (wDA00_CurrentObjectAddrLo) to compute an index into data_00_325F.
-; Shifts HL left three times (×8), adds the table base, and returns the byte at that location.
+; Shifts HL left three times (x8), adds the table base, and returns the byte at that location.
 ; Usage: Fetches an object-type ID or pointer index for the active object.
     ld   HL, wDA00_CurrentObjectAddrLo                                     ;; 00:35e8 $21 $00 $da
     ld   L, [HL]                                       ;; 00:35eb $6e

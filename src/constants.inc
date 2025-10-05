@@ -278,13 +278,15 @@ DEF OBJECT_SPRITE_IDS_PTR_OFFSET            EQU $0B ; ptr to sprite data (in obj
 DEF OBJECT_FACINGDIRECTION_OFFSET           EQU $0D
 DEF OBJECT_XPOS_OFFSET                      EQU $0E
 DEF OBJECT_YPOS_OFFSET                      EQU $10
-DEF OBJECT_WIDTH_OFFSET                     EQU $12
-DEF OBJECT_HEIGHT_OFFSET                    EQU $13
-DEF OBJECT_UNK14_OFFSET                     EQU $14
-DEF OBJECT_UNK15_OFFSET                     EQU $15 ; collision related
-DEF OBJECT_UNK16_OFFSET                     EQU $16
+DEF OBJECT_WIDTH_OFFSET                     EQU $12 ; set to [1] into data_00_3258
+DEF OBJECT_HEIGHT_OFFSET                    EQU $13 ; set to [2] into data_00_3258
+DEF OBJECT_COLLISION_TYPE_OFFSET            EQU $14 ; set to [3] into data_00_3258
+DEF OBJECT_UNK15_OFFSET                     EQU $15 ; collision related, starts as 0
+DEF OBJECT_UNK16_OFFSET                     EQU $16 ; collision related, starts as [4] into data_00_3258, minus 1
 DEF OBJECT_SPRITE_BANK_OFFSET               EQU $17
-DEF OBJECT_EXTRA_FLAGS_OFFSET               EQU $19 ; used for moving platforms, skating elf health, and sec bot (?)
+DEF OBJECT_UNK18_OFFSET                     EQU $18 ; starts as 0
+DEF OBJECT_EXTRA_FLAGS_OFFSET               EQU $19 ; only used by moving platforms, skating elf health, and sec bot (?)
+                                                    ; starts as [5] into data_00_3258
 DEF OBJECT_TIMER1A_OFFSET                   EQU $1A
 DEF OBJECT_XVEL_OFFSET                      EQU $1B
 DEF OBJECT_UNK1C_OFFSET                     EQU $1C

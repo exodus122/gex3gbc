@@ -1079,7 +1079,7 @@ call_01_4722_MenuStateHandlerTable:
     ld   A, $01                                        ;; 01:4759 $3e $01
     ret                                                ;; 01:475b $c9
 .call_01_475c:
-    ld   A, [wDC4E]                                    ;; 01:475c $fa $4e $dc
+    ld   A, [wDC4E_PlayerLivesRemaining]                                    ;; 01:475c $fa $4e $dc
     ret                                                ;; 01:475f $c9
 
 call_01_4760_MenuState_SubmenuHandler:
@@ -2395,7 +2395,7 @@ call_01_4f7e_SeedTileLookupTable:
 entry_01_4f8c_BuildCollisionBitfieldAndChecksum:
 call_01_4f8c_BuildCollisionBitfieldAndChecksum:
 ; Description:
-; Clears wDB72–wDB7D, seeds wDB73–wDB75 from wDC4E/AF/4F, then iterates through DC5C/DC5D data, 
+; Clears wDB72–wDB7D, seeds wDB73–wDB75 from wDC4E_PlayerLivesRemaining/AF/4F, then iterates through DC5C/DC5D data, 
 ; checking bit masks (.data_01_5013 and .data_01_501f) to build bitfields in wDB76+. 
 ; Sums values for a checksum in wDB72 and sets a completion flag wDB91.
     ld   HL, wDB72                                     ;; 01:4f8c $21 $72 $db
@@ -2407,7 +2407,7 @@ call_01_4f8c_BuildCollisionBitfieldAndChecksum:
     jr   NZ, .jr_01_4f92                               ;; 01:4f94 $20 $fc
     xor  A, A                                          ;; 01:4f96 $af
     ld   [wDB72], A                                    ;; 01:4f97 $ea $72 $db
-    ld   A, [wDC4E]                                    ;; 01:4f9a $fa $4e $dc
+    ld   A, [wDC4E_PlayerLivesRemaining]                                    ;; 01:4f9a $fa $4e $dc
     ld   [wDB73], A                                    ;; 01:4f9d $ea $73 $db
     ld   A, [wDCAF]                                    ;; 01:4fa0 $fa $af $dc
     ld   [wDB74], A                                    ;; 01:4fa3 $ea $74 $db
@@ -2590,7 +2590,7 @@ call_01_50b5_GenerateCollisionTableFromMasks:
 ; Builds a collision lookup table (wDC5C_ProgressFlags) from static mask tables .data_01_511a_CollisionColumnMaskTable and .data_01_5126_BitMaskLut_80to01. 
 ; It iterates through each mask byte, rotates bits, checks wDB76 bitfields, and sets collision bits 
 ; in a temporary register (C). Once a row is processed, it stores the result into wDC5C_ProgressFlags, repeating 
-; for 12 entries. Finally, it updates wDC4E/AF/4F with values from wDB73–wDB75.
+; for 12 entries. Finally, it updates wDC4E_PlayerLivesRemaining/AF/4F with values from wDB73–wDB75.
     xor  A, A                                          ;; 01:50b5 $af
     ld   [wDB90], A                                    ;; 01:50b6 $ea $90 $db
     ld   DE, $00                                       ;; 01:50b9 $11 $00 $00
@@ -2643,7 +2643,7 @@ call_01_50b5_GenerateCollisionTableFromMasks:
     cp   A, $0c                                        ;; 01:5103 $fe $0c
     jr   C, .jr_01_50bc                                ;; 01:5105 $38 $b5
     ld   A, [wDB73]                                    ;; 01:5107 $fa $73 $db
-    ld   [wDC4E], A                                    ;; 01:510a $ea $4e $dc
+    ld   [wDC4E_PlayerLivesRemaining], A                                    ;; 01:510a $ea $4e $dc
     ld   A, [wDB74]                                    ;; 01:510d $fa $74 $db
     ld   [wDCAF], A                                    ;; 01:5110 $ea $af $dc
     ld   A, [wDB75]                                    ;; 01:5113 $fa $75 $db

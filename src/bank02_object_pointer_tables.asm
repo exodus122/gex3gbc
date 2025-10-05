@@ -287,9 +287,9 @@ data_02_4000:
 .data_02_4344:
     dw   call_02_5bb3_ObjectAction_UpdateBonusStageTimer, data_02_769f
 .data_02_4348:
-    dw   call_02_5bd4_ObjectAction_Remote_unk, data_02_76a5
-    dw   call_02_5bef_ObjectAction_Remote_unk3, data_02_764b
-    dw   call_02_5bfa_ObjectAction_Remote_unk2, data_02_75c2
+    dw   call_02_5bd4_ObjectAction_FreestandingRemote_unk0, data_02_76a5
+    dw   call_02_5bef_ObjectAction_FreestandingRemote_unk1, data_02_764b
+    dw   call_02_5bfa_ObjectAction_FreestandingRemote_unk2, data_02_75c2
 .data_02_4354:
     dw   call_02_582e_ObjectAction_None, data_02_76ab
     dw   call_02_582e_ObjectAction_None, data_02_76b1

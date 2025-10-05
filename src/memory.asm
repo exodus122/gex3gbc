@@ -796,7 +796,7 @@ wDC4C:
 wDC4D:
     ds 1                                               ;; dc4d
 
-wDC4E:
+wDC4E_PlayerLivesRemaining:
     ds 1                                               ;; dc4e
 
 wDC4F:
@@ -932,7 +932,8 @@ wDC8A:
 wDC8B:
     ds 1                                               ;; dc8b
 
-wDC8C:
+wDC8C_PlayerYVelocity:
+; can freeze to levitate
     ds 1                                               ;; dc8c
 
 wDC8D:
@@ -1085,7 +1086,9 @@ wDCD0:
 wDCD1:
     ds 1                                               ;; dcd1
 
-wDCD2:
+wDCD2_HitFreestandingRemoteFlags:
+; gets set when a collision occurs with a freestanding remote
+; the remote object checks for this flag and sets progressflags
     ds 1                                               ;; dcd2
 
 wDCD3:

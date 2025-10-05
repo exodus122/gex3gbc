@@ -199,7 +199,7 @@ call_00_0150_Init:
     jr   NZ, .jp_00_02b2                               ;; 00:02ca $20 $e6
 .jp_00_02cc:
     ld   A, $04                                        ;; 00:02cc $3e $04
-    ld   [wDC4E], A                                    ;; 00:02ce $ea $4e $dc
+    ld   [wDC4E_PlayerLivesRemaining], A                                    ;; 00:02ce $ea $4e $dc
     xor  A, A                                          ;; 00:02d1 $af
     ld   [wDCAF], A                                    ;; 00:02d2 $ea $af $dc
     ld   [wDC4F], A                                    ;; 00:02d5 $ea $4f $dc
@@ -345,7 +345,7 @@ call_00_0150_Init:
     ld   HL, wDB6A                                     ;; 00:0466 $21 $6a $db
     bit  1, [HL]                                       ;; 00:0469 $cb $4e
     jr   Z, .jr_00_0487                                ;; 00:046b $28 $1a
-    ld   HL, wDC4E                                     ;; 00:046d $21 $4e $dc
+    ld   HL, wDC4E_PlayerLivesRemaining                                     ;; 00:046d $21 $4e $dc
     dec  [HL]                                          ;; 00:0470 $35
     jp   NZ, .jp_00_0357                               ;; 00:0471 $c2 $57 $03
     farcall entry_01_42fd_LoadMenu03_InitSong15
@@ -493,7 +493,7 @@ call_00_05c7:
     ld   A, [wDB6D]                                    ;; 00:05c7 $fa $6d $db
     and  A, A                                          ;; 00:05ca $a7
     ret  Z                                             ;; 00:05cb $c8
-    ld   HL, wDCD2                                     ;; 00:05cc $21 $d2 $dc
+    ld   HL, wDCD2_HitFreestandingRemoteFlags                                     ;; 00:05cc $21 $d2 $dc
     bit  7, [HL]                                       ;; 00:05cf $cb $7e
     jr   NZ, .jr_00_05f1                               ;; 00:05d1 $20 $1e
     ld   HL, wDB6F                                     ;; 00:05d3 $21 $6f $db
@@ -677,7 +677,7 @@ call_00_0723_IncrementCollectibleCount:
 ; Sets flag bit0 in wDB69, plays sound 02.
 ; Increments counter wDC68_CollectibleCount, triggers sound effects and sets a per-level 
 ; completion flag when it reaches 0x32 or 0x64.
-; Also increments wDC4E but caps at 63.
+; Also increments wDC4E_PlayerLivesRemaining but caps at 63.
 ; Looks like it manages collectible counters / progress milestones.
     ld   HL, wDB69                                     ;; 00:0723 $21 $69 $db
     set  0, [HL]                                       ;; 00:0726 $cb $c6
@@ -700,7 +700,7 @@ call_00_0723_IncrementCollectibleCount:
     set  3, [HL]                                       ;; 00:0748 $cb $de
     ret                                                ;; 00:074a $c9
 .jr_00_074b:
-    ld   HL, wDC4E                                     ;; 00:074b $21 $4e $dc
+    ld   HL, wDC4E_PlayerLivesRemaining                                     ;; 00:074b $21 $4e $dc
     ld   A, [HL]                                       ;; 00:074e $7e
     cp   A, $63                                        ;; 00:074f $fe $63
     ret  NC                                            ;; 00:0751 $d0

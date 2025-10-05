@@ -2,7 +2,7 @@ call_02_582e_ObjectAction_None:
     ret                                                ;; 02:582e $c9
 
 call_02_582f_ObjectAction_DestroyWithoutParticles:
-    call call_00_288c_Object_Clear14
+    call call_00_288c_Object_ClearCollisionType
     call call_00_2b8b_HandleObjectFlag6ClearOrInit
     call call_00_2a5d_Object_Check5Flag2
     jp   nz,call_00_2bbe_SpawnCollectibleObject
@@ -13,7 +13,7 @@ call_02_583c_ObjectAction_Destroy:
     jr   Z, .jr_02_5850                                ;; 02:583f $28 $0f
     ld   HL, .data_02_5857_ParticlesPalette                             ;; 02:5841 $21 $57 $58
     call call_00_2c20_Object_CopyPaletteToBuffer                                  ;; 02:5844 $cd $20 $2c
-    call call_00_288c_Object_Clear14                                  ;; 02:5847 $cd $8a $28
+    call call_00_288c_Object_ClearCollisionType                                  ;; 02:5847 $cd $8a $28
     call call_00_2b8b_HandleObjectFlag6ClearOrInit                                  ;; 02:584a $cd $8b $2b
     call call_00_2c67_Particle_InitBurst                                  ;; 02:584d $cd $67 $2c
 .jr_02_5850:
@@ -458,11 +458,11 @@ call_02_5bb3_ObjectAction_UpdateBonusStageTimer:
     ld   [hl],a
     ret  
 
-call_02_5bd4_ObjectAction_Remote_unk:
+call_02_5bd4_ObjectAction_FreestandingRemote_unk0:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 02:5bd4 $fa $1e $dc
     and  A, A                                          ;; 02:5bd7 $a7
     jr   Z, .jr_02_5be4                                ;; 02:5bd8 $28 $0a
-    ld   A, [wDCD2]                                    ;; 02:5bda $fa $d2 $dc
+    ld   A, [wDCD2_HitFreestandingRemoteFlags]                                    ;; 02:5bda $fa $d2 $dc
     and  A, A                                          ;; 02:5bdd $a7
     ld   A, $01                                        ;; 02:5bde $3e $01
     jp   NZ, call_02_72ac_SetupNewAction                              ;; 02:5be0 $c2 $ac $72
@@ -474,21 +474,21 @@ call_02_5bd4_ObjectAction_Remote_unk:
     jp   Z, call_02_72ac_SetupNewAction                               ;; 02:5beb $ca $ac $72
     ret                                                ;; 02:5bee $c9
 
-call_02_5bef_ObjectAction_Remote_unk3:
-    ld   A, [wDCD2]                                    ;; 02:5bef $fa $d2 $dc
+call_02_5bef_ObjectAction_FreestandingRemote_unk1:
+    ld   A, [wDCD2_HitFreestandingRemoteFlags]                                    ;; 02:5bef $fa $d2 $dc
     cp   A, $81                                        ;; 02:5bf2 $fe $81
     ld   A, $02                                        ;; 02:5bf4 $3e $02
     jp   Z, call_02_72ac_SetupNewAction                               ;; 02:5bf6 $ca $ac $72
     ret                                                ;; 02:5bf9 $c9
 
-call_02_5bfa_ObjectAction_Remote_unk2:
+call_02_5bfa_ObjectAction_FreestandingRemote_unk2:
     call call_00_29f5_Object_ClearActiveFlagAndCheck                                  ;; 02:5bfa $cd $f5 $29
     jr   Z, .jr_02_5c23                                ;; 02:5bfd $28 $24
     ld   A, $1e                                        ;; 02:5bff $3e $1e
     call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 02:5c01 $cd $f5 $0f
     ld   HL, .data_02_5c3b                             ;; 02:5c04 $21 $3b $5c
     call call_00_2c20_Object_CopyPaletteToBuffer                                  ;; 02:5c07 $cd $20 $2c
-    call call_00_288c_Object_Clear14                                  ;; 02:5c0a $cd $8a $28
+    call call_00_288c_Object_ClearCollisionType                                  ;; 02:5c0a $cd $8a $28
     call call_00_2b8b_HandleObjectFlag6ClearOrInit                                  ;; 02:5c0d $cd $8b $2b
     call call_00_2c67_Particle_InitBurst                                  ;; 02:5c10 $cd $67 $2c
     ld   C, $3c                                        ;; 02:5c13 $0e $3c
@@ -2807,7 +2807,7 @@ call_02_6e09_ObjectAction_BrainOfOz_Unk8:
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   hl,.data_6e3c
     call call_00_2c20_Object_CopyPaletteToBuffer
-    call call_00_288c_Object_Clear14
+    call call_00_288c_Object_ClearCollisionType
     call call_00_2b8b_HandleObjectFlag6ClearOrInit
     call call_00_2c67_Particle_InitBurst
     ld   c,$3C

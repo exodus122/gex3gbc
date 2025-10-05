@@ -958,10 +958,10 @@ call_00_26c9_Object_InfluencePlayerX:
     or   a,OBJECT_XVEL_OFFSET
     ld   l,a
     ld   c,[hl]
-    xor  a,OBJECT_ACTIONPTR_OFFSET
+    xor  a,$02
     ld   l,a
     ld   b,[hl]
-    xor  a,OBJECT_SPRITE_BANK_OFFSET
+    xor  a,$17
     ld   l,a
     ldi  a,[hl]
     ld   e,a
@@ -1316,15 +1316,15 @@ call_00_2879_Object_SetBoundingBoxXMin:
     ld   [hl],d
     ret  
 
-call_00_288c_Object_Clear14:
+call_00_288c_Object_ClearCollisionType:
 ; Write Byte to Object Offset $14
 ; Writes register C (or zero if called via the preceding stub) into the 
 ; object’s $D8:xx14 slot, likely a state/timer field.
     ld   C, $00                                        ;; 00:288a $0e $00
-call_00_288c_Object_Set14:
+call_00_288c_Object_SetCollisionType:
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:288c $26 $d8
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:288e $fa $00 $da
-    or   A, OBJECT_UNK14_OFFSET                                        ;; 00:2891 $f6 $14
+    or   A, OBJECT_COLLISION_TYPE_OFFSET                                        ;; 00:2891 $f6 $14
     ld   L, A                                          ;; 00:2893 $6f
     ld   [HL], C                                       ;; 00:2894 $71
     ret                                                ;; 00:2895 $c9
@@ -2029,7 +2029,7 @@ call_00_2bbe_SpawnCollectibleObject:
     ld   C, $02                                        ;; 00:2bc9 $0e $02
     call call_00_2930_Object_SetId                                  ;; 00:2bcb $cd $30 $29
     ld   C, $08                                        ;; 00:2bce $0e $08
-    call call_00_288c_Object_Set14                                  ;; 00:2bd0 $cd $8c $28
+    call call_00_288c_Object_SetCollisionType                                  ;; 00:2bd0 $cd $8c $28
     ld   C, $12                                        ;; 00:2bd3 $0e $12
     call call_00_2944_Object_SetWidth                                  ;; 00:2bd5 $cd $44 $29
     ld   C, $12                                        ;; 00:2bd8 $0e $12

@@ -5,7 +5,7 @@
 ; Counters (wDCCA–wDCCD, wDCCC, etc.) are collectible progress trackers.
 ; Transformations usually load new object data from a bank depending on state.
 ; Slot functions either set/clear/accumulate object slot values.
-; Special flags (wDCD2, wDC88) are level or event triggers.
+; Special flags (wDCD2_HitFreestandingRemoteFlags, wDC88) are level or event triggers.
 
 call_03_4c38_UpdateObjectCollision_Dispatch:
 ; Main dispatcher: checks if collisions enabled (wDCA7_DrawGexFlag).
@@ -21,18 +21,18 @@ call_03_4c38_UpdateObjectCollision_Dispatch:
     ld   A, [HL]                                       ;; 03:4c45 $7e
     and  A, A                                          ;; 03:4c46 $a7
     jr   Z, .jr_03_4c4a                                ;; 03:4c47 $28 $01
-    dec  [HL]                                          ;; 03:4c49 $35
+    dec  [HL]                                          ;; 03:4c49 $35 ; if instance+15 is not 0, decrement it
 .jr_03_4c4a:
     ld   A, L                                          ;; 03:4c4a $7d
     xor  A, $10                                        ;; 03:4c4b $ee $10
     ld   L, A                                          ;; 03:4c4d $6f
     bit  0, [HL]                                       ;; 03:4c4e $cb $46
-    ret  NZ                                            ;; 03:4c50 $c0
+    ret  NZ                                            ;; 03:4c50 $c0 ; return if bit 0 of instance+05 is set
     ld   A, L                                          ;; 03:4c51 $7d
     xor  A, $11                                        ;; 03:4c52 $ee $11
     ld   L, A                                          ;; 03:4c54 $6f
-    ld   L, [HL]                                       ;; 03:4c55 $6e
-    res  7, L                                          ;; 03:4c56 $cb $bd
+    ld   L, [HL]                                       ;; 03:4c55 $6e ; l = instance+14
+    res  7, L                                          ;; 03:4c56 $cb $bd ; unset bit 0 in instance+14
     ld   H, $00                                        ;; 03:4c58 $26 $00
     add  HL, HL                                        ;; 03:4c5a $29
     ld   BC, .data_03_4c63_ObjectCollisionJumpTable    ;; 03:4c5b $01 $63 $4c
@@ -40,7 +40,7 @@ call_03_4c38_UpdateObjectCollision_Dispatch:
     ld   A, [HL+]                                      ;; 03:4c5f $2a
     ld   H, [HL]                                       ;; 03:4c60 $66
     ld   L, A                                          ;; 03:4c61 $6f
-    jp   HL                                            ;; 03:4c62 $e9
+    jp   HL                                            ;; 03:4c62 $e9 ; load collision routine and jump
 .data_03_4c63_ObjectCollisionJumpTable:
     dw   call_03_4ccf_CollisionHandler_None                                 ;; 03:4c63 pP
     dw   call_03_56c1_CheckPlayerObjectCollision_Main
@@ -49,9 +49,9 @@ call_03_4c38_UpdateObjectCollision_Dispatch:
     dw   call_03_4ce1_Collision_PlayerHit_ActionSwitch                                 ;; 03:4c6b pP
     dw   call_03_4d38_Collision_PlayerHit_GenericOrRespawn
     dw   call_03_4d44_Collision_PlayerHit_ActionChangeConditional                            ;; 03:4c6d ????
-    dw   call_03_4d9b_Collision_PlayerHit_SetLevelFlag                                 ;; 03:4c71 pP
-    dw   call_03_4db3_Collision_PlayerHit_IncrementCounter                                 ;; 03:4c73 pP
-    dw   call_03_4dc2_Collision_PlayerHit_CollectibleTracker                                 ;; 03:4c75 pP
+    dw   call_03_4d9b_Collision_ObtainBonusCoin                                 ;; 03:4c71 pP ; correct
+    dw   call_03_4db3_Collision_ObtainCollectible                                 ;; 03:4c73 pP ; correct
+    dw   call_03_4dc2_Collision_ObtainPawCoin                                 ;; 03:4c75 pP ; correct
     dw   call_03_4e04_Collision_PlayerHit_TriggerPhaseChange
     dw   call_03_4e31_Collision_PlayerHit_SetObjectState                           ;; 03:4c77 ????
     dw   call_03_4e4b_Collision_PlayerHit_MultiStageCollectible                                 ;; 03:4c7b pP
@@ -127,7 +127,6 @@ call_03_4ce1_Collision_PlayerHit_ActionSwitch:
     ret  NC                                            ;; 03:4ce4 $d0
     cp   A, $00                                        ;; 03:4ce5 $fe $00
     jp   NZ, call_03_5671_HandleObjectHitOrRespawn                                ;; 03:4ce7 $c2 $71 $56
-    
 call_03_4cea_TriggerPlayerActionChange:
 ; Reads player action ID. If certain actions (09, 29, 36) → skip. Otherwise, if not 45, calls HandleGenericHitResponse.
 ; Then calculates player vs object X difference, stores facing direction in wDC98.
@@ -225,7 +224,7 @@ call_03_4d44_Collision_PlayerHit_ActionChangeConditional:
     farcall entry_02_54f9_SwitchPlayerAction
     ret  
 
-call_03_4d9b_Collision_PlayerHit_SetLevelFlag:
+call_03_4d9b_Collision_ObtainBonusCoin:
 ; If collision: sets per-level progress bit (bit4 of level data), plays sound 02, then handles respawn/hit.
     call call_03_550e_CheckPlayerObjectInteraction                                  ;; 03:4d9b $cd $0e $55
     ret  NC                                            ;; 03:4d9e $d0
@@ -239,7 +238,7 @@ call_03_4d9b_Collision_PlayerHit_SetLevelFlag:
     call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 03:4dad $cd $f5 $0f
     jp   call_03_5671_HandleObjectHitOrRespawn                                    ;; 03:4db0 $c3 $71 $56
 
-call_03_4db3_Collision_PlayerHit_IncrementCounter:
+call_03_4db3_Collision_ObtainCollectible:
 ; If collision: calls IncrementProgressCounter, plays sound 02, then handles respawn/hit.
     call call_03_550e_CheckPlayerObjectInteraction                                  ;; 03:4db3 $cd $0e $55
     ret  NC                                            ;; 03:4db6 $d0
@@ -248,7 +247,7 @@ call_03_4db3_Collision_PlayerHit_IncrementCounter:
     call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 03:4dbc $cd $f5 $0f
     jp   call_03_5671_HandleObjectHitOrRespawn                                    ;; 03:4dbf $c3 $71 $56
 
-call_03_4dc2_Collision_PlayerHit_CollectibleTracker:
+call_03_4dc2_Collision_ObtainPawCoin:
 ; If collision:
 ; Resolves object index via call_00_230f_ResolveObjectListIndex.
 ; Looks up a flag mask (00, 20, 40, 80).
@@ -478,7 +477,7 @@ call_03_4f23_Collision_ObjectCounterDecrement:
     ret  Z                                             ;; 03:4f44 $c8
     dec  [HL]                                          ;; 03:4f45 $35
     ret  NZ                                            ;; 03:4f46 $c0
-    call call_00_288c_Object_Clear14                                  ;; 03:4f47 $cd $8a $28
+    call call_00_288c_Object_ClearCollisionType                                  ;; 03:4f47 $cd $8a $28
     call call_00_2b8b_HandleObjectFlag6ClearOrInit                                  ;; 03:4f4a $cd $8b $2b
     ld   HL, wDCC8                                     ;; 03:4f4d $21 $c8 $dc
     inc  [HL]                                          ;; 03:4f50 $34
@@ -852,7 +851,7 @@ call_03_51b8_Collision_TransformOrSlotBurst:
 label51E3:
     call call_00_22ef_SetObjectSlotActive
     ld   c,$00
-    call call_00_288c_Object_Set14
+    call call_00_288c_Object_SetCollisionType
     ld   c,$00
     call call_00_2958_Object_SetFacingDirection
     call call_00_2c67_Particle_InitBurst
@@ -1043,7 +1042,7 @@ call_03_532f_Collision_DecrementCounterBank4:
 ; - Loads new data (bank 4).
 ; - Decrements object counter wDCD5.
 ; - If zero → clear object, increment wDCC8, dispatch action.
-; - If all counters = 0 → set wDCD2=1 (event flag).
+; - If all counters = 0 → set wDCD2_HitFreestandingRemoteFlags=1 (event flag).
     call call_00_2962_Object_GetActionId
     cp   a,$04
     ret  nc
@@ -1062,7 +1061,7 @@ call_03_532f_Collision_DecrementCounterBank4:
     ret  z
     dec  [hl]
     ret  nz
-    call call_00_288c_Object_Clear14
+    call call_00_288c_Object_ClearCollisionType
     call call_00_2b8b_HandleObjectFlag6ClearOrInit
     ld   hl,wDCC8
     inc  [hl]
@@ -1079,7 +1078,7 @@ label536D:
     and  a
     ret  nz
     ld   a,$01
-    ld   [wDCD2],a
+    ld   [wDCD2_HitFreestandingRemoteFlags],a
     ret  
     
 call_03_537a_Collision_SlotIndexAccumulator:
@@ -1098,7 +1097,7 @@ call_03_537a_Collision_SlotIndexAccumulator:
     
 call_03_538e_Collision_HeptCollectibleToBank1:
 ; On collision (interaction=1):
-; - If action=0 → increment wDCCC, dispatch action, set wDCD2=1 when =7.
+; - If action=0 → increment wDCCC, dispatch action, set wDCD2_HitFreestandingRemoteFlags=1 when =7.
 ; - Always load new data (bank 1), set status nibble=2.
     call call_03_550e_CheckPlayerObjectInteraction
     ret  nc
@@ -1115,7 +1114,7 @@ call_03_538e_Collision_HeptCollectibleToBank1:
     cp   a,$07
     jr   nz,label53B0
     ld   a,$01
-    ld   [wDCD2],a
+    ld   [wDCD2_HitFreestandingRemoteFlags],a
 label53B0:
     ld   a,$01
     farcall entry_02_72ac_SetupNewAction
@@ -1234,14 +1233,14 @@ call_03_5469_Collision_ClearObjectAlways:
     jp   call_00_2b7a_ClearObjectThenJump
 
 call_03_5473_Collision_SetEvent81:
-; On collision (interaction=1): set wDCD2=0x81 (event flag).
+; On collision (interaction=1): set wDCD2_HitFreestandingRemoteFlags=0x81 (event flag).
     call call_03_550e_CheckPlayerObjectInteraction                                  ;; 03:5473 $cd $0e $55
     ret  NC                                            ;; 03:5476 $d0
     cp   A, $01                                        ;; 03:5477 $fe $01
     ret  NZ                                            ;; 03:5479 $c0
     call call_00_2962_Object_GetActionId                                  ;; 03:547a $cd $62 $29
     ld   A, $81                                        ;; 03:547d $3e $81
-    ld   [wDCD2], A                                    ;; 03:547f $ea $d2 $dc
+    ld   [wDCD2_HitFreestandingRemoteFlags], A                                    ;; 03:547f $ea $d2 $dc
     ret                                                ;; 03:5482 $c9
     
 call_03_5483_Collision_YMapTransform:
@@ -1331,7 +1330,7 @@ call_03_550e_CheckPlayerObjectInteraction:
 ; If overlap fails → bail (call_03_55fd_ReturnNoInteraction).
 ; If overlap succeeds → branch into different behaviors depending on wDC58 bits:
 ; - Bit 1 case: interacts with wDC7F (player state flags), clears it, and returns a “special” interaction result ($FF+2).
-; - Bit 2 case: only triggers if the player is in certain action IDs ($0E,$0F,$25,$26), and if vertical velocity (wDC8C) is negative (jump/falling). Then sets wDC8C = $2A and returns $FF+3. This looks like a bounce effect (spring/booster tile).
+; - Bit 2 case: only triggers if the player is in certain action IDs ($0E,$0F,$25,$26), and if vertical velocity (wDC8C_PlayerYVelocity) is negative (jump/falling). Then sets wDC8C_PlayerYVelocity = $2A and returns $FF+3. This looks like a bounce effect (spring/booster tile).
 ; - Otherwise calls call_00_0759 (probably a more general collision/interaction handler). If that succeeds, returns $FF+1.
 ; So this routine is the core collision handler for player–object interactions, with special cases for springs, breakables, pushables, etc., driven by data_03_55ff_ObjectInteractionFlagsTable.
     ld   B, HIGH(wD800_ObjectMemory)                                        ;; 03:550e $06 $d8
@@ -1469,7 +1468,7 @@ call_03_550e_CheckPlayerObjectInteraction:
     cp   A, $26                                        ;; 03:55e1 $fe $26
     jr   NZ, .jr_03_55f3                               ;; 03:55e3 $20 $0e
 .jr_03_55e5:
-    ld   HL, wDC8C                                     ;; 03:55e5 $21 $8c $dc
+    ld   HL, wDC8C_PlayerYVelocity                                     ;; 03:55e5 $21 $8c $dc
     bit  7, [HL]                                       ;; 03:55e8 $cb $7e
     jr   Z, .jr_03_55f3                                ;; 03:55ea $28 $07
     ld   [HL], $2a                                     ;; 03:55ec $36 $2a
@@ -1559,7 +1558,7 @@ call_03_5671_HandleObjectHitOrRespawn:
     jr   Z, .jr_03_56a6                                ;; 03:5695 $28 $0f
     push AF                                            ;; 03:5697 $f5
     ld   C, $00                                        ;; 03:5698 $0e $00
-    call call_00_288c_Object_Set14                                  ;; 03:569a $cd $8c $28
+    call call_00_288c_Object_SetCollisionType                                  ;; 03:569a $cd $8c $28
     ld   C, $00                                        ;; 03:569d $0e $00
     call call_00_2958_Object_SetFacingDirection                                  ;; 03:569f $cd $58 $29
     call call_00_2c67_Particle_InitBurst                                  ;; 03:56a2 $cd $67 $2c
@@ -1762,7 +1761,7 @@ label57AE:
     ld   a,c
     cp   a,$10
     jr   nc,call_03_57f8_ClearCollisionForObject
-    ld   a,[wDC8C]
+    ld   a,[wDC8C_PlayerYVelocity]
     sra  a
     sra  a
     sra  a
@@ -1828,7 +1827,7 @@ call_03_581a_CheckPlayerObjectCollision_Simple:
 ; Skips entirely if the player is in the same “ignore” action IDs.
 ; Uses the object’s width/height at $D8xx+12/+13 to test bounding-box intersection against the player.
 ; Again compares Y offset + vertical delta (wDC88).
-; If all checks pass, adjusts by camera scroll (wDC8C >> 4) and then calls into 57e6 (collision hit) or 57f8 (miss).
+; If all checks pass, adjusts by camera scroll (wDC8C_PlayerYVelocity >> 4) and then calls into 57e6 (collision hit) or 57f8 (miss).
 ; Role: This is a simplified AABB collision test between the player and an object. 
 ; It’s likely for a different type of object (maybe platforms, triggers, or zones).
     ld   A, [wD801_PlayerObject_ActionId]                                    ;; 03:581a $fa $01 $d8
@@ -1904,7 +1903,7 @@ call_03_581a_CheckPlayerObjectCollision_Simple:
     ld   A, C                                          ;; 03:5889 $79
     cp   A, $10                                        ;; 03:588a $fe $10
     jp   NC, call_03_57f8_ClearCollisionForObject                                ;; 03:588c $d2 $f8 $57
-    ld   A, [wDC8C]                                    ;; 03:588f $fa $8c $dc
+    ld   A, [wDC8C_PlayerYVelocity]                                    ;; 03:588f $fa $8c $dc
     sra  A                                             ;; 03:5892 $cb $2f
     sra  A                                             ;; 03:5894 $cb $2f
     sra  A                                             ;; 03:5896 $cb $2f

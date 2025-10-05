@@ -257,7 +257,7 @@ call_02_4f32_PlayerUpdateMain:
     bit  7, [HL]                                       ;; 02:4f56 $cb $7e
     jr   Z, .jr_02_4f71                                ;; 02:4f58 $28 $17
     res  1, C                                          ;; 02:4f5a $cb $89
-    ld   A, [wDC8C]                                    ;; 02:4f5c $fa $8c $dc
+    ld   A, [wDC8C_PlayerYVelocity]                                    ;; 02:4f5c $fa $8c $dc
     bit  7, A                                          ;; 02:4f5f $cb $7f
     jr   Z, .jr_02_4f71                                ;; 02:4f61 $28 $0e
     bit  1, E                                          ;; 02:4f63 $cb $4b
@@ -648,7 +648,7 @@ call_02_51cb_CheckLeftCollisionAndStoreOffset:
 ; Compares the player’s X position to stored tile edge positions.
 ; If overlap exists, calls ResolveLeftwardTilePushback.
 ; Stores the corrected offset between player and solid edge back into the object table.
-    or   A, OBJECT_UNK14_OFFSET                                        ;; 02:51cb $f6 $14
+    or   A, OBJECT_COLLISION_TYPE_OFFSET                                        ;; 02:51cb $f6 $14
     ld   L, A                                          ;; 02:51cd $6f
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:51ce $26 $d8
     bit  7, [HL]                                       ;; 02:51d0 $cb $7e
@@ -741,7 +741,7 @@ call_02_5238_CheckRightCollisionAndStoreOffset:
 ; Performs the same operations but for movement to the right.
 ; Calls ResolveRightwardTilePushback when needed.
 ; Updates the tile offset table after adjustment.
-    or   A, OBJECT_UNK14_OFFSET                                        ;; 02:5238 $f6 $14
+    or   A, OBJECT_COLLISION_TYPE_OFFSET                                        ;; 02:5238 $f6 $14
     ld   L, A                                          ;; 02:523a $6f
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:523b $26 $d8
     bit  7, [HL]                                       ;; 02:523d $cb $7e
@@ -776,7 +776,7 @@ call_02_5238_CheckRightCollisionAndStoreOffset:
 call_02_5267_PlatformSlopeAndTriggerHandler:
 ; Purpose: Manages sloped surfaces, triggers, and speed modifiers.
 ; Details:
-; Reads slope/collision data (wDC8C, wDC8F, etc.) and adjusts horizontal velocity.
+; Reads slope/collision data (wDC8C_PlayerYVelocity, wDC8F, etc.) and adjusts horizontal velocity.
 ; Checks level ID and player action IDs to trigger special cases (calls call_02_54f9_SwitchPlayerAction).
 ; Handles different terrain behaviors (e.g., slippery slopes or triggers unique to levels 7 & 8).
     call call_02_5541_GetActionPropertyByte                                  ;; 02:5267 $cd $41 $55
@@ -785,7 +785,7 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     ld   A, [wDC1F]                                    ;; 02:526d $fa $1f $dc
     cp   A, $01                                        ;; 02:5270 $fe $01
     jp   Z, .jp_02_5348                                ;; 02:5272 $ca $48 $53
-    ld   A, [wDC8C]                                    ;; 02:5275 $fa $8c $dc
+    ld   A, [wDC8C_PlayerYVelocity]                                    ;; 02:5275 $fa $8c $dc
     bit  7, A                                          ;; 02:5278 $cb $7f
     jr   NZ, .jr_02_52b3                               ;; 02:527a $20 $37
     and  A, A                                          ;; 02:527c $a7
@@ -793,7 +793,7 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     xor  A, A                                          ;; 02:527f $af
     ld   [wDC8F], A                                    ;; 02:5280 $ea $8f $dc
 .jp_02_5283:
-    ld   A, [wDC8C]                                    ;; 02:5283 $fa $8c $dc
+    ld   A, [wDC8C_PlayerYVelocity]                                    ;; 02:5283 $fa $8c $dc
     sub  A, $02                                        ;; 02:5286 $d6 $02
     bit  7, A                                          ;; 02:5288 $cb $7f
     jr   Z, .jr_02_529b                                ;; 02:528a $28 $0f
@@ -806,7 +806,7 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     ld   [HL], A                                       ;; 02:5298 $77
     ld   A, $c0                                        ;; 02:5299 $3e $c0
 .jr_02_529b:
-    ld   [wDC8C], A                                    ;; 02:529b $ea $8c $dc
+    ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:529b $ea $8c $dc
     cpl                                                ;; 02:529e $2f
     inc  A                                             ;; 02:529f $3c
     swap A                                             ;; 02:52a0 $cb $37
@@ -829,7 +829,7 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     ld   HL, wDABD_UnkBGCollisionFlags                                     ;; 02:52c0 $21 $bd $da
     bit  7, [HL]                                       ;; 02:52c3 $cb $7e
     jr   NZ, .jr_02_529b                               ;; 02:52c5 $20 $d4
-    ld   HL, wDC8C                                     ;; 02:52c7 $21 $8c $dc
+    ld   HL, wDC8C_PlayerYVelocity                                     ;; 02:52c7 $21 $8c $dc
     cp   A, [HL]                                       ;; 02:52ca $be
     jr   NC, .jr_02_529b                               ;; 02:52cb $30 $ce
     jr   .jp_02_5283                                   ;; 02:52cd $18 $b4
@@ -855,7 +855,7 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     jp   .jp_02_5283                                   ;; 02:52f5 $c3 $83 $52
 .jr_02_52f8:
     xor  A, A                                          ;; 02:52f8 $af
-    ld   [wDC8C], A                                    ;; 02:52f9 $ea $8c $dc
+    ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:52f9 $ea $8c $dc
     ld   HL, wDC8F                                     ;; 02:52fc $21 $8f $dc
     ld   C, [HL]                                       ;; 02:52ff $4e
     ld   [HL], $00                                     ;; 02:5300 $36 $00
@@ -891,7 +891,7 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     ld   A, $12                                        ;; 02:5343 $3e $12
     jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:5345 $c3 $f9 $54
 .jp_02_5348:
-    ld   A, [wDC8C]                                    ;; 02:5348 $fa $8c $dc
+    ld   A, [wDC8C_PlayerYVelocity]                                    ;; 02:5348 $fa $8c $dc
     sub  A, $02                                        ;; 02:534b $d6 $02
     bit  7, A                                          ;; 02:534d $cb $7f
     jr   Z, .jr_02_5357                                ;; 02:534f $28 $06
@@ -899,7 +899,7 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     jr   NC, .jr_02_5357                               ;; 02:5353 $30 $02
     ld   A, $c0                                        ;; 02:5355 $3e $c0
 .jr_02_5357:
-    ld   [wDC8C], A                                    ;; 02:5357 $ea $8c $dc
+    ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:5357 $ea $8c $dc
     cpl                                                ;; 02:535a $2f
     inc  A                                             ;; 02:535b $3c
     swap A                                             ;; 02:535c $cb $37
@@ -923,7 +923,7 @@ call_02_5374_LevelSpecificEventTrigger:
 ; Details:
 ; Filters on input state (and A,$08).
 ; Uses level number and index (wDC1E_CurrentLevelNumber) to find event tables (.data_02_53bf).
-; Compares collected values (wDCB1) to thresholds and modifies wDC8C (horizontal momentum or trigger accumulator).
+; Compares collected values (wDCB1) to thresholds and modifies wDC8C_PlayerYVelocity (horizontal momentum or trigger accumulator).
 ; Likely handles special pickups or doors that open based on conditions.
     call call_02_5541_GetActionPropertyByte                                  ;; 02:5374 $cd $41 $55
     and  A, $08                                        ;; 02:5377 $e6 $08
@@ -963,13 +963,13 @@ call_02_5374_LevelSpecificEventTrigger:
     cp   A, C                                          ;; 02:53aa $b9
     ret  C                                             ;; 02:53ab $d8
 .jr_02_53ac:
-    ld   A, [wDC8C]                                    ;; 02:53ac $fa $8c $dc
+    ld   A, [wDC8C_PlayerYVelocity]                                    ;; 02:53ac $fa $8c $dc
     add  A, $03                                        ;; 02:53af $c6 $03
     cp   A, $20                                        ;; 02:53b1 $fe $20
     jr   C, .jr_02_53b7                                ;; 02:53b3 $38 $02
     ld   A, $20                                        ;; 02:53b5 $3e $20
 .jr_02_53b7:
-    ld   [wDC8C], A                                    ;; 02:53b7 $ea $8c $dc
+    ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:53b7 $ea $8c $dc
     ld   A, $1d                                        ;; 02:53ba $3e $1d
     jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:53bc $c3 $f9 $54
 .data_02_53bf:
@@ -1081,7 +1081,7 @@ call_02_5431_HandleActionTriggersAndEvents:
     ld   A, [wD801_PlayerObject_ActionId]                                    ;; 02:5488 $fa $01 $d8
     cp   A, $0f                                        ;; 02:548b $fe $0f
     jr   NZ, .jr_02_5496                               ;; 02:548d $20 $07
-    ld   A, [wDC8C]                                    ;; 02:548f $fa $8c $dc
+    ld   A, [wDC8C_PlayerYVelocity]                                    ;; 02:548f $fa $8c $dc
     bit  7, A                                          ;; 02:5492 $cb $7f
     jr   Z, .jr_02_54a7                                ;; 02:5494 $28 $11
 .jr_02_5496:
@@ -1104,7 +1104,7 @@ call_02_5431_HandleActionTriggersAndEvents:
     xor  A, A                                          ;; 02:54c2 $af
     ld   [wDCA1], A                                    ;; 02:54c3 $ea $a1 $dc
     ld   [wDC86], A                                    ;; 02:54c6 $ea $86 $dc
-    ld   [wDC8C], A                                    ;; 02:54c9 $ea $8c $dc
+    ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:54c9 $ea $8c $dc
     ld   A, $22                                        ;; 02:54cc $3e $22
     jr   call_02_54f9_SwitchPlayerAction                                  ;; 02:54ce $18 $29
 .jr_02_54d0:

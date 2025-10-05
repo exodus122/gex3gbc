@@ -1364,7 +1364,7 @@ call_00_1bbc_CheckForDoorAndEnter:
     ret  Z                                             ;; 00:1bc4 $c8
     and  A, A                                          ;; 00:1bc5 $a7
     jr   Z, .jr_00_1bce                                ;; 00:1bc6 $28 $06
-    ld   A, [wDCD2]                                    ;; 00:1bc8 $fa $d2 $dc
+    ld   A, [wDCD2_HitFreestandingRemoteFlags]                                    ;; 00:1bc8 $fa $d2 $dc
     cp   A, $81                                        ;; 00:1bcb $fe $81
     ret  Z                                             ;; 00:1bcd $c8
 .jr_00_1bce:

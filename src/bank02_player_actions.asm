@@ -19,7 +19,7 @@ call_02_47b4_PlayerAction_Spawn:
 call_02_47ce_PlayerAction_Idle:
 ; Also checks bit 4 of wD805_Player_unk05. If set:
 ; Sets bit 6 of wDC80 (marking a new sub-state).
-; Clears wDC86, wDC8C, and wDC87.
+; Clears wDC86, wDC8C_PlayerYVelocity, and wDC87.
 ; Sets wDC83 = F0h (a countdown timer).
 ; Regardless, it checks if wDC81_CurrentInputs == Input_Up and, if so, calls call_00_1bbc_CheckForDoorAndEnter.
 ; It then calls call_02_4f11 to potentially switch actions.
@@ -31,7 +31,7 @@ call_02_47ce_PlayerAction_Idle:
     set  6, [HL]                                       ;; 02:47d8 $cb $f6
     xor  A, A                                          ;; 02:47da $af
     ld   [wDC86], A                                    ;; 02:47db $ea $86 $dc
-    ld   [wDC8C], A                                    ;; 02:47de $ea $8c $dc
+    ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:47de $ea $8c $dc
     ld   [wDC87], A                                    ;; 02:47e1 $ea $87 $dc
     ld   A, $f0                                        ;; 02:47e4 $3e $f0
     ld   [wDC83], A                                    ;; 02:47e6 $ea $83 $dc
@@ -112,7 +112,7 @@ call_02_484d:
     bit  4, [HL]                                       ;; 02:4850 $cb $66
     jr   Z, .jr_02_4864                                ;; 02:4852 $28 $10
     ld   A, $1c                                        ;; 02:4854 $3e $1c
-    ld   [wDC8C], A                                    ;; 02:4856 $ea $8c $dc
+    ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:4856 $ea $8c $dc
     ld   [wDC8E], A                                    ;; 02:4859 $ea $8e $dc
     call call_02_4e01_SetOneTimeFlag                                  ;; 02:485c $cd $01 $4e
     ld   A, $0a                                        ;; 02:485f $3e $0a
@@ -175,7 +175,7 @@ call_02_48bc:
     ld   A, $06                                        ;; 02:48c3 $3e $06
     call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 02:48c5 $cd $f5 $0f
     ld   A, $2a                                        ;; 02:48c8 $3e $2a
-    ld   [wDC8C], A                                    ;; 02:48ca $ea $8c $dc
+    ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:48ca $ea $8c $dc
     ld   [wDC8E], A                                    ;; 02:48cd $ea $8e $dc
     call call_02_4df6_FlagCollisionActive                                  ;; 02:48d0 $cd $f6 $4d
     call call_02_4e01_SetOneTimeFlag                                  ;; 02:48d3 $cd $01 $4e
@@ -197,7 +197,7 @@ call_02_48e8:
     ld   A, $07                                        ;; 02:48ef $3e $07
     call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 02:48f1 $cd $f5 $0f
     ld   A, $3e                                        ;; 02:48f4 $3e $3e
-    ld   [wDC8C], A                                    ;; 02:48f6 $ea $8c $dc
+    ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:48f6 $ea $8c $dc
     ld   [wDC8E], A                                    ;; 02:48f9 $ea $8e $dc
     call call_02_4df6_FlagCollisionActive                                  ;; 02:48fc $cd $f6 $4d
     call call_02_4e01_SetOneTimeFlag                                  ;; 02:48ff $cd $01 $4e
@@ -277,7 +277,7 @@ call_02_4989:
     bit  4,[hl]
     jr   z,call_02_49a8
     ld   a,$30
-    ld   [wDC8C],a
+    ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E],a
     call call_02_4e01_SetOneTimeFlag
     call call_00_06f6_HandleGenericHitResponse
@@ -304,7 +304,7 @@ call_02_49b3:
     set  6,[hl]
     xor  a
     ld   [wDC9B],a
-    ld   [wDC8C],a
+    ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8D],a
     ld   a,01
     ld   [wDC87],a
@@ -440,7 +440,7 @@ call_02_4aac:
     set  6,[hl]
     xor  a
     ld   [wDC9F],a
-    ld   [wDC8C],a
+    ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8D],a
     ld   a,$01
     ld   [wDC87],a
@@ -616,7 +616,7 @@ label4BFD:
     cp   [hl]
     ret  nz
     ld   a,$20
-    ld   [wDC8C],a
+    ld   [wDC8C_PlayerYVelocity],a
     ret  
 
 call_02_4C10:
@@ -640,7 +640,7 @@ call_02_4c2c:
     ld   a,$06
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$2A
-    ld   [wDC8C],a
+    ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E],a
     call call_02_4df6_FlagCollisionActive
     call call_02_4e01_SetOneTimeFlag
@@ -661,7 +661,7 @@ call_02_4c58:
     ld   a,$07
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$3E
-    ld   [wDC8C],a
+    ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E],a
     call call_02_4df6_FlagCollisionActive
     call call_02_4e01_SetOneTimeFlag
@@ -710,7 +710,7 @@ call_02_4cbd:
     bit  4,[hl]
     jr   z,label4CD4
     ld   a,$1C
-    ld   [wDC8C],a
+    ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E],a
     call call_02_4e01_SetOneTimeFlag
     ld   a,$0A
@@ -735,7 +735,7 @@ call_02_4ce3:
     bit  7,[hl]
     jr   z,call_02_4d02
     ld   a,$1E
-    ld   [wDC8C],a
+    ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E],a
 call_02_4d02:
     ld   a,[wDC8E]
@@ -758,7 +758,7 @@ call_02_4d14:
     bit  7,[hl]
     jr   z,call_02_4d33
     ld   a,$36
-    ld   [wDC8C],a
+    ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E],a
 call_02_4d33:
     ld   a,[wDC8E]
@@ -811,7 +811,7 @@ call_02_4d8b:
     bit  4,[hl]
     jr   z,label4DA2
     ld   a,$1C
-    ld   [wDC8C],a
+    ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E],a
     call call_02_4e01_SetOneTimeFlag
     ld   a,$0A
