@@ -2026,9 +2026,9 @@ call_00_2bbe_SpawnCollectibleObject:
     jr   Z, call_00_2b7a_ClearObjectThenJump                                 ;; 00:2bc3 $28 $b5
     bit  6, A                                          ;; 00:2bc5 $cb $77
     jr   Z, call_00_2b7a_ClearObjectThenJump                                 ;; 00:2bc7 $28 $b1
-    ld   C, $02                                        ;; 00:2bc9 $0e $02
+    ld   C, Object_FlyCoinSpawn                                        ;; 00:2bc9 $0e $02
     call call_00_2930_Object_SetId                                  ;; 00:2bcb $cd $30 $29
-    ld   C, $08                                        ;; 00:2bce $0e $08
+    ld   C, CollisionType_FlyCoin                                        ;; 00:2bce $0e $08
     call call_00_288c_Object_SetCollisionType                                  ;; 00:2bd0 $cd $8c $28
     ld   C, $12                                        ;; 00:2bd3 $0e $12
     call call_00_2944_Object_SetWidth                                  ;; 00:2bd5 $cd $44 $29
