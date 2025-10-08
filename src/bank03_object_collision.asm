@@ -251,8 +251,8 @@ call_03_4dc2_Collision_PawCoin:
 ; If collision:
 ; Resolves object index via call_00_230f_ResolveObjectListIndex.
 ; Looks up a flag mask (00, 20, 40, 80).
-; ORs it into level data, increments wDCAF.
-; Every 4 collected, increments wDC4F (if <4), resets counter, sets flag in wDB69.
+; ORs it into level data, increments wDCAF_PawCoinCounter.
+; Every 4 collected, increments wDC4F_PawCoinExtraHealth (if <4), resets counter, sets flag in wDB69.
 ; Plays sound 02, then handles respawn/hit.
 ; This is basically a collectible counter with milestones.
     call call_03_550e_CheckPlayerObjectInteraction                                  ;; 03:4dc2 $cd $0e $55
@@ -270,18 +270,18 @@ call_03_4dc2_Collision_PawCoin:
     ld   A, [HL]                                       ;; 03:4dda $7e
     or   A, C                                          ;; 03:4ddb $b1
     ld   [HL], A                                       ;; 03:4ddc $77
-    ld   HL, wDCAF                                     ;; 03:4ddd $21 $af $dc
+    ld   HL, wDCAF_PawCoinCounter                                     ;; 03:4ddd $21 $af $dc
     inc  [HL]                                          ;; 03:4de0 $34
     ld   A, [HL]                                       ;; 03:4de1 $7e
     sub  A, $04                                        ;; 03:4de2 $d6 $04
     jr   NZ, .jr_03_4df8                               ;; 03:4de4 $20 $12
-    ld   HL, wDC4F                                     ;; 03:4de6 $21 $4f $dc
+    ld   HL, wDC4F_PawCoinExtraHealth                                     ;; 03:4de6 $21 $4f $dc
     ld   A, [HL]                                       ;; 03:4de9 $7e
     cp   A, $04                                        ;; 03:4dea $fe $04
     jr   Z, .jr_03_4df8                                ;; 03:4dec $28 $0a
     inc  [HL]                                          ;; 03:4dee $34
     xor  A, A                                          ;; 03:4def $af
-    ld   [wDCAF], A                                    ;; 03:4df0 $ea $af $dc
+    ld   [wDCAF_PawCoinCounter], A                                    ;; 03:4df0 $ea $af $dc
     ld   HL, wDB69                                     ;; 03:4df3 $21 $69 $db
     set  1, [HL]                                       ;; 03:4df6 $cb $ce
 .jr_03_4df8:

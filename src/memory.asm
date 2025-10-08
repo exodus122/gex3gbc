@@ -229,7 +229,7 @@ wDAD9_ScrollX:
     ds 1                                               ;; dad9
 wDADA_ScrollY:
     ds 1                                               ;; dada
-wDADA_WindowX:
+wDADB_WindowX:
     ds 1                                               ;; dadb
 wDADC_WindowY:
     ds 1                                               ;; dadc
@@ -289,6 +289,7 @@ wDB6B_InterruptFlag:
     ds 1                                               ;; db6b
 
 wDB6C_CurrentMapId: ; can freeze and enter level to get to another level
+; also used for totals menu pages
     ds 1                                               ;; db6c
 
 wDB6D:
@@ -306,90 +307,86 @@ wDB71_CollectibleScreenRelativeYOffset:
     ds 1                                               ;; db71
 
 ; Menu-related wRAM starts here
-wDB72:
+wDB72_PasswordEncodedBuffer:
     ds 1                                               ;; db72
-wDB73:
+wDB73_PasswordLivesRemaining:
     ds 1                                               ;; db73
-wDB74:
+wDB74_PasswordPawCoinCounter:
     ds 1                                               ;; db74
-wDB75:
+wDB75_PasswordPawCoinExtraHealth:
     ds 1                                               ;; db75
-wDB76:
+wDB76_PasswordEncodedBuffer:
     ds 8                                               ;; db76
-wDB7E:
-    ds 1                                               ;; db7e
-wDB7F:
-    ds 17                                              ;; db7f
-wDB90:
+wDB7E_PasswordValues:
+    ds 18                                              ;; db7e
+wDB90_PasswordCounter:
     ds 1                                               ;; db90
-wDB91:
+wDB91_PasswordCompletionFlag:
     ds 1                                               ;; db91
 wDB92_MenuTypeDataPointer:
     ds 2                                               ;; db92
-wDB94:
+wDB94_MenuTypeData_Unk2:
     ds 1                                               ;; db94
-wDB95:
+wDB95_MenuTypeData_Unk3:
     ds 1                                               ;; db95
-wDB96:
+wDB96_MenuTypeData_Unk4:
     ds 1                                               ;; db96
-wDB97:
+wDB97_MenuTypeData_Unk5:
     ds 1                                               ;; db97
-wDB98:
+wDB98_MenuTypeData_Unk6:
     ds 1                                               ;; db98
-wDB99:
+wDB99_MenuTypeData_Unk7:
     ds 2                                               ;; db99
-wDB9B:
+wDB9B_MenuTypeData_Unk9:
     ds 1                                               ;; db9b
-wDB9C:
+wDB9C_MenuTypeData_UnkB:
     ds 2                                               ;; db9c
-wDB9E:
+wDB9E_MenuCommandBuffer_Unk0:
     ds 1                                               ;; db9e
-wDB9F:
+wDB9F_MenuCommandBuffer_Unk1:
     ds 1                                               ;; db9f
-wDBA0:
+wDBA0_MenuCommandBuffer_Unk2:
     ds 1                                               ;; dba0
-wDBA1:
+wDBA1_MenuCommandBuffer_Unk3:
     ds 1                                               ;; dba1
-wDBA2:
+wDBA2_MenuCommandBuffer_Unk4:
     ds 1                                               ;; dba2
-wDBA3:
+wDBA3_MenuCommandBuffer_Unk5:
     ds 1                                               ;; dba3
-wDBA4:
+wDBA4_MenuCommandBuffer2_Unk0:
     ds 1                                               ;; dba4
-wDBA5:
+wDBA5_MenuCommandBuffer2_Unk1:
     ds 1                                               ;; dba5
-wDBA6:
+wDBA6_MenuCommandBuffer2_Unk2:
     ds 1                                               ;; dba6
-wDBA7:
+wDBA7_MenuCommandBuffer2_Unk3:
     ds 1                                               ;; dba7
-wDBA8:
+wDBA8_MenuCommandBuffer2_Unk4:
     ds 1                                               ;; dba8
-wDBA9:
+wDBA9_MenuCommandBuffer2_Unk5:
     ds 1                                               ;; dba9
-wDBAA:
+wDBAA_MenuCommandBuffer2_Unk6:
     ds 1                                               ;; dbaa
-wDBAB:
+wDBAB_MenuCommandBuffer3_Unk0:
     ds 2                                               ;; dbab
-wDBAD:
+wDBAD_MenuCommandBuffer3_Unk2:
     ds 2                                               ;; dbad
-wDBAF:
+wDBAF_MenuCommandBuffer3_Unk4:
     ds 1                                               ;; dbaf
-wDBB0:
+wDBB0_MenuCommandBuffer3_Unk5:
     ds 1                                               ;; dbb0
-wDBB1:
+wDBB1_MenuCommandBuffer4_Unk0:
     ds 1                                               ;; dbb1
-wDBB2:
+wDBB2_MenuCommandBuffer4_Unk1:
     ds 1                                               ;; dbb2
-wDBB3:
+wDBB3_MenuCommandBuffer4_Unk2:
     ds 2                                               ;; dbb3
-wDBB5:
+wDBB5_MenuCommandBuffer4_Unk4:
     ds 2                                               ;; dbb5
-wDBB7:
+wDBB7_MenuCommandBuffer4_Unk6:
     ds 2                                               ;; dbb7
-wDBB9:
-    ds 1                                               ;; dbb9
-wDBBA:
-    ds 1                                               ;; dbba
+wDBB9_MenuUnknownPtr:
+    ds 2                                               ;; dbb9
 wDBBB:
     ds 1                                               ;; dbbb
 wDBBC:
@@ -454,15 +451,15 @@ wDBE9:
     ds 1                                               ;; dbe9
 wDBEA_MenuType:
     ds 1                                               ;; dbea
-wDBEB:
+wDBEB_MenuColumnSelected:
     ds 1                                               ;; dbeb
-wDBEC:
+wDBEC_MenuRowSelected:
     ds 1                                               ;; dbec
-wDBED:
+wDBED_PasswordColumnSelected:
     ds 1                                               ;; dbed
-wDBEE:
+wDBEE_PasswordRowSelected:
     ds 1                                               ;; dbee
-wDBEF:
+wDBEF_UnkCounter:
     ds 1                                               ;; dbef
 wDBF0:
     ds 1                                               ;; dbf0
@@ -656,7 +653,7 @@ wDC4D:
 wDC4E_PlayerLivesRemaining:
     ds 1                                               ;; dc4e
 
-wDC4F:
+wDC4F_PawCoinExtraHealth:
     ds 1                                               ;; dc4f
 
 wDC50_PlayerHealth:
@@ -886,7 +883,7 @@ wDCAD:
 wDCAE:
     ds 1                                               ;; dcae
 
-wDCAF:
+wDCAF_PawCoinCounter:
     ds 2                                               ;; dcaf
 
 wDCB1:

@@ -7,7 +7,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
 ; Loads map/VRAM data for menu backgrounds (call_03_6c89_LoadMapData).
 ; Handles multiple input modes:
 ; Navigation (up/down/left/right) through menu entries.
-; Page wrapping, clamping, and cursor movement (wDBED, wDBEE, etc.).
+; Page wrapping, clamping, and cursor movement (wDBED_PasswordColumnSelected, wDBEE_PasswordRowSelected, etc.).
 ; Sub-menu branching (jp_01_42c2, 42d0, etc.) and returning to game states.
 ; Calls tile loading and VRAM update routines between frames.
 ; Summary: Full menu controller—initializes, updates cursor positions, processes input, updates graphics, 
@@ -32,17 +32,17 @@ call_01_4000_MenuHandler_LoadAndProcess:
 ; - Masks to check directional inputs (up, down, left, right), confirm/accept, and cancel/back.
 ;
 ; B. Update Cursor Position
-; - Vertical movement (wDBED):
-;   - If UP is pressed → decrements wDBED.
-;   - If DOWN is pressed → increments wDBED.
-;   - Wraps/clamps wDBED within valid menu entries (e.g., from 0 → max_index).
-; - Horizontal/page movement (wDBEE):
+; - Vertical movement (wDBED_PasswordColumnSelected):
+;   - If UP is pressed → decrements wDBED_PasswordColumnSelected.
+;   - If DOWN is pressed → increments wDBED_PasswordColumnSelected.
+;   - Wraps/clamps wDBED_PasswordColumnSelected within valid menu entries (e.g., from 0 → max_index).
+; - Horizontal/page movement (wDBEE_PasswordRowSelected):
 ;   - LEFT/RIGHT changes page or sub-option index.
 ;   - Also wrapped/clamped to prevent out-of-range pages.
 ;
 ; C. Handle Accept/Cancel
 ; - Accept/confirm button:
-;   - Uses the cursor index (wDBED, wDBEE) to look up a jump table or handler routine for that menu option.
+;   - Uses the cursor index (wDBED_PasswordColumnSelected, wDBEE_PasswordRowSelected) to look up a jump table or handler routine for that menu option.
 ; - Calls routines like jp_01_42c2, jp_01_42d0, or others to branch to sub-menus, start a level, or change settings.
 ; - Cancel/back button:
 ;   - Restores the saved wDB6C_CurrentMapId.
@@ -67,7 +67,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
 ; MenuHandler_LoadAndProcess is essentially a menu state machine:
 ; 1. Initialize graphics and state.
 ; 2. Poll input each frame.
-; 3. Adjust cursor/page indices (wDBED, wDBEE).
+; 3. Adjust cursor/page indices (wDBED_PasswordColumnSelected, wDBEE_PasswordRowSelected).
 ; 4. Handle confirm or cancel to branch or exit.
 ; 5. Update VRAM/OAM for smooth visuals.
 ; 6. On exit, restore level and resume gameplay.
@@ -100,22 +100,22 @@ call_01_4000_MenuHandler_LoadAndProcess:
 .jr_01_4037:
     farcall call_03_6c89_LoadMapData
     xor  A, A                                          ;; 01:4042 $af
-    ld   [wDBEB], A                                    ;; 01:4043 $ea $eb $db
-    ld   [wDBEC], A                                    ;; 01:4046 $ea $ec $db
-    ld   [wDBED], A                                    ;; 01:4049 $ea $ed $db
-    ld   [wDBEE], A                                    ;; 01:404c $ea $ee $db
+    ld   [wDBEB_MenuColumnSelected], A                                    ;; 01:4043 $ea $eb $db
+    ld   [wDBEC_MenuRowSelected], A                                    ;; 01:4046 $ea $ec $db
+    ld   [wDBED_PasswordColumnSelected], A                                    ;; 01:4049 $ea $ed $db
+    ld   [wDBEE_PasswordRowSelected], A                                    ;; 01:404c $ea $ee $db
     ld   HL, wDB92_MenuTypeDataPointer                                     ;; 01:404f $21 $92 $db
     ld   A, [HL+]                                      ;; 01:4052 $2a
     ld   H, [HL]                                       ;; 01:4053 $66
     ld   L, A                                          ;; 01:4054 $6f
     call call_01_43f0_MenuEngine_MainLoop                                  ;; 01:4055 $cd $f0 $43
-    ld   A, [wDB94]                                    ;; 01:4058 $fa $94 $db
+    ld   A, [wDB94_MenuTypeData_Unk2]                                    ;; 01:4058 $fa $94 $db
     and  A, $02                                        ;; 01:405b $e6 $02
     jp   NZ, .jp_01_42c2                               ;; 01:405d $c2 $c2 $42
-    ld   A, [wDB94]                                    ;; 01:4060 $fa $94 $db
+    ld   A, [wDB94_MenuTypeData_Unk2]                                    ;; 01:4060 $fa $94 $db
     and  A, $04                                        ;; 01:4063 $e6 $04
     jp   NZ, .jp_01_42d0                               ;; 01:4065 $c2 $d0 $42
-    ld   A, [wDB94]                                    ;; 01:4068 $fa $94 $db
+    ld   A, [wDB94_MenuTypeData_Unk2]                                    ;; 01:4068 $fa $94 $db
     and  A, $08                                        ;; 01:406b $e6 $08
     jp   NZ, .jp_01_42e2                               ;; 01:406d $c2 $e2 $42
 .jp_01_4070:
@@ -128,7 +128,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     call call_01_4b6b_StreamTileDataToBuffer                                  ;; 01:407e $cd $6b $4b
     ld   HL, wDBDC                                     ;; 01:4081 $21 $dc $db
     dec  [HL]                                          ;; 01:4084 $35
-    ld   A, [wDB94]                                    ;; 01:4085 $fa $94 $db
+    ld   A, [wDB94_MenuTypeData_Unk2]                                    ;; 01:4085 $fa $94 $db
     and  A, $01                                        ;; 01:4088 $e6 $01
     jp   Z, .jp_01_41cb                                ;; 01:408a $ca $cb $41
     ld   HL, wDAD7_CurrentInputs                                     ;; 01:408d $21 $d7 $da
@@ -141,7 +141,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     farcall call_03_6c89_LoadMapData
     jp   .jp_01_4285                                   ;; 01:40aa $c3 $85 $42
 .jr_01_40ad:
-    ld   A, [wDB95]                                    ;; 01:40ad $fa $95 $db
+    ld   A, [wDB95_MenuTypeData_Unk3]                                    ;; 01:40ad $fa $95 $db
     and  A, A                                          ;; 01:40b0 $a7
     jr   Z, .jp_01_4078                                ;; 01:40b1 $28 $c5
     bit  1, [HL]                                       ;; 01:40b3 $cb $4e
@@ -155,7 +155,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     jr   Z, .jp_01_4078                                ;; 01:40c4 $28 $b2
     call call_00_0f6e_CheckInputRight                                  ;; 01:40c6 $cd $6e $0f
     jr   Z, .jr_01_40d7                                ;; 01:40c9 $28 $0c
-    ld   HL, wDBED                                     ;; 01:40cb $21 $ed $db
+    ld   HL, wDBED_PasswordColumnSelected                                     ;; 01:40cb $21 $ed $db
     inc  [HL]                                          ;; 01:40ce $34
     ld   A, [HL]                                       ;; 01:40cf $7e
     sub  A, $10                                        ;; 01:40d0 $d6 $10
@@ -165,7 +165,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
 .jr_01_40d7:
     call call_00_0f68_CheckInputLeft                                  ;; 01:40d7 $cd $68 $0f
     jr   Z, .jr_01_40e8                                ;; 01:40da $28 $0c
-    ld   HL, wDBED                                     ;; 01:40dc $21 $ed $db
+    ld   HL, wDBED_PasswordColumnSelected                                     ;; 01:40dc $21 $ed $db
     dec  [HL]                                          ;; 01:40df $35
     bit  7, [HL]                                       ;; 01:40e0 $cb $7e
     jr   Z, .jr_01_4109                                ;; 01:40e2 $28 $25
@@ -174,7 +174,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
 .jr_01_40e8:
     call call_00_0f7a_CheckInputDown                                  ;; 01:40e8 $cd $7a $0f
     jr   Z, .jr_01_40f9                                ;; 01:40eb $28 $0c
-    ld   HL, wDBEE                                     ;; 01:40ed $21 $ee $db
+    ld   HL, wDBEE_PasswordRowSelected                                     ;; 01:40ed $21 $ee $db
     inc  [HL]                                          ;; 01:40f0 $34
     ld   A, [HL]                                       ;; 01:40f1 $7e
     sub  A, $02                                        ;; 01:40f2 $d6 $02
@@ -184,7 +184,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
 .jr_01_40f9:
     call call_00_0f74_CheckInputUp                                  ;; 01:40f9 $cd $74 $0f
     jp   Z, .jp_01_4078                                ;; 01:40fc $ca $78 $40
-    ld   HL, wDBEE                                     ;; 01:40ff $21 $ee $db
+    ld   HL, wDBEE_PasswordRowSelected                                     ;; 01:40ff $21 $ee $db
     dec  [HL]                                          ;; 01:4102 $35
     bit  7, [HL]                                       ;; 01:4103 $cb $7e
     jr   Z, .jr_01_4109                                ;; 01:4105 $28 $02
@@ -194,7 +194,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     call call_00_0fd7_TriggerSoundEffect                                  ;; 01:410b $cd $d7 $0f
     jp   .jp_01_4070                                   ;; 01:410e $c3 $70 $40
 .jr_01_4111:
-    ld   HL, wDBEE                                     ;; 01:4111 $21 $ee $db
+    ld   HL, wDBEE_PasswordRowSelected                                     ;; 01:4111 $21 $ee $db
     ld   B, [HL]                                       ;; 01:4114 $46
     ld   A, $f0                                        ;; 01:4115 $3e $f0
 .jr_01_4117:
@@ -202,10 +202,10 @@ call_01_4000_MenuHandler_LoadAndProcess:
     dec  B                                             ;; 01:4119 $05
     bit  7, B                                          ;; 01:411a $cb $78
     jr   Z, .jr_01_4117                                ;; 01:411c $28 $f9
-    ld   HL, wDBED                                     ;; 01:411e $21 $ed $db
+    ld   HL, wDBED_PasswordColumnSelected                                     ;; 01:411e $21 $ed $db
     add  A, [HL]                                       ;; 01:4121 $86
     ld   C, A                                          ;; 01:4122 $4f
-    ld   HL, wDBEC                                     ;; 01:4123 $21 $ec $db
+    ld   HL, wDBEC_MenuRowSelected                                     ;; 01:4123 $21 $ec $db
     ld   B, [HL]                                       ;; 01:4126 $46
     ld   A, $fa                                        ;; 01:4127 $3e $fa
 .jr_01_4129:
@@ -213,21 +213,21 @@ call_01_4000_MenuHandler_LoadAndProcess:
     dec  B                                             ;; 01:412b $05
     bit  7, B                                          ;; 01:412c $cb $78
     jr   Z, .jr_01_4129                                ;; 01:412e $28 $f9
-    ld   HL, wDBEB                                     ;; 01:4130 $21 $eb $db
+    ld   HL, wDBEB_MenuColumnSelected                                     ;; 01:4130 $21 $eb $db
     add  A, [HL]                                       ;; 01:4133 $86
     ld   L, A                                          ;; 01:4134 $6f
     ld   H, $00                                        ;; 01:4135 $26 $00
-    ld   DE, wDB7E                                     ;; 01:4137 $11 $7e $db
+    ld   DE, wDB7E_PasswordValues                                     ;; 01:4137 $11 $7e $db
     add  HL, DE                                        ;; 01:413a $19
     ld   [HL], C                                       ;; 01:413b $71
     call call_01_4d6e_PrepareStreamingPointers                                  ;; 01:413c $cd $6e $4d
-    ld   HL, wDBEB                                     ;; 01:413f $21 $eb $db
+    ld   HL, wDBEB_MenuColumnSelected                                     ;; 01:413f $21 $eb $db
     inc  [HL]                                          ;; 01:4142 $34
     ld   A, [HL]                                       ;; 01:4143 $7e
     sub  A, $06                                        ;; 01:4144 $d6 $06
     jr   NZ, .jr_01_4153                               ;; 01:4146 $20 $0b
     ld   [HL], A                                       ;; 01:4148 $77
-    ld   HL, wDBEC                                     ;; 01:4149 $21 $ec $db
+    ld   HL, wDBEC_MenuRowSelected                                     ;; 01:4149 $21 $ec $db
     inc  [HL]                                          ;; 01:414c $34
     ld   A, [HL]                                       ;; 01:414d $7e
     sub  A, $03                                        ;; 01:414e $d6 $03
@@ -262,7 +262,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
 .jp_01_4180:
     call call_00_0f6e_CheckInputRight                                  ;; 01:4180 $cd $6e $0f
     jr   Z, .jr_01_4191                                ;; 01:4183 $28 $0c
-    ld   HL, wDBEB                                     ;; 01:4185 $21 $eb $db
+    ld   HL, wDBEB_MenuColumnSelected                                     ;; 01:4185 $21 $eb $db
     inc  [HL]                                          ;; 01:4188 $34
     ld   A, [HL]                                       ;; 01:4189 $7e
     sub  A, $06                                        ;; 01:418a $d6 $06
@@ -272,7 +272,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
 .jr_01_4191:
     call call_00_0f68_CheckInputLeft                                  ;; 01:4191 $cd $68 $0f
     jr   Z, .jr_01_41a2                                ;; 01:4194 $28 $0c
-    ld   HL, wDBEB                                     ;; 01:4196 $21 $eb $db
+    ld   HL, wDBEB_MenuColumnSelected                                     ;; 01:4196 $21 $eb $db
     dec  [HL]                                          ;; 01:4199 $35
     bit  7, [HL]                                       ;; 01:419a $cb $7e
     jr   Z, .jr_01_41c3                                ;; 01:419c $28 $25
@@ -281,7 +281,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
 .jr_01_41a2:
     call call_00_0f7a_CheckInputDown                                  ;; 01:41a2 $cd $7a $0f
     jr   Z, .jr_01_41b3                                ;; 01:41a5 $28 $0c
-    ld   HL, wDBEC                                     ;; 01:41a7 $21 $ec $db
+    ld   HL, wDBEC_MenuRowSelected                                     ;; 01:41a7 $21 $ec $db
     inc  [HL]                                          ;; 01:41aa $34
     ld   A, [HL]                                       ;; 01:41ab $7e
     sub  A, $03                                        ;; 01:41ac $d6 $03
@@ -291,7 +291,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
 .jr_01_41b3:
     call call_00_0f74_CheckInputUp                                  ;; 01:41b3 $cd $74 $0f
     jp   Z, .jp_01_4078                                ;; 01:41b6 $ca $78 $40
-    ld   HL, wDBEC                                     ;; 01:41b9 $21 $ec $db
+    ld   HL, wDBEC_MenuRowSelected                                     ;; 01:41b9 $21 $ec $db
     dec  [HL]                                          ;; 01:41bc $35
     bit  7, [HL]                                       ;; 01:41bd $cb $7e
     jr   Z, .jr_01_41c3                                ;; 01:41bf $28 $02
@@ -301,12 +301,12 @@ call_01_4000_MenuHandler_LoadAndProcess:
     call call_00_0fd7_TriggerSoundEffect                                  ;; 01:41c5 $cd $d7 $0f
     jp   .jp_01_4070                                   ;; 01:41c8 $c3 $70 $40
 .jp_01_41cb:
-    ld   A, [wDB95]                                    ;; 01:41cb $fa $95 $db
+    ld   A, [wDB95_MenuTypeData_Unk3]                                    ;; 01:41cb $fa $95 $db
     and  A, A                                          ;; 01:41ce $a7
     jp   Z, .jp_01_41fc                                ;; 01:41cf $ca $fc $41
     call call_00_0f74_CheckInputUp                                  ;; 01:41d2 $cd $74 $0f
     jr   Z, .jr_01_41e1                                ;; 01:41d5 $28 $0a
-    ld   HL, wDBEC                                     ;; 01:41d7 $21 $ec $db
+    ld   HL, wDBEC_MenuRowSelected                                     ;; 01:41d7 $21 $ec $db
     ld   A, [HL]                                       ;; 01:41da $7e
     and  A, A                                          ;; 01:41db $a7
     jr   Z, .jp_01_41fc                                ;; 01:41dc $28 $1e
@@ -315,9 +315,9 @@ call_01_4000_MenuHandler_LoadAndProcess:
 .jr_01_41e1:
     call call_00_0f7a_CheckInputDown                                  ;; 01:41e1 $cd $7a $0f
     jr   Z, .jp_01_41fc                                ;; 01:41e4 $28 $16
-    ld   A, [wDB95]                                    ;; 01:41e6 $fa $95 $db
+    ld   A, [wDB95_MenuTypeData_Unk3]                                    ;; 01:41e6 $fa $95 $db
     dec  A                                             ;; 01:41e9 $3d
-    ld   HL, wDBEC                                     ;; 01:41ea $21 $ec $db
+    ld   HL, wDBEC_MenuRowSelected                                     ;; 01:41ea $21 $ec $db
     cp   A, [HL]                                       ;; 01:41ed $be
     jr   Z, .jp_01_41fc                                ;; 01:41ee $28 $0c
     inc  [HL]                                          ;; 01:41f0 $34
@@ -327,7 +327,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     call call_01_43ba_JumpToDynamicHandler                                  ;; 01:41f6 $cd $ba $43
     jp   .jp_01_4070                                   ;; 01:41f9 $c3 $70 $40
 .jp_01_41fc:
-    ld   A, [wDB94]                                    ;; 01:41fc $fa $94 $db
+    ld   A, [wDB94_MenuTypeData_Unk2]                                    ;; 01:41fc $fa $94 $db
     and  A, $10                                        ;; 01:41ff $e6 $10
     jr   Z, .jr_01_423c                                ;; 01:4201 $28 $39
     call call_00_0f6e_CheckInputRight                                  ;; 01:4203 $cd $6e $0f
@@ -364,10 +364,10 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   A, [wDBE8]                                    ;; 01:424a $fa $e8 $db
     ld   [wDB6C_CurrentMapId], A                                    ;; 01:424d $ea $6c $db
     farcall call_03_6c89_LoadMapData
-    ld   A, [wDB95]                                    ;; 01:425b $fa $95 $db
+    ld   A, [wDB95_MenuTypeData_Unk3]                                    ;; 01:425b $fa $95 $db
     and  A, A                                          ;; 01:425e $a7
     jr   Z, .jp_01_4285                                ;; 01:425f $28 $24
-    ld   HL, wDBEC                                     ;; 01:4261 $21 $ec $db
+    ld   HL, wDBEC_MenuRowSelected                                     ;; 01:4261 $21 $ec $db
     ld   L, [HL]                                       ;; 01:4264 $6e
     ld   H, $00                                        ;; 01:4265 $26 $00
     ld   DE, wDBCB                                     ;; 01:4267 $11 $cb $db
@@ -503,7 +503,7 @@ call_01_432b_SetLevelMenuAndPalette:
     ld   [wDC59], A                                    ;; 01:433e $ea $59 $dc
     ld   A, $05                                        ;; 01:4341 $3e $05
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4343 $cd $00 $40
-    ld   A, [wDBEC]                                    ;; 01:4346 $fa $ec $db
+    ld   A, [wDBEC_MenuRowSelected]                                    ;; 01:4346 $fa $ec $db
     ld   [wDC5A], A                                    ;; 01:4349 $ea $5a $dc
     ret                                                ;; 01:434c $c9
 .jr_01_434d:
@@ -511,7 +511,7 @@ call_01_432b_SetLevelMenuAndPalette:
     ld   [wDC59], A                                    ;; 01:434f $ea $59 $dc
     ld   A, $07                                        ;; 01:4352 $3e $07
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4354 $cd $00 $40
-    ld   A, [wDBEC]                                    ;; 01:4357 $fa $ec $db
+    ld   A, [wDBEC_MenuRowSelected]                                    ;; 01:4357 $fa $ec $db
     ld   [wDC5A], A                                    ;; 01:435a $ea $5a $dc
     ret                                                ;; 01:435d $c9
 
@@ -579,9 +579,9 @@ call_01_435e_HandleLevelTransitionMenu:
 
 call_01_43ba_JumpToDynamicHandler:
 ; Behavior:
-; Reads a pointer from wDB9C/wDB9D; if nonzero, jumps there.
+; Reads a pointer from wDB9C_MenuTypeData_UnkB/wDB9D; if nonzero, jumps there.
 ; Likely Purpose: Generic “execute callback” mechanism for menu or level-specific code.
-    ld   HL, wDB9C                                     ;; 01:43ba $21 $9c $db
+    ld   HL, wDB9C_MenuTypeData_UnkB                                     ;; 01:43ba $21 $9c $db
     ld   A, [HL+]                                      ;; 01:43bd $2a
     ld   H, [HL]                                       ;; 01:43be $66
     ld   L, A                                          ;; 01:43bf $6f
@@ -591,10 +591,10 @@ call_01_43ba_JumpToDynamicHandler:
 
 call_01_43c3_LoadMenuObjectPalette:
 ; Behavior:
-; Copies one of two 16-byte palette sets into wDD4A_ObjectPalettes depending on wDBEC.
+; Copies one of two 16-byte palette sets into wDD4A_ObjectPalettes depending on wDBEC_MenuRowSelected.
 ; Likely Purpose: Sets object sprite palettes based on context (e.g., regular vs. alternate theme).
     ld   HL, .data_01_43d8                             ;; 01:43c3 $21 $d8 $43
-    ld   A, [wDBEC]                                    ;; 01:43c6 $fa $ec $db
+    ld   A, [wDBEC_MenuRowSelected]                                    ;; 01:43c6 $fa $ec $db
     and  A, A                                          ;; 01:43c9 $a7
     jr   Z, .jr_01_43cf                                ;; 01:43ca $28 $03
     ld   HL, .data_01_43e0                             ;; 01:43cc $21 $e0 $43
@@ -630,9 +630,9 @@ call_01_43f0_MenuEngine_MainLoop:
     pop  HL                                            ;; 01:440b $e1
 .jr_01_440c:
     ld   A, L                                          ;; 01:440c $7d
-    ld   [wDBB9], A                                    ;; 01:440d $ea $b9 $db
+    ld   [wDBB9_MenuUnknownPtr], A                                    ;; 01:440d $ea $b9 $db
     ld   A, H                                          ;; 01:4410 $7c
-    ld   [wDBBA], A                                    ;; 01:4411 $ea $ba $db
+    ld   [wDBB9_MenuUnknownPtr+1], A                                    ;; 01:4411 $ea $ba $db
     ld   A, $ff                                        ;; 01:4414 $3e $ff
     ld   [wDBDD], A                                    ;; 01:4416 $ea $dd $db
     call call_01_445c_ProcessMenuScript                                  ;; 01:4419 $cd $5c $44
@@ -645,7 +645,7 @@ call_01_43f0_MenuEngine_MainLoop:
 .jr_01_442b:
     call call_01_4f51_UploadSecondaryTileLayer                                  ;; 01:442b $cd $51 $4f
     call call_01_4f5c_UploadPrimaryTileLayer                                  ;; 01:442e $cd $5c $4f
-    ld   HL, wDB9B                                     ;; 01:4431 $21 $9b $db
+    ld   HL, wDB9B_MenuTypeData_Unk9                                     ;; 01:4431 $21 $9b $db
     bit  7, [HL]                                       ;; 01:4434 $cb $7e
     jr   NZ, .jr_01_4444                               ;; 01:4436 $20 $0c
     ld   C, [HL]                                       ;; 01:4438 $4e
@@ -660,19 +660,19 @@ call_01_43f0_MenuEngine_MainLoop:
 
 call_01_4454_SetMenuPointer:
 ; Behavior:
-; Stores HL into wDBB9/wDBBA.
+; Stores HL into wDBB9_MenuUnknownPtr/wDBB9_MenuUnknownPtr+1.
 ; Likely Purpose: Initializes the menu-script pointer for the engine.
     ld   A, L                                          ;; 01:4454 $7d
-    ld   [wDBB9], A                                    ;; 01:4455 $ea $b9 $db
+    ld   [wDBB9_MenuUnknownPtr], A                                    ;; 01:4455 $ea $b9 $db
     ld   A, H                                          ;; 01:4458 $7c
-    ld   [wDBBA], A                                    ;; 01:4459 $ea $ba $db
+    ld   [wDBB9_MenuUnknownPtr+1], A                                    ;; 01:4459 $ea $ba $db
 
 call_01_445c_ProcessMenuScript:
 ; Behavior:
-; Dereferences wDBB9 pointer, fetches a byte, and, until $FF, calls call_01_446b_ExecuteMenuCommand 
+; Dereferences wDBB9_MenuUnknownPtr pointer, fetches a byte, and, until $FF, calls call_01_446b_ExecuteMenuCommand 
 ; to process each command, looping through the script.
 ; Likely Purpose: Iterates through a menu script.
-    ld   HL, wDBB9                                     ;; 01:445c $21 $b9 $db
+    ld   HL, wDBB9_MenuUnknownPtr                                     ;; 01:445c $21 $b9 $db
     ld   A, [HL+]                                      ;; 01:445f $2a
     ld   H, [HL]                                       ;; 01:4460 $66
     ld   L, A                                          ;; 01:4461 $6f
@@ -684,10 +684,10 @@ call_01_445c_ProcessMenuScript:
 
 call_01_446b_ExecuteMenuCommand:
 ; Behavior:
-; Advances the script pointer, copies menu command parameters to working RAM (wDB9E, wDBA4), 
-; updates tile maps, handles jump tables, checks flags (wDBAA), and may jump to specialized handlers in .data_01_456b_MenuCommandJumpTable.
+; Advances the script pointer, copies menu command parameters to working RAM (wDB9E_MenuCommandBuffer_Unk0, wDBA4_MenuCommandBuffer2_Unk0), 
+; updates tile maps, handles jump tables, checks flags (wDBAA_MenuCommandBuffer2_Unk6), and may jump to specialized handlers in .data_01_456b_MenuCommandJumpTable.
 ; Likely Purpose: Decodes and executes individual menu commands, updating VRAM or branching to specialized routines.
-    ld   HL, wDBB9                                     ;; 01:446b $21 $b9 $db
+    ld   HL, wDBB9_MenuUnknownPtr                                     ;; 01:446b $21 $b9 $db
     ld   E, [HL]                                       ;; 01:446e $5e
     inc  HL                                            ;; 01:446f $23
     ld   D, [HL]                                       ;; 01:4470 $56
@@ -704,50 +704,50 @@ call_01_446b_ExecuteMenuCommand:
     add  HL, HL                                        ;; 01:447e $29
     ld   DE, data_01_512e                              ;; 01:447f $11 $2e $51
     add  HL, DE                                        ;; 01:4482 $19
-    ld   DE, wDB9E                                     ;; 01:4483 $11 $9e $db
+    ld   DE, wDB9E_MenuCommandBuffer_Unk0                                     ;; 01:4483 $11 $9e $db
     ld   BC, $06                                       ;; 01:4486 $01 $06 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4489 $cd $6e $07
 .jr_01_448c:
-    ld   HL, wDBB9                                     ;; 01:448c $21 $b9 $db
+    ld   HL, wDBB9_MenuUnknownPtr                                     ;; 01:448c $21 $b9 $db
     ld   A, [HL+]                                      ;; 01:448f $2a
     ld   H, [HL]                                       ;; 01:4490 $66
     ld   L, A                                          ;; 01:4491 $6f
-    ld   DE, wDBA4                                     ;; 01:4492 $11 $a4 $db
+    ld   DE, wDBA4_MenuCommandBuffer2_Unk0                                     ;; 01:4492 $11 $a4 $db
     ld   BC, $07                                       ;; 01:4495 $01 $07 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4498 $cd $6e $07
     ld   A, L                                          ;; 01:449b $7d
-    ld   [wDBB9], A                                    ;; 01:449c $ea $b9 $db
+    ld   [wDBB9_MenuUnknownPtr], A                                    ;; 01:449c $ea $b9 $db
     ld   A, H                                          ;; 01:449f $7c
-    ld   [wDBBA], A                                    ;; 01:44a0 $ea $ba $db
-    ld   A, [wDBA9]                                    ;; 01:44a3 $fa $a9 $db
+    ld   [wDBB9_MenuUnknownPtr+1], A                                    ;; 01:44a0 $ea $ba $db
+    ld   A, [wDBA9_MenuCommandBuffer2_Unk5]                                    ;; 01:44a3 $fa $a9 $db
     and  A, $0f                                        ;; 01:44a6 $e6 $0f
     ld   L, A                                          ;; 01:44a8 $6f
     ld   H, $00                                        ;; 01:44a9 $26 $00
     ld   DE, wDBCB                                     ;; 01:44ab $11 $cb $db
     add  HL, DE                                        ;; 01:44ae $19
-    ld   A, [wDBA9]                                    ;; 01:44af $fa $a9 $db
+    ld   A, [wDBA9_MenuCommandBuffer2_Unk5]                                    ;; 01:44af $fa $a9 $db
     and  A, $f0                                        ;; 01:44b2 $e6 $f0
     ld   [HL], A                                       ;; 01:44b4 $77
-    ld   A, [wDBAA]                                    ;; 01:44b5 $fa $aa $db
+    ld   A, [wDBAA_MenuCommandBuffer2_Unk6]                                    ;; 01:44b5 $fa $aa $db
     and  A, $01                                        ;; 01:44b8 $e6 $01
     call NZ, call_01_499f_ClearTilemapRegion                              ;; 01:44ba $c4 $9f $49
-    ld   A, [wDBA8]                                    ;; 01:44bd $fa $a8 $db
+    ld   A, [wDBA8_MenuCommandBuffer2_Unk4]                                    ;; 01:44bd $fa $a8 $db
     sub  A, $e0                                        ;; 01:44c0 $d6 $e0
     jr   C, .jr_01_44cd                                ;; 01:44c2 $38 $09
     ld   DE, .data_01_456b_MenuCommandJumpTable                             ;; 01:44c4 $11 $6b $45
     call call_00_0777                                  ;; 01:44c7 $cd $77 $07
     call call_00_0f22_JumpHL                                  ;; 01:44ca $cd $22 $0f
 .jr_01_44cd:
-    ld   A, [wDBAA]                                    ;; 01:44cd $fa $aa $db
+    ld   A, [wDBAA_MenuCommandBuffer2_Unk6]                                    ;; 01:44cd $fa $aa $db
     and  A, $02                                        ;; 01:44d0 $e6 $02
     call NZ, call_01_4875_ProcessTilemapOrCollectibles                              ;; 01:44d2 $c4 $75 $48
-    ld   A, [wDBAA]                                    ;; 01:44d5 $fa $aa $db
+    ld   A, [wDBAA_MenuCommandBuffer2_Unk6]                                    ;; 01:44d5 $fa $aa $db
     and  A, $20                                        ;; 01:44d8 $e6 $20
     jr   Z, .jr_01_448c                                ;; 01:44da $28 $b0
-    ld   A, [wDBAA]                                    ;; 01:44dc $fa $aa $db
+    ld   A, [wDBAA_MenuCommandBuffer2_Unk6]                                    ;; 01:44dc $fa $aa $db
     and  A, $40                                        ;; 01:44df $e6 $40
     jp   NZ, .jp_01_4560                               ;; 01:44e1 $c2 $60 $45
-    ld   HL, wDBA0                                     ;; 01:44e4 $21 $a0 $db
+    ld   HL, wDBA0_MenuCommandBuffer_Unk2                                     ;; 01:44e4 $21 $a0 $db
     ld   E, [HL]                                       ;; 01:44e7 $5e
     ld   D, $00                                        ;; 01:44e8 $16 $00
     inc  HL                                            ;; 01:44ea $23
@@ -763,19 +763,19 @@ call_01_446b_ExecuteMenuCommand:
     add  HL, DE                                        ;; 01:44f4 $19
     ld   DE, wD400_TileBuffer                                     ;; 01:44f5 $11 $00 $d4
     add  HL, DE                                        ;; 01:44f8 $19
-    ld   A, [wDBAA]                                    ;; 01:44f9 $fa $aa $db
+    ld   A, [wDBAA_MenuCommandBuffer2_Unk6]                                    ;; 01:44f9 $fa $aa $db
     and  A, $04                                        ;; 01:44fc $e6 $04
     jr   NZ, .jr_01_450d                               ;; 01:44fe $20 $0d
-    ld   A, [wDB9E]                                    ;; 01:4500 $fa $9e $db
+    ld   A, [wDB9E_MenuCommandBuffer_Unk0]                                    ;; 01:4500 $fa $9e $db
     ld   B, A                                          ;; 01:4503 $47
-    ld   A, [wDB9F]                                    ;; 01:4504 $fa $9f $db
+    ld   A, [wDB9F_MenuCommandBuffer_Unk1]                                    ;; 01:4504 $fa $9f $db
     ld   C, A                                          ;; 01:4507 $4f
     ld   DE, $1401                                     ;; 01:4508 $11 $01 $14
     jr   .jr_01_4518                                   ;; 01:450b $18 $0b
 .jr_01_450d:
-    ld   A, [wDB9E]                                    ;; 01:450d $fa $9e $db
+    ld   A, [wDB9E_MenuCommandBuffer_Unk0]                                    ;; 01:450d $fa $9e $db
     ld   C, A                                          ;; 01:4510 $4f
-    ld   A, [wDB9F]                                    ;; 01:4511 $fa $9f $db
+    ld   A, [wDB9F_MenuCommandBuffer_Unk1]                                    ;; 01:4511 $fa $9f $db
     ld   B, A                                          ;; 01:4514 $47
     ld   DE, $114                                      ;; 01:4515 $11 $14 $01
 .jr_01_4518:
@@ -785,7 +785,7 @@ call_01_446b_ExecuteMenuCommand:
     add  HL, BC                                        ;; 01:451d $09
     pop  BC                                            ;; 01:451e $c1
     push BC                                            ;; 01:451f $c5
-    ld   A, [wDBA3]                                    ;; 01:4520 $fa $a3 $db
+    ld   A, [wDBA3_MenuCommandBuffer_Unk5]                                    ;; 01:4520 $fa $a3 $db
     cp   A, $ff                                        ;; 01:4523 $fe $ff
     jr   NZ, .jr_01_452e                               ;; 01:4525 $20 $07
     call call_00_0800                                  ;; 01:4527 $cd $00 $08
@@ -815,7 +815,7 @@ call_01_446b_ExecuteMenuCommand:
     pop  BC                                            ;; 01:4544 $c1
     pop  HL                                            ;; 01:4545 $e1
 .jr_01_4546:
-    ld   A, [wDBA2]                                    ;; 01:4546 $fa $a2 $db
+    ld   A, [wDBA2_MenuCommandBuffer_Unk4]                                    ;; 01:4546 $fa $a2 $db
 .jr_01_4549:
     push BC                                            ;; 01:4549 $c5
     push DE                                            ;; 01:454a $d5
@@ -838,7 +838,7 @@ call_01_446b_ExecuteMenuCommand:
     dec  C                                             ;; 01:455d $0d
     jr   NZ, .jr_01_4549                               ;; 01:455e $20 $e9
 .jp_01_4560:
-    ld   A, [wDBAA]                                    ;; 01:4560 $fa $aa $db
+    ld   A, [wDBAA_MenuCommandBuffer2_Unk6]                                    ;; 01:4560 $fa $aa $db
     and  A, $80                                        ;; 01:4563 $e6 $80
     ret  Z                                             ;; 01:4565 $c8
     ld   C, $09                                        ;; 01:4566 $0e $09
@@ -867,9 +867,9 @@ call_01_446b_ExecuteMenuCommand:
 
 call_01_458d_MenuHandler_LoadAssetsAndJump:
 ; Behavior:
-; Copy data_01_6f39 to VRAM using wDBA7 and then jump to call_01_4d03_StreamTilemapBlockToBg.
+; Copy data_01_6f39 to VRAM using wDBA7_MenuCommandBuffer2_Unk3 and then jump to call_01_4d03_StreamTilemapBlockToBg.
 ; Likely Purpose: Load specific menu graphics and branch to a menu update routine.
-    ld   a,[wDBA7]
+    ld   a,[wDBA7_MenuCommandBuffer2_Unk3]
     ld   de,data_01_6f39
     call call_00_0777
     jp   call_01_4d03_StreamTilemapBlockToBg
@@ -877,7 +877,7 @@ call_01_458d_MenuHandler_LoadAssetsAndJump:
 call_01_4599_MenuHandler_LoadAssetsAndJump:
 ; Behavior:
 ; same as above
-    ld   A, [wDBA7]                                    ;; 01:4599 $fa $a7 $db
+    ld   A, [wDBA7_MenuCommandBuffer2_Unk3]                                    ;; 01:4599 $fa $a7 $db
     ld   DE, data_01_6f39                              ;; 01:459c $11 $39 $6f
     call call_00_0777                                  ;; 01:459f $cd $77 $07
     jp   call_01_4d03_StreamTilemapBlockToBg                                    ;; 01:45a2 $c3 $03 $4d
@@ -903,12 +903,12 @@ call_01_45a5_MenuHandler_LoadBgPalettesAndMap:
     ld   A, [wDB6C_CurrentMapId]                                    ;; 01:45c9 $fa $6c $db
     ld   DE, $b01                                      ;; 01:45cc $11 $01 $0b
     call call_00_0777                                  ;; 01:45cf $cd $77 $07
-    ld   A, [wDBA6]                                    ;; 01:45d2 $fa $a6 $db
-    ld   [wDBA2], A                                    ;; 01:45d5 $ea $a2 $db
+    ld   A, [wDBA6_MenuCommandBuffer2_Unk2]                                    ;; 01:45d2 $fa $a6 $db
+    ld   [wDBA2_MenuCommandBuffer_Unk4], A                                    ;; 01:45d5 $ea $a2 $db
     ld   A, $08                                        ;; 01:45d8 $3e $08
-    ld   [wDB9E], A                                    ;; 01:45da $ea $9e $db
+    ld   [wDB9E_MenuCommandBuffer_Unk0], A                                    ;; 01:45da $ea $9e $db
     ld   A, $06                                        ;; 01:45dd $3e $06
-    ld   [wDB9F], A                                    ;; 01:45df $ea $9f $db
+    ld   [wDB9F_MenuCommandBuffer_Unk1], A                                    ;; 01:45df $ea $9f $db
     push HL                                            ;; 01:45e2 $e5
     call call_01_4ce5_ComputeTilemapBlockOffset                                  ;; 01:45e3 $cd $e5 $4c
     pop  HL                                            ;; 01:45e6 $e1
@@ -947,10 +947,10 @@ call_01_4675_MenuState_LoadAndDrawB:
     jp   call_01_4cfa_SetStreamPointerHL                                  ;; 01:4678 $c3 $fa $4c
 
 call_01_467b_MenuState_UpdateLevelCursor:
-; Description: Uses wDBA7 (likely current menu index) and wDB6C_CurrentMapId to compute bitmask checks, 
+; Description: Uses wDBA7_MenuCommandBuffer2_Unk3 (likely current menu index) and wDB6C_CurrentMapId to compute bitmask checks, 
 ; updates several wDA?? variables (cursor positions, palette/offset values), calls 4C7E to draw, 
 ; then jumps to common rendering at 4CFA.
-    ld   HL, wDBA7                                     ;; 01:467b $21 $a7 $db
+    ld   HL, wDBA7_MenuCommandBuffer2_Unk3                                     ;; 01:467b $21 $a7 $db
     ld   L, [HL]                                       ;; 01:467e $6e
     ld   H, $00                                        ;; 01:467f $26 $00
     ld   DE, .data_01_46d1                             ;; 01:4681 $11 $d1 $46
@@ -969,13 +969,13 @@ call_01_467b_MenuState_UpdateLevelCursor:
 .jr_01_4698:
     ld   A, C                                          ;; 01:4698 $79
     ld   [wDADF], A                                    ;; 01:4699 $ea $df $da
-    ld   A, [wDBA1]                                    ;; 01:469c $fa $a1 $db
+    ld   A, [wDBA1_MenuCommandBuffer_Unk3]                                    ;; 01:469c $fa $a1 $db
     add  A, $02                                        ;; 01:469f $c6 $02
     add  A, A                                          ;; 01:46a1 $87
     add  A, A                                          ;; 01:46a2 $87
     add  A, A                                          ;; 01:46a3 $87
     ld   [wDADD], A                                    ;; 01:46a4 $ea $dd $da
-    ld   A, [wDBA0]                                    ;; 01:46a7 $fa $a0 $db
+    ld   A, [wDBA0_MenuCommandBuffer_Unk2]                                    ;; 01:46a7 $fa $a0 $db
     inc  A                                             ;; 01:46aa $3c
     sub  A, $02                                        ;; 01:46ab $d6 $02
     add  A, A                                          ;; 01:46ad $87
@@ -984,14 +984,14 @@ call_01_467b_MenuState_UpdateLevelCursor:
     ld   [wDADE], A                                    ;; 01:46b0 $ea $de $da
     ld   A, $03                                        ;; 01:46b3 $3e $03
     ld   [wDAE0], A                                    ;; 01:46b5 $ea $e0 $da
-    ld   A, [wDBA7]                                    ;; 01:46b8 $fa $a7 $db
+    ld   A, [wDBA7_MenuCommandBuffer2_Unk3]                                    ;; 01:46b8 $fa $a7 $db
     add  A, A                                          ;; 01:46bb $87
     add  A, A                                          ;; 01:46bc $87
     add  A, $04                                        ;; 01:46bd $c6 $04
     ld   [wDBDB], A                                    ;; 01:46bf $ea $db $db
     ld   BC, $202                                      ;; 01:46c2 $01 $02 $02
     call call_01_4c7e_CopyTextBlockToBuffer                                  ;; 01:46c5 $cd $7e $4c
-    ld   A, [wDBA7]                                    ;; 01:46c8 $fa $a7 $db
+    ld   A, [wDBA7_MenuCommandBuffer2_Unk3]                                    ;; 01:46c8 $fa $a7 $db
     call call_01_4b32_GetLevelDataSubsectionPtr                                  ;; 01:46cb $cd $32 $4b
     jp   call_01_4cfa_SetStreamPointerHL                                  ;; 01:46ce $c3 $fa $4c
 .data_01_46d1:
@@ -1003,13 +1003,13 @@ call_01_46d4_MenuState_InitSelectionScreen:
     call call_01_4599_MenuHandler_LoadAssetsAndJump                                  ;; 01:46d4 $cd $99 $45
     xor  A, A                                          ;; 01:46d7 $af
     ld   [wDBBF], A                                    ;; 01:46d8 $ea $bf $db
-    ld   A, [wDB9E]                                    ;; 01:46db $fa $9e $db
+    ld   A, [wDB9E_MenuCommandBuffer_Unk0]                                    ;; 01:46db $fa $9e $db
     ld   [wDBC4], A                                    ;; 01:46de $ea $c4 $db
-    ld   A, [wDB9F]                                    ;; 01:46e1 $fa $9f $db
+    ld   A, [wDB9F_MenuCommandBuffer_Unk1]                                    ;; 01:46e1 $fa $9f $db
     ld   [wDBC5], A                                    ;; 01:46e4 $ea $c5 $db
     ld   A, $ff                                        ;; 01:46e7 $3e $ff
     ld   [wDBC6], A                                    ;; 01:46e9 $ea $c6 $db
-    ld   A, [wDBA7]                                    ;; 01:46ec $fa $a7 $db
+    ld   A, [wDBA7_MenuCommandBuffer2_Unk3]                                    ;; 01:46ec $fa $a7 $db
     sub  A, $00                                        ;; 01:46ef $d6 $00
     add  A, $00                                        ;; 01:46f1 $c6 $00
     ld   [wDBC7], A                                    ;; 01:46f3 $ea $c7 $db
@@ -1040,9 +1040,9 @@ call_01_470c_MenuState_DispatchAndDraw:
     jp   call_01_4cfa_SetStreamPointerHL                                  ;; 01:471f $c3 $fa $4c
 
 call_01_4722_MenuStateHandlerTable:
-; Description: Table-based dispatcher: uses wDBA7 as index to pick one of several subroutines (.data_01_472c). 
+; Description: Table-based dispatcher: uses wDBA7_MenuCommandBuffer2_Unk3 as index to pick one of several subroutines (.data_01_472c). 
 ; Contains inline small handlers (.4744, .4748, .474c, etc.) that return values or constants.
-    ld   A, [wDBA7]                                    ;; 01:4722 $fa $a7 $db
+    ld   A, [wDBA7_MenuCommandBuffer2_Unk3]                                    ;; 01:4722 $fa $a7 $db
     ld   DE, .data_01_472c                             ;; 01:4725 $11 $2c $47
     call call_00_0777                                  ;; 01:4728 $cd $77 $07
     jp   HL                                            ;; 01:472b $e9
@@ -1063,7 +1063,7 @@ call_01_4722_MenuStateHandlerTable:
     ld   A, [wDC68_CollectibleCount]                                    ;; 01:4744 $fa $68 $dc
     ret                                                ;; 01:4747 $c9
 .call_01_4748:
-    ld   A, [wDCAF]                                    ;; 01:4748 $fa $af $dc
+    ld   A, [wDCAF_PawCoinCounter]                                    ;; 01:4748 $fa $af $dc
     ret                                                ;; 01:474b $c9
 .call_01_474c:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 01:474c $fa $1e $dc
@@ -1083,16 +1083,16 @@ call_01_4722_MenuStateHandlerTable:
     ret                                                ;; 01:475f $c9
 
 call_01_4760_MenuState_SubmenuHandler:
-; Description: If wDBA6 is nonzero, copies it and wDBA7 to wDBDE/DBDF, 
+; Description: If wDBA6_MenuCommandBuffer2_Unk2 is nonzero, copies it and wDBA7_MenuCommandBuffer2_Unk3 to wDBDE/DBDF, 
 ; then dispatches via table at data_01_5b61 and jumps to 4C45. Likely another state handler for sub-menus.
-    ld   A, [wDBA6]                                    ;; 01:4760 $fa $a6 $db
+    ld   A, [wDBA6_MenuCommandBuffer2_Unk2]                                    ;; 01:4760 $fa $a6 $db
     and  A, A                                          ;; 01:4763 $a7
     jr   Z, .jr_01_476f                                ;; 01:4764 $28 $09
     ld   [wDBDE], A                                    ;; 01:4766 $ea $de $db
-    ld   A, [wDBA7]                                    ;; 01:4769 $fa $a7 $db
+    ld   A, [wDBA7_MenuCommandBuffer2_Unk3]                                    ;; 01:4769 $fa $a7 $db
     ld   [wDBDF], A                                    ;; 01:476c $ea $df $db
 .jr_01_476f:
-    ld   A, [wDBA7]                                    ;; 01:476f $fa $a7 $db
+    ld   A, [wDBA7_MenuCommandBuffer2_Unk3]                                    ;; 01:476f $fa $a7 $db
     ld   DE, data_01_5b61                              ;; 01:4772 $11 $61 $5b
     call call_00_0777                                  ;; 01:4775 $cd $77 $07
     jp   call_01_4c45_ParseAndLoadTextIntoBuffer                                  ;; 01:4778 $c3 $45 $4c
@@ -1102,9 +1102,9 @@ call_01_477b_MenuState_NoOp:
     ret                                           ;; 01:477b ?
 
 call_01_477c_DrawMenuNumberSprite:
-; Description: Uses wDBA7 to compute sprite data offsets into wC980_NumberSprites, 
-;then uses wDB7E to pick a number graphic, combines with data_01_66f9, and jumps to jp_00_0bcf_CopyBlock16BytesLoop (sprite draw). Likely draws a numeric value (e.g., score).
-    ld   HL, wDBA7                                     ;; 01:477c $21 $a7 $db
+; Description: Uses wDBA7_MenuCommandBuffer2_Unk3 to compute sprite data offsets into wC980_NumberSprites, 
+;then uses wDB7E_PasswordValues to pick a number graphic, combines with data_01_66f9, and jumps to jp_00_0bcf_CopyBlock16BytesLoop (sprite draw). Likely draws a numeric value (e.g., score).
+    ld   HL, wDBA7_MenuCommandBuffer2_Unk3                                     ;; 01:477c $21 $a7 $db
     ld   L, [HL]                                       ;; 01:477f $6e
     ld   H, $00                                        ;; 01:4780 $26 $00
     add  HL, HL                                        ;; 01:4782 $29
@@ -1117,10 +1117,10 @@ call_01_477c_DrawMenuNumberSprite:
     add  HL, DE                                        ;; 01:478b $19
     ld   E, L                                          ;; 01:478c $5d
     ld   D, H                                          ;; 01:478d $54
-    ld   HL, wDBA7                                     ;; 01:478e $21 $a7 $db
+    ld   HL, wDBA7_MenuCommandBuffer2_Unk3                                     ;; 01:478e $21 $a7 $db
     ld   L, [HL]                                       ;; 01:4791 $6e
     ld   H, $00                                        ;; 01:4792 $26 $00
-    ld   BC, wDB7E                                     ;; 01:4794 $01 $7e $db
+    ld   BC, wDB7E_PasswordValues                                     ;; 01:4794 $01 $7e $db
     add  HL, BC                                        ;; 01:4797 $09
     ld   L, [HL]                                       ;; 01:4798 $6e
     ld   H, $00                                        ;; 01:4799 $26 $00
@@ -1136,18 +1136,18 @@ call_01_477c_DrawMenuNumberSprite:
     jp   jp_00_0bcf_CopyBlock16BytesLoop                                    ;; 01:47a7 $c3 $cf $0b
 
 call_01_47aa_StoreCurrentMenuIndex:
-; Description: Copies wDBA7 to wDBDD. Probably stores the current selection.
-    ld   A, [wDBA7]                                    ;; 01:47aa $fa $a7 $db
+; Description: Copies wDBA7_MenuCommandBuffer2_Unk3 to wDBDD. Probably stores the current selection.
+    ld   A, [wDBA7_MenuCommandBuffer2_Unk3]                                    ;; 01:47aa $fa $a7 $db
     ld   [wDBDD], A                                    ;; 01:47ad $ea $dd $db
     ret                                                ;; 01:47b0 $c9
 
 call_01_47b1_LoadMenuConfigData:
 ; Description: Uses a jump table (.data_01_47c6) to pick a configuration, 
-; copies 8 bytes into wDBB1, then jumps to jp_00_0781 (likely continues processing).
-    ld   A, [wDBA7]                                    ;; 01:47b1 $fa $a7 $db
+; copies 8 bytes into wDBB1_MenuCommandBuffer4_Unk0, then jumps to jp_00_0781 (likely continues processing).
+    ld   A, [wDBA7_MenuCommandBuffer2_Unk3]                                    ;; 01:47b1 $fa $a7 $db
     ld   DE, .data_01_47c6                             ;; 01:47b4 $11 $c6 $47
     call call_00_0777                                  ;; 01:47b7 $cd $77 $07
-    ld   DE, wDBB1                                     ;; 01:47ba $11 $b1 $db
+    ld   DE, wDBB1_MenuCommandBuffer4_Unk0                                     ;; 01:47ba $11 $b1 $db
     ld   BC, $08                                       ;; 01:47bd $01 $08 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:47c0 $cd $6e $07
     jp   jp_00_0781                                    ;; 01:47c3 $c3 $81 $07
@@ -1183,7 +1183,7 @@ call_01_4826_MenuState_UpdateCursorAlt:
 ; Description: Almost identical to 467b but uses a different mask table (.data_01_4871) 
 ; and sets wDAE0=1 instead of 3. Computes positions/offsets and calls 4C7E for drawing.
 ; Suggested Name: MenuState_UpdateCursorAlt
-    ld   hl,wDBA7
+    ld   hl,wDBA7_MenuCommandBuffer2_Unk3
     ld   l,[hl]
     ld   h,$00
     ld   de,.data_01_4871
@@ -1202,13 +1202,13 @@ call_01_4826_MenuState_UpdateCursorAlt:
 .label4843:
     ld   a,c
     ld   [wDADF],a
-    ld   a,[wDBA1]
+    ld   a,[wDBA1_MenuCommandBuffer_Unk3]
     add  a,$02
     add  a
     add  a
     add  a
     ld   [wDADD],a
-    ld   a,[wDBA0]
+    ld   a,[wDBA0_MenuCommandBuffer_Unk2]
     inc  a
     add  a
     add  a
@@ -1216,7 +1216,7 @@ call_01_4826_MenuState_UpdateCursorAlt:
     ld   [wDADE],a
     ld   a,$01
     ld   [wDAE0],a
-    ld   a,[wDBA7]
+    ld   a,[wDBA7_MenuCommandBuffer2_Unk3]
     add  a
     add  a
     add  a,$04
@@ -1227,10 +1227,10 @@ call_01_4826_MenuState_UpdateCursorAlt:
     db   $01, $02, $04, $08             ;; 01:486e ???????
 
 call_01_4875_ProcessTilemapOrCollectibles:
-; Description: Loads object/sprite data from a table into wDBAB, calls call_01_49bb_FormatAndPaginateText for setup, 
-; iterates through tile data at wDBA7, performs collision/bitmask checks, updates wDBA4 and wDBA5, 
+; Description: Loads object/sprite data from a table into wDBAB_MenuCommandBuffer3_Unk0, calls call_01_49bb_FormatAndPaginateText for setup, 
+; iterates through tile data at wDBA7_MenuCommandBuffer2_Unk3, performs collision/bitmask checks, updates wDBA4_MenuCommandBuffer2_Unk0 and wDBA5_MenuCommandBuffer2_Unk1, 
 ; and repeatedly calls call_01_48cd_TilemapXorCopy. Appears to process tilemap collisions or update collectible graphics.
-    ld   HL, wDBA6                                     ;; 01:4875 $21 $a6 $db
+    ld   HL, wDBA6_MenuCommandBuffer2_Unk2                                     ;; 01:4875 $21 $a6 $db
     ld   L, [HL]                                       ;; 01:4878 $6e
     ld   H, $00                                        ;; 01:4879 $26 $00
     add  HL, HL                                        ;; 01:487b $29
@@ -1238,12 +1238,12 @@ call_01_4875_ProcessTilemapOrCollectibles:
     add  HL, HL                                        ;; 01:487d $29
     ld   DE, data_01_5b77                              ;; 01:487e $11 $77 $5b
     add  HL, DE                                        ;; 01:4881 $19
-    ld   DE, wDBAB                                     ;; 01:4882 $11 $ab $db
+    ld   DE, wDBAB_MenuCommandBuffer3_Unk0                                     ;; 01:4882 $11 $ab $db
     ld   BC, $06                                       ;; 01:4885 $01 $06 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4888 $cd $6e $07
     call call_01_49bb_FormatAndPaginateText                                  ;; 01:488b $cd $bb $49
 .jr_01_488e:
-    ld   HL, wDBA7                                     ;; 01:488e $21 $a7 $db
+    ld   HL, wDBA7_MenuCommandBuffer2_Unk3                                     ;; 01:488e $21 $a7 $db
     ld   E, [HL]                                       ;; 01:4891 $5e
     inc  HL                                            ;; 01:4892 $23
     ld   D, [HL]                                       ;; 01:4893 $56
@@ -1256,14 +1256,14 @@ call_01_4875_ProcessTilemapOrCollectibles:
     cp   A, $fe                                        ;; 01:489d $fe $fe
     jr   NZ, .jr_01_48ac                               ;; 01:489f $20 $0b
     call call_01_4a55_MeasureTextWidth                                  ;; 01:48a1 $cd $55 $4a
-    ld   A, [wDB9E]                                    ;; 01:48a4 $fa $9e $db
+    ld   A, [wDB9E_MenuCommandBuffer_Unk0]                                    ;; 01:48a4 $fa $9e $db
     add  A, A                                          ;; 01:48a7 $87
     add  A, A                                          ;; 01:48a8 $87
     srl  C                                             ;; 01:48a9 $cb $39
     sub  A, C                                          ;; 01:48ab $91
 .jr_01_48ac:
-    ld   [wDBA4], A                                    ;; 01:48ac $ea $a4 $db
-    ld   HL, wDBA7                                     ;; 01:48af $21 $a7 $db
+    ld   [wDBA4_MenuCommandBuffer2_Unk0], A                                    ;; 01:48ac $ea $a4 $db
+    ld   HL, wDBA7_MenuCommandBuffer2_Unk3                                     ;; 01:48af $21 $a7 $db
     ld   A, [HL+]                                      ;; 01:48b2 $2a
     ld   H, [HL]                                       ;; 01:48b3 $66
     ld   L, A                                          ;; 01:48b4 $6f
@@ -1276,40 +1276,40 @@ call_01_4875_ProcessTilemapOrCollectibles:
     jr   Z, .jr_01_48b5                                ;; 01:48bd $28 $f6
     inc  HL                                            ;; 01:48bf $23
     call call_01_4cfa_SetStreamPointerHL                                  ;; 01:48c0 $cd $fa $4c
-    ld   HL, wDBA5                                     ;; 01:48c3 $21 $a5 $db
+    ld   HL, wDBA5_MenuCommandBuffer2_Unk1                                     ;; 01:48c3 $21 $a5 $db
     ld   A, [wDBE2]                                    ;; 01:48c6 $fa $e2 $db
     add  A, [HL]                                       ;; 01:48c9 $86
     ld   [HL], A                                       ;; 01:48ca $77
     jr   .jr_01_488e                                   ;; 01:48cb $18 $c1
 
 call_01_48cd_TilemapXorCopy:
-; Description: Performs bit manipulation to combine map data (uses wDBA4, wDBA5, wDB9E) with tile memory. 
+; Description: Performs bit manipulation to combine map data (uses wDBA4_MenuCommandBuffer2_Unk0, wDBA5_MenuCommandBuffer2_Unk1, wDB9E_MenuCommandBuffer_Unk0) with tile memory. 
 ; Does multiple shifts and XOR writes—likely draws or updates tile graphics.
     call call_01_4a7f_GetCharTileAddress                                  ;; 01:48cd $cd $7f $4a
-    ld   A, [wDBA4]                                    ;; 01:48d0 $fa $a4 $db
+    ld   A, [wDBA4_MenuCommandBuffer2_Unk0]                                    ;; 01:48d0 $fa $a4 $db
     and  A, $07                                        ;; 01:48d3 $e6 $07
     ld   C, A                                          ;; 01:48d5 $4f
     ld   A, $08                                        ;; 01:48d6 $3e $08
     sub  A, C                                          ;; 01:48d8 $91
     ld   [wDBC8], A                                    ;; 01:48d9 $ea $c8 $db
-    ld   A, [wDBA4]                                    ;; 01:48dc $fa $a4 $db
+    ld   A, [wDBA4_MenuCommandBuffer2_Unk0]                                    ;; 01:48dc $fa $a4 $db
     and  A, $f8                                        ;; 01:48df $e6 $f8
     ld   L, A                                          ;; 01:48e1 $6f
     ld   H, $00                                        ;; 01:48e2 $26 $00
     add  HL, HL                                        ;; 01:48e4 $29
-    ld   A, [wDBA5]                                    ;; 01:48e5 $fa $a5 $db
+    ld   A, [wDBA5_MenuCommandBuffer2_Unk1]                                    ;; 01:48e5 $fa $a5 $db
     and  A, $07                                        ;; 01:48e8 $e6 $07
     add  A, A                                          ;; 01:48ea $87
     ld   E, A                                          ;; 01:48eb $5f
     ld   D, $00                                        ;; 01:48ec $16 $00
     add  HL, DE                                        ;; 01:48ee $19
-    ld   A, [wDBA5]                                    ;; 01:48ef $fa $a5 $db
+    ld   A, [wDBA5_MenuCommandBuffer2_Unk1]                                    ;; 01:48ef $fa $a5 $db
     srl  A                                             ;; 01:48f2 $cb $3f
     srl  A                                             ;; 01:48f4 $cb $3f
     srl  A                                             ;; 01:48f6 $cb $3f
     jr   Z, .jr_01_490c                                ;; 01:48f8 $28 $12
     ld   C, A                                          ;; 01:48fa $4f
-    ld   A, [wDB9E]                                    ;; 01:48fb $fa $9e $db
+    ld   A, [wDB9E_MenuCommandBuffer_Unk0]                                    ;; 01:48fb $fa $9e $db
     swap A                                             ;; 01:48fe $cb $37
     ld   D, A                                          ;; 01:4900 $57
     and  A, $f0                                        ;; 01:4901 $e6 $f0
@@ -1326,7 +1326,7 @@ call_01_48cd_TilemapXorCopy:
     call call_01_4cd4_GetBgTilemapPtrFromIndex                                  ;; 01:490d $cd $d4 $4c
     pop  HL                                            ;; 01:4910 $e1
     add  HL, DE                                        ;; 01:4911 $19
-    ld   A, [wDBAF]                                    ;; 01:4912 $fa $af $db
+    ld   A, [wDBAF_MenuCommandBuffer3_Unk4]                                    ;; 01:4912 $fa $af $db
 .jr_01_4915:
     push AF                                            ;; 01:4915 $f5
     push HL                                            ;; 01:4916 $e5
@@ -1334,7 +1334,7 @@ call_01_48cd_TilemapXorCopy:
     ld   [wDBBB], A                                    ;; 01:4918 $ea $bb $db
     ld   A, H                                          ;; 01:491b $7c
     ld   [wDBBC], A                                    ;; 01:491c $ea $bc $db
-    ld   A, [wDBB0]                                    ;; 01:491f $fa $b0 $db
+    ld   A, [wDBB0_MenuCommandBuffer3_Unk5]                                    ;; 01:491f $fa $b0 $db
 .jr_01_4922:
     push AF                                            ;; 01:4922 $f5
     ld   A, [wDBBD]                                    ;; 01:4923 $fa $bd $db
@@ -1386,7 +1386,7 @@ call_01_48cd_TilemapXorCopy:
     ld   A, L                                          ;; 01:4969 $7d
     and  A, $0f                                        ;; 01:496a $e6 $0f
     jr   NZ, .jr_01_4980                               ;; 01:496c $20 $12
-    ld   A, [wDB9E]                                    ;; 01:496e $fa $9e $db
+    ld   A, [wDB9E_MenuCommandBuffer_Unk0]                                    ;; 01:496e $fa $9e $db
     swap A                                             ;; 01:4971 $cb $37
     ld   D, A                                          ;; 01:4973 $57
     and  A, $f0                                        ;; 01:4974 $e6 $f0
@@ -1411,7 +1411,7 @@ call_01_48cd_TilemapXorCopy:
     pop  AF                                            ;; 01:4991 $f1
     dec  A                                             ;; 01:4992 $3d
     jr   NZ, .jr_01_4915                               ;; 01:4993 $20 $80
-    ld   HL, wDBA4                                     ;; 01:4995 $21 $a4 $db
+    ld   HL, wDBA4_MenuCommandBuffer2_Unk0                                     ;; 01:4995 $21 $a4 $db
     ld   A, [wDBC9]                                    ;; 01:4998 $fa $c9 $db
     add  A, [HL]                                       ;; 01:499b $86
     inc  A                                             ;; 01:499c $3c
@@ -1452,11 +1452,11 @@ call_01_49bb_FormatAndPaginateText:
 ; repeatedly checks available text width (call_01_4a55_MeasureTextWidth), compares the width against the text buffer, and either:
 ; Scans backward to replace the last space with a break marker ($80) if overfull.
 ; Scans forward, invoking call_01_4cfa_SetStreamPointerHL to process text entries.
-; Also updates indices (wDBA5, wDBB0, etc.) and computes offsets for selecting the next text chunk.
+; Also updates indices (wDBA5_MenuCommandBuffer2_Unk1, wDBB0_MenuCommandBuffer3_Unk5, etc.) and computes offsets for selecting the next text chunk.
     call call_00_0835_LoadFromTextBank1C                                  ;; 01:49bb $cd $35 $08
 .jr_01_49be:
     call call_01_4a55_MeasureTextWidth                                  ;; 01:49be $cd $55 $4a
-    ld   HL, wDB9E                                     ;; 01:49c1 $21 $9e $db
+    ld   HL, wDB9E_MenuCommandBuffer_Unk0                                     ;; 01:49c1 $21 $9e $db
     ld   L, [HL]                                       ;; 01:49c4 $6e
     ld   H, $00                                        ;; 01:49c5 $26 $00
     add  HL, HL                                        ;; 01:49c7 $29
@@ -1467,7 +1467,7 @@ call_01_49bb_FormatAndPaginateText:
     ld   A, H                                          ;; 01:49cc $7c
     sbc  A, B                                          ;; 01:49cd $98
     jr   NC, .jr_01_49e5                               ;; 01:49ce $30 $15
-    ld   HL, wDBA7                                     ;; 01:49d0 $21 $a7 $db
+    ld   HL, wDBA7_MenuCommandBuffer2_Unk3                                     ;; 01:49d0 $21 $a7 $db
     ld   A, [HL+]                                      ;; 01:49d3 $2a
     ld   H, [HL]                                       ;; 01:49d4 $66
     ld   L, A                                          ;; 01:49d5 $6f
@@ -1483,7 +1483,7 @@ call_01_49bb_FormatAndPaginateText:
     ld   [HL], $80                                     ;; 01:49e1 $36 $80
     jr   .jr_01_49be                                   ;; 01:49e3 $18 $d9
 .jr_01_49e5:
-    ld   HL, wDBA7                                     ;; 01:49e5 $21 $a7 $db
+    ld   HL, wDBA7_MenuCommandBuffer2_Unk3                                     ;; 01:49e5 $21 $a7 $db
     ld   A, [HL+]                                      ;; 01:49e8 $2a
     ld   H, [HL]                                       ;; 01:49e9 $66
     ld   L, A                                          ;; 01:49ea $6f
@@ -1507,17 +1507,17 @@ call_01_49bb_FormatAndPaginateText:
     inc  HL                                            ;; 01:4a03 $23
     jr   .jr_01_49f7                                   ;; 01:4a04 $18 $f1
 .jr_01_4a06:
-    ld   A, [wDBA4]                                    ;; 01:4a06 $fa $a4 $db
+    ld   A, [wDBA4_MenuCommandBuffer2_Unk0]                                    ;; 01:4a06 $fa $a4 $db
     ld   [wDBE1], A                                    ;; 01:4a09 $ea $e1 $db
     ld   HL, wDADD                                     ;; 01:4a0c $21 $dd $da
     call call_01_4cfa_SetStreamPointerHL                                  ;; 01:4a0f $cd $fa $4c
-    ld   A, [wDBB0]                                    ;; 01:4a12 $fa $b0 $db
+    ld   A, [wDBB0_MenuCommandBuffer3_Unk5]                                    ;; 01:4a12 $fa $b0 $db
     inc  A                                             ;; 01:4a15 $3c
     ld   [wDBE2], A                                    ;; 01:4a16 $ea $e2 $db
-    ld   A, [wDBA5]                                    ;; 01:4a19 $fa $a5 $db
+    ld   A, [wDBA5_MenuCommandBuffer2_Unk1]                                    ;; 01:4a19 $fa $a5 $db
     cp   A, $fe                                        ;; 01:4a1c $fe $fe
     ret  NZ                                            ;; 01:4a1e $c0
-    ld   HL, wDBA7                                     ;; 01:4a1f $21 $a7 $db
+    ld   HL, wDBA7_MenuCommandBuffer2_Unk3                                     ;; 01:4a1f $21 $a7 $db
     ld   A, [HL+]                                      ;; 01:4a22 $2a
     ld   H, [HL]                                       ;; 01:4a23 $66
     ld   L, A                                          ;; 01:4a24 $6f
@@ -1531,9 +1531,9 @@ call_01_49bb_FormatAndPaginateText:
     and  A, A                                          ;; 01:4a2e $a7
     jr   NZ, .jr_01_4a27                               ;; 01:4a2f $20 $f6
     push BC                                            ;; 01:4a31 $c5
-    ld   A, [wDBB0]                                    ;; 01:4a32 $fa $b0 $db
+    ld   A, [wDBB0_MenuCommandBuffer3_Unk5]                                    ;; 01:4a32 $fa $b0 $db
     ld   B, A                                          ;; 01:4a35 $47
-    ld   A, [wDB9F]                                    ;; 01:4a36 $fa $9f $db
+    ld   A, [wDB9F_MenuCommandBuffer_Unk1]                                    ;; 01:4a36 $fa $9f $db
     add  A, A                                          ;; 01:4a39 $87
     add  A, A                                          ;; 01:4a3a $87
     add  A, A                                          ;; 01:4a3b $87
@@ -1549,8 +1549,8 @@ call_01_49bb_FormatAndPaginateText:
     sub  A, C                                          ;; 01:4a45 $91
     jr   NC, .jr_01_4a44                               ;; 01:4a46 $30 $fc
     ld   A, B                                          ;; 01:4a48 $78
-    ld   [wDBA5], A                                    ;; 01:4a49 $ea $a5 $db
-    ld   HL, wDBB0                                     ;; 01:4a4c $21 $b0 $db
+    ld   [wDBA5_MenuCommandBuffer2_Unk1], A                                    ;; 01:4a49 $ea $a5 $db
+    ld   HL, wDBB0_MenuCommandBuffer3_Unk5                                     ;; 01:4a4c $21 $b0 $db
     add  A, [HL]                                       ;; 01:4a4f $86
     inc  A                                             ;; 01:4a50 $3c
     ld   [wDBE2], A                                    ;; 01:4a51 $ea $e2 $db
@@ -1558,10 +1558,10 @@ call_01_49bb_FormatAndPaginateText:
 
 call_01_4a55_MeasureTextWidth:
 ; Description:
-; Traverses a text buffer pointed to by wDBA7, uses call_01_4df4_LookupTileFromTranslationTable to decode characters, 
-; and sums their widths (via wDBAD as a font-width table) into BC. Stops at a high-bit 
+; Traverses a text buffer pointed to by wDBA7_MenuCommandBuffer2_Unk3, uses call_01_4df4_LookupTileFromTranslationTable to decode characters, 
+; and sums their widths (via wDBAD_MenuCommandBuffer3_Unk2 as a font-width table) into BC. Stops at a high-bit 
 ; terminator and returns the accumulated width minus 1.
-    ld   HL, wDBA7                                     ;; 01:4a55 $21 $a7 $db
+    ld   HL, wDBA7_MenuCommandBuffer2_Unk3                                     ;; 01:4a55 $21 $a7 $db
     ld   A, [HL+]                                      ;; 01:4a58 $2a
     ld   H, [HL]                                       ;; 01:4a59 $66
     ld   L, A                                          ;; 01:4a5a $6f
@@ -1572,7 +1572,7 @@ call_01_4a55_MeasureTextWidth:
     ld   A, [HL+]                                      ;; 01:4a61 $2a
     push HL                                            ;; 01:4a62 $e5
     call call_01_4df4_LookupTileFromTranslationTable                                  ;; 01:4a63 $cd $f4 $4d
-    ld   HL, wDBAD                                     ;; 01:4a66 $21 $ad $db
+    ld   HL, wDBAD_MenuCommandBuffer3_Unk2                                     ;; 01:4a66 $21 $ad $db
     ld   E, [HL]                                       ;; 01:4a69 $5e
     inc  HL                                            ;; 01:4a6a $23
     ld   D, [HL]                                       ;; 01:4a6b $56
@@ -1595,10 +1595,10 @@ call_01_4a55_MeasureTextWidth:
 call_01_4a7f_GetCharTileAddress:
 ; Description:
 ; Given a character index from call_01_4df4_LookupTileFromTranslationTable, looks up a pointer into a character tilemap: 
-; multiplies tile height/width (wDBB0, wDBAF) to compute an offset and stores the final address in wDBBD/wDBBE.
+; multiplies tile height/width (wDBB0_MenuCommandBuffer3_Unk5, wDBAF_MenuCommandBuffer3_Unk4) to compute an offset and stores the final address in wDBBD/wDBBE.
     call call_01_4df4_LookupTileFromTranslationTable                                  ;; 01:4a7f $cd $f4 $4d
     push AF                                            ;; 01:4a82 $f5
-    ld   HL, wDBAD                                     ;; 01:4a83 $21 $ad $db
+    ld   HL, wDBAD_MenuCommandBuffer3_Unk2                                     ;; 01:4a83 $21 $ad $db
     ld   E, [HL]                                       ;; 01:4a86 $5e
     inc  HL                                            ;; 01:4a87 $23
     ld   D, [HL]                                       ;; 01:4a88 $56
@@ -1607,10 +1607,10 @@ call_01_4a7f_GetCharTileAddress:
     add  HL, DE                                        ;; 01:4a8c $19
     ld   A, [HL]                                       ;; 01:4a8d $7e
     ld   [wDBC9], A                                    ;; 01:4a8e $ea $c9 $db
-    ld   A, [wDBB0]                                    ;; 01:4a91 $fa $b0 $db
+    ld   A, [wDBB0_MenuCommandBuffer3_Unk5]                                    ;; 01:4a91 $fa $b0 $db
     add  A, A                                          ;; 01:4a94 $87
     ld   C, A                                          ;; 01:4a95 $4f
-    ld   A, [wDBAF]                                    ;; 01:4a96 $fa $af $db
+    ld   A, [wDBAF_MenuCommandBuffer3_Unk4]                                    ;; 01:4a96 $fa $af $db
     ld   B, A                                          ;; 01:4a99 $47
     xor  A, A                                          ;; 01:4a9a $af
 .jr_01_4a9b:
@@ -1619,7 +1619,7 @@ call_01_4a7f_GetCharTileAddress:
     jr   NZ, .jr_01_4a9b                               ;; 01:4a9d $20 $fc
     ld   E, A                                          ;; 01:4a9f $5f
     ld   D, $00                                        ;; 01:4aa0 $16 $00
-    ld   HL, wDBAB                                     ;; 01:4aa2 $21 $ab $db
+    ld   HL, wDBAB_MenuCommandBuffer3_Unk0                                     ;; 01:4aa2 $21 $ab $db
     ld   A, [HL+]                                      ;; 01:4aa5 $2a
     ld   H, [HL]                                       ;; 01:4aa6 $66
     ld   L, A                                          ;; 01:4aa7 $6f
@@ -1855,8 +1855,8 @@ call_01_4b6b_StreamTileDataToBuffer:
 
 call_01_4bb8_UpdateInterpolationStep:
 ; Description:
-; Calculates an interpolated point between two coordinates over time. Uses differences (wDB97–99, wDB96–98) 
-; and step counts (wDBEC, wDBEB) to update wDBC0/wDBC1, stores control bytes (wDBC2/wDBC3), and handles 
+; Calculates an interpolated point between two coordinates over time. Uses differences (wDB97_MenuTypeData_Unk5–99, wDB96_MenuTypeData_Unk4–98) 
+; and step counts (wDBEC_MenuRowSelected, wDBEB_MenuColumnSelected) to update wDBC0/wDBC1, stores control bytes (wDBC2/wDBC3), and handles 
 ; special cases when wDBC7 is $ff or $01.
     ld   A, [wDBC7]                                    ;; 01:4bb8 $fa $c7 $db
     cp   A, $ff                                        ;; 01:4bbb $fe $ff
@@ -1881,24 +1881,24 @@ call_01_4bb8_UpdateInterpolationStep:
     ld   [HL], C                                       ;; 01:4bdb $71
     ld   HL, wDBC3                                     ;; 01:4bdc $21 $c3 $db
     ld   [HL], B                                       ;; 01:4bdf $70
-    ld   A, [wDBEC]                                    ;; 01:4be0 $fa $ec $db
+    ld   A, [wDBEC_MenuRowSelected]                                    ;; 01:4be0 $fa $ec $db
     ld   C, A                                          ;; 01:4be3 $4f
     inc  C                                             ;; 01:4be4 $0c
-    ld   A, [wDB99]                                    ;; 01:4be5 $fa $99 $db
+    ld   A, [wDB99_MenuTypeData_Unk7]                                    ;; 01:4be5 $fa $99 $db
     ld   B, A                                          ;; 01:4be8 $47
-    ld   A, [wDB97]                                    ;; 01:4be9 $fa $97 $db
+    ld   A, [wDB97_MenuTypeData_Unk5]                                    ;; 01:4be9 $fa $97 $db
     sub  A, B                                          ;; 01:4bec $90
 .jr_01_4bed:
     add  A, B                                          ;; 01:4bed $80
     dec  C                                             ;; 01:4bee $0d
     jr   NZ, .jr_01_4bed                               ;; 01:4bef $20 $fc
     ld   [wDBC0], A                                    ;; 01:4bf1 $ea $c0 $db
-    ld   A, [wDBEB]                                    ;; 01:4bf4 $fa $eb $db
+    ld   A, [wDBEB_MenuColumnSelected]                                    ;; 01:4bf4 $fa $eb $db
     ld   C, A                                          ;; 01:4bf7 $4f
     inc  C                                             ;; 01:4bf8 $0c
-    ld   A, [wDB98]                                    ;; 01:4bf9 $fa $98 $db
+    ld   A, [wDB98_MenuTypeData_Unk6]                                    ;; 01:4bf9 $fa $98 $db
     ld   B, A                                          ;; 01:4bfc $47
-    ld   A, [wDB96]                                    ;; 01:4bfd $fa $96 $db
+    ld   A, [wDB96_MenuTypeData_Unk4]                                    ;; 01:4bfd $fa $96 $db
     sub  A, B                                          ;; 01:4c00 $90
 .jr_01_4c01:
     add  A, B                                          ;; 01:4c01 $80
@@ -1919,20 +1919,20 @@ call_01_4bb8_UpdateInterpolationStep:
     add  HL, HL                                        ;; 01:4c1d $29
     ld   DE, wD900                                     ;; 01:4c1e $11 $00 $d9
     add  HL, DE                                        ;; 01:4c21 $19
-    ld   A, [wDBEE]                                    ;; 01:4c22 $fa $ee $db
+    ld   A, [wDBEE_PasswordRowSelected]                                    ;; 01:4c22 $fa $ee $db
     add  A, A                                          ;; 01:4c25 $87
     add  A, A                                          ;; 01:4c26 $87
     add  A, A                                          ;; 01:4c27 $87
     add  A, $18                                        ;; 01:4c28 $c6 $18
     ld   [HL+], A                                      ;; 01:4c2a $22
-    ld   A, [wDBED]                                    ;; 01:4c2b $fa $ed $db
+    ld   A, [wDBED_PasswordColumnSelected]                                    ;; 01:4c2b $fa $ed $db
     ld   C, A                                          ;; 01:4c2e $4f
     add  A, A                                          ;; 01:4c2f $87
     add  A, A                                          ;; 01:4c30 $87
     add  A, A                                          ;; 01:4c31 $87
     add  A, $10                                        ;; 01:4c32 $c6 $10
     ld   [HL+], A                                      ;; 01:4c34 $22
-    ld   A, [wDBEE]                                    ;; 01:4c35 $fa $ee $db
+    ld   A, [wDBEE_PasswordRowSelected]                                    ;; 01:4c35 $fa $ee $db
     add  A, A                                          ;; 01:4c38 $87
     add  A, A                                          ;; 01:4c39 $87
     add  A, A                                          ;; 01:4c3a $87
@@ -2032,9 +2032,9 @@ call_01_4c7e_CopyTextBlockToBuffer:
 
 call_01_4cc3_GetVramTilePtrFromIndex:
 ; Description:
-; Computes a VRAM tile address by scaling wDBA2 by 16 (tile size in bytes) 
+; Computes a VRAM tile address by scaling wDBA2_MenuCommandBuffer_Unk4 by 16 (tile size in bytes) 
 ; and adding the base address $8000. Returns DE = tile address.
-    ld   hl,wDBA2
+    ld   hl,wDBA2_MenuCommandBuffer_Unk4
     ld   l,[hl]
     ld   h,$00
     add  hl,hl
@@ -2049,9 +2049,9 @@ call_01_4cc3_GetVramTilePtrFromIndex:
 
 call_01_4cd4_GetBgTilemapPtrFromIndex:
 ; Description:
-; Calculates a pointer into the background tilemap (wC000_BgMapTileIds) based on index wDBA2. 
+; Calculates a pointer into the background tilemap (wC000_BgMapTileIds) based on index wDBA2_MenuCommandBuffer_Unk4. 
 ; Performs several shifts to scale the index by tile size (×16) and returns DE = pointer.
-    ld   HL, wDBA2                                     ;; 01:4cd4 $21 $a2 $db
+    ld   HL, wDBA2_MenuCommandBuffer_Unk4                                     ;; 01:4cd4 $21 $a2 $db
     ld   L, [HL]                                       ;; 01:4cd7 $6e
     ld   H, $00                                        ;; 01:4cd8 $26 $00
     add  HL, HL                                        ;; 01:4cda $29
@@ -2066,9 +2066,9 @@ call_01_4cd4_GetBgTilemapPtrFromIndex:
 
 call_01_4ce5_ComputeTilemapBlockOffset:
 ; Description:
-; Given width (C) and height (B) from wDB9E/wDB9F, computes a linear offset equal to width × height ×16 
+; Given width (C) and height (B) from wDB9E_MenuCommandBuffer_Unk0/wDB9F_MenuCommandBuffer_Unk1, computes a linear offset equal to width × height ×16 
 ; (via repeated addition and shifting) and returns BC = offset.
-    ld   HL, wDB9E                                     ;; 01:4ce5 $21 $9e $db
+    ld   HL, wDB9E_MenuCommandBuffer_Unk0                                     ;; 01:4ce5 $21 $9e $db
     ld   C, [HL]                                       ;; 01:4ce8 $4e
     inc  HL                                            ;; 01:4ce9 $23
     ld   B, [HL]                                       ;; 01:4cea $46
@@ -2089,27 +2089,27 @@ call_01_4ce5_ComputeTilemapBlockOffset:
 
 call_01_4cfa_SetStreamPointerHL:
 ; Description:
-; Stores a pointer (HL) into wDBA7/wDBA8. Used by text or 
+; Stores a pointer (HL) into wDBA7_MenuCommandBuffer2_Unk3/wDBA8_MenuCommandBuffer2_Unk4. Used by text or 
 ; sprite loaders to update the current stream position.
     ld   A, L                                          ;; 01:4cfa $7d
-    ld   [wDBA7], A                                    ;; 01:4cfb $ea $a7 $db
+    ld   [wDBA7_MenuCommandBuffer2_Unk3], A                                    ;; 01:4cfb $ea $a7 $db
     ld   A, H                                          ;; 01:4cfe $7c
-    ld   [wDBA8], A                                    ;; 01:4cff $ea $a8 $db
+    ld   [wDBA8_MenuCommandBuffer2_Unk4], A                                    ;; 01:4cff $ea $a8 $db
     ret                                                ;; 01:4d02 $c9
 
 call_01_4d03_StreamTilemapBlockToBg:
 ; Description:
-; Loads width/height from a stream into wDB9E/F, computes a background tilemap address from wDBA6, 
+; Loads width/height from a stream into wDB9E_MenuCommandBuffer_Unk0/F, computes a background tilemap address from wDBA6_MenuCommandBuffer2_Unk2, 
 ; and copies a block of BC bytes from HL to DE if a nonzero flag is present. Handles staging of tilemap updates.
-    ld   A, [wDBA6]                                    ;; 01:4d03 $fa $a6 $db
-    ld   [wDBA2], A                                    ;; 01:4d06 $ea $a2 $db
+    ld   A, [wDBA6_MenuCommandBuffer2_Unk2]                                    ;; 01:4d03 $fa $a6 $db
+    ld   [wDBA2_MenuCommandBuffer_Unk4], A                                    ;; 01:4d06 $ea $a2 $db
     ld   A, [HL+]                                      ;; 01:4d09 $2a
-    ld   [wDB9E], A                                    ;; 01:4d0a $ea $9e $db
+    ld   [wDB9E_MenuCommandBuffer_Unk0], A                                    ;; 01:4d0a $ea $9e $db
     ld   A, [HL+]                                      ;; 01:4d0d $2a
-    ld   [wDB9F], A                                    ;; 01:4d0e $ea $9f $db
+    ld   [wDB9F_MenuCommandBuffer_Unk1], A                                    ;; 01:4d0e $ea $9f $db
     push HL                                            ;; 01:4d11 $e5
     call call_01_4ce5_ComputeTilemapBlockOffset                                  ;; 01:4d12 $cd $e5 $4c
-    ld   HL, wDBA6                                     ;; 01:4d15 $21 $a6 $db
+    ld   HL, wDBA6_MenuCommandBuffer2_Unk2                                     ;; 01:4d15 $21 $a6 $db
     ld   L, [HL]                                       ;; 01:4d18 $6e
     ld   H, $00                                        ;; 01:4d19 $26 $00
     add  HL, HL                                        ;; 01:4d1b $29
@@ -2135,7 +2135,7 @@ call_01_4d2c_ProcessTileStreamingLoop:
     call call_00_0b92_WaitForInterrupt                                  ;; 01:4d32 $cd $92 $0b
     ld   HL, wDBDC                                     ;; 01:4d35 $21 $dc $db
     dec  [HL]                                          ;; 01:4d38 $35
-    ld   A, [wDB94]                                    ;; 01:4d39 $fa $94 $db
+    ld   A, [wDB94_MenuTypeData_Unk2]                                    ;; 01:4d39 $fa $94 $db
     and  A, $01                                        ;; 01:4d3c $e6 $01
     ld   A, [wDAD7_CurrentInputs]                                    ;; 01:4d3e $fa $d7 $da
     jr   Z, .jr_01_4d45                                ;; 01:4d41 $28 $02
@@ -2178,14 +2178,14 @@ call_01_4d49_FormatDecimalToAsciiDigits:
 
 call_01_4d6e_PrepareStreamingPointers:
 ; Description:
-; Waits for wDBEF to clear, sets up several control flags (wDBEF–wDBF7), 
+; Waits for wDBEF_UnkCounter to clear, sets up several control flags (wDBEF_UnkCounter–wDBF7), 
 ; calculates offsets into two data tables (data_01_66f9 and VRAM $8000), 
 ; and stores resulting pointers. Prepares for a rendering or data streaming operation.
-    ld   A, [wDBEF]                                    ;; 01:4d6e $fa $ef $db
+    ld   A, [wDBEF_UnkCounter]                                    ;; 01:4d6e $fa $ef $db
     and  A, A                                          ;; 01:4d71 $a7
     jr   NZ, call_01_4d6e_PrepareStreamingPointers                              ;; 01:4d72 $20 $fa
     ld   A, $01                                        ;; 01:4d74 $3e $01
-    ld   [wDBEF], A                                    ;; 01:4d76 $ea $ef $db
+    ld   [wDBEF_UnkCounter], A                                    ;; 01:4d76 $ea $ef $db
     ld   A, $04                                        ;; 01:4d79 $3e $04
     ld   [wDBF0], A                                    ;; 01:4d7b $ea $f0 $db
     ld   A, $01                                        ;; 01:4d7e $3e $01
@@ -2218,9 +2218,9 @@ call_01_4d6e_PrepareStreamingPointers:
     ld   [wDBF4], A                                    ;; 01:4daa $ea $f4 $db
     ld   A, H                                          ;; 01:4dad $7c
     ld   [wDBF5], A                                    ;; 01:4dae $ea $f5 $db
-    ld   HL, wDBEF                                     ;; 01:4db1 $21 $ef $db
+    ld   HL, wDBEF_UnkCounter                                     ;; 01:4db1 $21 $ef $db
     ld   A, [HL+]                                      ;; 01:4db4 $2a
-    ld   [wDBEF], A                                    ;; 01:4db5 $ea $ef $db
+    ld   [wDBEF_UnkCounter], A                                    ;; 01:4db5 $ea $ef $db
     ld   A, [HL+]                                      ;; 01:4db8 $2a
     ld   [wDBF0], A                                    ;; 01:4db9 $ea $f0 $db
     ld   A, [HL+]                                      ;; 01:4dbc $2a
@@ -2233,9 +2233,9 @@ call_01_4d6e_PrepareStreamingPointers:
 
 call_01_4dc9_GetTileIdFromMapCoords:
 ; Description:
-; Derives a tile ID from row (wDBEC) and column (wDBEB) offsets, performs arithmetic 
-; to locate the correct entry in wDB7E, and returns the byte at that position.
-    ld   HL, wDBEC                                     ;; 01:4dc9 $21 $ec $db
+; Derives a tile ID from row (wDBEC_MenuRowSelected) and column (wDBEB_MenuColumnSelected) offsets, performs arithmetic 
+; to locate the correct entry in wDB7E_PasswordValues, and returns the byte at that position.
+    ld   HL, wDBEC_MenuRowSelected                                     ;; 01:4dc9 $21 $ec $db
     ld   B, [HL]                                       ;; 01:4dcc $46
     ld   A, $fa                                        ;; 01:4dcd $3e $fa
 .jr_01_4dcf:
@@ -2243,26 +2243,26 @@ call_01_4dc9_GetTileIdFromMapCoords:
     dec  B                                             ;; 01:4dd1 $05
     bit  7, B                                          ;; 01:4dd2 $cb $78
     jr   Z, .jr_01_4dcf                                ;; 01:4dd4 $28 $f9
-    ld   HL, wDBEB                                     ;; 01:4dd6 $21 $eb $db
+    ld   HL, wDBEB_MenuColumnSelected                                     ;; 01:4dd6 $21 $eb $db
     add  A, [HL]                                       ;; 01:4dd9 $86
     ld   E, A                                          ;; 01:4dda $5f
     ld   D, $00                                        ;; 01:4ddb $16 $00
-    ld   HL, wDB7E                                     ;; 01:4ddd $21 $7e $db
+    ld   HL, wDB7E_PasswordValues                                     ;; 01:4ddd $21 $7e $db
     add  HL, DE                                        ;; 01:4de0 $19
     ld   A, [HL]                                       ;; 01:4de1 $7e
     ret                                                ;; 01:4de2 $c9
 
 call_01_4de3_ComputeTilemapVramOffset:
 ; Description:
-; Computes an intermediate VRAM/tilemap offset from wDBEC and wDBEB using weighted sums and bit shifts, 
+; Computes an intermediate VRAM/tilemap offset from wDBEC_MenuRowSelected and wDBEB_MenuColumnSelected using weighted sums and bit shifts, 
 ; then adds $98. Used as part of address calculations for map-to-VRAM conversions.
-    ld   A, [wDBEC]                                    ;; 01:4de3 $fa $ec $db
+    ld   A, [wDBEC_MenuRowSelected]                                    ;; 01:4de3 $fa $ec $db
     add  A, A                                          ;; 01:4de6 $87
     ld   L, A                                          ;; 01:4de7 $6f
     add  A, A                                          ;; 01:4de8 $87
     add  A, L                                          ;; 01:4de9 $85
     ld   L, A                                          ;; 01:4dea $6f
-    ld   A, [wDBEB]                                    ;; 01:4deb $fa $eb $db
+    ld   A, [wDBEB_MenuColumnSelected]                                    ;; 01:4deb $fa $eb $db
     add  A, L                                          ;; 01:4dee $85
     add  A, A                                          ;; 01:4def $87
     add  A, A                                          ;; 01:4df0 $87
@@ -2381,20 +2381,20 @@ call_01_4f67_CopyTileBufferToBgMap:
 
 call_01_4f7e_SeedTileLookupTable:
 ; Description:
-; Initializes wDB7E with $20 and copies it forward 17 bytes, 
+; Initializes wDB7E_PasswordValues with $20 and copies it forward 17 bytes, 
 ; clearing or seeding a lookup table used by map computations.
-    ld   HL, wDB7E                                     ;; 01:4f7e $21 $7e $db
-    ld   DE, wDB7F                                     ;; 01:4f81 $11 $7f $db
+    ld   HL, wDB7E_PasswordValues                                     ;; 01:4f7e $21 $7e $db
+    ld   DE, wDB7E_PasswordValues+1                                     ;; 01:4f81 $11 $7f $db
     ld   BC, $11                                       ;; 01:4f84 $01 $11 $00
     ld   [HL], $20                                     ;; 01:4f87 $36 $20
     jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4f89 $c3 $6e $07
 
 call_01_4f8c_BuildPasswordBitfieldAndChecksum:
 ; Description:
-; Clears wDB72–wDB7D, seeds wDB73–wDB75 from wDC4E_PlayerLivesRemaining/AF/4F, then iterates through DC5C/DC5D data, 
-; checking bit masks (.data_01_5013 and .data_01_501f) to build bitfields in wDB76+. 
-; Sums values for a checksum in wDB72 and sets a completion flag wDB91.
-    ld   HL, wDB72                                     ;; 01:4f8c $21 $72 $db
+; Clears wDB72_PasswordEncodedBuffer–wDB7D, seeds wDB73_PasswordLivesRemaining–wDB75_PasswordPawCoinExtraHealth from wDC4E_PlayerLivesRemaining/AF/4F, then iterates through DC5C/DC5D data, 
+; checking bit masks (.data_01_5013 and .data_01_501f) to build bitfields in wDB76_PasswordEncodedBuffer+. 
+; Sums values for a checksum in wDB72_PasswordEncodedBuffer and sets a completion flag wDB91_PasswordCompletionFlag.
+    ld   HL, wDB72_PasswordEncodedBuffer                                     ;; 01:4f8c $21 $72 $db
     ld   B, $0c                                        ;; 01:4f8f $06 $0c
     xor  A, A                                          ;; 01:4f91 $af
 .jr_01_4f92:
@@ -2402,15 +2402,15 @@ call_01_4f8c_BuildPasswordBitfieldAndChecksum:
     dec  B                                             ;; 01:4f93 $05
     jr   NZ, .jr_01_4f92                               ;; 01:4f94 $20 $fc
     xor  A, A                                          ;; 01:4f96 $af
-    ld   [wDB72], A                                    ;; 01:4f97 $ea $72 $db
+    ld   [wDB72_PasswordEncodedBuffer], A                                    ;; 01:4f97 $ea $72 $db
     ld   A, [wDC4E_PlayerLivesRemaining]                                    ;; 01:4f9a $fa $4e $dc
-    ld   [wDB73], A                                    ;; 01:4f9d $ea $73 $db
-    ld   A, [wDCAF]                                    ;; 01:4fa0 $fa $af $dc
-    ld   [wDB74], A                                    ;; 01:4fa3 $ea $74 $db
-    ld   A, [wDC4F]                                    ;; 01:4fa6 $fa $4f $dc
-    ld   [wDB75], A                                    ;; 01:4fa9 $ea $75 $db
+    ld   [wDB73_PasswordLivesRemaining], A                                    ;; 01:4f9d $ea $73 $db
+    ld   A, [wDCAF_PawCoinCounter]                                    ;; 01:4fa0 $fa $af $dc
+    ld   [wDB74_PasswordPawCoinCounter], A                                    ;; 01:4fa3 $ea $74 $db
+    ld   A, [wDC4F_PawCoinExtraHealth]                                    ;; 01:4fa6 $fa $4f $dc
+    ld   [wDB75_PasswordPawCoinExtraHealth], A                                    ;; 01:4fa9 $ea $75 $db
     xor  A, A                                          ;; 01:4fac $af
-    ld   [wDB90], A                                    ;; 01:4fad $ea $90 $db
+    ld   [wDB90_PasswordCounter], A                                    ;; 01:4fad $ea $90 $db
     ld   DE, $00                                       ;; 01:4fb0 $11 $00 $00
 .jr_01_4fb3:
     push DE                                            ;; 01:4fb3 $d5
@@ -2427,16 +2427,16 @@ call_01_4f8c_BuildPasswordBitfieldAndChecksum:
     jr   Z, .jr_01_4fee                                ;; 01:4fc3 $28 $29
     bit  7, C                                          ;; 01:4fc5 $cb $79
     jr   Z, .jr_01_4fea                                ;; 01:4fc7 $28 $21
-    ld   A, [wDB90]                                    ;; 01:4fc9 $fa $90 $db
+    ld   A, [wDB90_PasswordCounter]                                    ;; 01:4fc9 $fa $90 $db
     srl  A                                             ;; 01:4fcc $cb $3f
     srl  A                                             ;; 01:4fce $cb $3f
     srl  A                                             ;; 01:4fd0 $cb $3f
     ld   E, A                                          ;; 01:4fd2 $5f
     ld   D, $00                                        ;; 01:4fd3 $16 $00
-    ld   HL, wDB76                                     ;; 01:4fd5 $21 $76 $db
+    ld   HL, wDB76_PasswordEncodedBuffer                                     ;; 01:4fd5 $21 $76 $db
     add  HL, DE                                        ;; 01:4fd8 $19
     push HL                                            ;; 01:4fd9 $e5
-    ld   A, [wDB90]                                    ;; 01:4fda $fa $90 $db
+    ld   A, [wDB90_PasswordCounter]                                    ;; 01:4fda $fa $90 $db
     and  A, $07                                        ;; 01:4fdd $e6 $07
     ld   E, A                                          ;; 01:4fdf $5f
     ld   D, $00                                        ;; 01:4fe0 $16 $00
@@ -2447,7 +2447,7 @@ call_01_4f8c_BuildPasswordBitfieldAndChecksum:
     or   A, [HL]                                       ;; 01:4fe8 $b6
     ld   [HL], A                                       ;; 01:4fe9 $77
 .jr_01_4fea:
-    ld   HL, wDB90                                     ;; 01:4fea $21 $90 $db
+    ld   HL, wDB90_PasswordCounter                                     ;; 01:4fea $21 $90 $db
     inc  [HL]                                          ;; 01:4fed $34
 .jr_01_4fee:
     sla  C                                             ;; 01:4fee $cb $21
@@ -2460,7 +2460,7 @@ call_01_4f8c_BuildPasswordBitfieldAndChecksum:
     ld   A, E                                          ;; 01:4ff8 $7b
     cp   A, $0c                                        ;; 01:4ff9 $fe $0c
     jr   C, .jr_01_4fb3                                ;; 01:4ffb $38 $b6
-    ld   HL, wDB73                                     ;; 01:4ffd $21 $73 $db
+    ld   HL, wDB73_PasswordLivesRemaining                                     ;; 01:4ffd $21 $73 $db
     ld   B, $0b                                        ;; 01:5000 $06 $0b
     xor  A, A                                          ;; 01:5002 $af
 .jr_01_5003:
@@ -2469,9 +2469,9 @@ call_01_4f8c_BuildPasswordBitfieldAndChecksum:
     dec  B                                             ;; 01:5005 $05
     jr   NZ, .jr_01_5003                               ;; 01:5006 $20 $fb
     xor  A, $b6                                        ;; 01:5008 $ee $b6
-    ld   [wDB72], A                                    ;; 01:500a $ea $72 $db
+    ld   [wDB72_PasswordEncodedBuffer], A                                    ;; 01:500a $ea $72 $db
     ld   A, $01                                        ;; 01:500d $3e $01
-    ld   [wDB91], A                                    ;; 01:500f $ea $91 $db
+    ld   [wDB91_PasswordCompletionFlag], A                                    ;; 01:500f $ea $91 $db
     ret                                                ;; 01:5012 $c9
 .data_01_5013:
     db   $f1, $ff, $ff, $ff, $ff, $ff, $ff, $01        ;; 01:5013 ........
@@ -2481,17 +2481,17 @@ call_01_4f8c_BuildPasswordBitfieldAndChecksum:
 
 call_01_5027_BuildPasswordBufferFromBitfield:
 ; Description:
-; Initializes the buffer at wDB7E to zeros, then iterates through bits in wDB72 to set flags in the buffer. 
-; It scans wDB72 bitfields (masking with $80, $40, etc.) and for each set bit, ORs $10 into the corresponding 
-; entry in wDB7E. Essentially, it maps a bitfield of collision/attribute flags into a tile-flag buffer.
-    ld   HL, wDB7E                                     ;; 01:5027 $21 $7e $db
-    ld   DE, wDB7F                                     ;; 01:502a $11 $7f $db
+; Initializes the buffer at wDB7E_PasswordValues to zeros, then iterates through bits in wDB72_PasswordEncodedBuffer to set flags in the buffer. 
+; It scans wDB72_PasswordEncodedBuffer bitfields (masking with $80, $40, etc.) and for each set bit, ORs $10 into the corresponding 
+; entry in wDB7E_PasswordValues. Essentially, it maps a bitfield of collision/attribute flags into a tile-flag buffer.
+    ld   HL, wDB7E_PasswordValues                                     ;; 01:5027 $21 $7e $db
+    ld   DE, wDB7E_PasswordValues+1                                     ;; 01:502a $11 $7f $db
     ld   BC, $11                                       ;; 01:502d $01 $11 $00
     ld   [HL], $00                                     ;; 01:5030 $36 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:5032 $cd $6e $07
-    ld   HL, wDB72                                     ;; 01:5035 $21 $72 $db
+    ld   HL, wDB72_PasswordEncodedBuffer                                     ;; 01:5035 $21 $72 $db
     ld   B, $80                                        ;; 01:5038 $06 $80
-    ld   DE, wDB7E                                     ;; 01:503a $11 $7e $db
+    ld   DE, wDB7E_PasswordValues                                     ;; 01:503a $11 $7e $db
     ld   C, $10                                        ;; 01:503d $0e $10
     ld   A, $5a                                        ;; 01:503f $3e $5a
 .jr_01_5041:
@@ -2519,11 +2519,11 @@ call_01_5027_BuildPasswordBufferFromBitfield:
 
 call_01_505a_ValidatePassword:
 ; Description:
-; Checks wDB7E for any tile flagged $20. If found early, returns 0. If not found after scanning $12 entries, 
-; it resets buffers (wDB72–wDB7D), then reconstructs bitfields from wDB7E back into wDB72. It sums these values, 
-; XORs with $B6, and compares to wDB72 as a checksum. On match, it calls call_01_50b5_SetProgressFlagsFromPasswordMasks 
+; Checks wDB7E_PasswordValues for any tile flagged $20. If found early, returns 0. If not found after scanning $12 entries, 
+; it resets buffers (wDB72_PasswordEncodedBuffer–wDB7D), then reconstructs bitfields from wDB7E_PasswordValues back into wDB72_PasswordEncodedBuffer. It sums these values, 
+; XORs with $B6, and compares to wDB72_PasswordEncodedBuffer as a checksum. On match, it calls call_01_50b5_SetProgressFlagsFromPasswordMasks 
 ; (which rebuilds DC5C/DC4E tile password data) and returns $20; otherwise, returns 0.
-    ld   HL, wDB7E                                     ;; 01:505a $21 $7e $db
+    ld   HL, wDB7E_PasswordValues                                     ;; 01:505a $21 $7e $db
     ld   B, $12                                        ;; 01:505d $06 $12
 .jr_01_505f:
     ld   A, [HL+]                                      ;; 01:505f $2a
@@ -2531,14 +2531,14 @@ call_01_505a_ValidatePassword:
     jr   Z, .jr_01_50b2                                ;; 01:5062 $28 $4e
     dec  B                                             ;; 01:5064 $05
     jr   NZ, .jr_01_505f                               ;; 01:5065 $20 $f8
-    ld   HL, wDB72                                     ;; 01:5067 $21 $72 $db
-    ld   DE, wDB73                                     ;; 01:506a $11 $73 $db
+    ld   HL, wDB72_PasswordEncodedBuffer                                     ;; 01:5067 $21 $72 $db
+    ld   DE, wDB73_PasswordLivesRemaining                                     ;; 01:506a $11 $73 $db
     ld   BC, $0b                                       ;; 01:506d $01 $0b $00
     ld   [HL], $00                                     ;; 01:5070 $36 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:5072 $cd $6e $07
-    ld   HL, wDB72                                     ;; 01:5075 $21 $72 $db
+    ld   HL, wDB72_PasswordEncodedBuffer                                     ;; 01:5075 $21 $72 $db
     ld   B, $80                                        ;; 01:5078 $06 $80
-    ld   DE, wDB7E                                     ;; 01:507a $11 $7e $db
+    ld   DE, wDB7E_PasswordValues                                     ;; 01:507a $11 $7e $db
     ld   C, $10                                        ;; 01:507d $0e $10
     ld   A, $5a                                        ;; 01:507f $3e $5a
 .jr_01_5081:
@@ -2562,7 +2562,7 @@ call_01_505a_ValidatePassword:
     pop  AF                                            ;; 01:5095 $f1
     dec  A                                             ;; 01:5096 $3d
     jr   NZ, .jr_01_5081                               ;; 01:5097 $20 $e8
-    ld   HL, wDB73                                     ;; 01:5099 $21 $73 $db
+    ld   HL, wDB73_PasswordLivesRemaining                                     ;; 01:5099 $21 $73 $db
     ld   B, $0b                                        ;; 01:509c $06 $0b
     xor  A, A                                          ;; 01:509e $af
 .jr_01_509f:
@@ -2571,7 +2571,7 @@ call_01_505a_ValidatePassword:
     dec  B                                             ;; 01:50a1 $05
     jr   NZ, .jr_01_509f                               ;; 01:50a2 $20 $fb
     xor  A, $b6                                        ;; 01:50a4 $ee $b6
-    ld   HL, wDB72                                     ;; 01:50a6 $21 $72 $db
+    ld   HL, wDB72_PasswordEncodedBuffer                                     ;; 01:50a6 $21 $72 $db
     cp   A, [HL]                                       ;; 01:50a9 $be
     jr   NZ, .jr_01_50b2                               ;; 01:50aa $20 $06
     call call_01_50b5_SetProgressFlagsFromPasswordMasks                                  ;; 01:50ac $cd $b5 $50
@@ -2585,11 +2585,11 @@ call_01_50b5_SetProgressFlagsFromPasswordMasks:
 ; Description:
 ; Builds a password lookup table (wDC5C_ProgressFlags) from static mask tables 
 ; .data_01_511a_PasswordColumnMaskTable and .data_01_5126_BitMaskLut_80to01. 
-; It iterates through each mask byte, rotates bits, checks wDB76 bitfields, and sets password bits 
+; It iterates through each mask byte, rotates bits, checks wDB76_PasswordEncodedBuffer bitfields, and sets password bits 
 ; in a temporary register (C). Once a row is processed, it stores the result into wDC5C_ProgressFlags, repeating 
-; for 12 entries. Finally, it updates wDC4E_PlayerLivesRemaining/AF/4F with values from wDB73–wDB75.
+; for 12 entries. Finally, it updates wDC4E_PlayerLivesRemaining/AF/4F with values from wDB73_PasswordLivesRemaining–wDB75_PasswordPawCoinExtraHealth.
     xor  A, A                                          ;; 01:50b5 $af
-    ld   [wDB90], A                                    ;; 01:50b6 $ea $90 $db
+    ld   [wDB90_PasswordCounter], A                                    ;; 01:50b6 $ea $90 $db
     ld   DE, $00                                       ;; 01:50b9 $11 $00 $00
 .jr_01_50bc:
     push DE                                            ;; 01:50bc $d5
@@ -2602,16 +2602,16 @@ call_01_50b5_SetProgressFlagsFromPasswordMasks:
     push AF                                            ;; 01:50c6 $f5
     bit  7, B                                          ;; 01:50c7 $cb $78
     jr   Z, .jr_01_50f3                                ;; 01:50c9 $28 $28
-    ld   A, [wDB90]                                    ;; 01:50cb $fa $90 $db
+    ld   A, [wDB90_PasswordCounter]                                    ;; 01:50cb $fa $90 $db
     srl  A                                             ;; 01:50ce $cb $3f
     srl  A                                             ;; 01:50d0 $cb $3f
     srl  A                                             ;; 01:50d2 $cb $3f
     ld   E, A                                          ;; 01:50d4 $5f
     ld   D, $00                                        ;; 01:50d5 $16 $00
-    ld   HL, wDB76                                     ;; 01:50d7 $21 $76 $db
+    ld   HL, wDB76_PasswordEncodedBuffer                                     ;; 01:50d7 $21 $76 $db
     add  HL, DE                                        ;; 01:50da $19
     push HL                                            ;; 01:50db $e5
-    ld   A, [wDB90]                                    ;; 01:50dc $fa $90 $db
+    ld   A, [wDB90_PasswordCounter]                                    ;; 01:50dc $fa $90 $db
     and  A, $07                                        ;; 01:50df $e6 $07
     ld   E, A                                          ;; 01:50e1 $5f
     ld   D, $00                                        ;; 01:50e2 $16 $00
@@ -2623,7 +2623,7 @@ call_01_50b5_SetProgressFlagsFromPasswordMasks:
     jr   Z, .jr_01_50ef                                ;; 01:50eb $28 $02
     set  7, C                                          ;; 01:50ed $cb $f9
 .jr_01_50ef:
-    ld   HL, wDB90                                     ;; 01:50ef $21 $90 $db
+    ld   HL, wDB90_PasswordCounter                                     ;; 01:50ef $21 $90 $db
     inc  [HL]                                          ;; 01:50f2 $34
 .jr_01_50f3:
     rlc  C                                             ;; 01:50f3 $cb $01
@@ -2639,12 +2639,12 @@ call_01_50b5_SetProgressFlagsFromPasswordMasks:
     ld   A, E                                          ;; 01:5102 $7b
     cp   A, $0c                                        ;; 01:5103 $fe $0c
     jr   C, .jr_01_50bc                                ;; 01:5105 $38 $b5
-    ld   A, [wDB73]                                    ;; 01:5107 $fa $73 $db
+    ld   A, [wDB73_PasswordLivesRemaining]                                    ;; 01:5107 $fa $73 $db
     ld   [wDC4E_PlayerLivesRemaining], A                                    ;; 01:510a $ea $4e $dc
-    ld   A, [wDB74]                                    ;; 01:510d $fa $74 $db
-    ld   [wDCAF], A                                    ;; 01:5110 $ea $af $dc
-    ld   A, [wDB75]                                    ;; 01:5113 $fa $75 $db
-    ld   [wDC4F], A                                    ;; 01:5116 $ea $4f $dc
+    ld   A, [wDB74_PasswordPawCoinCounter]                                    ;; 01:510d $fa $74 $db
+    ld   [wDCAF_PawCoinCounter], A                                    ;; 01:5110 $ea $af $dc
+    ld   A, [wDB75_PasswordPawCoinExtraHealth]                                    ;; 01:5113 $fa $75 $db
+    ld   [wDC4F_PawCoinExtraHealth], A                                    ;; 01:5116 $ea $4f $dc
     ret                                                ;; 01:5119 $c9
 .data_01_511a_PasswordColumnMaskTable:
 ; Description:
@@ -2655,7 +2655,7 @@ call_01_50b5_SetProgressFlagsFromPasswordMasks:
 .data_01_5126_BitMaskLut_80to01:
 ; Description:
 ; A standard bitmask lookup table for individual bits ($80, $40, $20 … $01). 
-; Used for testing individual tile bits in wDB76.
+; Used for testing individual tile bits in wDB76_PasswordEncodedBuffer.
     db   $80, $40, $20, $10, $08, $04, $02, $01        ;; 01:5126 ????????
 
 data_01_512e:

@@ -33,7 +33,7 @@ call_03_747d_StatusBar_UpdateOrTiles:
     jr   NC, .jr_03_74ba                               ;; 03:74b6 $30 $02
     set  0, E                                          ;; 03:74b8 $cb $c3
 .jr_03_74ba:
-    ld   HL, wDC4F                                     ;; 03:74ba $21 $4f $dc
+    ld   HL, wDC4F_PawCoinExtraHealth                                     ;; 03:74ba $21 $4f $dc
     cp   A, [HL]                                       ;; 03:74bd $be
     jr   NC, .jr_03_74cb                               ;; 03:74be $30 $0b
     set  1, E                                          ;; 03:74c0 $cb $cb

@@ -1,32 +1,26 @@
-    db   $d9                                           ;; 00:0000 ?
+    reti                                           ;; 00:0000 ?
 
 SECTION "isrVBlank", ROM0[$0040]
-
 isrVBlank:
     jp   call_00_0b25_MainGameLoop_UpdateAndRenderFrame                                    ;; 00:0040 $c3 $25 $0b
 
 SECTION "isrLCDC", ROM0[$0048]
-
 isrLCDC:
     jp   wD9A0                                         ;; 00:0048 $c3 $a0 $d9
 
 SECTION "isrTimer", ROM0[$0050]
-
 isrTimer:
     reti                                               ;; 00:0050 $d9
 
 SECTION "isrSerial", ROM0[$0058]
-
 isrSerial:
     reti                                               ;; 00:0058 $d9
 
 SECTION "isrJoypad", ROM0[$0060]
-
 isrJoypad:
     reti                                               ;; 00:0060 $d9
 
 SECTION "entry", ROM0[$0100]
-
 entry:
     nop                                                ;; 00:0100 $00
     jp   call_00_0150_Init                             ;; 00:0101 $c3 $50 $01
@@ -37,7 +31,7 @@ entry:
     db   CART_INDICATOR_GB                             ;; 00:0146
     db   CART_ROM_MBC5, CART_ROM_2048KB, CART_SRAM_NONE ;; 00:0147
     db   CART_DEST_NON_JAPANESE, $33, $00              ;; 00:014a $01 $33 $00
-    ds   3                                             ;; 00:014d
+    ds   $03                                             ;; 00:014d
 
 call_00_0150_Init:
     di                                                 ;; 00:0150 $f3
@@ -66,7 +60,7 @@ call_00_0150_Init:
     ldh  [rSCX], A                                     ;; 00:017f $e0 $43
     ldh  [rSCY], A                                     ;; 00:0181 $e0 $42
     ld   A, $07                                        ;; 00:0183 $3e $07
-    ld   [wDADA_WindowX], A                                    ;; 00:0185 $ea $db $da
+    ld   [wDADB_WindowX], A                                    ;; 00:0185 $ea $db $da
     ldh  [rWX], A                                      ;; 00:0188 $e0 $4b
     ld   A, $80                                        ;; 00:018a $3e $80
     ld   [wDADC_WindowY], A                                    ;; 00:018c $ea $dc $da
@@ -201,8 +195,8 @@ call_00_0150_Init:
     ld   A, $04                                        ;; 00:02cc $3e $04
     ld   [wDC4E_PlayerLivesRemaining], A                                    ;; 00:02ce $ea $4e $dc
     xor  A, A                                          ;; 00:02d1 $af
-    ld   [wDCAF], A                                    ;; 00:02d2 $ea $af $dc
-    ld   [wDC4F], A                                    ;; 00:02d5 $ea $4f $dc
+    ld   [wDCAF_PawCoinCounter], A                                    ;; 00:02d2 $ea $af $dc
+    ld   [wDC4F_PawCoinExtraHealth], A                                    ;; 00:02d5 $ea $4f $dc
     ld   HL, wDC5C_ProgressFlags                                     ;; 00:02d8 $21 $5c $dc
     ld   B, $0c                                        ;; 00:02db $06 $0c
     xor  A, A                                          ;; 00:02dd $af
@@ -234,7 +228,7 @@ call_00_0150_Init:
     farcall call_01_435e_HandleLevelTransitionMenu
 .jr_00_0326:
     farcall call_03_6c89_LoadMapData
-    ld   A, [wDC4F]                                    ;; 00:0331 $fa $4f $dc
+    ld   A, [wDC4F_PawCoinExtraHealth]                                    ;; 00:0331 $fa $4f $dc
     add  A, $04                                        ;; 00:0334 $c6 $04
     ld   [wDC50_PlayerHealth], A                                    ;; 00:0336 $ea $50 $dc
     farcall call_01_432b_SetLevelMenuAndPalette
@@ -255,7 +249,7 @@ call_00_0150_Init:
     ld   [wDCAA], A                                    ;; 00:036f $ea $aa $dc
     ld   [wDCAB], A                                    ;; 00:0372 $ea $ab $dc
     ld   [wDC89], A                                    ;; 00:0375 $ea $89 $dc
-    ld   A, [wDC4F]                                    ;; 00:0378 $fa $4f $dc
+    ld   A, [wDC4F_PawCoinExtraHealth]                                    ;; 00:0378 $fa $4f $dc
     add  A, $04                                        ;; 00:037b $c6 $04
     ld   [wDC50_PlayerHealth], A                                    ;; 00:037d $ea $50 $dc
     ld   A, $00                                        ;; 00:0380 $3e $00
@@ -593,7 +587,7 @@ label066C:
     ld   [wDCAE],a
     ret  
 label0682:
-    ld   a,[wDC4F]
+    ld   a,[wDC4F_PawCoinExtraHealth]
     add  a,$04
     ld   hl,wDC50_PlayerHealth
     cp   [hl]
@@ -748,13 +742,13 @@ call_00_0777:
     ret                                                ;; 00:0780 $c9
 
 jp_00_0781:
-    ld   A, [wDBB2]                                    ;; 00:0781 $fa $b2 $db
+    ld   A, [wDBB2_MenuCommandBuffer4_Unk1]                                    ;; 00:0781 $fa $b2 $db
     call call_00_0eee_SwitchBank                                  ;; 00:0784 $cd $ee $0e
-    ld   HL, wDBB7                                     ;; 00:0787 $21 $b7 $db
+    ld   HL, wDBB7_MenuCommandBuffer4_Unk6                                     ;; 00:0787 $21 $b7 $db
     ld   C, [HL]                                       ;; 00:078a $4e
     inc  HL                                            ;; 00:078b $23
     ld   B, [HL]                                       ;; 00:078c $46
-    ld   HL, wDBB5                                     ;; 00:078d $21 $b5 $db
+    ld   HL, wDBB5_MenuCommandBuffer4_Unk4                                     ;; 00:078d $21 $b5 $db
     ld   A, [HL+]                                      ;; 00:0790 $2a
     ld   H, [HL]                                       ;; 00:0791 $66
     ld   L, A                                          ;; 00:0792 $6f
@@ -778,14 +772,14 @@ jp_00_0781:
 .jr_00_07b2:
     ld   DE, wC000_BgMapTileIds                                     ;; 00:07b2 $11 $00 $c0
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:07b5 $cd $6e $07
-    ld   HL, wDBB3                                     ;; 00:07b8 $21 $b3 $db
+    ld   HL, wDBB3_MenuCommandBuffer4_Unk2                                     ;; 00:07b8 $21 $b3 $db
     ld   A, [HL+]                                      ;; 00:07bb $2a
     ld   H, [HL]                                       ;; 00:07bc $66
     ld   L, A                                          ;; 00:07bd $6f
     ld   DE, wD400_TileBuffer                                     ;; 00:07be $11 $00 $d4
     ld   BC, $168                                      ;; 00:07c1 $01 $68 $01
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:07c4 $cd $6e $07
-    ld   A, [wDBB1]                                    ;; 00:07c7 $fa $b1 $db
+    ld   A, [wDBB1_MenuCommandBuffer4_Unk0]                                    ;; 00:07c7 $fa $b1 $db
     and  A, A                                          ;; 00:07ca $a7
     jr   Z, .jr_00_07d9                                ;; 00:07cb $28 $0c
     ld   DE, wD578_TileBuffer2                                     ;; 00:07cd $11 $78 $d5
@@ -859,7 +853,7 @@ call_00_0800:
 call_00_0835_LoadFromTextBank1C:
     ld   A, $1c                                        ;; 00:0835 $3e $1c
     call call_00_0eee_SwitchBank                                  ;; 00:0837 $cd $ee $0e
-    ld   HL, wDBA7                                     ;; 00:083a $21 $a7 $db
+    ld   HL, wDBA7_MenuCommandBuffer2_Unk3                                     ;; 00:083a $21 $a7 $db
     ld   A, [HL+]                                      ;; 00:083d $2a
     ld   D, [HL]                                       ;; 00:083e $56
     ld   E, A                                          ;; 00:083f $5f
@@ -882,9 +876,9 @@ call_00_0835_LoadFromTextBank1C:
     ld   [DE], A                                       ;; 00:0856 $12
     ld   HL, wDADD                                     ;; 00:0857 $21 $dd $da
     ld   A, L                                          ;; 00:085a $7d
-    ld   [wDBA7], A                                    ;; 00:085b $ea $a7 $db
+    ld   [wDBA7_MenuCommandBuffer2_Unk3], A                                    ;; 00:085b $ea $a7 $db
     ld   A, H                                          ;; 00:085e $7c
-    ld   [wDBA8], A                                    ;; 00:085f $ea $a8 $db
+    ld   [wDBA8_MenuCommandBuffer2_Unk4], A                                    ;; 00:085f $ea $a8 $db
     jp   call_00_0f08_RestoreBank                                  ;; 00:0862 $c3 $08 $0f
 
 call_00_0865_LoadFromTextBank1C:
@@ -1306,7 +1300,7 @@ call_00_0b25_MainGameLoop_UpdateAndRenderFrame:
     ldh  [rSCX], A                                     ;; 00:0b4e $e0 $43
     ld   A, [wDADA_ScrollY]                                    ;; 00:0b50 $fa $da $da
     ldh  [rSCY], A                                     ;; 00:0b53 $e0 $42
-    ld   A, [wDADA_WindowX]                                    ;; 00:0b55 $fa $db $da
+    ld   A, [wDADB_WindowX]                                    ;; 00:0b55 $fa $db $da
     ldh  [rWX], A                                      ;; 00:0b58 $e0 $4b
     ld   A, [wDADC_WindowY]                                    ;; 00:0b5a $fa $dc $da
     ldh  [rWY], A                                      ;; 00:0b5d $e0 $4a
@@ -1773,14 +1767,14 @@ call_00_0dc6_HBlankInterrupt_LoadPaletteSlice:
 
 call_00_0df9_ProcessVRAMTransferQueue:
 ; First calls call_00_0c6a_HandlePendingHDMATransfers (HDMA/VRAM copy handler).
-; Then checks a counter at wDBEF. If nonzero, decrements it and uses wDBF0..wDBF7 
+; Then checks a counter at wDBEF_UnkCounter. If nonzero, decrements it and uses wDBF0..wDBF7 
 ; as a state structure to fetch source/destination pointers and a bank.
 ; Sets up a copy loop through jp_00_0bcf_CopyBlock16BytesLoop, which transfers a block of data from 
 ; ROM (after bank switching) into RAM/VRAM.
     call call_00_0c6a_HandlePendingHDMATransfers                                  ;; 00:0df9 $cd $6a $0c
     jp   .jp_00_0dff                                   ;; 00:0dfc $c3 $ff $0d
 .jp_00_0dff:
-    ld   HL, wDBEF                                     ;; 00:0dff $21 $ef $db
+    ld   HL, wDBEF_UnkCounter                                     ;; 00:0dff $21 $ef $db
     ld   A, [HL]                                       ;; 00:0e02 $7e
     and  A, A                                          ;; 00:0e03 $a7
     ret  Z                                             ;; 00:0e04 $c8
@@ -1845,7 +1839,7 @@ call_00_0e3b_ClearGameStateVariables:
     ld   [wDC20], A                                    ;; 00:0e3f $ea $20 $dc
     ld   [wDB66_HDMATransferFlags], A                                    ;; 00:0e42 $ea $66 $db
     ld   [wDB69], A                                    ;; 00:0e45 $ea $69 $db
-    ld   [wDBEF], A                                    ;; 00:0e48 $ea $ef $db
+    ld   [wDBEF_UnkCounter], A                                    ;; 00:0e48 $ea $ef $db
     ld   [wDC72], A                                    ;; 00:0e4b $ea $72 $dc
     ld   [wDBE3], A                                    ;; 00:0e4e $ea $e3 $db
     ld   [wDD6B], A                                    ;; 00:0e51 $ea $6b $dd
