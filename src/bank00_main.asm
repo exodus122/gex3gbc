@@ -210,7 +210,7 @@ call_00_0150_Init:
     ld   [HL+], A                                      ;; 00:02de $22
     dec  B                                             ;; 00:02df $05
     jr   NZ, .jr_00_02de                               ;; 00:02e0 $20 $fc
-    farcall call_01_4f8c_BuildCollisionBitfieldAndChecksum
+    farcall call_01_4f8c_BuildPasswordBitfieldAndChecksum
 .jr_00_02ed:
     xor  A, A                                          ;; 00:02ed $af
     ld   [wDB6C_CurrentMapId], A                                    ;; 00:02ee $ea $6c $db

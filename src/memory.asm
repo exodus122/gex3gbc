@@ -7,7 +7,7 @@ wC400_CollisionTilesetData: ; C400-CC00 is a copy of 03:4100-03:48FF but in a di
 ; that is the collision tileset data, collectible sprites, and number sprites, and some code
     ds 1408                                            ;; c400
 
-wC980_NumberSprites: ; this is the start of the number sprites from bank 3
+wC980_NumberSprites: ; this is the start of the number sprites copied from bank 3
     ds 896                                             ;; c980
 
 wCD00_RowOffsetTableForMap:
@@ -94,8 +94,7 @@ wD904:
     ds 156                                             ;; d904
 
 ; Graphics/Rendering related memory
-wD9A0:
-; Interrupt code location?
+wD9A0: ; Interrupt code location?
     ds 93                                              ;; d9a0
 wD9FD:
     ds 1                                               ;; d9fd
@@ -126,13 +125,13 @@ wDA13_ObjectXVelocityDelta:
     ds 1                                               ;; da13
 
 ; Camera position
-wDA14_CameraLeft:
+wDA14_CameraPos_Left:
     ds 2                                               ;; da14
-wDA16_CameraRight:
+wDA16_CameraPos_Right:
     ds 2                                               ;; da16
-wDA18_CameraTop:
+wDA18_CameraPos_Top:
     ds 2                                               ;; da18
-wDA1A_CameraBottom:
+wDA1A_CameraPos_Bottom:
     ds 2                                               ;; da1a
 
 ; DA1C through DA9B is memory storing constants for each loaded object (8 instances of size 0x10)
@@ -301,346 +300,239 @@ wDB6E:
 wDB6F:
     ds 1                                               ;; db6f
 
-wDB70:
+wDB70_CollectibleScreenRelativeXOffset:
     ds 1                                               ;; db70
-
-wDB71:
+wDB71_CollectibleScreenRelativeYOffset:
     ds 1                                               ;; db71
 
+; Menu-related wRAM starts here
 wDB72:
     ds 1                                               ;; db72
-
 wDB73:
     ds 1                                               ;; db73
-
 wDB74:
     ds 1                                               ;; db74
-
 wDB75:
     ds 1                                               ;; db75
-
 wDB76:
     ds 8                                               ;; db76
-
 wDB7E:
     ds 1                                               ;; db7e
-
 wDB7F:
     ds 17                                              ;; db7f
-
 wDB90:
     ds 1                                               ;; db90
-
 wDB91:
     ds 1                                               ;; db91
-
 wDB92_MenuTypeDataPointer:
     ds 2                                               ;; db92
-
 wDB94:
     ds 1                                               ;; db94
-
 wDB95:
     ds 1                                               ;; db95
-
 wDB96:
     ds 1                                               ;; db96
-
 wDB97:
     ds 1                                               ;; db97
-
 wDB98:
     ds 1                                               ;; db98
-
 wDB99:
     ds 2                                               ;; db99
-
 wDB9B:
     ds 1                                               ;; db9b
-
 wDB9C:
     ds 2                                               ;; db9c
-
 wDB9E:
     ds 1                                               ;; db9e
-
 wDB9F:
     ds 1                                               ;; db9f
-
 wDBA0:
     ds 1                                               ;; dba0
-
 wDBA1:
     ds 1                                               ;; dba1
-
 wDBA2:
     ds 1                                               ;; dba2
-
 wDBA3:
     ds 1                                               ;; dba3
-
 wDBA4:
     ds 1                                               ;; dba4
-
 wDBA5:
     ds 1                                               ;; dba5
-
 wDBA6:
     ds 1                                               ;; dba6
-
 wDBA7:
     ds 1                                               ;; dba7
-
 wDBA8:
     ds 1                                               ;; dba8
-
 wDBA9:
     ds 1                                               ;; dba9
-
 wDBAA:
     ds 1                                               ;; dbaa
-
 wDBAB:
     ds 2                                               ;; dbab
-
 wDBAD:
     ds 2                                               ;; dbad
-
 wDBAF:
     ds 1                                               ;; dbaf
-
 wDBB0:
     ds 1                                               ;; dbb0
-
 wDBB1:
     ds 1                                               ;; dbb1
-
 wDBB2:
     ds 1                                               ;; dbb2
-
 wDBB3:
     ds 2                                               ;; dbb3
-
 wDBB5:
     ds 2                                               ;; dbb5
-
 wDBB7:
     ds 2                                               ;; dbb7
-
 wDBB9:
     ds 1                                               ;; dbb9
-
 wDBBA:
     ds 1                                               ;; dbba
-
 wDBBB:
     ds 1                                               ;; dbbb
-
 wDBBC:
     ds 1                                               ;; dbbc
-
 wDBBD:
     ds 1                                               ;; dbbd
-
 wDBBE:
     ds 1                                               ;; dbbe
-
 wDBBF:
     ds 1                                               ;; dbbf
-
 wDBC0:
     ds 1                                               ;; dbc0
-
 wDBC1:
     ds 1                                               ;; dbc1
-
 wDBC2:
     ds 1                                               ;; dbc2
-
 wDBC3:
     ds 1                                               ;; dbc3
-
 wDBC4:
     ds 1                                               ;; dbc4
-
 wDBC5:
     ds 1                                               ;; dbc5
-
 wDBC6:
     ds 1                                               ;; dbc6
-
 wDBC7:
     ds 1                                               ;; dbc7
-
 wDBC8:
     ds 1                                               ;; dbc8
-
 wDBC9:
     ds 1                                               ;; dbc9
-
 wDBCA:
     ds 1                                               ;; dbca
-
 wDBCB:
     ds 16                                              ;; dbcb
-
 wDBDB:
     ds 1                                               ;; dbdb
-
 wDBDC:
     ds 1                                               ;; dbdc
-
 wDBDD:
     ds 1                                               ;; dbdd
-
 wDBDE:
     ds 1                                               ;; dbde
-
 wDBDF:
     ds 2                                               ;; dbdf
-
 wDBE1:
     ds 1                                               ;; dbe1
-
 wDBE2:
     ds 1                                               ;; dbe2
-
 wDBE3:
     ds 1                                               ;; dbe3
-
 wDBE4:
     ds 1                                               ;; dbe4
-
 wDBE5:
     ds 1                                               ;; dbe5
-
 wDBE6:
     ds 1                                               ;; dbe6
-
 wDBE7:
     ds 1                                               ;; dbe7
-
 wDBE8:
     ds 1                                               ;; dbe8
-
 wDBE9:
     ds 1                                               ;; dbe9
-
 wDBEA_MenuType:
     ds 1                                               ;; dbea
-
 wDBEB:
     ds 1                                               ;; dbeb
-
 wDBEC:
     ds 1                                               ;; dbec
-
 wDBED:
     ds 1                                               ;; dbed
-
 wDBEE:
     ds 1                                               ;; dbee
-
 wDBEF:
     ds 1                                               ;; dbef
-
 wDBF0:
     ds 1                                               ;; dbf0
-
 wDBF1:
     ds 1                                               ;; dbf1
-
 wDBF2:
     ds 1                                               ;; dbf2
-
 wDBF3:
     ds 1                                               ;; dbf3
-
 wDBF4:
     ds 1                                               ;; dbf4
-
 wDBF5:
     ds 1                                               ;; dbf5
-
 wDBF6:
     ds 1                                               ;; dbf6
-
 wDBF7:
     ds 1                                               ;; dbf7
 
-wDBF8:
+wDBF8: ; text related
     ds 1                                               ;; dbf8
 
+; Map-related wRAM starts here
 wDBF9_XPositionInMap:
     ds 2                                               ;; dbf9
-
 wDBFB_YPositionInMap:
     ds 2                                               ;; dbfb
-
 wDBFD_XPositionRelated:
     ds 2                                               ;; dbfd
-
 wDBFF_YPositionRelated:
     ds 2                                               ;; dbff
 
 wDC01_MapBank:
     ds 1                                               ;; dc01
-
 wDC02_MapBankOffset:
     ds 2                                               ;; dc02
-
 wDC04_MapExtendedBank:
     ds 1                                               ;; dc04
-
 wDC05_MapExtendedBankOffset:
     ds 2                                               ;; dc05
-
 wDC07_TilesetBank:
     ds 1                                               ;; dc07
-
 wDC08_TilesetBankOffset:
     ds 2                                               ;; dc08
-
 wDC0A_BlocksetBank: 
 ; also contains palette ids for each block and flags to flip tiles horizontally, vertically, or use second vRAM bank
     ds 1                                               ;; dc0a
-
 wDC0B_BlocksetBankOffset:
     ds 2                                               ;; dc0b
-
 wDC0D_MapCollisionBank:
     ds 1                                               ;; dc0d
-
 wDC0E_MapCollisionBankOffset:
     ds 2                                               ;; dc0e
-
 wDC10_CollisionBlockset:
     ds 1                                               ;; dc10
-
 wDC11_CollisionBlocksetOffset:
     ds 2                                               ;; dc11
-
 wDC13_BgPaletteBank:
-    ds 1                                               ;; dc13
-
+   ds 1                                               ;; dc13
 wDC14_BgPaletteBankOffset:
     ds 2                                               ;; dc14
-
 wDC16_ObjectListBank:
     ds 1                                               ;; dc16
-
 wDC17_ObjectListBankOffset:
     ds 2                                               ;; dc17
-
 wDC19_CollectibleListBank:
     ds 1                                               ;; dc19
-
 wDC1A_CollectibleListBankOffset:
     ds 2                                               ;; dc1a
-
 wDC1C_CurrentMapWidthAndHeightInBlocks:
     ds 2                                               ;; dc1c
-
 wDC1E_CurrentLevelNumber: ; all maps in the same level share the same value here
     ds 1                                               ;; dc1e
 

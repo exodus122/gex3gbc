@@ -1676,7 +1676,7 @@ call_00_2a15_CheckCameraOverlapBoundingBox:
     ld   C, A                                          ;; 00:2a27 $4f
     ld   A, [HL+]                                      ;; 00:2a28 $2a
     ld   B, A                                          ;; 00:2a29 $47
-    ld   HL, wDA14_CameraLeft                                     ;; 00:2a2a $21 $14 $da
+    ld   HL, wDA14_CameraPos_Left                                     ;; 00:2a2a $21 $14 $da
     ld   A, E                                          ;; 00:2a2d $7b
     sub  A, [HL]                                       ;; 00:2a2e $96
     inc  HL                                            ;; 00:2a2f $23
@@ -1704,7 +1704,7 @@ call_00_2a15_CheckCameraOverlapBoundingBox:
     ld   C, A                                          ;; 00:2a4b $4f
     ld   A, [HL+]                                      ;; 00:2a4c $2a
     ld   B, A                                          ;; 00:2a4d $47
-    ld   HL, wDA18_CameraTop                                     ;; 00:2a4e $21 $18 $da
+    ld   HL, wDA18_CameraPos_Top                                     ;; 00:2a4e $21 $18 $da
     ld   A, E                                          ;; 00:2a51 $7b
     sub  A, [HL]                                       ;; 00:2a52 $96
     inc  HL                                            ;; 00:2a53 $23

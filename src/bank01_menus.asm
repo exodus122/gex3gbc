@@ -238,7 +238,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4155 $cd $d7 $0f
     jp   .jp_01_4070                                   ;; 01:4158 $c3 $70 $40
 .jp_01_415b:
-    call call_01_505a_ValidateTileBufferAndRebuildCollisionData                                  ;; 01:415b $cd $5a $50
+    call call_01_505a_ValidatePassword                                  ;; 01:415b $cd $5a $50
     push AF                                            ;; 01:415e $f5
     cp   A, $20                                        ;; 01:415f $fe $20
     ld   A, $ff                                        ;; 01:4161 $3e $ff
@@ -396,8 +396,8 @@ call_01_4000_MenuHandler_LoadAndProcess:
 .jr_01_4290:
     ld   A, [wDBEA_MenuType]                                    ;; 01:4290 $fa $ea $db
     ld   [wDBE9], A                                    ;; 01:4293 $ea $e9 $db
-    call call_01_4f8c_BuildCollisionBitfieldAndChecksum                                  ;; 01:4296 $cd $8c $4f
-    call call_01_5027_BuildTileFlagBufferFromBitfield                                  ;; 01:4299 $cd $27 $50
+    call call_01_4f8c_BuildPasswordBitfieldAndChecksum                                  ;; 01:4296 $cd $8c $4f
+    call call_01_5027_BuildPasswordBufferFromBitfield                                  ;; 01:4299 $cd $27 $50
     ld   A, $02                                        ;; 01:429c $3e $02
     jp   .jp_01_4005                                   ;; 01:429e $c3 $05 $40
 .jp_01_42a1:
@@ -2389,7 +2389,7 @@ call_01_4f7e_SeedTileLookupTable:
     ld   [HL], $20                                     ;; 01:4f87 $36 $20
     jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4f89 $c3 $6e $07
 
-call_01_4f8c_BuildCollisionBitfieldAndChecksum:
+call_01_4f8c_BuildPasswordBitfieldAndChecksum:
 ; Description:
 ; Clears wDB72–wDB7D, seeds wDB73–wDB75 from wDC4E_PlayerLivesRemaining/AF/4F, then iterates through DC5C/DC5D data, 
 ; checking bit masks (.data_01_5013 and .data_01_501f) to build bitfields in wDB76+. 
@@ -2479,7 +2479,7 @@ call_01_4f8c_BuildCollisionBitfieldAndChecksum:
 .data_01_501f:
     db   $80, $40, $20, $10, $08, $04, $02, $01        ;; 01:501f ??.?.???
 
-call_01_5027_BuildTileFlagBufferFromBitfield:
+call_01_5027_BuildPasswordBufferFromBitfield:
 ; Description:
 ; Initializes the buffer at wDB7E to zeros, then iterates through bits in wDB72 to set flags in the buffer. 
 ; It scans wDB72 bitfields (masking with $80, $40, etc.) and for each set bit, ORs $10 into the corresponding 
@@ -2517,12 +2517,12 @@ call_01_5027_BuildTileFlagBufferFromBitfield:
     jr   NZ, .jr_01_5041                               ;; 01:5057 $20 $e8
     ret                                                ;; 01:5059 $c9
 
-call_01_505a_ValidateTileBufferAndRebuildCollisionData:
+call_01_505a_ValidatePassword:
 ; Description:
 ; Checks wDB7E for any tile flagged $20. If found early, returns 0. If not found after scanning $12 entries, 
 ; it resets buffers (wDB72–wDB7D), then reconstructs bitfields from wDB7E back into wDB72. It sums these values, 
-; XORs with $B6, and compares to wDB72 as a checksum. On match, it calls call_01_50b5_GenerateCollisionTableFromMasks 
-; (which rebuilds DC5C/DC4E tile collision data) and returns $20; otherwise, returns 0.
+; XORs with $B6, and compares to wDB72 as a checksum. On match, it calls call_01_50b5_SetProgressFlagsFromPasswordMasks 
+; (which rebuilds DC5C/DC4E tile password data) and returns $20; otherwise, returns 0.
     ld   HL, wDB7E                                     ;; 01:505a $21 $7e $db
     ld   B, $12                                        ;; 01:505d $06 $12
 .jr_01_505f:
@@ -2574,17 +2574,18 @@ call_01_505a_ValidateTileBufferAndRebuildCollisionData:
     ld   HL, wDB72                                     ;; 01:50a6 $21 $72 $db
     cp   A, [HL]                                       ;; 01:50a9 $be
     jr   NZ, .jr_01_50b2                               ;; 01:50aa $20 $06
-    call call_01_50b5_GenerateCollisionTableFromMasks                                  ;; 01:50ac $cd $b5 $50
+    call call_01_50b5_SetProgressFlagsFromPasswordMasks                                  ;; 01:50ac $cd $b5 $50
     ld   A, $20                                        ;; 01:50af $3e $20
     ret                                                ;; 01:50b1 $c9
 .jr_01_50b2:
     ld   A, $00                                        ;; 01:50b2 $3e $00
     ret                                                ;; 01:50b4 $c9
 
-call_01_50b5_GenerateCollisionTableFromMasks:
+call_01_50b5_SetProgressFlagsFromPasswordMasks:
 ; Description:
-; Builds a collision lookup table (wDC5C_ProgressFlags) from static mask tables .data_01_511a_CollisionColumnMaskTable and .data_01_5126_BitMaskLut_80to01. 
-; It iterates through each mask byte, rotates bits, checks wDB76 bitfields, and sets collision bits 
+; Builds a password lookup table (wDC5C_ProgressFlags) from static mask tables 
+; .data_01_511a_PasswordColumnMaskTable and .data_01_5126_BitMaskLut_80to01. 
+; It iterates through each mask byte, rotates bits, checks wDB76 bitfields, and sets password bits 
 ; in a temporary register (C). Once a row is processed, it stores the result into wDC5C_ProgressFlags, repeating 
 ; for 12 entries. Finally, it updates wDC4E_PlayerLivesRemaining/AF/4F with values from wDB73–wDB75.
     xor  A, A                                          ;; 01:50b5 $af
@@ -2592,7 +2593,7 @@ call_01_50b5_GenerateCollisionTableFromMasks:
     ld   DE, $00                                       ;; 01:50b9 $11 $00 $00
 .jr_01_50bc:
     push DE                                            ;; 01:50bc $d5
-    ld   HL, .data_01_511a_CollisionColumnMaskTable                             ;; 01:50bd $21 $1a $51
+    ld   HL, .data_01_511a_PasswordColumnMaskTable                             ;; 01:50bd $21 $1a $51
     add  HL, DE                                        ;; 01:50c0 $19
     ld   B, [HL]                                       ;; 01:50c1 $46
     ld   C, $00                                        ;; 01:50c2 $0e $00
@@ -2645,9 +2646,9 @@ call_01_50b5_GenerateCollisionTableFromMasks:
     ld   A, [wDB75]                                    ;; 01:5113 $fa $75 $db
     ld   [wDC4F], A                                    ;; 01:5116 $ea $4f $dc
     ret                                                ;; 01:5119 $c9
-.data_01_511a_CollisionColumnMaskTable:
+.data_01_511a_PasswordColumnMaskTable:
 ; Description:
-; A static table of bit masks used by call_01_50b5 to control which collision checks 
+; A static table of bit masks used by call_01_50b5 to control which password checks 
 ; to perform for each column. Likely a column mask pattern for map rows.
     db   $f1, $ff, $ff, $ff, $ff, $ff, $ff, $01        ;; 01:511a ????????
     db   $01, $01, $01, $01                            ;; 01:5122 ????

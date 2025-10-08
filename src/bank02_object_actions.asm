@@ -1231,14 +1231,14 @@ call_02_624e_ObjectAction_Raft_MoveRightAndCarryPlayer:
     ldi  a,[hl]
     ld   d,[hl]
     ld   e,a
-    ld   hl,wDA14_CameraLeft
+    ld   hl,wDA14_CameraPos_Left
     ld   a,e
     sub  [hl]
     inc  hl
     ld   a,d
     sbc  [hl]
     jr   c,.label6285
-    ld   hl,wDA16_CameraRight
+    ld   hl,wDA16_CameraPos_Right
     ld   a,e
     sub  [hl]
     inc  hl

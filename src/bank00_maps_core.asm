@@ -73,7 +73,7 @@ call_00_10c7_InitRowOffsetTableForMap:
 call_00_10de_UpdatePlayerMapWindow:
 ; Role: Computes the player’s X/Y position within the map, clamps it against map bounds, 
 ; and calculates visible window extents. Stores several intermediate values 
-; (e.g., wDA14_CameraLeft–wDA1A_CameraBottom+1, wDBF9–wDBFC) used for scrolling and collision.
+; (e.g., wDA14_CameraPos_Left–wDA1A_CameraPos_Bottom+1, wDBF9–wDBFC) used for scrolling and collision.
 ; Why: Prepares all map-relative coordinates for rendering and collision based on the player’s position.
     ld   A, [wDC29]                                    ;; 00:10de $fa $29 $dc
     and  A, A                                          ;; 00:10e1 $a7
@@ -130,16 +130,16 @@ call_00_10de_UpdatePlayerMapWindow:
     ld   DE, $00                                       ;; 00:1129 $11 $00 $00
 .jr_00_112c:
     ld   A, E                                          ;; 00:112c $7b
-    ld   [wDA14_CameraLeft], A                                    ;; 00:112d $ea $14 $da
+    ld   [wDA14_CameraPos_Left], A                                    ;; 00:112d $ea $14 $da
     ld   A, D                                          ;; 00:1130 $7a
-    ld   [wDA14_CameraLeft+1], A                                    ;; 00:1131 $ea $15 $da
+    ld   [wDA14_CameraPos_Left+1], A                                    ;; 00:1131 $ea $15 $da
     pop  DE                                            ;; 00:1134 $d1
     ld   A, E                                          ;; 00:1135 $7b
     add  A, $b0                                        ;; 00:1136 $c6 $b0
-    ld   [wDA16_CameraRight], A                                    ;; 00:1138 $ea $16 $da
+    ld   [wDA16_CameraPos_Right], A                                    ;; 00:1138 $ea $16 $da
     ld   A, D                                          ;; 00:113b $7a
     adc  A, $00                                        ;; 00:113c $ce $00
-    ld   [wDA16_CameraRight+1], A                                    ;; 00:113e $ea $17 $da
+    ld   [wDA16_CameraPos_Right+1], A                                    ;; 00:113e $ea $17 $da
     pop  DE                                            ;; 00:1141 $d1
     srl  D                                             ;; 00:1142 $cb $3a
     rr   E                                             ;; 00:1144 $cb $1b
@@ -203,16 +203,16 @@ call_00_10de_UpdatePlayerMapWindow:
     ld   DE, $00                                       ;; 00:119a $11 $00 $00
 .jr_00_119d:
     ld   A, E                                          ;; 00:119d $7b
-    ld   [wDA18_CameraTop], A                                    ;; 00:119e $ea $18 $da
+    ld   [wDA18_CameraPos_Top], A                                    ;; 00:119e $ea $18 $da
     ld   A, D                                          ;; 00:11a1 $7a
-    ld   [wDA18_CameraTop+1], A                                    ;; 00:11a2 $ea $19 $da
+    ld   [wDA18_CameraPos_Top+1], A                                    ;; 00:11a2 $ea $19 $da
     pop  DE                                            ;; 00:11a5 $d1
     ld   A, E                                          ;; 00:11a6 $7b
     add  A, $b0                                        ;; 00:11a7 $c6 $b0
-    ld   [wDA1A_CameraBottom], A                                    ;; 00:11a9 $ea $1a $da
+    ld   [wDA1A_CameraPos_Bottom], A                                    ;; 00:11a9 $ea $1a $da
     ld   A, D                                          ;; 00:11ac $7a
     adc  A, $00                                        ;; 00:11ad $ce $00
-    ld   [wDA1A_CameraBottom+1], A                                    ;; 00:11af $ea $1b $da
+    ld   [wDA1A_CameraPos_Bottom+1], A                                    ;; 00:11af $ea $1b $da
     pop  DE                                            ;; 00:11b2 $d1
     srl  D                                             ;; 00:11b3 $cb $3a
     rr   E                                             ;; 00:11b5 $cb $1b

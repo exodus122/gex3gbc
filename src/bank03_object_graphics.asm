@@ -701,7 +701,7 @@ call_03_6148_ClearUnusedSpriteSlots:
 
 call_03_615d_SetupCollectibleSprites:
 ; Purpose:
-; Calculates screen-relative X/Y offsets (wDB70, wDB71) for collectibles based 
+; Calculates screen-relative X/Y offsets (wDB70_CollectibleScreenRelativeXOffset, wDB71_CollectibleScreenRelativeYOffset) for collectibles based 
 ; on the player’s map position.
 ; Walks through collectible table entries for the current level.
 ; Checks if collectibles are within a visible region.
@@ -714,13 +714,13 @@ call_03_615d_SetupCollectibleSprites:
     ld   B, A                                          ;; 03:6162 $47
     ld   A, $10                                        ;; 03:6163 $3e $10
     sub  A, B                                          ;; 03:6165 $90
-    ld   [wDB70], A                                    ;; 03:6166 $ea $70 $db
+    ld   [wDB70_CollectibleScreenRelativeXOffset], A                                    ;; 03:6166 $ea $70 $db
     ld   A, [wDBFB_YPositionInMap]                                    ;; 03:6169 $fa $fb $db
     and  A, $0f                                        ;; 03:616c $e6 $0f
     ld   B, A                                          ;; 03:616e $47
     ld   A, $18                                        ;; 03:616f $3e $18
     sub  A, B                                          ;; 03:6171 $90
-    ld   [wDB71], A                                    ;; 03:6172 $ea $71 $db
+    ld   [wDB71_CollectibleScreenRelativeYOffset], A                                    ;; 03:6172 $ea $71 $db
     ld   HL, wDAAC_CameraXHi                                     ;; 03:6175 $21 $ac $da
     ld   L, [HL]                                       ;; 03:6178 $6e
     ld   H, $d3                                        ;; 03:6179 $26 $d3
@@ -748,7 +748,7 @@ call_03_615d_SetupCollectibleSprites:
     cp   A, $0a                                        ;; 03:6199 $fe $0a
     jr   NC, .jr_03_61d4                               ;; 03:619b $30 $37
     swap A                                             ;; 03:619d $cb $37
-    ld   HL, wDB71                                     ;; 03:619f $21 $71 $db
+    ld   HL, wDB71_CollectibleScreenRelativeYOffset                                     ;; 03:619f $21 $71 $db
     add  A, [HL]                                       ;; 03:61a2 $86
     ld   C, A                                          ;; 03:61a3 $4f
     dec  HL                                            ;; 03:61a4 $2b

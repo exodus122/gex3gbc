@@ -959,7 +959,7 @@ call_00_3618_HandleObjectSpawn:
 ; If a slot is found:
 ; Calculates an offset into the object spawn table using wDAB8_ObjectCounter and the bank offset.
 ; Checks for $FF sentinel and level ID match.
-; Performs collision-distance checks against player position (wDA14_CameraLeft–wDA1A_CameraBottom+1).
+; Performs collision-distance checks against player position (wDA14_CameraPos_Left–wDA1A_CameraPos_Bottom+1).
 ; If within range, copies multiple fields from the spawn table into working object memory (wDA24_ObjectInitialXPos, wDA1C_ObjectBoundingBoxXMax, etc.).
 ; Sets up animation/state data, calls alt-bank functions to finish initialization.
 ; Usage: Core routine that validates and copies object-spawn data into live object RAM.
@@ -1044,7 +1044,7 @@ call_00_3618_HandleObjectSpawn:
     add  HL, DE                                        ;; 00:3696 $19
     ld   C, L                                          ;; 00:3697 $4d
     ld   B, H                                          ;; 00:3698 $44
-    ld   HL, wDA14_CameraLeft                                     ;; 00:3699 $21 $14 $da
+    ld   HL, wDA14_CameraPos_Left                                     ;; 00:3699 $21 $14 $da
     ld   A, [BC]                                       ;; 00:369c $0a
     sub  A, [HL]                                       ;; 00:369d $96
     inc  HL                                            ;; 00:369e $23
@@ -1055,16 +1055,16 @@ call_00_3618_HandleObjectSpawn:
     inc  BC                                            ;; 00:36a3 $03
     ld   L, C                                          ;; 00:36a4 $69
     ld   H, B                                          ;; 00:36a5 $60
-    ld   A, [wDA16_CameraRight]                                    ;; 00:36a6 $fa $16 $da
+    ld   A, [wDA16_CameraPos_Right]                                    ;; 00:36a6 $fa $16 $da
     sub  A, [HL]                                       ;; 00:36a9 $96
     inc  HL                                            ;; 00:36aa $23
-    ld   A, [wDA16_CameraRight+1]                                    ;; 00:36ab $fa $17 $da
+    ld   A, [wDA16_CameraPos_Right+1]                                    ;; 00:36ab $fa $17 $da
     sbc  A, [HL]                                       ;; 00:36ae $9e
     ret  C                                             ;; 00:36af $d8
     inc  HL                                            ;; 00:36b0 $23
     ld   C, L                                          ;; 00:36b1 $4d
     ld   B, H                                          ;; 00:36b2 $44
-    ld   HL, wDA18_CameraTop                                     ;; 00:36b3 $21 $18 $da
+    ld   HL, wDA18_CameraPos_Top                                     ;; 00:36b3 $21 $18 $da
     ld   A, [BC]                                       ;; 00:36b6 $0a
     sub  A, [HL]                                       ;; 00:36b7 $96
     inc  HL                                            ;; 00:36b8 $23
@@ -1075,10 +1075,10 @@ call_00_3618_HandleObjectSpawn:
     inc  BC                                            ;; 00:36bd $03
     ld   L, C                                          ;; 00:36be $69
     ld   H, B                                          ;; 00:36bf $60
-    ld   A, [wDA1A_CameraBottom]                                    ;; 00:36c0 $fa $1a $da
+    ld   A, [wDA1A_CameraPos_Bottom]                                    ;; 00:36c0 $fa $1a $da
     sub  A, [HL]                                       ;; 00:36c3 $96
     inc  HL                                            ;; 00:36c4 $23
-    ld   A, [wDA1A_CameraBottom+1]                                    ;; 00:36c5 $fa $1b $da
+    ld   A, [wDA1A_CameraPos_Bottom+1]                                    ;; 00:36c5 $fa $1b $da
     sbc  A, [HL]                                       ;; 00:36c8 $9e
     ret  C                                             ;; 00:36c9 $d8
     ld   HL, wDAB9_NextAvailableObjectSlot                                     ;; 00:36ca $21 $b9 $da
