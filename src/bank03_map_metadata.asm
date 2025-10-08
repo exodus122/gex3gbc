@@ -1,4 +1,3 @@
-entry_03_6c89_LoadMapData:
 call_03_6c89_LoadMapData:
 ; Purpose: Copies level-specific metadata from a lookup table into working RAM.
 ; Behavior:

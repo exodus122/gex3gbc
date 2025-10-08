@@ -58,7 +58,7 @@ call_00_0150_Init:
     ld   [MBC1SRamEnable], A                                    ;; 00:016a $ea $01 $00
     ld   [MBC1SRamBankingMode], A                                    ;; 00:016d $ea $01 $60
     ld   HL, wC000_BgMapTileIds                                     ;; 00:0170 $21 $00 $c0
-    ld   DE, wC001_BgMapTileIds                                     ;; 00:0173 $11 $01 $c0 ; wC000_BgMapTileIds
+    ld   DE, wC000_BgMapTileIds+1                                     ;; 00:0173 $11 $01 $c0 ; wC000_BgMapTileIds
     ld   BC, $1fff                                     ;; 00:0176 $01 $ff $1f
     ld   [HL], $00                                     ;; 00:0179 $36 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:017b $cd $6e $07
@@ -158,7 +158,7 @@ call_00_0150_Init:
     ldh  [rIE], A                                      ;; 00:0232 $e0 $ff
     ld   A, $04                                        ;; 00:0234 $3e $04
     call call_00_0eee_SwitchBank                                  ;; 00:0236 $cd $ee $0e
-    call entry_04_4000_Audio                                  ;; 00:0239 $cd $00 $40
+    call call_04_4000_Audio                                  ;; 00:0239 $cd $00 $40
     call call_00_0f08_RestoreBank                                  ;; 00:023c $cd $08 $0f
     xor  A, A                                          ;; 00:023f $af
     ld   [wDE60], A                                    ;; 00:0240 $ea $60 $de
@@ -172,27 +172,27 @@ call_00_0150_Init:
     ldh  [rLCDC], A                                    ;; 00:0256 $e0 $40
     ei                                                 ;; 00:0258 $fb
     call call_00_0b92_WaitForInterrupt                                  ;; 00:0259 $cd $92 $0b
-    farcall entry_01_4f7e_SeedTileLookupTable
+    farcall call_01_4f7e_SeedTileLookupTable
 .jp_00_0267:
     ld   A, $00                                        ;; 00:0267 $3e $00
     call call_00_0fa2_PlaySong                                  ;; 00:0269 $cd $a2 $0f
     ld   A, $00                                        ;; 00:026c $3e $00
     call call_00_0fd7_TriggerSoundEffect                                  ;; 00:026e $cd $d7 $0f
     ld   A, $11                                        ;; 00:0271 $3e $11
-    farcall entry_01_4000_MenuHandler_LoadAndProcess
+    farcall call_01_4000_MenuHandler_LoadAndProcess
     ld   A, $12                                        ;; 00:027e $3e $12
-    farcall entry_01_4000_MenuHandler_LoadAndProcess
+    farcall call_01_4000_MenuHandler_LoadAndProcess
     ld   A, $14                                        ;; 00:028b $3e $14
-    farcall entry_01_4000_MenuHandler_LoadAndProcess
+    farcall call_01_4000_MenuHandler_LoadAndProcess
     ld   A, $13                                        ;; 00:0298 $3e $13
-    farcall entry_01_4000_MenuHandler_LoadAndProcess
+    farcall call_01_4000_MenuHandler_LoadAndProcess
     ld   A, $0f                                        ;; 00:02a5 $3e $0f
-    farcall entry_01_4000_MenuHandler_LoadAndProcess
+    farcall call_01_4000_MenuHandler_LoadAndProcess
 .jp_00_02b2:
     ld   A, $01                                        ;; 00:02b2 $3e $01
     call call_00_0fa2_PlaySong                                  ;; 00:02b4 $cd $a2 $0f
     ld   A, $00                                        ;; 00:02b7 $3e $00
-    farcall entry_01_4000_MenuHandler_LoadAndProcess
+    farcall call_01_4000_MenuHandler_LoadAndProcess
     cp   A, $20                                        ;; 00:02c4 $fe $20
     jr   Z, .jr_00_02ed                                ;; 00:02c6 $28 $25
     cp   A, $10                                        ;; 00:02c8 $fe $10
@@ -210,7 +210,7 @@ call_00_0150_Init:
     ld   [HL+], A                                      ;; 00:02de $22
     dec  B                                             ;; 00:02df $05
     jr   NZ, .jr_00_02de                               ;; 00:02e0 $20 $fc
-    farcall entry_01_4f8c_BuildCollisionBitfieldAndChecksum
+    farcall call_01_4f8c_BuildCollisionBitfieldAndChecksum
 .jr_00_02ed:
     xor  A, A                                          ;; 00:02ed $af
     ld   [wDB6C_CurrentMapId], A                                    ;; 00:02ee $ea $6c $db
@@ -231,13 +231,13 @@ call_00_0150_Init:
     ld   A, [wDB6A]                                    ;; 00:0314 $fa $6a $db
     and  A, $10                                        ;; 00:0317 $e6 $10
     jr   Z, .jr_00_0326                                ;; 00:0319 $28 $0b
-    farcall entry_01_435e_HandleLevelTransitionMenu
+    farcall call_01_435e_HandleLevelTransitionMenu
 .jr_00_0326:
-    farcall entry_03_6c89_LoadMapData
+    farcall call_03_6c89_LoadMapData
     ld   A, [wDC4F]                                    ;; 00:0331 $fa $4f $dc
     add  A, $04                                        ;; 00:0334 $c6 $04
     ld   [wDC50_PlayerHealth], A                                    ;; 00:0336 $ea $50 $dc
-    farcall entry_01_432b_SetLevelMenuAndPalette
+    farcall call_01_432b_SetLevelMenuAndPalette
     call call_00_0e3b_ClearGameStateVariables                                  ;; 00:0344 $cd $3b $0e
     call call_00_2f85_LoadAndSortCollectibleData                                  ;; 00:0347 $cd $85 $2f
     call call_00_2ff8_InitLevelObjectsAndConfig                                  ;; 00:034a $cd $f8 $2f
@@ -248,7 +248,7 @@ call_00_0150_Init:
 .jp_00_0357:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:0357 $fa $1e $dc
     ld   [wDB6C_CurrentMapId], A                                    ;; 00:035a $ea $6c $db
-    farcall entry_03_6c89_LoadMapData
+    farcall call_03_6c89_LoadMapData
     xor  A, A                                          ;; 00:0368 $af
     ld   [wDC51], A                                    ;; 00:0369 $ea $51 $dc
     ld   [wDCA9], A                                    ;; 00:036c $ea $a9 $dc
@@ -264,7 +264,7 @@ call_00_0150_Init:
     call call_00_2f85_LoadAndSortCollectibleData                                  ;; 00:0388 $cd $85 $2f
     call call_00_2ff8_InitLevelObjectsAndConfig                                  ;; 00:038b $cd $f8 $2f
 .jp_00_038e:
-    farcall entry_03_6c89_LoadMapData
+    farcall call_03_6c89_LoadMapData
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:0399 $fa $1e $dc
     cp   A, $07                                        ;; 00:039c $fe $07
     jr   NZ, .jr_00_03b6                               ;; 00:039e $20 $16
@@ -289,7 +289,7 @@ call_00_0150_Init:
     ld   A, [wDC78]                                    ;; 00:03c6 $fa $78 $dc
     cp   A, $00                                        ;; 00:03c9 $fe $00
     jr   Z, .jr_00_03e8                                ;; 00:03cb $28 $1b
-    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 00:03cd $fa $01 $d8
+    ld   A, [wD801_Player_ActionId]                                    ;; 00:03cd $fa $01 $d8
     sub  A, $3c                                        ;; 00:03d0 $d6 $3c
     jr   C, .jr_00_03eb                                ;; 00:03d2 $38 $17
     jr   .jr_00_03e8                                   ;; 00:03d4 $18 $12
@@ -298,7 +298,7 @@ call_00_0150_Init:
     cp   A, $00                                        ;; 00:03d9 $fe $00
     ld   A, $3c                                        ;; 00:03db $3e $3c
     jr   Z, .jr_00_03e8                                ;; 00:03dd $28 $09
-    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 00:03df $fa $01 $d8
+    ld   A, [wD801_Player_ActionId]                                    ;; 00:03df $fa $01 $d8
     cp   A, $3c                                        ;; 00:03e2 $fe $3c
     jr   NC, .jr_00_03eb                               ;; 00:03e4 $30 $05
     add  A, $3c                                        ;; 00:03e6 $c6 $3c
@@ -310,9 +310,9 @@ call_00_0150_Init:
     ld   A, $01                                        ;; 00:03ef $3e $01
     ld   [wDCA7_DrawGexFlag], A                                    ;; 00:03f1 $ea $a7 $dc
     call call_00_04fb                                  ;; 00:03f4 $cd $fb $04
-    farcall entry_03_647c_InitPlayerPositionAndLevel
+    farcall call_03_647c_InitPlayerPositionAndLevel
     call call_00_1056_LoadFullMap                                  ;; 00:0402 $cd $56 $10
-    farcall entry_02_708f_InitObjectsAndSpawnPlayer
+    farcall call_02_708f_InitObjectsAndSpawnPlayer
     call call_00_0513                                  ;; 00:0410 $cd $13 $05
     xor  A, A                                          ;; 00:0413 $af
     ld   [wDB6A], A                                    ;; 00:0414 $ea $6a $db
@@ -324,8 +324,8 @@ call_00_0150_Init:
     call call_00_0595_PlaySongBasedOnLevel                                  ;; 00:0421 $cd $95 $05
     call call_00_04fb                                  ;; 00:0424 $cd $fb $04
     call call_00_1056_LoadFullMap                                  ;; 00:0427 $cd $56 $10
-    farcall entry_02_7142_RestoreObjectTable
-    farcall entry_03_68d9_AssignAllObjectPalettes
+    farcall call_02_7142_RestoreObjectTable
+    farcall call_03_68d9_AssignAllObjectPalettes
     call call_00_0513                                  ;; 00:0440 $cd $13 $05
 .jp_00_0443:
     call call_00_0b92_WaitForInterrupt                                  ;; 00:0443 $cd $92 $0b
@@ -348,12 +348,12 @@ call_00_0150_Init:
     ld   HL, wDC4E_PlayerLivesRemaining                                     ;; 00:046d $21 $4e $dc
     dec  [HL]                                          ;; 00:0470 $35
     jp   NZ, .jp_00_0357                               ;; 00:0471 $c2 $57 $03
-    farcall entry_01_42fd_LoadMenu03_InitSong15
+    farcall call_01_42fd_LoadMenu03_InitSong15
     cp   A, $40                                        ;; 00:047f $fe $40
     jp   Z, .jp_00_02cc                                ;; 00:0481 $ca $cc $02
     jp   .jp_00_02b2                                   ;; 00:0484 $c3 $b2 $02
 .jr_00_0487:
-    farcall entry_02_5541_GetActionPropertyByte
+    farcall call_02_5541_GetActionPropertyByte
     and  A, $08                                        ;; 00:0492 $e6 $08
     jr   NZ, .jr_00_04d8                               ;; 00:0494 $20 $42
     call call_00_0f80_CheckInputStart                                  ;; 00:0496 $cd $80 $0f
@@ -362,14 +362,14 @@ call_00_0150_Init:
     call call_00_0fa2_PlaySong                                  ;; 00:049d $cd $a2 $0f
     ld   A, $00                                        ;; 00:04a0 $3e $00
     call call_00_0fd7_TriggerSoundEffect                                  ;; 00:04a2 $cd $d7 $0f
-    farcall entry_02_7132_BackupObjectTable
+    farcall call_02_7132_BackupObjectTable
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:04b0 $fa $1e $dc
     and  A, A                                          ;; 00:04b3 $a7
     ld   A, $0b                                        ;; 00:04b4 $3e $0b
     jr   Z, .jr_00_04ba                                ;; 00:04b6 $28 $02
     ld   A, $0d                                        ;; 00:04b8 $3e $0d
 .jr_00_04ba:
-    farcall entry_01_4000_MenuHandler_LoadAndProcess
+    farcall call_01_4000_MenuHandler_LoadAndProcess
     cp   A, $60                                        ;; 00:04c5 $fe $60
     jp   NZ, .jp_00_0421                               ;; 00:04c7 $c2 $21 $04
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:04ca $fa $1e $dc
@@ -381,7 +381,7 @@ call_00_0150_Init:
 .jr_00_04d8:
     call call_00_05fd                                  ;; 00:04d8 $cd $fd $05
     call call_00_05c7                                  ;; 00:04db $cd $c7 $05
-    farcall entry_02_7152_UpdateObjects
+    farcall call_02_7152_UpdateObjects
     call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:04e9 $cd $c8 $11
     call call_00_0fc8_ProcessQueuedSoundEffect                                  ;; 00:04ec $cd $c8 $0f
     call call_00_150f_CheckAndSetLevelTrigger                                  ;; 00:04ef $cd $0f $15
@@ -417,7 +417,7 @@ call_00_0513:
     ld   A, [HL+]                                      ;; 00:052b $2a
     ld   H, [HL]                                       ;; 00:052c $66
     ld   L, A                                          ;; 00:052d $6f
-    ld   A, [wD80A_Player_unk0A]                                    ;; 00:052e $fa $0a $d8
+    ld   A, [wD80A_Player_SpriteId]                                    ;; 00:052e $fa $0a $d8
     ld   E, A                                          ;; 00:0531 $5f
     ld   D, $00                                        ;; 00:0532 $16 $00
     add  HL, DE                                        ;; 00:0534 $19
@@ -441,9 +441,9 @@ call_00_0513:
     inc  HL                                            ;; 00:0552 $23
     inc  HL                                            ;; 00:0553 $23
     ld   A, [HL+]                                      ;; 00:0554 $2a
-    ld   [wDAC0_GeneralPurposeDMASourceAddressLo], A                                    ;; 00:0555 $ea $c0 $da
+    ld   [wDAC0_GeneralPurposeDMASourceAddress], A                                    ;; 00:0555 $ea $c0 $da
     ld   A, [HL+]                                      ;; 00:0558 $2a
-    ld   [wDAC1_GeneralPurposeDMASourceAddressHi], A                                    ;; 00:0559 $ea $c1 $da
+    ld   [wDAC0_GeneralPurposeDMASourceAddress+1], A                                    ;; 00:0559 $ea $c1 $da
     call call_00_0f08_RestoreBank                                  ;; 00:055c $cd $08 $0f
     ld   HL, wDB66_HDMATransferFlags                                     ;; 00:055f $21 $66 $db
     set  0, [HL]                                       ;; 00:0562 $cb $c6
@@ -460,7 +460,7 @@ call_00_0513:
     ld   A, [wDB69]                                    ;; 00:057b $fa $69 $db
     and  A, $2f                                        ;; 00:057e $e6 $2f
     jr   NZ, .jr_00_056e                               ;; 00:0580 $20 $ec
-    farcall entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision
+    farcall call_03_5ec1_UpdateAllObjectsGraphicsAndCollision
     ld   A, $01                                        ;; 00:058d $3e $01
     ld   [wDD6A], A                                    ;; 00:058f $ea $6a $dd
     jp   call_00_0b92_WaitForInterrupt                                  ;; 00:0592 $c3 $92 $0b
@@ -526,7 +526,7 @@ call_00_05fd:
     ld   A, [wDC51]                                    ;; 00:0601 $fa $51 $dc
     and  A, A                                          ;; 00:0604 $a7
     ret  Z                                             ;; 00:0605 $c8
-    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 00:0606 $fa $01 $d8
+    ld   A, [wD801_Player_ActionId]                                    ;; 00:0606 $fa $01 $d8
     cp   A, $01                                        ;; 00:0609 $fe $01
     ret  C                                             ;; 00:060b $d8
     cp   A, $03                                        ;; 00:060c $fe $03
@@ -537,7 +537,7 @@ call_00_05fd:
     ret  NC                                            ;; 00:0615 $d0
 .jr_00_0616:
     ld   A, $08                                        ;; 00:0616 $3e $08
-    farcall entry_02_54f9_SwitchPlayerAction
+    farcall call_02_54f9_SwitchPlayerAction
     ret                                                ;; 00:0623 $c9
 
 call_00_0624_SetPhase_TimersAndFlags:
@@ -617,7 +617,7 @@ jp_00_0693:
     jr   Z, .jr_00_06ae                                ;; 00:06aa $28 $02
     ld   A, $1a                                        ;; 00:06ac $3e $1a
 .jr_00_06ae:
-    farcall entry_02_54f9_SwitchPlayerAction
+    farcall call_02_54f9_SwitchPlayerAction
     ret                                                ;; 00:06b9 $c9
 .jr_00_06ba:
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:06ba $fa $6c $db
@@ -630,17 +630,17 @@ jp_00_0693:
     jr   Z, .jr_00_06ce                                ;; 00:06ca $28 $02
     ld   A, $0a                                        ;; 00:06cc $3e $0a
 .jr_00_06ce:
-    farcall entry_02_54f9_SwitchPlayerAction
+    farcall call_02_54f9_SwitchPlayerAction
     ret                                                ;; 00:06d9 $c9
 
 jp_00_06da:
     ld   A, $1b                                        ;; 00:06da $3e $1b
-    farcall entry_02_54f9_SwitchPlayerAction
+    farcall call_02_54f9_SwitchPlayerAction
     ret                                                ;; 00:06e7 $c9
 
 jp_00_06e8:
     ld   A, $13                                        ;; 00:06e8 $3e $13
-    farcall entry_02_54f9_SwitchPlayerAction
+    farcall call_02_54f9_SwitchPlayerAction
     ret                                                ;; 00:06f5 $c9
 
 call_00_06f6_HandleGenericHitResponse:
@@ -1059,10 +1059,10 @@ call_00_08f8_SetupObjectVRAMTransfer:
     dec  C                                             ;; 00:0952 $0d
     jr   NZ, .jr_00_0951                               ;; 00:0953 $20 $fc
     ld   A, L                                          ;; 00:0955 $7d
-    ld   [wDB64_VRAMTransferSourceLo], A                                    ;; 00:0956 $ea $64 $db
+    ld   [wDB64_VRAMTransferSource], A                                    ;; 00:0956 $ea $64 $db
     ld   A, H                                          ;; 00:0959 $7c
-    ld   [wDB64_VRAMTransferSourceHi], A                                    ;; 00:095a $ea $65 $db
-    farcall entry_03_59b6_LookupObjectPropertyFromType
+    ld   [wDB64_VRAMTransferSource+1], A                                    ;; 00:095a $ea $65 $db
+    farcall call_03_59b6_LookupObjectPropertyFromType
     ld   [wDB63_ActiveObjectType], A                                    ;; 00:0968 $ea $63 $db
     ld   HL, wDB66_HDMATransferFlags                                     ;; 00:096b $21 $66 $db
 .jr_00_096e:
@@ -1087,7 +1087,7 @@ call_00_08f8_SetupObjectVRAMTransfer:
     ld   L, A                                          ;; 00:09a5 $6f
     ld   A, [HL]                                       ;; 00:09a6 $7e
     push AF                                            ;; 00:09a7 $f5
-    farcall entry_03_59b6_LookupObjectPropertyFromType
+    farcall call_03_59b6_LookupObjectPropertyFromType
     ld   [wDB63_ActiveObjectType], A                                    ;; 00:09b3 $ea $63 $db
     ld   L, A                                          ;; 00:09b6 $6f
     ld   H, $00                                        ;; 00:09b7 $26 $00
@@ -1182,9 +1182,9 @@ call_00_08f8_SetupObjectVRAMTransfer:
     add  HL, DE                                        ;; 00:0a44 $19
 .jr_00_0a45:
     ld   A, L                                          ;; 00:0a45 $7d
-    ld   [wDB64_VRAMTransferSourceLo], A                                    ;; 00:0a46 $ea $64 $db
+    ld   [wDB64_VRAMTransferSource], A                                    ;; 00:0a46 $ea $64 $db
     ld   A, H                                          ;; 00:0a49 $7c
-    ld   [wDB64_VRAMTransferSourceHi], A                                    ;; 00:0a4a $ea $65 $db
+    ld   [wDB64_VRAMTransferSource+1], A                                    ;; 00:0a4a $ea $65 $db
     ld   HL, wDB66_HDMATransferFlags                                     ;; 00:0a4d $21 $66 $db
     set  1, [HL]                                       ;; 00:0a50 $cb $ce
 .jp_00_0a52:
@@ -1225,7 +1225,7 @@ call_00_0a6a_LoadMapConfigAndWaitVBlank:
     ld   A, [wDC08_TilesetBankOffset]                                    ;; 00:0a87 $fa $08 $dc
     add  A, [HL]                                       ;; 00:0a8a $86
     ld   [HL+], A                                      ;; 00:0a8b $22
-    ld   A, [wDC09_TilesetBankOffset]                                    ;; 00:0a8c $fa $09 $dc
+    ld   A, [wDC08_TilesetBankOffset+1]                                    ;; 00:0a8c $fa $09 $dc
     adc  A, [HL]                                       ;; 00:0a8f $8e
     ld   [HL], A                                       ;; 00:0a90 $77
     ld   A, [wDC07_TilesetBank]                                    ;; 00:0a91 $fa $07 $dc
@@ -1531,8 +1531,8 @@ call_00_0c6a_HandlePendingHDMATransfers:
 ; Clears wDB67_HDMATempScratch.
 ; Reads control flags from wDB66_HDMATransferFlags.
 ; Depending on bits, it sets up HDMA transfers from different sources:
-; Bit 0 → copy tiles from wDAC0_GeneralPurposeDMASourceAddressLo–wDAC2_DMATransferLength.
-; Bit 1 → copy tiles from wDB64_VRAMTransferSourceLo–wDB64_VRAMTransferSourceHi.
+; Bit 0 → copy tiles from wDAC0_GeneralPurposeDMASourceAddress–wDAC2_DMATransferLength.
+; Bit 1 → copy tiles from wDB64_VRAMTransferSource–wDB64_VRAMTransferSource+1.
 ; Bit 2 → perform a variable-length transfer using wDC2B–wDC32.
 ; Manages VBK for VRAM bank selection when needed.
 ; Clears the trigger bits after performing the transfer.
@@ -1552,9 +1552,9 @@ call_00_0c6a_HandlePendingHDMATransfers:
 .jr_00_0c84:
     ld   A, [wDABF_GexSpriteBank]                                    ;; 00:0c84 $fa $bf $da
     call call_00_0f25_AltSwitchBank                                  ;; 00:0c87 $cd $25 $0f
-    ld   A, [wDAC1_GeneralPurposeDMASourceAddressHi]                                    ;; 00:0c8a $fa $c1 $da
+    ld   A, [wDAC0_GeneralPurposeDMASourceAddress+1]                                    ;; 00:0c8a $fa $c1 $da
     ldh  [rHDMA1], A                                   ;; 00:0c8d $e0 $51
-    ld   A, [wDAC0_GeneralPurposeDMASourceAddressLo]                                    ;; 00:0c8f $fa $c0 $da
+    ld   A, [wDAC0_GeneralPurposeDMASourceAddress]                                    ;; 00:0c8f $fa $c0 $da
     ldh  [rHDMA2], A                                   ;; 00:0c92 $e0 $52
     ld   A, $80                                        ;; 00:0c94 $3e $80
     ldh  [rHDMA3], A                                   ;; 00:0c96 $e0 $53
@@ -1581,9 +1581,9 @@ call_00_0c6a_HandlePendingHDMATransfers:
     ld   L, A                                          ;; 00:0cbe $6f
     bit  5, [HL]                                       ;; 00:0cbf $cb $6e
     jr   NZ, .jr_00_0ceb                               ;; 00:0cc1 $20 $28
-    ld   A, [wDB64_VRAMTransferSourceHi]                                    ;; 00:0cc3 $fa $65 $db
+    ld   A, [wDB64_VRAMTransferSource+1]                                    ;; 00:0cc3 $fa $65 $db
     ldh  [rHDMA1], A                                   ;; 00:0cc6 $e0 $51
-    ld   A, [wDB64_VRAMTransferSourceLo]                                    ;; 00:0cc8 $fa $64 $db
+    ld   A, [wDB64_VRAMTransferSource]                                    ;; 00:0cc8 $fa $64 $db
     ldh  [rHDMA2], A                                   ;; 00:0ccb $e0 $52
     ld   A, [wDB61_ActiveObjectSlot]                                    ;; 00:0ccd $fa $61 $db
     rlca                                               ;; 00:0cd0 $07
@@ -1605,9 +1605,9 @@ call_00_0c6a_HandlePendingHDMATransfers:
 .jr_00_0ceb:
     ld   A, $01                                        ;; 00:0ceb $3e $01
     ldh  [rVBK], A                                     ;; 00:0ced $e0 $4f
-    ld   A, [wDB64_VRAMTransferSourceHi]                                    ;; 00:0cef $fa $65 $db
+    ld   A, [wDB64_VRAMTransferSource+1]                                    ;; 00:0cef $fa $65 $db
     ldh  [rHDMA1], A                                   ;; 00:0cf2 $e0 $51
-    ld   A, [wDB64_VRAMTransferSourceLo]                                    ;; 00:0cf4 $fa $64 $db
+    ld   A, [wDB64_VRAMTransferSource]                                    ;; 00:0cf4 $fa $64 $db
     ldh  [rHDMA2], A                                   ;; 00:0cf7 $e0 $52
     ld   A, $84                                        ;; 00:0cf9 $3e $84
     ldh  [rHDMA3], A                                   ;; 00:0cfb $e0 $53
@@ -1849,7 +1849,7 @@ call_00_0e3b_ClearGameStateVariables:
     ld   [wDC72], A                                    ;; 00:0e4b $ea $72 $dc
     ld   [wDBE3], A                                    ;; 00:0e4e $ea $e3 $db
     ld   [wDD6B], A                                    ;; 00:0e51 $ea $6b $dd
-    farcall entry_02_7123_ClearObjectSlotsExcludingPlayer
+    farcall call_02_7123_ClearObjectSlotsExcludingPlayer
     jp   call_00_0b92_WaitForInterrupt                                  ;; 00:0e5f $c3 $92 $0b
 
 call_00_0e62_ResetFlagsAndVRAMState:
@@ -2113,7 +2113,7 @@ call_00_0fa2_PlaySong:
 ; Otherwise, it stores the new code in wDE5C.
 ; Waits for an interrupt (call_00_0b92_WaitForInterrupt)—this syncs playback changes to a safe frame.
 ; Derives wDE60 as (wDE5C >> 4) & $0F (bank group) and uses it +4 to switch to the appropriate ROM bank.
-; Then isolates the lower nibble and calls entry_04_4006_Audio in bank 04 to start the track.
+; Then isolates the lower nibble and calls call_04_4006_Audio in bank 04 to start the track.
 ; Finally restores the original bank (call_00_0f08_RestoreBank).
 ; Summary: Changes music track safely by switching banks and calling the main audio engine.
     cp   A, $ff                                        ;; 00:0fa2 $fe $ff
@@ -2131,7 +2131,7 @@ call_00_0fa2_PlaySong:
     call call_00_0eee_SwitchBank                                  ;; 00:0fba $cd $ee $0e
     ld   A, [wDE5C]                                    ;; 00:0fbd $fa $5c $de
     and  A, $0f                                        ;; 00:0fc0 $e6 $0f
-    call entry_04_4006_Audio                                  ;; 00:0fc2 $cd $06 $40
+    call call_04_4006_Audio                                  ;; 00:0fc2 $cd $06 $40
     jp   call_00_0f08_RestoreBank                                  ;; 00:0fc5 $c3 $08 $0f
 
 call_00_0fc8_ProcessQueuedSoundEffect:
@@ -2149,7 +2149,7 @@ call_00_0fc8_ProcessQueuedSoundEffect:
 
 call_00_0fd7_TriggerSoundEffect:
 ; Re-validates ID (not $FF).
-; Bank-switches to 04, calls entry_04_4024_Audio twice:
+; Bank-switches to 04, calls call_04_4024_Audio twice:
 ; First with A=$00 (resets/flushes channels?),
 ; Then with A=effect ID (plays the new effect).
 ; Moves wDE5E (effect priority) into wDE5F after zeroing wDE5E.
@@ -2161,9 +2161,9 @@ call_00_0fd7_TriggerSoundEffect:
     ld   A, $04                                        ;; 00:0fdb $3e $04
     call call_00_0eee_SwitchBank                                  ;; 00:0fdd $cd $ee $0e
     ld   A, $00                                        ;; 00:0fe0 $3e $00
-    call entry_04_4024_Audio                                  ;; 00:0fe2 $cd $24 $40
+    call call_04_4024_Audio                                  ;; 00:0fe2 $cd $24 $40
     pop  AF                                            ;; 00:0fe5 $f1
-    call entry_04_4024_Audio                                  ;; 00:0fe6 $cd $24 $40
+    call call_04_4024_Audio                                  ;; 00:0fe6 $cd $24 $40
     ld   HL, wDE5E                                     ;; 00:0fe9 $21 $5e $de
     ld   A, [HL]                                       ;; 00:0fec $7e
     ld   [HL], $00                                     ;; 00:0fed $36 $00

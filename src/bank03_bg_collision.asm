@@ -1,10 +1,9 @@
-entry_03_46e0_UpdateBgCollision_MainDispatcher:
 call_03_46e0_UpdateBgCollision_MainDispatcher:
 ; Saves current bank in wDAD6_ReturnBank
-; Calls a banked function (entry_02_5541_GetActionPropertyByte) to get collision status
+; Calls a banked function (call_02_5541_GetActionPropertyByte) to get collision status
 ; Depending on result bits, jumps to specialized collision handlers 
 ; (call_03_4a3f_CollisionHandler_ByAction, call_03_4ae4_CollisionMask_LookupAndDispatch, or mode-specific handler table).
-    farcall entry_02_5541_GetActionPropertyByte
+    farcall call_02_5541_GetActionPropertyByte
     bit  5, A                                          ;; 03:46eb $cb $6f
     jp   NZ, call_03_4a3f_CollisionHandler_ByAction            ;; 03:46ed $c2 $3f $4a
     bit  7, A                                          ;; 03:46f0 $cb $7f
@@ -195,7 +194,7 @@ call_03_4708_CollisionHandler_Sidescroller:
     bit  7, A                                          ;; 03:4806 $cb $7f
     jr   Z, .jr_03_4876                                ;; 03:4808 $28 $6c
 .jr_03_480a:
-    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 03:480a $fa $01 $d8
+    ld   A, [wD801_Player_ActionId]                                    ;; 03:480a $fa $01 $d8
     cp   A, $1b                                        ;; 03:480d $fe $1b
     ld   A, $04                                        ;; 03:480f $3e $04
     jr   Z, .jr_03_486e                                ;; 03:4811 $28 $5b
@@ -553,7 +552,7 @@ call_03_48ad_CollisionHandler_TopDown:
 call_03_4a3f_CollisionHandler_ByAction:
 ; Special action-dependent collision check.
 ; Clears/sets collision flags.
-; Looks at the player’s current action ID (wD801_PlayerObject_ActionId) to pick a rule set.
+; Looks at the player’s current action ID (wD801_Player_ActionId) to pick a rule set.
 ; Uses lookup tables (.data_03_4a98) for bitmasks and allowed transitions.
 ; Updates wDC81_CurrentInputs depending on what collisions are valid for that action (e.g. standing, climbing, swimming).
     ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 03:4a3f $21 $be $da
@@ -561,7 +560,7 @@ call_03_4a3f_CollisionHandler_ByAction:
     ld   [HL], $00                                     ;; 03:4a43 $36 $00
     ld   [wDABD_UnkBGCollisionFlags], A                                    ;; 03:4a45 $ea $bd $da
     set  7, [HL]                                       ;; 03:4a48 $cb $fe
-    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 03:4a4a $fa $01 $d8
+    ld   A, [wD801_Player_ActionId]                                    ;; 03:4a4a $fa $01 $d8
     ld   L, $03                                        ;; 03:4a4d $2e $03
     cp   A, $1f                                        ;; 03:4a4f $fe $1f
     jr   Z, .jr_03_4a61                                ;; 03:4a51 $28 $0e
@@ -773,7 +772,6 @@ call_03_4b82_TileCollisionCheck_Raw:
 .data_03_4bae:
     db   $80, $40, $20, $10, $08, $04, $02, $01                            ;; 03:4bb2 ????
 
-entry_03_4bb6_CacheNearbyTileValues:
 call_03_4bb6_CacheNearbyTileValues:
 ; SampleSurroundingTiles
 ; Samples four surrounding tiles relative to the player (above, below, etc.) into temporary buffers (wDC92–wDC97).
@@ -859,7 +857,7 @@ call_03_4c12_FetchTileValue:
     ld   B, A                                          ;; 03:4c2c $47
     ret                                                ;; 03:4c2d $c9
 
-entry_03_4c2e_IsTileType3D:
+call_03_4c2e_IsTileType3D:
 ; CheckTileEquals3D
 ; Wrapper around call_03_4c12.
 ; Fetches a tile, compares it to $3D, and returns.

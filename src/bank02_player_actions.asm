@@ -1,10 +1,10 @@
 call_02_47b4_PlayerAction_Spawn:
-; Checks bit 4 of wD805_Player_unk05 (a flag for spawning in a level). 
+; Checks bit 4 of wD805_Player_SpriteFlags (a flag for spawning in a level). 
 ; If the bit is not set, it returns. If set, it:
 ; Clears state variables (wDCA2, wDCA3, wDC87).
 ; Sets wDCA4 = 05h (some delay or counter).
 ; Plays sound effect $0E via call_00_0ff5_QueueSoundEffectWithPriority
-    ld   HL, wD805_Player_unk05                                     ;; 02:47b4 $21 $05 $d8
+    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:47b4 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:47b7 $cb $66
     ret  Z                                             ;; 02:47b9 $c8
     xor  A, A                                          ;; 02:47ba $af
@@ -17,14 +17,14 @@ call_02_47b4_PlayerAction_Spawn:
     jp   call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 02:47cb $c3 $f5 $0f
 
 call_02_47ce_PlayerAction_Idle:
-; Also checks bit 4 of wD805_Player_unk05. If set:
+; Also checks bit 4 of wD805_Player_SpriteFlags. If set:
 ; Sets bit 6 of wDC80 (marking a new sub-state).
 ; Clears wDC86, wDC8C_PlayerYVelocity, and wDC87.
 ; Sets wDC83 = F0h (a countdown timer).
 ; Regardless, it checks if wDC81_CurrentInputs == Input_Up and, if so, calls call_00_1bbc_CheckForDoorAndEnter.
 ; It then calls call_02_4f11 to potentially switch actions.
 ; Finally, it decrements the countdown timer at wDC83. If it hits zero, it switches player action to $02.
-    ld   HL, wD805_Player_unk05                                     ;; 02:47ce $21 $05 $d8
+    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:47ce $21 $05 $d8
     bit  4, [HL]                                       ;; 02:47d1 $cb $66
     jr   Z, .jr_02_47e9                                ;; 02:47d3 $28 $14
     ld   HL, wDC80                                     ;; 02:47d5 $21 $80 $dc
@@ -56,9 +56,9 @@ call_02_47fe_PlayerAction_IdleAnimation:
     ret                                                ;; 02:4809 $c9
 
 call_02_480a:
-; Checks bit 4 of wD805_Player_unk05. If set, sets wDC87 = 02h (possibly a movement or animation flag). 
+; Checks bit 4 of wD805_Player_SpriteFlags. If set, sets wDC87 = 02h (possibly a movement or animation flag). 
 ; Then calls call_02_4f11.
-    ld   HL, wD805_Player_unk05                                     ;; 02:480a $21 $05 $d8
+    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:480a $21 $05 $d8
     bit  4, [HL]                                       ;; 02:480d $cb $66
     jr   Z, .jr_02_4816                                ;; 02:480f $28 $05
     ld   A, $02                                        ;; 02:4811 $3e $02
@@ -87,7 +87,7 @@ call_02_481f_IncrementDCACWithClamp:
     ret                                                ;; 02:482d $c9
 
 call_02_482e:
-    ld   A, [wD809_Player_unk09]                                    ;; 02:482e $fa $09 $d8
+    ld   A, [wD809_Player_SpriteCounter]                                    ;; 02:482e $fa $09 $d8
     srl  A                                             ;; 02:4831 $cb $3f
     ld   C, A                                          ;; 02:4833 $4f
     ld   A, $02                                        ;; 02:4834 $3e $02
@@ -99,7 +99,7 @@ call_02_482e:
     ret                                                ;; 02:483d $c9
 
 call_02_483e:
-    ld   hl,wD805_Player_unk05
+    ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     ret  z
     ld   a,$05
@@ -108,7 +108,7 @@ call_02_483e:
     jp   call_00_0624_SetPhase_TimersAndFlags
 
 call_02_484d:
-    ld   HL, wD805_Player_unk05                                     ;; 02:484d $21 $05 $d8
+    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:484d $21 $05 $d8
     bit  4, [HL]                                       ;; 02:4850 $cb $66
     jr   Z, .jr_02_4864                                ;; 02:4852 $28 $10
     ld   A, $1c                                        ;; 02:4854 $3e $1c
@@ -127,7 +127,7 @@ call_02_484d:
     ret                                                ;; 02:4872 $c9
 
 call_02_4873:
-    ld   HL, wD805_Player_unk05                                     ;; 02:4873 $21 $05 $d8
+    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:4873 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:4876 $cb $66
     jr   Z, .jr_02_4883                                ;; 02:4878 $28 $09
     xor  A, A                                          ;; 02:487a $af
@@ -144,7 +144,7 @@ call_02_4889:
     ld   [wDC87], A                                    ;; 02:488a $ea $87 $dc
     ld   A, $3c                                        ;; 02:488d $3e $3c
     ld   [wDC7E], A                                    ;; 02:488f $ea $7e $dc
-    ld   A, [wD805_Player_unk05]                                    ;; 02:4892 $fa $05 $d8
+    ld   A, [wD805_Player_SpriteFlags]                                    ;; 02:4892 $fa $05 $d8
     and  A, $04                                        ;; 02:4895 $e6 $04
     ret  Z                                             ;; 02:4897 $c8
     ld   A, [wDB6A]                                    ;; 02:4898 $fa $6a $db
@@ -153,7 +153,7 @@ call_02_4889:
     ret                                                ;; 02:48a0 $c9
 
 call_02_48a1:
-    ld   HL, wD805_Player_unk05                                     ;; 02:48a1 $21 $05 $d8
+    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:48a1 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:48a4 $cb $66
     ld   A, $1d                                        ;; 02:48a6 $3e $1d
     call NZ, call_00_0ff5_QueueSoundEffectWithPriority                              ;; 02:48a8 $c4 $f5 $0f
@@ -161,7 +161,7 @@ call_02_48a1:
     jp   call_02_4db1_CheckPlayerObjectXDistance                                    ;; 02:48ad $c3 $b1 $4d
 
 call_02_48b0:
-    ld   A, [wD805_Player_unk05]                                    ;; 02:48b0 $fa $05 $d8
+    ld   A, [wD805_Player_SpriteFlags]                                    ;; 02:48b0 $fa $05 $d8
     and  A, $04                                        ;; 02:48b3 $e6 $04
     ret  Z                                             ;; 02:48b5 $c8
     ld   HL, wDB6A                                     ;; 02:48b6 $21 $6a $db
@@ -169,7 +169,7 @@ call_02_48b0:
     ret                                                ;; 02:48bb $c9
 
 call_02_48bc:
-    ld   HL, wD805_Player_unk05                                     ;; 02:48bc $21 $05 $d8
+    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:48bc $21 $05 $d8
     bit  4, [HL]                                       ;; 02:48bf $cb $66
     jr   Z, .jr_02_48d6                                ;; 02:48c1 $28 $13
     ld   A, $06                                        ;; 02:48c3 $3e $06
@@ -190,7 +190,7 @@ call_02_48bc:
     jp   call_02_4dce_SetTriggerByLevel                                    ;; 02:48e5 $c3 $ce $4d
 
 call_02_48e8:
-    ld   HL, wD805_Player_unk05                                     ;; 02:48e8 $21 $05 $d8
+    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:48e8 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:48eb $cb $66
     jr   Z, .jr_02_4902                                ;; 02:48ed $28 $13
 .jr_02_48ef:
@@ -211,7 +211,7 @@ call_02_48e8:
     jp   call_02_4dce_SetTriggerByLevel                                    ;; 02:490e $c3 $ce $4d
 
 call_02_4911:
-    ld   HL, wD805_Player_unk05                                     ;; 02:4911 $21 $05 $d8
+    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:4911 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:4914 $cb $66
     jr   Z, .jr_02_492a                                ;; 02:4916 $28 $12
     ld   A, $04                                        ;; 02:4918 $3e $04
@@ -222,7 +222,7 @@ call_02_4911:
     ld   [wDC7F], A                                    ;; 02:4924 $ea $7f $dc
     call call_02_4e01_SetOneTimeFlag                                  ;; 02:4927 $cd $01 $4e
 .jr_02_492a:
-    ld   A, [wD805_Player_unk05]                                    ;; 02:492a $fa $05 $d8
+    ld   A, [wD805_Player_SpriteFlags]                                    ;; 02:492a $fa $05 $d8
     and  A, $04                                        ;; 02:492d $e6 $04
     ret  Z                                             ;; 02:492f $c8
     xor  A, A                                          ;; 02:4930 $af
@@ -246,7 +246,7 @@ call_02_4911:
     jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:4954 $c3 $f9 $54
 
 call_02_4957:
-    ld   HL, wD805_Player_unk05                                     ;; 02:4957 $21 $05 $d8
+    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:4957 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:495a $cb $66
     jr   Z, .jr_02_4966                                ;; 02:495c $28 $08
     ld   A, $01                                        ;; 02:495e $3e $01
@@ -264,7 +264,7 @@ call_02_4957:
     jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:4977 $c3 $f9 $54
 
 call_02_497a:
-    ld   HL, wD805_Player_unk05                                     ;; 02:497a $21 $05 $d8
+    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:497a $21 $05 $d8
     bit  4, [HL]                                       ;; 02:497d $cb $66
     ld   A, $08                                        ;; 02:497f $3e $08
     call NZ, call_00_0ff5_QueueSoundEffectWithPriority                              ;; 02:4981 $c4 $f5 $0f
@@ -273,7 +273,7 @@ call_02_497a:
     ret                                                ;; 02:4988 $c9
 
 call_02_4989:
-    ld   hl,wD805_Player_unk05
+    ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,call_02_49a8
     ld   a,$30
@@ -284,20 +284,20 @@ call_02_4989:
     ld   a,$0B
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$14
-    call entry_02_72ac_SetupNewAction
+    call call_02_72ac_SetupNewAction
 
 call_02_49a8:
     ld   a,[wDC8E]
     and  a
     ld   a,$01
-    jp   z,entry_02_54f9_SwitchPlayerAction
+    jp   z,call_02_54f9_SwitchPlayerAction
     ret  
     
 call_02_49b2:  
     ret  
 
 call_02_49b3:
-    ld   hl,wD805_Player_unk05
+    ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,.label49CE
     ld   hl,wDC80
@@ -342,7 +342,7 @@ call_02_49b3:
 .label4A05:
     ld   a,[wDC9B]
     add  c
-    ld   hl,wD80A_Player_unk0A
+    ld   hl,wD80A_Player_SpriteId
     cp   [hl]
     ret  z
     ld   [hl],a
@@ -382,7 +382,7 @@ call_02_4a51:
     ret  
 
 call_02_4a52:
-    ld   hl,wD805_Player_unk05
+    ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,label4A61
     ld   a,$01
@@ -399,7 +399,7 @@ call_02_4a69:
     jp   call_02_4db1_CheckPlayerObjectXDistance
 
 call_02_4a6e:
-    ld   hl,wD805_Player_unk05
+    ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,label4A87
     ld   a,$04
@@ -410,7 +410,7 @@ call_02_4a6e:
     ld   [wDC7F],a
     ld   [wDC87],a
 label4A87:
-    ld   a,[wD805_Player_unk05]
+    ld   a,[wD805_Player_SpriteFlags]
     and  a,$04
     ret  z
     xor  a
@@ -418,7 +418,7 @@ label4A87:
     ld   hl,wDC80
     set  6,[hl]
     ld   a,$19
-    jp   entry_02_54f9_SwitchPlayerAction
+    jp   call_02_54f9_SwitchPlayerAction
 
 call_02_4a9b:
     ld   a,$01
@@ -433,7 +433,7 @@ call_02_4aa1:
     ret  
 
 call_02_4aac:
-    ld   hl,wD805_Player_unk05
+    ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,.label4ACC
     ld   hl,wDC80
@@ -496,7 +496,7 @@ call_02_4adb:
 .label4B16:
     ld   a,[wDC9F]
     add  c
-    ld   hl,wD80A_Player_unk0A
+    ld   hl,wD80A_Player_SpriteId
     cp   [hl]
     jr   z,.label4B26
     ld   [hl],a
@@ -507,7 +507,7 @@ call_02_4adb:
     and  a,$02
     jr   z,.label4B32
     ld   a,$0E
-    call entry_02_54f9_SwitchPlayerAction
+    call call_02_54f9_SwitchPlayerAction
 .label4B32:
     ld   a,[wDC81_CurrentInputs]
     and  a,$01
@@ -551,7 +551,7 @@ label4B7F:
     add  [hl]
     and  a,$07
     add  a,$E5
-    ld   hl,wD80A_Player_unk0A
+    ld   hl,wD80A_Player_SpriteId
     cp   [hl]
     ret  z
     ld   [hl],a
@@ -574,7 +574,7 @@ label4B7F:
     ret  
 
 call_02_4bb7:
-    ld   hl,wD805_Player_unk05
+    ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,label4BDC
     ld   a,$03
@@ -634,7 +634,7 @@ call_02_4C16:
     db   $20, $0f, $20, $10, $20, $ff
 
 call_02_4c2c:
-    ld   hl,wD805_Player_unk05
+    ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,label4C46
     ld   a,$06
@@ -651,11 +651,11 @@ label4C46:
     ld   a,[wDC81_CurrentInputs]
     and  a,$02
     ld   a,$26
-    jp   nz,entry_02_54f9_SwitchPlayerAction
+    jp   nz,call_02_54f9_SwitchPlayerAction
     jp   call_02_4dce_SetTriggerByLevel
 
 call_02_4c58:
-    ld   hl,wD805_Player_unk05
+    ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,label4C72
     ld   a,$07
@@ -672,7 +672,7 @@ label4C72:
     ret  
 
 call_02_4c7a:
-    ld   hl,wD805_Player_unk05
+    ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,label4CA1
     xor  a
@@ -692,7 +692,7 @@ label4CA1:
     jp   call_02_4E0C_UpdateActionSequence
 
 call_02_4ca4:
-    ld   hl,wD805_Player_unk05
+    ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,label4CB3
     ld   a,$01
@@ -702,11 +702,11 @@ label4CB3:
     ld   a,[wDC8E]
     and  a
     ld   a,$24
-    jp   z,entry_02_54f9_SwitchPlayerAction
+    jp   z,call_02_54f9_SwitchPlayerAction
     ret  
 
 call_02_4cbd:
-    ld   hl,wD805_Player_unk05
+    ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,label4CD4
     ld   a,$1C
@@ -721,7 +721,7 @@ label4CD4:
     ld   a,[wDC8E]
     and  a
     ld   a,$24
-    jp   z,entry_02_54f9_SwitchPlayerAction
+    jp   z,call_02_54f9_SwitchPlayerAction
     ret  
 
 call_02_4ce3:
@@ -729,7 +729,7 @@ call_02_4ce3:
     call call_00_0ff5_QueueSoundEffectWithPriority
     call call_02_4e01_SetOneTimeFlag
     ld   a,$31
-    call entry_02_54f9_SwitchPlayerAction
+    call call_02_54f9_SwitchPlayerAction
     call call_02_4df6_FlagCollisionActive
     ld   hl,wDABE_UnkBGCollisionFlags2
     bit  7,[hl]
@@ -744,7 +744,7 @@ call_02_4d02:
     ld   a,[wDC81_CurrentInputs]
     and  a,$02
     ld   a,$32
-    jp   nz,entry_02_54f9_SwitchPlayerAction
+    jp   nz,call_02_54f9_SwitchPlayerAction
     jp   call_02_4dce_SetTriggerByLevel
 
 call_02_4d14:
@@ -752,7 +752,7 @@ call_02_4d14:
     call call_00_0ff5_QueueSoundEffectWithPriority
     call call_02_4e01_SetOneTimeFlag
     ld   a,$33
-    call entry_02_54f9_SwitchPlayerAction
+    call call_02_54f9_SwitchPlayerAction
     call call_02_4df6_FlagCollisionActive
     ld   hl,wDABE_UnkBGCollisionFlags2
     bit  7,[hl]
@@ -767,11 +767,11 @@ call_02_4d33:
     ld   a,[wDC81_CurrentInputs]
     and  a,$02
     ld   a,$32
-    jp   nz,entry_02_54f9_SwitchPlayerAction
+    jp   nz,call_02_54f9_SwitchPlayerAction
     jp   call_02_4dce_SetTriggerByLevel
 
 call_02_4d45:
-    ld   hl,wD805_Player_unk05
+    ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,label4D5E
     ld   a,$04
@@ -782,7 +782,7 @@ call_02_4d45:
     ld   [wDC7F],a
     call call_02_4e01_SetOneTimeFlag
 label4D5E:
-    ld   a,[wD805_Player_unk05]
+    ld   a,[wD805_Player_SpriteFlags]
     and  a,$04
     ret  z
     xor  a
@@ -790,10 +790,10 @@ label4D5E:
     ld   hl,wDC80
     set  6,[hl]
     ld   a,$30
-    jp   entry_02_54f9_SwitchPlayerAction
+    jp   call_02_54f9_SwitchPlayerAction
 
 call_02_4d72:
-    ld   hl,wD805_Player_unk05
+    ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,label4D81
     ld   a,$01
@@ -803,11 +803,11 @@ label4D81:
     ld   a,[wDC8E]
     and  a
     ld   a,$30
-    jp   z,entry_02_54f9_SwitchPlayerAction
+    jp   z,call_02_54f9_SwitchPlayerAction
     ret  
 
 call_02_4d8b:
-    ld   hl,wD805_Player_unk05
+    ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,label4DA2
     ld   a,$1C
@@ -822,5 +822,5 @@ label4DA2:
     ld   a,[wDC8E]
     and  a
     ld   a,$30
-    jp   z,entry_02_54f9_SwitchPlayerAction
+    jp   z,call_02_54f9_SwitchPlayerAction
     ret  

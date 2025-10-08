@@ -1,4 +1,3 @@
-entry_03_6567_SetupObjectPalettes:
 call_03_6567_SetupObjectPalettes:
 ; Purpose: Chooses which object palette set to load based on state flags.
 ; Behavior:
@@ -37,7 +36,6 @@ call_03_6567_SetupObjectPalettes:
     db   $e0, $7f, $00, $00, $00, $00, $00, $00        ;; 03:65bc ????????
     db   $00, $00                                      ;; 03:65c4 ??
 
-entry_03_65c6_LoadMenuOrLevelPalettes:
 call_03_65c6_LoadMenuOrLevelPalettes:
 ; Purpose: Loads either level palettes or menu palettes depending on C.
 ; Behavior:
@@ -175,7 +173,6 @@ call_03_65c6_LoadMenuOrLevelPalettes:
     db   $3e, $02, $21, $ac, $72, $cd, $dd, $0e        ;; 03:6873 ????????
     db   $c9                                           ;; 03:687b ?
 
-entry_03_687c_AssignObjectPalette:
 call_03_687c_AssignObjectPalette:
 ; Purpose: Assigns a palette to a single game object based on its type and state.
 ; Behavior:
@@ -252,7 +249,7 @@ call_03_687c_AssignObjectPalette:
     ld   [DE], A                                       ;; 03:68d7 $12
     ret                                                ;; 03:68d8 $c9
 
-entry_03_68d9_AssignAllObjectPalettes:
+call_03_68d9_AssignAllObjectPalettes:
 ; Purpose: Loops through all active objects and assigns palettes to each.
 ; Behavior:
 ; Starts at address $40 in object memory.

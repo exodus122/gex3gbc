@@ -1,8 +1,8 @@
 ; Relevant wRAM notes:
-; Many are multi-collectible handlers (wDCC5–wDCCF).
+; Many are multi-collectible handlers (wDCC5_BloodCoolerCounter–wDCCF_PlayingCardCounter).
 ; Others are slot managers (activate/clear/increment).
 ; A few are conditional transforms (load new object data depending on state or player).
-; Counters (wDCCA–wDCCD, wDCCC, etc.) are collectible progress trackers.
+; Counters (wDCCA_StrayCatCounter–wDCCD_ConvictCounter, wDCCC_BellCounter, etc.) are collectible progress trackers.
 ; Transformations usually load new object data from a bank depending on state.
 ; Slot functions either set/clear/accumulate object slot values.
 ; Special flags (wDCD2_HitFreestandingRemoteFlags, wDC88) are level or event triggers.
@@ -133,7 +133,7 @@ call_03_4cea_TriggerPlayerActionChange:
 ; Depending on level ID (07, 08), sets a return bank (player action variant).
 ; Switches player action by calling into banked routine.
 ; This is basically a player transformation / state-change trigger.
-    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 03:4cea $fa $01 $d8
+    ld   A, [wD801_Player_ActionId]                                    ;; 03:4cea $fa $01 $d8
     cp   A, $09                                        ;; 03:4ced $fe $09
     jr   Z, .jr_03_4cfe                                ;; 03:4cef $28 $0d
     cp   A, $29                                        ;; 03:4cf1 $fe $29
@@ -150,7 +150,7 @@ call_03_4cea_TriggerPlayerActionChange:
     ld   A, [wD80E_PlayerXPosition]                                    ;; 03:4d06 $fa $0e $d8
     sub  A, [HL]                                       ;; 03:4d09 $96
     inc  HL                                            ;; 03:4d0a $23
-    ld   A, [wD80F_PlayerXPosition]                                    ;; 03:4d0b $fa $0f $d8
+    ld   A, [wD80E_PlayerXPosition+1]                                    ;; 03:4d0b $fa $0f $d8
     sbc  A, [HL]                                       ;; 03:4d0e $9e
     ld   A, $ff                                        ;; 03:4d0f $3e $ff
     jr   C, .jr_03_4d15                                ;; 03:4d11 $38 $02
@@ -167,7 +167,7 @@ call_03_4cea_TriggerPlayerActionChange:
     jr   Z, .jr_03_4d2c                                ;; 03:4d28 $28 $02
     ld   A, $09                                        ;; 03:4d2a $3e $09
 .jr_03_4d2c:
-    farcall entry_02_54f9_SwitchPlayerAction
+    farcall call_02_54f9_SwitchPlayerAction
     ret                                                ;; 03:4d37 $c9
 
 call_03_4d38_Collision_PlayerHit_GenericOrRespawn:
@@ -176,13 +176,13 @@ call_03_4d38_Collision_PlayerHit_GenericOrRespawn:
     ret  nc
     cp   a,$00
     jp   z,call_00_06f6_HandleGenericHitResponse
-    jp   entry_03_5671_HandleObjectHitOrRespawn
+    jp   call_03_5671_HandleObjectHitOrRespawn
 
 call_03_4d44_Collision_PlayerHit_ActionChangeConditional:
 ; Similar to above but excludes some player actions (09, 29, 36, 45).
 ; On collision: if A==01, goes to respawn handler. Otherwise sets timer, 
 ; calculates relative position, sets facing direction, and triggers action change (like 4cea).
-    ld   a,[wD801_PlayerObject_ActionId]
+    ld   a,[wD801_Player_ActionId]
     cp   a,$09
     ret  z
     cp   a,$29
@@ -194,7 +194,7 @@ call_03_4d44_Collision_PlayerHit_ActionChangeConditional:
     call call_03_550e_CheckPlayerObjectInteraction
     ret  nc
     cp   a,$01
-    jp   z,entry_03_5671_HandleObjectHitOrRespawn
+    jp   z,call_03_5671_HandleObjectHitOrRespawn
     ld   a,$3C
     ld   [wDC7E],a
     ld   h, HIGH(wD800_ObjectMemory)
@@ -204,7 +204,7 @@ call_03_4d44_Collision_PlayerHit_ActionChangeConditional:
     ld   a,[wD80E_PlayerXPosition]
     sub  [hl]
     inc  hl
-    ld   a,[wD80F_PlayerXPosition]
+    ld   a,[wD80E_PlayerXPosition+1]
     sbc  [hl]
     ld   a,$FF
     jr   c,.label4D78
@@ -221,7 +221,7 @@ call_03_4d44_Collision_PlayerHit_ActionChangeConditional:
     jr   z,.label4D8F
     ld   a,$09
 .label4D8F:
-    farcall entry_02_54f9_SwitchPlayerAction
+    farcall call_02_54f9_SwitchPlayerAction
     ret  
 
 call_03_4d9b_Collision_BonusCoin:
@@ -331,7 +331,7 @@ call_03_4e31_Collision_FlyTV:
     ret  nz
     ld   a,$03
     call call_00_0ff5_QueueSoundEffectWithPriority
-    call entry_03_5671_HandleObjectHitOrRespawn
+    call call_03_5671_HandleObjectHitOrRespawn
     ld   c,$02
     jp   call_00_2299_SetObjectStatusLowNibble
 
@@ -339,8 +339,8 @@ call_03_4e4b_Collision_IceSculpture:
 ; If object action ID<2 and collision A==01:
 ; Plays sound 19, increments action ID, updates object status nibble.
 ; Loads new object data (via banked routine).
-; If new action ID==2, increments wDCC3.
-; When wDCC3==5, triggers PlaySound_1E.
+; If new action ID==2, increments wDCC3_IceSculptureCounter.
+; When wDCC3_IceSculptureCounter==5, triggers PlaySound_1E.
 ; Then dispatches new offset action.
 ; Basically a multi-stage collectible or progress item (like 5 items → trigger special event).
     call call_00_2962_Object_GetActionId                                  ;; 03:4e4b $cd $62 $29
@@ -359,17 +359,17 @@ call_03_4e4b_Collision_IceSculpture:
     ld   C, A                                          ;; 03:4e63 $4f
     call call_00_2299_SetObjectStatusLowNibble                                  ;; 03:4e64 $cd $99 $22
     pop  AF                                            ;; 03:4e67 $f1
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     pop  AF                                            ;; 03:4e73 $f1
     cp   A, $02                                        ;; 03:4e74 $fe $02
     ret  NZ                                            ;; 03:4e76 $c0
-    ld   HL, wDCC3                                     ;; 03:4e77 $21 $c3 $dc
+    ld   HL, wDCC3_IceSculptureCounter                                     ;; 03:4e77 $21 $c3 $dc
     inc  [HL]                                          ;; 03:4e7a $34
     ld   A, [HL]                                       ;; 03:4e7b $7e
     cp   A, $05                                        ;; 03:4e7c $fe $05
     ld   C, $01                                        ;; 03:4e7e $0e $01
     call Z, call_00_21ef_PlayRemoteSpawnSFX                               ;; 03:4e80 $cc $ef $21
-    ld   A, [wDCC3]                                    ;; 03:4e83 $fa $c3 $dc
+    ld   A, [wDCC3_IceSculptureCounter]                                    ;; 03:4e83 $fa $c3 $dc
     jp   call_00_2c09_Object_SpawnRelativeWithOffset6                                  ;; 03:4e86 $c3 $09 $2c
 
 call_03_4e89_Collision_EvilSantaProjectile:
@@ -446,7 +446,7 @@ call_03_4e89_Collision_EvilSantaProjectile:
     ret                                                ;; 03:4ee9 $c9
 .jr_03_4eea:
     ld   A, $06                                        ;; 03:4eea $3e $06
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     jp   call_03_4cea_TriggerPlayerActionChange                                   ;; 03:4ef7 $c3 $ea $4c
 .data_03_4efa:
     db   $00, $01, $02, $03, $04, $05, $06, $07        ;; 03:4efa ???.????
@@ -460,14 +460,14 @@ call_03_4f23_Collision_HolidayTV_Elf:
 ; On collision:
 ; - If A!=01 → trigger player action change.
 ; - If A==01: loads new object data (bank 4), decrements per-object counter (wDCD5), 
-;   clears object when it hits 0, increments wDCC8, dispatches offset action.
+;   clears object when it hits 0, increments wDCC8_ElfCounter, dispatches offset action.
 ; - If all counters zero → play sound 1E.
     call call_03_550e_CheckPlayerObjectInteraction                                  ;; 03:4f23 $cd $0e $55
     ret  NC                                            ;; 03:4f26 $d0
     cp   A, $01                                        ;; 03:4f27 $fe $01
     jp   NZ, call_03_4cea_TriggerPlayerActionChange                               ;; 03:4f29 $c2 $ea $4c
     ld   A, $04                                        ;; 03:4f2c $3e $04
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     call call_00_230f_ResolveObjectListIndex                                  ;; 03:4f39 $cd $0f $23
     ld   B, $00                                        ;; 03:4f3c $06 $00
     ld   HL, wDCD5                                     ;; 03:4f3e $21 $d5 $dc
@@ -479,7 +479,7 @@ call_03_4f23_Collision_HolidayTV_Elf:
     ret  NZ                                            ;; 03:4f46 $c0
     call call_00_288c_Object_ClearCollisionType                                  ;; 03:4f47 $cd $8a $28
     call call_00_2b8b_HandleObjectFlag6ClearOrInit                                  ;; 03:4f4a $cd $8b $2b
-    ld   HL, wDCC8                                     ;; 03:4f4d $21 $c8 $dc
+    ld   HL, wDCC8_ElfCounter                                     ;; 03:4f4d $21 $c8 $dc
     inc  [HL]                                          ;; 03:4f50 $34
     ld   A, [HL]                                       ;; 03:4f51 $7e
     call call_00_2c09_Object_SpawnRelativeWithOffset6                                  ;; 03:4f52 $cd $09 $2c
@@ -493,8 +493,8 @@ call_03_4f23_Collision_HolidayTV_Elf:
 call_03_4f60_Collision_BloodCooler:
 ; Only for objects in action 00.
 ; If collision with A==01:
-; - Handles hit/respawn, plays sound 19, sets object status, increments wDCC5.
-; - When wDCC5==3, plays sound 1E.
+; - Handles hit/respawn, plays sound 19, sets object status, increments wDCC5_BloodCoolerCounter.
+; - When wDCC5_BloodCoolerCounter==3, plays sound 1E.
 ; - Dispatches offset action.
     call call_00_2962_Object_GetActionId
     cp   a,$00
@@ -503,18 +503,18 @@ call_03_4f60_Collision_BloodCooler:
     ret  nc
     cp   a,$01
     ret  nz
-    call entry_03_5671_HandleObjectHitOrRespawn
+    call call_03_5671_HandleObjectHitOrRespawn
     ld   a,$19
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   c,$01
     call call_00_2299_SetObjectStatusLowNibble
-    ld   hl,wDCC5
+    ld   hl,wDCC5_BloodCoolerCounter
     inc  [hl]
     ld   a,[hl]
     cp   a,$03
     ld   c,$02
     call z,call_00_21ef_PlayRemoteSpawnSFX
-    ld   a,[wDCC5]
+    ld   a,[wDCC5_BloodCoolerCounter]
     jp   call_00_2c09_Object_SpawnRelativeWithOffset6
 
 call_03_4f8c_Collision_MagicSword:
@@ -523,7 +523,7 @@ call_03_4f8c_Collision_MagicSword:
     ret  nc
     ld   c,$03
     call call_00_21ef_PlayRemoteSpawnSFX
-    jp   entry_03_5671_HandleObjectHitOrRespawn
+    jp   call_03_5671_HandleObjectHitOrRespawn
 
 call_03_4f98_Collision_GhostKnight:
 ; On collision:
@@ -533,7 +533,7 @@ call_03_4f98_Collision_GhostKnight:
     ret  nc
     cp   a,$01
     jp   nz,call_03_4cea_TriggerPlayerActionChange
-    call entry_03_5671_HandleObjectHitOrRespawn
+    call call_03_5671_HandleObjectHitOrRespawn
     call call_00_2962_Object_GetActionId
     cp   a,$05
     jp   z,call_00_22ef_SetObjectSlotActive
@@ -549,13 +549,13 @@ call_03_4fad_Collision_Hand:
     cp   a,$00
     ret  nz
     ld   a,$01
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ret  
     
 call_03_4fca_Collision_LostArk:
 ; For action 00 only.
 ; On collision A==02:
-; Handle hit/respawn, set status nibble 04, increment wDCC6.
+; Handle hit/respawn, set status nibble 04, increment wDCC6_LostArkCounter.
 ; On 3rd collected, play sound 1E.
 ; Dispatch offset action.
     call call_00_2962_Object_GetActionId
@@ -565,35 +565,35 @@ call_03_4fca_Collision_LostArk:
     ret  nc
     cp   a,$02
     ret  nz
-    call entry_03_5671_HandleObjectHitOrRespawn
+    call call_03_5671_HandleObjectHitOrRespawn
     ld   c,$04
     call call_00_2299_SetObjectStatusLowNibble
-    ld   hl,wDCC6
+    ld   hl,wDCC6_LostArkCounter
     inc  [hl]
     ld   a,[hl]
     cp   a,$03
     ld   c,$02
     call z,call_00_21ef_PlayRemoteSpawnSFX
-    ld   a,[wDCC6]
+    ld   a,[wDCC6_LostArkCounter]
     jp   call_00_2c09_Object_SpawnRelativeWithOffset6
     
 call_03_4ff1_Collision_RaStaff:
 ; On collision A==01:
-; - Handle hit/respawn, increment wDCC7.
+; - Handle hit/respawn, increment wDCC7_RaStaffCounter.
 ; - On 3rd collected, play sound 1E.
 ; - Dispatch offset action.
     call call_03_550e_CheckPlayerObjectInteraction
     ret  nc
     cp   a,$01
     ret  nz
-    call entry_03_5671_HandleObjectHitOrRespawn
-    ld   hl,wDCC7
+    call call_03_5671_HandleObjectHitOrRespawn
+    ld   hl,wDCC7_RaStaffCounter
     inc  [hl]
     ld   a,[hl]
     cp   a,$03
     ld   c,$01
     call z,call_00_21ef_PlayRemoteSpawnSFX
-    ld   a,[wDCC7]
+    ld   a,[wDCC7_RaStaffCounter]
     jp   call_00_2c09_Object_SpawnRelativeWithOffset6
     
 call_03_500d_Collision_Coffin:
@@ -607,7 +607,7 @@ call_03_500d_Collision_Coffin:
     cp   a,$01
     ret  nz
     ld   a,$01
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ret  
    
 call_03_5028_Collision_Cactus:
@@ -627,7 +627,7 @@ call_03_5028_Collision_Cactus:
     jr   z,label5044
     call call_00_2962_Object_GetActionId
     cp   a,$05
-    call c,entry_03_5671_HandleObjectHitOrRespawn
+    call c,call_03_5671_HandleObjectHitOrRespawn
     jr   label504C
 label5044:
     call call_00_2962_Object_GetActionId
@@ -642,26 +642,26 @@ label504C:
     cp   a,$28
     ret  nc
     ld   a,$05
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ret  
 
 call_03_5069_Collision_PlayingCard:
 ; On collision where A!=00:
-; - Handle hit/respawn, increment wDCCF.
+; - Handle hit/respawn, increment wDCCF_PlayingCardCounter.
 ; - On 5th collected, play sound 1E.
 ; - Dispatch offset action.
     call call_03_550e_CheckPlayerObjectInteraction
     ret  nc
     cp   a,$00
     ret  z
-    call entry_03_5671_HandleObjectHitOrRespawn
-    ld   hl,wDCCF
+    call call_03_5671_HandleObjectHitOrRespawn
+    ld   hl,wDCCF_PlayingCardCounter
     inc  [hl]
     ld   a,[hl]
     cp   a,$05
     ld   c,$02
     call z,call_00_21ef_PlayRemoteSpawnSFX
-    ld   a,[wDCCF]
+    ld   a,[wDCCF_PlayingCardCounter]
     jp   call_00_2c09_Object_SpawnRelativeWithOffset6
 
 call_03_5085_Collision_HardHat:
@@ -679,19 +679,19 @@ call_03_5085_Collision_HardHat:
     cp   a,$02
     jr   z,label50A8
     cp   a,$01
-    jp   z,entry_03_5671_HandleObjectHitOrRespawn
+    jp   z,call_03_5671_HandleObjectHitOrRespawn
     ld   a,$02
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ret  
 label50A8:
     ld   a,$01
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ret  
 
 call_03_50b6_Collision_AlienCultureTube:
 ; For action 00 only.
 ; On collision A==01:
-; - Handle hit/respawn, mark slot active, set status, increment wDCC9.
+; - Handle hit/respawn, mark slot active, set status, increment wDCC9_AlienCultureTubeCounter.
 ; - On 3rd collected, play sound 1E.
 ; - Dispatch offset action.
     call call_00_2962_Object_GetActionId
@@ -701,17 +701,17 @@ call_03_50b6_Collision_AlienCultureTube:
     ret  nc
     cp   a,$01
     ret  nz
-    call entry_03_5671_HandleObjectHitOrRespawn
+    call call_03_5671_HandleObjectHitOrRespawn
     call call_00_22ef_SetObjectSlotActive
     ld   c,$02
     call call_00_2299_SetObjectStatusLowNibble
-    ld   hl,wDCC9
+    ld   hl,wDCC9_AlienCultureTubeCounter
     inc  [hl]
     ld   a,[hl]
     cp   a,$03
     ld   c,$01
     call z,call_00_21ef_PlayRemoteSpawnSFX
-    ld   a,[wDCC9]
+    ld   a,[wDCC9_AlienCultureTubeCounter]
     jp   call_00_2c09_Object_SpawnRelativeWithOffset6
 
 call_03_50e0_Collision_OnSwitch:
@@ -743,7 +743,7 @@ call_03_50f4_Collision_OnSwitch2:
     ld   c,$01
     call call_00_2299_SetObjectStatusLowNibble
     ld   a,$01
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     jp   call_00_22e0_IncrementObjectSlot
     
 call_03_5116_Collision_Door:
@@ -762,7 +762,7 @@ call_03_5116_Collision_Door:
     ld   hl,wDC81_CurrentInputs
     bit  6,[hl]
     ret  z
-    ld   a,[wD801_PlayerObject_ActionId]
+    ld   a,[wD801_Player_ActionId]
     cp   a,$01
     ret  c
     cp   a,$03
@@ -777,7 +777,7 @@ label5143:
     ld   a,$18
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$01
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ret  
 
 call_03_5156_Collision_Door2:
@@ -793,7 +793,7 @@ call_03_5156_Collision_Door2:
     ld   hl,wDC81_CurrentInputs
     bit  6,[hl]
     ret  z
-    ld   a,[wD801_PlayerObject_ActionId]
+    ld   a,[wD801_Player_ActionId]
     cp   a,$01
     ret  c
     cp   a,$03
@@ -808,7 +808,7 @@ label5183:
     ld   a,$18
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$03
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ret  
     
 call_03_5196_Collision_Secbot:
@@ -819,12 +819,12 @@ call_03_5196_Collision_Secbot:
     ret  nc
     cp   a,$01
     jp   nz,call_03_4cea_TriggerPlayerActionChange
-    call entry_03_5671_HandleObjectHitOrRespawn
+    call call_03_5671_HandleObjectHitOrRespawn
     call call_00_2962_Object_GetActionId
     cp   a,$00
     jp   nz,call_00_22ef_SetObjectSlotActive
     ld   a,$02
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ret  
     
 call_03_51b8_Collision_SailorToonGirl:
@@ -840,13 +840,13 @@ call_03_51b8_Collision_SailorToonGirl:
     call call_00_2962_Object_GetActionId
     cp   a,$02
     jr   z,label51E3
-    call entry_03_5671_HandleObjectHitOrRespawn
+    call call_03_5671_HandleObjectHitOrRespawn
     call call_00_2962_Object_GetActionId
     cp   a,$02
     ld   c,$02
     jp   z,call_00_2299_SetObjectStatusLowNibble
     ld   a,$03
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ret  
 label51E3:
     call call_00_22ef_SetObjectSlotActive
@@ -856,7 +856,7 @@ label51E3:
     call call_00_2958_Object_SetFacingDirection
     call call_00_2c67_Particle_InitBurst
     ld   a,$07
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ret  
     
 call_03_5201_Collision_BigSilverRobot:
@@ -872,11 +872,11 @@ call_03_5201_Collision_BigSilverRobot:
     jr   z,label5222
     call call_03_4cea_TriggerPlayerActionChange
     ld   a,$02
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     jp   call_00_2410_Object_SetFacingRelativeToPlayer
 label5222:
     call call_00_2410_Object_SetFacingRelativeToPlayer
-    call entry_03_5671_HandleObjectHitOrRespawn
+    call call_03_5671_HandleObjectHitOrRespawn
     call call_00_2962_Object_GetActionId
     cp   a,$03
     jp   z,call_00_22ef_SetObjectSlotActive
@@ -886,7 +886,7 @@ call_03_5231_Collision_Mech:
 ; If collision →
 ; - If interaction ≠ 1 → player action change.
 ; - If = 1 and wDCA9–wDCAB flags are set:
-;   - Handle hit/respawn, increment wDCCB.
+;   - Handle hit/respawn, increment wDCCB_MechCounter.
 ;   - Every 4th, play sound 1E, then dispatch offset action.
 ; Special case for levels $29/$2A only.
     call call_03_550e_CheckPlayerObjectInteraction
@@ -899,7 +899,7 @@ call_03_5231_Collision_Mech:
     inc  hl
     or   [hl]
     ret  z
-    call entry_03_5671_HandleObjectHitOrRespawn
+    call call_03_5671_HandleObjectHitOrRespawn
     call call_00_2962_Object_GetActionId
     cp   a,$01
     ret  nz
@@ -910,13 +910,13 @@ call_03_5231_Collision_Mech:
     cp   a,$2A
     ret  nz
 label5258:
-    ld   hl,wDCCB
+    ld   hl,wDCCB_MechCounter
     inc  [hl]
     ld   a,[hl]
     cp   a,$04
     ld   c,$03
     call z,call_00_21ef_PlayRemoteSpawnSFX
-    ld   a,[wDCCB]
+    ld   a,[wDCCB_MechCounter]
     jp   call_00_2c09_Object_SpawnRelativeWithOffset6
     call call_03_550e_CheckPlayerObjectInteraction
     ret  nc
@@ -931,7 +931,7 @@ call_03_5274_Collision_PlanetOBlast:
     ret  nc
     cp   a,$02
     ret  nz
-    call entry_03_5671_HandleObjectHitOrRespawn
+    call call_03_5671_HandleObjectHitOrRespawn
     call call_00_2962_Object_GetActionId
     cp   a,$01
     ret  nz
@@ -940,40 +940,40 @@ call_03_5274_Collision_PlanetOBlast:
     jp   call_00_22ff_ClearObjectSlot
     
 call_03_528c_Collision_StrayCat:
-; On collision, if interaction ≠ 0 → handle hit/respawn, increment wDCCA.
+; On collision, if interaction ≠ 0 → handle hit/respawn, increment wDCCA_StrayCatCounter.
 ; Every 3rd → play sound 1E (#2).
 ; Always dispatch offset action.
     call call_03_550e_CheckPlayerObjectInteraction
     ret  nc
     cp   a,$00
     jp   z,call_03_4cea_TriggerPlayerActionChange
-    call entry_03_5671_HandleObjectHitOrRespawn
-    ld   hl,wDCCA
+    call call_03_5671_HandleObjectHitOrRespawn
+    ld   hl,wDCCA_StrayCatCounter
     inc  [hl]
     ld   a,[hl]
     cp   a,$03
     ld   c,$02
     call z,call_00_21ef_PlayRemoteSpawnSFX
-    ld   a,[wDCCA]
+    ld   a,[wDCCA_StrayCatCounter]
     jp   call_00_2c09_Object_SpawnRelativeWithOffset6
     
 call_03_52aa_Collision_Convict:
 ; On collision (interaction=1):
-; Handle hit/respawn, increment wDCCD.
+; Handle hit/respawn, increment wDCCD_ConvictCounter.
 ; Every 5th → play sound 1E (#3).
 ; Dispatch offset action.
     call call_03_550e_CheckPlayerObjectInteraction
     ret  nc
     cp   a,$01
     jp   nz,call_03_4cea_TriggerPlayerActionChange
-    call entry_03_5671_HandleObjectHitOrRespawn
-    ld   hl,wDCCD
+    call call_03_5671_HandleObjectHitOrRespawn
+    ld   hl,wDCCD_ConvictCounter
     inc  [hl]
     ld   a,[hl]
     cp   a,$05
     ld   c,$03
     call z,call_00_21ef_PlayRemoteSpawnSFX
-    ld   a,[wDCCD]
+    ld   a,[wDCCD_ConvictCounter]
     jp   call_00_2c09_Object_SpawnRelativeWithOffset6
     
 call_03_52c8_Collision_YellowGoon:
@@ -986,7 +986,7 @@ call_03_52c8_Collision_YellowGoon:
     jp   nz,call_03_4cea_TriggerPlayerActionChange
     call call_00_29ac_Object_CheckFacingPlayer
     jp   z,call_03_4cea_TriggerPlayerActionChange
-    jp   entry_03_5671_HandleObjectHitOrRespawn
+    jp   call_03_5671_HandleObjectHitOrRespawn
     
 call_03_52da_Collision_ChomperTV:
 ; On collision (interaction=1):
@@ -996,12 +996,12 @@ call_03_52da_Collision_ChomperTV:
     ret  nc
     cp   a,$01
     jp   nz,call_03_4cea_TriggerPlayerActionChange
-    call entry_03_5671_HandleObjectHitOrRespawn
+    call call_03_5671_HandleObjectHitOrRespawn
     call call_00_2962_Object_GetActionId
     cp   a,$03
     ret  z
     ld   a,$02
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ret  
     
 call_03_52fa_Collision_Bomb:
@@ -1017,7 +1017,7 @@ call_03_52fa_Collision_Bomb:
     cp   a,$01
     ret  nz
     ld   a,$03
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ret  
     
 call_03_531a_Collision_WaterTowerStand:
@@ -1033,7 +1033,7 @@ call_03_531a_Collision_WaterTowerStand:
     inc  hl
     or   [hl]
     ret  z
-    call entry_03_5671_HandleObjectHitOrRespawn
+    call call_03_5671_HandleObjectHitOrRespawn
     jp   call_00_22ef_SetObjectSlotActive
     
 call_03_532f_Collision_GextremeSports_Elf:
@@ -1041,7 +1041,7 @@ call_03_532f_Collision_GextremeSports_Elf:
 ; On collision (interaction=1):
 ; - Loads new data (bank 4).
 ; - Decrements object counter wDCD5.
-; - If zero → clear object, increment wDCC8, dispatch action.
+; - If zero → clear object, increment wDCC8_ElfCounter, dispatch action.
 ; - If all counters = 0 → set wDCD2_HitFreestandingRemoteFlags=1 (event flag).
     call call_00_2962_Object_GetActionId
     cp   a,$04
@@ -1051,7 +1051,7 @@ call_03_532f_Collision_GextremeSports_Elf:
     cp   a,$01
     jp   nz,call_03_4cea_TriggerPlayerActionChange
     ld   a,$04
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     call call_00_230f_ResolveObjectListIndex
     ld   b,$00
     ld   hl,wDCD5
@@ -1063,7 +1063,7 @@ call_03_532f_Collision_GextremeSports_Elf:
     ret  nz
     call call_00_288c_Object_ClearCollisionType
     call call_00_2b8b_HandleObjectFlag6ClearOrInit
-    ld   hl,wDCC8
+    ld   hl,wDCC8_ElfCounter
     inc  [hl]
     ld   a,[hl]
     call call_00_2c09_Object_SpawnRelativeWithOffset6
@@ -1093,11 +1093,11 @@ call_03_537a_Collision_BonusTimeCoin:
     ld   a,[wDB6E]
     add  c
     ld   [wDB6E],a
-    jp   entry_03_5671_HandleObjectHitOrRespawn
+    jp   call_03_5671_HandleObjectHitOrRespawn
     
 call_03_538e_Collision_Bell:
 ; On collision (interaction=1):
-; - If action=0 → increment wDCCC, dispatch action, set wDCD2_HitFreestandingRemoteFlags=1 when =7.
+; - If action=0 → increment wDCCC_BellCounter, dispatch action, set wDCD2_HitFreestandingRemoteFlags=1 when =7.
 ; - Always load new data (bank 1), set status nibble=2.
     call call_03_550e_CheckPlayerObjectInteraction
     ret  nc
@@ -1106,18 +1106,18 @@ call_03_538e_Collision_Bell:
     call call_00_2962_Object_GetActionId
     cp   a,$00
     jr   nz,label53B0
-    ld   hl,wDCCC
+    ld   hl,wDCCC_BellCounter
     inc  [hl]
     ld   a,[hl]
     call call_00_2c09_Object_SpawnRelativeWithOffset6
-    ld   a,[wDCCC]
+    ld   a,[wDCCC_BellCounter]
     cp   a,$07
     jr   nz,label53B0
     ld   a,$01
     ld   [wDCD2_HitFreestandingRemoteFlags],a
 label53B0:
     ld   a,$01
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ld   c,$02
     jp   call_00_2299_SetObjectStatusLowNibble
 
@@ -1133,14 +1133,14 @@ call_03_53c2_Collision_RockHard:
     call call_03_550e_CheckPlayerObjectInteraction
     ret  nc
     cp   a,$01
-    jp   z,entry_03_5671_HandleObjectHitOrRespawn
+    jp   z,call_03_5671_HandleObjectHitOrRespawn
     ret  
 label53D6:
     ld   a,[wDC88]
     and  a
     ret  nz
     ld   a,$01
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     jp   call_03_4cea_TriggerPlayerActionChange
     
 call_03_53eb_Collision_Cannon:
@@ -1154,7 +1154,7 @@ call_03_53eb_Collision_Cannon:
     cp   a,$01
     ret  nz
     ld   a,$03
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ret  
     
 call_03_5406_Collision_BrainOfOz:
@@ -1217,12 +1217,12 @@ call_03_5406_Collision_BrainOfOz:
     ld   a,c
     cp   a,$18
     ret  nc
-    call entry_03_5671_HandleObjectHitOrRespawn
+    call call_03_5671_HandleObjectHitOrRespawn
     call call_00_2995_Object_GetActionId
     cp   a,$07
     ret  z
     ld   a,$06
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ret  
     
 call_03_5469_Collision_BrainOfOzProjectile:
@@ -1260,7 +1260,7 @@ call_03_5483_Collision_Meteor:
 .jr_03_5497:
     call call_00_27cb_Object_PositionAboveViewport
     ld   a,$01
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ret                                          ;; 03:5482 $c9
     
 call_03_54a8_Collision_Rez:
@@ -1276,7 +1276,7 @@ call_03_54a8_Collision_Rez:
     ret  nc
     cp   a,$01
     jp   nz,call_03_4cea_TriggerPlayerActionChange
-    call entry_03_5671_HandleObjectHitOrRespawn
+    call call_03_5671_HandleObjectHitOrRespawn
     ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_UNK15_OFFSET
@@ -1298,7 +1298,7 @@ call_03_54a8_Collision_Rez:
     ld   c,$09
 .label54E1:
     ld   a,c
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ret  
     
 call_03_54ee_Collision_RaStatueProjectile:
@@ -1307,7 +1307,7 @@ call_03_54ee_Collision_RaStatueProjectile:
     ret  nc
     call call_03_4cea_TriggerPlayerActionChange
     ld   a,$00
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ret  
 
 call_03_54f9:
@@ -1354,7 +1354,7 @@ call_03_550e_CheckPlayerObjectInteraction:
     ld   A, [HL+]                                      ;; 03:5531 $2a
     ld   H, [HL]                                       ;; 03:5532 $66
     ld   L, A                                          ;; 03:5533 $6f
-    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 03:5534 $fa $01 $d8
+    ld   A, [wD801_Player_ActionId]                                    ;; 03:5534 $fa $01 $d8
     ld   DE, $00                                       ;; 03:5537 $11 $00 $00
     cp   A, $05                                        ;; 03:553a $fe $05
     jr   NZ, .jr_03_5541                                ;; 03:553c $20 $03
@@ -1458,7 +1458,7 @@ call_03_550e_CheckPlayerObjectInteraction:
     ld   A, [wDC58]                                    ;; 03:55cb $fa $58 $dc
     bit  2, A                                          ;; 03:55ce $cb $57
     jr   Z, .jr_03_55f3                                ;; 03:55d0 $28 $21
-    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 03:55d2 $fa $01 $d8
+    ld   A, [wD801_Player_ActionId]                                    ;; 03:55d2 $fa $01 $d8
     cp   A, $0e                                        ;; 03:55d5 $fe $0e
     jr   Z, .jr_03_55e5                                ;; 03:55d7 $28 $0c
     cp   A, $0f                                        ;; 03:55d9 $fe $0f
@@ -1511,7 +1511,6 @@ data_03_55ff_ObjectInteractionFlagsTable:
     db   $00, $02, $01, $00, $00, $00, $03, $01        ;; 03:5667 ????????
     db   $01, $01                                      ;; 03:566f ??
 
-entry_03_5671_HandleObjectHitOrRespawn:
 call_03_5671_HandleObjectHitOrRespawn:
 ; Reads object state bytes at +$15/$16.
 ; If $15 is nonzero, returns (object busy).
@@ -1524,7 +1523,7 @@ call_03_5671_HandleObjectHitOrRespawn:
 ; - If valid:
 ;   - If high bit set → sets facing direction, initializes particles (burst effect), 
 ;     sets object param $14, plays effect.
-;   - Stores low 6 bits into wDAD6_ReturnBank, then calls entry_02_72ac_SetupNewAction 
+;   - Stores low 6 bits into wDAD6_ReturnBank, then calls call_02_72ac_SetupNewAction 
 ;     from bank 2 (reloads object definition).
 ;   - Plays sound effect $10.
 ; - If $16 didn’t reach 0:
@@ -1565,7 +1564,7 @@ call_03_5671_HandleObjectHitOrRespawn:
     pop  AF                                            ;; 03:56a5 $f1
 .jr_03_56a6:
     and  A, $3f                                        ;; 03:56a6 $e6 $3f
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ld   A, $10                                        ;; 03:56b3 $3e $10
     jp   call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 03:56b5 $c3 $f5 $0f
 .jr_03_56b8:
@@ -1587,7 +1586,7 @@ call_03_56c1_Collision_Platform:
 ; Jumps to call_03_580b_RegisterSecondaryCollision (registers the object as the active collision target),
 ; Or to call_03_57f8_ClearCollisionForObject (clear/ignore collision).
 ; Role: The main “does the player collide with this object?” function.
-    ld   a,[wD801_PlayerObject_ActionId]
+    ld   a,[wD801_Player_ActionId]
     cp   a,$1A
     jp   z,call_03_57f8_ClearCollisionForObject
     cp   a,$2E
@@ -1606,7 +1605,7 @@ label56E3:
     ld   a,[wD810_PlayerYPosition]
     add  e
     ld   e,a
-    ld   a,[wD811_PlayerYPosition]
+    ld   a,[wD810_PlayerYPosition+1]
     adc  d
     ld   d,a
     ld   h, HIGH(wD800_ObjectMemory)
@@ -1653,7 +1652,7 @@ label571F:
     sub  [hl]
     ld   e,a
     inc  hl
-    ld   a,[wD80F_PlayerXPosition]
+    ld   a,[wD80E_PlayerXPosition+1]
     sbc  [hl]
     ld   d,a
     ld   a,e
@@ -1711,7 +1710,7 @@ label577C:
     sub  [hl]
     ld   e,a
     inc  hl
-    ld   a,[wD80F_PlayerXPosition]
+    ld   a,[wD80E_PlayerXPosition+1]
     sbc  [hl]
     ld   d,a
     ld   a,e
@@ -1741,7 +1740,7 @@ label57AE:
     ld   a,[wD810_PlayerYPosition]
     add  e
     ld   e,a
-    ld   a,[wD811_PlayerYPosition]
+    ld   a,[wD810_PlayerYPosition+1]
     adc  d
     ld   d,a
     ld   a,e
@@ -1791,7 +1790,6 @@ call_03_57e6_ResolveCollision_Reset:
     ld   [HL], $00                                     ;; 03:57f5 $36 $00
     ret                                                ;; 03:57f7 $c9
 
-entry_03_57f8_ClearCollisionForObject:
 call_03_57f8_ClearCollisionForObject:
 ; Compares the current object ID to the two “last touched object” slots (wDC7B and wDC7D).
 ; If it matches, clears those slots.
@@ -1830,7 +1828,7 @@ call_03_581a_Collision_TVButton:
 ; If all checks pass, adjusts by camera scroll (wDC8C_PlayerYVelocity >> 4) and then calls into 57e6 (collision hit) or 57f8 (miss).
 ; Role: This is a simplified AABB collision test between the player and an object. 
 ; It’s likely for a different type of object (maybe platforms, triggers, or zones).
-    ld   A, [wD801_PlayerObject_ActionId]                                    ;; 03:581a $fa $01 $d8
+    ld   A, [wD801_Player_ActionId]                                    ;; 03:581a $fa $01 $d8
     cp   A, $1a                                        ;; 03:581d $fe $1a
     jp   Z, call_03_57f8_ClearCollisionForObject                                 ;; 03:581f $ca $f8 $57
     cp   A, $2e                                        ;; 03:5822 $fe $2e
@@ -1853,7 +1851,7 @@ call_03_581a_Collision_TVButton:
     sub  A, [HL]                                       ;; 03:5843 $96
     ld   E, A                                          ;; 03:5844 $5f
     inc  HL                                            ;; 03:5845 $23
-    ld   A, [wD80F_PlayerXPosition]                                    ;; 03:5846 $fa $0f $d8
+    ld   A, [wD80E_PlayerXPosition+1]                                    ;; 03:5846 $fa $0f $d8
     sbc  A, [HL]                                       ;; 03:5849 $9e
     ld   D, A                                          ;; 03:584a $57
     ld   A, E                                          ;; 03:584b $7b
@@ -1883,7 +1881,7 @@ call_03_581a_Collision_TVButton:
     ld   A, [wD810_PlayerYPosition]                                    ;; 03:586b $fa $10 $d8
     add  A, E                                          ;; 03:586e $83
     ld   E, A                                          ;; 03:586f $5f
-    ld   A, [wD811_PlayerYPosition]                                    ;; 03:5870 $fa $11 $d8
+    ld   A, [wD810_PlayerYPosition+1]                                    ;; 03:5870 $fa $11 $d8
     adc  A, D                                          ;; 03:5873 $8a
     ld   D, A                                          ;; 03:5874 $57
     ld   A, E                                          ;; 03:5875 $7b

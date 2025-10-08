@@ -1,4 +1,3 @@
-entry_03_6203_LoadLevelBoundariesFromId:
 call_03_6203_LoadLevelBoundariesFromId:
 ; Purpose: Given the current level ID, looks up and stores the level’s screen/window boundaries.
 ; Behavior:
@@ -133,7 +132,7 @@ call_03_6203_LoadLevelBoundariesFromId:
     db   $00, $00, $80, $01, $28, $00, $28, $00        ;; 03:6470 ????????
     db   $00, $00, $00, $00                            ;; 03:6478 ????
 
-entry_03_647c_InitPlayerPositionAndLevel:
+call_03_647c_InitPlayerPositionAndLevel:
 ; Purpose: Initializes the player’s spawn coordinates and current level on scene entry or respawn.
 ; Behavior:
 ; Resets checkpoint flags (wDCAC/wDCAD).
@@ -151,11 +150,11 @@ entry_03_647c_InitPlayerPositionAndLevel:
     ld   A, [wDC6A]                                    ;; 03:648a $fa $6a $dc
     ld   [wD80E_PlayerXPosition], A                                    ;; 03:648d $ea $0e $d8
     ld   A, [wDC6B]                                    ;; 03:6490 $fa $6b $dc
-    ld   [wD80F_PlayerXPosition], A                                    ;; 03:6493 $ea $0f $d8
+    ld   [wD80E_PlayerXPosition+1], A                                    ;; 03:6493 $ea $0f $d8
     ld   A, [wDC6C]                                    ;; 03:6496 $fa $6c $dc
     ld   [wD810_PlayerYPosition], A                                    ;; 03:6499 $ea $10 $d8
     ld   A, [wDC6D]                                    ;; 03:649c $fa $6d $dc
-    ld   [wD811_PlayerYPosition], A                                    ;; 03:649f $ea $11 $d8
+    ld   [wD810_PlayerYPosition+1], A                                    ;; 03:649f $ea $11 $d8
     jr   .jr_03_64c6                                   ;; 03:64a2 $18 $22
 .jr_03_64a4:
     ld   A, [wDB6C_CurrentMapId]                                    ;; 03:64a4 $fa $6c $db
@@ -171,11 +170,11 @@ entry_03_647c_InitPlayerPositionAndLevel:
     ld   A, [HL+]                                      ;; 03:64b6 $2a
     ld   [wD80E_PlayerXPosition], A                                    ;; 03:64b7 $ea $0e $d8
     ld   A, [HL+]                                      ;; 03:64ba $2a
-    ld   [wD80F_PlayerXPosition], A                                    ;; 03:64bb $ea $0f $d8
+    ld   [wD80E_PlayerXPosition+1], A                                    ;; 03:64bb $ea $0f $d8
     ld   A, [HL+]                                      ;; 03:64be $2a
     ld   [wD810_PlayerYPosition], A                                    ;; 03:64bf $ea $10 $d8
     ld   A, [HL]                                       ;; 03:64c2 $7e
-    ld   [wD811_PlayerYPosition], A                                    ;; 03:64c3 $ea $11 $d8
+    ld   [wD810_PlayerYPosition+1], A                                    ;; 03:64c3 $ea $11 $d8
 .jr_03_64c6:
     call call_03_6203_LoadLevelBoundariesFromId                                  ;; 03:64c6 $cd $03 $62
     jp   call_00_10de_UpdatePlayerMapWindow                                  ;; 03:64c9 $c3 $de $10
@@ -187,7 +186,7 @@ entry_03_647c_InitPlayerPositionAndLevel:
     add  HL, DE                                        ;; 03:64d5 $19
     ld   A, [HL]                                       ;; 03:64d6 $7e
     ld   [wDB6C_CurrentMapId], A                                    ;; 03:64d7 $ea $6c $db
-    call entry_03_6c89_LoadMapData                                  ;; 03:64da $cd $89 $6c
+    call call_03_6c89_LoadMapData                                  ;; 03:64da $cd $89 $6c
     ld   HL, wDC5B                                     ;; 03:64dd $21 $5b $dc
     ld   L, [HL]                                       ;; 03:64e0 $6e
     ld   H, $00                                        ;; 03:64e1 $26 $00
@@ -198,11 +197,11 @@ entry_03_647c_InitPlayerPositionAndLevel:
     ld   A, [HL+]                                      ;; 03:64e9 $2a
     ld   [wD80E_PlayerXPosition], A                                    ;; 03:64ea $ea $0e $d8
     ld   A, [HL+]                                      ;; 03:64ed $2a
-    ld   [wD80F_PlayerXPosition], A                                    ;; 03:64ee $ea $0f $d8
+    ld   [wD80E_PlayerXPosition+1], A                                    ;; 03:64ee $ea $0f $d8
     ld   A, [HL+]                                      ;; 03:64f1 $2a
     ld   [wD810_PlayerYPosition], A                                    ;; 03:64f2 $ea $10 $d8
     ld   A, [HL]                                       ;; 03:64f5 $7e
-    ld   [wD811_PlayerYPosition], A                                    ;; 03:64f6 $ea $11 $d8
+    ld   [wD810_PlayerYPosition+1], A                                    ;; 03:64f6 $ea $11 $d8
     jr   .jr_03_64c6                                   ;; 03:64f9 $18 $cb
 .data_03_64fb:
     db   $00, $01                                      ;; 03:64fb ..

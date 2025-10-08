@@ -161,7 +161,7 @@ call_00_22b1_HandleObjectStateChange:
 ; Similar indexing logic as 2299, but:
 ; Compares the current low nibble with C.
 ; If different, stores the old low nibble to wDAD6_ReturnBank.
-; Then calls an alternate-bank routine (entry_02_72ac_SetupNewAction)
+; Then calls an alternate-bank routine (call_02_72ac_SetupNewAction)
 ; Purpose: Detect a change in the object’s state nibble and, if changed, 
 ; trigger an alternate-bank handler for state transitions.
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:22b1 $fa $00 $da
@@ -179,7 +179,7 @@ call_00_22b1_HandleObjectStateChange:
     and  A, $0f                                        ;; 00:22c4 $e6 $0f
     cp   A, C                                          ;; 00:22c6 $b9
     ret  Z                                             ;; 00:22c7 $c8
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ret                                                ;; 00:22d3 $c9
     
 call_00_22d4_CheckObjectSlotFlag:
@@ -402,7 +402,7 @@ call_00_2410_Object_SetFacingRelativeToPlayer:
     ld   a,[wD80E_PlayerXPosition]
     sub  [hl]
     inc  hl
-    ld   a,[wD80F_PlayerXPosition]
+    ld   a,[wD80E_PlayerXPosition+1]
     sbc  [hl]
     jr   c,label2427
     ld   c,OBJECT_LEFT_OF_GEX
@@ -425,7 +425,7 @@ call_00_242d_Object_SetFacingRelativeToPlayer_Inverse:
     ld   a,[wD80E_PlayerXPosition]
     sub  [hl]
     inc  hl
-    ld   a,[wD80F_PlayerXPosition]
+    ld   a,[wD80E_PlayerXPosition+1]
     sbc  [hl]
     jr   c,label2444
     ld   c,OBJECT_RIGHT_OF_GEX
@@ -993,7 +993,7 @@ call_00_26F1_Player_UpdateXFromObject:
     ld   l,a
     ld   a,[wD80E_PlayerXPosition]
     sub  e
-    ld   a,[wD80F_PlayerXPosition]
+    ld   a,[wD80E_PlayerXPosition+1]
     sbc  d
     jr   c,call_00_2714_Player_ClampXLeft
     ld   a,e
@@ -1001,7 +1001,7 @@ call_00_26F1_Player_UpdateXFromObject:
     ld   [wD80E_PlayerXPosition],a
     ld   a,d
     adc  a,$00
-    ld   [wD80F_PlayerXPosition],a
+    ld   [wD80E_PlayerXPosition+1],a
     ret  
 
 call_00_2714_Player_ClampXLeft:
@@ -1016,7 +1016,7 @@ call_00_2714_Player_ClampXLeft:
     ld   [wD80E_PlayerXPosition],a
     ld   a,d
     sbc  a,$00
-    ld   [wD80F_PlayerXPosition],a
+    ld   [wD80E_PlayerXPosition+1],a
     ret  
 
 call_00_2722_IsPlayerNearObject:
@@ -1060,13 +1060,13 @@ call_00_2722_IsPlayerNearObject:
     call call_00_2857_Object_GetBoundingBoxXMin                                  ;; 00:2746 $cd $57 $28
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2749 $fa $0e $d8
     sub  A, E                                          ;; 00:274c $93
-    ld   A, [wD80F_PlayerXPosition]                                    ;; 00:274d $fa $0f $d8
+    ld   A, [wD80E_PlayerXPosition+1]                                    ;; 00:274d $fa $0f $d8
     sbc  A, D                                          ;; 00:2750 $9a
     jr   C, .jr_00_2764                                ;; 00:2751 $38 $11
     call call_00_2846_Object_GetBoundingBoxXMax                                  ;; 00:2753 $cd $46 $28
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2756 $fa $0e $d8
     sub  A, E                                          ;; 00:2759 $93
-    ld   A, [wD80F_PlayerXPosition]                                    ;; 00:275a $fa $0f $d8
+    ld   A, [wD80E_PlayerXPosition+1]                                    ;; 00:275a $fa $0f $d8
     sbc  A, D                                          ;; 00:275d $9a
     jr   NC, .jr_00_2764                               ;; 00:275e $30 $04
     ld   A, $01                                        ;; 00:2760 $3e $01
@@ -1104,7 +1104,7 @@ call_00_2766_Object_ResetYIfAboveStart:
 call_00_2780_Object_CheckBelowMapViewport:
 ; Loads current map scroll position + offset, compares against object’s Y position.
 ; Likely used for despawning when off-screen below the camera.
-    ld   hl,wDBFB_YPositionInMapLo
+    ld   hl,wDBFB_YPositionInMap
     ldi  a,[hl]
     ld   h,[hl]
     ld   l,a
@@ -1171,10 +1171,10 @@ call_00_27cb_Object_PositionAboveViewport:
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_YPOS_OFFSET
     ld   l,a
-    ld   a,[wDBFB_YPositionInMapLo]
+    ld   a,[wDBFB_YPositionInMap]
     sub  a,$14
     ldi  [hl],a
-    ld   a,[wDBFC_YPositionInMapHi]
+    ld   a,[wDBFB_YPositionInMap+1]
     sbc  a,$00
     ld   [hl],a
     ret  nc
@@ -1676,7 +1676,7 @@ call_00_2a15_CheckCameraOverlapBoundingBox:
     ld   C, A                                          ;; 00:2a27 $4f
     ld   A, [HL+]                                      ;; 00:2a28 $2a
     ld   B, A                                          ;; 00:2a29 $47
-    ld   HL, wDA14_CameraLeftLo                                     ;; 00:2a2a $21 $14 $da
+    ld   HL, wDA14_CameraLeft                                     ;; 00:2a2a $21 $14 $da
     ld   A, E                                          ;; 00:2a2d $7b
     sub  A, [HL]                                       ;; 00:2a2e $96
     inc  HL                                            ;; 00:2a2f $23
@@ -1704,7 +1704,7 @@ call_00_2a15_CheckCameraOverlapBoundingBox:
     ld   C, A                                          ;; 00:2a4b $4f
     ld   A, [HL+]                                      ;; 00:2a4c $2a
     ld   B, A                                          ;; 00:2a4d $47
-    ld   HL, wDA18_CameraTopLo                                     ;; 00:2a4e $21 $18 $da
+    ld   HL, wDA18_CameraTop                                     ;; 00:2a4e $21 $18 $da
     ld   A, E                                          ;; 00:2a51 $7b
     sub  A, [HL]                                       ;; 00:2a52 $96
     inc  HL                                            ;; 00:2a53 $23
@@ -1744,7 +1744,7 @@ call_00_2a68_Object_ComputePlayerXProximity:
     sub  A, [HL]                                       ;; 00:2a75 $96
     ld   E, A                                          ;; 00:2a76 $5f
     inc  HL                                            ;; 00:2a77 $23
-    ld   A, [wD80F_PlayerXPosition]                                    ;; 00:2a78 $fa $0f $d8
+    ld   A, [wD80E_PlayerXPosition+1]                                    ;; 00:2a78 $fa $0f $d8
     sbc  A, [HL]                                       ;; 00:2a7b $9e
     ld   D, A                                          ;; 00:2a7c $57
     jr   NC, .jr_00_2a88                               ;; 00:2a7d $30 $09
@@ -1772,7 +1772,7 @@ call_00_2a98_HandlePlayerObjectInteraction:
 ; Resolves an object list index, computes a pointer to an object’s bounding box/metadata in memory.
 ; Compares the player’s X/Y positions against that object’s bounding box (series of sub/sbc, add, cp checks).
 ; If inside bounds, copies several bytes from the object’s data into the current object’s D8xx structure and 
-; triggers a banked function (entry_02_72ac_SetupNewAction)
+; triggers a banked function (call_02_72ac_SetupNewAction)
 ; Purpose: Detects when the player collides with or interacts with a special object and dispatches a handler.
     push de
     call call_00_230f_ResolveObjectListIndex
@@ -1790,7 +1790,7 @@ call_00_2a98_HandlePlayerObjectInteraction:
     sub  [hl]
     ld   e,a
     inc  hl
-    ld   a,[wD80F_PlayerXPosition]
+    ld   a,[wD80E_PlayerXPosition+1]
     sbc  [hl]
     ld   d,a
     inc  hl
@@ -1810,7 +1810,7 @@ call_00_2a98_HandlePlayerObjectInteraction:
     sub  [hl]
     ld   e,a
     inc  hl
-    ld   a,[wD811_PlayerYPosition]
+    ld   a,[wD810_PlayerYPosition+1]
     sbc  [hl]
     ld   d,a
     inc  hl
@@ -1845,7 +1845,7 @@ call_00_2a98_HandlePlayerObjectInteraction:
     xor  a
     ld   [de],a
     ld   a,[hl]
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ret  
 
 call_00_2afc_FindFreeObjectSlot:
@@ -2018,7 +2018,7 @@ call_00_2bbe_SpawnCollectibleObject:
 ; Validates current object value via call_00_35e8_GetObjectTypeIndex.
 ; If not $FF and bit 6 is set, sets up multiple object parameters 
 ; (ObjectSetId, Object_Set14, palette, facing direction, etc.).
-; Updates its status to $50, resets return bank, calls an alternate bank function (entry_02_72ac_SetupNewAction), 
+; Updates its status to $50, resets return bank, calls an alternate bank function (call_02_72ac_SetupNewAction), 
 ; and copies a palette (call_00_2c20_Object_CopyPaletteToBuffer).
 ; This is the main “spawn/setup object” function.
     call call_00_35e8_GetObjectTypeIndex                                  ;; 00:2bbe $cd $e8 $35
@@ -2042,7 +2042,7 @@ call_00_2bbe_SpawnCollectibleObject:
     call call_00_2299_SetObjectStatusLowNibble                                  ;; 00:2be9 $cd $99 $22
     call call_00_2ba9_SetObjectStatusTo50                                  ;; 00:2bec $cd $a9 $2b
     xor  A, A                                          ;; 00:2bef $af
-    farcall entry_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetupNewAction
     ld   HL, .data_02_2c01                                     ;; 00:2bfb $21 $01 $2c
     jp   call_00_2c20_Object_CopyPaletteToBuffer                                  ;; 00:2bfe $c3 $20 $2c
 .data_02_2c01:

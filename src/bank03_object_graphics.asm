@@ -31,7 +31,7 @@ data_03_58d3:
     db   $02, $05, $02, $91, $1c, $09, $01, $04        ;; 03:59ab ????????
     db   $01, $05, $02                                 ;; 03:59b3 ???
 
-entry_03_59b6_LookupObjectPropertyFromType:
+call_03_59b6_LookupObjectPropertyFromType:
 ; Object Property Lookup (DB61-based)
 ; Description:
 ; Uses the byte at wDB61_ActiveObjectSlot as an index into a two-byte table at data_03_58d3 to return an object property byte. 
@@ -47,7 +47,7 @@ entry_03_59b6_LookupObjectPropertyFromType:
     ld   A, [HL]                                       ;; 03:59c4 $7e
     ret                                                ;; 03:59c5 $c9
 
-entry_03_59c6_IsObjectFlaggedHighBit:
+call_03_59c6_IsObjectFlaggedHighBit:
 ; Check High-Bit Flag for Current Object
 ; Description:
 ; Fetches the current object’s index from wDA00_CurrentObjectAddrLo, looks it up in data_03_58d2, 
@@ -239,7 +239,7 @@ data_03_59ea_SpriteData:
     db   $fc, $1e, $08, $10, $04, $26, $08, $10        ;; 03:5eb2 ????????
     db   $0c, $2e, $08, $10, $14, $36, $08             ;; 03:5eba ???????
 
-entry_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
+call_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
 ; Main Object Graphics/Collision Updater
 ; Description:
 ; Top-level routine for each frame’s object processing:
@@ -439,7 +439,7 @@ call_03_5fc2_SetupObjectSprite:
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5fe1 $fa $00 $da
     or   A, OBJECT_XPOS_OFFSET                                        ;; 03:5fe4 $f6 $0e
     ld   E, A                                          ;; 03:5fe6 $5f
-    ld   HL, wDBF9_XPositionInMapLo                                     ;; 03:5fe7 $21 $f9 $db
+    ld   HL, wDBF9_XPositionInMap                                     ;; 03:5fe7 $21 $f9 $db
     ld   A, [DE]                                       ;; 03:5fea $1a
     sub  A, [HL]                                       ;; 03:5feb $96
     ld   C, A                                          ;; 03:5fec $4f
@@ -462,7 +462,7 @@ call_03_5fc2_SetupObjectSprite:
     jr   C, .jr_03_6026                                ;; 03:6004 $38 $20
 .jr_03_6006:
     inc  E                                             ;; 03:6006 $1c
-    ld   HL, wDBFB_YPositionInMapLo                                     ;; 03:6007 $21 $fb $db
+    ld   HL, wDBFB_YPositionInMap                                     ;; 03:6007 $21 $fb $db
     ld   A, [DE]                                       ;; 03:600a $1a
     sub  A, [HL]                                       ;; 03:600b $96
     ld   B, A                                          ;; 03:600c $47
@@ -709,13 +709,13 @@ call_03_615d_SetupCollectibleSprites:
 ; into sprite memory.
 ; Updates tracking variables to prevent re-drawing already collected items.
 ; Summary: Determines which collectible items should be visible and spawns their sprites.
-    ld   A, [wDBF9_XPositionInMapLo]                                    ;; 03:615d $fa $f9 $db
+    ld   A, [wDBF9_XPositionInMap]                                    ;; 03:615d $fa $f9 $db
     and  A, $0f                                        ;; 03:6160 $e6 $0f
     ld   B, A                                          ;; 03:6162 $47
     ld   A, $10                                        ;; 03:6163 $3e $10
     sub  A, B                                          ;; 03:6165 $90
     ld   [wDB70], A                                    ;; 03:6166 $ea $70 $db
-    ld   A, [wDBFB_YPositionInMapLo]                                    ;; 03:6169 $fa $fb $db
+    ld   A, [wDBFB_YPositionInMap]                                    ;; 03:6169 $fa $fb $db
     and  A, $0f                                        ;; 03:616c $e6 $0f
     ld   B, A                                          ;; 03:616e $47
     ld   A, $18                                        ;; 03:616f $3e $18

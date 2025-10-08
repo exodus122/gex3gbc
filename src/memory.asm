@@ -1,13 +1,12 @@
 SECTION "wram0", WRAM0[$c000]
 
 wC000_BgMapTileIds:
-    ds 1                                            ;; c000
-wC001_BgMapTileIds:
-    ds 1023                                         ;; c001
+    ds 1024                                            ;; c000
 
 wC400_CollisionTilesetData: ; C400-CC00 is a copy of 03:4100-03:48FF but in a different order
 ; that is the collision tileset data, collectible sprites, and number sprites, and some code
     ds 1408                                            ;; c400
+
 wC980_NumberSprites: ; this is the start of the number sprites from bank 3
     ds 896                                             ;; c980
 
@@ -43,13 +42,9 @@ wD300_CollectibleBucketLookupTable:
     ds 256                                             ;; d300
 
 wD400_TileBuffer:
-    ds 1                                               ;; d400
-wD401_TileBuffer:
-    ds 375                                             ;; d401
+    ds 376                                               ;; d400
 wD578_TileBuffer2:
-    ds 1                                               ;; d578
-wD579_TileBuffer2:
-    ds 391                                             ;; d579
+    ds 392                                               ;; d578
 
 wD700_ObjectFlags:
 ; Each byte stores the current flags for each object in the object list for the level
@@ -59,31 +54,28 @@ wD700_ObjectFlags:
 ; There are 8 instances of 0x20 bytes each. 
 ; Object Instance Struct is defined in constants.inc
 wD800_ObjectMemory:
-wD800_PlayerObject_Id:
+wD800_Player_Id:
     ds 1                                               ;; d800
-wD801_PlayerObject_ActionId:
+wD801_Player_ActionId:
     ds 1                                               ;; d801
-wD802_PlayerObject_ActionFunc:
+wD802_Player_ActionFunc:
     ds 3                                               ;; d802
-wD805_Player_unk05:
+wD805_Player_SpriteFlags:
     ds 4                                               ;; d805
-wD809_Player_unk09:
+wD809_Player_SpriteCounter:
     ds 1                                               ;; d809
-wD80A_Player_unk0A:
+wD80A_Player_SpriteId:
     ds 3                                               ;; d80a
 wD80D_PlayerFacingDirection:
     ds 1                                               ;; d80d
 wD80E_PlayerXPosition:
-    ds 1                                               ;; d80e
-wD80F_PlayerXPosition:
-    ds 1                                               ;; d80f
+    ds 2                                               ;; d80e
 wD810_PlayerYPosition:
-    ds 1                                               ;; d810
-wD811_PlayerYPosition:
-    ds 15                                              ;; d811
+    ds 2                                               ;; d810
+    ds 14                                              ;; d811
 wD820_ObjectMemoryAfterPlayer:
     ds 32                                              ;; d820
-wD840_ObjectMemoryAfterPlayer: ; why does some code use this and not wDB20? is this a bug? 
+wD840_ObjectMemoryAfterPlayer: ; why does some code use this and not wDB20?
     ds 32                                              ;; d840
     ds 32 
     ds 32 
@@ -134,22 +126,14 @@ wDA13_ObjectXVelocityDelta:
     ds 1                                               ;; da13
 
 ; Camera position
-wDA14_CameraLeftLo:
-    ds 1                                               ;; da14
-wDA15_CameraLeftHi:
-    ds 1                                               ;; da15
-wDA16_CameraRightLo:
-    ds 1                                               ;; da16
-wDA17_CameraRightHi:
-    ds 1                                               ;; da17
-wDA18_CameraTopLo:
-    ds 1                                               ;; da18
-wDA19_CameraTopHi:
-    ds 1                                               ;; da19
-wDA1A_CameraBottomLo:
-    ds 1                                               ;; da1a
-wDA1B_CameraBottomHi:
-    ds 1                                               ;; da1b
+wDA14_CameraLeft:
+    ds 2                                               ;; da14
+wDA16_CameraRight:
+    ds 2                                               ;; da16
+wDA18_CameraTop:
+    ds 2                                               ;; da18
+wDA1A_CameraBottom:
+    ds 2                                               ;; da1a
 
 ; DA1C through DA9B is memory storing constants for each loaded object (8 instances of size 0x10)
 ; 12 bytes are copied from the object spawn data, but in a different order
@@ -223,10 +207,8 @@ wDABE_UnkBGCollisionFlags2:
 wDABF_GexSpriteBank:
     ds 1                                               ;; dabf
 
-wDAC0_GeneralPurposeDMASourceAddressLo:
-    ds 1                                               ;; dac0
-wDAC1_GeneralPurposeDMASourceAddressHi:
-    ds 1                                               ;; dac1
+wDAC0_GeneralPurposeDMASourceAddress:
+    ds 2                                               ;; dac0
 wDAC2_DMATransferLength:
     ds 1                                               ;; dac2
 
@@ -273,10 +255,8 @@ wDB61_ActiveObjectSlot:
     ds 2                                               ;; db61
 wDB63_ActiveObjectType:
     ds 1                                               ;; db63
-wDB64_VRAMTransferSourceLo:
-    ds 1                                               ;; db64
-wDB64_VRAMTransferSourceHi:
-    ds 1                                               ;; db65
+wDB64_VRAMTransferSource:
+    ds 2                                               ;; db64
 wDB66_HDMATransferFlags:
 ; Bit 0 set →
 ; Copy a fixed number of tiles from a general-purpose buffer (wDAC0–wDAC2).
@@ -591,17 +571,11 @@ wDBF7:
 wDBF8:
     ds 1                                               ;; dbf8
 
-wDBF9_XPositionInMapLo:
-    ds 1                                               ;; dbf9
+wDBF9_XPositionInMap:
+    ds 2                                               ;; dbf9
 
-wDBFA_XPositionInMapHi:
-    ds 1                                               ;; dbfa
-
-wDBFB_YPositionInMapLo:
-    ds 1                                               ;; dbfb
-
-wDBFC_YPositionInMapHi:
-    ds 1                                               ;; dbfc
+wDBFB_YPositionInMap:
+    ds 2                                               ;; dbfb
 
 wDBFD_XPositionRelated:
     ds 2                                               ;; dbfd
@@ -625,20 +599,14 @@ wDC07_TilesetBank:
     ds 1                                               ;; dc07
 
 wDC08_TilesetBankOffset:
-    ds 1                                               ;; dc08
-
-wDC09_TilesetBankOffset:
-    ds 1                                               ;; dc09
+    ds 2                                               ;; dc08
 
 wDC0A_BlocksetBank: 
 ; also contains palette ids for each block and flags to flip tiles horizontally, vertically, or use second vRAM bank
     ds 1                                               ;; dc0a
 
 wDC0B_BlocksetBankOffset:
-    ds 1                                               ;; dc0b
-
-wDC0C_BlocksetBankOffset:
-    ds 1                                               ;; dc0c
+    ds 2                                               ;; dc0b
 
 wDC0D_MapCollisionBank:
     ds 1                                               ;; dc0d
@@ -650,10 +618,7 @@ wDC10_CollisionBlockset:
     ds 1                                               ;; dc10
 
 wDC11_CollisionBlocksetOffset:
-    ds 1                                               ;; dc11
-
-wDC12_CollisionBlocksetOffset:
-    ds 1                                               ;; dc12
+    ds 2                                               ;; dc11
 
 wDC13_BgPaletteBank:
     ds 1                                               ;; dc13
@@ -1041,83 +1006,59 @@ wDCC1:
 wDCC2:
     ds 1                                               ;; dcc2
 
-wDCC3:
+; Object counters and flags
+wDCC3_IceSculptureCounter:
     ds 1                                               ;; dcc3
-
 wDCC4_EvilSantaHealth:
     ds 1                                               ;; dcc4
-
-wDCC5:
+wDCC5_BloodCoolerCounter:
     ds 1                                               ;; dcc5
-
-wDCC6:
+wDCC6_LostArkCounter:
     ds 1                                               ;; dcc6
-
-wDCC7:
+wDCC7_RaStaffCounter:
     ds 1                                               ;; dcc7
-
-wDCC8:
+wDCC8_ElfCounter:
     ds 1                                               ;; dcc8
-
-wDCC9:
+wDCC9_AlienCultureTubeCounter:
     ds 1                                               ;; dcc9
-
-wDCCA:
+wDCCA_StrayCatCounter:
     ds 1                                               ;; dcca
-
-wDCCB:
+wDCCB_MechCounter:
     ds 1                                               ;; dccb
-
-wDCCC:
+wDCCC_BellCounter:
     ds 1                                               ;; dccc
-
-wDCCD:
+wDCCD_ConvictCounter:
     ds 1                                               ;; dccd
-
-wDCCE:
+wDCCE_BombCounter:
     ds 1                                               ;; dcce
-
-wDCCF:
+wDCCF_PlayingCardCounter:
     ds 1                                               ;; dccf
-
-wDCD0:
+wDCD0_MadBomberFlag:
     ds 1                                               ;; dcd0
-
-wDCD1:
+wDCD1_BrainOfOzFlag:
     ds 1                                               ;; dcd1
-
 wDCD2_HitFreestandingRemoteFlags:
 ; gets set when a collision occurs with a freestanding remote
 ; the remote object checks for this flag and sets progressflags
     ds 1                                               ;; dcd2
-
 wDCD3:
     ds 1                                               ;; dcd3
-
 wDCD4:
     ds 1                                               ;; dcd4
-
 wDCD5:
     ds 1                                               ;; dcd5
-
 wDCD6:
     ds 1                                               ;; dcd6
-
 wDCD7:
     ds 1                                               ;; dcd7
-
 wDCD8:
     ds 1                                               ;; dcd8
-
 wDCD9:
     ds 1                                               ;; dcd9
-
-wDCDA:
+wDCDA_BrainOfOzAndRezCounter:
     ds 1                                               ;; dcda
-
 wDCDB_EvilSantaHitByProjectileFlag:
     ds 1                                               ;; dcdb
-
 wDCDC_HandObjectUnkFlag:
     ds 2                                               ;; dcdc
 
@@ -1144,21 +1085,21 @@ wDCE9:
 
 wDCEA_BgPalettes:
     ds 32                                              ;; dcea
-
 wDD0A_BgPalettes:
     ds 32                                              ;; dd0a
-
 wDD2A_ObjectPalettes:
     ds 32                                              ;; dd2a
-
 wDD4A_ObjectPalettes:
     ds 32                                              ;; dd4a
 
 wDD6A:
     ds 1                                               ;; dd6a
 
-wDD6B: ; this section seems to be unused
-    ds 89                                             ;; dd6b
+wDD6B: 
+    ds 1
+    
+; this section seems to be unused
+    ds 88                                             ;; dd6b
 
 wDDC4_ParticleSlot1Buffer:
     ds 19

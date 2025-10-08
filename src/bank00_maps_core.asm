@@ -7,7 +7,7 @@ call_00_1056_LoadFullMap:
     call call_00_0e62_ResetFlagsAndVRAMState                                  ;; 00:1059 $cd $62 $0e
     call call_00_10c7_InitRowOffsetTableForMap                                  ;; 00:105c $cd $c7 $10
     ld   C, $00                                        ;; 00:105f $0e $00
-    farcall entry_03_65c6_LoadMenuOrLevelPalettes
+    farcall call_03_65c6_LoadMenuOrLevelPalettes
     ld   C, $03                                        ;; 00:106c $0e $03
     call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:106e $cd $6a $0a
     ld   C, $04                                        ;; 00:1071 $0e $04
@@ -44,7 +44,7 @@ call_00_1056_LoadFullMap:
     jr   NZ, .jr_00_10a4                               ;; 00:10af $20 $f3
     call call_00_0f08_RestoreBank                                  ;; 00:10b1 $cd $08 $0f
     call call_00_0b92_WaitForInterrupt                                  ;; 00:10b4 $cd $92 $0b
-    farcall entry_02_72fb_UpdateMapWindow
+    farcall call_02_72fb_UpdateMapWindow
     xor  A, A                                          ;; 00:10c2 $af
     ld   [wDC20], A                                    ;; 00:10c3 $ea $20 $dc
     ret                                                ;; 00:10c6 $c9
@@ -73,7 +73,7 @@ call_00_10c7_InitRowOffsetTableForMap:
 call_00_10de_UpdatePlayerMapWindow:
 ; Role: Computes the player’s X/Y position within the map, clamps it against map bounds, 
 ; and calculates visible window extents. Stores several intermediate values 
-; (e.g., wDA14_CameraLeftLo–wDA1B_CameraBottomHi, wDBF9–wDBFC) used for scrolling and collision.
+; (e.g., wDA14_CameraLeft–wDA1A_CameraBottom+1, wDBF9–wDBFC) used for scrolling and collision.
 ; Why: Prepares all map-relative coordinates for rendering and collision based on the player’s position.
     ld   A, [wDC29]                                    ;; 00:10de $fa $29 $dc
     and  A, A                                          ;; 00:10e1 $a7
@@ -86,7 +86,7 @@ call_00_10de_UpdatePlayerMapWindow:
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:10ea $fa $0e $d8
     sub  A, $50                                        ;; 00:10ed $d6 $50
     ld   C, A                                          ;; 00:10ef $4f
-    ld   A, [wD80F_PlayerXPosition]                                    ;; 00:10f0 $fa $0f $d8
+    ld   A, [wD80E_PlayerXPosition+1]                                    ;; 00:10f0 $fa $0f $d8
     sbc  A, $00                                        ;; 00:10f3 $de $00
     ld   B, A                                          ;; 00:10f5 $47
     jr   C, .jr_00_1109                                ;; 00:10f6 $38 $11
@@ -117,9 +117,9 @@ call_00_10de_UpdatePlayerMapWindow:
     push DE                                            ;; 00:1115 $d5
     push DE                                            ;; 00:1116 $d5
     ld   A, E                                          ;; 00:1117 $7b
-    ld   [wDBF9_XPositionInMapLo], A                                    ;; 00:1118 $ea $f9 $db
+    ld   [wDBF9_XPositionInMap], A                                    ;; 00:1118 $ea $f9 $db
     ld   A, D                                          ;; 00:111b $7a
-    ld   [wDBFA_XPositionInMapHi], A                                    ;; 00:111c $ea $fa $db
+    ld   [wDBF9_XPositionInMap+1], A                                    ;; 00:111c $ea $fa $db
     ld   A, E                                          ;; 00:111f $7b
     sub  A, $10                                        ;; 00:1120 $d6 $10
     ld   E, A                                          ;; 00:1122 $5f
@@ -130,16 +130,16 @@ call_00_10de_UpdatePlayerMapWindow:
     ld   DE, $00                                       ;; 00:1129 $11 $00 $00
 .jr_00_112c:
     ld   A, E                                          ;; 00:112c $7b
-    ld   [wDA14_CameraLeftLo], A                                    ;; 00:112d $ea $14 $da
+    ld   [wDA14_CameraLeft], A                                    ;; 00:112d $ea $14 $da
     ld   A, D                                          ;; 00:1130 $7a
-    ld   [wDA15_CameraLeftHi], A                                    ;; 00:1131 $ea $15 $da
+    ld   [wDA14_CameraLeft+1], A                                    ;; 00:1131 $ea $15 $da
     pop  DE                                            ;; 00:1134 $d1
     ld   A, E                                          ;; 00:1135 $7b
     add  A, $b0                                        ;; 00:1136 $c6 $b0
-    ld   [wDA16_CameraRightLo], A                                    ;; 00:1138 $ea $16 $da
+    ld   [wDA16_CameraRight], A                                    ;; 00:1138 $ea $16 $da
     ld   A, D                                          ;; 00:113b $7a
     adc  A, $00                                        ;; 00:113c $ce $00
-    ld   [wDA17_CameraRightHi], A                                    ;; 00:113e $ea $17 $da
+    ld   [wDA16_CameraRight+1], A                                    ;; 00:113e $ea $17 $da
     pop  DE                                            ;; 00:1141 $d1
     srl  D                                             ;; 00:1142 $cb $3a
     rr   E                                             ;; 00:1144 $cb $1b
@@ -156,7 +156,7 @@ call_00_10de_UpdatePlayerMapWindow:
     add  A, [HL]                                       ;; 00:115c $86
     ld   C, A                                          ;; 00:115d $4f
     inc  HL                                            ;; 00:115e $23
-    ld   A, [wD811_PlayerYPosition]                                    ;; 00:115f $fa $11 $d8
+    ld   A, [wD810_PlayerYPosition+1]                                    ;; 00:115f $fa $11 $d8
     adc  A, [HL]                                       ;; 00:1162 $8e
     ld   B, A                                          ;; 00:1163 $47
     ld   HL, wDC38                                     ;; 00:1164 $21 $38 $dc
@@ -190,9 +190,9 @@ call_00_10de_UpdatePlayerMapWindow:
     push DE                                            ;; 00:1186 $d5
     push DE                                            ;; 00:1187 $d5
     ld   A, E                                          ;; 00:1188 $7b
-    ld   [wDBFB_YPositionInMapLo], A                                    ;; 00:1189 $ea $fb $db
+    ld   [wDBFB_YPositionInMap], A                                    ;; 00:1189 $ea $fb $db
     ld   A, D                                          ;; 00:118c $7a
-    ld   [wDBFC_YPositionInMapHi], A                                    ;; 00:118d $ea $fc $db
+    ld   [wDBFB_YPositionInMap+1], A                                    ;; 00:118d $ea $fc $db
     ld   A, E                                          ;; 00:1190 $7b
     sub  A, $10                                        ;; 00:1191 $d6 $10
     ld   E, A                                          ;; 00:1193 $5f
@@ -203,16 +203,16 @@ call_00_10de_UpdatePlayerMapWindow:
     ld   DE, $00                                       ;; 00:119a $11 $00 $00
 .jr_00_119d:
     ld   A, E                                          ;; 00:119d $7b
-    ld   [wDA18_CameraTopLo], A                                    ;; 00:119e $ea $18 $da
+    ld   [wDA18_CameraTop], A                                    ;; 00:119e $ea $18 $da
     ld   A, D                                          ;; 00:11a1 $7a
-    ld   [wDA19_CameraTopHi], A                                    ;; 00:11a2 $ea $19 $da
+    ld   [wDA18_CameraTop+1], A                                    ;; 00:11a2 $ea $19 $da
     pop  DE                                            ;; 00:11a5 $d1
     ld   A, E                                          ;; 00:11a6 $7b
     add  A, $b0                                        ;; 00:11a7 $c6 $b0
-    ld   [wDA1A_CameraBottomLo], A                                    ;; 00:11a9 $ea $1a $da
+    ld   [wDA1A_CameraBottom], A                                    ;; 00:11a9 $ea $1a $da
     ld   A, D                                          ;; 00:11ac $7a
     adc  A, $00                                        ;; 00:11ad $ce $00
-    ld   [wDA1B_CameraBottomHi], A                                    ;; 00:11af $ea $1b $da
+    ld   [wDA1A_CameraBottom+1], A                                    ;; 00:11af $ea $1b $da
     pop  DE                                            ;; 00:11b2 $d1
     srl  D                                             ;; 00:11b3 $cb $3a
     rr   E                                             ;; 00:11b5 $cb $1b
@@ -249,7 +249,7 @@ call_00_11e5_LoadVerticalBgStrip:
 ; Switches between multiple banks to pull map, extended, and collision data, 
 ; then assembles tiles and writes them to VRAM buffers.
 ; Why: Updates the tilemap column(s) entering view when the camera scrolls vertically.
-    ld   HL, wDBFB_YPositionInMapLo                                     ;; 00:11e5 $21 $fb $db
+    ld   HL, wDBFB_YPositionInMap                                     ;; 00:11e5 $21 $fb $db
     ld   A, [HL+]                                      ;; 00:11e8 $2a
     ld   C, A                                          ;; 00:11e9 $4f
     ld   A, [HL+]                                      ;; 00:11ea $2a
@@ -263,7 +263,7 @@ call_00_11e5_LoadVerticalBgStrip:
     add  HL, BC                                        ;; 00:11f9 $09
     ld   C, L                                          ;; 00:11fa $4d
     ld   B, H                                          ;; 00:11fb $44
-    ld   HL, wDBF9_XPositionInMapLo                                     ;; 00:11fc $21 $f9 $db
+    ld   HL, wDBF9_XPositionInMap                                     ;; 00:11fc $21 $f9 $db
     ld   E, [HL]                                       ;; 00:11ff $5e
     inc  HL                                            ;; 00:1200 $23
     ld   D, [HL]                                       ;; 00:1201 $56
@@ -414,7 +414,7 @@ call_00_11e5_LoadVerticalBgStrip:
     ld   A, [wDC0B_BlocksetBankOffset]                                    ;; 00:12e3 $fa $0b $dc
     add  A, C                                          ;; 00:12e6 $81
     ld   C, A                                          ;; 00:12e7 $4f
-    ld   A, [wDC0C_BlocksetBankOffset]                                    ;; 00:12e8 $fa $0c $dc
+    ld   A, [wDC0B_BlocksetBankOffset+1]                                    ;; 00:12e8 $fa $0c $dc
     adc  A, B                                          ;; 00:12eb $88
     ld   B, A                                          ;; 00:12ec $47
     ld   A, $0b                                        ;; 00:12ed $3e $0b
@@ -463,7 +463,7 @@ call_00_11e5_LoadVerticalBgStrip:
     ld   A, [wDC11_CollisionBlocksetOffset]                                    ;; 00:1326 $fa $11 $dc
     add  A, C                                          ;; 00:1329 $81
     ld   C, A                                          ;; 00:132a $4f
-    ld   A, [wDC12_CollisionBlocksetOffset]                                    ;; 00:132b $fa $12 $dc
+    ld   A, [wDC11_CollisionBlocksetOffset+1]                                    ;; 00:132b $fa $12 $dc
     adc  A, B                                          ;; 00:132e $88
     ld   B, A                                          ;; 00:132f $47
     ld   A, $0b                                        ;; 00:1330 $3e $0b
@@ -499,7 +499,7 @@ call_00_1351_LoadHorizontalBgStrip:
 ; Switches between multiple banks to pull map, extended, and collision data, 
 ; then assembles tiles and writes them to VRAM buffers.
 ; Why: Updates the tilemap row(s) entering view when the camera scrolls horizontally.
-    ld   HL, wDBF9_XPositionInMapLo                                     ;; 00:1351 $21 $f9 $db
+    ld   HL, wDBF9_XPositionInMap                                     ;; 00:1351 $21 $f9 $db
     ld   A, [HL+]                                      ;; 00:1354 $2a
     ld   E, A                                          ;; 00:1355 $5f
     ld   A, [HL+]                                      ;; 00:1356 $2a
@@ -513,7 +513,7 @@ call_00_1351_LoadHorizontalBgStrip:
     add  HL, DE                                        ;; 00:1365 $19
     ld   E, L                                          ;; 00:1366 $5d
     ld   D, H                                          ;; 00:1367 $54
-    ld   HL, wDBFB_YPositionInMapLo                                     ;; 00:1368 $21 $fb $db
+    ld   HL, wDBFB_YPositionInMap                                     ;; 00:1368 $21 $fb $db
     ld   C, [HL]                                       ;; 00:136b $4e
     inc  HL                                            ;; 00:136c $23
     ld   B, [HL]                                       ;; 00:136d $46
@@ -682,7 +682,7 @@ call_00_1351_LoadHorizontalBgStrip:
     ld   A, [wDC0B_BlocksetBankOffset]                                    ;; 00:146c $fa $0b $dc
     add  A, C                                          ;; 00:146f $81
     ld   C, A                                          ;; 00:1470 $4f
-    ld   A, [wDC0C_BlocksetBankOffset]                                    ;; 00:1471 $fa $0c $dc
+    ld   A, [wDC0B_BlocksetBankOffset+1]                                    ;; 00:1471 $fa $0c $dc
     adc  A, B                                          ;; 00:1474 $88
     ld   B, A                                          ;; 00:1475 $47
     ld   A, $0b                                        ;; 00:1476 $3e $0b
@@ -732,7 +732,7 @@ call_00_1351_LoadHorizontalBgStrip:
     ld   A, [wDC11_CollisionBlocksetOffset]                                    ;; 00:14b0 $fa $11 $dc
     add  A, C                                          ;; 00:14b3 $81
     ld   C, A                                          ;; 00:14b4 $4f
-    ld   A, [wDC12_CollisionBlocksetOffset]                                    ;; 00:14b5 $fa $12 $dc
+    ld   A, [wDC11_CollisionBlocksetOffset+1]                                    ;; 00:14b5 $fa $12 $dc
     adc  A, B                                          ;; 00:14b8 $88
     ld   B, A                                          ;; 00:14b9 $47
     ld   A, $0b                                        ;; 00:14ba $3e $0b
@@ -910,7 +910,7 @@ call_00_1633_HandleLevelWarpOrExit:
     sub  A, [HL]                                       ;; 00:1671 $96
     ld   E, A                                          ;; 00:1672 $5f
     inc  HL                                            ;; 00:1673 $23
-    ld   A, [wD811_PlayerYPosition]                                    ;; 00:1674 $fa $11 $d8
+    ld   A, [wD810_PlayerYPosition+1]                                    ;; 00:1674 $fa $11 $d8
     sbc  A, [HL]                                       ;; 00:1677 $9e
     ld   D, A                                          ;; 00:1678 $57
     pop  HL                                            ;; 00:1679 $e1
@@ -1078,7 +1078,7 @@ call_00_1a22_LoadInitialBgMap:
 .jr_00_1a27:
     push AF                                            ;; 00:1a27 $f5
     call call_00_1a46_LoadBgMapRow                                  ;; 00:1a28 $cd $46 $1a
-    ld   HL, wDBFB_YPositionInMapLo                                     ;; 00:1a2b $21 $fb $db
+    ld   HL, wDBFB_YPositionInMap                                     ;; 00:1a2b $21 $fb $db
     ld   A, [HL]                                       ;; 00:1a2e $7e
     add  A, $08                                        ;; 00:1a2f $c6 $08
     ld   [HL+], A                                      ;; 00:1a31 $22
@@ -1088,7 +1088,7 @@ call_00_1a22_LoadInitialBgMap:
     pop  AF                                            ;; 00:1a36 $f1
     dec  A                                             ;; 00:1a37 $3d
     jr   NZ, .jr_00_1a27                               ;; 00:1a38 $20 $ed
-    ld   HL, wDBFB_YPositionInMapLo                                     ;; 00:1a3a $21 $fb $db
+    ld   HL, wDBFB_YPositionInMap                                     ;; 00:1a3a $21 $fb $db
     ld   A, [HL]                                       ;; 00:1a3d $7e
     sub  A, $b0                                        ;; 00:1a3e $d6 $b0
     ld   [HL+], A                                      ;; 00:1a40 $22
@@ -1104,14 +1104,14 @@ call_00_1a46_LoadBgMapRow:
 ; Computes tile/block pointers, switches to the correct VRAM/map banks, 
 ; copies tile and collision data into VRAM buffers, and restores banks.
 ; Handles both visual tiles and collision blocks.
-    ld   HL, wDBFB_YPositionInMapLo                                     ;; 00:1a46 $21 $fb $db
+    ld   HL, wDBFB_YPositionInMap                                     ;; 00:1a46 $21 $fb $db
     ld   A, [HL+]                                      ;; 00:1a49 $2a
     sub  A, $01                                        ;; 00:1a4a $d6 $01
     ld   C, A                                          ;; 00:1a4c $4f
     ld   A, [HL]                                       ;; 00:1a4d $7e
     sbc  A, $00                                        ;; 00:1a4e $de $00
     ld   B, A                                          ;; 00:1a50 $47
-    ld   HL, wDBF9_XPositionInMapLo                                     ;; 00:1a51 $21 $f9 $db
+    ld   HL, wDBF9_XPositionInMap                                     ;; 00:1a51 $21 $f9 $db
     ld   A, [HL+]                                      ;; 00:1a54 $2a
     ld   E, A                                          ;; 00:1a55 $5f
     ld   D, [HL]                                       ;; 00:1a56 $56
@@ -1230,7 +1230,7 @@ call_00_1a46_LoadBgMapRow:
     ld   A, [wDC0B_BlocksetBankOffset]                                    ;; 00:1b0f $fa $0b $dc
     add  A, E                                          ;; 00:1b12 $83
     ld   E, A                                          ;; 00:1b13 $5f
-    ld   A, [wDC0C_BlocksetBankOffset]                                    ;; 00:1b14 $fa $0c $dc
+    ld   A, [wDC0B_BlocksetBankOffset+1]                                    ;; 00:1b14 $fa $0c $dc
     adc  A, D                                          ;; 00:1b17 $8a
     ld   D, A                                          ;; 00:1b18 $57
     ld   A, $0b                                        ;; 00:1b19 $3e $0b
@@ -1316,7 +1316,7 @@ call_00_1a46_LoadBgMapRow:
     ld   A, [wDC11_CollisionBlocksetOffset]                                    ;; 00:1b8c $fa $11 $dc
     add  A, E                                          ;; 00:1b8f $83
     ld   E, A                                          ;; 00:1b90 $5f
-    ld   A, [wDC12_CollisionBlocksetOffset]                                    ;; 00:1b91 $fa $12 $dc
+    ld   A, [wDC11_CollisionBlocksetOffset+1]                                    ;; 00:1b91 $fa $12 $dc
     adc  A, D                                          ;; 00:1b94 $8a
     ld   D, A                                          ;; 00:1b95 $57
     ld   A, $0b                                        ;; 00:1b96 $3e $0b
@@ -1392,7 +1392,7 @@ call_00_1bbc_CheckForDoorAndEnter:
     sub  A, [HL]                                       ;; 00:1bed $96
     ld   B, A                                          ;; 00:1bee $47
     inc  HL                                            ;; 00:1bef $23
-    ld   A, [wD811_PlayerYPosition]                                    ;; 00:1bf0 $fa $11 $d8
+    ld   A, [wD810_PlayerYPosition+1]                                    ;; 00:1bf0 $fa $11 $d8
     sbc  A, [HL]                                       ;; 00:1bf3 $9e
     inc  HL                                            ;; 00:1bf4 $23
     or   A, B                                          ;; 00:1bf5 $b0
@@ -1400,7 +1400,7 @@ call_00_1bbc_CheckForDoorAndEnter:
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:1bf8 $fa $0e $d8
     sub  A, E                                          ;; 00:1bfb $93
     ld   E, A                                          ;; 00:1bfc $5f
-    ld   A, [wD80F_PlayerXPosition]                                    ;; 00:1bfd $fa $0f $d8
+    ld   A, [wD80E_PlayerXPosition+1]                                    ;; 00:1bfd $fa $0f $d8
     sbc  A, D                                          ;; 00:1c00 $9a
     ld   D, A                                          ;; 00:1c01 $57
     ld   A, E                                          ;; 00:1c02 $7b
@@ -1522,12 +1522,12 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
 ; to select an entry from .data_00_1fc0.
 ; Retrieves a pointer from .data_00_1ff0 to a level setup script (data_2014, 202a, 2040, …).
 ; Temporarily stores the current level ID, loads a new one from the script, and swaps 
-; banks to copy in the proper level/map data (entry_03_6c89_LoadMapData, entry_03_6203_LoadLevelBoundariesFromId, etc.).
+; banks to copy in the proper level/map data (call_03_6c89_LoadMapData, call_03_6203_LoadLevelBoundariesFromId, etc.).
 ; Sets the player’s starting X/Y positions and various working variables.
 
 ; Enters a loop that:
 ; Waits for inputs and updates the map
-; Calls call_00_217f_ProcessCutsceneMovement (movement handler below) and updates objects (entry_02_7152_UpdateObjects).
+; Calls call_00_217f_ProcessCutsceneMovement (movement handler below) and updates objects (call_02_7152_UpdateObjects).
 ; Spawns any queued objects (call_00_35fa_WaitForLineThenSpawnObject).
 ; Decrements timing counters until the script says to advance or exit.
 
@@ -1587,11 +1587,11 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
     ld   A, $00                                        ;; 00:1ee5 $3e $00
     ld   [wDC78], A                                    ;; 00:1ee7 $ea $78 $dc
     call call_00_04fb                                  ;; 00:1eea $cd $fb $04
-    farcall entry_03_6c89_LoadMapData
-    farcall entry_03_6203_LoadLevelBoundariesFromId
+    farcall call_03_6c89_LoadMapData
+    farcall call_03_6203_LoadLevelBoundariesFromId
     call call_00_10de_UpdatePlayerMapWindow                                  ;; 00:1f03 $cd $de $10
     call call_00_1056_LoadFullMap                                  ;; 00:1f06 $cd $56 $10
-    farcall entry_02_708f_InitObjectsAndSpawnPlayer
+    farcall call_02_708f_InitObjectsAndSpawnPlayer
     call call_00_0513                                  ;; 00:1f14 $cd $13 $05
     pop  HL                                            ;; 00:1f17 $e1
     ld   E, [HL]                                       ;; 00:1f18 $5e
@@ -1625,7 +1625,7 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
 .jr_00_1f42:
     call call_00_0b92_WaitForInterrupt                                  ;; 00:1f42 $cd $92 $0b
     call call_00_217f_ProcessCutsceneMovement                                  ;; 00:1f45 $cd $7f $21
-    farcall entry_02_7152_UpdateObjects
+    farcall call_02_7152_UpdateObjects
     call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:1f53 $cd $c8 $11
     call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:1f56 $cd $fa $35
     call call_00_08f8_SetupObjectVRAMTransfer                                  ;; 00:1f59 $cd $f8 $08
@@ -1655,7 +1655,7 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
 .jr_00_1f7a:
     push AF                                            ;; 00:1f7a $f5
     call call_00_0b92_WaitForInterrupt                                  ;; 00:1f7b $cd $92 $0b
-    farcall entry_02_7152_UpdateObjects
+    farcall call_02_7152_UpdateObjects
     call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:1f89 $cd $c8 $11
     call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:1f8c $cd $fa $35
     call call_00_08f8_SetupObjectVRAMTransfer                                  ;; 00:1f8f $cd $f8 $08
@@ -1671,7 +1671,7 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
 .jp_00_1f9f:
     ld   A, $01                                        ;; 00:1f9f $3e $01
     ld   [wDCA7_DrawGexFlag], A                                    ;; 00:1fa1 $ea $a7 $dc
-    ld   HL, wD811_PlayerYPosition                                     ;; 00:1fa4 $21 $11 $d8
+    ld   HL, wD810_PlayerYPosition+1                                     ;; 00:1fa4 $21 $11 $d8
     pop  BC                                            ;; 00:1fa7 $c1
     ld   [HL], B                                       ;; 00:1fa8 $70
     dec  HL                                            ;; 00:1fa9 $2b
@@ -1683,7 +1683,7 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
     ld   [HL], C                                       ;; 00:1faf $71
     pop  AF                                            ;; 00:1fb0 $f1
     ld   [wDB6C_CurrentMapId], A                                    ;; 00:1fb1 $ea $6c $db
-    farcall entry_03_6c89_LoadMapData
+    farcall call_03_6c89_LoadMapData
     ret                                                ;; 00:1fbf $c9
 .data_00_1fc0:
     db   $ff, $ff, $ff, $ff, $00, $01, $02, $ff        ;; 00:1fc0 ...?www?
@@ -1787,35 +1787,35 @@ call_00_217f_ProcessCutsceneMovement:
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:21a7 $fa $0e $d8
     add  A, C                                          ;; 00:21aa $81
     ld   [wD80E_PlayerXPosition], A                                    ;; 00:21ab $ea $0e $d8
-    ld   A, [wD80F_PlayerXPosition]                                    ;; 00:21ae $fa $0f $d8
+    ld   A, [wD80E_PlayerXPosition+1]                                    ;; 00:21ae $fa $0f $d8
     adc  A, $00                                        ;; 00:21b1 $ce $00
-    ld   [wD80F_PlayerXPosition], A                                    ;; 00:21b3 $ea $0f $d8
+    ld   [wD80E_PlayerXPosition+1], A                                    ;; 00:21b3 $ea $0f $d8
 .jr_00_21b6:
     bit  5, [HL]                                       ;; 00:21b6 $cb $6e
     jr   Z, .jr_00_21c9                                ;; 00:21b8 $28 $0f
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:21ba $fa $0e $d8
     sub  A, C                                          ;; 00:21bd $91
     ld   [wD80E_PlayerXPosition], A                                    ;; 00:21be $ea $0e $d8
-    ld   A, [wD80F_PlayerXPosition]                                    ;; 00:21c1 $fa $0f $d8
+    ld   A, [wD80E_PlayerXPosition+1]                                    ;; 00:21c1 $fa $0f $d8
     sbc  A, $00                                        ;; 00:21c4 $de $00
-    ld   [wD80F_PlayerXPosition], A                                    ;; 00:21c6 $ea $0f $d8
+    ld   [wD80E_PlayerXPosition+1], A                                    ;; 00:21c6 $ea $0f $d8
 .jr_00_21c9:
     bit  7, [HL]                                       ;; 00:21c9 $cb $7e
     jr   Z, .jr_00_21dc                                ;; 00:21cb $28 $0f
     ld   A, [wD810_PlayerYPosition]                                    ;; 00:21cd $fa $10 $d8
     add  A, C                                          ;; 00:21d0 $81
     ld   [wD810_PlayerYPosition], A                                    ;; 00:21d1 $ea $10 $d8
-    ld   A, [wD811_PlayerYPosition]                                    ;; 00:21d4 $fa $11 $d8
+    ld   A, [wD810_PlayerYPosition+1]                                    ;; 00:21d4 $fa $11 $d8
     adc  A, $00                                        ;; 00:21d7 $ce $00
-    ld   [wD811_PlayerYPosition], A                                    ;; 00:21d9 $ea $11 $d8
+    ld   [wD810_PlayerYPosition+1], A                                    ;; 00:21d9 $ea $11 $d8
 .jr_00_21dc:
     bit  6, [HL]                                       ;; 00:21dc $cb $76
     ret  Z                                             ;; 00:21de $c8
     ld   A, [wD810_PlayerYPosition]                                    ;; 00:21df $fa $10 $d8
     sub  A, C                                          ;; 00:21e2 $91
     ld   [wD810_PlayerYPosition], A                                    ;; 00:21e3 $ea $10 $d8
-    ld   A, [wD811_PlayerYPosition]                                    ;; 00:21e6 $fa $11 $d8
+    ld   A, [wD810_PlayerYPosition+1]                                    ;; 00:21e6 $fa $11 $d8
     sbc  A, $00                                        ;; 00:21e9 $de $00
-    ld   [wD811_PlayerYPosition], A                                    ;; 00:21eb $ea $11 $d8
+    ld   [wD810_PlayerYPosition+1], A                                    ;; 00:21eb $ea $11 $d8
     ret                                                ;; 00:21ee $c9
     
