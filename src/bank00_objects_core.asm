@@ -522,7 +522,7 @@ call_00_2ff8_InitLevelObjectsAndConfig:
 ; Initialize Level State
 ; Behavior: Switches to the object list bank, resets wDAB8_ObjectCounter counter, clears a large block 
 ; of level state variables (wDCC5_BloodCoolerCounter–wDCDA_BrainOfOzAndRezCounter), copies level-specific configuration tables 
-; (.data_00_30ba and .data_00_317a) into RAM, sets default timers (wDCD5–wDCD9), adjusts 
+; (.data_00_30ba and .data_00_317a) into RAM, sets default timers (wDCD5_ElfHealth1–wDCD9_ElfHealth5), adjusts 
 ; special-case values for level 07/08, and calls setup routines 3180, 31d9, 320d, and 3252.
 ; Purpose: Sets up all object, collectible, and configuration state for a new level.
     ld   A, [wDC16_ObjectListBank]                                    ;; 00:2ff8 $fa $16 $dc
@@ -565,7 +565,7 @@ call_00_2ff8_InitLevelObjectsAndConfig:
     ld   [wDCCF_PlayingCardCounter], A                                    ;; 00:3043 $ea $cf $dc
     ld   [wDCD0_MadBomberFlag], A                                    ;; 00:3046 $ea $d0 $dc
     ld   [wDCD1_BrainOfOzFlag], A                                    ;; 00:3049 $ea $d1 $dc
-    ld   [wDCD2_HitFreestandingRemoteFlags], A                                    ;; 00:304c $ea $d2 $dc
+    ld   [wDCD2_FreestandingRemoteHitFlags], A                                    ;; 00:304c $ea $d2 $dc
     ld   [wDCDA_BrainOfOzAndRezCounter], A                                    ;; 00:304f $ea $da $dc
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:3052 $21 $1e $dc
     ld   L, [HL]                                       ;; 00:3055 $6e
@@ -580,15 +580,15 @@ call_00_2ff8_InitLevelObjectsAndConfig:
     ld   BC, $10                                       ;; 00:3063 $01 $10 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:3066 $cd $6e $07
     ld   HL, .data_00_317a                                     ;; 00:3069 $21 $7a $31
-    ld   DE, wDCE2                                     ;; 00:306c $11 $e2 $dc
+    ld   DE, wDCE2_ElevatorObjectUnkData                                     ;; 00:306c $11 $e2 $dc
     ld   BC, $06                                       ;; 00:306f $01 $06 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:3072 $cd $6e $07
     ld   A, $02                                        ;; 00:3075 $3e $02
-    ld   [wDCD5], A                                    ;; 00:3077 $ea $d5 $dc
-    ld   [wDCD6], A                                    ;; 00:307a $ea $d6 $dc
-    ld   [wDCD7], A                                    ;; 00:307d $ea $d7 $dc
-    ld   [wDCD8], A                                    ;; 00:3080 $ea $d8 $dc
-    ld   [wDCD9], A                                    ;; 00:3083 $ea $d9 $dc
+    ld   [wDCD5_ElfHealth1], A                                    ;; 00:3077 $ea $d5 $dc
+    ld   [wDCD6_ElfHealth2], A                                    ;; 00:307a $ea $d6 $dc
+    ld   [wDCD7_ElfHealth3], A                                    ;; 00:307d $ea $d7 $dc
+    ld   [wDCD8_ElfHealth4], A                                    ;; 00:3080 $ea $d8 $dc
+    ld   [wDCD9_ElfHealth5], A                                    ;; 00:3083 $ea $d9 $dc
     ld   HL, wDB6D                                     ;; 00:3086 $21 $6d $db
     ld   [HL], $00                                     ;; 00:3089 $36 $00
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:308b $fa $1e $dc

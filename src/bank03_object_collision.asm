@@ -5,7 +5,7 @@
 ; Counters (wDCCA_StrayCatCounter–wDCCD_ConvictCounter, wDCCC_BellCounter, etc.) are collectible progress trackers.
 ; Transformations usually load new object data from a bank depending on state.
 ; Slot functions either set/clear/accumulate object slot values.
-; Special flags (wDCD2_HitFreestandingRemoteFlags, wDC88) are level or event triggers.
+; Special flags (wDCD2_FreestandingRemoteHitFlags, wDC88) are level or event triggers.
 
 call_03_4c38_UpdateObjectCollision_Dispatch:
 ; Main dispatcher: checks if collisions enabled (wDCA7_DrawGexFlag).
@@ -292,7 +292,7 @@ call_03_4dc2_Collision_PawCoin:
     db   $00, $20, $40, $80
 
 call_03_4e04_Collision_Fly:
-; If collision: gets object ID, looks up a state value in .data_03_4e2c, calls SetPhase_TimersAndFlags.
+; If collision: gets object ID, looks up a state value in .data_03_4e2c, calls call_00_0624_SetFly_TimersAndFlags.
 ; Modifies object graphics/status, then clears the object.
 ; Looks like a pickup that triggers a phase/state change.
     call call_03_550e_CheckPlayerObjectInteraction
@@ -304,7 +304,7 @@ call_03_4e04_Collision_Fly:
     ld   de,.data_03_4e2c
     add  hl,de
     ld   a,[hl]
-    call call_00_0624_SetPhase_TimersAndFlags
+    call call_00_0624_SetFly_TimersAndFlags
     ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_UNK1F_OFFSET
@@ -459,7 +459,7 @@ call_03_4e89_Collision_EvilSantaProjectile:
 call_03_4f23_Collision_HolidayTV_Elf:
 ; On collision:
 ; - If A!=01 → trigger player action change.
-; - If A==01: loads new object data (bank 4), decrements per-object counter (wDCD5), 
+; - If A==01: loads new object data (bank 4), decrements per-object counter (wDCD5_ElfHealth1), 
 ;   clears object when it hits 0, increments wDCC8_ElfCounter, dispatches offset action.
 ; - If all counters zero → play sound 1E.
     call call_03_550e_CheckPlayerObjectInteraction                                  ;; 03:4f23 $cd $0e $55
@@ -470,7 +470,7 @@ call_03_4f23_Collision_HolidayTV_Elf:
     farcall call_02_72ac_SetupNewAction
     call call_00_230f_ResolveObjectListIndex                                  ;; 03:4f39 $cd $0f $23
     ld   B, $00                                        ;; 03:4f3c $06 $00
-    ld   HL, wDCD5                                     ;; 03:4f3e $21 $d5 $dc
+    ld   HL, wDCD5_ElfHealth1                                     ;; 03:4f3e $21 $d5 $dc
     add  HL, BC                                        ;; 03:4f41 $09
     ld   A, [HL]                                       ;; 03:4f42 $7e
     and  A, A                                          ;; 03:4f43 $a7
@@ -483,7 +483,7 @@ call_03_4f23_Collision_HolidayTV_Elf:
     inc  [HL]                                          ;; 03:4f50 $34
     ld   A, [HL]                                       ;; 03:4f51 $7e
     call call_00_2c09_Object_SpawnRelativeWithOffset6                                  ;; 03:4f52 $cd $09 $2c
-    ld   HL, wDCD5                                     ;; 03:4f55 $21 $d5 $dc
+    ld   HL, wDCD5_ElfHealth1                                     ;; 03:4f55 $21 $d5 $dc
     ld   A, [HL+]                                      ;; 03:4f58 $2a
     or   A, [HL]                                       ;; 03:4f59 $b6
     ret  NZ                                            ;; 03:4f5a $c0
@@ -611,7 +611,7 @@ call_03_500d_Collision_Coffin:
     ret  
    
 call_03_5028_Collision_Cactus:
-; Collision logic depends on nearby flags (wDCA9–wDCAB).
+; Collision logic depends on nearby flags (wDCA9_FlyTimerOrFlags4–wDCAB_FlyTimerOrFlags2).
 ; Sometimes triggers hit/respawn if action ID < 5.
 ; Otherwise, for action 05, can trigger a player action change.
 ; If action < 4 and player within 0x28 in X vector → loads new object data (bank 5).
@@ -619,7 +619,7 @@ call_03_5028_Collision_Cactus:
     jr   nc,label504C
     cp   a,$00
     jr   z,label5044
-    ld   hl,wDCA9
+    ld   hl,wDCA9_FlyTimerOrFlags4
     ldi  a,[hl]
     or   [hl]
     inc  hl
@@ -885,7 +885,7 @@ label5222:
 call_03_5231_Collision_Mech:
 ; If collision →
 ; - If interaction ≠ 1 → player action change.
-; - If = 1 and wDCA9–wDCAB flags are set:
+; - If = 1 and wDCA9_FlyTimerOrFlags4–wDCAB_FlyTimerOrFlags2 flags are set:
 ;   - Handle hit/respawn, increment wDCCB_MechCounter.
 ;   - Every 4th, play sound 1E, then dispatch offset action.
 ; Special case for levels $29/$2A only.
@@ -893,7 +893,7 @@ call_03_5231_Collision_Mech:
     ret  nc
     cp   a,$01
     jp   nz,call_03_4cea_TriggerPlayerActionChange
-    ld   hl,wDCA9
+    ld   hl,wDCA9_FlyTimerOrFlags4
     ldi  a,[hl]
     or   [hl]
     inc  hl
@@ -1022,12 +1022,12 @@ call_03_52fa_Collision_Bomb:
     
 call_03_531a_Collision_WaterTowerStand:
 ; On collision (interaction=1):
-; - If wDCA9–wDCAB flags set → handle hit/respawn, then set slot active.
+; - If wDCA9_FlyTimerOrFlags4–wDCAB_FlyTimerOrFlags2 flags set → handle hit/respawn, then set slot active.
     call call_03_550e_CheckPlayerObjectInteraction
     ret  nc
     cp   a,$01
     ret  nz
-    ld   hl,wDCA9
+    ld   hl,wDCA9_FlyTimerOrFlags4
     ldi  a,[hl]
     or   [hl]
     inc  hl
@@ -1040,9 +1040,9 @@ call_03_532f_Collision_GextremeSports_Elf:
 ; Works for actions < 4 only.
 ; On collision (interaction=1):
 ; - Loads new data (bank 4).
-; - Decrements object counter wDCD5.
+; - Decrements object counter wDCD5_ElfHealth1.
 ; - If zero → clear object, increment wDCC8_ElfCounter, dispatch action.
-; - If all counters = 0 → set wDCD2_HitFreestandingRemoteFlags=1 (event flag).
+; - If all counters = 0 → set wDCD2_FreestandingRemoteHitFlags=1 (event flag).
     call call_00_2962_Object_GetActionId
     cp   a,$04
     ret  nc
@@ -1054,7 +1054,7 @@ call_03_532f_Collision_GextremeSports_Elf:
     farcall call_02_72ac_SetupNewAction
     call call_00_230f_ResolveObjectListIndex
     ld   b,$00
-    ld   hl,wDCD5
+    ld   hl,wDCD5_ElfHealth1
     add  hl,bc
     ld   a,[hl]
     and  a
@@ -1067,7 +1067,7 @@ call_03_532f_Collision_GextremeSports_Elf:
     inc  [hl]
     ld   a,[hl]
     call call_00_2c09_Object_SpawnRelativeWithOffset6
-    ld   hl,wDCD5
+    ld   hl,wDCD5_ElfHealth1
     ld   b,$05
     xor  a
 label536D:
@@ -1078,7 +1078,7 @@ label536D:
     and  a
     ret  nz
     ld   a,$01
-    ld   [wDCD2_HitFreestandingRemoteFlags],a
+    ld   [wDCD2_FreestandingRemoteHitFlags],a
     ret  
     
 call_03_537a_Collision_BonusTimeCoin:
@@ -1097,7 +1097,7 @@ call_03_537a_Collision_BonusTimeCoin:
     
 call_03_538e_Collision_Bell:
 ; On collision (interaction=1):
-; - If action=0 → increment wDCCC_BellCounter, dispatch action, set wDCD2_HitFreestandingRemoteFlags=1 when =7.
+; - If action=0 → increment wDCCC_BellCounter, dispatch action, set wDCD2_FreestandingRemoteHitFlags=1 when =7.
 ; - Always load new data (bank 1), set status nibble=2.
     call call_03_550e_CheckPlayerObjectInteraction
     ret  nc
@@ -1114,7 +1114,7 @@ call_03_538e_Collision_Bell:
     cp   a,$07
     jr   nz,label53B0
     ld   a,$01
-    ld   [wDCD2_HitFreestandingRemoteFlags],a
+    ld   [wDCD2_FreestandingRemoteHitFlags],a
 label53B0:
     ld   a,$01
     farcall call_02_72ac_SetupNewAction
@@ -1233,14 +1233,14 @@ call_03_5469_Collision_BrainOfOzProjectile:
     jp   call_00_2b7a_ClearObjectThenJump
 
 call_03_5473_Collision_FreestandingRemote:
-; On collision (interaction=1): set wDCD2_HitFreestandingRemoteFlags=0x81 (event flag).
+; On collision (interaction=1): set wDCD2_FreestandingRemoteHitFlags=0x81 (event flag).
     call call_03_550e_CheckPlayerObjectInteraction                                  ;; 03:5473 $cd $0e $55
     ret  NC                                            ;; 03:5476 $d0
     cp   A, $01                                        ;; 03:5477 $fe $01
     ret  NZ                                            ;; 03:5479 $c0
     call call_00_2962_Object_GetActionId                                  ;; 03:547a $cd $62 $29
     ld   A, $81                                        ;; 03:547d $3e $81
-    ld   [wDCD2_HitFreestandingRemoteFlags], A                                    ;; 03:547f $ea $d2 $dc
+    ld   [wDCD2_FreestandingRemoteHitFlags], A                                    ;; 03:547f $ea $d2 $dc
     ret                                                ;; 03:5482 $c9
     
 call_03_5483_Collision_Meteor:

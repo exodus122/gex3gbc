@@ -1,5 +1,3 @@
-SECTION "bank01", ROMX[$4000], BANK[$01]
-
 call_01_4000_MenuHandler_LoadAndProcess:
 ; Purpose:
 ; Initializes menu variables (wDBE9, wDBEA_MenuType, etc.) and copies menu-type–specific data into wDB92.
@@ -655,7 +653,7 @@ call_01_43f0_MenuEngine_MainLoop:
     ld   A, $d3                                        ;; 01:4447 $3e $d3
     call call_00_0e33_SetLCDControlRegister                                  ;; 01:4449 $cd $33 $0e
     ld   A, $01                                        ;; 01:444c $3e $01
-    ld   [wDD6A], A                                    ;; 01:444e $ea $6a $dd
+    ld   [wDD6A_GameBoyColorPaletteFlag], A                                    ;; 01:444e $ea $6a $dd
     jp   call_00_0b92_WaitForInterrupt                                  ;; 01:4451 $c3 $92 $0b
 
 call_01_4454_SetMenuPointer:

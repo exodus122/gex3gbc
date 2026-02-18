@@ -1,18 +1,18 @@
 call_02_47b4_PlayerAction_Spawn:
 ; Checks bit 4 of wD805_Player_SpriteFlags (a flag for spawning in a level). 
 ; If the bit is not set, it returns. If set, it:
-; Clears state variables (wDCA2, wDCA3, wDC87).
-; Sets wDCA4 = 05h (some delay or counter).
+; Clears state variables (wDCA2_PlayerUnk1, wDCA3_PlayerUnk2, wDC87).
+; Sets wDCA4_PlayerUnk3 = 05h (some delay or counter).
 ; Plays sound effect $0E via call_00_0ff5_QueueSoundEffectWithPriority
     ld   HL, wD805_Player_SpriteFlags                                     ;; 02:47b4 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:47b7 $cb $66
     ret  Z                                             ;; 02:47b9 $c8
     xor  A, A                                          ;; 02:47ba $af
-    ld   [wDCA2], A                                    ;; 02:47bb $ea $a2 $dc
-    ld   [wDCA3], A                                    ;; 02:47be $ea $a3 $dc
+    ld   [wDCA2_PlayerUnk1], A                                    ;; 02:47bb $ea $a2 $dc
+    ld   [wDCA3_PlayerUnk2], A                                    ;; 02:47be $ea $a3 $dc
     ld   [wDC87], A                                    ;; 02:47c1 $ea $87 $dc
     ld   A, $05                                        ;; 02:47c4 $3e $05
-    ld   [wDCA4], A                                    ;; 02:47c6 $ea $a4 $dc
+    ld   [wDCA4_PlayerUnk3], A                                    ;; 02:47c6 $ea $a4 $dc
     ld   A, $0e                                        ;; 02:47c9 $3e $0e
     jp   call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 02:47cb $c3 $f5 $0f
 
@@ -105,7 +105,7 @@ call_02_483e:
     ld   a,$05
     call call_00_0ff5_QueueSoundEffectWithPriority
     xor  a
-    jp   call_00_0624_SetPhase_TimersAndFlags
+    jp   call_00_0624_SetFly_TimersAndFlags
 
 call_02_484d:
     ld   HL, wD805_Player_SpriteFlags                                     ;; 02:484d $21 $05 $d8
@@ -464,7 +464,7 @@ call_02_4adb:
     ld   h,[hl]
     ld   c,e
     call call_02_4ee7_MapCollisionFlags
-    ld   hl,wDCA1
+    ld   hl,wDCA1_PlayerUnk6
     cp   a,$FF
     jr   z,.label4AEA
     ld   [hl],a
@@ -482,7 +482,7 @@ call_02_4adb:
     ld   hl,.data_02_4b56
     add  hl,de
     ld   c,[hl]
-    ld   hl,wDCA0
+    ld   hl,wDCA0_PlayerUnk7
     dec  [hl]
     bit  7,[hl]
     jr   z,.label4B16
@@ -533,12 +533,12 @@ call_02_4adb:
 
 call_02_4B66:
     call call_02_4ee7_MapCollisionFlags
-    ld   hl,wDCA1
+    ld   hl,wDCA1_PlayerUnk6
     cp   a,$FF
     jr   z,label4B71
     ld   [hl],a
 label4B71:
-    ld   hl,wDCA0
+    ld   hl,wDCA0_PlayerUnk7
     dec  [hl]
     bit  7,[hl]
     jr   z,label4B7F
@@ -547,7 +547,7 @@ label4B71:
     inc  [hl]
 label4B7F:
     ld   a,[wDC9F]
-    ld   hl,wDCA1
+    ld   hl,wDCA1_PlayerUnk6
     add  [hl]
     and  a,$07
     add  a,$E5
@@ -580,13 +580,13 @@ call_02_4bb7:
     ld   a,$03
     ld   [wDC87],a
     xor  a
-    ld   [wDCA2],a
-    ld   [wDCA3],a
+    ld   [wDCA2_PlayerUnk1],a
+    ld   [wDCA3_PlayerUnk2],a
     ld   a,$05
-    ld   [wDCA4],a
+    ld   [wDCA4_PlayerUnk3],a
     ld   a,$01
-    ld   [wDCA5],a
-    ld   [wDCA6],a
+    ld   [wDCA5_PlayerUnk4],a
+    ld   [wDCA6_PlayerUnk5],a
     ld   hl,wDC80
     set  6,[hl]
 label4BDC:
@@ -594,14 +594,14 @@ label4BDC:
     bit  6,a
     call nz,call_00_1bbc_CheckForDoorAndEnter
     call call_02_4E0C_UpdateActionSequence
-    ld   a,[wDCA5]
+    ld   a,[wDCA5_PlayerUnk4]
     and  a
     jr   z,call_02_4C11
-    ld   a,[wDCA6]
+    ld   a,[wDCA6_PlayerUnk5]
     and  a
     jr   z,call_02_4C10
     ld   c,a
-    ld   a,[wDCA5]
+    ld   a,[wDCA5_PlayerUnk4]
     cp   a,$01
     ret  nz
     ld   hl,call_02_4C16
@@ -623,7 +623,7 @@ call_02_4C10:
     ret  
 
 call_02_4C11:
-    ld   a,[wDCA6]
+    ld   a,[wDCA6_PlayerUnk5]
     and  a
     ret  z
 call_02_4C16:
@@ -676,11 +676,11 @@ call_02_4c7a:
     bit  4,[hl]
     jr   z,label4CA1
     xor  a
-    ld   [wDCA2],a
+    ld   [wDCA2_PlayerUnk1],a
     ld   a,$03
-    ld   [wDCA3],a
+    ld   [wDCA3_PlayerUnk2],a
     ld   a,$0B
-    ld   [wDCA4],a
+    ld   [wDCA4_PlayerUnk3],a
     ld   a,$04
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   hl,wDC80

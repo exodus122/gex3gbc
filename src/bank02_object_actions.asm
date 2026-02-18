@@ -461,7 +461,7 @@ call_02_5bd4_ObjectAction_FreestandingRemote_unk0:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 02:5bd4 $fa $1e $dc
     and  A, A                                          ;; 02:5bd7 $a7
     jr   Z, .jr_02_5be4                                ;; 02:5bd8 $28 $0a
-    ld   A, [wDCD2_HitFreestandingRemoteFlags]                                    ;; 02:5bda $fa $d2 $dc
+    ld   A, [wDCD2_FreestandingRemoteHitFlags]                                    ;; 02:5bda $fa $d2 $dc
     and  A, A                                          ;; 02:5bdd $a7
     ld   A, $01                                        ;; 02:5bde $3e $01
     jp   NZ, call_02_72ac_SetupNewAction                              ;; 02:5be0 $c2 $ac $72
@@ -474,7 +474,7 @@ call_02_5bd4_ObjectAction_FreestandingRemote_unk0:
     ret                                                ;; 02:5bee $c9
 
 call_02_5bef_ObjectAction_FreestandingRemote_unk1:
-    ld   A, [wDCD2_HitFreestandingRemoteFlags]                                    ;; 02:5bef $fa $d2 $dc
+    ld   A, [wDCD2_FreestandingRemoteHitFlags]                                    ;; 02:5bef $fa $d2 $dc
     cp   A, $81                                        ;; 02:5bf2 $fe $81
     ld   A, $02                                        ;; 02:5bf4 $3e $02
     jp   Z, call_02_72ac_SetupNewAction                               ;; 02:5bf6 $ca $ac $72
@@ -781,7 +781,7 @@ call_02_5e34_ObjectAction_SkatingElf_Damaged:
     ret  Z                                             ;; 02:5e57 $c8
     call call_00_230f_ResolveObjectListIndex                                  ;; 02:5e58 $cd $0f $23
     ld   B, $00                                        ;; 02:5e5b $06 $00
-    ld   HL, wDCD5                                     ;; 02:5e5d $21 $d5 $dc
+    ld   HL, wDCD5_ElfHealth1                                     ;; 02:5e5d $21 $d5 $dc
     add  HL, BC                                        ;; 02:5e60 $09
     ld   A, [HL]                                       ;; 02:5e61 $7e
     and  A, A                                          ;; 02:5e62 $a7
@@ -926,8 +926,8 @@ call_02_5f50_ObjectAction_SafariSamProjectile_Update:
 
 call_02_5f69_ObjectAction_GhostKnight_Unk0:
     xor  a
-    ld   [wDCD3],a
-    ld   [wDCD4],a
+    ld   [wDCD3_GhostKnightDamageCounter1],a
+    ld   [wDCD4_GhostKnightDamageCounter2],a
     call call_02_5F9B
     ld   a,$01
     jp   call_02_72ac_SetupNewAction
@@ -948,11 +948,11 @@ call_02_5f78_ObjectAction_GhostKnight_Unk1:
 call_02_5f91_ObjectAction_GhostKnight_Unk3:
     call call_00_29f5_Object_ClearActiveFlagAndCheck
     ret  z
-    ld   hl,wDCD3
+    ld   hl,wDCD3_GhostKnightDamageCounter1
     inc  [hl]
     res  3,[hl]
 call_02_5F9B:
-    ld   hl,wDCD3
+    ld   hl,wDCD3_GhostKnightDamageCounter1
     ld   l,[hl]
     ld   h,00
     ld   de,.data_02_5fbf
@@ -1016,11 +1016,11 @@ call_02_5F9B:
 call_02_60c7_ObjectAction_GhostKnightProjectile_Update:
     call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label60F2
-    ld   a,[wDCD3]
+    ld   a,[wDCD3_GhostKnightDamageCounter1]
     add  a
     add  a
     ld   c,a
-    ld   hl,wDCD4
+    ld   hl,wDCD4_GhostKnightDamageCounter2
     ld   a,[hl]
     inc  [hl]
     and  a,$03
@@ -1943,7 +1943,7 @@ call_02_67c2_ObjectAction_Elevator_Update:
     ld   l,c
     ld   h,$00
     add  hl,hl
-    ld   de,wDCE2
+    ld   de,wDCE2_ElevatorObjectUnkData
     add  hl,de
     ld   d, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
@@ -2006,7 +2006,7 @@ call_02_67c2_ObjectAction_Elevator_Update:
     ld   l,c
     ld   h,$00
     add  hl,hl
-    ld   de,wDCE2
+    ld   de,wDCE2_ElevatorObjectUnkData
     add  hl,de
     ld   d, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
@@ -2587,7 +2587,7 @@ call_02_6c73_ObjectAction_GextremeSportsElf_Unk4:
     ret  z
     call call_00_230f_ResolveObjectListIndex
     ld   b,$00
-    ld   hl,wDCD5
+    ld   hl,wDCD5_ElfHealth1
     add  hl,bc
     ld   a,[hl]
     and  a

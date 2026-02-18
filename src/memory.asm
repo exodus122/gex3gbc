@@ -75,7 +75,7 @@ wD810_PlayerYPosition:
     ds 14                                              ;; d811
 wD820_ObjectMemoryAfterPlayer:
     ds 32                                              ;; d820
-wD840_ObjectMemoryAfterPlayer: ; why does some code use this and not wDB20?
+wD840_ObjectMemoryAfterPlayer: ; why does some code use this and not wDB20? maybe wD820 is reserved for a particular object
     ds 32                                              ;; d840
     ds 32 
     ds 32 
@@ -702,17 +702,13 @@ wDC68_CollectibleCount:
 wDC69_PlayerSpawnIdInLevel:
     ds 1                                               ;; dc69
 
-wDC6A:
-    ds 1                                               ;; dc6a
+wDC6A_CheckpointStoredX:
+    ds 2                                               ;; dc6a
+wDC6C_CheckpointStoredY:
+    ds 2                                               ;; dc6c
 
-wDC6B:
-    ds 1                                               ;; dc6b
-
-wDC6C:
-    ds 1                                               ;; dc6c
-
-wDC6D:
-    ds 2                                               ;; dc6d
+; unused?
+    ds 1                                               ;; dc6e
 
 wDC6F:
     ds 1                                               ;; dc6f
@@ -732,6 +728,7 @@ wDC73:
 wDC78:
     ds 1                                               ;; dc78
 
+; Misc player variables
 wDC79:
     ds 1                                               ;; dc79
 
@@ -786,8 +783,7 @@ wDC8A:
 wDC8B:
     ds 1                                               ;; dc8b
 
-wDC8C_PlayerYVelocity:
-; can freeze to levitate
+wDC8C_PlayerYVelocity: ; can freeze to levitate
     ds 1                                               ;; dc8c
 
 wDC8D:
@@ -838,61 +834,55 @@ wDC9E:
 wDC9F:
     ds 1                                               ;; dc9f
 
-wDCA0:
+wDCA0_PlayerUnk7:
     ds 1                                               ;; dca0
 
-wDCA1:
+wDCA1_PlayerUnk6:
     ds 1                                               ;; dca1
 
-wDCA2:
+wDCA2_PlayerUnk1:
     ds 1                                               ;; dca2
-
-wDCA3:
+wDCA3_PlayerUnk2:
     ds 1                                               ;; dca3
-
-wDCA4:
+wDCA4_PlayerUnk3:
     ds 1                                               ;; dca4
-
-wDCA5:
+wDCA5_PlayerUnk4:
     ds 1                                               ;; dca5
-
-wDCA6:
+wDCA6_PlayerUnk5:
     ds 1                                               ;; dca6
 
 wDCA7_DrawGexFlag:
     ds 1                                               ;; dca7
 
-wDCA8:
+wDCA8_FlyTimerOrFlags3:
     ds 1                                               ;; dca8
-
-wDCA9:
+wDCA9_FlyTimerOrFlags4:
     ds 1                                               ;; dca9
-
-wDCAA:
+wDCAA_FlyTimerOrFlags1:
     ds 1                                               ;; dcaa
-
-wDCAB:
+wDCAB_FlyTimerOrFlags2:
     ds 1                                               ;; dcab
 
 wDCAC:
     ds 1                                               ;; dcac
-
 wDCAD:
     ds 1                                               ;; dcad
 
-wDCAE:
+wDCAE_FlyTimerOrFlags5:
     ds 1                                               ;; dcae
 
-wDCAF_PawCoinCounter:
-    ds 2                                               ;; dcaf
+wDCAF_PawCoinCounter: ; for every 4 collected, increment Gex's health
+    ds 1                                               ;; dcaf
+
+; unused?
+    ds 1
 
 wDCB1:
     ds 16                                              ;; dcb1
 
-wDCC1:
+wDCC1_EnterDoorRelated1:
     ds 1                                               ;; dcc1
-
-wDCC2:
+wDCC2_EnterDoorRelated2:
     ds 1                                               ;; dcc2
 
 ; Object counters and flags
@@ -926,23 +916,23 @@ wDCD0_MadBomberFlag:
     ds 1                                               ;; dcd0
 wDCD1_BrainOfOzFlag:
     ds 1                                               ;; dcd1
-wDCD2_HitFreestandingRemoteFlags:
+wDCD2_FreestandingRemoteHitFlags:
 ; gets set when a collision occurs with a freestanding remote
 ; the remote object checks for this flag and sets progressflags
     ds 1                                               ;; dcd2
-wDCD3:
+wDCD3_GhostKnightDamageCounter1:
     ds 1                                               ;; dcd3
-wDCD4:
+wDCD4_GhostKnightDamageCounter2:
     ds 1                                               ;; dcd4
-wDCD5:
+wDCD5_ElfHealth1:
     ds 1                                               ;; dcd5
-wDCD6:
+wDCD6_ElfHealth2:
     ds 1                                               ;; dcd6
-wDCD7:
+wDCD7_ElfHealth3:
     ds 1                                               ;; dcd7
-wDCD8:
+wDCD8_ElfHealth4:
     ds 1                                               ;; dcd8
-wDCD9:
+wDCD9_ElfHealth5:
     ds 1                                               ;; dcd9
 wDCDA_BrainOfOzAndRezCounter:
     ds 1                                               ;; dcda
@@ -951,27 +941,27 @@ wDCDB_EvilSantaHitByProjectileFlag:
 wDCDC_HandObjectUnkFlag:
     ds 2                                               ;; dcdc
 
-wDCDE:
+; Mission Preview Cutscene flags
+wDCDE_MissionPreviewCutsceneRelated:
     ds 1                                               ;; dcde
-
-wDCDF:
+wDCDF: ; unused except set to 0?
     ds 1                                               ;; dcdf
-
-wDCE0:
+wDCE0_MissionPreviewCutsceneMovementFlag:
     ds 1                                               ;; dce0
-
-wDCE1:
+wDCE1: ; unused except set to 0?
     ds 1                                               ;; dce1
 
-wDCE2:
+; Elevator object data
+wDCE2_ElevatorObjectUnkData:
     ds 6                                               ;; dce2
 
+; Object spawning related flags
 wDCE8:
     ds 1                                               ;; dce8
-
 wDCE9:
     ds 1                                               ;; dce9
 
+; Palletes and related flags
 wDCEA_BgPalettes:
     ds 32                                              ;; dcea
 wDD0A_BgPalettes:
@@ -980,16 +970,16 @@ wDD2A_ObjectPalettes:
     ds 32                                              ;; dd2a
 wDD4A_ObjectPalettes:
     ds 32                                              ;; dd4a
-
-wDD6A:
+wDD6A_GameBoyColorPaletteFlag: ; determines if colored palettes will be used
     ds 1                                               ;; dd6a
 
-wDD6B: 
+wDD6B: ; unused except set to 0?
     ds 1
     
-; this section seems to be unused
+; unused section?
     ds 88                                             ;; dd6b
 
+; Particle buffer
 wDDC4_ParticleSlot1Buffer:
     ds 19
 wDDD7_ParticleSlot2Buffer:
@@ -1008,20 +998,19 @@ wDE49_ParticleSlot8Buffer:
     ds 19
 
 ; Start of Audio wRAM section
-wDE5C:
+wDE5C_CurrentSong:
     ds 1                                               ;; de5c
-
-wDE5D:
+wDE5D_QueuedSoundEffect:
     ds 1                                               ;; de5d
-
-wDE5E:
+wDE5E_QueuedSoundEffectPriority:
     ds 1                                               ;; de5e
-
-wDE5F:
+wDE5F_CurrentSoundEffectPriority:
     ds 1                                               ;; de5f
-
-wDE60:
-    ds 160                                             ;; de60
+wDE60_AudioBankRelated:
+    ds 1                                               ;; de60
+    
+; unused section?
+    ds 159                                             ;; de61
 
 ; Start of Bank 04-05 audio ram
 wDF00:
@@ -1289,16 +1278,12 @@ SECTION "hram", HRAM[$ff80]
 
 hFF80:
     ds 112                                             ;; ff80
-
 hFFF0:
     ds 12                                              ;; fff0
-
 hFFFC:
     ds 1                                               ;; fffc
-
 hFFFD:
     ds 1                                               ;; fffd
-
 hFFFE:
     ds 1                                               ;; fffe
 

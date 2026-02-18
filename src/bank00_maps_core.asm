@@ -868,7 +868,7 @@ call_00_1633_HandleLevelWarpOrExit:
 ; Level Transition Loader
 ; Calculates a destination level and coordinates based on current level number (wDC1E) and 
 ; player Y-position. It fetches a pointer from .data_00_16a2_PlayerSpawnPositions, determines the new level ID, 
-; screen positions (wDC6A/B), and offset vector (wDC6C), ensuring transitions are within bounds.
+; screen positions (wDC6A_CheckpointStoredX/B), and offset vector (wDC6C_CheckpointStoredY), ensuring transitions are within bounds.
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:1633 $21 $1e $dc
     ld   L, [HL]                                       ;; 00:1636 $6e
     ld   H, $00                                        ;; 00:1637 $26 $00
@@ -894,7 +894,7 @@ call_00_1633_HandleLevelWarpOrExit:
     pop  HL                                            ;; 00:1655 $e1
     ld   A, [HL+]                                      ;; 00:1656 $2a
     ld   [wDB6C_CurrentMapId], A                                    ;; 00:1657 $ea $6c $db
-    ld   DE, wDC6A                                     ;; 00:165a $11 $6a $dc
+    ld   DE, wDC6A_CheckpointStoredX                                     ;; 00:165a $11 $6a $dc
     ld   BC, $04                                       ;; 00:165d $01 $04 $00
     jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:1660 $c3 $6e $07
 .jr_00_1663:
@@ -917,9 +917,9 @@ call_00_1633_HandleLevelWarpOrExit:
     ld   A, [HL+]                                      ;; 00:167a $2a
     ld   [wDB6C_CurrentMapId], A                                    ;; 00:167b $ea $6c $db
     ld   A, [HL+]                                      ;; 00:167e $2a
-    ld   [wDC6A], A                                    ;; 00:167f $ea $6a $dc
+    ld   [wDC6A_CheckpointStoredX], A                                    ;; 00:167f $ea $6a $dc
     ld   A, [HL+]                                      ;; 00:1682 $2a
-    ld   [wDC6B], A                                    ;; 00:1683 $ea $6b $dc
+    ld   [wDC6A_CheckpointStoredX+1], A                                    ;; 00:1683 $ea $6b $dc
     ld   A, [HL+]                                      ;; 00:1686 $2a
     add  A, E                                          ;; 00:1687 $83
     ld   E, A                                          ;; 00:1688 $5f
@@ -936,23 +936,24 @@ call_00_1633_HandleLevelWarpOrExit:
 .jr_00_1698:
     ld   DE, $10                                       ;; 00:1698 $11 $10 $00
 .jr_00_169b:
-    ld   HL, wDC6C                                     ;; 00:169b $21 $6c $dc
+    ld   HL, wDC6C_CheckpointStoredY                                     ;; 00:169b $21 $6c $dc
     ld   [HL], E                                       ;; 00:169e $73
     inc  HL                                            ;; 00:169f $23
     ld   [HL], D                                       ;; 00:16a0 $72
     ret                                                ;; 00:16a1 $c9
 .data_00_16a2_PlayerSpawnPositions:
-    dw   $16c2                                         ;; 00:16a2 wW
-    dw   $16f2                                         ;; 00:16a4 wW
-    db   $22, $17, $e2, $17, $4a, $18, $d2, $18        ;; 00:16a6 ????????
-    db   $62, $19, $b2, $19
+    dw   .data_00_16c2                                         ;; 00:16a2 wW
+    dw   .data_00_16f2                                         ;; 00:16a4 wW
+    dw   .data_00_1722, .data_00_17e2, .data_00_184a, .data_00_18d2        ;; 00:16a6 ????????
+    dw   .data_00_1962, .data_00_19b2
     dw   .data_00_16ba
     dw   .data_00_16ba
     dw   .data_00_16ba
-    db   $e2, $19
+    dw   .data_00_19e2
 .data_00_16ba:
     db   $00, $00, $00, $00        ;; 00:16b6 ????????
     db   $00, $00, $00, $00
+.data_00_16c2:
     db   $00, $b0, $01             ;; 00:16be ????w..
     dw   $00f0                                         ;; 00:16c5 wW
     db   $ff, $00, $00, $00, $50, $00                  ;; 00:16c7 .??w..
@@ -964,14 +965,18 @@ call_00_1633_HandleLevelWarpOrExit:
     dw   $00f0                                         ;; 00:16e5 wW
     db   $ff, $00, $00, $0e, $30, $00                  ;; 00:16e7 .??w..
     dw   $0030                                         ;; 00:16ed wW
-    db   $ff, $00, $00, $0f, $20, $01, $80, $00        ;; 00:16ef .??w....
+    db   $ff, $00, $00
+.data_00_16f2:
+    db   $0f, $20, $01, $80, $00        ;; 00:16ef .??w....
     db   $ff, $00, $00, $10, $20, $00, $30, $01        ;; 00:16f7 .???????
     db   $ff, $00, $00, $11, $30, $01, $60, $00        ;; 00:16ff ???w...W
     db   $ff, $00, $00, $01, $60, $09                  ;; 00:1707 .??w..
     dw   $0400                                         ;; 00:170d wW
     db   $ff, $00, $00, $01, $a0, $07, $00, $01        ;; 00:170f .???????
     db   $ff, $00, $00, $01, $c8, $02, $80, $00        ;; 00:1717 ???w....
-    db   $ff, $00, $00, $12, $c0, $00, $60, $02        ;; 00:171f .???????
+    db   $ff, $00, $00
+.data_00_1722:
+    db   $12, $c0, $00, $60, $02        ;; 00:171f .???????
     db   $ff, $00, $00, $14, $20, $00, $80, $00        ;; 00:1727 ????????
     db   $ff, $00, $00, $15, $20, $01, $30, $01        ;; 00:172f ????????
     db   $ff, $00, $00, $16, $20, $00, $e0, $01        ;; 00:1737 ????????
@@ -995,7 +1000,9 @@ call_00_1633_HandleLevelWarpOrExit:
     db   $ff, $00, $00, $14, $a0, $00, $10, $00        ;; 00:17c7 ????????
     db   $ff, $00, $00, $02, $08, $01, $50, $02        ;; 00:17cf ????????
     db   $ff, $00, $00, $02, $a8, $02, $d0, $01        ;; 00:17d7 ????????
-    db   $ff, $00, $00, $1b, $10, $00, $00, $03        ;; 00:17df ????????
+    db   $ff, $00, $00
+.data_00_17e2:
+    db   $1b, $10, $00, $00, $03        ;; 00:17df ????????
     db   $05, $00, $00, $1d, $54, $04, $10, $00        ;; 00:17e7 ????????
     db   $ff, $00, $00, $1d, $54, $04, $10, $00        ;; 00:17ef ????????
     db   $ff, $00, $00, $1c, $10, $00, $40, $01        ;; 00:17f7 ????????
@@ -1008,7 +1015,9 @@ call_00_1633_HandleLevelWarpOrExit:
     db   $0a, $00, $00, $1c, $30, $06, $40, $01        ;; 00:182f ????????
     db   $09, $00, $00, $20, $10, $00, $60, $01        ;; 00:1837 ????????
     db   $ff, $00, $00, $1b, $7c, $02, $60, $02        ;; 00:183f ????????
-    db   $ff, $00, $00, $23, $10, $00, $70, $00        ;; 00:1847 ????????
+    db   $ff, $00, $00
+.data_00_184a:
+    db   $23, $10, $00, $70, $00        ;; 00:1847 ????????
     db   $ff, $00, $00, $04, $c0, $00, $50, $01        ;; 00:184f ????????
     db   $ff, $00, $00, $26, $10, $00, $70, $00        ;; 00:1857 ????????
     db   $ff, $00, $00, $04, $10, $01, $50, $01        ;; 00:185f ????????
@@ -1025,7 +1034,9 @@ call_00_1633_HandleLevelWarpOrExit:
     db   $0c, $00, $00, $25, $28, $00, $10, $00        ;; 00:18b7 ????????
     db   $ff, $00, $00, $25, $68, $03, $10, $00        ;; 00:18bf ????????
     db   $ff, $00, $00, $27, $60, $00, $10, $01        ;; 00:18c7 ????????
-    db   $ff, $00, $00, $2b, $30, $00, $80, $02        ;; 00:18cf ????????
+    db   $ff, $00, $00
+.data_00_18d2:
+    db   $2b, $30, $00, $80, $02        ;; 00:18cf ????????
     db   $ff, $00, $00, $2c, $a0, $09, $80, $00        ;; 00:18d7 ????????
     db   $ff, $00, $00, $29, $30, $00, $c0, $01        ;; 00:18df ????????
     db   $ff, $00, $00, $05, $c0, $00, $c0, $01        ;; 00:18e7 ????????
@@ -1043,7 +1054,9 @@ call_00_1633_HandleLevelWarpOrExit:
     db   $ff, $00, $00, $2d, $a0, $01, $f0, $00        ;; 00:1947 ????????
     db   $ff, $00, $00, $2e, $f0, $00, $00, $02        ;; 00:194f ????????
     db   $ff, $00, $00, $2f, $50, $00, $10, $03        ;; 00:1957 ????????
-    db   $ff, $00, $00, $31, $c0, $0b, $a0, $02        ;; 00:195f ????????
+    db   $ff, $00, $00
+.data_00_1962:
+    db   $31, $c0, $0b, $a0, $02        ;; 00:195f ????????
     db   $ff, $00, $00, $06, $70, $00, $b0, $00        ;; 00:1967 ????????
     db   $ff, $00, $00, $32, $60, $00, $80, $00        ;; 00:196f ????????
     db   $ff, $00, $00, $06, $70, $00, $00, $01        ;; 00:1977 ????????
@@ -1053,13 +1066,17 @@ call_00_1633_HandleLevelWarpOrExit:
     db   $ff, $00, $00, $31, $40, $04, $00, $01        ;; 00:1997 ????????
     db   $ff, $00, $00, $35, $50, $00, $60, $00        ;; 00:199f ????????
     db   $ff, $00, $00, $34, $a0, $02, $80, $00        ;; 00:19a7 ????????
-    db   $ff, $00, $00, $36, $20, $00, $30, $01        ;; 00:19af ????????
+    db   $ff, $00, $00
+.data_00_19b2:
+    db   $36, $20, $00, $30, $01        ;; 00:19af ????????
     db   $ff, $00, $00, $37, $20, $00, $30, $01        ;; 00:19b7 ????????
     db   $ff, $00, $00, $38, $20, $00, $30, $01        ;; 00:19bf ????????
     db   $ff, $00, $00, $07, $7c, $02, $b8, $02        ;; 00:19c7 ????????
     db   $ff, $00, $00, $07, $fc, $01, $b8, $01        ;; 00:19cf ????????
     db   $ff, $00, $00, $07, $8c, $01, $f8, $00        ;; 00:19d7 ????????
-    db   $ff, $00, $00, $39, $00, $01, $b0, $00        ;; 00:19df ????????
+    db   $ff, $00, $00
+.data_00_19e2:
+    db   $39, $00, $01, $b0, $00        ;; 00:19df ????????
     db   $ff, $00, $00, $39, $30, $00, $f0, $00        ;; 00:19e7 ????????
     db   $ff, $00, $00, $39, $c0, $01, $f0, $00        ;; 00:19ef ????????
     db   $ff, $00, $00, $39, $00, $01, $20, $00        ;; 00:19f7 ????????
@@ -1354,7 +1371,7 @@ call_00_1a46_LoadBgMapRow:
 call_00_1bbc_CheckForDoorAndEnter:
 ; Using the current level number (wDC1E_CurrentLevelNumber) and position (wD80E/wD810), 
 ; scans a table (.data_00_1c33_DoorLocationsByMap) for proximity to door trigger points. If within a bounding box, 
-; writes trigger data to wDCC1/wDCC2, sets wDC69_PlayerSpawnIdInLevel, and marks wDB6A flag. 
+; writes trigger data to wDCC1_EnterDoorRelated1/wDCC2_EnterDoorRelated2, sets wDC69_PlayerSpawnIdInLevel, and marks wDB6A flag. 
 ; Skips special levels $05 and $0B.
 ; Purpose: Used to enter doors after pressing Up on Dpad
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:1bbc $fa $1e $dc
@@ -1364,7 +1381,7 @@ call_00_1bbc_CheckForDoorAndEnter:
     ret  Z                                             ;; 00:1bc4 $c8
     and  A, A                                          ;; 00:1bc5 $a7
     jr   Z, .jr_00_1bce                                ;; 00:1bc6 $28 $06
-    ld   A, [wDCD2_HitFreestandingRemoteFlags]                                    ;; 00:1bc8 $fa $d2 $dc
+    ld   A, [wDCD2_FreestandingRemoteHitFlags]                                    ;; 00:1bc8 $fa $d2 $dc
     cp   A, $81                                        ;; 00:1bcb $fe $81
     ret  Z                                             ;; 00:1bcd $c8
 .jr_00_1bce:
@@ -1381,9 +1398,9 @@ call_00_1bbc_CheckForDoorAndEnter:
     ret  Z                                             ;; 00:1bdd $c8
 .jr_00_1bde:
     ld   A, [HL+]                                      ;; 00:1bde $2a
-    ld   [wDCC1], A                                    ;; 00:1bdf $ea $c1 $dc
+    ld   [wDCC1_EnterDoorRelated1], A                                    ;; 00:1bdf $ea $c1 $dc
     ld   A, [HL+]                                      ;; 00:1be2 $2a
-    ld   [wDCC2], A                                    ;; 00:1be3 $ea $c2 $dc
+    ld   [wDCC2_EnterDoorRelated2], A                                    ;; 00:1be3 $ea $c2 $dc
     ld   E, [HL]                                       ;; 00:1be6 $5e
     inc  HL                                            ;; 00:1be7 $23
     ld   D, [HL]                                       ;; 00:1be8 $56
@@ -1418,7 +1435,7 @@ call_00_1bbc_CheckForDoorAndEnter:
     jr   NZ, .jr_00_1bde                               ;; 00:1c13 $20 $c9
     ret                                                ;; 00:1c15 $c9
 .jr_00_1c16:
-    ld   A, [wDCC2]                                    ;; 00:1c16 $fa $c2 $dc
+    ld   A, [wDCC2_EnterDoorRelated2]                                    ;; 00:1c16 $fa $c2 $dc
     cp   A, $ff                                        ;; 00:1c19 $fe $ff
     jr   Z, .jr_00_1c27                                ;; 00:1c1b $28 $0a
     ld   E, A                                          ;; 00:1c1d $5f
@@ -1429,92 +1446,170 @@ call_00_1bbc_CheckForDoorAndEnter:
     and  A, A                                          ;; 00:1c25 $a7
     ret  Z                                             ;; 00:1c26 $c8
 .jr_00_1c27:
-    ld   A, [wDCC1]                                    ;; 00:1c27 $fa $c1 $dc
+    ld   A, [wDCC1_EnterDoorRelated1]                                    ;; 00:1c27 $fa $c1 $dc
     ld   [wDC69_PlayerSpawnIdInLevel], A                                    ;; 00:1c2a $ea $69 $dc
     ld   HL, wDB6A                                     ;; 00:1c2d $21 $6a $db
     set  2, [HL]                                       ;; 00:1c30 $cb $d6
     ret                                                ;; 00:1c32 $c9
 .data_00_1c33_DoorLocationsByMap:
-    dw   .data_00_1cad
-    db   $d5, $1c, $f6, $1c, $00, $00        ;; 00:1c33 ....????
-    db   $5c, $1d, $9f, $1d, $08, $1e, $4a, $1e        ;; 00:1c3b ????????
-    db   $00, $00, $00, $00, $00, $00, $72, $1e        ;; 00:1c43 ????????
-    db   $c0, $1c, $c7, $1c, $ce, $1c, $e8, $1c        ;; 00:1c4b ........
-    db   $ef, $1c, $00, $00, $00, $00, $27, $1d        ;; 00:1c53 ????????
-    db   $34, $1d, $3b, $1d, $42, $1d, $00, $00        ;; 00:1c5b ????????
-    db   $00, $00, $00, $00, $00, $00, $4f, $1d        ;; 00:1c63 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:1c6b ????????
-    db   $00, $00, $75, $1d, $7c, $1d, $83, $1d        ;; 00:1c73 ????????
-    db   $00, $00, $00, $00, $8a, $1d, $91, $1d        ;; 00:1c7b ????????
-    db   $98, $1d, $b2, $1d, $bf, $1d, $c6, $1d        ;; 00:1c83 ????????
-    db   $cd, $1d, $da, $1d, $e1, $1d, $e8, $1d        ;; 00:1c8b ????????
-    db   $ef, $1d, $15, $1e, $28, $1e, $2f, $1e        ;; 00:1c93 ????????
-    db   $36, $1e, $43, $1e, $5d, $1e, $64, $1e        ;; 00:1c9b ????????
-    db   $6b, $1e, $79, $1e, $92, $1e, $99, $1e        ;; 00:1ca3 ????????
-    db   $00, $00
+    dw   .data_00_1cad, .data_00_1cd5, .data_00_1cf6, $0000        ;; 00:1c33 ....????
+    dw   .data_00_1d5c, .data_00_1d9f, .data_00_1e08, .data_00_1e4a        ;; 00:1c3b ????????
+    dw   $0000, $0000, $0000, .data_00_1e72        ;; 00:1c43 ????????
+    dw   .data_00_1cc0, .data_00_1cc7, .data_00_1cce, .data_00_1ce8        ;; 00:1c4b ........
+    dw   .data_00_1cef, $0000, $0000, .data_00_1d27        ;; 00:1c53 ????????
+    dw   .data_00_1d34, .data_00_1d3b, .data_00_1d42, $0000        ;; 00:1c5b ????????
+    dw   $0000, $0000, $0000, .data_00_1d4f        ;; 00:1c63 ????????
+    dw   $0000, $0000, $0000, $0000        ;; 00:1c6b ????????
+    dw   $0000, .data_00_1d75, .data_00_1d7c, .data_00_1d83        ;; 00:1c73 ????????
+    dw   $0000, $0000, .data_00_1d8a, .data_00_1d91        ;; 00:1c7b ????????
+    dw   .data_00_1d98, .data_00_1db2, .data_00_1dbf, .data_00_1dc6        ;; 00:1c83 ????????
+    dw   .data_00_1dcd, .data_00_1dda, .data_00_1de1, .data_00_1de8        ;; 00:1c8b ????????
+    dw   .data_00_1def, .data_00_1e15, .data_00_1e28, .data_00_1e2f        ;; 00:1c93 ????????
+    dw   .data_00_1e36, .data_00_1e43, .data_00_1e5d, .data_00_1e64        ;; 00:1c9b ????????
+    dw   .data_00_1e6b, .data_00_1e79, .data_00_1e92, .data_00_1e99        ;; 00:1ca3 ????????
+    dw   $0000
 .data_00_1cad:
     db   $03, $ff, $b0, $01, $f0, $00        ;; 00:1cab ??w...??
     db   $04, $ff, $50, $00, $70, $00, $05, $ff        ;; 00:1cb3 w...??w.
-    db   $50, $01, $40, $00, $ff, $00, $ff, $f0        ;; 00:1cbb ..??.w..
-    db   $00, $80, $00, $ff, $01, $ff, $f0, $00        ;; 00:1cc3 .???w...
-    db   $f0, $00, $ff, $02, $ff, $30, $00, $30        ;; 00:1ccb ???w...?
-    db   $00, $ff, $00, $ff, $60, $09, $00, $04        ;; 00:1cd3 ??w...??
+    db   $50, $01, $40, $00, $ff
+.data_00_1cc0:
+    db   $00, $ff, $f0        ;; 00:1cbb ..??.w..
+    db   $00, $80, $00, $ff
+.data_00_1cc7:
+    db   $01, $ff, $f0, $00        ;; 00:1cc3 .???w...
+    db   $f0, $00, $ff
+.data_00_1cce:
+    db   $02, $ff, $30, $00, $30        ;; 00:1ccb ???w...?
+    db   $00, $ff
+.data_00_1cd5:
+    db   $00, $ff, $60, $09, $00, $04        ;; 00:1cd3 ??w...??
     db   $01, $ff, $a0, $07, $00, $01, $02, $ff        ;; 00:1cdb ....??w.
-    db   $c8, $02, $80, $00, $ff, $03, $ff, $20        ;; 00:1ce3 ..??.w..
-    db   $01, $80, $00, $ff, $04, $ff, $20, $00        ;; 00:1ceb .??.????
-    db   $30, $01, $ff, $00, $ff, $98, $02, $b0        ;; 00:1cf3 ????????
+    db   $c8, $02, $80, $00, $ff
+.data_00_1ce8:
+    db   $03, $ff, $20        ;; 00:1ce3 ..??.w..
+    db   $01, $80, $00, $ff
+.data_00_1cef:
+    db   $04, $ff, $20, $00        ;; 00:1ceb .??.????
+    db   $30, $01, $ff
+.data_00_1cf6:
+    db   $00, $ff, $98, $02, $b0        ;; 00:1cf3 ????????
     db   $02, $01, $ff, $28, $02, $b0, $02, $02        ;; 00:1cfb ????????
     db   $ff, $68, $02, $d0, $01, $03, $ff, $d8        ;; 00:1d03 ????????
     db   $00, $40, $01, $04, $ff, $f8, $01, $80        ;; 00:1d0b ????????
     db   $00, $05, $ff, $28, $00, $50, $00, $17        ;; 00:1d13 ????????
     db   $ff, $08, $01, $50, $02, $16, $ff, $a8        ;; 00:1d1b ????????
-    db   $02, $d0, $01, $ff, $09, $ff, $18, $00        ;; 00:1d23 ????????
+    db   $02, $d0, $01, $ff
+.data_00_1d27:
+    db   $09, $ff, $18, $00        ;; 00:1d23 ????????
     db   $68, $00, $0a, $ff, $b8, $02, $68, $00        ;; 00:1d2b ????????
-    db   $ff, $0b, $ff, $20, $00, $80, $00, $ff        ;; 00:1d33 ????????
-    db   $0c, $ff, $20, $01, $30, $01, $ff, $0d        ;; 00:1d3b ????????
+    db   $ff
+.data_00_1d34:
+    db   $0b, $ff, $20, $00, $80, $00, $ff        ;; 00:1d33 ????????
+.data_00_1d3b:
+    db   $0c, $ff, $20, $01, $30, $01, $ff
+.data_00_1d42:
+    db   $0d        ;; 00:1d3b ????????
     db   $ff, $20, $00, $e0, $01, $0e, $ff, $20        ;; 00:1d43 ????????
-    db   $01, $e0, $01, $ff, $07, $00, $ec, $00        ;; 00:1d4b ????????
+    db   $01, $e0, $01, $ff
+.data_00_1d4f:
+    db   $07, $00, $ec, $00        ;; 00:1d4b ????????
     db   $60, $02, $0b, $01, $7c, $02, $60, $02        ;; 00:1d53 ????????
-    db   $ff, $00, $ff, $c0, $00, $50, $01, $02        ;; 00:1d5b ????????
+    db   $ff
+.data_00_1d5c:
+    db   $00, $ff, $c0, $00, $50, $01, $02        ;; 00:1d5b ????????
     db   $ff, $10, $01, $50, $01, $04, $ff, $98        ;; 00:1d63 ????????
     db   $01, $a0, $00, $06, $ff, $f0, $01, $50        ;; 00:1d6b ????????
-    db   $01, $ff, $08, $ff, $aa, $01, $98, $00        ;; 00:1d73 ????????
-    db   $ff, $09, $ff, $30, $01, $90, $00, $ff        ;; 00:1d7b ????????
-    db   $01, $ff, $10, $00, $70, $00, $ff, $03        ;; 00:1d83 ????????
-    db   $ff, $10, $00, $70, $00, $ff, $05, $ff        ;; 00:1d8b ????????
-    db   $10, $00, $00, $01, $ff, $07, $ff, $10        ;; 00:1d93 ????????
-    db   $00, $70, $00, $ff, $00, $ff, $c0, $00        ;; 00:1d9b ????????
+    db   $01, $ff
+.data_00_1d75:
+    db   $08, $ff, $aa, $01, $98, $00        ;; 00:1d73 ????????
+    db   $ff
+.data_00_1d7c:
+    db   $09, $ff, $30, $01, $90, $00, $ff        ;; 00:1d7b ????????
+.data_00_1d83:
+    db   $01, $ff, $10, $00, $70, $00, $ff
+.data_00_1d8a:
+    db   $03        ;; 00:1d83 ????????
+    db   $ff, $10, $00, $70, $00, $ff
+.data_00_1d91:
+    db   $05, $ff        ;; 00:1d8b ????????
+    db   $10, $00, $00, $01, $ff
+.data_00_1d98:
+    db   $07, $ff, $10        ;; 00:1d93 ????????
+    db   $00, $70, $00, $ff
+.data_00_1d9f:
+    db   $00, $ff, $c0, $00        ;; 00:1d9b ????????
     db   $c0, $01, $01, $ff, $f0, $01, $c0, $01        ;; 00:1da3 ????????
-    db   $02, $ff, $20, $03, $c0, $01, $ff, $05        ;; 00:1dab ????????
+    db   $02, $ff, $20, $03, $c0, $01, $ff
+.data_00_1db2:
+    db   $05        ;; 00:1dab ????????
     db   $ff, $30, $00, $c0, $01, $09, $ff, $e0        ;; 00:1db3 ????????
-    db   $02, $00, $01, $ff, $07, $ff, $c0, $01        ;; 00:1dbb ????????
-    db   $80, $00, $ff, $03, $ff, $30, $00, $80        ;; 00:1dc3 ????????
-    db   $02, $ff, $04, $ff, $a0, $09, $80, $00        ;; 00:1dcb ????????
-    db   $0b, $05, $e0, $03, $40, $01, $ff, $0c        ;; 00:1dd3 ????????
-    db   $ff, $a0, $01, $f0, $00, $ff, $0d, $ff        ;; 00:1ddb ????????
-    db   $f0, $00, $00, $02, $ff, $0e, $ff, $50        ;; 00:1de3 ????????
-    db   $00, $10, $03, $ff, $0a, $0d, $b0, $03        ;; 00:1deb ????????
+    db   $02, $00, $01, $ff
+.data_00_1dbf:
+    db   $07, $ff, $c0, $01        ;; 00:1dbb ????????
+    db   $80, $00, $ff
+.data_00_1dc6:
+    db   $03, $ff, $30, $00, $80        ;; 00:1dc3 ????????
+    db   $02, $ff
+.data_00_1dcd:
+    db   $04, $ff, $a0, $09, $80, $00        ;; 00:1dcb ????????
+    db   $0b, $05, $e0, $03, $40, $01, $ff
+.data_00_1dda:
+    db   $0c        ;; 00:1dd3 ????????
+    db   $ff, $a0, $01, $f0, $00, $ff
+.data_00_1de1:
+    db   $0d, $ff        ;; 00:1ddb ????????
+    db   $f0, $00, $00, $02, $ff
+.data_00_1de8:
+    db   $0e, $ff, $50        ;; 00:1de3 ????????
+    db   $00, $10, $03, $ff
+.data_00_1def:
+    db   $0a, $0d, $b0, $03        ;; 00:1deb ????????
     db   $40, $01, $0f, $0a, $70, $01, $a0, $00        ;; 00:1df3 ????????
     db   $10, $0b, $50, $02, $30, $00, $11, $0c        ;; 00:1dfb ????????
-    db   $30, $03, $a0, $00, $ff, $00, $ff, $70        ;; 00:1e03 ????????
+    db   $30, $03, $a0, $00, $ff
+.data_00_1e08:
+    db   $00, $ff, $70        ;; 00:1e03 ????????
     db   $00, $b0, $00, $02, $ff, $70, $00, $00        ;; 00:1e0b ????????
-    db   $01, $ff, $01, $ff, $c0, $0b, $a0, $02        ;; 00:1e13 ????????
+    db   $01, $ff
+.data_00_1e15:
+    db   $01, $ff, $c0, $0b, $a0, $02        ;; 00:1e13 ????????
     db   $04, $ff, $80, $00, $20, $03, $06, $ff        ;; 00:1e1b ????????
-    db   $40, $04, $00, $01, $ff, $03, $ff, $60        ;; 00:1e23 ????????
-    db   $00, $80, $00, $ff, $05, $ff, $e0, $00        ;; 00:1e2b ????????
-    db   $a0, $01, $ff, $07, $ff, $a0, $02, $c0        ;; 00:1e33 ????????
+    db   $40, $04, $00, $01, $ff
+.data_00_1e28:
+    db   $03, $ff, $60        ;; 00:1e23 ????????
+    db   $00, $80, $00, $ff
+.data_00_1e2f:
+    db   $05, $ff, $e0, $00        ;; 00:1e2b ????????
+    db   $a0, $01, $ff
+.data_00_1e36:
+    db   $07, $ff, $a0, $02, $c0        ;; 00:1e33 ????????
     db   $01, $08, $ff, $a0, $02, $80, $00, $ff        ;; 00:1e3b ????????
-    db   $09, $ff, $50, $00, $60, $00, $ff, $00        ;; 00:1e43 ????????
+.data_00_1e43:
+    db   $09, $ff, $50, $00, $60, $00, $ff
+.data_00_1e4a:
+    db   $00        ;; 00:1e43 ????????
     db   $ff, $7c, $02, $b8, $02, $01, $ff, $fc        ;; 00:1e4b ????????
     db   $01, $b8, $01, $02, $ff, $8c, $01, $f8        ;; 00:1e53 ????????
-    db   $00, $ff, $03, $ff, $20, $00, $30, $01        ;; 00:1e5b ????????
-    db   $ff, $04, $ff, $20, $00, $30, $01, $ff        ;; 00:1e63 ????????
-    db   $05, $ff, $20, $00, $30, $01, $ff, $00        ;; 00:1e6b ????????
-    db   $00, $60, $02, $c0, $00, $ff, $05, $ff        ;; 00:1e73 ????????
+    db   $00, $ff
+.data_00_1e5d:
+    db   $03, $ff, $20, $00, $30, $01        ;; 00:1e5b ????????
+    db   $ff
+.data_00_1e64:
+    db   $04, $ff, $20, $00, $30, $01, $ff        ;; 00:1e63 ????????
+.data_00_1e6b:
+    db   $05, $ff, $20, $00, $30, $01, $ff
+.data_00_1e72:
+    db   $00, $00, $60, $02, $c0, $00, $ff ;; 00:1e6b ????????
+.data_00_1e79:
+    db   $05, $ff        ;; 00:1e73 ????????
     db   $30, $00, $f0, $00, $04, $ff, $00, $01        ;; 00:1e7b ????????
     db   $b0, $00, $06, $01, $c0, $01, $f0, $00        ;; 00:1e83 ????????
-    db   $07, $02, $00, $01, $20, $00, $ff, $01        ;; 00:1e8b ????????
-    db   $ff, $38, $01, $80, $01, $ff, $02, $ff        ;; 00:1e93 ????????
+    db   $07, $02, $00, $01, $20, $00, $ff
+.data_00_1e92:
+    db   $01        ;; 00:1e8b ????????
+    db   $ff, $38, $01, $80, $01, $ff
+.data_00_1e99:
+    db   $02, $ff        ;; 00:1e93 ????????
     db   $38, $01, $80, $01, $ff                       ;; 00:1e9b ?????
 
 call_00_1ea0_LoadAndRunMissionPreviewCutscene:
@@ -1605,13 +1700,13 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
     ld   L, E                                          ;; 00:1f21 $6b
     ld   H, D                                          ;; 00:1f22 $62
     xor  A, A                                          ;; 00:1f23 $af
-    ld   [wDCE0], A                                    ;; 00:1f24 $ea $e0 $dc
+    ld   [wDCE0_MissionPreviewCutsceneMovementFlag], A                                    ;; 00:1f24 $ea $e0 $dc
     ld   [wDCE1], A                                    ;; 00:1f27 $ea $e1 $dc
     ld   A, [HL+]                                      ;; 00:1f2a $2a
 .jr_00_1f2b:
     ld   [wDC81_CurrentInputs], A                                    ;; 00:1f2b $ea $81 $dc
     ld   A, [HL+]                                      ;; 00:1f2e $2a
-    ld   [wDCDE], A                                    ;; 00:1f2f $ea $de $dc
+    ld   [wDCDE_MissionPreviewCutsceneRelated], A                                    ;; 00:1f2f $ea $de $dc
     ld   A, [HL+]                                      ;; 00:1f32 $2a
     ld   [wDCDF], A                                    ;; 00:1f33 $ea $df $dc
     push HL                                            ;; 00:1f36 $e5
@@ -1629,7 +1724,7 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
     call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:1f53 $cd $c8 $11
     call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:1f56 $cd $fa $35
     call call_00_08f8_SetupObjectVRAMTransfer                                  ;; 00:1f59 $cd $f8 $08
-    ld   HL, wDCDE                                     ;; 00:1f5c $21 $de $dc
+    ld   HL, wDCDE_MissionPreviewCutsceneRelated                                     ;; 00:1f5c $21 $de $dc
     ld   A, [HL]                                       ;; 00:1f5f $7e
     sub  A, $01                                        ;; 00:1f60 $d6 $01
     ld   [HL+], A                                      ;; 00:1f62 $22
@@ -1752,7 +1847,7 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
 
 call_00_217f_ProcessCutsceneMovement:
 ; Reads wDC81_CurrentInputs (input flags).
-; Writes either $10 or $00 to wDCE0, mixes low bits into its second byte, then derives a movement step (C).
+; Writes either $10 or $00 to wDCE0_MissionPreviewCutsceneMovementFlag, mixes low bits into its second byte, then derives a movement step (C).
 ; Checks bits in wDC81_CurrentInputs to adjust player position:
 ; Bit 4: move player right by C.
 ; Bit 5: move player left by C.
@@ -1764,14 +1859,14 @@ call_00_217f_ProcessCutsceneMovement:
     ld   A, [wDC81_CurrentInputs]                                    ;; 00:217f $fa $81 $dc
     and  A, A                                          ;; 00:2182 $a7
     jr   NZ, .jr_00_218c                               ;; 00:2183 $20 $07
-    ld   HL, wDCE0                                     ;; 00:2185 $21 $e0 $dc
+    ld   HL, wDCE0_MissionPreviewCutsceneMovementFlag                                     ;; 00:2185 $21 $e0 $dc
     ld   [HL], $00                                     ;; 00:2188 $36 $00
     jr   .jr_00_2191                                   ;; 00:218a $18 $05
 .jr_00_218c:
-    ld   HL, wDCE0                                     ;; 00:218c $21 $e0 $dc
+    ld   HL, wDCE0_MissionPreviewCutsceneMovementFlag                                     ;; 00:218c $21 $e0 $dc
     ld   [HL], $10                                     ;; 00:218f $36 $10
 .jr_00_2191:
-    ld   HL, wDCE0                                     ;; 00:2191 $21 $e0 $dc
+    ld   HL, wDCE0_MissionPreviewCutsceneMovementFlag                                     ;; 00:2191 $21 $e0 $dc
     ld   A, [HL+]                                      ;; 00:2194 $2a
     ld   C, A                                          ;; 00:2195 $4f
     ld   A, [HL]                                       ;; 00:2196 $7e

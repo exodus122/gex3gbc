@@ -63,13 +63,13 @@ call_02_4e01_SetOneTimeFlag:
     ret                                                ;; 02:4e0b $c9
 
 call_02_4E0C_UpdateActionSequence:
-; Updates counters (wDCA2–wDCA6) for a repeating animation or scripted sequence. 
+; Updates counters (wDCA2_PlayerUnk1–wDCA6_PlayerUnk5) for a repeating animation or scripted sequence. 
 ; Uses call_02_4E7A_LookupFrameData to fetch frame data from tables at $4EA1/$4EC3. Handles two cases: 
 ; when the player’s action ID is $27 (special move) or any other action. Sets flags (wDC7F, wDC80), 
 ; triggers sound/action (call_02_54f9_SwitchPlayerAction) when counters overflow, and sets wDB66_HDMATransferFlags to signal a redraw.
 ; Purpose: Manage complex animation or event sequences based on timers and player state.
-    ld   a,[wDCA5]
-    ld   [wDCA6],a
+    ld   a,[wDCA5_PlayerUnk4]
+    ld   [wDCA6_PlayerUnk5],a
     ld   hl,wDC95
     ld   e,[hl]
     call call_02_4E7A_LookupFrameData
@@ -80,17 +80,17 @@ call_02_4E0C_UpdateActionSequence:
     ld   e,[hl]
     call call_02_4E7A_LookupFrameData
 label4E24:
-    ld   hl,wDCA5
+    ld   hl,wDCA5_PlayerUnk4
     ld   [hl],d
     ld   a,[wD801_Player_ActionId]
     cp   a,$27
     jr   nz,label4E57
-    ld   hl,wDCA3
+    ld   hl,wDCA3_PlayerUnk2
     dec  [hl]
     bit  7,[hl]
     jr   z,label4E50
     ld   [hl],$03
-    ld   hl,wDCA2
+    ld   hl,wDCA2_PlayerUnk1
     inc  [hl]
     ld   a,[hl]
     cp   a,$08
@@ -102,22 +102,22 @@ label4E24:
     ld   a,$24
     jp   call_02_54f9_SwitchPlayerAction
 label4E50:
-    ld   a,[wDCA2]
+    ld   a,[wDCA2_PlayerUnk1]
     and  a,$07
     jr   label4E6A
 label4E57:
-    ld   hl,wDCA3
+    ld   hl,wDCA3_PlayerUnk2
     dec  [hl]
     bit  7,[hl]
     jr   z,label4E65
     ld   [hl],$09
-    ld   hl,wDCA2
+    ld   hl,wDCA2_PlayerUnk1
     inc  [hl]
 label4E65:
-    ld   a,[wDCA2]
+    ld   a,[wDCA2_PlayerUnk1]
     and  a,$01
 label4E6A:
-    ld   hl,wDCA4
+    ld   hl,wDCA4_PlayerUnk3
     add  [hl]
     ld   hl,wD80A_Player_SpriteId
     cp   [hl]
@@ -129,7 +129,7 @@ label4E6A:
 
 call_02_4E7A_LookupFrameData:
 ; Scans a table for an entry matching value E, then selects a frame or command 
-; byte based on facing direction. Stores result in wDCA4.
+; byte based on facing direction. Stores result in wDCA4_PlayerUnk3.
 ; Purpose: Table-driven frame or pattern lookup for 4E0C.
     ld   d,$00
     ld   hl,.data_02_4EC3
@@ -155,7 +155,7 @@ call_02_4E7A_LookupFrameData:
     jr   z,.label4E9F
     ld   a,b
 .label4E9F:
-    ld   [wDCA4],a
+    ld   [wDCA4_PlayerUnk3],a
     ret  
 .data_02_4EA3:
     db   $01        ;; 02:4e9c ????????
@@ -226,7 +226,7 @@ call_02_4f32_PlayerUpdateMain:
 ; The main per-frame player update.
 ; Actions:
 ; - Processes inputs, clearing or setting bits in wDC80/wDC81_CurrentInputs.
-; - Manages timers (wDC7E, wDCA9–wDCAB) using call_02_4ffb_DecTimerEveryCycle.
+; - Manages timers (wDC7E, wDCA9_FlyTimerOrFlags4–wDCAB_FlyTimerOrFlags2) using call_02_4ffb_DecTimerEveryCycle.
 ; - Calls palette setup (call_03_6567_SetupObjectPalettes), BG collision update, object caching, and object loading.
 ; - Jumps to the player action function (wD802_Player_ActionFunc).
 ; - Clears bits and finalizes state before call_02_724d.
@@ -291,11 +291,11 @@ call_02_4f32_PlayerUpdateMain:
     jr   Z, .jr_02_4f95                                ;; 02:4f92 $28 $01
     dec  [HL]                                          ;; 02:4f94 $35
 .jr_02_4f95:
-    ld   HL, wDCA9                                     ;; 02:4f95 $21 $a9 $dc
+    ld   HL, wDCA9_FlyTimerOrFlags4                                     ;; 02:4f95 $21 $a9 $dc
     call call_02_4ffb_DecTimerEveryCycle                                  ;; 02:4f98 $cd $fb $4f
-    ld   HL, wDCAA                                     ;; 02:4f9b $21 $aa $dc
+    ld   HL, wDCAA_FlyTimerOrFlags1                                     ;; 02:4f9b $21 $aa $dc
     call call_02_4ffb_DecTimerEveryCycle                                  ;; 02:4f9e $cd $fb $4f
-    ld   HL, wDCAB                                     ;; 02:4fa1 $21 $ab $dc
+    ld   HL, wDCAB_FlyTimerOrFlags2                                     ;; 02:4fa1 $21 $ab $dc
     call call_02_4ffb_DecTimerEveryCycle                                  ;; 02:4fa4 $cd $fb $4f
     farcall call_03_6567_SetupObjectPalettes
     call call_02_5081_Player_UpdateFacingAndMovementVector                                  ;; 02:4fb2 $cd $81 $50
@@ -326,17 +326,17 @@ call_02_4f32_PlayerUpdateMain:
     jp   call_02_724d_UpdateObjectAnimationTimersAndSpriteId                                  ;; 02:4ff8 $c3 $4d $72
 
 call_02_4ffb_DecTimerEveryCycle:
-; Decrements a timer in [HL] every wDCA8 frames. Resets wDCA8 to 3C when it wraps.
+; Decrements a timer in [HL] every wDCA8_FlyTimerOrFlags3 frames. Resets wDCA8_FlyTimerOrFlags3 to 3C when it wraps.
 ; Purpose: Frame-based countdown helper.
     ld   A, [HL]                                       ;; 02:4ffb $7e
     and  A, A                                          ;; 02:4ffc $a7
     ret  Z                                             ;; 02:4ffd $c8
-    ld   A, [wDCA8]                                    ;; 02:4ffe $fa $a8 $dc
+    ld   A, [wDCA8_FlyTimerOrFlags3]                                    ;; 02:4ffe $fa $a8 $dc
     dec  A                                             ;; 02:5001 $3d
     jr   NZ, .jr_02_5006                               ;; 02:5002 $20 $02
     ld   A, $3c                                        ;; 02:5004 $3e $3c
 .jr_02_5006:
-    ld   [wDCA8], A                                    ;; 02:5006 $ea $a8 $dc
+    ld   [wDCA8_FlyTimerOrFlags3], A                                    ;; 02:5006 $ea $a8 $dc
     cp   A, $3c                                        ;; 02:5009 $fe $3c
     ret  NZ                                            ;; 02:500b $c0
     dec  [HL]                                          ;; 02:500c $35
@@ -1102,7 +1102,7 @@ call_02_5431_HandleActionTriggersAndEvents:
     farcall call_03_4c2e_IsTileType3D
     jr   NZ, .jr_02_54d0                               ;; 02:54c0 $20 $0e
     xor  A, A                                          ;; 02:54c2 $af
-    ld   [wDCA1], A                                    ;; 02:54c3 $ea $a1 $dc
+    ld   [wDCA1_PlayerUnk6], A                                    ;; 02:54c3 $ea $a1 $dc
     ld   [wDC86], A                                    ;; 02:54c6 $ea $86 $dc
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:54c9 $ea $8c $dc
     ld   A, $22                                        ;; 02:54cc $3e $22

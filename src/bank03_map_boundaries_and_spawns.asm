@@ -136,7 +136,7 @@ call_03_647c_InitPlayerPositionAndLevel:
 ; Purpose: Initializes the player’s spawn coordinates and current level on scene entry or respawn.
 ; Behavior:
 ; Resets checkpoint flags (wDCAC/wDCAD).
-; If checkpoint bit set in wDB6A, restores stored X/Y from wDC6A–wDC6D.
+; If checkpoint bit set in wDB6A, restores stored X/Y from wDC6A_CheckpointStoredX–wDC6D.
 ; Else, if level ID non-zero, fetches default spawn coords from .data_03_6537.
 ; If level ID is zero, pulls next-level ID from .data_03_652b, copies level data (call_03_6c89), 
 ; then fetches new spawn coords.
@@ -147,13 +147,13 @@ call_03_647c_InitPlayerPositionAndLevel:
     ld   HL, wDB6A                                     ;; 03:6483 $21 $6a $db
     bit  2, [HL]                                       ;; 03:6486 $cb $56
     jr   Z, .jr_03_64a4                                ;; 03:6488 $28 $1a
-    ld   A, [wDC6A]                                    ;; 03:648a $fa $6a $dc
+    ld   A, [wDC6A_CheckpointStoredX]                                    ;; 03:648a $fa $6a $dc
     ld   [wD80E_PlayerXPosition], A                                    ;; 03:648d $ea $0e $d8
-    ld   A, [wDC6B]                                    ;; 03:6490 $fa $6b $dc
+    ld   A, [wDC6A_CheckpointStoredX+1]                                    ;; 03:6490 $fa $6b $dc
     ld   [wD80E_PlayerXPosition+1], A                                    ;; 03:6493 $ea $0f $d8
-    ld   A, [wDC6C]                                    ;; 03:6496 $fa $6c $dc
+    ld   A, [wDC6C_CheckpointStoredY]                                    ;; 03:6496 $fa $6c $dc
     ld   [wD810_PlayerYPosition], A                                    ;; 03:6499 $ea $10 $d8
-    ld   A, [wDC6D]                                    ;; 03:649c $fa $6d $dc
+    ld   A, [wDC6C_CheckpointStoredY+1]                                    ;; 03:649c $fa $6d $dc
     ld   [wD810_PlayerYPosition+1], A                                    ;; 03:649f $ea $11 $d8
     jr   .jr_03_64c6                                   ;; 03:64a2 $18 $22
 .jr_03_64a4:

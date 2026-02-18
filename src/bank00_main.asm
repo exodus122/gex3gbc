@@ -155,12 +155,12 @@ call_00_0150_Init:
     call call_04_4000_Audio                                  ;; 00:0239 $cd $00 $40
     call call_00_0f08_RestoreBank                                  ;; 00:023c $cd $08 $0f
     xor  A, A                                          ;; 00:023f $af
-    ld   [wDE60], A                                    ;; 00:0240 $ea $60 $de
-    ld   [wDE5E], A                                    ;; 00:0243 $ea $5e $de
-    ld   [wDE5F], A                                    ;; 00:0246 $ea $5f $de
+    ld   [wDE60_AudioBankRelated], A                                    ;; 00:0240 $ea $60 $de
+    ld   [wDE5E_QueuedSoundEffectPriority], A                                    ;; 00:0243 $ea $5e $de
+    ld   [wDE5F_CurrentSoundEffectPriority], A                                    ;; 00:0246 $ea $5f $de
     ld   A, $ff                                        ;; 00:0249 $3e $ff
-    ld   [wDE5C], A                                    ;; 00:024b $ea $5c $de
-    ld   [wDE5D], A                                    ;; 00:024e $ea $5d $de
+    ld   [wDE5C_CurrentSong], A                                    ;; 00:024b $ea $5c $de
+    ld   [wDE5D_QueuedSoundEffect], A                                    ;; 00:024e $ea $5d $de
     ld   A, $c7                                        ;; 00:0251 $3e $c7
     ld   [wDAD8_LCDControlMirror], A                                    ;; 00:0253 $ea $d8 $da
     ldh  [rLCDC], A                                    ;; 00:0256 $e0 $40
@@ -245,9 +245,9 @@ call_00_0150_Init:
     farcall call_03_6c89_LoadMapData
     xor  A, A                                          ;; 00:0368 $af
     ld   [wDC51], A                                    ;; 00:0369 $ea $51 $dc
-    ld   [wDCA9], A                                    ;; 00:036c $ea $a9 $dc
-    ld   [wDCAA], A                                    ;; 00:036f $ea $aa $dc
-    ld   [wDCAB], A                                    ;; 00:0372 $ea $ab $dc
+    ld   [wDCA9_FlyTimerOrFlags4], A                                    ;; 00:036c $ea $a9 $dc
+    ld   [wDCAA_FlyTimerOrFlags1], A                                    ;; 00:036f $ea $aa $dc
+    ld   [wDCAB_FlyTimerOrFlags2], A                                    ;; 00:0372 $ea $ab $dc
     ld   [wDC89], A                                    ;; 00:0375 $ea $89 $dc
     ld   A, [wDC4F_PawCoinExtraHealth]                                    ;; 00:0378 $fa $4f $dc
     add  A, $04                                        ;; 00:037b $c6 $04
@@ -385,10 +385,10 @@ call_00_0150_Init:
 
 call_00_04fb:
     xor  A, A                                          ;; 00:04fb $af
-    ld   [wDE5E], A                                    ;; 00:04fc $ea $5e $de
-    ld   [wDE5F], A                                    ;; 00:04ff $ea $5f $de
+    ld   [wDE5E_QueuedSoundEffectPriority], A                                    ;; 00:04fc $ea $5e $de
+    ld   [wDE5F_CurrentSoundEffectPriority], A                                    ;; 00:04ff $ea $5f $de
     ld   A, $ff                                        ;; 00:0502 $3e $ff
-    ld   [wDE5D], A                                    ;; 00:0504 $ea $5d $de
+    ld   [wDE5D_QueuedSoundEffect], A                                    ;; 00:0504 $ea $5d $de
     call call_00_0e3b_ClearGameStateVariables                                  ;; 00:0507 $cd $3b $0e
     call call_00_0e62_ResetFlagsAndVRAMState                                  ;; 00:050a $cd $62 $0e
     ld   A, $e7                                        ;; 00:050d $3e $e7
@@ -456,7 +456,7 @@ call_00_0513:
     jr   NZ, .jr_00_056e                               ;; 00:0580 $20 $ec
     farcall call_03_5ec1_UpdateAllObjectsGraphicsAndCollision
     ld   A, $01                                        ;; 00:058d $3e $01
-    ld   [wDD6A], A                                    ;; 00:058f $ea $6a $dd
+    ld   [wDD6A_GameBoyColorPaletteFlag], A                                    ;; 00:058f $ea $6a $dd
     jp   call_00_0b92_WaitForInterrupt                                  ;; 00:0592 $c3 $92 $0b
 
 call_00_0595_PlaySongBasedOnLevel:
@@ -487,7 +487,7 @@ call_00_05c7:
     ld   A, [wDB6D]                                    ;; 00:05c7 $fa $6d $db
     and  A, A                                          ;; 00:05ca $a7
     ret  Z                                             ;; 00:05cb $c8
-    ld   HL, wDCD2_HitFreestandingRemoteFlags                                     ;; 00:05cc $21 $d2 $dc
+    ld   HL, wDCD2_FreestandingRemoteHitFlags                                     ;; 00:05cc $21 $d2 $dc
     bit  7, [HL]                                       ;; 00:05cf $cb $7e
     jr   NZ, .jr_00_05f1                               ;; 00:05d1 $20 $1e
     ld   HL, wDB6F                                     ;; 00:05d3 $21 $6f $db
@@ -534,10 +534,11 @@ call_00_05fd:
     farcall call_02_54f9_SwitchPlayerAction
     ret                                                ;; 00:0623 $c9
 
-call_00_0624_SetPhase_TimersAndFlags:
+call_00_0624_SetFly_TimersAndFlags:
 ; Acts like a state setter for variables around wDC5x–wDCAx.
 ; Reads current state from wDC51, swaps with A, and depending on the old state (01–05) 
-; initializes timers/flags (wDCAA, wDCAB, wDCA8, wDCA9, wDCAE).
+; initializes timers/flags (wDCAA_FlyTimerOrFlags1, wDCAB_FlyTimerOrFlags2, wDCA8_FlyTimerOrFlags3, 
+; wDCA9_FlyTimerOrFlags4, wDCAE_FlyTimerOrFlags5).
 ; Special case for state 03: increments a counter, sets a flag in wDB69.
 ; Looks like it initializes different “modes” or “phases” (timers controlling durations).
     ld   hl,wDC51
@@ -545,48 +546,48 @@ call_00_0624_SetPhase_TimersAndFlags:
     ld   [hl],a
     ld   a,c
     cp   a,$03
-    jr   z,label0682
+    jr   z,.jr_00_0682
     cp   a,$04
     jp   z,call_00_0723_IncrementCollectibleCount.jr_00_074b
     cp   a,$01
-    jr   z,label066C
+    jr   z,.jr_00_066C
     cp   a,$05
-    jr   z,label0655
+    jr   z,.jr_00_0655
     cp   a,$02
     ret  nz
     xor  a
-    ld   [wDCAA],a
-    ld   [wDCAB],a
+    ld   [wDCAA_FlyTimerOrFlags1],a
+    ld   [wDCAB_FlyTimerOrFlags2],a
     ld   a,$14
-    ld   [wDCA9],a
+    ld   [wDCA9_FlyTimerOrFlags4],a
     ld   a,$3C
-    ld   [wDCA8],a
+    ld   [wDCA8_FlyTimerOrFlags3],a
     ld   a,$02
-    ld   [wDCAE],a
+    ld   [wDCAE_FlyTimerOrFlags5],a
     ret  
-label0655:
+.jr_00_0655:
     xor  a
-    ld   [wDCAA],a
-    ld   [wDCA9],a
+    ld   [wDCAA_FlyTimerOrFlags1],a
+    ld   [wDCA9_FlyTimerOrFlags4],a
     ld   a,$14
-    ld   [wDCAB],a
+    ld   [wDCAB_FlyTimerOrFlags2],a
     ld   a,$3C
-    ld   [wDCA8],a
+    ld   [wDCA8_FlyTimerOrFlags3],a
     ld   a,$01
-    ld   [wDCAE],a
+    ld   [wDCAE_FlyTimerOrFlags5],a
     ret  
-label066C:
+.jr_00_066C:
     xor  a
-    ld   [wDCA9],a
-    ld   [wDCAB],a
+    ld   [wDCA9_FlyTimerOrFlags4],a
+    ld   [wDCAB_FlyTimerOrFlags2],a
     ld   a,$14
-    ld   [wDCAA],a
+    ld   [wDCAA_FlyTimerOrFlags1],a
     ld   a,$3C
-    ld   [wDCA8],a
+    ld   [wDCA8_FlyTimerOrFlags3],a
     xor  a
-    ld   [wDCAE],a
+    ld   [wDCAE_FlyTimerOrFlags5],a
     ret  
-label0682:
+.jr_00_0682:
     ld   a,[wDC4F_PawCoinExtraHealth]
     add  a,$04
     ld   hl,wDC50_PlayerHealth
@@ -1306,7 +1307,7 @@ call_00_0b25_MainGameLoop_UpdateAndRenderFrame:
     ldh  [rWY], A                                      ;; 00:0b5d $e0 $4a
     ld   HL, wDC71_FrameCounter                                     ;; 00:0b5f $21 $71 $dc
     inc  [HL]                                          ;; 00:0b62 $34
-    ld   A, [wDE60]                                    ;; 00:0b63 $fa $60 $de
+    ld   A, [wDE60_AudioBankRelated]                                    ;; 00:0b63 $fa $60 $de
     add  A, $04                                        ;; 00:0b66 $c6 $04
     call call_00_0f25_AltSwitchBank                                  ;; 00:0b68 $cd $25 $0f
     call call_04_4009                                  ;; 00:0b6b $cd $09 $40
@@ -1847,11 +1848,11 @@ call_00_0e3b_ClearGameStateVariables:
     jp   call_00_0b92_WaitForInterrupt                                  ;; 00:0e5f $c3 $92 $0b
 
 call_00_0e62_ResetFlagsAndVRAMState:
-; Purpose: Resets some RAM variables (wDD6A, wDAD9_ScrollX, wDADA_ScrollY) and clears a chunk of RAM (wD900 to wD99F).
+; Purpose: Resets some RAM variables (wDD6A_GameBoyColorPaletteFlag, wDAD9_ScrollX, wDADA_ScrollY) and clears a chunk of RAM (wD900 to wD99F).
 ; Then: Waits for interrupts at key points.
 ; Use Case: VRAM/object state reset before loading new assets or scenes.
     xor  A, A                                          ;; 00:0e62 $af
-    ld   [wDD6A], A                                    ;; 00:0e63 $ea $6a $dd
+    ld   [wDD6A_GameBoyColorPaletteFlag], A                                    ;; 00:0e63 $ea $6a $dd
     call call_00_0b92_WaitForInterrupt                                  ;; 00:0e66 $cd $92 $0b
     xor  A, A                                          ;; 00:0e69 $af
     ld   [wDAD9_ScrollX], A                                    ;; 00:0e6a $ea $d9 $da
@@ -1864,9 +1865,9 @@ call_00_0e62_ResetFlagsAndVRAMState:
     jp   call_00_0b92_WaitForInterrupt                                  ;; 00:0e7e $c3 $92 $0b
 
 call_00_0e81_LoadPalettesToHardware:
-; If wDD6A=0, fills BG/OBJ palettes with default gray values. 
+; If wDD6A_GameBoyColorPaletteFlag=0, fills BG/OBJ palettes with default gray values. 
 ; Otherwise, copies palette data from wDCEA_BgPalettes into hardware registers rBCPD/rOCPD.
-    ld   A, [wDD6A]                                    ;; 00:0e81 $fa $6a $dd
+    ld   A, [wDD6A_GameBoyColorPaletteFlag]                                    ;; 00:0e81 $fa $6a $dd
     and  A, A                                          ;; 00:0e84 $a7
     jr   NZ, .jr_00_0e97                               ;; 00:0e85 $20 $10
     ld   A, $80                                        ;; 00:0e87 $3e $80
@@ -2103,42 +2104,42 @@ call_00_0f9c_CheckInputB:
 
 call_00_0fa2_PlaySong:
 ; Accepts a song ID in A.
-; If $FF (no song) or equal to the current song (wDE5C), it does nothing.
-; Otherwise, it stores the new code in wDE5C.
+; If $FF (no song) or equal to the current song (wDE5C_CurrentSong), it does nothing.
+; Otherwise, it stores the new code in wDE5C_CurrentSong.
 ; Waits for an interrupt (call_00_0b92_WaitForInterrupt)—this syncs playback changes to a safe frame.
-; Derives wDE60 as (wDE5C >> 4) & $0F (bank group) and uses it +4 to switch to the appropriate ROM bank.
+; Derives wDE60_AudioBankRelated as (wDE5C_CurrentSong >> 4) & $0F (bank group) and uses it +4 to switch to the appropriate ROM bank.
 ; Then isolates the lower nibble and calls call_04_4006_Audio in bank 04 to start the track.
 ; Finally restores the original bank (call_00_0f08_RestoreBank).
 ; Summary: Changes music track safely by switching banks and calling the main audio engine.
     cp   A, $ff                                        ;; 00:0fa2 $fe $ff
     ret  Z                                             ;; 00:0fa4 $c8
-    ld   HL, wDE5C                                     ;; 00:0fa5 $21 $5c $de
+    ld   HL, wDE5C_CurrentSong                                     ;; 00:0fa5 $21 $5c $de
     cp   A, [HL]                                       ;; 00:0fa8 $be
     ret  Z                                             ;; 00:0fa9 $c8
     ld   [HL], A                                       ;; 00:0faa $77
     call call_00_0b92_WaitForInterrupt                                  ;; 00:0fab $cd $92 $0b
-    ld   A, [wDE5C]                                    ;; 00:0fae $fa $5c $de
+    ld   A, [wDE5C_CurrentSong]                                    ;; 00:0fae $fa $5c $de
     swap A                                             ;; 00:0fb1 $cb $37
     and  A, $0f                                        ;; 00:0fb3 $e6 $0f
-    ld   [wDE60], A                                    ;; 00:0fb5 $ea $60 $de
+    ld   [wDE60_AudioBankRelated], A                                    ;; 00:0fb5 $ea $60 $de
     add  A, $04                                        ;; 00:0fb8 $c6 $04
     call call_00_0eee_SwitchBank                                  ;; 00:0fba $cd $ee $0e
-    ld   A, [wDE5C]                                    ;; 00:0fbd $fa $5c $de
+    ld   A, [wDE5C_CurrentSong]                                    ;; 00:0fbd $fa $5c $de
     and  A, $0f                                        ;; 00:0fc0 $e6 $0f
     call call_04_4006_Audio                                  ;; 00:0fc2 $cd $06 $40
     jp   call_00_0f08_RestoreBank                                  ;; 00:0fc5 $c3 $08 $0f
 
 call_00_0fc8_ProcessQueuedSoundEffect:
-; Loads the queued effect ID from wDE5D and clears that slot to $FF.
-; If it was $FF (none queued), clears wDE5E (priority) and exits.
+; Loads the queued effect ID from wDE5D_QueuedSoundEffect and clears that slot to $FF.
+; If it was $FF (none queued), clears wDE5E_QueuedSoundEffectPriority (priority) and exits.
 ; Otherwise branches to call_00_0fd7_TriggerSoundEffect.
-    ld   HL, wDE5D                                     ;; 00:0fc8 $21 $5d $de
+    ld   HL, wDE5D_QueuedSoundEffect                                     ;; 00:0fc8 $21 $5d $de
     ld   A, [HL]                                       ;; 00:0fcb $7e
     ld   [HL], $ff                                     ;; 00:0fcc $36 $ff
     cp   A, $ff                                        ;; 00:0fce $fe $ff
     jr   NZ, call_00_0fd7_TriggerSoundEffect                              ;; 00:0fd0 $20 $05
     xor  A, A                                          ;; 00:0fd2 $af
-    ld   [wDE5E], A                                    ;; 00:0fd3 $ea $5e $de
+    ld   [wDE5E_QueuedSoundEffectPriority], A                                    ;; 00:0fd3 $ea $5e $de
     ret                                                ;; 00:0fd6 $c9
 
 call_00_0fd7_TriggerSoundEffect:
@@ -2146,7 +2147,7 @@ call_00_0fd7_TriggerSoundEffect:
 ; Bank-switches to 04, calls call_04_4024_Audio twice:
 ; First with A=$00 (resets/flushes channels?),
 ; Then with A=effect ID (plays the new effect).
-; Moves wDE5E (effect priority) into wDE5F after zeroing wDE5E.
+; Moves wDE5E_QueuedSoundEffectPriority (effect priority) into wDE5F_CurrentSoundEffectPriority after zeroing wDE5E_QueuedSoundEffectPriority.
 ; Restores bank and exits.
 ; Summary: Handles actually starting a queued sound effect in the audio engine.
     cp   A, $ff                                        ;; 00:0fd7 $fe $ff
@@ -2158,21 +2159,21 @@ call_00_0fd7_TriggerSoundEffect:
     call call_04_4024_Audio                                  ;; 00:0fe2 $cd $24 $40
     pop  AF                                            ;; 00:0fe5 $f1
     call call_04_4024_Audio                                  ;; 00:0fe6 $cd $24 $40
-    ld   HL, wDE5E                                     ;; 00:0fe9 $21 $5e $de
+    ld   HL, wDE5E_QueuedSoundEffectPriority                                     ;; 00:0fe9 $21 $5e $de
     ld   A, [HL]                                       ;; 00:0fec $7e
     ld   [HL], $00                                     ;; 00:0fed $36 $00
-    ld   [wDE5F], A                                    ;; 00:0fef $ea $5f $de
+    ld   [wDE5F_CurrentSoundEffectPriority], A                                    ;; 00:0fef $ea $5f $de
     jp   call_00_0f08_RestoreBank                                  ;; 00:0ff2 $c3 $08 $0f
 
 call_00_0ff5_QueueSoundEffectWithPriority:
 ; Accepts a sound effect code in A. If $FF, returns.
 ; Uses .data_00_1037 as a priority lookup table: B = priorityTable[A].
 ; Checks multiple channel-status bytes (wDF68–wDF72) to see if the sound hardware is busy.
-; If any channel active, compares B against wDE5F (currently playing effect priority) 
+; If any channel active, compares B against wDE5F_CurrentSoundEffectPriority (currently playing effect priority) 
 ; and returns early if the new effect is lower priority.
 ; If no channels active or priority is higher/equal, also compares against
-; wDE5E (last queued priority) when a sound is already queued.
-; If it passes priority checks, stores the effect code in wDE5D and its priority in wDE5E.
+; wDE5E_QueuedSoundEffectPriority (last queued priority) when a sound is already queued.
+; If it passes priority checks, stores the effect code in wDE5D_QueuedSoundEffect and its priority in wDE5E_QueuedSoundEffectPriority.
 ; Summary: Decides whether a new effect should replace the current/queued effect based on priority.
     cp   A, $ff                                        ;; 00:0ff5 $fe $ff
     ret  Z                                             ;; 00:0ff7 $c8
@@ -2200,21 +2201,21 @@ call_00_0ff5_QueueSoundEffectWithPriority:
     or   A, [HL]                                       ;; 00:1018 $b6
     jr   Z, .jr_00_1021                                ;; 00:1019 $28 $06
     ld   A, B                                          ;; 00:101b $78
-    ld   HL, wDE5F                                     ;; 00:101c $21 $5f $de
+    ld   HL, wDE5F_CurrentSoundEffectPriority                                     ;; 00:101c $21 $5f $de
     cp   A, [HL]                                       ;; 00:101f $be
     ret  C                                             ;; 00:1020 $d8
 .jr_00_1021:
-    ld   A, [wDE5D]                                    ;; 00:1021 $fa $5d $de
+    ld   A, [wDE5D_QueuedSoundEffect]                                    ;; 00:1021 $fa $5d $de
     cp   A, $ff                                        ;; 00:1024 $fe $ff
     jr   Z, .jr_00_102e                                ;; 00:1026 $28 $06
     ld   A, B                                          ;; 00:1028 $78
-    ld   HL, wDE5E                                     ;; 00:1029 $21 $5e $de
+    ld   HL, wDE5E_QueuedSoundEffectPriority                                     ;; 00:1029 $21 $5e $de
     cp   A, [HL]                                       ;; 00:102c $be
     ret  C                                             ;; 00:102d $d8
 .jr_00_102e:
-    ld   HL, wDE5D                                     ;; 00:102e $21 $5d $de
+    ld   HL, wDE5D_QueuedSoundEffect                                     ;; 00:102e $21 $5d $de
     ld   [HL], C                                       ;; 00:1031 $71
-    ld   HL, wDE5E                                     ;; 00:1032 $21 $5e $de
+    ld   HL, wDE5E_QueuedSoundEffectPriority                                     ;; 00:1032 $21 $5e $de
     ld   [HL], B                                       ;; 00:1035 $70
     ret                                                ;; 00:1036 $c9
 .data_00_1037:

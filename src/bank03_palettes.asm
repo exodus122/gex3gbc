@@ -1,12 +1,12 @@
 call_03_6567_SetupObjectPalettes:
 ; Purpose: Chooses which object palette set to load based on state flags.
 ; Behavior:
-; If wDCAB non-zero, uses default palette table .data_03_658c.
+; If wDCAB_FlyTimerOrFlags2 non-zero, uses default palette table .data_03_658c.
 ; Otherwise, checks wDC51, indexes .data_03_6594, and resolves an HL pointer to palette data.
 ; Copies 8 bytes into wDD2A_ObjectPalettes.
 ; Usage: Called when loading or switching level themes/objects.
     ld   HL, .data_03_658c                             ;; 03:6567 $21 $8c $65
-    ld   A, [wDCAB]                                    ;; 03:656a $fa $ab $dc
+    ld   A, [wDCAB_FlyTimerOrFlags2]                                    ;; 03:656a $fa $ab $dc
     and  A, A                                          ;; 03:656d $a7
     jr   NZ, .jr_03_6583                               ;; 03:656e $20 $13
     ld   A, [wDC51]                                    ;; 03:6570 $fa $51 $dc

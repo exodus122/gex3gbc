@@ -1,26 +1,27 @@
 ;; Disassembled with BadBoy Disassembler: https://github.com/daid/BadBoy
 
-INCLUDE "include/hardware.inc"
-INCLUDE "include/macros.inc"
-INCLUDE "include/charmaps.inc"
-INCLUDE "constants.inc"
-INCLUDE "memory.asm"
+INCLUDE "src/include/hardware.inc"
+INCLUDE "src/include/macros.inc"
+INCLUDE "src/include/charmaps.inc"
+INCLUDE "src/constants.inc"
+INCLUDE "src/memory.asm"
 
 SECTION "bank00", ROM0[$0000]
-INCLUDE "bank00_main.asm"
-INCLUDE "bank00_maps_core.asm"
-INCLUDE "bank00_object_utils.asm"
-INCLUDE "bank00_objects_core.asm"
+INCLUDE "src/bank00_main.asm"
+INCLUDE "src/bank00_maps_core.asm"
+INCLUDE "src/bank00_object_utils.asm"
+INCLUDE "src/bank00_objects_core.asm"
 
-INCLUDE "bank01_menus.asm"
+SECTION "bank01", ROMX[$4000], BANK[$01]
+INCLUDE "src/bank01_menus.asm"
 
 SECTION "bank02", ROMX[$4000], BANK[$02]
-INCLUDE "bank02_object_pointer_tables.asm"
-INCLUDE "bank02_player_actions.asm"
-INCLUDE "bank02_update_player.asm"
-INCLUDE "bank02_object_actions.asm"
-INCLUDE "bank02_update_objects.asm"
-INCLUDE "bank02_object_animation_data.asm"
+INCLUDE "src/bank02_object_pointer_tables.asm"
+INCLUDE "src/bank02_player_actions.asm"
+INCLUDE "src/bank02_update_player.asm"
+INCLUDE "src/bank02_object_actions.asm"
+INCLUDE "src/bank02_update_objects.asm"
+INCLUDE "src/bank02_object_animation_data.asm"
 
 SECTION "bank03", ROMX[$4000], BANK[$03]
 data_03_4000_bg_collision_tileset_flags:
@@ -31,16 +32,16 @@ image_003_4400:
     INCBIN ".gfx/misc_sprites/image_003_4400.bin"
 image_003_4580:
     INCBIN ".gfx/misc_sprites/image_003_4580.bin"
-INCLUDE "bank03_bg_collision.asm"
-INCLUDE "bank03_object_collision.asm"
-INCLUDE "bank03_object_graphics.asm"
-INCLUDE "bank03_map_boundaries_and_spawns.asm"
-INCLUDE "bank03_palettes.asm"
-INCLUDE "bank03_map_metadata.asm"
-INCLUDE "bank03_hud_graphics.asm"
+INCLUDE "src/bank03_bg_collision.asm"
+INCLUDE "src/bank03_object_collision.asm"
+INCLUDE "src/bank03_object_graphics.asm"
+INCLUDE "src/bank03_map_boundaries_and_spawns.asm"
+INCLUDE "src/bank03_palettes.asm"
+INCLUDE "src/bank03_map_metadata.asm"
+INCLUDE "src/bank03_hud_graphics.asm"
 
-INCLUDE "audio_engine/bank04_audio1.asm"
-INCLUDE "audio_engine/bank05_audio2.asm"
+INCLUDE "src/audio_engine/bank04_audio1.asm"
+INCLUDE "src/audio_engine/bank05_audio2.asm"
 
 SECTION "bank06", ROMX[$4000], BANK[$06]
 image_006_4000:
