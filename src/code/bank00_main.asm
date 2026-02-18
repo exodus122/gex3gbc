@@ -172,20 +172,20 @@ call_00_0150_Init:
     call call_00_0fa2_PlaySong                                  ;; 00:0269 $cd $a2 $0f
     ld   A, $00                                        ;; 00:026c $3e $00
     call call_00_0fd7_TriggerSoundEffect                                  ;; 00:026e $cd $d7 $0f
-    ld   A, $11                                        ;; 00:0271 $3e $11
+    ld   A, MENU_OPENING_CREDITS_1                                        ;; 00:0271 $3e $11
     farcall call_01_4000_MenuHandler_LoadAndProcess
-    ld   A, $12                                        ;; 00:027e $3e $12
+    ld   A, MENU_OPENING_CREDITS_2                                        ;; 00:027e $3e $12
     farcall call_01_4000_MenuHandler_LoadAndProcess
-    ld   A, $14                                        ;; 00:028b $3e $14
+    ld   A, MENU_EIDOS_INTERACTIVE                                        ;; 00:028b $3e $14
     farcall call_01_4000_MenuHandler_LoadAndProcess
-    ld   A, $13                                        ;; 00:0298 $3e $13
+    ld   A, MENU_OPENING_CRYSTAL_DYNAMICS                                        ;; 00:0298 $3e $13
     farcall call_01_4000_MenuHandler_LoadAndProcess
-    ld   A, $0f                                        ;; 00:02a5 $3e $0f
+    ld   A, MENU_DAVID_A_PALMER                                        ;; 00:02a5 $3e $0f
     farcall call_01_4000_MenuHandler_LoadAndProcess
 .jp_00_02b2:
     ld   A, $01                                        ;; 00:02b2 $3e $01
     call call_00_0fa2_PlaySong                                  ;; 00:02b4 $cd $a2 $0f
-    ld   A, $00                                        ;; 00:02b7 $3e $00
+    ld   A, MENU_TITLE_SCREEN                                        ;; 00:02b7 $3e $00
     farcall call_01_4000_MenuHandler_LoadAndProcess
     cp   A, $20                                        ;; 00:02c4 $fe $20
     jr   Z, .jr_00_02ed                                ;; 00:02c6 $28 $25
@@ -359,9 +359,9 @@ call_00_0150_Init:
     farcall call_02_7132_BackupObjectTable
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:04b0 $fa $1e $dc
     and  A, A                                          ;; 00:04b3 $a7
-    ld   A, $0b                                        ;; 00:04b4 $3e $0b
+    ld   A, MENU_PAUSE_IN_GEX_CAVE                                        ;; 00:04b4 $3e $0b
     jr   Z, .jr_00_04ba                                ;; 00:04b6 $28 $02
-    ld   A, $0d                                        ;; 00:04b8 $3e $0d
+    ld   A, MENU_PAUSE_IN_LEVEL                                        ;; 00:04b8 $3e $0d
 .jr_00_04ba:
     farcall call_01_4000_MenuHandler_LoadAndProcess
     cp   A, $60                                        ;; 00:04c5 $fe $60

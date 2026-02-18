@@ -30,9 +30,8 @@
 *.sg1
 
 # other files
-*.gfx
-*.dep
-*.obj
+src/.gfx
+build
 *.bak
 tools/banks/*
 tools/map2png/tile_bins/*

@@ -1,7 +1,8 @@
-ROM = rom.gb
+ROM := rom.gb
+BUILDDIR := build
 
-SRCS = $(wildcard src/game.asm)
-GFXS = $(shell find gfx/ -type f -name '*.png')
+SRCS := $(wildcard src/main.asm)
+GFXS := $(shell find src/gfx/ -type f -name '*.png')
 
 RGBDS ?=
 RGBASM  ?= $(RGBDS)rgbasm
@@ -9,34 +10,41 @@ RGBFIX  ?= $(RGBDS)rgbfix
 RGBGFX  ?= $(RGBDS)rgbgfx
 RGBLINK ?= $(RGBDS)rgblink
 
+OBJS := $(patsubst src/main.asm,$(BUILDDIR)/rom.o,$(SRCS))
+DEPS := $(patsubst src/main.asm,$(BUILDDIR)/rom.mk,$(SRCS))
+
 all: $(ROM)
 
 check: $(ROM)
 	md5sum -c $(ROM).md5
 
 clean:
-	-rm -rf .bin .obj .dep .gfx $(ROM)
+	-rm -rf $(BUILDDIR) $(ROM) src/.gfx
 
-$(ROM): $(patsubst src/game.asm,.obj/%.o,$(SRCS))
+$(ROM): $(OBJS)
 	@mkdir -p $(@D)
-	rgblink -w -m $(basename $@).map -n $(basename $@).sym -o $@ $^
-	rgbfix --validate $(FIXFLAGS) $@
+	$(RGBLINK) -w -m $(BUILDDIR)/$(basename $@).map -n $(basename $@).sym -o $@ $^
+	$(RGBFIX) --validate $(FIXFLAGS) $@
 
+# assemble .asm → build/rom.o and build/rom.mk
+$(BUILDDIR)/rom.o $(BUILDDIR)/rom.mk: src/main.asm $(patsubst src/gfx/%.png,src/.gfx/%.bin,$(GFXS))
+	@mkdir -p $(BUILDDIR)
+	$(RGBASM) -Wall -Wextra --export-all -Isrc -I.gfx \
+		-M $(BUILDDIR)/rom.mk -MP -MQ $(BUILDDIR)/rom.o -MQ $(BUILDDIR)/rom.mk \
+		-o $(BUILDDIR)/rom.o $<
 
-.obj/%.o $(DEPDIR)/%.mk: src/game.asm $(patsubst gfx/%.png,.gfx/%.bin,$(GFXS))
-	@mkdir -p $(dir .obj/$* .dep/$*)
-	rgbasm -Wall -Wextra --export-all -Isrc -I.gfx -M .dep/$*.mk -MP -MQ .obj/$*.o -MQ .dep/$*.mk -o .obj/$*.o $<
+# Special gfx processing flags
+src/.gfx/object_sprites/%.bin: rgbgfx += --columns
+src/.gfx/misc_sprites/%.bin: rgbgfx += --columns
+src/.gfx/collision_tileset/%.bin: rgbgfx += -d 1
 
-.gfx/object_sprites/%.bin: rgbgfx += --columns
-.gfx/misc_sprites/%.bin: rgbgfx += --columns
-.gfx/collision_tileset/%.bin: rgbgfx += -d 1
-
-.gfx/%.bin: gfx/%.png
-	@mkdir -p $(dir .gfx/$*)
+# png → .bin
+src/.gfx/%.bin: src/gfx/%.png
+	@mkdir -p $(dir $@)
 	$(RGBGFX) $(rgbgfx) -o $@ $<
 
 ifneq ($(MAKECMDGOALS),clean)
--include $(patsubst src/game.asm,.dep/%.mk,$(SRCS))
+-include $(DEPS)
 endif
 
 .PHONY: all clean

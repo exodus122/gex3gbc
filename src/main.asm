@@ -1,27 +1,26 @@
 ;; Disassembled with BadBoy Disassembler: https://github.com/daid/BadBoy
 
-INCLUDE "src/include/hardware.inc"
-INCLUDE "src/include/macros.inc"
-INCLUDE "src/include/charmaps.inc"
-INCLUDE "src/constants.inc"
-INCLUDE "src/memory.asm"
+INCLUDE "constants/hardware.inc"
+INCLUDE "constants/macros.asm"
+INCLUDE "constants/constants.asm"
+INCLUDE "constants/memory.asm"
 
 SECTION "bank00", ROM0[$0000]
-INCLUDE "src/bank00_main.asm"
-INCLUDE "src/bank00_maps_core.asm"
-INCLUDE "src/bank00_object_utils.asm"
-INCLUDE "src/bank00_objects_core.asm"
+INCLUDE "code/bank00_main.asm"
+INCLUDE "code/bank00_maps_core.asm"
+INCLUDE "code/bank00_object_utils.asm"
+INCLUDE "code/bank00_objects_core.asm"
 
 SECTION "bank01", ROMX[$4000], BANK[$01]
-INCLUDE "src/bank01_menus.asm"
+INCLUDE "code/bank01_menus.asm"
 
 SECTION "bank02", ROMX[$4000], BANK[$02]
-INCLUDE "src/bank02_object_pointer_tables.asm"
-INCLUDE "src/bank02_player_actions.asm"
-INCLUDE "src/bank02_update_player.asm"
-INCLUDE "src/bank02_object_actions.asm"
-INCLUDE "src/bank02_update_objects.asm"
-INCLUDE "src/bank02_object_animation_data.asm"
+INCLUDE "code/bank02_object_pointer_tables.asm"
+INCLUDE "code/bank02_player_actions.asm"
+INCLUDE "code/bank02_update_player.asm"
+INCLUDE "code/bank02_object_actions.asm"
+INCLUDE "code/bank02_update_objects.asm"
+INCLUDE "code/bank02_object_animation_data.asm"
 
 SECTION "bank03", ROMX[$4000], BANK[$03]
 data_03_4000_bg_collision_tileset_flags:
@@ -33,19 +32,19 @@ image_003_4400:
     INCBIN ".gfx/misc_sprites/image_003_4400.bin"
 image_003_4580:
     INCBIN ".gfx/misc_sprites/image_003_4580.bin"
-INCLUDE "src/bank03_bg_collision.asm"
-INCLUDE "src/bank03_object_collision.asm"
-INCLUDE "src/bank03_object_graphics.asm"
-INCLUDE "src/bank03_map_boundaries_and_spawns.asm"
-INCLUDE "src/bank03_palettes.asm"
-INCLUDE "src/bank03_map_metadata.asm"
-INCLUDE "src/bank03_hud_graphics.asm"
+INCLUDE "code/bank03_bg_collision.asm"
+INCLUDE "code/bank03_object_collision.asm"
+INCLUDE "code/bank03_object_graphics.asm"
+INCLUDE "code/bank03_map_boundaries_and_spawns.asm"
+INCLUDE "code/bank03_palettes.asm"
+INCLUDE "code/bank03_map_metadata.asm"
+INCLUDE "code/bank03_hud_graphics.asm"
 
 SECTION "bank04", ROMX[$4000], BANK[$04]
-INCLUDE "src/audio_engine/bank04_audio1.asm"
+INCLUDE "code/audio/bank04_audio1.asm"
 
 SECTION "bank05", ROMX[$4000], BANK[$05]
-INCLUDE "src/audio_engine/bank05_audio2.asm"
+INCLUDE "code/audio/bank05_audio2.asm"
 
 SECTION "bank06", ROMX[$4000], BANK[$06]
 image_006_4000:
@@ -87,9 +86,9 @@ image_006_67c6_palette_ids:
 
 SECTION "bank07", ROMX[$4000], BANK[$07]
 image_007_4000:
-    INCBIN "./.gfx/object_sprites/image_007_4000.bin"
+    INCBIN ".gfx/object_sprites/image_007_4000.bin"
 image_007_5b00:
-    INCBIN "./.gfx/menu_tilesets/image_007_5b00.bin"
+    INCBIN ".gfx/menu_tilesets/image_007_5b00.bin"
 image_007_5b00_bgmap_tile_ids:
     INCBIN "gfx/menu_tilesets/bgmap_tile_ids/image_007_5b00_bgmap_tile_ids.bin"
 

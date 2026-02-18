@@ -325,17 +325,17 @@ DEF MENU_SEE_PASSWORD                     EQU $02
 DEF MENU_GAME_OVER                        EQU $03
 DEF MENU_BAD_PASSWORD                     EQU $04
 DEF MENU_MISSION_SELECT_1_REMOTE          EQU $05
-DEF MENU_UNK06                            EQU $06
+DEF MENU_UNK06                            EQU $06 ; unused?
 DEF MENU_MISSION_SELECT_3_REMOTES         EQU $07
 DEF MENU_TOTALS                           EQU $08
-DEF MENU_UNK09                            EQU $09
-DEF MENU_UNK0A                            EQU $0A
+DEF MENU_UNK09                            EQU $09 ; used but unknown
+DEF MENU_UNK0A                            EQU $0A ; used but unknown
 DEF MENU_PAUSE_IN_GEX_CAVE                EQU $0B
 DEF MENU_QUIT_GAME                        EQU $0C
 DEF MENU_PAUSE_IN_LEVEL                   EQU $0D
 DEF MENU_GO_TO_MAP                        EQU $0E
 DEF MENU_DAVID_A_PALMER                   EQU $0F
-DEF MENU_UNK10                            EQU $10
+DEF MENU_UNK10                            EQU $10 ; unused?
 DEF MENU_OPENING_CREDITS_1                EQU $11
 DEF MENU_OPENING_CREDITS_2                EQU $12
 DEF MENU_OPENING_CRYSTAL_DYNAMICS         EQU $13
@@ -346,6 +346,7 @@ DEF MENU_END_CREDITS_3                    EQU $17
 DEF MENU_END_CREDITS_4                    EQU $18
 DEF MENU_END_CREDITS_5                    EQU $19
 DEF MENU_END_CREDITS_6                    EQU $1A
+DEF MENU_UNK1B                            EQU $1B ; used but unknown
 
 ; Sound Effects
 DEF SFX_UNK00                              EQU $00

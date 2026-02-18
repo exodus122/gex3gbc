@@ -254,7 +254,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     pop  AF                                            ;; 01:4174 $f1
     cp   A, $20                                        ;; 01:4175 $fe $20
     ret  Z                                             ;; 01:4177 $c8
-    ld   A, $04                                        ;; 01:4178 $3e $04
+    ld   A, MENU_BAD_PASSWORD                                        ;; 01:4178 $3e $04
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:417a $cd $00 $40
     jp   .jp_01_42a1                                   ;; 01:417d $c3 $a1 $42
 .jp_01_4180:
@@ -396,11 +396,11 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   [wDBE9], A                                    ;; 01:4293 $ea $e9 $db
     call call_01_4f8c_BuildPasswordBitfieldAndChecksum                                  ;; 01:4296 $cd $8c $4f
     call call_01_5027_BuildPasswordBufferFromBitfield                                  ;; 01:4299 $cd $27 $50
-    ld   A, $02                                        ;; 01:429c $3e $02
+    ld   A, MENU_SEE_PASSWORD                                        ;; 01:429c $3e $02
     jp   .jp_01_4005                                   ;; 01:429e $c3 $05 $40
 .jp_01_42a1:
     call call_01_4f7e_SeedTileLookupTable                                  ;; 01:42a1 $cd $7e $4f
-    ld   A, $01                                        ;; 01:42a4 $3e $01
+    ld   A, MENU_ENTER_PASSWORD                                        ;; 01:42a4 $3e $01
     jp   call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:42a6 $c3 $00 $40
 .jr_01_42a9:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 01:42a9 $fa $1e $dc
@@ -458,7 +458,7 @@ call_01_42fd_LoadMenu03_InitSong15:
 ; Likely Purpose: Entry point to show a specific menu screen (e.g., pause/options).
     ld   A, $15                                        ;; 01:42fd $3e $15
     call call_00_0fa2_PlaySong                                  ;; 01:42ff $cd $a2 $0f
-    ld   A, $03                                        ;; 01:4302 $3e $03
+    ld   A, MENU_GAME_OVER                                        ;; 01:4302 $3e $03
     jp   call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4304 $c3 $00 $40
 
 call_01_4307_PreloadMenus_15to1A:
@@ -468,17 +468,17 @@ call_01_4307_PreloadMenus_15to1A:
 ; graphics for level select or transitions).
     ld   A, $19                                        ;; 01:4307 $3e $19
     call call_00_0fa2_PlaySong                                  ;; 01:4309 $cd $a2 $0f
-    ld   A, $15                                        ;; 01:430c $3e $15
+    ld   A, MENU_END_CREDITS_1                                        ;; 01:430c $3e $15
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:430e $cd $00 $40
-    ld   A, $16                                        ;; 01:4311 $3e $16
+    ld   A, MENU_END_CREDITS_2                                        ;; 01:4311 $3e $16
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4313 $cd $00 $40
-    ld   A, $17                                        ;; 01:4316 $3e $17
+    ld   A, MENU_END_CREDITS_3                                        ;; 01:4316 $3e $17
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4318 $cd $00 $40
-    ld   A, $18                                        ;; 01:431b $3e $18
+    ld   A, MENU_END_CREDITS_4                                        ;; 01:431b $3e $18
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:431d $cd $00 $40
-    ld   A, $19                                        ;; 01:4320 $3e $19
+    ld   A, MENU_END_CREDITS_5                                        ;; 01:4320 $3e $19
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4322 $cd $00 $40
-    ld   A, $1a                                        ;; 01:4325 $3e $1a
+    ld   A, MENU_END_CREDITS_6                                        ;; 01:4325 $3e $1a
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4327 $cd $00 $40
     ret                                                ;; 01:432a $c9
 
@@ -499,7 +499,7 @@ call_01_432b_SetLevelMenuAndPalette:
     jr   C, .jr_01_434d                                ;; 01:433a $38 $11
     ld   A, $01                                        ;; 01:433c $3e $01
     ld   [wDC59], A                                    ;; 01:433e $ea $59 $dc
-    ld   A, $05                                        ;; 01:4341 $3e $05
+    ld   A, MENU_MISSION_SELECT_1_REMOTE                                        ;; 01:4341 $3e $05
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4343 $cd $00 $40
     ld   A, [wDBEC_MenuRowSelected]                                    ;; 01:4346 $fa $ec $db
     ld   [wDC5A], A                                    ;; 01:4349 $ea $5a $dc
@@ -507,7 +507,7 @@ call_01_432b_SetLevelMenuAndPalette:
 .jr_01_434d:
     ld   A, $03                                        ;; 01:434d $3e $03
     ld   [wDC59], A                                    ;; 01:434f $ea $59 $dc
-    ld   A, $07                                        ;; 01:4352 $3e $07
+    ld   A, MENU_MISSION_SELECT_3_REMOTES                                        ;; 01:4352 $3e $07
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4354 $cd $00 $40
     ld   A, [wDBEC_MenuRowSelected]                                    ;; 01:4357 $fa $ec $db
     ld   [wDC5A], A                                    ;; 01:435a $ea $5a $dc
@@ -542,13 +542,13 @@ call_01_435e_HandleLevelTransitionMenu:
     res  5, [HL]                                       ;; 01:4376 $cb $ae
     ld   A, $15                                        ;; 01:4378 $3e $15
     call call_00_0fa2_PlaySong                                  ;; 01:437a $cd $a2 $0f
-    ld   A, $0a                                        ;; 01:437d $3e $0a
+    ld   A, MENU_UNK0A                                        ;; 01:437d $3e $0a
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:437f $cd $00 $40
     jr   .jr_01_43ae                                   ;; 01:4382 $18 $2a
 .jr_01_4384:
     ld   A, $13                                        ;; 01:4384 $3e $13
     call call_00_0fa2_PlaySong                                  ;; 01:4386 $cd $a2 $0f
-    ld   A, $1b                                        ;; 01:4389 $3e $1b
+    ld   A, MENU_UNK1B                                        ;; 01:4389 $3e $1b
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:438b $cd $00 $40
     jr   .jr_01_43ae                                   ;; 01:438e $18 $1e
 .jr_01_4390:
@@ -564,7 +564,7 @@ call_01_435e_HandleLevelTransitionMenu:
 .jr_01_43a4:
     ld   A, $13                                        ;; 01:43a4 $3e $13
     call call_00_0fa2_PlaySong                                  ;; 01:43a6 $cd $a2 $0f
-    ld   A, $09                                        ;; 01:43a9 $3e $09
+    ld   A, MENU_UNK09                                        ;; 01:43a9 $3e $09
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:43ab $cd $00 $40
 .jr_01_43ae:
     xor  A, A                                          ;; 01:43ae $af

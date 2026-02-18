@@ -1,0 +1,9 @@
+{
+    "rgbdsz80.includePath": [
+        "src"
+    ],
+    "files.associations": {
+        "*.asm": "gbz80",
+        "*.inc": "gbz80"
+    }
+}
