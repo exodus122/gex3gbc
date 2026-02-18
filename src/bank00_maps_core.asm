@@ -1700,15 +1700,15 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
     ld   L, E                                          ;; 00:1f21 $6b
     ld   H, D                                          ;; 00:1f22 $62
     xor  A, A                                          ;; 00:1f23 $af
-    ld   [wDCE0_MissionPreviewCutsceneMovementFlag], A                                    ;; 00:1f24 $ea $e0 $dc
-    ld   [wDCE1], A                                    ;; 00:1f27 $ea $e1 $dc
+    ld   [wDCE0_MissionPreviewCutsceneMovementFlags], A                                    ;; 00:1f24 $ea $e0 $dc
+    ld   [wDCE0_MissionPreviewCutsceneMovementFlags+1], A                                    ;; 00:1f27 $ea $e1 $dc
     ld   A, [HL+]                                      ;; 00:1f2a $2a
 .jr_00_1f2b:
-    ld   [wDC81_CurrentInputs], A                                    ;; 00:1f2b $ea $81 $dc
+    ld   [wDC81_CurrentInputsAlt], A                                    ;; 00:1f2b $ea $81 $dc
     ld   A, [HL+]                                      ;; 00:1f2e $2a
     ld   [wDCDE_MissionPreviewCutsceneRelated], A                                    ;; 00:1f2f $ea $de $dc
     ld   A, [HL+]                                      ;; 00:1f32 $2a
-    ld   [wDCDF], A                                    ;; 00:1f33 $ea $df $dc
+    ld   [wDCDE_MissionPreviewCutsceneRelated+1], A                                    ;; 00:1f33 $ea $df $dc
     push HL                                            ;; 00:1f36 $e5
 .jr_00_1f37:
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:1f37 $fa $d7 $da
@@ -1846,9 +1846,9 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
     db   $50, $40, $00, $00, $3c, $00, $ff             ;; 00:2178 ???????
 
 call_00_217f_ProcessCutsceneMovement:
-; Reads wDC81_CurrentInputs (input flags).
-; Writes either $10 or $00 to wDCE0_MissionPreviewCutsceneMovementFlag, mixes low bits into its second byte, then derives a movement step (C).
-; Checks bits in wDC81_CurrentInputs to adjust player position:
+; Reads wDC81_CurrentInputsAlt (input flags).
+; Writes either $10 or $00 to wDCE0_MissionPreviewCutsceneMovementFlags, mixes low bits into its second byte, then derives a movement step (C).
+; Checks bits in wDC81_CurrentInputsAlt to adjust player position:
 ; Bit 4: move player right by C.
 ; Bit 5: move player left by C.
 ; Bit 7: move player down by C.
@@ -1856,17 +1856,17 @@ call_00_217f_ProcessCutsceneMovement:
 ; Updates both low and high bytes of player X/Y position (wD80E–wD811) with proper carry/borrow handling.
 ; Usage: Low-level player movement updater—applies directional flags and speed accumulation each frame.
 ; This is used to move around the "camera" for the mission preview cutscenes
-    ld   A, [wDC81_CurrentInputs]                                    ;; 00:217f $fa $81 $dc
+    ld   A, [wDC81_CurrentInputsAlt]                                    ;; 00:217f $fa $81 $dc
     and  A, A                                          ;; 00:2182 $a7
     jr   NZ, .jr_00_218c                               ;; 00:2183 $20 $07
-    ld   HL, wDCE0_MissionPreviewCutsceneMovementFlag                                     ;; 00:2185 $21 $e0 $dc
+    ld   HL, wDCE0_MissionPreviewCutsceneMovementFlags                                     ;; 00:2185 $21 $e0 $dc
     ld   [HL], $00                                     ;; 00:2188 $36 $00
     jr   .jr_00_2191                                   ;; 00:218a $18 $05
 .jr_00_218c:
-    ld   HL, wDCE0_MissionPreviewCutsceneMovementFlag                                     ;; 00:218c $21 $e0 $dc
+    ld   HL, wDCE0_MissionPreviewCutsceneMovementFlags                                     ;; 00:218c $21 $e0 $dc
     ld   [HL], $10                                     ;; 00:218f $36 $10
 .jr_00_2191:
-    ld   HL, wDCE0_MissionPreviewCutsceneMovementFlag                                     ;; 00:2191 $21 $e0 $dc
+    ld   HL, wDCE0_MissionPreviewCutsceneMovementFlags                                     ;; 00:2191 $21 $e0 $dc
     ld   A, [HL+]                                      ;; 00:2194 $2a
     ld   C, A                                          ;; 00:2195 $4f
     ld   A, [HL]                                       ;; 00:2196 $7e
@@ -1876,7 +1876,7 @@ call_00_217f_ProcessCutsceneMovement:
     swap A                                             ;; 00:219b $cb $37
     and  A, $0f                                        ;; 00:219d $e6 $0f
     ld   C, A                                          ;; 00:219f $4f
-    ld   HL, wDC81_CurrentInputs                                     ;; 00:21a0 $21 $81 $dc
+    ld   HL, wDC81_CurrentInputsAlt                                     ;; 00:21a0 $21 $81 $dc
     bit  4, [HL]                                       ;; 00:21a3 $cb $66
     jr   Z, .jr_00_21b6                                ;; 00:21a5 $28 $0f
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:21a7 $fa $0e $d8

@@ -73,15 +73,15 @@ DEF Bank4f_Tileset            EQU $4f ; WesternStation, WWGexWrestling, ChannelZ
 
 DEF Bank7f                    EQU $7f ; object sprite and palette data
 
-; Inputs
-DEF Input_A        EQU $01
-DEF Input_B        EQU $02
-DEF Input_Select   EQU $04
-DEF Input_Start    EQU $08
-DEF Input_Right    EQU $10
-DEF Input_Left     EQU $20
-DEF Input_Up       EQU $40
-DEF Input_Down     EQU $80
+; Inputs (defined in hardware.inc)
+; DEF PADF_DOWN   EQU $80
+; DEF PADF_UP     EQU $40
+; DEF PADF_LEFT   EQU $20
+; DEF PADF_RIGHT  EQU $10
+; DEF PADF_START  EQU $08
+; DEF PADF_SELECT EQU $04
+; DEF PADF_B      EQU $02
+; DEF PADF_A      EQU $01
 
 ; Maps
 DEF Map_GexCave1                  EQU $00

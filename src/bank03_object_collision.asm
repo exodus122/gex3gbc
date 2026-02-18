@@ -748,7 +748,7 @@ call_03_50f4_Collision_OnSwitch2:
     
 call_03_5116_Collision_Door:
 ; For action 00 only.
-; On collision: requires certain global flags (wDABE_UnkBGCollisionFlags2, wDC81_CurrentInputs) and player action between 01–02.
+; On collision: requires certain global flags (wDABE_UnkBGCollisionFlags2, wDC81_CurrentInputsAlt) and player action between 01–02.
 ; Checks object slot flag; plays sound 1B if not set, else sound 18.
 ; Loads new object data (bank 1).
     call call_00_2962_Object_GetActionId
@@ -759,7 +759,7 @@ call_03_5116_Collision_Door:
     ld   hl,wDABE_UnkBGCollisionFlags2
     bit  7,[hl]
     ret  z
-    ld   hl,wDC81_CurrentInputs
+    ld   hl,wDC81_CurrentInputsAlt
     bit  6,[hl]
     ret  z
     ld   a,[wD801_Player_ActionId]
@@ -790,7 +790,7 @@ call_03_5156_Collision_Door2:
     ld   hl,wDABE_UnkBGCollisionFlags2
     bit  7,[hl]
     ret  z
-    ld   hl,wDC81_CurrentInputs
+    ld   hl,wDC81_CurrentInputsAlt
     bit  6,[hl]
     ret  z
     ld   a,[wD801_Player_ActionId]

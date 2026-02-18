@@ -373,7 +373,7 @@ call_00_0150_Init:
     ld   [wDB6C_CurrentMapId], A                                    ;; 00:04d2 $ea $6c $db
     jp   .jp_00_0314                                   ;; 00:04d5 $c3 $14 $03
 .jr_00_04d8:
-    call call_00_05fd                                  ;; 00:04d8 $cd $fd $05
+    call call_00_05fd_CheckForEatFly                                  ;; 00:04d8 $cd $fd $05
     call call_00_05c7                                  ;; 00:04db $cd $c7 $05
     farcall call_02_7152_UpdateObjects
     call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:04e9 $cd $c8 $11
@@ -514,7 +514,7 @@ call_00_05c7:
     set  4, [HL]                                       ;; 00:05fa $cb $e6
     ret                                                ;; 00:05fc $c9
 
-call_00_05fd:
+call_00_05fd_CheckForEatFly:
     call call_00_0f8b_CheckInputSelect                                  ;; 00:05fd $cd $8b $0f
     ret  Z                                             ;; 00:0600 $c8
     ld   A, [wDC51]                                    ;; 00:0601 $fa $51 $dc
@@ -2048,27 +2048,27 @@ call_00_0f5e_WaitUntilNoInputPressed:
 
 call_00_0f68_CheckInputLeft:
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:0f68 $fa $d7 $da
-    and  A, $20                                        ;; 00:0f6b $e6 $20
+    and  A, PADF_LEFT                                        ;; 00:0f6b $e6 $20
     ret                                                ;; 00:0f6d $c9
 
 call_00_0f6e_CheckInputRight:
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:0f6e $fa $d7 $da
-    and  A, $10                                        ;; 00:0f71 $e6 $10
+    and  A, PADF_RIGHT                                        ;; 00:0f71 $e6 $10
     ret                                                ;; 00:0f73 $c9
 
 call_00_0f74_CheckInputUp:
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:0f74 $fa $d7 $da
-    and  A, $40                                        ;; 00:0f77 $e6 $40
+    and  A, PADF_UP                                        ;; 00:0f77 $e6 $40
     ret                                                ;; 00:0f79 $c9
 
 call_00_0f7a_CheckInputDown:
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:0f7a $fa $d7 $da
-    and  A, $80                                        ;; 00:0f7d $e6 $80
+    and  A, PADF_DOWN                                        ;; 00:0f7d $e6 $80
     ret                                                ;; 00:0f7f $c9
 
 call_00_0f80_CheckInputStart:
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:0f80 $fa $d7 $da
-    cp   A, $08                                        ;; 00:0f83 $fe $08
+    cp   A, PADF_START                                        ;; 00:0f83 $fe $08
     jr   Z, .jr_00_0f89                                ;; 00:0f85 $28 $02
     xor  A, A                                          ;; 00:0f87 $af
     ret                                                ;; 00:0f88 $c9
@@ -2084,7 +2084,7 @@ call_00_0f8b_CheckInputSelect:
 ; A == $04 → returns immediately.
 ; Otherwise sets A=0 and returns.
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:0f8b $fa $d7 $da
-    cp   A, $04                                        ;; 00:0f8e $fe $04
+    cp   A, PADF_SELECT                                        ;; 00:0f8e $fe $04
     jr   Z, .jr_00_0f94                                ;; 00:0f90 $28 $02
     xor  A, A                                          ;; 00:0f92 $af
     ret                                                ;; 00:0f93 $c9
@@ -2093,13 +2093,13 @@ call_00_0f8b_CheckInputSelect:
     ret                                                ;; 00:0f95 $c9
 
 call_00_0f96_CheckInputA:
-    ld   a,[wDAD7_CurrentInputs]
-    and  a,$01
+    ld   a, [wDAD7_CurrentInputs]
+    and  a, PADF_A
     ret  
 
 call_00_0f9c_CheckInputB:
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:0f9c $fa $d7 $da
-    and  A, $02                                        ;; 00:0f9f $e6 $02
+    and  A, PADF_B                                        ;; 00:0f9f $e6 $02
     ret                                                ;; 00:0fa1 $c9
 
 call_00_0fa2_PlaySong:

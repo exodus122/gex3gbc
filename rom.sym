@@ -40,8 +40,8 @@
 00:05af call_00_05af_LoadMapPalettes
 00:05c7 call_00_05c7
 00:05f1 call_00_05c7.jr_00_05f1
-00:05fd call_00_05fd
-00:0616 call_00_05fd.jr_00_0616
+00:05fd call_00_05fd_CheckForEatFly
+00:0616 call_00_05fd_CheckForEatFly.jr_00_0616
 00:0624 call_00_0624_SetFly_TimersAndFlags
 00:0655 call_00_0624_SetFly_TimersAndFlags.jr_00_0655
 00:066c call_00_0624_SetFly_TimersAndFlags.jr_00_066C
@@ -2970,7 +2970,7 @@
 00:dc7e wDC7E
 00:dc7f wDC7F
 00:dc80 wDC80
-00:dc81 wDC81_CurrentInputs
+00:dc81 wDC81_CurrentInputsAlt
 00:dc83 wDC83
 00:dc84 wDC84
 00:dc85 wDC85
@@ -3043,9 +3043,7 @@
 00:dcdb wDCDB_EvilSantaHitByProjectileFlag
 00:dcdc wDCDC_HandObjectUnkFlag
 00:dcde wDCDE_MissionPreviewCutsceneRelated
-00:dcdf wDCDF
-00:dce0 wDCE0_MissionPreviewCutsceneMovementFlag
-00:dce1 wDCE1
+00:dce0 wDCE0_MissionPreviewCutsceneMovementFlags
 00:dce2 wDCE2_ElevatorObjectUnkData
 00:dce8 wDCE8
 00:dce9 wDCE9

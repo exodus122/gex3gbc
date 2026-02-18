@@ -170,11 +170,9 @@ wDA26_ObjectInitialYPos:
 wDA9C:
     ds 16                                              ;; da9c
 
-wDAAC_CameraXHi:
-; Camera X position related
+wDAAC_CameraXHi: ; Camera X position related
     ds 1                                               ;; daac
-wDAAD_CameraYHi:
-; Camera Y position related
+wDAAD_CameraYHi: ; Camera Y position related
     ds 1                                               ;; daad
 
 wDAAE_ObjectPaletteIds:
@@ -753,7 +751,7 @@ wDC7F:
 wDC80:
     ds 1                                               ;; dc80
 
-wDC81_CurrentInputs:
+wDC81_CurrentInputsAlt:
     ds 2                                               ;; dc81
 
 wDC83:
@@ -943,13 +941,9 @@ wDCDC_HandObjectUnkFlag:
 
 ; Mission Preview Cutscene flags
 wDCDE_MissionPreviewCutsceneRelated:
-    ds 1                                               ;; dcde
-wDCDF: ; unused except set to 0?
-    ds 1                                               ;; dcdf
-wDCE0_MissionPreviewCutsceneMovementFlag:
-    ds 1                                               ;; dce0
-wDCE1: ; unused except set to 0?
-    ds 1                                               ;; dce1
+    ds 2                                                ;; dcde
+wDCE0_MissionPreviewCutsceneMovementFlags:
+    ds 2                                               ;; dce0
 
 ; Elevator object data
 wDCE2_ElevatorObjectUnkData:
