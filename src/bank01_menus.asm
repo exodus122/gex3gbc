@@ -638,7 +638,7 @@ call_01_43f0_MenuEngine_MainLoop:
     cp   A, $ff                                        ;; 01:441f $fe $ff
     jr   Z, .jr_01_442b                                ;; 01:4421 $28 $08
     ld   DE, data_01_5596                              ;; 01:4423 $11 $96 $55
-    call call_00_0777                                  ;; 01:4426 $cd $77 $07
+    call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 01:4426 $cd $77 $07
     jr   .jr_01_440c                                   ;; 01:4429 $18 $e1
 .jr_01_442b:
     call call_01_4f51_UploadSecondaryTileLayer                                  ;; 01:442b $cd $51 $4f
@@ -733,7 +733,7 @@ call_01_446b_ExecuteMenuCommand:
     sub  A, $e0                                        ;; 01:44c0 $d6 $e0
     jr   C, .jr_01_44cd                                ;; 01:44c2 $38 $09
     ld   DE, .data_01_456b_MenuCommandJumpTable                             ;; 01:44c4 $11 $6b $45
-    call call_00_0777                                  ;; 01:44c7 $cd $77 $07
+    call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 01:44c7 $cd $77 $07
     call call_00_0f22_JumpHL                                  ;; 01:44ca $cd $22 $0f
 .jr_01_44cd:
     ld   A, [wDBAA_MenuCommandBuffer2_Unk6]                                    ;; 01:44cd $fa $aa $db
@@ -869,7 +869,7 @@ call_01_458d_MenuHandler_LoadAssetsAndJump:
 ; Likely Purpose: Load specific menu graphics and branch to a menu update routine.
     ld   a,[wDBA7_MenuCommandBuffer2_Unk3]
     ld   de,data_01_6f39
-    call call_00_0777
+    call call_00_0777_LoadPointerIndexAFromTableDE
     jp   call_01_4d03_StreamTilemapBlockToBg
 
 call_01_4599_MenuHandler_LoadAssetsAndJump:
@@ -877,7 +877,7 @@ call_01_4599_MenuHandler_LoadAssetsAndJump:
 ; same as above
     ld   A, [wDBA7_MenuCommandBuffer2_Unk3]                                    ;; 01:4599 $fa $a7 $db
     ld   DE, data_01_6f39                              ;; 01:459c $11 $39 $6f
-    call call_00_0777                                  ;; 01:459f $cd $77 $07
+    call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 01:459f $cd $77 $07
     jp   call_01_4d03_StreamTilemapBlockToBg                                    ;; 01:45a2 $c3 $03 $4d
 
 call_01_45a5_MenuHandler_LoadBgPalettesAndMap:
@@ -891,7 +891,7 @@ call_01_45a5_MenuHandler_LoadBgPalettesAndMap:
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:45ae $cd $6e $07
     ld   A, [wDB6C_CurrentMapId]                                    ;; 01:45b1 $fa $6c $db
     ld   DE, $b01                                      ;; 01:45b4 $11 $01 $0b
-    call call_00_0777                                  ;; 01:45b7 $cd $77 $07
+    call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 01:45b7 $cd $77 $07
     ld   DE, $330                                      ;; 01:45ba $11 $30 $03
     add  HL, DE                                        ;; 01:45bd $19
     ld   DE, wDD0A_BgPalettes                                     ;; 01:45be $11 $0a $dd
@@ -900,7 +900,7 @@ call_01_45a5_MenuHandler_LoadBgPalettesAndMap:
     call call_00_075f_SwitchBankAndCopyBCBytesFromHLToDE                                  ;; 01:45c6 $cd $5f $07
     ld   A, [wDB6C_CurrentMapId]                                    ;; 01:45c9 $fa $6c $db
     ld   DE, $b01                                      ;; 01:45cc $11 $01 $0b
-    call call_00_0777                                  ;; 01:45cf $cd $77 $07
+    call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 01:45cf $cd $77 $07
     ld   A, [wDBA6_MenuCommandBuffer2_Unk2]                                    ;; 01:45d2 $fa $a6 $db
     ld   [wDBA2_MenuCommandBuffer_Unk4], A                                    ;; 01:45d5 $ea $a2 $db
     ld   A, $08                                        ;; 01:45d8 $3e $08
@@ -1042,7 +1042,7 @@ call_01_4722_MenuStateHandlerTable:
 ; Contains inline small handlers (.4744, .4748, .474c, etc.) that return values or constants.
     ld   A, [wDBA7_MenuCommandBuffer2_Unk3]                                    ;; 01:4722 $fa $a7 $db
     ld   DE, .data_01_472c                             ;; 01:4725 $11 $2c $47
-    call call_00_0777                                  ;; 01:4728 $cd $77 $07
+    call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 01:4728 $cd $77 $07
     jp   HL                                            ;; 01:472b $e9
 .data_01_472c:
     dw   call_01_4acf_CountCollectedBitsForLevel                                  ;; 01:472c pP
@@ -1092,7 +1092,7 @@ call_01_4760_MenuState_SubmenuHandler:
 .jr_01_476f:
     ld   A, [wDBA7_MenuCommandBuffer2_Unk3]                                    ;; 01:476f $fa $a7 $db
     ld   DE, data_01_5b61                              ;; 01:4772 $11 $61 $5b
-    call call_00_0777                                  ;; 01:4775 $cd $77 $07
+    call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 01:4775 $cd $77 $07
     jp   call_01_4c45_ParseAndLoadTextIntoBuffer                                  ;; 01:4778 $c3 $45 $4c
 
 call_01_477b_MenuState_NoOp:
@@ -1144,21 +1144,28 @@ call_01_47b1_LoadMenuConfigData:
 ; copies 8 bytes into wDBB1_MenuCommandBuffer4_Unk0, then jumps to jp_00_0781 (likely continues processing).
     ld   A, [wDBA7_MenuCommandBuffer2_Unk3]                                    ;; 01:47b1 $fa $a7 $db
     ld   DE, .data_01_47c6                             ;; 01:47b4 $11 $c6 $47
-    call call_00_0777                                  ;; 01:47b7 $cd $77 $07
+    call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 01:47b7 $cd $77 $07
     ld   DE, wDBB1_MenuCommandBuffer4_Unk0                                     ;; 01:47ba $11 $b1 $db
     ld   BC, $08                                       ;; 01:47bd $01 $08 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:47c0 $cd $6e $07
     jp   jp_00_0781                                    ;; 01:47c3 $c3 $81 $07
 .data_01_47c6:
-    db   $d4, $47, $dc, $47, $e4, $47, $ec, $47        ;; 01:47c6 ..??....
-    db   $f4, $47, $fc, $47, $04, $48, $00, $06        ;; 01:47ce ....??..
-    db   $e0, $45, $00, $40, $e0, $05, $00, $06        ;; 01:47d6 ......??
-    db   $a6, $48, $a6, $47, $00, $01, $01, $06        ;; 01:47de ??????..
-    db   $fe, $56, $1e, $4a, $e0, $0c, $00, $06        ;; 01:47e6 ........
-    db   $06, $66, $86, $60, $80, $05, $00, $06        ;; 01:47ee ........
-    db   $66, $6b, $c6, $67, $a0, $03, $00, $06        ;; 01:47f6 ........
-    db   $ce, $5e, $ce, $59, $00, $05, $01, $11        ;; 01:47fe ......??
-    db   $90, $51, $00, $40, $90, $11
+    dw   .data_01_47d4, .data_01_47dc, .data_01_47e4, .data_01_47ec        ;; 01:47c6 ..??....
+    dw   .data_01_47f4, .data_01_47fc, .data_01_4804
+.data_01_47d4:
+    db   $00, $06, $e0, $45, $00, $40, $e0, $05
+.data_01_47dc:
+    db   $00, $06, $a6, $48, $a6, $47, $00, $01
+.data_01_47e4:
+    db   $01, $06, $fe, $56, $1e, $4a, $e0, $0c
+.data_01_47ec:
+    db   $00, $06, $06, $66, $86, $60, $80, $05
+.data_01_47f4:
+    db   $00, $06, $66, $6b, $c6, $67, $a0, $03
+.data_01_47fc:
+    db   $00, $06, $ce, $5e, $ce, $59, $00, $05
+.data_01_4804
+    db   $01, $11, $90, $51, $00, $40, $90, $11
 
 call_01_480c_MenuState_DrawWithOffset:
 ; Description: Writes $80 to wDADD, performs some setup with call_01_4ab9_CountSetBitsInFlags and 4acf, 
@@ -1806,7 +1813,7 @@ call_01_4b6b_StreamTileDataToBuffer:
     jp   .jp_01_4b81                                   ;; 01:4b7e $c3 $81 $4b
 .jp_01_4b81:
     ld   DE, data_01_5b61                              ;; 01:4b81 $11 $61 $5b
-    call call_00_0777                                  ;; 01:4b84 $cd $77 $07
+    call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 01:4b84 $cd $77 $07
     ld   A, [HL+]                                      ;; 01:4b87 $2a
     cp   A, $ff                                        ;; 01:4b88 $fe $ff
     ret  Z                                             ;; 01:4b8a $c8

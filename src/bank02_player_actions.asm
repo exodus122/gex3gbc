@@ -13,7 +13,7 @@ call_02_47b4_PlayerAction_Spawn:
     ld   [wDC87], A                                    ;; 02:47c1 $ea $87 $dc
     ld   A, $05                                        ;; 02:47c4 $3e $05
     ld   [wDCA4_PlayerUnk3], A                                    ;; 02:47c6 $ea $a4 $dc
-    ld   A, $0e                                        ;; 02:47c9 $3e $0e
+    ld   A, SFX_GEX_SPAWN                                        ;; 02:47c9 $3e $0e
     jp   call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 02:47cb $c3 $f5 $0f
 
 call_02_47ce_PlayerAction_Idle:
@@ -115,11 +115,11 @@ call_02_484d:
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:4856 $ea $8c $dc
     ld   [wDC8E], A                                    ;; 02:4859 $ea $8e $dc
     call call_02_4e01_SetOneTimeFlag                                  ;; 02:485c $cd $01 $4e
-    ld   A, $0a                                        ;; 02:485f $3e $0a
+    ld   A, SFX_PLAYER_DAMAGED                                        ;; 02:485f $3e $0a
     call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 02:4861 $cd $f5 $0f
 .jr_02_4864:
     ld   A, $3c                                        ;; 02:4864 $3e $3c
-    ld   [wDC7E], A                                    ;; 02:4866 $ea $7e $dc
+    ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 02:4866 $ea $7e $dc
     ld   A, [wDC8E]                                    ;; 02:4869 $fa $8e $dc
     and  A, A                                          ;; 02:486c $a7
     ld   A, $01                                        ;; 02:486d $3e $01
@@ -136,14 +136,14 @@ call_02_4873:
     call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 02:4880 $cd $f5 $0f
 .jr_02_4883:
     ld   A, $3c                                        ;; 02:4883 $3e $3c
-    ld   [wDC7E], A                                    ;; 02:4885 $ea $7e $dc
+    ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 02:4885 $ea $7e $dc
     ret                                                ;; 02:4888 $c9
 
 call_02_4889:
     xor  A, A                                          ;; 02:4889 $af
     ld   [wDC87], A                                    ;; 02:488a $ea $87 $dc
     ld   A, $3c                                        ;; 02:488d $3e $3c
-    ld   [wDC7E], A                                    ;; 02:488f $ea $7e $dc
+    ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 02:488f $ea $7e $dc
     ld   A, [wD805_Player_SpriteFlags]                                    ;; 02:4892 $fa $05 $d8
     and  A, $04                                        ;; 02:4895 $e6 $04
     ret  Z                                             ;; 02:4897 $c8
@@ -280,7 +280,7 @@ call_02_4989:
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E],a
     call call_02_4e01_SetOneTimeFlag
-    call call_00_06f6_HandleGenericHitResponse
+    call call_00_06f6_DealDamageToPlayer
     ld   a,$0B
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$14
@@ -358,7 +358,7 @@ call_02_4a25:
     xor  a
     ld   [wDC87],a
     ld   a,$3C
-    ld   [wDC7E],a
+    ld   [wDC7E_PlayerDamageCooldownTimer],a
     ld   a,[wDC93]
     cp   a,$28
     jp   z,jp_00_06da
@@ -368,7 +368,7 @@ call_02_4a37:
     xor  A, A                                          ;; 02:4a37 $af
     ld   [wDC87], A                                    ;; 02:4a38 $ea $87 $dc
     ld   A, $3c                                        ;; 02:4a3b $3e $3c
-    ld   [wDC7E], A                                    ;; 02:4a3d $ea $7e $dc
+    ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 02:4a3d $ea $7e $dc
     ld   A, $01                                        ;; 02:4a40 $3e $01
     ld   [wDC29], A                                    ;; 02:4a42 $ea $29 $dc
     ld   A, [wDC91]                                    ;; 02:4a45 $fa $91 $dc
@@ -713,11 +713,11 @@ call_02_4cbd:
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E],a
     call call_02_4e01_SetOneTimeFlag
-    ld   a,$0A
+    ld   a,SFX_PLAYER_DAMAGED
     call call_00_0ff5_QueueSoundEffectWithPriority
 label4CD4:
     ld   a,$3C
-    ld   [wDC7E],a
+    ld   [wDC7E_PlayerDamageCooldownTimer],a
     ld   a,[wDC8E]
     and  a
     ld   a,$24
@@ -814,11 +814,11 @@ call_02_4d8b:
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E],a
     call call_02_4e01_SetOneTimeFlag
-    ld   a,$0A
+    ld   a,SFX_PLAYER_DAMAGED
     call call_00_0ff5_QueueSoundEffectWithPriority
 label4DA2:
     ld   a,$3C
-    ld   [wDC7E],a
+    ld   [wDC7E_PlayerDamageCooldownTimer],a
     ld   a,[wDC8E]
     and  a
     ld   a,$30

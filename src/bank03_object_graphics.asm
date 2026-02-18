@@ -573,7 +573,7 @@ call_03_5fc2_SetupObjectSprite:
     res  5, [HL]                                       ;; 03:60b2 $cb $ae
 .jr_03_60b4:
     ld   DE, data_03_59ea_SpriteData                              ;; 03:60b4 $11 $ea $59
-    call call_00_0777                                  ;; 03:60b7 $cd $77 $07
+    call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 03:60b7 $cd $77 $07
     ld   A, [wDC6F]                                    ;; 03:60ba $fa $6f $dc
     ld   E, A                                          ;; 03:60bd $5f
     ld   D, $d9                                        ;; 03:60be $16 $d9

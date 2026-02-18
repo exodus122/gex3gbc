@@ -109,7 +109,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     ld   B, A                                          ;; 00:2d73 $47
     call call_00_2f00_CallBank2_Helper_AndCheckBit8                                  ;; 00:2d74 $cd $00 $2f
     jr   NZ, .jr_00_2d87                               ;; 00:2d77 $20 $0e
-    ld   A, [wDC7E]                                    ;; 00:2d79 $fa $7e $dc
+    ld   A, [wDC7E_PlayerDamageCooldownTimer]                                    ;; 00:2d79 $fa $7e $dc
     and  A, A                                          ;; 00:2d7c $a7
     jr   Z, .jr_00_2d87                                ;; 00:2d7d $28 $08
     ld   A, [wDC71_FrameCounter]                                    ;; 00:2d7f $fa $71 $dc
@@ -163,7 +163,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     ld   B, A                                          ;; 00:2dce $47
     call call_00_2f00_CallBank2_Helper_AndCheckBit8                                  ;; 00:2dcf $cd $00 $2f
     jr   NZ, .jr_00_2de2                               ;; 00:2dd2 $20 $0e
-    ld   A, [wDC7E]                                    ;; 00:2dd4 $fa $7e $dc
+    ld   A, [wDC7E_PlayerDamageCooldownTimer]                                    ;; 00:2dd4 $fa $7e $dc
     and  A, A                                          ;; 00:2dd7 $a7
     jr   Z, .jr_00_2de2                                ;; 00:2dd8 $28 $08
     ld   A, [wDC71_FrameCounter]                                    ;; 00:2dda $fa $71 $dc
@@ -222,7 +222,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     ld   B, A                                          ;; 00:2e32 $47
     call call_00_2f00_CallBank2_Helper_AndCheckBit8                                  ;; 00:2e33 $cd $00 $2f
     jr   NZ, .jr_00_2e46                               ;; 00:2e36 $20 $0e
-    ld   A, [wDC7E]                                    ;; 00:2e38 $fa $7e $dc
+    ld   A, [wDC7E_PlayerDamageCooldownTimer]                                    ;; 00:2e38 $fa $7e $dc
     and  A, A                                          ;; 00:2e3b $a7
     jr   Z, .jr_00_2e46                                ;; 00:2e3c $28 $08
     ld   A, [wDC71_FrameCounter]                                    ;; 00:2e3e $fa $71 $dc
@@ -279,7 +279,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     ld   B, A                                          ;; 00:2e91 $47
     call call_00_2f00_CallBank2_Helper_AndCheckBit8                                  ;; 00:2e92 $cd $00 $2f
     jr   NZ, .jr_00_2ea4                               ;; 00:2e95 $20 $0d
-    ld   A, [wDC7E]                                    ;; 00:2e97 $fa $7e $dc
+    ld   A, [wDC7E_PlayerDamageCooldownTimer]                                    ;; 00:2e97 $fa $7e $dc
     and  A, A                                          ;; 00:2e9a $a7
     jr   Z, .jr_00_2ea4                                ;; 00:2e9b $28 $07
     ld   A, [wDC71_FrameCounter]                                    ;; 00:2e9d $fa $71 $dc
@@ -797,7 +797,7 @@ data_00_3258:
     db   $00
 data_00_3259:
     db   $00, $00, CollisionType_None, $00, $00, $00
-data_00_325F:    
+data_00_325F:
     db   $ff        ;; 00:3258 ???????? ; Object_Gex
     db   $01, $0c, $0c, CollisionType_BonusCoin, $02, $00, $ff, $81 ;; 00:3260 ......?? ; Object_BonusCoin
     db   $01, $0c, $0c, CollisionType_FlyCoin, $02, $00, $ff, $81 ;; 00:3268 ......?. ; Object_FlyCoinSpawn
@@ -831,87 +831,87 @@ data_00_325F:
     db   $01, $0c, $10, CollisionType_None, $00, $00, $ff, $ff ;; 00:3348 ......?? ; Object_HolidayTV_EvilSanta
     db   $01, $0c, $08, CollisionType_EvilSantaProjectile, $00, $00, $ff, $ff ;; 00:3350 ?.....?? ; Object_HolidayTV_EvilSantaProjectile
     db   $01, $0c, $10, CollisionType_HolidayTV_Elf, $00, $00, $ff, $c0 ;; 00:3358 ......?. ; Object_HolidayTV_SkatingElf
-    db   $01, $0a, $0a, CollisionType_GenericEnemy, $02, $00, $ff, $c3 ;; 00:3360 ......?. ; Object_HolidayTV_Penguin
-    db   $01, $10, $10, CollisionType_GenericEnemy, $02, $00, $ff, $c3 ;; 00:3368 ???????? ; Object_MysteryTV_Rezling
+    db   $01, $0a, $0a, CollisionType_DamageAndRemain, $02, $00, $ff, $c3 ;; 00:3360 ......?. ; Object_HolidayTV_Penguin
+    db   $01, $10, $10, CollisionType_DamageAndRemain, $02, $00, $ff, $c3 ;; 00:3368 ???????? ; Object_MysteryTV_Rezling
     db   $01, $0c, $10, CollisionType_BloodCooler, $02, $00, $ff, $01 ;; 00:3370 ???????? ; Object_MysteryTV_BloodCooler
-    db   $01, $0c, $0c, CollisionType_Fish, $00, $00, $ff, $ff ;; 00:3378 ???????? ; Object_MysteryTV_Fish
+    db   $01, $0c, $0c, CollisionType_DamageUnderwater, $00, $00, $ff, $ff ;; 00:3378 ???????? ; Object_MysteryTV_Fish
     db   $01, $08, $10, CollisionType_MagicSword, $02, $00, $ff, $c2 ;; 00:3380 ???????? ; Object_MysteryTV_MagicSword
-    db   $01, $10, $10, CollisionType_GenericEnemy, $02, $00, $ff, $c3 ;; 00:3388 ???????? ; Object_MysteryTV_SafariSam
-    db   $01, $0c, $10, CollisionType_GenericProjectile, $00, $00, $ff, $ff ;; 00:3390 ???????? ; Object_MysteryTV_SafariSamProjectile
+    db   $01, $10, $10, CollisionType_DamageAndRemain, $02, $00, $ff, $c3 ;; 00:3388 ???????? ; Object_MysteryTV_SafariSam
+    db   $01, $0c, $10, CollisionType_DamageAndDestroy, $00, $00, $ff, $ff ;; 00:3390 ???????? ; Object_MysteryTV_SafariSamProjectile
     db   $01, $08, $08, CollisionType_GhostKnight, $04, $00, $ff, $85 ;; 00:3398 ???????? ; Object_MysteryTV_GhostKnight
-    db   $01, $0a, $0a, CollisionType_GenericEnemy, $00, $00, $ff, $ff ;; 00:33a0 ???????? ; Object_MysteryTV_GhostKnightProjectile
+    db   $01, $0a, $0a, CollisionType_DamageAndRemain, $00, $00, $ff, $ff ;; 00:33a0 ???????? ; Object_MysteryTV_GhostKnightProjectile
     db   $01, $0c, $0c, CollisionType_Hand, $00, $00, $ff, $ff ;; 00:33a8 ???????? ; Object_TutTV_Hand
     db   $01, $10, $08, CollisionType_LostArk, $02, $00, $ff, $01 ;; 00:33b0 ???????? ; Object_TutTV_LostArk
-    db   $01, $0c, $08, CollisionType_Platform, $00, $00, $ff, $ff ;; 00:33b8 ???????? ; Object_TutTV_RisingPlatform
-    db   $01, $0c, $08, CollisionType_Platform, $00, $00, $ff, $ff ;; 00:33c0 ???????? ; Object_TutTV_SidewaysPlatform
-    db   $01, $0c, $0c, CollisionType_GenericEnemy, $02, $00, $ff, $c4 ;; 00:33c8 ???????? ; Object_TutTV_Bee
-    db   $01, $10, $08, CollisionType_Platform, $00, $00, $ff, $ff ;; 00:33d0 ???????? ; Object_TutTV_Raft
-    db   $01, $08, $08, CollisionType_GenericEnemy, $02, $00, $ff, $c3 ;; 00:33d8 ???????? ; Object_TutTV_SnakeFacingRight
-    db   $01, $08, $08, CollisionType_GenericEnemy, $02, $00, $ff, $c3 ;; 00:33e0 ???????? ; Object_TutTV_SnakeFacingLeft
-    db   $01, $06, $08, CollisionType_GenericProjectile, $00, $00, $ff, $ff ;; 00:33e8 ???????? ; Object_TutTV_SnakeRightProjectile
-    db   $01, $06, $08, CollisionType_GenericProjectile, $00, $00, $ff, $ff ;; 00:33f0 ???????? ; Object_TutTV_SnakeLeftProjectile
+    db   $01, $0c, $08, CollisionType_PlatformWithFlag, $00, $00, $ff, $ff ;; 00:33b8 ???????? ; Object_TutTV_RisingPlatform
+    db   $01, $0c, $08, CollisionType_PlatformWithFlag, $00, $00, $ff, $ff ;; 00:33c0 ???????? ; Object_TutTV_SidewaysPlatform
+    db   $01, $0c, $0c, CollisionType_DamageAndRemain, $02, $00, $ff, $c4 ;; 00:33c8 ???????? ; Object_TutTV_Bee
+    db   $01, $10, $08, CollisionType_PlatformWithFlag, $00, $00, $ff, $ff ;; 00:33d0 ???????? ; Object_TutTV_Raft
+    db   $01, $08, $08, CollisionType_DamageAndRemain, $02, $00, $ff, $c3 ;; 00:33d8 ???????? ; Object_TutTV_SnakeFacingRight
+    db   $01, $08, $08, CollisionType_DamageAndRemain, $02, $00, $ff, $c3 ;; 00:33e0 ???????? ; Object_TutTV_SnakeFacingLeft
+    db   $01, $06, $08, CollisionType_DamageAndDestroy, $00, $00, $ff, $ff ;; 00:33e8 ???????? ; Object_TutTV_SnakeRightProjectile
+    db   $01, $06, $08, CollisionType_DamageAndDestroy, $00, $00, $ff, $ff ;; 00:33f0 ???????? ; Object_TutTV_SnakeLeftProjectile
     db   $01, $08, $10, CollisionType_RaStaff, $02, $00, $ff, $81 ;; 00:33f8 ???????? ; Object_TutTV_RaStaff
     db   $01, $0a, $0a, CollisionType_RaStatueProjectile, $00, $00, $ff, $ff ;; 00:3400 ???????? ; Object_TutTV_RaStatueHorizontalProjectile
     db   $01, $0a, $0a, CollisionType_RaStatueProjectile, $00, $00, $ff, $ff ;; 00:3408 ???????? ; Object_TutTV_RaStatueDiagonalProjectile
-    db   $01, $12, $08, CollisionType_Platform, $00, $00, $ff, $ff ;; 00:3410 ???????? ; Object_TutTV_BreakableBlock
+    db   $01, $12, $08, CollisionType_PlatformWithFlag, $00, $00, $ff, $ff ;; 00:3410 ???????? ; Object_TutTV_BreakableBlock
     db   $01, $10, $20, CollisionType_Coffin, $00, $00, $ff, $ff ;; 00:3418 ???????? ; Object_TutTV_Coffin
     db   $01, $10, $18, CollisionType_Cactus, $03, $00, $ff, $46 ;; 00:3420 ???????? ; Object_WesternStation_Cactus
-    db   $01, $10, $18, CollisionType_GenericEnemy, $00, $00, $ff, $ff ;; 00:3428 ???????? ; Object_unk3A
-    db   $01, $0a, $10, CollisionType_Platform, $00, $00, $ff, $ff ;; 00:3430 ???????? ; Object_WesternStation_RockPlatform
+    db   $01, $10, $18, CollisionType_DamageAndRemain, $00, $00, $ff, $ff ;; 00:3428 ???????? ; Object_unk3A
+    db   $01, $0a, $10, CollisionType_PlatformWithFlag, $00, $00, $ff, $ff ;; 00:3430 ???????? ; Object_WesternStation_RockPlatform
     db   $01, $0a, $0a, CollisionType_HardHat, $02, $00, $ff, $c4 ;; 00:3438 ???????? ; Object_WesternStation_HardHat
     db   $01, $0a, $0a, CollisionType_PlayingCard, $02, $00, $ff, $81 ;; 00:3440 ???????? ; Object_WesternStation_PlayingCard
-    db   $01, $0a, $0a, CollisionType_GenericEnemy, $02, $00, $ff, $84 ;; 00:3448 ???????? ; Object_WesternStation_Bat
-    db   $01, $0c, $08, CollisionType_Platform, $00, $00, $ff, $ff ;; 00:3450 ???????? ; Object_WesternStation_RisingPlatform
+    db   $01, $0a, $0a, CollisionType_DamageAndRemain, $02, $00, $ff, $84 ;; 00:3448 ???????? ; Object_WesternStation_Bat
+    db   $01, $0c, $08, CollisionType_PlatformWithFlag, $00, $00, $ff, $ff ;; 00:3450 ???????? ; Object_WesternStation_RisingPlatform
     db   $01, $08, $08, CollisionType_Door, $00, $00, $ff, $ff ;; 00:3458 ???????? ; Object_AnimeChannel_Door
     db   $01, $08, $08, CollisionType_Door2, $00, $00, $ff, $ff ;; 00:3460 ???????? ; Object_AnimeChannel_Door2
     db   $01, $00, $00, CollisionType_None, $00, $00, $ff, $ff ;; 00:3468 ???????? ; Object_AnimeChannel_FanLift
     db   $01, $10, $10, CollisionType_Mech, $04, $00, $ff, $81 ;; 00:3470 ???????? ; Object_AnimeChannel_MechFacingRight
     db   $01, $10, $10, CollisionType_Mech, $04, $00, $ff, $81 ;; 00:3478 ???????? ; Object_AnimeChannel_MechFacingLeft
-    db   $01, $12, $08, CollisionType_Platform, $00, $00, $ff, $ff ;; 00:3480 ???????? ; Object_AnimeChannel_DisappearingFloor
+    db   $01, $12, $08, CollisionType_PlatformWithFlag, $00, $00, $ff, $ff ;; 00:3480 ???????? ; Object_AnimeChannel_DisappearingFloor
     db   $01, $08, $08, CollisionType_OnSwitch2, $00, $00, $ff, $ff ;; 00:3488 ???????? ; Object_AnimeChannel_OnSwitch2
     db   $01, $10, $20, CollisionType_AlienCultureTube, $02, $00, $ff, $01 ;; 00:3490 ???????? ; Object_AnimeChannel_AlienCultureTube
-    db   $01, $08, $40, CollisionType_Platform, $00, $00, $ff, $ff ;; 00:3498 ???????? ; Object_AnimeChannel_BlueBeamBarrier
-    db   $01, $08, $08, CollisionType_Platform, $00, $00, $ff, $ff ;; 00:34a0 ???????? ; Object_AnimeChannel_RisingPlatform
+    db   $01, $08, $40, CollisionType_PlatformWithFlag, $00, $00, $ff, $ff ;; 00:3498 ???????? ; Object_AnimeChannel_BlueBeamBarrier
+    db   $01, $08, $08, CollisionType_PlatformWithFlag, $00, $00, $ff, $ff ;; 00:34a0 ???????? ; Object_AnimeChannel_RisingPlatform
     db   $01, $08, $08, CollisionType_OnSwitch, $00, $00, $ff, $ff ;; 00:34a8 ???????? ; Object_AnimeChannel_OnSwitch
     db   $01, $08, $08, CollisionType_OffSwitch, $00, $00, $ff, $ff ;; 00:34b0 ???????? ; Object_AnimeChannel_OffSwitch
     db   $01, $10, $10, CollisionType_SailorToonGirl, $04, $00, $ff, $42 ;; 00:34b8 ???????? ; Object_AnimeChannel_SailorToonGirl
     db   $01, $10, $20, CollisionType_BigSilverRobot, $04, $00, $ff, $03 ;; 00:34c0 ???????? ; Object_AnimeChannel_BigSilverRobot
-    db   $01, $0a, $0a, CollisionType_GenericEnemy, $02, $00, $ff, $c2 ;; 00:34c8 ???????? ; Object_AnimeChannel_SmallBlueRobot
+    db   $01, $0a, $0a, CollisionType_DamageAndRemain, $02, $00, $ff, $c2 ;; 00:34c8 ???????? ; Object_AnimeChannel_SmallBlueRobot
     db   $01, $0a, $0a, CollisionType_Secbot, $03, $00, $ff, $c4 ;; 00:34d0 ???????? ; Object_AnimeChannel_Secbot
-    db   $01, $0a, $0a, CollisionType_GenericProjectile, $00, $00, $ff, $ff ;; 00:34d8 ???????? ; Object_AnimeChannel_SecbotProjectile
-    db   $01, $12, $08, CollisionType_Platform, $00, $00, $ff, $ff ;; 00:34e0 ???????? ; Object_AnimeChannel_Elevator
-    db   $01, $0c, $0c, CollisionType_GenericEnemy, $00, $00, $ff, $ff ;; 00:34e8 ???????? ; Object_AnimeChannel_FireWallEnemy
-    db   $01, $0a, $0a, CollisionType_GenericEnemy, $00, $00, $ff, $ff ;; 00:34f0 ???????? ; Object_AnimeChannel_Grenade
+    db   $01, $0a, $0a, CollisionType_DamageAndDestroy, $00, $00, $ff, $ff ;; 00:34d8 ???????? ; Object_AnimeChannel_SecbotProjectile
+    db   $01, $12, $08, CollisionType_PlatformWithFlag, $00, $00, $ff, $ff ;; 00:34e0 ???????? ; Object_AnimeChannel_Elevator
+    db   $01, $0c, $0c, CollisionType_DamageAndRemain, $00, $00, $ff, $ff ;; 00:34e8 ???????? ; Object_AnimeChannel_FireWallEnemy
+    db   $01, $0a, $0a, CollisionType_DamageAndRemain, $00, $00, $ff, $ff ;; 00:34f0 ???????? ; Object_AnimeChannel_Grenade
     db   $01, $14, $14, CollisionType_PlanetOBlast, $04, $00, $ff, $c1 ;; 00:34f8 ???????? ; Object_AnimeChannel_PlanetOBlastWeapon
     db   $01, $10, $18, CollisionType_None, $06, $00, $ff, $05 ;; 00:3500 ???????? ; Object_SuperheroShow_MadBomber
     db   $01, $0a, $0a, CollisionType_Bomb, $00, $00, $ff, $ff ;; 00:3508 ???????? ; Object_SuperheroShow_Bomb
-    db   $01, $10, $10, CollisionType_Platform, $00, $00, $ff, $ff ;; 00:3510 ???????? ; Object_SuperheroShow_WaterTowerTank
+    db   $01, $10, $10, CollisionType_PlatformWithFlag, $00, $00, $ff, $ff ;; 00:3510 ???????? ; Object_SuperheroShow_WaterTowerTank
     db   $01, $14, $18, CollisionType_WaterTowerStand, $02, $00, $ff, $01 ;; 00:3518 ???????? ; Object_SuperheroShow_WaterTowerStand
     db   $01, $0c, $10, CollisionType_Convict, $02, $00, $ff, $c3 ;; 00:3520 ???????? ; Object_SuperheroShow_Convict
-    db   $01, $0a, $0a, CollisionType_GenericEnemy, $03, $00, $ff, $c3 ;; 00:3528 ???????? ; Object_SuperheroShow_Spider
+    db   $01, $0a, $0a, CollisionType_DamageAndRemain, $03, $00, $ff, $c3 ;; 00:3528 ???????? ; Object_SuperheroShow_Spider
     db   $01, $0c, $0c, CollisionType_StrayCat, $02, $00, $ff, $c5 ;; 00:3530 ???????? ; Object_SuperheroShow_StrayCat
     db   $01, $0c, $10, CollisionType_YellowGoon, $04, $00, $ff, $c3 ;; 00:3538 ???????? ; Object_SuperheroShow_YellowGoon
-    db   $01, $0c, $0c, CollisionType_GenericEnemy, $04, $00, $ff, $c2 ;; 00:3540 ???????? ; Object_SuperheroShow_Rat
+    db   $01, $0c, $0c, CollisionType_DamageAndRemain, $04, $00, $ff, $c2 ;; 00:3540 ???????? ; Object_SuperheroShow_Rat
     db   $01, $0a, $0a, CollisionType_ChomperTV, $03, $00, $ff, $c3 ;; 00:3548 ???????? ; Object_SuperheroShow_ChomperTV
-    db   $01, $10, $08, CollisionType_Platform, $00, $00, $ff, $ff ;; 00:3550 ???????? ; Object_SuperheroShow_CrumblingFloor
-    db   $01, $0a, $0a, CollisionType_GenericEnemy, $00, $00, $ff, $ff ;; 00:3558 ???????? ; Object_SuperheroShow_ConvictProjectile
+    db   $01, $10, $08, CollisionType_PlatformWithFlag, $00, $00, $ff, $ff ;; 00:3550 ???????? ; Object_SuperheroShow_CrumblingFloor
+    db   $01, $0a, $0a, CollisionType_DamageAndRemain, $00, $00, $ff, $ff ;; 00:3558 ???????? ; Object_SuperheroShow_ConvictProjectile
     db   $01, $0c, $10, CollisionType_GextremeSports_Elf, $00, $00, $ff, $80 ;; 00:3560 ???????? ; Object_GextremeSports_Elf
     db   $01, $10, $10, CollisionType_BonusTimeCoin, $02, $00, $ff, $81 ;; 00:3568 ???????? ; Object_GextremeSports_BonusTimeCoin
     db   $01, $10, $10, CollisionType_Bell, $00, $00, $ff, $ff ;; 00:3570 ???????? ; Object_MarsupialMadness_Bell
     db   $01, $08, $08, CollisionType_None, $00, $00, $ff, $ff ;; 00:3578 ???????? ; Object_MarsupialMadness_Bird
-    db   $01, $0a, $0a, CollisionType_GenericEnemy, $02, $00, $ff, $81 ;; 00:3580 ???????? ; Object_MarsupialMadness_BirdProjectile
+    db   $01, $0a, $0a, CollisionType_DamageAndRemain, $02, $00, $ff, $81 ;; 00:3580 ???????? ; Object_MarsupialMadness_BirdProjectile
     db   $01, $10, $20, CollisionType_RockHard, $04, $00, $ff, $05 ;; 00:3588 ???????? ; Object_WWGexWrestling_RockHard
     db   $01, $0c, $10, CollisionType_BrainOfOz, $08, $00, $ff, $87 ;; 00:3590 ???????? ; Object_LizardOfOz_BrainOfOz
     db   $01, $10, $10, CollisionType_None, $00, $00, $ff, $ff ;; 00:3598 ???????? ; Object_LizardOfOz_CannonProjectile
     db   $01, $08, $08, CollisionType_Cannon, $00, $00, $ff, $ff ;; 00:35a0 ???????? ; Object_LizardOfOz_Cannon
     db   $01, $0a, $0a, CollisionType_BrainOfOzProjectile, $00, $00, $ff, $ff ;; 00:35a8 ???????? ; Object_LizardOfOz_BrainOfOzProjectile
     db   $01, $10, $10, CollisionType_None, $00, $00, $ff, $ff ;; 00:35b0 ???????? ; Object_unk6B
-    db   $01, $10, $08, CollisionType_Platform, $00, $00, $ff, $ff ;; 00:35b8 ???????? ; Object_unk6C
-    db   $01, $10, $08, CollisionType_Platform, $00, $00, $ff, $ff ;; 00:35c0 ???????? ; Object_unk6D
+    db   $01, $10, $08, CollisionType_PlatformWithFlag, $00, $00, $ff, $ff ;; 00:35b8 ???????? ; Object_unk6C
+    db   $01, $10, $08, CollisionType_PlatformWithFlag, $00, $00, $ff, $ff ;; 00:35c0 ???????? ; Object_unk6D
     db   $01, $1c, $20, CollisionType_Rez, $10, $00, $ff, $8a ;; 00:35c8 ???????? ; Object_ChannelZ_Rez
-    db   $01, $0a, $40, CollisionType_GenericEnemy, $00, $00, $ff, $ff ;; 00:35d0 ???????? ; Object_unk6F
+    db   $01, $0a, $40, CollisionType_DamageAndRemain, $00, $00, $ff, $ff ;; 00:35d0 ???????? ; Object_unk6F
     db   $01, $0c, $0c, CollisionType_Meteor, $02, $00, $ff, $82 ;; 00:35d8 ???????? ; Object_ChannelZ_Meteor
-    db   $01, $0a, $0a, CollisionType_GenericEnemy, $02, $00, $ff, $81 ;; 00:35e0 ???????? ; Object_ChannelZ_RezProjectile
+    db   $01, $0a, $0a, CollisionType_DamageAndRemain, $02, $00, $ff, $81 ;; 00:35e0 ???????? ; Object_ChannelZ_RezProjectile
 
 call_00_35e8_GetObjectTypeIndex:
 ; loads index*[7] into data_00_3258 table

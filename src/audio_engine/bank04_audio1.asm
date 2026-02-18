@@ -1,5 +1,3 @@
-SECTION "bank04", ROMX[$4000], BANK[$04]
-
 call_04_4000_Audio:
     jp   call_04_40e3                                    ;; 04:4000 $c3 $e3 $40
     db   $c3, $7b, $48                                 ;; 04:4003 ???

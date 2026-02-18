@@ -569,22 +569,16 @@ wDC2A:
 
 wDC2B:
     ds 1                                               ;; dc2b
-
 wDC2C:
     ds 1                                               ;; dc2c
-
 wDC2D:
     ds 1                                               ;; dc2d
-
 wDC2E:
     ds 1                                               ;; dc2e
-
 wDC2F:
     ds 2                                               ;; dc2f
-
 wDC31:
     ds 1                                               ;; dc31
-
 wDC32_VRAMBank:
     ds 1                                               ;; dc32
 
@@ -742,7 +736,7 @@ wDC7C:
 wDC7D:
     ds 1                                               ;; dc7d
 
-wDC7E:
+wDC7E_PlayerDamageCooldownTimer:
     ds 1                                               ;; dc7e
 
 wDC7F:

@@ -226,7 +226,7 @@ call_02_4f32_PlayerUpdateMain:
 ; The main per-frame player update.
 ; Actions:
 ; - Processes inputs, clearing or setting bits in wDC80/wDC81_CurrentInputsAlt.
-; - Manages timers (wDC7E, wDCA9_FlyTimerOrFlags4–wDCAB_FlyTimerOrFlags2) using call_02_4ffb_DecTimerEveryCycle.
+; - Manages timers (wDC7E_PlayerDamageCooldownTimer, wDCA9_FlyTimerOrFlags4–wDCAB_FlyTimerOrFlags2) using call_02_4ffb_DecTimerEveryCycle.
 ; - Calls palette setup (call_03_6567_SetupObjectPalettes), BG collision update, object caching, and object loading.
 ; - Jumps to the player action function (wD802_Player_ActionFunc).
 ; - Clears bits and finalizes state before call_02_724d.
@@ -285,7 +285,7 @@ call_02_4f32_PlayerUpdateMain:
 .jr_02_4f89:
     ld   HL, wDC81_CurrentInputsAlt                                     ;; 02:4f89 $21 $81 $dc
     ld   [HL], C                                       ;; 02:4f8c $71
-    ld   HL, wDC7E                                     ;; 02:4f8d $21 $7e $dc
+    ld   HL, wDC7E_PlayerDamageCooldownTimer                                     ;; 02:4f8d $21 $7e $dc
     ld   A, [HL]                                       ;; 02:4f90 $7e
     and  A, A                                          ;; 02:4f91 $a7
     jr   Z, .jr_02_4f95                                ;; 02:4f92 $28 $01

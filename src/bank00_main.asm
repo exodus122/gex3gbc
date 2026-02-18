@@ -638,18 +638,18 @@ jp_00_06e8:
     farcall call_02_54f9_SwitchPlayerAction
     ret                                                ;; 00:06f5 $c9
 
-call_00_06f6_HandleGenericHitResponse:
-; Calls call_00_0759 (a check routine). If it fails, exits.
-; If passes: sets timer wDC7E=3C, sets flag bit1 in wDB69, plays sound 0A.
+call_00_06f6_DealDamageToPlayer:
+; Returns if player is currently in damage cooldown.
+; If passes: sets timer wDC7E_PlayerDamageCooldownTimer=3C, sets flag bit1 in wDB69, plays sound 0A.
 ; Then manipulates wDC51 and wDC50_PlayerHealth counters, decrementing until zero. If it hits 0, jumps to jp_00_0693.
 ; This is a hit/interaction response handler with timers, sound, and state decrement.
-    call call_00_0759                                  ;; 00:06f6 $cd $59 $07
+    call call_00_0759_IsPlayerDamageCooldownActive                                  ;; 00:06f6 $cd $59 $07
     ret  NZ                                            ;; 00:06f9 $c0
     ld   A, $3c                                        ;; 00:06fa $3e $3c
-    ld   [wDC7E], A                                    ;; 00:06fc $ea $7e $dc
+    ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 00:06fc $ea $7e $dc
     ld   HL, wDB69                                     ;; 00:06ff $21 $69 $db
     set  1, [HL]                                       ;; 00:0702 $cb $ce
-    ld   A, $0a                                        ;; 00:0704 $3e $0a
+    ld   A, SFX_PLAYER_DAMAGED                                        ;; 00:0704 $3e $0a
     call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 00:0706 $cd $f5 $0f
     ld   HL, wDC51                                     ;; 00:0709 $21 $51 $dc
     ld   A, [HL]                                       ;; 00:070c $7e
@@ -676,7 +676,7 @@ call_00_0723_IncrementCollectibleCount:
 ; Looks like it manages collectible counters / progress milestones.
     ld   HL, wDB69                                     ;; 00:0723 $21 $69 $db
     set  0, [HL]                                       ;; 00:0726 $cb $c6
-    ld   A, $02                                        ;; 00:0728 $3e $02
+    ld   A, SFX_ITEM_PICKUP                                        ;; 00:0728 $3e $02
     call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 00:072a $cd $f5 $0f
     ld   HL, wDC68_CollectibleCount                                     ;; 00:072d $21 $68 $dc
     inc  [HL]                                          ;; 00:0730 $34
@@ -685,7 +685,7 @@ call_00_0723_IncrementCollectibleCount:
     jr   Z, .jr_00_074b                                ;; 00:0734 $28 $15
     cp   A, $64                                        ;; 00:0736 $fe $64
     ret  NZ                                            ;; 00:0738 $c0
-    ld   A, $1e                                        ;; 00:0739 $3e $1e
+    ld   A, SFX_REMOTE                                        ;; 00:0739 $3e $1e
     call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 00:073b $cd $f5 $0f
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:073e $21 $1e $dc
     ld   L, [HL]                                       ;; 00:0741 $6e
@@ -704,8 +704,8 @@ call_00_0723_IncrementCollectibleCount:
     set  0, [HL]                                       ;; 00:0756 $cb $c6
     ret                                                ;; 00:0758 $c9
 
-call_00_0759:
-    ld   A, [wDC7E]                                    ;; 00:0759 $fa $7e $dc
+call_00_0759_IsPlayerDamageCooldownActive:
+    ld   A, [wDC7E_PlayerDamageCooldownTimer]                                    ;; 00:0759 $fa $7e $dc
     and  A, A                                          ;; 00:075c $a7
     ret  NZ                                            ;; 00:075d $c0
     ret                                                ;; 00:075e $c9
@@ -731,7 +731,7 @@ call_00_076e_CopyBCBytesFromHLToDE:
     jr   NZ, call_00_076e_CopyBCBytesFromHLToDE                              ;; 00:0774 $20 $f8
     ret                                                ;; 00:0776 $c9
 
-call_00_0777:
+call_00_0777_LoadPointerIndexAFromTableDE:
     ld   L, A                                          ;; 00:0777 $6f
     ld   H, $00                                        ;; 00:0778 $26 $00
     add  HL, HL                                        ;; 00:077a $29
@@ -822,7 +822,7 @@ call_00_0800:
     call call_00_0eee_SwitchBank                                  ;; 00:0806 $cd $ee $0e
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:0809 $fa $6c $db
     ld   DE, $b01                                      ;; 00:080c $11 $01 $0b
-    call call_00_0777                                  ;; 00:080f $cd $77 $07
+    call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 00:080f $cd $77 $07
     ld   DE, $300                                      ;; 00:0812 $11 $00 $03
     add  HL, DE                                        ;; 00:0815 $19
     ld   E, L                                          ;; 00:0816 $5d
@@ -1253,6 +1253,7 @@ call_00_0a6a_LoadMapConfigAndWaitVBlank:
     dw   $c000, _SCRN0, $0400, $0001                    ;; 00:0ae9 ........
     dw   $c000, _VRAM, $1000, $0001                    ;; 00:0af1 ........
     dw   $c000, _VRAM, $1000, $0101                    ;; 00:0af9 .???????
+
     dw   $4000, $4000, $4350, $46a0                    ;; 00:0b01 .???????
     dw   $49f0, $4d40, $5090, $53e0                    ;; 00:0b09 .???????
     dw   $53e0, $5730, $5a80, $5dd0                    ;; 00:0b11 .???????
@@ -1508,8 +1509,12 @@ call_00_0c44_LCDInterrupt_Table:
 ; Different entries configure palette changes, etc.
     db   $08, $00, $01, $53, $0c, $08, $00, $15
     db   $55, $0c, $08, $00, $01, $f8, $0d, $d9
-    db   $c9, $f5
 
+call_00_0c54:
+    ret
+
+call_00_0c55:
+    push af
     push hl
     ld   a,[wDB67_HDMATempScratch]
     sub  a,$7F
@@ -1836,7 +1841,7 @@ call_00_0e3b_ClearGameStateVariables:
 ; Then: Waits for interrupt.
 ; Use Case: Prepares the game for a fresh state, probably at start of a level or menu.
     xor  A, A                                          ;; 00:0e3b $af
-    ld   [wDC7E], A                                    ;; 00:0e3c $ea $7e $dc
+    ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 00:0e3c $ea $7e $dc
     ld   [wDC20], A                                    ;; 00:0e3f $ea $20 $dc
     ld   [wDB66_HDMATransferFlags], A                                    ;; 00:0e42 $ea $66 $db
     ld   [wDB69], A                                    ;; 00:0e45 $ea $69 $db

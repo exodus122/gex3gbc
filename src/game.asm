@@ -25,7 +25,8 @@ INCLUDE "src/bank02_object_animation_data.asm"
 
 SECTION "bank03", ROMX[$4000], BANK[$03]
 data_03_4000_bg_collision_tileset_flags:
-    INCBIN "data/bg_collision_tileset_flags.bin"       ; the flags determine which tiles are walls, ceilings, or ?
+; these flags determine which collision tiles are walls, ceilings, or kill tiles
+    INCBIN "data/bg_collision_tileset_flags.bin" 
 image_003_4100_collision_tileset:
     INCBIN ".gfx/collision_tileset/image_003_4100.bin"
 image_003_4400:
@@ -40,7 +41,10 @@ INCLUDE "src/bank03_palettes.asm"
 INCLUDE "src/bank03_map_metadata.asm"
 INCLUDE "src/bank03_hud_graphics.asm"
 
+SECTION "bank04", ROMX[$4000], BANK[$04]
 INCLUDE "src/audio_engine/bank04_audio1.asm"
+
+SECTION "bank05", ROMX[$4000], BANK[$05]
 INCLUDE "src/audio_engine/bank05_audio2.asm"
 
 SECTION "bank06", ROMX[$4000], BANK[$06]

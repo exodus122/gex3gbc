@@ -330,7 +330,7 @@ DEF MENU_MISSION_SELECT_3_REMOTES         EQU $07
 DEF MENU_TOTALS                           EQU $08
 DEF MENU_UNK09                            EQU $09
 DEF MENU_UNK0A                            EQU $0A
-DEF MENU_PAUSE_GEX_CAVE                   EQU $0B
+DEF MENU_PAUSE_IN_GEX_CAVE                EQU $0B
 DEF MENU_QUIT_GAME                        EQU $0C
 DEF MENU_PAUSE_IN_LEVEL                   EQU $0D
 DEF MENU_GO_TO_MAP                        EQU $0E
@@ -350,45 +350,45 @@ DEF MENU_END_CREDITS_6                    EQU $1A
 ; Sound Effects
 DEF SFX_UNK00                              EQU $00
 DEF SFX_UNK01                              EQU $01
-DEF SFX_UNK02                              EQU $02
-DEF SFX_UNK03                              EQU $03
+DEF SFX_ITEM_PICKUP                        EQU $02 ; fly coins, paw coins, bonus coins
+DEF SFX_FLY_TV                             EQU $03
 DEF SFX_UNK04                              EQU $04
 DEF SFX_UNK05                              EQU $05
 DEF SFX_UNK06                              EQU $06
 DEF SFX_UNK07                              EQU $07
 DEF SFX_UNK08                              EQU $08
 DEF SFX_UNK09                              EQU $09
-DEF SFX_UNK0A                              EQU $0A
+DEF SFX_PLAYER_DAMAGED                     EQU $0A
 DEF SFX_UNK0B                              EQU $0B
 DEF SFX_UNK0C                              EQU $0C
 DEF SFX_UNK0D                              EQU $0D
-DEF SFX_UNK0E                              EQU $0E
-DEF SFX_UNK0F                              EQU $0F
-DEF SFX_UNK10                              EQU $10
+DEF SFX_GEX_SPAWN                          EQU $0E
+DEF SFX_GEX_HIT1                           EQU $0F
+DEF SFX_GEX_HIT2                           EQU $10
 DEF SFX_UNK11                              EQU $11
 DEF SFX_UNK12                              EQU $12
-DEF SFX_UNK13                              EQU $13
-DEF SFX_UNK14                              EQU $14
-DEF SFX_UNK15                              EQU $15
+DEF SFX_METEOR                             EQU $13
+DEF SFX_CANNON                             EQU $14
+DEF SFX_BRAIN_OF_OZ                        EQU $15
 DEF SFX_UNK16                              EQU $16
 DEF SFX_UNK17                              EQU $17
-DEF SFX_UNK18                              EQU $18
-DEF SFX_UNK19                              EQU $19
-DEF SFX_BOSS_DEATH                         EQU $1A ; evil santa, ?
-DEF SFX_UNK1B                              EQU $1B
-DEF SFX_UNK1C                              EQU $1C
+DEF SFX_DOOR1                              EQU $18
+DEF SFX_SMALL_BANG                         EQU $19 ; misc
+DEF SFX_LOUD_BANG                          EQU $1A ; boss deaths, TutTV block
+DEF SFX_DOOR2                              EQU $1B ; also used by cannon?
+DEF SFX_BOMB                               EQU $1C
 DEF SFX_UNK1D                              EQU $1D
 DEF SFX_REMOTE                             EQU $1E
 DEF SFX_UNK1F                              EQU $1F
 
 ; Collision Types
 DEF CollisionType_None                    EQU $00
-DEF CollisionType_Platform2               EQU $01
-DEF CollisionType_Fish                    EQU $02
-DEF CollisionType_GenericProjectile       EQU $03
-DEF CollisionType_GenericEnemy            EQU $04
-DEF CollisionType_unk05                   EQU $05
-DEF CollisionType_unk06                   EQU $06
+DEF CollisionType_Platform                EQU $01
+DEF CollisionType_DamageUnderwater        EQU $02 ; player is damaged, but do not change player's action or position
+DEF CollisionType_DamageAndDestroy        EQU $03 ; player is damaged, and the object is destroyed
+DEF CollisionType_DamageAndRemain         EQU $04 ; player is damaged, but the object remains loaded
+DEF CollisionType_unk05                   EQU $05 ; seems unused
+DEF CollisionType_unk06                   EQU $06 ; seems unused
 DEF CollisionType_BonusCoin               EQU $07
 DEF CollisionType_FlyCoin                 EQU $08
 DEF CollisionType_PawCoin                 EQU $09
@@ -436,4 +436,4 @@ DEF CollisionType_Rez                     EQU $32
 DEF CollisionType_TVButton                EQU $33
 DEF CollisionType_RaStatueProjectile      EQU $34
 DEF CollisionType_RockHard                EQU $35
-DEF CollisionType_Platform                EQU $81
+DEF CollisionType_PlatformWithFlag        EQU $81

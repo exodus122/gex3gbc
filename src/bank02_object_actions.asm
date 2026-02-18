@@ -483,7 +483,7 @@ call_02_5bef_ObjectAction_FreestandingRemote_unk1:
 call_02_5bfa_ObjectAction_FreestandingRemote_unk2:
     call call_00_29f5_Object_ClearActiveFlagAndCheck                                  ;; 02:5bfa $cd $f5 $29
     jr   Z, .jr_02_5c23                                ;; 02:5bfd $28 $24
-    ld   A, $1e                                        ;; 02:5bff $3e $1e
+    ld   A, SFX_REMOTE                                        ;; 02:5bff $3e $1e
     call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 02:5c01 $cd $f5 $0f
     ld   HL, .data_02_5c3b                             ;; 02:5c04 $21 $3b $5c
     call call_00_2c20_Object_CopyPaletteToBuffer                                  ;; 02:5c07 $cd $20 $2c
@@ -565,7 +565,7 @@ call_02_5c82_ObjectAction_EvilSanta_Stand:
 
 call_02_5ca5_ObjectAction_EvilSanta_Damaged:
     call call_00_29f5_Object_ClearActiveFlagAndCheck
-    ld   a,$19
+    ld   a,SFX_SMALL_BANG
     call nz,call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,[wDC71_FrameCounter]
     and  a,$0F
@@ -582,7 +582,7 @@ call_02_5ca5_ObjectAction_EvilSanta_Damaged:
 call_02_5cd0_ObjectAction_EvilSanta_Death:
     call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,label5CF0
-    ld   a,$1A
+    ld   a,SFX_LOUD_BANG
     call call_00_0ff5_QueueSoundEffectWithPriority
     call call_02_5d02_LoadEvilSantaPalette
     call call_00_2976_Object_GetFacingDirection
@@ -1086,7 +1086,7 @@ call_02_6163_ObjectAction_Hand_Unk2:
 call_02_616f_ObjectAction_Hand_Unk3:
     call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label61A1
-    ld   a,$19
+    ld   a,SFX_SMALL_BANG
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   c,$10
     call call_00_28dc_Object_SetYVelocity
@@ -1115,7 +1115,7 @@ call_02_616f_ObjectAction_Hand_Unk3:
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_ResetYIfAboveStart
     ret  c
-    ld   a,$19
+    ld   a,SFX_SMALL_BANG
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$04
     jp   call_02_72ac_SetupNewAction
@@ -1400,7 +1400,7 @@ call_02_63a8_ObjectAction_BreakableBlock_Unk0:
     jp   call_02_72ac_SetupNewAction
 
 call_02_63c0_ObjectAction_BreakableBlock_Unk3:
-    ld   a,$1A
+    ld   a,SFX_LOUD_BANG
     call call_00_0ff5_QueueSoundEffectWithPriority
     farcall call_03_57f8_ClearCollisionForObject
     jp   call_00_2b7a_ClearObjectThenJump
@@ -2242,7 +2242,7 @@ call_02_69af_ObjectAction_Bomb_Unk1:
     call call_00_28dc_Object_SetYVelocity
     ld   c,$2D
     call call_00_290d_Object_SetTimer1A
-    ld   a,$1C
+    ld   a,SFX_BOMB
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$02
     jp   call_02_72ac_SetupNewAction
@@ -2291,7 +2291,7 @@ call_02_6a13_ObjectAction_Bomb_Unk3:
     
 call_02_6a4c_ObjectAction_Bomb_Unk4:
     call call_00_29f5_Object_ClearActiveFlagAndCheck
-    ld   a,$19
+    ld   a,SFX_SMALL_BANG
     call nz,call_00_0ff5_QueueSoundEffectWithPriority
     ld   hl,.data_02_6a89
     call call_00_2c20_Object_CopyPaletteToBuffer
@@ -2334,7 +2334,7 @@ call_02_6a91_ObjectAction_WaterTowerTank_Unk0:
 .label6AA1:
     call call_00_22d4_CheckObjectSlotFlag
     ret  z
-    ld   a,$1A
+    ld   a,SFX_LOUD_BANG
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   c,$02
     call call_00_2299_SetObjectStatusLowNibble
@@ -2348,7 +2348,7 @@ call_02_6ab4_ObjectAction_WaterTowerTank_Unk1:
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_ResetYIfAboveStart
     ret  c
-    ld   a,$19
+    ld   a,SFX_SMALL_BANG
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$02
     jp   call_02_72ac_SetupNewAction
@@ -2661,7 +2661,7 @@ call_02_6cdd_ObjectAction_BirdProjectile_Update:
     ld   [hl],d
     dec  l
     ld   [hl],e
-    ld   a,$19
+    ld   a,SFX_SMALL_BANG
     call call_00_0ff5_QueueSoundEffectWithPriority
     call call_00_2922_Object_Timer1ACountdown
     ld   c,$20
@@ -2681,7 +2681,7 @@ call_02_6d3a_ObjectAction_RockHard_Unk0:
 call_02_6d3b_ObjectAction_RockHard_Unk2:
     call call_00_2a5d_Object_Check5Flag2
     ret  z
-    ld   a,$1A
+    ld   a,SFX_LOUD_BANG
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$03
     jp   call_02_72ac_SetupNewAction
@@ -2776,7 +2776,7 @@ call_02_6ddd_ObjectAction_BrainOfOz_Unk5:
     call call_00_233e_Object_UpdatePatternedPositionFromVelocityTable
     call call_00_29f5_Object_ClearActiveFlagAndCheck
     ret  z
-    ld   a,$15
+    ld   a,SFX_BRAIN_OF_OZ
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   c,$18
     jp   call_00_3792_PrepareRelativeObjectSpawn
@@ -2802,7 +2802,7 @@ call_02_6dee_ObjectAction_BrainOfOz_Unk7:
 call_02_6e09_ObjectAction_BrainOfOz_Unk8:
     call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label6E27
-    ld   a,$1A
+    ld   a,SFX_LOUD_BANG
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   hl,.data_6e3c
     call call_00_2c20_Object_CopyPaletteToBuffer
@@ -2881,7 +2881,7 @@ call_02_6e88_ObjectAction_Cannon_Unk0:
 
 call_02_6ea8_ObjectAction_Cannon_Unk2:
     call call_00_29f5_Object_ClearActiveFlagAndCheck
-    ld   a,$1B
+    ld   a,SFX_DOOR2
     call nz,call_00_0ff5_QueueSoundEffectWithPriority
     call call_00_2922_Object_Timer1ACountdown
     ld   a,$04
@@ -2893,7 +2893,7 @@ call_02_6eb9_ObjectAction_Cannon_Unk3:
     ret  z
     ld   c,$16
     call call_00_3792_PrepareRelativeObjectSpawn
-    ld   a,$14
+    ld   a,SFX_CANNON
     jp   call_00_0ff5_QueueSoundEffectWithPriority
 
 call_02_6ec7_ObjectAction_CannonProjectile_Update:
@@ -2927,7 +2927,7 @@ call_02_6ec7_ObjectAction_CannonProjectile_Update:
     dec  l
     ld   [hl],e
 .label6EFA:
-    ld   a,$19
+    ld   a,SFX_SMALL_BANG
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   c,$17
     call call_00_3792_PrepareRelativeObjectSpawn
@@ -3029,7 +3029,7 @@ call_02_6fa1_ObjectAction_Rez_Unk10:
 call_02_6faa_ObjectAction_Rez_Unk11:
     call call_00_29f5_Object_ClearActiveFlagAndCheck
     jr   z,.label6FBE
-    ld   a,$1A
+    ld   a,SFX_LOUD_BANG
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   c,$B4
     call call_00_290d_Object_SetTimer1A
@@ -3100,7 +3100,7 @@ call_02_7019_ObjectAction_Unk_None:
 
 call_02_701a_ObjectAction_Meteor_Update:
     call call_00_29f5_Object_ClearActiveFlagAndCheck
-    ld   a,$13
+    ld   a,SFX_METEOR
     call nz,call_00_0ff5_QueueSoundEffectWithPriority
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
     call call_00_2766_Object_ResetYIfAboveStart
@@ -3154,7 +3154,7 @@ call_02_702e_ObjectAction_RezProjectile_Update:
     ld   [hl],d
     dec  hl
     ld   [hl],e
-    ld   a,$19
+    ld   a,SFX_SMALL_BANG
     call call_00_0ff5_QueueSoundEffectWithPriority
     ld   a,$01
     jp   call_02_72ac_SetupNewAction
