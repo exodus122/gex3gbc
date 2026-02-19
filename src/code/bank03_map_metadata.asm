@@ -18,34 +18,39 @@ call_03_6c89_LoadMapData:
     jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 03:6c9d $c3 $6e $07
 .data_03_6ca0_LevelData:
     dw   .data_03_6d1a_LevelDataGexCave1
-    dw   .data_03_6d96_LevelDataHolidayTV
-    dw   .data_03_6e12_LevelDataMysteryTV
-    dw   .data_03_6f48_LevelTutTV        ;; 03:6ca0 ........
+    dw   .data_03_6d96_LevelDataHolidayTV1
+    dw   .data_03_6e12_LevelDataMysteryTV1
+    dw   .data_03_6f48_LevelDataTutTV1
     dw   .data_03_7021_LevelWesternStation
     dw   .data_03_7138_LevelAnimeChannel
     dw   .data_03_724f_LevelSuperheroShow
-    dw   .data_03_7309_LevelGextremeSports        ;; 03:6ca8 ......??
+    dw   .data_03_7309_LevelGextremeSports
     dw   .data_03_7385_LevelMarsupialMadness
     dw   .data_03_73a4_LevelWWGexWrestling
     dw   .data_03_73c3_LevelLizardOfOz
-    dw   .data_03_73e2_LevelChannelZ        ;; 03:6cb0 ????????
-
+    dw   .data_03_73e2_LevelChannelZ
     dw   .data_03_6d39_LevelDataGexCave2
     dw   .data_03_6d58_LevelDataGexCave3
     dw   .data_03_6d77_LevelDataGexCave4
-    dw   .data_03_6db5_LevelDataHolidayTV2        ;; 03:6cb8 ........
+    dw   .data_03_6db5_LevelDataHolidayTV2
     dw   .data_03_6dd4_LevelDataHolidayTV3
     dw   .data_03_6df3_LevelDataHolidayTV4
     dw   .data_03_6e31_LevelDataMysteryTV2
-    dw   .data_03_6e50_LevelDataMysteryTV3        ;; 03:6cc0 ??..????
+    dw   .data_03_6e50_LevelDataMysteryTV3
     dw   .data_03_6e6f_LevelDataMysteryTV4
     dw   .data_03_6e8e_LevelDataMysteryTV5
     dw   .data_03_6ead_LevelDataMysteryTV6
     dw   .data_03_6ecc_LevelDataMysteryTV7
     dw   .data_03_6eeb_LevelDataMysteryTV8
-    db   $0a, $6f, $29, $6f, $67, $6f        ;; 03:6cd0 ????????
-    db   $86, $6f, $a5, $6f, $c4, $6f, $e3, $6f        ;; 03:6cd8 ????????
-    db   $02, $70, $40, $70, $5f, $70, $7e, $70        ;; 03:6ce0 ????????
+    dw   .data_03_6f0a_LevelDataMysteryTV9
+    dw   .data_03_6f29_LevelDataMysteryTV10
+    dw   .data_03_6f67_LevelDataTutTV2
+    dw   .data_03_6f86_LevelDataTutTV3
+    dw   .data_03_6fa5_LevelDataTutTV4
+    dw   .data_03_6fc4_LevelDataTutTV5
+    dw   .data_03_6fe3_LevelDataTutTV6
+    dw   .data_03_7002_LevelDataTutTV7
+    db   $40, $70, $5f, $70, $7e, $70        ;; 03:6ce0 ????????
     db   $9d, $70, $bc, $70, $db, $70, $fa, $70        ;; 03:6ce8 ????????
     db   $19, $71, $57, $71, $76, $71, $95, $71        ;; 03:6cf0 ????????
     db   $b4, $71, $d3, $71, $f2, $71, $11, $72        ;; 03:6cf8 ????????
@@ -53,209 +58,507 @@ call_03_6c89_LoadMapData:
     db   $cb, $72, $ea, $72, $28, $73, $47, $73        ;; 03:6d08 ????????
     db   $66, $73, $01, $74, $20, $74, $3f, $74        ;; 03:6d10 ????????
     db   $5e, $74
- 
-.data_03_6d1a_LevelDataGexCave1:
-    db   $3e                                           ;; 03:6d1a ??.
-    dw   $702c                                         ;; 03:6d1b wW
-    db   $3d                                           ;; 03:6d1d .
-    dw   $702c                                         ;; 03:6d1e wW
-    db   $4e, $00, $40, $28                            ;; 03:6d20 ....
-    dw   $4000                                         ;; 03:6d24 wW
-    db   $3f                                           ;; 03:6d26 .
-    dw   $702c                                         ;; 03:6d27 wW
-    db   $23                                           ;; 03:6d29 .
-    dw   $4000                                         ;; 03:6d2a wW
-    db   $21, $00, $40, $22                            ;; 03:6d2c ....
-    dw   $4000                                  ;; 03:6d30 pP
-    db   $21, $80, $4c, $1e, $11, $00, $00
-.data_03_6d39_LevelDataGexCave2:    
-    db   $3e        ;; 03:6d39 ...p.ww.
-    dw   $722a                                         ;; 03:6d3a wW
-    db   $3d                                           ;; 03:6d3c .
-    dw   $722a                                         ;; 03:6d3d wW
-    db   $4e, $70, $4f, $28                            ;; 03:6d3f ....
-    dw   $4488                                         ;; 03:6d43 wW
-    db   $3f                                           ;; 03:6d45 .
-    dw   $722a                                         ;; 03:6d46 wW
-    db   $23                                           ;; 03:6d48 .
-    dw   $4020                                         ;; 03:6d49 wW
-    db   $21, $40, $40, $22                            ;; 03:6d4b ....
-    dw   $4000                                  ;; 03:6d4f pP
-    db   $21, $80, $4c, $1e, $11, $00, $00
-.data_03_6d58_LevelDataGexCave3:    
-    db   $3e        ;; 03:6d58 ...p.ww.
-    dw   $7428                                         ;; 03:6d59 wW
-    db   $3d                                           ;; 03:6d5b .
-    dw   $7428                                         ;; 03:6d5c wW
-    db   $4e, $90, $63, $28                            ;; 03:6d5e ....
-    dw   $4950                                         ;; 03:6d62 wW
-    db   $3f                                           ;; 03:6d64 .
-    dw   $7428                                         ;; 03:6d65 wW
-    db   $23                                           ;; 03:6d67 .
-    dw   $4040                                         ;; 03:6d68 wW
-    db   $21, $80, $40, $22                            ;; 03:6d6a ....
-    dw   $4000                                         ;; 03:6d6e wW
-    db   $21, $80, $4c, $1e, $11, $00, $00
-.data_03_6d77_LevelDataGexCave4:    
-    db   $3e        ;; 03:6d77 ...w.ww.
-    dw   $7626                                         ;; 03:6d78 wW
-    db   $3d                                           ;; 03:6d7a .
-    dw   $7626                                         ;; 03:6d7b wW
-    db   $4d, $70, $5e, $28                            ;; 03:6d7d ....
-    dw   $4e60                                         ;; 03:6d81 wW
-    db   $3f                                           ;; 03:6d83 .
-    dw   $7626                                         ;; 03:6d84 wW
-    db   $23                                           ;; 03:6d86 .
-    dw   $4058                                         ;; 03:6d87 wW
-    db   $21, $c0, $40, $22                            ;; 03:6d89 ....
-    dw   $4000                                         ;; 03:6d8d wW
-    db   $21, $80, $4c, $1e, $11, $00, $00
-.data_03_6d96_LevelDataHolidayTV: 
-    db   $35                                           ;; 03:6d96 ...p.ww.
-    dw   $4000                                         ;; 03:6d97 wW
-    db   $34                                           ;; 03:6d99 .
-    dw   $4000                                         ;; 03:6d9a wW
-    db   $43, $00, $40, $24                            ;; 03:6d9c ....
-    dw   $6ab0                                         ;; 03:6da0 wW
-    db   $36                                           ;; 03:6da2 .
-    dw   $4000                                         ;; 03:6da3 wW
-    db   $23                                           ;; 03:6da5 .
-    dw   $4074                                         ;; 03:6da6 wW
-    db   $21, $00, $41, $22                            ;; 03:6da8 ....
-    dw   $41b1                                  ;; 03:6dac pP
-    db   $21, $83, $4c, $a0, $50, $01, $00
-.data_03_6db5_LevelDataHolidayTV2:    
-    db   $32        ;; 03:6db5 ...p.ww.
-    dw   $7a9c                                         ;; 03:6db6 wW
-    db   $31                                           ;; 03:6db8 .
-    dw   $7a9c                                         ;; 03:6db9 wW
-    db   $43, $00, $5c, $25                            ;; 03:6dbb ....
-    dw   $4000                                         ;; 03:6dbf wW
-    db   $33                                           ;; 03:6dc1 .
-    dw   $7a9c                                         ;; 03:6dc2 wW
-    db   $23                                           ;; 03:6dc4 .
-    dw   $410c                                         ;; 03:6dc5 wW
-    db   $21, $40, $41, $22                            ;; 03:6dc7 ....
-    dw   $41b1                                         ;; 03:6dcb wW
-    db   $21, $83, $4c, $14, $16, $01, $00
-.data_03_6dd4_LevelDataHolidayTV3:    
-    db   $32        ;; 03:6dd4 ...p.ww?
-    db   $9c, $7a, $31, $9c, $7a, $43, $00, $5c        ;; 03:6dd5 ????????
-    db   $25, $00, $40, $33, $9c, $7a, $23, $0c        ;; 03:6ddd ????????
-    db   $41, $21, $80, $41, $22, $b1, $41, $21        ;; 03:6de5 ????????
-    db   $83, $4c, $14, $16, $01, $00
-.data_03_6df3_LevelDataHolidayTV4:    
-    db   $35             ;; 03:6df3 ??????.
-    dw   $7200                                         ;; 03:6df4 wW
-    db   $34                                           ;; 03:6df6 .
-    dw   $7200                                         ;; 03:6df7 wW
-    db   $45, $a0, $6c, $24                            ;; 03:6df9 ....
-    dw   $7570                                         ;; 03:6dfd wW
-    db   $36                                           ;; 03:6dff .
-    dw   $7200                                         ;; 03:6e00 wW
-    db   $23                                           ;; 03:6e02 .
-    dw   $4134                                         ;; 03:6e03 wW
-    db   $21, $c0, $41, $22                            ;; 03:6e05 ....
-    dw   $41b1                                         ;; 03:6e09 wW
-    db   $21, $83, $4c, $14, $09, $01, $00
-.data_03_6e12_LevelDataMysteryTV:
-    db   $32        ;; 03:6e12 ...p.ww.
-    db   $00, $40, $31, $00, $40, $44, $00, $40        ;; 03:6e13 ........
-    db   $24, $00, $40, $33, $00, $40, $23, $44        ;; 03:6e1b ........
-    db   $41, $21, $00, $42, $22, $32, $43, $21        ;; 03:6e23 ........
-    db   $9a, $4d, $2d, $2d, $02, $00
-.data_03_6e31_LevelDataMysteryTV2:    
-    db   $32, $e9        ;; 03:6e31 ....w.??
-    db   $47, $31, $e9, $47, $44, $a0, $5b, $24        ;; 03:6e33 ????????
-    db   $c0, $4d, $33, $e9, $47, $23, $70, $41        ;; 03:6e3b ????????
-    db   $21, $40, $42, $22, $32, $43, $21, $9a        ;; 03:6e43 ????????
-    db   $4d, $28, $32, $02, $01
-.data_03_6e50_LevelDataMysteryTV3:   
-    db   $32, $b9, $4f        ;; 03:6e50 ????????
-    db   $31, $b9, $4f, $45, $00, $40, $24, $80        ;; 03:6e53 ????????
-    db   $53, $33, $b9, $4f, $23, $94, $41, $21        ;; 03:6e5b ????????
-    db   $80, $42, $22, $32, $43, $21, $9a, $4d        ;; 03:6e63 ????????
-    db   $2d, $1e, $02, $00
-.data_03_6e6f_LevelDataMysteryTV4:     
-    db   $32, $ff, $54, $31        ;; 03:6e6f ????????
-    db   $ff, $54, $44, $90, $63, $24, $58, $5e        ;; 03:6e73 ????????
-    db   $33, $ff, $54, $23, $28, $42, $21, $c0        ;; 03:6e7b ????????
-    db   $42, $22, $32, $43, $21, $9a, $4d, $14        ;; 03:6e83 ????????
-    db   $2a, $02, $00
-.data_03_6e8e_LevelDataMysteryTV5:     
-    db   $32, $ff, $54, $31, $ff        ;; 03:6e8e ????????
-    db   $54, $44, $90, $63, $24, $58, $5e, $33        ;; 03:6e93 ????????
-    db   $ff, $54, $23, $28, $42, $21, $00, $43        ;; 03:6e9b ????????
-    db   $22, $32, $43, $21, $9a, $4d, $14, $2a        ;; 03:6ea3 ????????
-    db   $02, $00
-.data_03_6ead_LevelDataMysteryTV6:    
-    db   $32, $ff, $54, $31, $ff, $54        ;; 03:6ead ????????
-    db   $44, $90, $63, $24, $58, $5e, $33, $ff        ;; 03:6eb3 ????????
-    db   $54, $23, $28, $42, $21, $40, $43, $22        ;; 03:6ebb ????????
-    db   $32, $43, $21, $9a, $4d, $14, $2a, $02        ;; 03:6ec3 ????????
-    db   $00
-.data_03_6ecc_LevelDataMysteryTV7:    
-    db   $32, $47, $58, $31, $47, $58, $45        ;; 03:6ecc ????????
-    db   $b0, $5e, $24, $08, $66, $33, $47, $58        ;; 03:6ed3 ????????
-    db   $23, $68, $42, $21, $80, $43, $22, $32        ;; 03:6edb ????????
-    db   $43, $21, $9a, $4d, $0a, $08, $02, $01        ;; 03:6ee3 ????????
-.data_03_6eeb_LevelDataMysteryTV8:
-    db   $32, $97, $58, $31, $97, $58, $44, $50        ;; 03:6eeb ????????
-    db   $74, $24, $88, $68, $33, $97, $58, $23        ;; 03:6ef3 ????????
-    db   $a0, $42, $21, $c0, $43, $22, $32, $43        ;; 03:6efb ????????
-    db   $21, $9a, $4d, $0a, $09, $02, $01
-    
-    db   $32        ;; 03:6f0a ????????
-    db   $ff, $54, $31, $ff, $54, $44, $90, $63        ;; 03:6f0b ????????
-    db   $24, $58, $5e, $33, $ff, $54, $23, $28        ;; 03:6f13 ????????
-    db   $42, $21, $c0, $42, $22, $32, $43, $21        ;; 03:6f1b ????????
-    db   $9a, $4d, $14, $2a, $02, $00
-    
-    db   $32, $e9        ;; 03:6f29 ????????
-    db   $47, $31, $e9, $47, $44, $a0, $5b, $24        ;; 03:6f2b ????????
-    db   $c0, $4d, $33, $e9, $47, $23, $70, $41        ;; 03:6f33 ????????
-    db   $21, $40, $42, $22, $32, $43, $21, $9a        ;; 03:6f3b ????????
-    db   $4d, $28, $32, $02, $01
-.data_03_6f48_LevelTutTV:    
-    db   $32, $f1, $58        ;; 03:6f48 ?????...
-    db   $31, $f1, $58, $46, $00, $40, $25, $30        ;; 03:6f4b ........
-    db   $4b, $33, $f1, $58, $23, $cc, $42, $21        ;; 03:6f53 ........
-    db   $00, $44, $22, $63, $45, $21, $ae, $4e        ;; 03:6f5b ........
-    db   $27, $13, $03, $00
-    
-    db   $32, $d6, $5b, $31        ;; 03:6f67 ..w.????
-    db   $d6, $5b, $46, $c0, $55, $25, $60, $51        ;; 03:6f6b ????????
-    db   $33, $d6, $5b, $23, $2c, $43, $21, $40        ;; 03:6f73 ????????
-    db   $44, $22, $63, $45, $21, $ae, $4e, $34        ;; 03:6f7b ????????
-    db   $33, $03, $00
-    
-    db   $32, $32, $66, $31, $32        ;; 03:6f86 ????????
-    db   $66, $47, $00, $40, $25, $08, $57, $33        ;; 03:6f8b ????????
-    db   $32, $66, $23, $70, $43, $21, $80, $44        ;; 03:6f93 ????????
-    db   $22, $63, $45, $21, $ae, $4e, $64, $17        ;; 03:6f9b ????????
-    db   $03, $00
-    
-    db   $32, $2e, $6f, $31, $2e, $6f        ;; 03:6fa5 ????????
-    db   $47, $c0, $4b, $25, $a8, $5b, $33, $2e        ;; 03:6fab ????????
-    db   $6f, $23, $bc, $43, $21, $c0, $44, $22        ;; 03:6fb3 ????????
-    db   $63, $45, $21, $ae, $4e, $4a, $13, $03        ;; 03:6fbb ????????
-    db   $00
-    
-    db   $32, $ac, $74, $31, $ac, $74, $47        ;; 03:6fc4 ????????
-    db   $80, $61, $25, $b8, $5f, $33, $ac, $74        ;; 03:6fcb ????????
-    db   $23, $ec, $43, $21, $00, $45, $22, $63        ;; 03:6fd3 ????????
-    db   $45, $21, $ae, $4e, $0a, $09, $03, $00        ;; 03:6fdb ????????
 
-    db   $32, $06, $75, $31, $06, $75, $4a, $70        ;; 03:6fe3 ????????
-    db   $6f, $24, $60, $7a, $33, $06, $75, $23        ;; 03:6feb ????????
-    db   $2c, $44, $21, $40, $45, $22, $63, $45        ;; 03:6ff3 ????????
-    db   $21, $ae, $4e, $14, $09, $03, $00
-    
-    db   $32        ;; 03:7002 ????????
-    db   $ba, $75, $31, $ba, $75, $46, $10, $6d        ;; 03:7003 ????????
-    db   $25, $30, $62, $33, $ba, $75, $23, $74        ;; 03:700b ????????
-    db   $44, $21, $80, $45, $22, $63, $45, $21        ;; 03:7013 ????????
-    db   $ae, $4e, $32, $19, $03, $00
+.data_03_6d1a_LevelDataGexCave1:
+    db   BANK(GexCave_1_map)
+    dw   GexCave_1_map
+    db   BANK(GexCave_1_map_extended)
+    dw   GexCave_1_map_extended
+    db   BANK(GexCave_1_tileset)
+    dw   GexCave_1_tileset
+    db   BANK(GexCave_1_blockset)
+    dw   GexCave_1_blockset
+    db   BANK(GexCave_1_collision)
+    dw   GexCave_1_collision
+    db   BANK(GexCave_1_collision_blockset)
+    dw   GexCave_1_collision_blockset
+    db   BANK(GexCave_1_palette)
+    dw   GexCave_1_palette
+    db   BANK(GexCave_object_list)
+    dw   GexCave_object_list
+    db   BANK(GexCave_collectible_list)
+    dw   GexCave_collectible_list
+    db   $1e, $11, $00, $00
+.data_03_6d39_LevelDataGexCave2:
+    db   BANK(GexCave_2_map)
+    dw   GexCave_2_map
+    db   BANK(GexCave_2_map_extended)
+    dw   GexCave_2_map_extended
+    db   BANK(GexCave_2_tileset)
+    dw   GexCave_2_tileset
+    db   BANK(GexCave_2_blockset)
+    dw   GexCave_2_blockset
+    db   BANK(GexCave_2_collision)
+    dw   GexCave_2_collision
+    db   BANK(GexCave_2_collision_blockset)
+    dw   GexCave_2_collision_blockset
+    db   BANK(GexCave_2_palette)
+    dw   GexCave_2_palette
+    db   BANK(GexCave_object_list)
+    dw   GexCave_object_list
+    db   BANK(GexCave_collectible_list)
+    dw   GexCave_collectible_list
+    db   $1e, $11, $00, $00
+.data_03_6d58_LevelDataGexCave3:
+    db   BANK(GexCave_3_map)
+    dw   GexCave_3_map
+    db   BANK(GexCave_3_map_extended)
+    dw   GexCave_3_map_extended
+    db   BANK(GexCave_3_tileset)
+    dw   GexCave_3_tileset
+    db   BANK(GexCave_3_blockset)
+    dw   GexCave_3_blockset
+    db   BANK(GexCave_3_collision)
+    dw   GexCave_3_collision
+    db   BANK(GexCave_3_collision_blockset)
+    dw   GexCave_3_collision_blockset
+    db   BANK(GexCave_3_palette)
+    dw   GexCave_3_palette
+    db   BANK(GexCave_object_list)
+    dw   GexCave_object_list
+    db   BANK(GexCave_collectible_list)
+    dw   GexCave_collectible_list
+    db   $1e, $11, $00, $00
+.data_03_6d77_LevelDataGexCave4:
+    db   BANK(GexCave_4_map)
+    dw   GexCave_4_map
+    db   BANK(GexCave_4_map_extended)
+    dw   GexCave_4_map_extended
+    db   BANK(GexCave_4_tileset)
+    dw   GexCave_4_tileset
+    db   BANK(GexCave_4_blockset)
+    dw   GexCave_4_blockset
+    db   BANK(GexCave_4_collision)
+    dw   GexCave_4_collision
+    db   BANK(GexCave_4_collision_blockset)
+    dw   GexCave_4_collision_blockset
+    db   BANK(GexCave_4_palette)
+    dw   GexCave_4_palette
+    db   BANK(GexCave_object_list)
+    dw   GexCave_object_list
+    db   BANK(GexCave_collectible_list)
+    dw   GexCave_collectible_list
+    db   $1e, $11, $00, $00
+.data_03_6d96_LevelDataHolidayTV1:
+    db   BANK(HolidayTV_1_map)
+    dw   HolidayTV_1_map
+    db   BANK(HolidayTV_1_map_extended)
+    dw   HolidayTV_1_map_extended
+    db   BANK(HolidayTV_1_tileset)
+    dw   HolidayTV_1_tileset
+    db   BANK(HolidayTV_1_blockset)
+    dw   HolidayTV_1_blockset
+    db   BANK(HolidayTV_1_collision)
+    dw   HolidayTV_1_collision
+    db   BANK(HolidayTV_1_collision_blockset)
+    dw   HolidayTV_1_collision_blockset
+    db   BANK(HolidayTV_1_palette)
+    dw   HolidayTV_1_palette
+    db   BANK(HolidayTV_object_list)
+    dw   HolidayTV_object_list
+    db   BANK(HolidayTV_collectible_list)
+    dw   HolidayTV_collectible_list
+    db   $a0, $50, $01, $00
+.data_03_6db5_LevelDataHolidayTV2:
+    db   BANK(HolidayTV_2_map)
+    dw   HolidayTV_2_map
+    db   BANK(HolidayTV_2_map_extended)
+    dw   HolidayTV_2_map_extended
+    db   BANK(HolidayTV_2_tileset)
+    dw   HolidayTV_2_tileset
+    db   BANK(HolidayTV_2_blockset)
+    dw   HolidayTV_2_blockset
+    db   BANK(HolidayTV_2_collision)
+    dw   HolidayTV_2_collision
+    db   BANK(HolidayTV_2_collision_blockset)
+    dw   HolidayTV_2_collision_blockset
+    db   BANK(HolidayTV_2_palette)
+    dw   HolidayTV_2_palette
+    db   BANK(HolidayTV_object_list)
+    dw   HolidayTV_object_list
+    db   BANK(HolidayTV_collectible_list)
+    dw   HolidayTV_collectible_list
+    db   $14, $16, $01, $00
+.data_03_6dd4_LevelDataHolidayTV3:
+    db   BANK(HolidayTV_2_map)
+    dw   HolidayTV_2_map
+    db   BANK(HolidayTV_2_map_extended)
+    dw   HolidayTV_2_map_extended
+    db   BANK(HolidayTV_2_tileset)
+    dw   HolidayTV_2_tileset
+    db   BANK(HolidayTV_2_blockset)
+    dw   HolidayTV_2_blockset
+    db   BANK(HolidayTV_2_collision)
+    dw   HolidayTV_2_collision
+    db   BANK(HolidayTV_2_collision_blockset)
+    dw   HolidayTV_2_collision_blockset
+    db   BANK(HolidayTV_3_palette_4180)
+    dw   HolidayTV_3_palette_4180
+    db   BANK(HolidayTV_object_list)
+    dw   HolidayTV_object_list
+    db   BANK(HolidayTV_collectible_list)
+    dw   HolidayTV_collectible_list
+    db   $14, $16, $01, $00
+.data_03_6df3_LevelDataHolidayTV4:
+    db   BANK(HolidayTV_4_map)
+    dw   HolidayTV_4_map
+    db   BANK(HolidayTV_4_map_extended)
+    dw   HolidayTV_4_map_extended
+    db   BANK(HolidayTV_4_tileset)
+    dw   HolidayTV_4_tileset
+    db   BANK(HolidayTV_4_blockset)
+    dw   HolidayTV_4_blockset
+    db   BANK(HolidayTV_4_collision)
+    dw   HolidayTV_4_collision
+    db   BANK(HolidayTV_4_collision_blockset)
+    dw   HolidayTV_4_collision_blockset
+    db   BANK(HolidayTV_4_palette)
+    dw   HolidayTV_4_palette
+    db   BANK(HolidayTV_object_list)
+    dw   HolidayTV_object_list
+    db   BANK(HolidayTV_collectible_list)
+    dw   HolidayTV_collectible_list
+    db   $14, $9, $01, $00
+.data_03_6e12_LevelDataMysteryTV1:
+    db   BANK(MysteryTV_1_map)
+    dw   MysteryTV_1_map
+    db   BANK(MysteryTV_1_map_extended)
+    dw   MysteryTV_1_map_extended
+    db   BANK(MysteryTV_1_tileset)
+    dw   MysteryTV_1_tileset
+    db   BANK(MysteryTV_1_blockset)
+    dw   MysteryTV_1_blockset
+    db   BANK(MysteryTV_1_collision)
+    dw   MysteryTV_1_collision
+    db   BANK(MysteryTV_1_collision_blockset)
+    dw   MysteryTV_1_collision_blockset
+    db   BANK(MysteryTV_1_palette)
+    dw   MysteryTV_1_palette
+    db   BANK(MysteryTV_object_list)
+    dw   MysteryTV_object_list
+    db   BANK(MysteryTV_collectible_list)
+    dw   MysteryTV_collectible_list
+    db   $2d, $2d, $02, $00
+.data_03_6e31_LevelDataMysteryTV2:
+    db   BANK(MysteryTV_2_map)
+    dw   MysteryTV_2_map
+    db   BANK(MysteryTV_2_map_extended)
+    dw   MysteryTV_2_map_extended
+    db   BANK(MysteryTV_2_tileset)
+    dw   MysteryTV_2_tileset
+    db   BANK(MysteryTV_2_blockset)
+    dw   MysteryTV_2_blockset
+    db   BANK(MysteryTV_2_collision)
+    dw   MysteryTV_2_collision
+    db   BANK(MysteryTV_2_collision_blockset)
+    dw   MysteryTV_2_collision_blockset
+    db   BANK(MysteryTV_2_palette)
+    dw   MysteryTV_2_palette
+    db   BANK(MysteryTV_object_list)
+    dw   MysteryTV_object_list
+    db   BANK(MysteryTV_collectible_list)
+    dw   MysteryTV_collectible_list
+    db   $28, $32, $02, $01
+.data_03_6e50_LevelDataMysteryTV3:
+    db   BANK(MysteryTV_3_map)
+    dw   MysteryTV_3_map
+    db   BANK(MysteryTV_3_map_extended)
+    dw   MysteryTV_3_map_extended
+    db   BANK(MysteryTV_3_tileset)
+    dw   MysteryTV_3_tileset
+    db   BANK(MysteryTV_3_blockset)
+    dw   MysteryTV_3_blockset
+    db   BANK(MysteryTV_3_collision)
+    dw   MysteryTV_3_collision
+    db   BANK(MysteryTV_3_collision_blockset)
+    dw   MysteryTV_3_collision_blockset
+    db   BANK(MysteryTV_3_palette)
+    dw   MysteryTV_3_palette
+    db   BANK(MysteryTV_object_list)
+    dw   MysteryTV_object_list
+    db   BANK(MysteryTV_collectible_list)
+    dw   MysteryTV_collectible_list
+    db   $2d, $1e, $02, $00
+.data_03_6e6f_LevelDataMysteryTV4:
+    db   BANK(MysteryTV_4_map)
+    dw   MysteryTV_4_map
+    db   BANK(MysteryTV_4_map_extended)
+    dw   MysteryTV_4_map_extended
+    db   BANK(MysteryTV_4_tileset)
+    dw   MysteryTV_4_tileset
+    db   BANK(MysteryTV_4_blockset)
+    dw   MysteryTV_4_blockset
+    db   BANK(MysteryTV_4_collision)
+    dw   MysteryTV_4_collision
+    db   BANK(MysteryTV_4_collision_blockset)
+    dw   MysteryTV_4_collision_blockset
+    db   BANK(MysteryTV_4_palette)
+    dw   MysteryTV_4_palette
+    db   BANK(MysteryTV_object_list)
+    dw   MysteryTV_object_list
+    db   BANK(MysteryTV_collectible_list)
+    dw   MysteryTV_collectible_list
+    db   $14, $2a, $02, $00
+.data_03_6e8e_LevelDataMysteryTV5:
+    db   BANK(MysteryTV_4_map)
+    dw   MysteryTV_4_map
+    db   BANK(MysteryTV_4_map_extended)
+    dw   MysteryTV_4_map_extended
+    db   BANK(MysteryTV_4_tileset)
+    dw   MysteryTV_4_tileset
+    db   BANK(MysteryTV_4_blockset)
+    dw   MysteryTV_4_blockset
+    db   BANK(MysteryTV_4_collision)
+    dw   MysteryTV_4_collision
+    db   BANK(MysteryTV_4_collision_blockset)
+    dw   MysteryTV_4_collision_blockset
+    db   BANK(MysteryTV_5_palette_4300)
+    dw   MysteryTV_5_palette_4300
+    db   BANK(MysteryTV_object_list)
+    dw   MysteryTV_object_list
+    db   BANK(MysteryTV_collectible_list)
+    dw   MysteryTV_collectible_list
+    db   $14, $2a, $02, $00
+.data_03_6ead_LevelDataMysteryTV6:
+    db   BANK(MysteryTV_4_map)
+    dw   MysteryTV_4_map
+    db   BANK(MysteryTV_4_map_extended)
+    dw   MysteryTV_4_map_extended
+    db   BANK(MysteryTV_4_tileset)
+    dw   MysteryTV_4_tileset
+    db   BANK(MysteryTV_4_blockset)
+    dw   MysteryTV_4_blockset
+    db   BANK(MysteryTV_4_collision)
+    dw   MysteryTV_4_collision
+    db   BANK(MysteryTV_4_collision_blockset)
+    dw   MysteryTV_4_collision_blockset
+    db   BANK(MysteryTV_6_palette_4340)
+    dw   MysteryTV_6_palette_4340
+    db   BANK(MysteryTV_object_list)
+    dw   MysteryTV_object_list
+    db   BANK(MysteryTV_collectible_list)
+    dw   MysteryTV_collectible_list
+    db   $14, $2a, $02, $00
+.data_03_6ecc_LevelDataMysteryTV7:
+    db   BANK(MysteryTV_7_map)
+    dw   MysteryTV_7_map
+    db   BANK(MysteryTV_7_map_extended)
+    dw   MysteryTV_7_map_extended
+    db   BANK(MysteryTV_7_tileset)
+    dw   MysteryTV_7_tileset
+    db   BANK(MysteryTV_7_blockset)
+    dw   MysteryTV_7_blockset
+    db   BANK(MysteryTV_7_collision)
+    dw   MysteryTV_7_collision
+    db   BANK(MysteryTV_7_collision_blockset)
+    dw   MysteryTV_7_collision_blockset
+    db   BANK(MysteryTV_7_palette)
+    dw   MysteryTV_7_palette
+    db   BANK(MysteryTV_object_list)
+    dw   MysteryTV_object_list
+    db   BANK(MysteryTV_collectible_list)
+    dw   MysteryTV_collectible_list
+    db   $0a, $08, $02, $01
+.data_03_6eeb_LevelDataMysteryTV8:
+    db   BANK(MysteryTV_8_map)
+    dw   MysteryTV_8_map
+    db   BANK(MysteryTV_8_map_extended)
+    dw   MysteryTV_8_map_extended
+    db   BANK(MysteryTV_8_tileset)
+    dw   MysteryTV_8_tileset
+    db   BANK(MysteryTV_8_blockset)
+    dw   MysteryTV_8_blockset
+    db   BANK(MysteryTV_8_collision)
+    dw   MysteryTV_8_collision
+    db   BANK(MysteryTV_8_collision_blockset)
+    dw   MysteryTV_8_collision_blockset
+    db   BANK(MysteryTV_8_palette)
+    dw   MysteryTV_8_palette
+    db   BANK(MysteryTV_object_list)
+    dw   MysteryTV_object_list
+    db   BANK(MysteryTV_collectible_list)
+    dw   MysteryTV_collectible_list
+    db   $0a, $09, $02, $01
+.data_03_6f0a_LevelDataMysteryTV9:
+    db   BANK(MysteryTV_4_map)
+    dw   MysteryTV_4_map
+    db   BANK(MysteryTV_4_map_extended)
+    dw   MysteryTV_4_map_extended
+    db   BANK(MysteryTV_4_tileset)
+    dw   MysteryTV_4_tileset
+    db   BANK(MysteryTV_4_blockset)
+    dw   MysteryTV_4_blockset
+    db   BANK(MysteryTV_4_collision)
+    dw   MysteryTV_4_collision
+    db   BANK(MysteryTV_4_collision_blockset)
+    dw   MysteryTV_4_collision_blockset
+    db   BANK(MysteryTV_4_palette)
+    dw   MysteryTV_4_palette
+    db   BANK(MysteryTV_object_list)
+    dw   MysteryTV_object_list
+    db   BANK(MysteryTV_collectible_list)
+    dw   MysteryTV_collectible_list
+    db   $14, $2a, $02, $00
+.data_03_6f29_LevelDataMysteryTV10:
+    db   BANK(MysteryTV_2_map)
+    dw   MysteryTV_2_map
+    db   BANK(MysteryTV_2_map_extended)
+    dw   MysteryTV_2_map_extended
+    db   BANK(MysteryTV_2_tileset)
+    dw   MysteryTV_2_tileset
+    db   BANK(MysteryTV_2_blockset)
+    dw   MysteryTV_2_blockset
+    db   BANK(MysteryTV_2_collision)
+    dw   MysteryTV_2_collision
+    db   BANK(MysteryTV_2_collision_blockset)
+    dw   MysteryTV_2_collision_blockset
+    db   BANK(MysteryTV_2_palette)
+    dw   MysteryTV_2_palette
+    db   BANK(MysteryTV_object_list)
+    dw   MysteryTV_object_list
+    db   BANK(MysteryTV_collectible_list)
+    dw   MysteryTV_collectible_list
+    db   $28, $32, $02, $01
+.data_03_6f48_LevelDataTutTV1:
+    db   BANK(TutTV_1_map)
+    dw   TutTV_1_map
+    db   BANK(TutTV_1_map_extended)
+    dw   TutTV_1_map_extended
+    db   BANK(TutTV_1_tileset)
+    dw   TutTV_1_tileset
+    db   BANK(TutTV_1_blockset)
+    dw   TutTV_1_blockset
+    db   BANK(TutTV_1_collision)
+    dw   TutTV_1_collision
+    db   BANK(TutTV_1_collision_blockset)
+    dw   TutTV_1_collision_blockset
+    db   BANK(TutTV_1_palette)
+    dw   TutTV_1_palette
+    db   BANK(TutTV_object_list)
+    dw   TutTV_object_list
+    db   BANK(TutTV_collectible_list)
+    dw   TutTV_collectible_list
+    db   $27, $13, $03, $00
+.data_03_6f67_LevelDataTutTV2:
+    db   BANK(TutTV_2_map)
+    dw   TutTV_2_map
+    db   BANK(TutTV_2_map_extended)
+    dw   TutTV_2_map_extended
+    db   BANK(TutTV_2_tileset)
+    dw   TutTV_2_tileset
+    db   BANK(TutTV_2_blockset)
+    dw   TutTV_2_blockset
+    db   BANK(TutTV_2_collision)
+    dw   TutTV_2_collision
+    db   BANK(TutTV_2_collision_blockset)
+    dw   TutTV_2_collision_blockset
+    db   BANK(TutTV_2_palette)
+    dw   TutTV_2_palette
+    db   BANK(TutTV_object_list)
+    dw   TutTV_object_list
+    db   BANK(TutTV_collectible_list)
+    dw   TutTV_collectible_list
+    db   $34, $33, $03, $00
+.data_03_6f86_LevelDataTutTV3:
+    db   BANK(TutTV_3_map)
+    dw   TutTV_3_map
+    db   BANK(TutTV_3_map_extended)
+    dw   TutTV_3_map_extended
+    db   BANK(TutTV_3_tileset)
+    dw   TutTV_3_tileset
+    db   BANK(TutTV_3_blockset)
+    dw   TutTV_3_blockset
+    db   BANK(TutTV_3_collision)
+    dw   TutTV_3_collision
+    db   BANK(TutTV_3_collision_blockset)
+    dw   TutTV_3_collision_blockset
+    db   BANK(TutTV_3_palette)
+    dw   TutTV_3_palette
+    db   BANK(TutTV_object_list)
+    dw   TutTV_object_list
+    db   BANK(TutTV_collectible_list)
+    dw   TutTV_collectible_list
+    db   $64, $17, $03, $00
+.data_03_6fa5_LevelDataTutTV4:
+    db   BANK(TutTV_4_map)
+    dw   TutTV_4_map
+    db   BANK(TutTV_4_map_extended)
+    dw   TutTV_4_map_extended
+    db   BANK(TutTV_4_tileset)
+    dw   TutTV_4_tileset
+    db   BANK(TutTV_4_blockset)
+    dw   TutTV_4_blockset
+    db   BANK(TutTV_4_collision)
+    dw   TutTV_4_collision
+    db   BANK(TutTV_4_collision_blockset)
+    dw   TutTV_4_collision_blockset
+    db   BANK(TutTV_4_palette)
+    dw   TutTV_4_palette
+    db   BANK(TutTV_object_list)
+    dw   TutTV_object_list
+    db   BANK(TutTV_collectible_list)
+    dw   TutTV_collectible_list
+    db   $4a, $13, $03, $00
+.data_03_6fc4_LevelDataTutTV5:
+    db   BANK(TutTV_5_map)
+    dw   TutTV_5_map
+    db   BANK(TutTV_5_map_extended)
+    dw   TutTV_5_map_extended
+    db   BANK(TutTV_5_tileset)
+    dw   TutTV_5_tileset
+    db   BANK(TutTV_5_blockset)
+    dw   TutTV_5_blockset
+    db   BANK(TutTV_5_collision)
+    dw   TutTV_5_collision
+    db   BANK(TutTV_5_collision_blockset)
+    dw   TutTV_5_collision_blockset
+    db   BANK(TutTV_5_palette)
+    dw   TutTV_5_palette
+    db   BANK(TutTV_object_list)
+    dw   TutTV_object_list
+    db   BANK(TutTV_collectible_list)
+    dw   TutTV_collectible_list
+    db   $0a, $09, $03, $00
+.data_03_6fe3_LevelDataTutTV6:
+    db   BANK(TutTV_6_map)
+    dw   TutTV_6_map
+    db   BANK(TutTV_6_map_extended)
+    dw   TutTV_6_map_extended
+    db   BANK(TutTV_6_tileset)
+    dw   TutTV_6_tileset
+    db   BANK(TutTV_6_blockset)
+    dw   TutTV_6_blockset
+    db   BANK(TutTV_6_collision)
+    dw   TutTV_6_collision
+    db   BANK(TutTV_6_collision_blockset)
+    dw   TutTV_6_collision_blockset
+    db   BANK(TutTV_6_palette)
+    dw   TutTV_6_palette
+    db   BANK(TutTV_object_list)
+    dw   TutTV_object_list
+    db   BANK(TutTV_collectible_list)
+    dw   TutTV_collectible_list
+    db   $14, $09, $03, $00
+.data_03_7002_LevelDataTutTV7:
+    db   BANK(TutTV_7_map)
+    dw   TutTV_7_map
+    db   BANK(TutTV_7_map_extended)
+    dw   TutTV_7_map_extended
+    db   BANK(TutTV_7_tileset)
+    dw   TutTV_7_tileset
+    db   BANK(TutTV_7_blockset)
+    dw   TutTV_7_blockset
+    db   BANK(TutTV_7_collision)
+    dw   TutTV_7_collision
+    db   BANK(TutTV_7_collision_blockset)
+    dw   TutTV_7_collision_blockset
+    db   BANK(TutTV_7_palette)
+    dw   TutTV_7_palette
+    db   BANK(TutTV_object_list)
+    dw   TutTV_object_list
+    db   BANK(TutTV_collectible_list)
+    dw   TutTV_collectible_list
+    db   $32, $19, $03, $00
 .data_03_7021_LevelWesternStation:    
     db   $2f, $47        ;; 03:7021 ??????..
     db   $55, $2e, $47, $55, $42, $00, $40, $25        ;; 03:7023 ........

@@ -124,7 +124,7 @@ call_00_0150_Init:
     jr   Z, .jr_00_01e7                                ;; 00:01fc $28 $e9
     ld   HL, wDAD3_PtrToBankStackPosition                                     ;; 00:01fe $21 $d3 $da
     ld   DE, wDAC3_BankStack                                     ;; 00:0201 $11 $c3 $da
-    ld   A, $01                                        ;; 00:0204 $3e $01
+    ld   A, BANK_01_MENU_CODE                                        ;; 00:0204 $3e $01
     ld   [HL], E                                       ;; 00:0206 $73
     inc  HL                                            ;; 00:0207 $23
     ld   [HL], D                                       ;; 00:0208 $72
@@ -150,12 +150,12 @@ call_00_0150_Init:
     ldh  [rSTAT], A                                    ;; 00:022e $e0 $41
     ld   A, $03                                        ;; 00:0230 $3e $03
     ldh  [rIE], A                                      ;; 00:0232 $e0 $ff
-    ld   A, $04                                        ;; 00:0234 $3e $04
+    ld   A, BANK_04_AUDIO_CODE_1                                        ;; 00:0234 $3e $04
     call call_00_0eee_SwitchBank                                  ;; 00:0236 $cd $ee $0e
     call call_04_4000_Audio                                  ;; 00:0239 $cd $00 $40
     call call_00_0f08_RestoreBank                                  ;; 00:023c $cd $08 $0f
     xor  A, A                                          ;; 00:023f $af
-    ld   [wDE60_AudioBankRelated], A                                    ;; 00:0240 $ea $60 $de
+    ld   [wDE60_AudioBankCurrent], A                                    ;; 00:0240 $ea $60 $de
     ld   [wDE5E_QueuedSoundEffectPriority], A                                    ;; 00:0243 $ea $5e $de
     ld   [wDE5F_CurrentSoundEffectPriority], A                                    ;; 00:0246 $ea $5f $de
     ld   A, $ff                                        ;; 00:0249 $3e $ff
@@ -396,7 +396,7 @@ call_00_04fb:
     ret                                                ;; 00:0512 $c9
 
 call_00_0513:
-    ld   A, $7f                                        ;; 00:0513 $3e $7f
+    ld   A, BANK_7F_OBJECT_PALETTES                                        ;; 00:0513 $3e $7f
     call call_00_0eee_SwitchBank                                  ;; 00:0515 $cd $ee $0e
     ld   HL, wDB6C_CurrentMapId                                     ;; 00:0518 $21 $6c $db
     ld   E, [HL]                                       ;; 00:051b $5e
@@ -743,9 +743,9 @@ call_00_0777_LoadPointerIndexAFromTableDE:
     ret                                                ;; 00:0780 $c9
 
 jp_00_0781:
-    ld   A, [wDBB2_MenuCommandBuffer4_Unk1]                                    ;; 00:0781 $fa $b2 $db
+    ld   A, [wDBB2_MenuCommandBuffer4_Bank]                                    ;; 00:0781 $fa $b2 $db
     call call_00_0eee_SwitchBank                                  ;; 00:0784 $cd $ee $0e
-    ld   HL, wDBB7_MenuCommandBuffer4_Unk6                                     ;; 00:0787 $21 $b7 $db
+    ld   HL, wDBB7_MenuCommandBuffer4_BankOffset                                     ;; 00:0787 $21 $b7 $db
     ld   C, [HL]                                       ;; 00:078a $4e
     inc  HL                                            ;; 00:078b $23
     ld   B, [HL]                                       ;; 00:078c $46
@@ -818,7 +818,7 @@ call_00_0800:
     push DE                                            ;; 00:0801 $d5
     push BC                                            ;; 00:0802 $c5
     push HL                                            ;; 00:0803 $e5
-    ld   A, $1f                                        ;; 00:0804 $3e $1f
+    ld   A, BANK_1F_SECONDARY_TILESETS                                        ;; 00:0804 $3e $1f
     call call_00_0eee_SwitchBank                                  ;; 00:0806 $cd $ee $0e
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:0809 $fa $6c $db
     ld   DE, $b01                                      ;; 00:080c $11 $01 $0b
@@ -852,7 +852,7 @@ call_00_0800:
     ret                                                ;; 00:0834 $c9
 
 call_00_0835_LoadFromTextBank1C:
-    ld   A, $1c                                        ;; 00:0835 $3e $1c
+    ld   A, BANK_1C_TEXT                                        ;; 00:0835 $3e $1c
     call call_00_0eee_SwitchBank                                  ;; 00:0837 $cd $ee $0e
     ld   HL, wDBA7_MenuCommandBuffer2_Unk3                                     ;; 00:083a $21 $a7 $db
     ld   A, [HL+]                                      ;; 00:083d $2a
@@ -882,9 +882,9 @@ call_00_0835_LoadFromTextBank1C:
     ld   [wDBA8_MenuCommandBuffer2_Unk4], A                                    ;; 00:085f $ea $a8 $db
     jp   call_00_0f08_RestoreBank                                  ;; 00:0862 $c3 $08 $0f
 
-call_00_0865_LoadFromTextBank1C:
+call_00_0865_LoadFromTextBank1C_2:
     push de
-    ld   a,$1C
+    ld   a,BANK_1C_TEXT
     call call_00_0eee_SwitchBank
     pop  de
     ld   hl,wDBF8
@@ -919,7 +919,7 @@ call_00_088a_HDMA_BackgroundAnimator:
     ld   A, [wDBE3]                                    ;; 00:088a $fa $e3 $db
     and  A, A                                          ;; 00:088d $a7
     ret  Z                                             ;; 00:088e $c8
-    ld   A, $0a                                        ;; 00:088f $3e $0a
+    ld   A, BANK_0A_OBJECT_SPRITES                                        ;; 00:088f $3e $0a
     call call_00_0eee_SwitchBank                                  ;; 00:0891 $cd $ee $0e
     ld   HL, wDC72                                     ;; 00:0894 $21 $72 $dc
     inc  [HL]                                          ;; 00:0897 $34
@@ -1200,7 +1200,7 @@ call_00_0a6a_LoadMapConfigAndWaitVBlank:
 ; Key Actions:
 ; - Indexes into .data_00_0aa9_TilesetLoadConfigTable using a value in register C to get map/scene config.
 ; - Copies 8 bytes of data to wDC2B.
-; - If a certain flag is unset (wDC31 == $FF), calculates and writes tile offsets and assigns tile bank (wDC07).
+; - If a certain flag is unset (wDC31_TilesetBankRelated == $FF), calculates and writes tile offsets and assigns tile bank (wDC07).
 ; - Sets bits 2 and 7 in wDB66_HDMATransferFlags.
 ; - Waits for VBlank or completion signal (bit 2 of wDB66_HDMATransferFlags cleared).
     ld   L, C                                          ;; 00:0a6a $69
@@ -1213,7 +1213,7 @@ call_00_0a6a_LoadMapConfigAndWaitVBlank:
     ld   DE, wDC2B                                     ;; 00:0a74 $11 $2b $dc
     ld   BC, $08                                       ;; 00:0a77 $01 $08 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:0a7a $cd $6e $07
-    ld   A, [wDC31]                                    ;; 00:0a7d $fa $31 $dc
+    ld   A, [wDC31_TilesetBankRelated]                                    ;; 00:0a7d $fa $31 $dc
     cp   A, $ff                                        ;; 00:0a80 $fe $ff
     jr   NZ, .jr_00_0a94                               ;; 00:0a82 $20 $10
     ld   HL, wDC2B                                     ;; 00:0a84 $21 $2b $dc
@@ -1225,7 +1225,7 @@ call_00_0a6a_LoadMapConfigAndWaitVBlank:
     ld   [HL], A                                       ;; 00:0a90 $77
     ld   A, [wDC07_TilesetBank]                                    ;; 00:0a91 $fa $07 $dc
 .jr_00_0a94:
-    ld   [wDC31], A                                    ;; 00:0a94 $ea $31 $dc
+    ld   [wDC31_TilesetBankRelated], A                                    ;; 00:0a94 $ea $31 $dc
     ld   HL, wDB66_HDMATransferFlags                                     ;; 00:0a97 $21 $66 $db
     set  2, [HL]                                       ;; 00:0a9a $cb $d6
     set  7, [HL]                                       ;; 00:0a9c $cb $fe
@@ -1308,8 +1308,8 @@ call_00_0b25_MainGameLoop_UpdateAndRenderFrame:
     ldh  [rWY], A                                      ;; 00:0b5d $e0 $4a
     ld   HL, wDC71_FrameCounter                                     ;; 00:0b5f $21 $71 $dc
     inc  [HL]                                          ;; 00:0b62 $34
-    ld   A, [wDE60_AudioBankRelated]                                    ;; 00:0b63 $fa $60 $de
-    add  A, $04                                        ;; 00:0b66 $c6 $04
+    ld   A, [wDE60_AudioBankCurrent]                                    ;; 00:0b63 $fa $60 $de
+    add  A, BANK_04_AUDIO_CODE_1                                        ;; 00:0b66 $c6 $04
     call call_00_0f25_AltSwitchBank                                  ;; 00:0b68 $cd $25 $0f
     call call_04_4009                                  ;; 00:0b6b $cd $09 $40
     ld   A, [wDAD5_CurrentROMBank]                                    ;; 00:0b6e $fa $d5 $da
@@ -1368,7 +1368,7 @@ call_00_0b9f_Frame_TilemapUpdateHandler:
 ; If no updates, calls status bar and animated background update.
 ; Purpose: This is the frame entry point for tilemap updates.
 ; It either processes pending updates (via buffers), or if nothing queued, it runs HUD/background effects.
-    ld   A, $03                                        ;; 00:0b9f $3e $03
+    ld   A, BANK_03_COLLISION_AND_GRAPHICS_CODE                                        ;; 00:0b9f $3e $03
     call call_00_0f25_AltSwitchBank                                  ;; 00:0ba1 $cd $25 $0f
     ld   HL, wDC20                                     ;; 00:0ba4 $21 $20 $dc
     bit  7, [HL]                                       ;; 00:0ba7 $cb $7e
@@ -1624,7 +1624,7 @@ call_00_0c6a_HandlePendingHDMATransfers:
     res  7, [HL]                                       ;; 00:0d11 $cb $be
     ret                                                ;; 00:0d13 $c9
 .jp_00_0d14:
-    ld   A, [wDC31]                                    ;; 00:0d14 $fa $31 $dc
+    ld   A, [wDC31_TilesetBankRelated]                                    ;; 00:0d14 $fa $31 $dc
     call call_00_0f25_AltSwitchBank                                  ;; 00:0d17 $cd $25 $0f
     ld   A, [wDC32_VRAMBank]                                    ;; 00:0d1a $fa $32 $dc
     ldh  [rVBK], A                                     ;; 00:0d1d $e0 $4f
@@ -2112,7 +2112,7 @@ call_00_0fa2_PlaySong:
 ; If $FF (no song) or equal to the current song (wDE5C_CurrentSong), it does nothing.
 ; Otherwise, it stores the new code in wDE5C_CurrentSong.
 ; Waits for an interrupt (call_00_0b92_WaitForInterrupt)—this syncs playback changes to a safe frame.
-; Derives wDE60_AudioBankRelated as (wDE5C_CurrentSong >> 4) & $0F (bank group) and uses it +4 to switch to the appropriate ROM bank.
+; Derives wDE60_AudioBankCurrent as (wDE5C_CurrentSong >> 4) & $0F (bank group) and uses it +4 to switch to the appropriate ROM bank.
 ; Then isolates the lower nibble and calls call_04_4006_Audio in bank 04 to start the track.
 ; Finally restores the original bank (call_00_0f08_RestoreBank).
 ; Summary: Changes music track safely by switching banks and calling the main audio engine.
@@ -2126,8 +2126,8 @@ call_00_0fa2_PlaySong:
     ld   A, [wDE5C_CurrentSong]                                    ;; 00:0fae $fa $5c $de
     swap A                                             ;; 00:0fb1 $cb $37
     and  A, $0f                                        ;; 00:0fb3 $e6 $0f
-    ld   [wDE60_AudioBankRelated], A                                    ;; 00:0fb5 $ea $60 $de
-    add  A, $04                                        ;; 00:0fb8 $c6 $04
+    ld   [wDE60_AudioBankCurrent], A                                    ;; 00:0fb5 $ea $60 $de
+    add  A, BANK_04_AUDIO_CODE_1                                        ;; 00:0fb8 $c6 $04
     call call_00_0eee_SwitchBank                                  ;; 00:0fba $cd $ee $0e
     ld   A, [wDE5C_CurrentSong]                                    ;; 00:0fbd $fa $5c $de
     and  A, $0f                                        ;; 00:0fc0 $e6 $0f
@@ -2158,7 +2158,7 @@ call_00_0fd7_TriggerSoundEffect:
     cp   A, $ff                                        ;; 00:0fd7 $fe $ff
     ret  Z                                             ;; 00:0fd9 $c8
     push AF                                            ;; 00:0fda $f5
-    ld   A, $04                                        ;; 00:0fdb $3e $04
+    ld   A, BANK_04_AUDIO_CODE_1                                        ;; 00:0fdb $3e $04
     call call_00_0eee_SwitchBank                                  ;; 00:0fdd $cd $ee $0e
     ld   A, $00                                        ;; 00:0fe0 $3e $00
     call call_04_4024_Audio                                  ;; 00:0fe2 $cd $24 $40

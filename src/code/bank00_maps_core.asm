@@ -26,7 +26,7 @@ call_00_1056_LoadFullMap:
     call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:1091 $cd $6a $0a
     ld   A, $80                                        ;; 00:1094 $3e $80
     call call_00_1a22_LoadInitialBgMap                                  ;; 00:1096 $cd $22 $1a
-    ld   A, $03                                        ;; 00:1099 $3e $03
+    ld   A, BANK_03_COLLISION_AND_GRAPHICS_CODE                                        ;; 00:1099 $3e $03
     call call_00_0eee_SwitchBank                                  ;; 00:109b $cd $ee $0e
     ld   HL, image_003_4100_collision_tileset                                     ;; 00:109e $21 $00 $41
     ld   DE, wC400_CollisionTilesetData                                     ;; 00:10a1 $11 $00 $c4

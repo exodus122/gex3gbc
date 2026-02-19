@@ -847,7 +847,7 @@ call_01_446b_ExecuteMenuCommand:
 ; Likely Purpose: Dispatch table for specialized menu drawing or behavior.
     dw   call_01_458d_MenuHandler_LoadAssetsAndJump                                      ;; 01:456b ??
     dw   call_01_4599_MenuHandler_LoadAssetsAndJump                                  ;; 01:456d pP
-    dw   call_01_45a5_MenuHandler_LoadBgPalettesAndMap                                  ;; 01:456f pP
+    dw   call_01_45a5_MenuHandler_LoadBgPalettesAndSecondaryTilesets                                  ;; 01:456f pP
     dw   call_01_466f_MenuState_LoadAndDrawA                                  ;; 01:4571 pP
     dw   call_01_4675_MenuState_LoadAndDrawB                                  ;; 01:4573 pP
     dw   call_01_467b_MenuState_UpdateLevelCursor                                  ;; 01:4575 pP
@@ -880,7 +880,7 @@ call_01_4599_MenuHandler_LoadAssetsAndJump:
     call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 01:459f $cd $77 $07
     jp   call_01_4d03_StreamTilemapBlockToBg                                    ;; 01:45a2 $c3 $03 $4d
 
-call_01_45a5_MenuHandler_LoadBgPalettesAndMap:
+call_01_45a5_MenuHandler_LoadBgPalettesAndSecondaryTilesets:
 ; Behavior:
 ; Copies background palettes from .data_01_45ef to VRAM, uses wDB6C_CurrentMapId for 
 ; selecting additional data, then calls helper functions (call_01_4ce5_ComputeTilemapBlockOffset) to set up the background tile map.
@@ -896,7 +896,7 @@ call_01_45a5_MenuHandler_LoadBgPalettesAndMap:
     add  HL, DE                                        ;; 01:45bd $19
     ld   DE, wDD0A_BgPalettes                                     ;; 01:45be $11 $0a $dd
     ld   BC, $20                                       ;; 01:45c1 $01 $20 $00
-    ld   A, $1f                                        ;; 01:45c4 $3e $1f
+    ld   A, BANK_1F_SECONDARY_TILESETS                                        ;; 01:45c4 $3e $1f
     call call_00_075f_SwitchBankAndCopyBCBytesFromHLToDE                                  ;; 01:45c6 $cd $5f $07
     ld   A, [wDB6C_CurrentMapId]                                    ;; 01:45c9 $fa $6c $db
     ld   DE, $b01                                      ;; 01:45cc $11 $01 $0b
@@ -911,7 +911,7 @@ call_01_45a5_MenuHandler_LoadBgPalettesAndMap:
     call call_01_4ce5_ComputeTilemapBlockOffset                                  ;; 01:45e3 $cd $e5 $4c
     pop  HL                                            ;; 01:45e6 $e1
     ld   DE, $c010                                     ;; 01:45e7 $11 $10 $c0 ; wC000_BgMapTileIds
-    ld   A, $1f                                        ;; 01:45ea $3e $1f
+    ld   A, BANK_1F_SECONDARY_TILESETS                                        ;; 01:45ea $3e $1f
     jp   call_00_075f_SwitchBankAndCopyBCBytesFromHLToDE                                  ;; 01:45ec $c3 $5f $07
 .data_01_45ef:
     db   $00, $00, $00, $40, $ff, $03, $ff, $7f        ;; 01:45ef ........
@@ -1173,7 +1173,7 @@ call_01_480c_MenuState_DrawWithOffset:
     ld   hl,wDADD
     ld   [hl],$80
     ld   de,call_01_4ab9_CountSetBitsInFlags.jr_01_4ac3
-    call call_00_0865_LoadFromTextBank1C
+    call call_00_0865_LoadFromTextBank1C_2
     call call_01_4acf_CountCollectedBitsForLevel
     add  a,$30
     ld   [wDADD],a

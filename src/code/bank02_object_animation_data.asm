@@ -1,3 +1,5 @@
+; This contains the sprite frame data for object animations
+
 data_02_739b:
     db   $00, $81, $1a, $08, $0b
     db   $a8, $a7, $a6, $a5, $a4, $a3, $a2, $a1, $a0, $9f, $9e

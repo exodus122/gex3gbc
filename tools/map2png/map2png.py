@@ -227,7 +227,7 @@ COLLECTIBLE_LIST_BANK_OFFSET = 17
 MAP_WIDTH = 18 # width of map (in blocks. each block is 4 tiles)
 MAP_HEIGHT = 19 # height of map (in blocks. each block is 4 tiles)
 LEVEL_ID = 20
-PADDING = 21 # always $00
+UNKNOWN = 21
 
 level_names = ["GexCave", "HolidayTV", "MysteryTV", "TutTV", "WesternStation", "AnimeChannel", 
                "SuperheroShow", "GextremeSports", "MarsupialMadness", "WWGexWrestling",
@@ -327,6 +327,19 @@ if draw_objects_and_collectibles:
     img.putdata(newData)
     img.save("collectible_sprite.png", "PNG")
         
+out2 = open('extracted_map_data/map_metadata.txt', "w")
+out2.close()
+out2 = open('extracted_map_data/tilesets.txt', "w")
+out2.close()
+out2 = open('extracted_map_data/maps.txt', "w")
+out2.close()
+out2 = open('extracted_map_data/blocksets.txt', "w")
+out2.close()
+out2 = open('extracted_map_data/bg_palettes.txt', "w")
+out2.close()
+out2 = open('extracted_map_data/collision_blocksets.txt', "w")
+out2.close()
+
 # split the various map data banks into separate bins
 if split_map_data:
     os.system('mkdir -p extracted_map_data')
@@ -341,6 +354,8 @@ if split_map_data:
 
         width = level_data[MAP_WIDTH]
         height = level_data[MAP_HEIGHT]
+        level_id = level_data[LEVEL_ID]
+        unknown = level_data[UNKNOWN]
         offset = level_data[MAP_BANK_OFFSET]
 
         map_file = "../banks/bank_0"+f"{level_data[MAP_BANK]:x}"+".bin"
@@ -354,115 +369,149 @@ if split_map_data:
         channel_map_number = str(level_numbers[level_data[LEVEL_ID]])
 
         print("Starting: "+level_name+str(level_numbers[level_data[LEVEL_ID]]))
-        if map_data not in maps:
-            maps.append(map_data)
+        '''if map_data not in maps:
+            maps.append(map_data)'''
             
-            os.system('mkdir -p extracted_map_data/'+level_name)
-            os.system('mkdir -p extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number)
+        os.system('mkdir -p extracted_map_data/'+level_name)
+        os.system('mkdir -p extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number)
 
-            # tileset
-            tileset_file = "../banks/bank_0"+f"{level_data[TILESET_BANK]:x}"+".bin"
-            end_addr = get_next_offset(sorted_tileset_offsets, [level_data[TILESET_BANK], level_data[TILESET_BANK_OFFSET]])
-            tileset_data = open(tileset_file, 'rb').read()[level_data[TILESET_BANK_OFFSET]-0x4000:end_addr-0x4000]
-            tileset_data = remove_trailing_zeros(tileset_data)
-            out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_tileset.bin', "wb")
-            out.write(tileset_data)
-            out.close()
-            num_tiles = int(len(tileset_data) / 0x10)
-            adjusted_size = (math.ceil(num_tiles / 16) * 16)
-            adjusted_size = adjusted_size - num_tiles
-            os.system('rgbgfx --reverse 16 -x '+str(adjusted_size)+' -o extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_tileset.bin extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_tileset.png')
+        # tileset
+        tileset_file = "../banks/bank_0"+f"{level_data[TILESET_BANK]:x}"+".bin"
+        end_addr = get_next_offset(sorted_tileset_offsets, [level_data[TILESET_BANK], level_data[TILESET_BANK_OFFSET]])
+        tileset_data = open(tileset_file, 'rb').read()[level_data[TILESET_BANK_OFFSET]-0x4000:end_addr-0x4000]
+        tileset_data = remove_trailing_zeros(tileset_data)
+        out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_tileset.bin', "wb")
+        out.write(tileset_data)
+        out.close()
+        num_tiles = int(len(tileset_data) / 0x10)
+        adjusted_size = (math.ceil(num_tiles / 16) * 16)
+        adjusted_size = adjusted_size - num_tiles
+        os.system('rgbgfx --reverse 16 -x '+str(adjusted_size)+' -o extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_tileset.bin extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_tileset.png')
+        out2 = open('extracted_map_data/tilesets.txt', "a")
+        out2.write(level_name+'_'+channel_map_number+'_tileset:\n    INCBIN \"data/maps/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_tileset.bin\"\n')
+        out2.close()
 
-            # blockset
-            blockset_file = "../banks/bank_0"+f"{level_data[BLOCKSET_AND_PALETTE_IDS_BANK]:x}"+".bin"
-            end_addr = get_next_offset(sorted_blockset_offsets, [level_data[BLOCKSET_AND_PALETTE_IDS_BANK], level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]])
-            blockset_data = open(blockset_file, "rb").read()[level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]-0x4000:end_addr-0x4000]
-            blockset_data = remove_trailing_zeros(blockset_data)
-            out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_blockset.bin', "wb")
-            out.write(blockset_data)
-            out.close()
-            out2 = open('extracted_map_data/blocksets.txt', "a")
-            out2.write(level_name+'_'+channel_map_number+'_blockset.bin:\n    INCBIN \"data/maps/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_blockset.bin\"\n')
-            out2.close()
+        # blockset
+        blockset_file = "../banks/bank_0"+f"{level_data[BLOCKSET_AND_PALETTE_IDS_BANK]:x}"+".bin"
+        end_addr = get_next_offset(sorted_blockset_offsets, [level_data[BLOCKSET_AND_PALETTE_IDS_BANK], level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]])
+        blockset_data = open(blockset_file, "rb").read()[level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]-0x4000:end_addr-0x4000]
+        blockset_data = remove_trailing_zeros(blockset_data)
+        out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_blockset.bin', "wb")
+        out.write(blockset_data)
+        out.close()
+        out2 = open('extracted_map_data/blocksets.txt', "a")
+        out2.write(level_name+'_'+channel_map_number+'_blockset:\n    INCBIN \"data/maps/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_blockset.bin\"\n')
+        out2.close()
 
-            # map
-            out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_map.bin', "wb")
-            out.write(map_data)
-            out.close()
-            out2 = open('extracted_map_data/maps.txt', "a")
-            out2.write(level_name+'_'+channel_map_number+'_map.bin:\n    INCBIN \"data/maps/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_map.bin\"\n')
-            out2.close()
+        # map
+        out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_map.bin', "wb")
+        out.write(map_data)
+        out.close()
+        out2 = open('extracted_map_data/maps.txt', "a")
+        out2.write(level_name+'_'+channel_map_number+'_map:\n    INCBIN \"data/maps/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_map.bin\"\n')
+        out2.close()
 
-            # extended map
-            extended_map_file = "../banks/bank_0"+f"{level_data[EXTENDED_MAP_BANK]:x}"+".bin"
-            extended_map_data = open(extended_map_file, "rb").read()[level_data[EXTENDED_MAP_BANK_OFFSET]-0x4000:offset-0x4000+width*height]
-            out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_extended.bin', "wb")
-            out.write(extended_map_data)
-            out.close()
+        # extended map
+        extended_map_file = "../banks/bank_0"+f"{level_data[EXTENDED_MAP_BANK]:x}"+".bin"
+        extended_map_data = open(extended_map_file, "rb").read()[level_data[EXTENDED_MAP_BANK_OFFSET]-0x4000:offset-0x4000+width*height]
+        out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_extended.bin', "wb")
+        out.write(extended_map_data)
+        out.close()
 
-            # map collision
-            map_collision_file = "../banks/bank_0"+f"{level_data[MAP_COLLISION_BANK]:x}"+".bin"
-            map_collision_data = open(map_collision_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
-            out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_collision.bin', "wb")
-            out.write(map_collision_data)
-            out.close()
+        # map collision
+        map_collision_file = "../banks/bank_0"+f"{level_data[MAP_COLLISION_BANK]:x}"+".bin"
+        map_collision_data = open(map_collision_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
+        out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_collision.bin', "wb")
+        out.write(map_collision_data)
+        out.close()
 
-            # collectible list
-            collectible_list_file = "../banks/bank_0"+f"{level_data[COLLECTIBLE_LIST_BANK]:x}"+".bin"
-            end_addr = get_next_offset(sorted_collectible_list_offsets, [level_data[COLLECTIBLE_LIST_BANK], level_data[COLLECTIBLE_LIST_BANK_OFFSET]])
-            collectible_list_data = open(collectible_list_file, "rb").read()[level_data[COLLECTIBLE_LIST_BANK_OFFSET]-0x4000:end_addr-0x4000]
-            collectible_list_data = remove_trailing_zeros(collectible_list_data)
-            out = open('extracted_map_data/'+level_name+'/'+level_name+'_collectible_list.bin', "wb")
-            out.write(collectible_list_data)
-            out.close()
+        # collectible list
+        collectible_list_file = "../banks/bank_0"+f"{level_data[COLLECTIBLE_LIST_BANK]:x}"+".bin"
+        end_addr = get_next_offset(sorted_collectible_list_offsets, [level_data[COLLECTIBLE_LIST_BANK], level_data[COLLECTIBLE_LIST_BANK_OFFSET]])
+        collectible_list_data = open(collectible_list_file, "rb").read()[level_data[COLLECTIBLE_LIST_BANK_OFFSET]-0x4000:end_addr-0x4000]
+        collectible_list_data = remove_trailing_zeros(collectible_list_data)
+        out = open('extracted_map_data/'+level_name+'/'+level_name+'_collectible_list.bin', "wb")
+        out.write(collectible_list_data)
+        out.close()
 
-            # object list
-            object_list_file = "../banks/bank_0"+f"{level_data[OBJECT_LIST_BANK]:x}"+".bin"
-            end_addr = get_next_offset(sorted_object_list_offsets, [level_data[OBJECT_LIST_BANK], level_data[OBJECT_LIST_BANK_OFFSET]])
-            object_list_data = open(object_list_file, "rb").read()[level_data[OBJECT_LIST_BANK_OFFSET]-0x4000:end_addr-0x4000]
-            object_list_data = remove_trailing_zeros(object_list_data)
-            out = open('extracted_map_data/'+level_name+'/'+level_name+'_object_list.bin', "wb")
-            out.write(object_list_data)
-            out.close()
-            
-            os.system('mkdir -p extracted_map_data/object_lists')
-            # create the object list asm file
-            out = open('extracted_map_data/object_lists/'+level_name+'_object_list.asm', "w")
-            
-            for i in range(0, len(object_list_data)-1, 0x10):
-                try:
-                    objectId, xPosition, yPosition, xMax, xMin, yMin, yMax, flags, map = struct.unpack('<BHHHHHHHB',object_list_data[i:i+0x10])
-                    object_name = object_names[objectId]
-                    object_string = "    db   {}\n    dw   ${:04x}, ${:04x}\n    dw   ${:04x}, ${:04x}, ${:04x}, ${:04x}\n    dw   ${:04x}\n    db   ${:02x}\n\n".format(object_name, xPosition, yPosition, xMax, xMin, yMin, yMax, flags, map)
-                    out.write(object_string)
-                except:
-                    break
-            
-            out.write("    db   ObjectListTerminator\n")
-            out.close()
+        # object list
+        object_list_file = "../banks/bank_0"+f"{level_data[OBJECT_LIST_BANK]:x}"+".bin"
+        end_addr = get_next_offset(sorted_object_list_offsets, [level_data[OBJECT_LIST_BANK], level_data[OBJECT_LIST_BANK_OFFSET]])
+        object_list_data = open(object_list_file, "rb").read()[level_data[OBJECT_LIST_BANK_OFFSET]-0x4000:end_addr-0x4000]
+        object_list_data = remove_trailing_zeros(object_list_data)
+        out = open('extracted_map_data/'+level_name+'/'+level_name+'_object_list.bin', "wb")
+        out.write(object_list_data)
+        out.close()
+        
+        os.system('mkdir -p extracted_map_data/object_lists')
+        # create the object list asm file
+        out = open('extracted_map_data/object_lists/'+level_name+'_object_list.asm', "w")
+        
+        for i in range(0, len(object_list_data)-1, 0x10):
+            try:
+                objectId, xPosition, yPosition, xMax, xMin, yMin, yMax, flags, map = struct.unpack('<BHHHHHHHB',object_list_data[i:i+0x10])
+                object_name = object_names[objectId]
+                object_string = "    db   {}\n    dw   ${:04x}, ${:04x}\n    dw   ${:04x}, ${:04x}, ${:04x}, ${:04x}\n    dw   ${:04x}\n    db   ${:02x}\n\n".format(object_name, xPosition, yPosition, xMax, xMin, yMin, yMax, flags, map)
+                out.write(object_string)
+            except:
+                break
+        
+        out.write("    db   ObjectListTerminator\n")
+        out.close()
 
 
-            # collision blockset
-            collision_blockset_file = "../banks/bank_0"+f"{level_data[COLLISION_BLOCKSET_BANK]:x}"+".bin"
-            end_addr = get_next_offset(sorted_collision_blockset_offsets, [level_data[COLLISION_BLOCKSET_BANK], level_data[COLLISION_BLOCKSET_BANK_OFFSET]])
-            collision_blockset_data = open(collision_blockset_file, "rb").read()[level_data[COLLISION_BLOCKSET_BANK_OFFSET]-0x4000:end_addr-0x4000]
-            collision_blockset_data = remove_trailing_zeros(collision_blockset_data)
-            out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_collision_blockset.bin', "wb")
-            out.write(collision_blockset_data)
-            out.close()
+        # collision blockset
+        collision_blockset_file = "../banks/bank_0"+f"{level_data[COLLISION_BLOCKSET_BANK]:x}"+".bin"
+        end_addr = get_next_offset(sorted_collision_blockset_offsets, [level_data[COLLISION_BLOCKSET_BANK], level_data[COLLISION_BLOCKSET_BANK_OFFSET]])
+        collision_blockset_data = open(collision_blockset_file, "rb").read()[level_data[COLLISION_BLOCKSET_BANK_OFFSET]-0x4000:end_addr-0x4000]
+        collision_blockset_data = remove_trailing_zeros(collision_blockset_data)
+        out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_collision_blockset.bin', "wb")
+        out.write(collision_blockset_data)
+        out.close()
+        out2 = open('extracted_map_data/collision_blocksets.txt', "a")
+        out2.write(level_name+'_'+channel_map_number+'_collision_blockset:\n    INCBIN \"data/maps/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_collision_blockset.bin\"\n')
+        out2.close()
 
-            # palette
-            out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_palette.bin', "wb")
-            out.write(palette_data)
-            out.close()
-            palettes.append(palette_data)
-        else: # there are more palettes than there are maps in HolidayTV and MysteryTV
+        # palette
+        out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_palette.bin', "wb")
+        out.write(palette_data)
+        out.close()
+        palettes.append(palette_data)
+        out2 = open('extracted_map_data/bg_palettes.txt', "a")
+        out2.write(level_name+'_'+channel_map_number+'_palette:\n    INCBIN \"data/maps/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_palette.bin\"\n')
+        out2.close()
+
+        # create map metadata file
+        out2 = open('extracted_map_data/map_metadata.txt', "a")
+        out2.write('.data_03_9999_LevelData'+level_name+channel_map_number+':\n')
+        out2.write('    db   BANK('+level_name+'_'+channel_map_number+'_map)\n')
+        out2.write('    dw   '+level_name+'_'+channel_map_number+'_map\n')
+        out2.write('    db   BANK('+level_name+'_'+channel_map_number+'_map_extended)\n')
+        out2.write('    dw   '+level_name+'_'+channel_map_number+'_map_extended\n')
+        out2.write('    db   BANK('+level_name+'_'+channel_map_number+'_tileset)\n')
+        out2.write('    dw   '+level_name+'_'+channel_map_number+'_tileset\n')
+        out2.write('    db   BANK('+level_name+'_'+channel_map_number+'_blockset)\n')
+        out2.write('    dw   '+level_name+'_'+channel_map_number+'_blockset\n')
+        out2.write('    db   BANK('+level_name+'_'+channel_map_number+'_collision)\n')
+        out2.write('    dw   '+level_name+'_'+channel_map_number+'_collision\n')
+        out2.write('    db   BANK('+level_name+'_'+channel_map_number+'_collision_blockset)\n')
+        out2.write('    dw   '+level_name+'_'+channel_map_number+'_collision_blockset\n')
+        out2.write('    db   BANK('+level_name+'_'+channel_map_number+'_palette)\n')
+        out2.write('    dw   '+level_name+'_'+channel_map_number+'_palette\n')
+        out2.write('    db   BANK('+level_name+'_object_list)\n')
+        out2.write('    dw   '+level_name+'_object_list\n')
+        out2.write('    db   BANK('+level_name+'_collectible_list)\n')
+        out2.write('    dw   '+level_name+'_collectible_list\n')
+        out2.write('    db   $'+f"{width:02x}"+', $'+f"{height:02x}"+', $'+f"{level_id:02x}"+', $'+f"{unknown:02x}"+'\n')
+        out2.close()
+
+        '''else: # there are more palettes than there are maps in HolidayTV and MysteryTV
             if palette_data not in palettes:
                 palettes.append(palette_data)
 
                 out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'_palette_'+f"{level_data[BG_PALETTE_BANK_OFFSET]:x}"+'.bin', "wb")
                 out.write(palette_data)
-                out.close()
+                out.close()'''
 
 # generate .png of each map
 if generate_regular_maps:

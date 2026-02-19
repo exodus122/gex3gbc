@@ -1,5 +1,5 @@
 call_00_2cbf_LoadObjectPalettes:
-    ld   A, $7f                                        ;; 00:2cbf $3e $7f
+    ld   A, BANK_7F_OBJECT_PALETTES                                        ;; 00:2cbf $3e $7f
     call call_00_0eee_SwitchBank                                  ;; 00:2cc1 $cd $ee $0e
     ld   HL, wDB6C_CurrentMapId                                     ;; 00:2cc4 $21 $6c $db
     ld   E, [HL]                                       ;; 00:2cc7 $5e
@@ -37,7 +37,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     ld   HL, wDC7A                                     ;; 00:2cea $21 $7a $dc
     or   A, [HL]                                       ;; 00:2ced $b6
     ld   [wDC53], A                                    ;; 00:2cee $ea $53 $dc
-    ld   A, $7f                                        ;; 00:2cf1 $3e $7f
+    ld   A, BANK_7F_OBJECT_PALETTES                                        ;; 00:2cf1 $3e $7f
     call call_00_0eee_SwitchBank                                  ;; 00:2cf3 $cd $ee $0e
     ld   HL, wDB6C_CurrentMapId                                     ;; 00:2cf6 $21 $6c $db
     ld   E, [HL]                                       ;; 00:2cf9 $5e
@@ -386,12 +386,12 @@ call_00_2f34_CountActiveCollectibles:
     inc  hl
     ld   de,$0003
     ld   c,$FF
-label2F46:
+.jr_00_2F46:
     ld   a,[hl]
     add  hl,de
     inc  c
     and  a
-    jr   nz,label2F46
+    jr   nz,.jr_00_2F46
     push bc
     call call_00_0f08_RestoreBank
     ld   a,[wDC16_ObjectListBank]
@@ -401,10 +401,10 @@ label2F46:
     ld   h,[hl]
     ld   l,a
     pop  bc
-label2F5D:
+.jr_00_2F5D:
     ld   a,[hl]
     cp   a,$FF
-    jr   z,label2F7E
+    jr   z,.jr_00_2F7E
     push hl
     ld   l,a
     ld   h,$00
@@ -415,16 +415,16 @@ label2F5D:
     add  hl,de
     ld   a,[hl]
     cp   a,$FF
-    jr   z,label2F77
+    jr   z,.jr_00_2F77
     bit  6,a
-    jr   z,label2F77
+    jr   z,.jr_00_2F77
     inc  c
-label2F77:
+.jr_00_2F77:
     pop  hl
     ld   de,$0010
     add  hl,de
-    jr   label2F5D
-label2F7E:
+    jr   .jr_00_2F5D
+.jr_00_2F7E:
     ld   a,c
     push af
     call call_00_0f08_RestoreBank

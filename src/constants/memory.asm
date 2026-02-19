@@ -375,13 +375,13 @@ wDBB0_MenuCommandBuffer3_Unk5:
     ds 1                                               ;; dbb0
 wDBB1_MenuCommandBuffer4_Unk0:
     ds 1                                               ;; dbb1
-wDBB2_MenuCommandBuffer4_Unk1:
+wDBB2_MenuCommandBuffer4_Bank:
     ds 1                                               ;; dbb2
 wDBB3_MenuCommandBuffer4_Unk2:
     ds 2                                               ;; dbb3
 wDBB5_MenuCommandBuffer4_Unk4:
     ds 2                                               ;; dbb5
-wDBB7_MenuCommandBuffer4_Unk6:
+wDBB7_MenuCommandBuffer4_BankOffset:
     ds 2                                               ;; dbb7
 wDBB9_MenuUnknownPtr:
     ds 2                                               ;; dbb9
@@ -577,7 +577,7 @@ wDC2E:
     ds 1                                               ;; dc2e
 wDC2F:
     ds 2                                               ;; dc2f
-wDC31:
+wDC31_TilesetBankRelated:
     ds 1                                               ;; dc31
 wDC32_VRAMBank:
     ds 1                                               ;; dc32
@@ -994,7 +994,7 @@ wDE5E_QueuedSoundEffectPriority:
     ds 1                                               ;; de5e
 wDE5F_CurrentSoundEffectPriority:
     ds 1                                               ;; de5f
-wDE60_AudioBankRelated:
+wDE60_AudioBankCurrent:
     ds 1                                               ;; de60
     
 ; unused section?

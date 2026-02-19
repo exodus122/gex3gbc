@@ -5,17 +5,17 @@ DEF MBC1SRamBank        EQU $4001
 DEF MBC1SRamBankingMode EQU $6001
 
 ; ROM Banks
-DEF Bank00_Home               EQU $00
-DEF Bank01_Menus              EQU $01
-DEF Bank02_Objects            EQU $02
-DEF Bank03_CollisionGraphics  EQU $03
-DEF Bank04_Audio1             EQU $04
-DEF Bank05_Audio2             EQU $05
+DEF BANK_00_HOME_CODE         EQU $00
+DEF BANK_01_MENU_CODE         EQU $01
+DEF BANK_02_OBJECT_CODE       EQU $02
+DEF BANK_03_COLLISION_AND_GRAPHICS_CODE EQU $03
+DEF BANK_04_AUDIO_CODE_1      EQU $04
+DEF BANK_05_AUDIO_CODE_2      EQU $05
 DEF Bank06                    EQU $06
 DEF Bank07                    EQU $07
 DEF Bank08                    EQU $08
 DEF Bank09                    EQU $09
-DEF Bank0a                    EQU $0a
+DEF BANK_0A_OBJECT_SPRITES    EQU $0a
 DEF Bank0b                    EQU $0b
 DEF Bank0c                    EQU $0c
 DEF Bank0d                    EQU $0d
@@ -23,10 +23,10 @@ DEF Bank0e                    EQU $0e
 DEF Bank0f                    EQU $0f
 DEF Bank10                    EQU $10
 DEF Bank11                    EQU $11
-DEF Bank1c_Text               EQU $1c
+DEF BANK_1C_TEXT              EQU $1c
 DEF Bank1d                    EQU $1d
 DEF Bank1e                    EQU $1e
-DEF Bank1f                    EQU $1f
+DEF BANK_1F_SECONDARY_TILESETS EQU $1f
 DEF Bank20                    EQU $20 ; unused
 DEF Bank21_BgPalettesAndCollectibleLists EQU $21 ; bg palette data, and collectible lists for each map
 DEF Bank22_ObjectSpawnLists   EQU $22 ; object spawn lists for each map
@@ -71,7 +71,7 @@ DEF Bank4d_Tileset            EQU $4d ; GexCave, AnimeChannel, GextremeSports
 DEF Bank4e_Tileset            EQU $4e ; GexCave
 DEF Bank4f_Tileset            EQU $4f ; WesternStation, WWGexWrestling, ChannelZ
 
-DEF Bank7f                    EQU $7f ; object sprite and palette data
+DEF BANK_7F_OBJECT_PALETTES   EQU $7f ; object sprite and palette data
 
 ; Inputs (defined in hardware.inc)
 ; DEF PADF_DOWN   EQU $80
