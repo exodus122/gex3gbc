@@ -1,4 +1,6 @@
-    reti                                           ;; 00:0000 ?
+;; Disassembled with BadBoy Disassembler: https://github.com/daid/BadBoy
+
+    reti                                               ;; 00:0000 ?
 
 SECTION "isrVBlank", ROM0[$0040]
 isrVBlank:

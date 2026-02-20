@@ -1,0 +1,2388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>🕹️ GBC Map Editor & Painter</title>
+<style>
+body {
+  margin: 0;
+  background: #202020;
+  color: #eaeaea;
+  font-family: "Fira Code", monospace;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+header {
+  background: #333;
+  padding: 0.5em 1em;
+  color: #ffcc00;
+  font-weight: bold;
+}
+main { display: flex; flex: 1; overflow: hidden; position: relative; }
+aside {
+  background: #222;
+  width: 340px;
+  padding: 1em;
+  overflow-y: auto;
+  position: relative;
+}
+#canvas-container {
+  flex: 1;
+  background: #111;
+  overflow: auto;
+  padding: 1em;
+  position: relative;
+}
+canvas {
+  image-rendering: pixelated;
+  border: 1px solid #555;
+  background: #000;
+  transform-origin: top left;
+}
+footer {
+  background: #222;
+  color: #888;
+  text-align: center;
+  font-size: 0.8em;
+  padding: 0.4em;
+}
+label { display:block; margin-top:0.5em; }
+select, input[type=number], input[type=range], button {
+  background: #333;
+  color: #eee;
+  border: 1px solid #555;
+  margin-top: 0.3em;
+}
+button:hover { background: #444; cursor: pointer; }
+#zoomLabel { font-size: 0.9em; color: #ccc; }
+
+/* Loading Overlay */
+#loadingOverlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.8);
+  color: #ffcc00;
+  font-size: 1.2em;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+#loadingOverlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+.spinner {
+  border: 4px solid #555;
+  border-top: 4px solid #ffcc00;
+  border-radius: 50%;
+  width: 40px; height: 40px;
+  margin-right: 0.8em;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* Map canvas is the single interactive surface — no DOM grid overlay needed */
+#mapCanvas { cursor: crosshair; }
+
+#blockPaletteContainer, #collBlockPaletteContainer {
+  background: #111;
+  padding: 0;
+  border: 1px solid #555;
+  overflow-x: hidden;
+  overflow-y: auto;
+  width: 100%;
+  box-sizing: border-box;
+  max-height: 240px;
+}
+#blockPaletteCanvas, #collBlockPaletteCanvas {
+  background: #222;
+  image-rendering: pixelated;
+  cursor: pointer;
+  display: block;
+}
+
+/* ---- Editor Panel (right side) ---- */
+#editor-panel {
+  width: 320px;
+  background: #1a1a1a;
+  border-left: 1px solid #444;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.editor-tabs {
+  display: flex;
+  background: #111;
+  border-bottom: 1px solid #444;
+  flex-shrink: 0;
+}
+.editor-tab {
+  flex: 1;
+  padding: 6px 4px;
+  font-size: 10px;
+  text-align: center;
+  cursor: pointer;
+  color: #888;
+  background: #111;
+  border: none;
+  border-right: 1px solid #333;
+  font-family: "Fira Code", monospace;
+  transition: background 0.15s;
+}
+.editor-tab:last-child { border-right: none; }
+.editor-tab.active { background: #2a2a2a; color: #ffcc00; }
+.editor-tab:hover:not(.active) { background: #1e1e1e; color: #ccc; }
+.editor-pane {
+  display: none;
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+.editor-pane.active { display: block; }
+
+/* Block editor */
+.block-editor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  margin-bottom: 10px;
+  width: fit-content;
+  border: 2px solid #555;
+  box-sizing: border-box;
+}
+.tile-slot {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border: none;
+  border-right: 1px solid #555;
+  border-bottom: 1px solid #555;
+  cursor: pointer;
+  image-rendering: pixelated;
+  background: #000;
+  box-sizing: border-box;
+}
+/* Remove right border on right column, bottom border on bottom row */
+.tile-slot:nth-child(2n)   { border-right: none; }
+.tile-slot:nth-child(n+3)  { border-bottom: none; }
+.tile-slot.selected-slot { outline: 2px solid #ffcc00; outline-offset: -2px; z-index: 1; }
+.tile-slot.hover-slot    { outline: 2px solid #00c8ff; outline-offset: -2px; z-index: 1; }
+.tile-slot.selected-slot.hover-slot { outline-color: #ffcc00; }
+.tile-slot canvas {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  display: block;
+}
+.block-editor-controls {
+  font-size: 11px;
+  color: #ccc;
+}
+.block-editor-controls label { margin-top: 5px; font-size: 11px; }
+.block-editor-controls select,
+.block-editor-controls input[type=number] {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 11px;
+  padding: 2px 4px;
+}
+.block-editor-controls .check-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+  align-items: center;
+}
+.block-editor-controls .check-row label { margin: 0; display: flex; align-items: center; gap: 4px; }
+
+/* Tileset picker inside editor */
+.tileset-picker-wrap {
+  margin-top: 8px;
+  border: 1px solid #444;
+  overflow: auto;
+  max-height: 160px;
+  background: #000;
+  cursor: crosshair;
+  position: relative;
+}
+.tileset-hover-tip {
+  position: fixed;
+  background: rgba(0,0,0,0.75);
+  color: #ffcc00;
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 100;
+  white-space: nowrap;
+  transition: opacity 0.1s ease;
+}
+#editorTilesetCanvas, #editorCollTilesetCanvas {
+  image-rendering: pixelated;
+  display: block;
+  border: none;
+  background: #000;
+}
+
+/* Palette editor */
+.pal-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  gap: 4px;
+}
+.pal-row-label {
+  font-size: 10px;
+  color: #888;
+  width: 48px;
+  flex-shrink: 0;
+}
+.pal-swatch {
+  width: 28px;
+  height: 28px;
+  border: 2px solid #555;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.pal-swatch:hover { border-color: #ffcc00; }
+.pal-swatch.selected-swatch { border-color: #ffcc00; }
+.pal-color-editor {
+  margin-top: 10px;
+  padding: 8px;
+  background: #222;
+  border: 1px solid #444;
+  border-radius: 4px;
+  font-size: 11px;
+}
+.pal-color-editor label { margin-top: 4px; }
+.pal-color-editor input[type=range] { width: 100%; margin: 0; }
+.pal-color-preview {
+  width: 100%;
+  height: 30px;
+  border: 1px solid #555;
+  margin-bottom: 6px;
+  box-sizing: border-box;
+}
+
+#hoverTooltip, #paletteTooltip {
+  position: absolute;
+  background: rgba(0,0,0,0.75);
+  color: #ffcc00;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+  z-index: 20;
+  white-space: nowrap;
+}
+#opacityControls {
+  display: none;
+  margin-top: 0.4em;
+}
+#opacityControls.visible {
+  display: block;
+}
+.opacity-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 0.85em;
+}
+.opacity-row span {
+  min-width: 32px;
+  text-align: right;
+  color: #aaa;
+}
+</style>
+</head>
+<body>
+<header>🕹️ Game Boy Color Map Editor</header>
+<main>
+  <aside>
+    <div id="paletteTooltip"></div>
+    <h3>Files</h3>
+    <div style="display:flex;align-items:center;gap:4px;margin-top:0.5em;">
+      <label style="flex:1;margin:0;">Map: <input type="file" id="map"></label>
+      <button id="newMap" style="font-size:10px;padding:2px 6px;flex-shrink:0;margin-top:0;">New</button>
+    </div>
+    <label>Extended Map: <input type="file" id="extmap"></label>
+    <div style="display:flex;align-items:center;gap:4px;margin-top:0.5em;">
+      <label style="flex:1;margin:0;">Blockset: <input type="file" id="blockset"></label>
+      <button id="newBlockset" style="font-size:10px;padding:2px 6px;flex-shrink:0;margin-top:0;">New</button>
+    </div>
+    <label>Tileset (PNG): <input type="file" id="tileset" accept="image/png"></label>
+    <div style="display:flex;align-items:center;gap:4px;margin-top:0.5em;">
+      <label style="flex:1;margin:0;">Palette: <input type="file" id="palette"></label>
+      <button id="newPalette" style="font-size:10px;padding:2px 6px;flex-shrink:0;margin-top:0;">New</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;margin-top:0.5em;">
+      <label style="flex:1;margin:0;">Collision Blockset: <input type="file" id="collBlockset"></label>
+      <button id="newCollBlockset" style="font-size:10px;padding:2px 6px;flex-shrink:0;margin-top:0;">New</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;margin-top:0.5em;">
+      <label style="flex:1;margin:0;">Collision Map: <input type="file" id="collMap"></label>
+      <button id="newCollMap" style="font-size:10px;padding:2px 6px;flex-shrink:0;margin-top:0;">New</button>
+    </div>
+    <label>Collision Tileset (PNG): <input type="file" id="collTileset" accept="image/png"></label>
+    <hr>
+    <label>Width: <input type="number" id="width" value="30" min="1" max="256"></label>
+    <label>Height: <input type="number" id="height" value="16" min="1" max="256"></label>
+    <hr>
+    <label>View Mode:
+      <select id="viewMode">
+        <option value="map">Map Only</option>
+        <option value="collision">Collision Only</option>
+        <option value="both">Map + Collision</option>
+      </select>
+    </label>
+    <div id="opacityControls">
+      <div class="opacity-row">
+        <label style="margin:0;flex:1;">Map opacity</label>
+        <input type="range" id="mapOpacity" min="0" max="1" step="0.05" value="1" style="flex:2;margin:0;">
+        <span id="mapOpacityLabel">100%</span>
+      </div>
+      <div class="opacity-row">
+        <label style="margin:0;flex:1;">Coll opacity</label>
+        <input type="range" id="collOpacity" min="0" max="1" step="0.05" value="0.5" style="flex:2;margin:0;">
+        <span id="collOpacityLabel">50%</span>
+      </div>
+    </div>
+    <hr>
+    <button id="toggleGrid">Toggle Gridlines</button>
+    <label>Zoom: <span id="zoomLabel">1.0×</span></label>
+    <input type="range" id="zoom" min="0.1" max="3" step="0.1" value="1"><br>
+    <button id="render">Render Map</button>
+    <button id="undoBtn" title="Ctrl+Z">↩ Undo</button>
+    <button id="saveMap">Save Map</button>
+    <hr>
+    <h3>Block Palette <span id="activePaletteLabel" style="font-size:0.75em;color:#aaa;">(map)</span></h3>
+    <div id="blockPaletteContainer">
+      <canvas id="blockPaletteCanvas"></canvas>
+    </div>
+    <hr>
+    <h3>Collision Block Palette <span id="activeCollPaletteLabel" style="font-size:0.75em;color:#aaa;"></span></h3>
+    <div id="collBlockPaletteContainer">
+      <canvas id="collBlockPaletteCanvas"></canvas>
+    </div>
+    <hr>
+  </aside>
+  <div id="canvas-container">
+    <div id="hoverTooltip"></div>
+    <div style="position:relative; display:inline-block;">
+      <canvas id="mapCanvas" width="320" height="320"></canvas>
+      <canvas id="hoverCanvas" width="320" height="320" style="position:absolute;top:0;left:0;pointer-events:none;image-rendering:pixelated;background:transparent;border:none;"></canvas>
+    </div>
+    <div id="loadingOverlay">
+      <div class="spinner"></div>
+      <span>Rendering map...</span>
+    </div>
+  </div>
+
+  <!-- Right-side editor panel -->
+  <div id="editor-panel">
+    <div class="editor-tabs">
+      <button class="editor-tab active" data-tab="blockEd">Block Editor</button>
+      <button class="editor-tab" data-tab="collBlockEd">Coll Block</button>
+      <button class="editor-tab" data-tab="palEd">Palette</button>
+    </div>
+
+    <!-- Block Editor -->
+    <div class="editor-pane active" id="blockEd">
+      <div style="font-size:11px;color:#aaa;margin-bottom:6px;">
+        Editing Block <span id="blockEdIdx">—</span>
+        &nbsp;<button id="blockEdPrev" style="font-size:10px;padding:1px 5px;">◀</button>
+        <button id="blockEdNext" style="font-size:10px;padding:1px 5px;">▶</button>
+      </div>
+      <div class="block-editor-grid" id="blockSlots">
+        <div class="tile-slot selected-slot" data-slot="0"><canvas id="bs0" width="64" height="64"></canvas></div>
+        <div class="tile-slot" data-slot="1"><canvas id="bs1" width="64" height="64"></canvas></div>
+        <div class="tile-slot" data-slot="2"><canvas id="bs2" width="64" height="64"></canvas></div>
+        <div class="tile-slot" data-slot="3"><canvas id="bs3" width="64" height="64"></canvas></div>
+      </div>
+      <div class="block-editor-controls">
+        <div style="color:#888;font-size:10px;margin-bottom:3px;">Selected slot: <span id="blockEdSlotLabel">TL (0)</span></div>
+        <label>Tile Index: <input type="number" id="blockEdTileIdx" min="0" max="511" value="0"></label>
+        <label>Palette (0–7): <input type="number" id="blockEdPalIdx" min="0" max="7" value="0"></label>
+        <div class="check-row">
+          <label><input type="checkbox" id="blockEdFlipH"> Flip H</label>
+          <label><input type="checkbox" id="blockEdFlipV"> Flip V</label>
+        </div>
+        <button id="blockEdApply" style="width:100%;margin-top:6px;">Apply to Slot</button>
+        <button id="blockEdApplyAll" style="width:100%;margin-top:4px;font-size:10px;">Save & Update Map</button>
+        <button id="blockEdAddBlock" style="width:100%;margin-top:4px;font-size:10px;color:#8f8;">+ Add New Block</button>
+        <button id="blockEdRemoveBlock" style="width:100%;margin-top:4px;font-size:10px;color:#f88;">✕ Remove This Block</button>
+      </div>
+      <div style="font-size:10px;color:#888;margin-top:6px;">Click tileset to pick tile:</div>
+      <div class="tileset-picker-wrap" id="editorTilesetWrap">
+        <div class="tileset-hover-tip" id="editorTilesetTip"></div>
+        <canvas id="editorTilesetCanvas"></canvas>
+      </div>
+    </div>
+
+    <!-- Collision Block Editor -->
+    <div class="editor-pane" id="collBlockEd">
+      <div style="font-size:11px;color:#aaa;margin-bottom:6px;">
+        Editing Coll Block <span id="collBlockEdIdx">—</span>
+        &nbsp;<button id="collBlockEdPrev" style="font-size:10px;padding:1px 5px;">◀</button>
+        <button id="collBlockEdNext" style="font-size:10px;padding:1px 5px;">▶</button>
+      </div>
+      <div class="block-editor-grid" id="collBlockSlots">
+        <div class="tile-slot selected-slot" data-slot="0"><canvas id="cbs0" width="64" height="64"></canvas></div>
+        <div class="tile-slot" data-slot="1"><canvas id="cbs1" width="64" height="64"></canvas></div>
+        <div class="tile-slot" data-slot="2"><canvas id="cbs2" width="64" height="64"></canvas></div>
+        <div class="tile-slot" data-slot="3"><canvas id="cbs3" width="64" height="64"></canvas></div>
+      </div>
+      <div class="block-editor-controls">
+        <div style="color:#888;font-size:10px;margin-bottom:3px;">Selected slot: <span id="collBlockEdSlotLabel">TL (0)</span></div>
+        <label>Tile Index: <input type="number" id="collBlockEdTileIdx" min="0" max="255" value="0"></label>
+        <button id="collBlockEdApply" style="width:100%;margin-top:6px;">Apply to Slot</button>
+        <button id="collBlockEdApplyAll" style="width:100%;margin-top:4px;font-size:10px;">Save & Update Map</button>
+        <button id="collBlockEdAddBlock" style="width:100%;margin-top:4px;font-size:10px;color:#8f8;">+ Add New Block</button>
+        <button id="collBlockEdRemoveBlock" style="width:100%;margin-top:4px;font-size:10px;color:#f88;">✕ Remove This Block</button>
+      </div>
+      <div style="font-size:10px;color:#888;margin-top:6px;">Click tileset to pick tile:</div>
+      <div class="tileset-picker-wrap" id="editorCollTilesetWrap">
+        <div class="tileset-hover-tip" id="editorCollTilesetTip"></div>
+        <canvas id="editorCollTilesetCanvas"></canvas>
+      </div>
+    </div>
+
+    <!-- Palette Editor -->
+    <div class="editor-pane" id="palEd">
+      <div style="display:flex;gap:4px;margin-bottom:8px;">
+        <button id="palEdAddPalette" style="flex:1;font-size:10px;color:#8f8;">+ Add Palette</button>
+      </div>
+      <div style="font-size:11px;color:#aaa;margin-bottom:6px;">Click a swatch to edit its color.</div>
+      <div id="palSwatches"></div>
+      <div class="pal-color-editor" id="palColorEditor" style="display:none;">
+        <div style="font-size:10px;color:#888;margin-bottom:4px;">Editing Pal <span id="palEdPalIdx">—</span>, Color <span id="palEdColIdx">—</span></div>
+        <div class="pal-color-preview" id="palColorPreview"></div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <label style="margin:0;font-size:11px;color:#aaa;flex-shrink:0;">#</label>
+          <input type="text" id="palEdHex" maxlength="6" placeholder="rrggbb"
+            style="flex:1;background:#333;color:#eee;border:1px solid #555;font-family:'Fira Code',monospace;font-size:12px;padding:2px 5px;box-sizing:border-box;">
+        </div>
+        <label>R: <input type="range" id="palEdR" min="0" max="248" step="8" value="0"></label>
+        <label>G: <input type="range" id="palEdG" min="0" max="248" step="8" value="0"></label>
+        <label>B: <input type="range" id="palEdB" min="0" max="248" step="8" value="0"></label>
+        <button id="palEdApply" style="width:100%;margin-top:6px;">Apply Color</button>
+        <button id="palEdApplyRebuild" style="width:100%;margin-top:4px;font-size:10px;">Apply & Rebuild Everything</button>
+      </div>
+    </div>
+  </div>
+</main>
+<footer>Built with ❤️ — Supports palettes, collisions, tilesets, and editing</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+/* ============================================================
+   PERFORMANCE STRATEGY
+   ============================================================
+   FIX 1 — Cache tileCache globally. Recompute only when tileset
+            or palette files actually change. Never inside draw loops
+            or event handlers.
+
+   FIX 2 — Pre-bake each block into its own offscreen canvas once.
+            Store in blockImageCache[]. Drawing a block is then a
+            single ctx.drawImage() call instead of 4 tile lookups
+            + canvas creates per block per frame.
+
+   FIX 3 — Remove the DOM grid overlay entirely. Handle all map
+            interaction (hover, click) on the canvas itself via
+            pointer math. Eliminates hundreds of DOM elements and
+            their event listeners.
+
+   FIX 4 — On a single-block paint, patch only that one block's
+            pixels onto the canvas. No full redraw, no DOM rebuild.
+
+   FIX 5 — Palette hover: redraw only the two cells that changed
+            (old hover → new hover). Never redraw the whole palette
+            on mousemove.
+
+   FIX 6 — Palette click: same targeted redraw — deselect old cell,
+            select new cell. No full palette repaint.
+   ============================================================ */
+
+/* ---------- Utility Parsing (unchanged) ---------- */
+function parseMap(map, extMap, width, height) {
+  const out = new Uint16Array(width * height);
+  for (let i = 0; i < width * height; i++) {
+    out[i] = (map[i] || 0) + (extMap ? extMap[i] * 256 : 0);
+  }
+  return out;
+}
+
+function parseBlockset(bytes) {
+  const blocks = [];
+  for (let i = 0; i < bytes.length; i += 8) {
+    const tileIDs = new Uint16Array(4);
+    const attrs = bytes.slice(i + 4, i + 8);
+    for (let t = 0; t < 4; t++) {
+      let tile = bytes[i + t];
+      if (attrs[t] & 0x08) tile += 0x100;
+      tileIDs[t] = tile;
+    }
+    blocks.push({ tileIDs, attrs });
+  }
+  return blocks;
+}
+
+function parsePalettes(bytes) {
+  const palettes = [];
+  for (let i = 0; i < bytes.length; i += 8) {
+    const colors = [];
+    for (let j = 0; j < 8; j += 2) {
+      const val = (bytes[i + j] & 0xFF) | (bytes[i + j + 1] << 8);
+      colors.push([
+        (val & 0x1F) << 3,
+        ((val >> 5) & 0x1F) << 3,
+        ((val >> 10) & 0x1F) << 3,
+      ]);
+    }
+    palettes.push(colors);
+  }
+  return palettes;
+}
+
+function serializePalettes(pals) {
+  // 8 bytes per palette, 2 bytes per color, GBC 15-bit little-endian BGR555
+  const out = new Uint8Array(pals.length * 8);
+  pals.forEach((pal, pi) => {
+    pal.forEach((col, ci) => {
+      const r5 = (col[0] >> 3) & 0x1F;
+      const g5 = (col[1] >> 3) & 0x1F;
+      const b5 = (col[2] >> 3) & 0x1F;
+      const val = r5 | (g5 << 5) | (b5 << 10);
+      out[pi * 8 + ci * 2]     = val & 0xFF;
+      out[pi * 8 + ci * 2 + 1] = (val >> 8) & 0xFF;
+    });
+  });
+  return out;
+}
+
+function parseCollisionBlockset(bytes) {
+  const blocks = [];
+  for (let i = 0; i < bytes.length; i += 4)
+    blocks.push([bytes[i], bytes[i+1], bytes[i+2], bytes[i+3]]);
+  return blocks;
+}
+
+function serializeBlockset(blocks) {
+  // 8 bytes per block: 4 tile low-bytes, then 4 attr bytes (bank bit in attr bit 3)
+  const out = new Uint8Array(blocks.length * 8);
+  blocks.forEach((block, i) => {
+    for (let t = 0; t < 4; t++) {
+      out[i*8 + t]   = block.tileIDs[t] & 0xFF;  // low byte of tile index
+      // Preserve existing attrs but ensure bank bit matches tileID
+      let attr = block.attrs[t];
+      if (block.tileIDs[t] >= 0x100) attr |=  0x08;
+      else                            attr &= ~0x08;
+      out[i*8 + 4 + t] = attr;
+    }
+  });
+  return out;
+}
+
+function serializeCollBlockset(blocks) {
+  // 4 bytes per block: one tile index per slot
+  const out = new Uint8Array(blocks.length * 4);
+  blocks.forEach((block, i) => {
+    for (let t = 0; t < 4; t++) out[i*4 + t] = block[t] & 0xFF;
+  });
+  return out;
+}
+
+function parseCollisionMap(bytes, width, height) {
+  return new Uint8Array(bytes.slice(0, width * height));
+}
+
+/* ---------- Global State ---------- */
+let mapData = null, extMapData = null;
+let blockset = [], palettes = [];
+let collBlockset = [], collMap = null, collMapRaw = null;
+let tilesetImg = null, collTilesetImg = null;
+let selectedBlock     = 0;  // selected block in map palette
+let selectedCollBlock = 0;  // selected block in collision palette
+// Which palette is "active" — determines what canvas painting does
+// 'map' = painting writes to mapLayer, 'coll' = writes to collLayer
+let activePalette = 'map';
+let showGrid = false;
+let parsedMap = null; // cached Uint16Array
+
+// Undo stack — each entry is a Uint16Array snapshot of parsedMap
+const UNDO_LIMIT = 50;
+let undoStack     = [];  // map undo
+let collUndoStack = [];  // collision undo
+let undoPendingSnapshot     = null;
+let collUndoPendingSnapshot = null;
+
+// FIX 1: tileCache is computed ONCE when tileset/palette changes.
+let tileCache = null;           // tileCache[tileIndex][palID] = ImageData
+// FIX 2: blockImageCache[blockID] = offscreen HTMLCanvasElement (16×16, pre-baked)
+let blockImageCache = null;
+// Collision block palette cache — baked from collTilesetImg (no palette recoloring)
+let collBlockImageCache = null; // { mapCache, paletteCache }
+
+// Offscreen layer canvases — rendered once, composited cheaply on every opacity change
+let mapLayer  = document.createElement("canvas");
+let collLayer = document.createElement("canvas");
+
+const BLOCK_SIZE = 16;
+const TILE_SIZE  = 8;
+// Palette: 24px blocks. The aside is 340px wide, padding 1em≈16px each side = 308px inner.
+// With border 2px, usable = 306px. 306/24 = 12.75 → 12 columns = 288px canvas. Fits cleanly.
+const PALETTE_BLOCK = 24;
+const PALETTE_COLS  = 12;
+
+/* ---------- DOM Elements ---------- */
+const mapCanvas   = document.getElementById("mapCanvas");
+const ctx         = mapCanvas.getContext("2d");
+const hoverCanvas = document.getElementById("hoverCanvas");
+const hctx        = hoverCanvas.getContext("2d");
+const paletteCanvas     = document.getElementById("blockPaletteCanvas");
+const pctx              = paletteCanvas.getContext("2d");
+const collPaletteCanvas = document.getElementById("collBlockPaletteCanvas");
+const cpctx             = collPaletteCanvas.getContext("2d");
+const loadingOverlay = document.getElementById("loadingOverlay");
+const canvasContainer = document.getElementById("canvas-container");
+const tooltip     = document.getElementById("hoverTooltip");
+const paletteTooltip = document.getElementById("paletteTooltip");
+const zoomSlider  = document.getElementById("zoom");
+
+/* =============================================================
+   FIX 1 — Build tileCache once. Returns ImageData per tile/pal.
+   ============================================================= */
+function buildTileCache(img, pals) {
+  const tilesPerRow = img.width / TILE_SIZE;
+  const totalTiles  = tilesPerRow * (img.height / TILE_SIZE);
+
+  const off = document.createElement("canvas");
+  off.width  = img.width;
+  off.height = img.height;
+  const offCtx = off.getContext("2d");
+  offCtx.drawImage(img, 0, 0);
+
+  const cache = new Array(totalTiles);
+
+  for (let i = 0; i < totalTiles; i++) {
+    const tx = (i % tilesPerRow) * TILE_SIZE;
+    const ty = Math.floor(i / tilesPerRow) * TILE_SIZE;
+    const base = offCtx.getImageData(tx, ty, TILE_SIZE, TILE_SIZE);
+    cache[i] = new Array(pals.length);
+
+    for (let p = 0; p < pals.length; p++) {
+      const pal = pals[p];
+      const d   = new Uint8ClampedArray(base.data);
+      for (let px = 0; px < d.length; px += 4) {
+        const shade = 3 - Math.min(3, d[px] >> 6);
+        d[px]   = pal[shade][0];
+        d[px+1] = pal[shade][1];
+        d[px+2] = pal[shade][2];
+      }
+      cache[i][p] = new ImageData(d, TILE_SIZE, TILE_SIZE);
+    }
+  }
+  return cache;
+}
+
+/* =============================================================
+   FIX 2 — Bake every block into two offscreen canvases:
+     blockImageCache[id]        = 16×16 for the map canvas
+     blockPaletteImageCache[id] = PALETTE_BLOCK×PALETTE_BLOCK for the palette
+   ============================================================= */
+function buildBlockImageCache(blocks, tc) {
+  const scratch = document.createElement("canvas");
+  scratch.width  = TILE_SIZE;
+  scratch.height = TILE_SIZE;
+  const sctx = scratch.getContext("2d");
+
+  const mapCache     = [];
+  const paletteCache = [];
+
+  blocks.forEach(block => {
+    // 16×16 for map
+    const offMap = document.createElement("canvas");
+    offMap.width  = BLOCK_SIZE;
+    offMap.height = BLOCK_SIZE;
+    const ocMap = offMap.getContext("2d");
+
+    // PALETTE_BLOCK×PALETTE_BLOCK for palette (scaled)
+    const offPal = document.createElement("canvas");
+    offPal.width  = PALETTE_BLOCK;
+    offPal.height = PALETTE_BLOCK;
+    const ocPal = offPal.getContext("2d");
+    ocPal.imageSmoothingEnabled = false;
+
+    for (let t = 0; t < 4; t++) {
+      const tileIndex = block.tileIDs[t];
+      const attr  = block.attrs[t];
+      const palID = attr & 0x7;
+      const flipH = !!(attr & 0x20);
+      const flipV = !!(attr & 0x40);
+      const palCount = tc[tileIndex] ? tc[tileIndex].length : 1;
+      sctx.putImageData(tc[tileIndex][palID % palCount], 0, 0);
+
+      // Map-size tile
+      const dx = (t % 2) * TILE_SIZE;
+      const dy = Math.floor(t / 2) * TILE_SIZE;
+      ocMap.save();
+      ocMap.translate(dx + (flipH ? TILE_SIZE : 0), dy + (flipV ? TILE_SIZE : 0));
+      ocMap.scale(flipH ? -1 : 1, flipV ? -1 : 1);
+      ocMap.drawImage(scratch, 0, 0);
+      ocMap.restore();
+
+      // Palette-size tile (scaled up)
+      const scale = PALETTE_BLOCK / BLOCK_SIZE;
+      const pdx = (t % 2) * TILE_SIZE * scale;
+      const pdy = Math.floor(t / 2) * TILE_SIZE * scale;
+      ocPal.save();
+      ocPal.translate(pdx + (flipH ? TILE_SIZE * scale : 0), pdy + (flipV ? TILE_SIZE * scale : 0));
+      ocPal.scale(flipH ? -scale : scale, flipV ? -scale : scale);
+      ocPal.drawImage(scratch, 0, 0);
+      ocPal.restore();
+    }
+
+    mapCache.push(offMap);
+    paletteCache.push(offPal);
+  });
+
+  return { mapCache, paletteCache };
+}
+
+/* ---------- Invalidate caches (call when source data changes) ---------- */
+function invalidateCaches() {
+  tileCache       = null;
+  blockImageCache = null;   // { mapCache, paletteCache }
+  parsedMap       = null;
+}
+
+function invalidateCollCache() {
+  collBlockImageCache = null;
+}
+
+function ensureCaches() {
+  if (!tilesetImg || palettes.length === 0 || blockset.length === 0) return false;
+  if (!tileCache)       tileCache       = buildTileCache(tilesetImg, palettes);
+  if (!blockImageCache) blockImageCache = buildBlockImageCache(blockset, tileCache);
+  return true;
+}
+
+/* Build collision block image cache from collTilesetImg (raw, no palette recoloring). */
+function buildCollBlockImageCache(blocks, img) {
+  if (!img || !blocks.length) return null;
+
+  const collTilesPerRow = Math.floor(img.width  / TILE_SIZE);
+  const collTilesPerCol = Math.floor(img.height / TILE_SIZE);
+  const maxTileIndex    = collTilesPerRow * collTilesPerCol - 1;
+
+  // Draw full tileset onto offscreen canvas to read pixels
+  const srcOff = document.createElement("canvas");
+  srcOff.width  = img.width;
+  srcOff.height = img.height;
+  srcOff.getContext("2d").drawImage(img, 0, 0);
+
+  const scratch = document.createElement("canvas");
+  scratch.width  = TILE_SIZE;
+  scratch.height = TILE_SIZE;
+  const sc = scratch.getContext("2d");
+
+  const mapCache     = [];
+  const paletteCache = [];
+  const scale = PALETTE_BLOCK / BLOCK_SIZE;
+
+  blocks.forEach(block => {
+    // 16×16 for map layer
+    const offMap = document.createElement("canvas");
+    offMap.width  = BLOCK_SIZE;
+    offMap.height = BLOCK_SIZE;
+    const ocMap = offMap.getContext("2d");
+
+    // 24×24 for collision palette display
+    const offPal = document.createElement("canvas");
+    offPal.width  = PALETTE_BLOCK;
+    offPal.height = PALETTE_BLOCK;
+    const ocPal = offPal.getContext("2d");
+    ocPal.imageSmoothingEnabled = false;
+
+    for (let t = 0; t < 4; t++) {
+      const ti = block[t];
+      if (ti > maxTileIndex) continue;
+      const tx = (ti % collTilesPerRow) * TILE_SIZE;
+      const ty = Math.floor(ti / collTilesPerRow) * TILE_SIZE;
+
+      sc.clearRect(0, 0, TILE_SIZE, TILE_SIZE);
+      sc.drawImage(img, tx, ty, TILE_SIZE, TILE_SIZE, 0, 0, TILE_SIZE, TILE_SIZE);
+
+      const dx = (t % 2) * TILE_SIZE;
+      const dy = Math.floor(t / 2) * TILE_SIZE;
+      ocMap.drawImage(scratch, dx, dy);
+
+      const pdx = (t % 2) * TILE_SIZE * scale;
+      const pdy = Math.floor(t / 2) * TILE_SIZE * scale;
+      ocPal.drawImage(scratch, pdx, pdy, TILE_SIZE * scale, TILE_SIZE * scale);
+    }
+
+    mapCache.push(offMap);
+    paletteCache.push(offPal);
+  });
+
+  return { mapCache, paletteCache };
+}
+
+function ensureCollCache() {
+  if (!collTilesetImg || !collBlockset.length) return false;
+  if (!collBlockImageCache) collBlockImageCache = buildCollBlockImageCache(collBlockset, collTilesetImg);
+  return true;
+}
+
+/* =============================================================
+   Drawing helpers
+   ============================================================= */
+
+// Draw one block at map-pixel position (px, py) using cached images.
+function drawBlock(targetCtx, blockID, px, py) {
+  if (!blockImageCache || !blockImageCache.mapCache[blockID]) return;
+  targetCtx.drawImage(blockImageCache.mapCache[blockID], px, py);
+}
+
+/* Render all map blocks into mapLayer (offscreen). Never touches main ctx. */
+function renderMapLayer() {
+  if (!parsedMap || !blockImageCache) return;
+  const width  = +document.getElementById("width").value;
+  const height = +document.getElementById("height").value;
+  mapLayer.width  = mapCanvas.width;
+  mapLayer.height = mapCanvas.height;
+  const lctx = mapLayer.getContext("2d");
+  lctx.clearRect(0, 0, mapLayer.width, mapLayer.height);
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      drawBlock(lctx, parsedMap[y * width + x], x * BLOCK_SIZE, y * BLOCK_SIZE);
+    }
+  }
+}
+
+/* Render all collision tiles into collLayer using pre-baked cache. */
+function renderCollLayer() {
+  if (!collMap || !collBlockset.length || !collTilesetImg) return;
+  if (!ensureCollCache()) return;
+
+  const width  = +document.getElementById("width").value;
+  const height = +document.getElementById("height").value;
+
+  collLayer.width  = mapCanvas.width;
+  collLayer.height = mapCanvas.height;
+  const lctx = collLayer.getContext("2d");
+  lctx.clearRect(0, 0, collLayer.width, collLayer.height);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const blockID = collMap[y * width + x];
+      const img = collBlockImageCache.mapCache[blockID];
+      if (!img) continue;
+      lctx.drawImage(img, x * BLOCK_SIZE, y * BLOCK_SIZE);
+    }
+  }
+}
+
+/* Fast composite — just two drawImage calls. Called by sliders and after any paint. */
+function composite() {
+  const mode      = document.getElementById("viewMode").value;
+  const mapAlpha  = parseFloat(document.getElementById("mapOpacity").value);
+  const collAlpha = parseFloat(document.getElementById("collOpacity").value);
+
+  ctx.clearRect(0, 0, mapCanvas.width, mapCanvas.height);
+
+  if (mode === "collision") {
+    ctx.globalAlpha = 1;
+    ctx.drawImage(collLayer, 0, 0);
+  } else if (mode === "map") {
+    ctx.globalAlpha = 1;
+    ctx.drawImage(mapLayer, 0, 0);
+  } else { // both
+    ctx.globalAlpha = mapAlpha;
+    ctx.drawImage(mapLayer, 0, 0);
+    ctx.globalAlpha = collAlpha;
+    ctx.drawImage(collLayer, 0, 0);
+  }
+  ctx.globalAlpha = 1;
+
+  if (showGrid) drawGridlines();
+}
+
+/* Kept for compatibility — rebuilds layers then composites */
+function drawMapFull() {
+  renderMapLayer();
+  composite();
+}
+
+function drawCollisionOverlay(mode) {
+  renderCollLayer();
+  composite();
+}
+
+/* ---------- Full redraw (called on load / render button) ---------- */
+function redrawMap() {
+  // For "map" mode we need map data + blockset + tileset + palettes.
+  // For "collision" mode we only need collision data.
+  const mode = document.getElementById("viewMode").value;
+  const hasMap  = mapData && blockset.length && tilesetImg && palettes.length;
+  const hasColl = collMapRaw && collBlockset.length && collTilesetImg;
+
+  if (mode === "map" && !hasMap) return;
+  if (mode === "collision" && !hasColl) return;
+  if (mode === "both" && !hasMap) return;
+
+  loadingOverlay.classList.add("active");
+
+  requestAnimationFrame(() => {
+    try {
+      const width  = +document.getElementById("width").value;
+      const height = +document.getElementById("height").value;
+
+      mapCanvas.width  = width  * BLOCK_SIZE;
+      mapCanvas.height = height * BLOCK_SIZE;
+      // Keep hover overlay canvas in sync
+      hoverCanvas.width  = mapCanvas.width;
+      hoverCanvas.height = mapCanvas.height;
+
+      if (hasMap) {
+        parsedMap = parseMap(mapData, extMapData, width, height);
+        ensureCaches();
+        renderMapLayer();
+      }
+
+      // Always re-parse collMap from raw bytes so it respects current width/height
+      if (collMapRaw) {
+        collMap = parseCollisionMap(collMapRaw, width, height);
+        renderCollLayer();
+      }
+
+      composite();
+      if (hasMap) {
+        drawBlockPaletteFull();
+        // Auto-init block editor if it hasn't been loaded yet or caches just rebuilt
+        if (blockImageCache && tileCache) blockEdLoad(blockEdBlock);
+      }
+      // Build/refresh collision block palette whenever coll data is available
+      if (collBlockset.length && collTilesetImg) {
+        ensureCollCache();
+        drawCollBlockPaletteFull();
+        if (collBlockImageCache) collBlockEdLoad(collBlockEdBlock);
+      }
+    } finally {
+      loadingOverlay.classList.remove("active");
+    }
+  });
+}
+
+/* =============================================================
+   FIX 3 & 4 — Canvas-based map interaction (no DOM grid).
+   Hover → tooltip + outline on hoverCanvas.
+   Click/drag → patch one block, push undo snapshot.
+   ============================================================= */
+let lastHoverMapCell = { x: -1, y: -1 };
+
+function drawHoverOutline(bx, by) {
+  hctx.clearRect(0, 0, hoverCanvas.width, hoverCanvas.height);
+  if (bx < 0 || by < 0) return;
+  hctx.strokeStyle = activePalette === 'coll' ? "#00ffaa" : "#ffcc00";
+  hctx.lineWidth = 1.5;
+  hctx.strokeRect(bx * BLOCK_SIZE + 0.75, by * BLOCK_SIZE + 0.75, BLOCK_SIZE - 1.5, BLOCK_SIZE - 1.5);
+}
+
+mapCanvas.addEventListener("mousemove", e => {
+  const hasAny = parsedMap || collMap;
+  if (!hasAny) return;
+  const rect  = mapCanvas.getBoundingClientRect();
+  const zoom  = parseFloat(zoomSlider.value);
+  const bx = Math.floor((e.clientX - rect.left) / zoom / BLOCK_SIZE);
+  const by = Math.floor((e.clientY - rect.top)  / zoom / BLOCK_SIZE);
+  const width  = +document.getElementById("width").value;
+  const height = +document.getElementById("height").value;
+
+  if (bx < 0 || by < 0 || bx >= width || by >= height) {
+    hideTooltip();
+    drawHoverOutline(-1, -1);
+    return;
+  }
+
+  if (bx !== lastHoverMapCell.x || by !== lastHoverMapCell.y) {
+    lastHoverMapCell = { x: bx, y: by };
+    const idx = by * width + bx;
+    const mapBlockId  = parsedMap ? parsedMap[idx] : null;
+    const collBlockId = collMap   ? collMap[idx]   : null;
+    showTooltip(bx, by, mapBlockId, collBlockId, e.clientX, e.clientY);
+    drawHoverOutline(bx, by);
+  } else if (tooltip.style.opacity === "1") {
+    // Still update position even when hovering the same cell
+    updateTooltipPosition(e.clientX, e.clientY);
+  }
+
+  // Also handle drag-paint
+  if (e.buttons === 1) paintAt(e, bx, by);
+});
+
+mapCanvas.addEventListener("mouseleave", () => {
+  hideTooltip();
+  drawHoverOutline(-1, -1);
+  undoPendingSnapshot     = null;
+  collUndoPendingSnapshot = null;
+});
+
+mapCanvas.addEventListener("mousedown", e => {
+  if (!parsedMap && activePalette === 'map') return;
+  if (!collMap    && activePalette === 'coll') return;
+  // Take a snapshot before any changes
+  if (activePalette === 'map') {
+    undoPendingSnapshot = parsedMap.slice();
+  } else {
+    collUndoPendingSnapshot = collMap.slice();
+  }
+  const rect  = mapCanvas.getBoundingClientRect();
+  const zoom  = parseFloat(zoomSlider.value);
+  const bx = Math.floor((e.clientX - rect.left) / zoom / BLOCK_SIZE);
+  const by = Math.floor((e.clientY - rect.top)  / zoom / BLOCK_SIZE);
+  paintAt(e, bx, by);
+});
+
+mapCanvas.addEventListener("mouseup", () => {
+  undoPendingSnapshot     = null;
+  collUndoPendingSnapshot = null;
+});
+
+/* Paint map block or collision block depending on activePalette */
+function paintAt(e, bx, by) {
+  const width  = +document.getElementById("width").value;
+  const height = +document.getElementById("height").value;
+
+  if (bx === undefined) {
+    const rect = mapCanvas.getBoundingClientRect();
+    const zoom = parseFloat(zoomSlider.value);
+    bx = Math.floor((e.clientX - rect.left) / zoom / BLOCK_SIZE);
+    by = Math.floor((e.clientY - rect.top)  / zoom / BLOCK_SIZE);
+  }
+
+  if (bx < 0 || by < 0 || bx >= width || by >= height) return;
+  const idx = by * width + bx;
+
+  if (activePalette === 'map') {
+    if (!parsedMap) return;
+    if (parsedMap[idx] === selectedBlock) return;
+
+    if (undoPendingSnapshot) {
+      if (undoStack.length >= UNDO_LIMIT) undoStack.shift();
+      undoStack.push(undoPendingSnapshot);
+      undoPendingSnapshot = null;
+      updateUndoButton();
+    }
+
+    parsedMap[idx]  = selectedBlock;
+    mapData[idx]    = selectedBlock & 0xFF;
+    if (extMapData) extMapData[idx] = (selectedBlock >> 8) & 0xFF;
+
+    if (!ensureCaches()) return;
+    const lctx = mapLayer.getContext("2d");
+    lctx.clearRect(bx * BLOCK_SIZE, by * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+    drawBlock(lctx, selectedBlock, bx * BLOCK_SIZE, by * BLOCK_SIZE);
+
+  } else { // activePalette === 'coll'
+    if (!collMap || !collMapRaw) return;
+    if (collMap[idx] === selectedCollBlock) return;
+
+    if (collUndoPendingSnapshot) {
+      if (collUndoStack.length >= UNDO_LIMIT) collUndoStack.shift();
+      collUndoStack.push(collUndoPendingSnapshot);
+      collUndoPendingSnapshot = null;
+      updateUndoButton();
+    }
+
+    collMap[idx]    = selectedCollBlock;
+    collMapRaw[idx] = selectedCollBlock; // keep raw in sync for re-parses
+
+    if (!ensureCollCache()) return;
+    // Patch collLayer for this one block
+    const lctx = collLayer.getContext("2d");
+    lctx.clearRect(bx * BLOCK_SIZE, by * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+    if (collBlockImageCache.mapCache[selectedCollBlock]) {
+      lctx.drawImage(collBlockImageCache.mapCache[selectedCollBlock], bx * BLOCK_SIZE, by * BLOCK_SIZE);
+    }
+  }
+
+  composite();
+}
+
+/* ---------- Undo ---------- */
+function updateUndoButton() {
+  const btn = document.getElementById("undoBtn");
+  const total = undoStack.length + collUndoStack.length;
+  btn.disabled = total === 0;
+  btn.title = total > 0 ? `Undo (${total} step${total > 1 ? "s" : ""}) — Ctrl+Z` : "Nothing to undo";
+}
+
+function performUndo() {
+  // Undo whichever stack has the most recent action (active palette first)
+  if (activePalette === 'coll' && collUndoStack.length > 0) {
+    const snapshot = collUndoStack.pop();
+    collMap = snapshot;
+    // Keep collMapRaw in sync
+    for (let i = 0; i < collMap.length; i++) collMapRaw[i] = collMap[i];
+    renderCollLayer();
+    composite();
+  } else if (undoStack.length > 0) {
+    const snapshot = undoStack.pop();
+    parsedMap = snapshot;
+    for (let i = 0; i < parsedMap.length; i++) {
+      mapData[i] = parsedMap[i] & 0xFF;
+      if (extMapData) extMapData[i] = (parsedMap[i] >> 8) & 0xFF;
+    }
+    renderMapLayer();
+    composite();
+  } else if (collUndoStack.length > 0) {
+    const snapshot = collUndoStack.pop();
+    collMap = snapshot;
+    for (let i = 0; i < collMap.length; i++) collMapRaw[i] = collMap[i];
+    renderCollLayer();
+    composite();
+  }
+  updateUndoButton();
+}
+
+document.getElementById("undoBtn").addEventListener("click", performUndo);
+document.addEventListener("keydown", e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === "z") { e.preventDefault(); performUndo(); }
+});
+
+/* =============================================================
+   FIX 5 & 6 — Palette: targeted cell redraws only.
+   Full repaint only on initial draw or block count change.
+   ============================================================= */
+
+function paletteIndexToXY(i) {
+  const col = i % PALETTE_COLS;
+  const row = Math.floor(i / PALETTE_COLS);
+  return { x: col * PALETTE_BLOCK, y: row * PALETTE_BLOCK };
+}
+
+// Draw a single palette cell (block i), with optional hover/select overlays
+function drawPaletteCell(i, hover) {
+  if (!blockImageCache || !blockImageCache.paletteCache[i]) return;
+  const { x, y } = paletteIndexToXY(i);
+
+  pctx.drawImage(blockImageCache.paletteCache[i], x, y);
+
+  // Separator
+  pctx.strokeStyle = "#444";
+  pctx.lineWidth = 1;
+  pctx.strokeRect(x + 0.5, y + 0.5, PALETTE_BLOCK - 1, PALETTE_BLOCK - 1);
+
+  // Hover overlay — bright cyan outline + tint so it's unmissable
+  if (hover) {
+    pctx.fillStyle = "rgba(0, 200, 255, 0.25)";
+    pctx.fillRect(x, y, PALETTE_BLOCK, PALETTE_BLOCK);
+    pctx.strokeStyle = "#00c8ff";
+    pctx.lineWidth = 2;
+    pctx.strokeRect(x + 1, y + 1, PALETTE_BLOCK - 2, PALETTE_BLOCK - 2);
+  }
+
+  // Selected highlight — yellow, only when this palette is active
+  if (i === selectedBlock && activePalette === 'map') {
+    pctx.strokeStyle = "#ffcc00";
+    pctx.lineWidth = 2;
+    pctx.strokeRect(x + 1, y + 1, PALETTE_BLOCK - 2, PALETTE_BLOCK - 2);
+  }
+}
+
+function drawBlockPaletteFull() {
+  if (!blockImageCache) return;
+  const rows = Math.ceil(blockset.length / PALETTE_COLS);
+  paletteCanvas.width  = PALETTE_COLS * PALETTE_BLOCK;
+  paletteCanvas.height = rows * PALETTE_BLOCK;
+  // +2 to account for 1px border top+bottom, preventing a spurious scrollbar
+  document.getElementById("blockPaletteContainer").style.height = (paletteCanvas.height + 2) + "px";
+  pctx.clearRect(0, 0, paletteCanvas.width, paletteCanvas.height);
+
+  for (let i = 0; i < blockset.length; i++) {
+    drawPaletteCell(i, false);
+  }
+}
+
+let paletteHoverIdx = -1;
+
+// FIX 5: Only redraw the two cells affected by a hover change
+paletteCanvas.addEventListener("mousemove", e => {
+  if (!blockImageCache) return;
+  const rect = paletteCanvas.getBoundingClientRect();
+  const col  = Math.floor((e.clientX - rect.left) / PALETTE_BLOCK);
+  const row  = Math.floor((e.clientY - rect.top)  / PALETTE_BLOCK);
+  const idx  = row * PALETTE_COLS + col;
+
+  // Update floating tooltip position every move (cursor may move within same cell)
+  if (paletteHoverIdx >= 0) {
+    const aside = document.querySelector("aside");
+    const asideRect = aside.getBoundingClientRect();
+    paletteTooltip.style.left = (e.clientX - asideRect.left + 12) + "px";
+    paletteTooltip.style.top  = (e.clientY - asideRect.top  - 22 + aside.scrollTop) + "px";
+  }
+
+  if (idx === paletteHoverIdx) return; // cell hasn't changed — no redraw needed
+
+  const prev = paletteHoverIdx;
+  paletteHoverIdx = (idx >= 0 && idx < blockset.length) ? idx : -1;
+
+  if (prev >= 0 && prev < blockset.length) drawPaletteCell(prev, false);
+  if (paletteHoverIdx >= 0) {
+    drawPaletteCell(paletteHoverIdx, true);
+    paletteTooltip.textContent = `Block ${paletteHoverIdx}`;
+    paletteTooltip.style.opacity = 1;
+    // Position on first entry to this cell
+    const aside = document.querySelector("aside");
+    const asideRect = aside.getBoundingClientRect();
+    paletteTooltip.style.left = (e.clientX - asideRect.left + 12) + "px";
+    paletteTooltip.style.top  = (e.clientY - asideRect.top  - 22 + aside.scrollTop) + "px";
+  } else {
+    paletteTooltip.style.opacity = 0;
+  }
+});
+
+paletteCanvas.addEventListener("mouseleave", () => {
+  if (paletteHoverIdx >= 0 && paletteHoverIdx < blockset.length) {
+    const prev = paletteHoverIdx;
+    paletteHoverIdx = -1;
+    drawPaletteCell(prev, false);
+  }
+  paletteTooltip.style.opacity = 0;
+});
+
+// FIX 6: Only redraw old and new selected cells on click
+paletteCanvas.addEventListener("click", e => {
+  if (!blockImageCache) return;
+  const rect = paletteCanvas.getBoundingClientRect();
+  const col  = Math.floor((e.clientX - rect.left) / PALETTE_BLOCK);
+  const row  = Math.floor((e.clientY - rect.top)  / PALETTE_BLOCK);
+  const idx  = row * PALETTE_COLS + col;
+  if (idx < 0 || idx >= blockset.length) return;
+
+  const prev = selectedBlock;
+  selectedBlock = idx;
+  activePalette = 'map';
+  updateActivePaletteLabels();
+
+  // Also deselect in coll palette visually by redrawing its selected cell
+  if (prev !== idx) drawPaletteCell(prev, paletteHoverIdx === prev);
+  drawPaletteCell(idx, paletteHoverIdx === idx);
+
+  // Redraw previously-selected coll block to remove its yellow highlight
+  drawCollPaletteCell(selectedCollBlock, collPaletteHoverIdx === selectedCollBlock);
+});
+
+/* ---- Collision Block Palette ---- */
+
+function collPaletteIndexToXY(i) {
+  const col = i % PALETTE_COLS;
+  const row = Math.floor(i / PALETTE_COLS);
+  return { x: col * PALETTE_BLOCK, y: row * PALETTE_BLOCK };
+}
+
+function drawCollPaletteCell(i, hover) {
+  if (!collBlockImageCache || !collBlockImageCache.paletteCache[i]) return;
+  const { x, y } = collPaletteIndexToXY(i);
+
+  cpctx.drawImage(collBlockImageCache.paletteCache[i], x, y);
+
+  cpctx.strokeStyle = "#444";
+  cpctx.lineWidth = 1;
+  cpctx.strokeRect(x + 0.5, y + 0.5, PALETTE_BLOCK - 1, PALETTE_BLOCK - 1);
+
+  if (hover) {
+    cpctx.fillStyle = "rgba(0, 200, 255, 0.25)";
+    cpctx.fillRect(x, y, PALETTE_BLOCK, PALETTE_BLOCK);
+    cpctx.strokeStyle = "#00c8ff";
+    cpctx.lineWidth = 2;
+    cpctx.strokeRect(x + 1, y + 1, PALETTE_BLOCK - 2, PALETTE_BLOCK - 2);
+  }
+
+  // Yellow selection highlight only when this palette is active
+  if (i === selectedCollBlock && activePalette === 'coll') {
+    cpctx.strokeStyle = "#ffcc00";
+    cpctx.lineWidth = 2;
+    cpctx.strokeRect(x + 1, y + 1, PALETTE_BLOCK - 2, PALETTE_BLOCK - 2);
+  }
+}
+
+function drawCollBlockPaletteFull() {
+  if (!collBlockImageCache) return;
+  const rows = Math.ceil(collBlockset.length / PALETTE_COLS);
+  collPaletteCanvas.width  = PALETTE_COLS * PALETTE_BLOCK;
+  collPaletteCanvas.height = rows * PALETTE_BLOCK;
+  document.getElementById("collBlockPaletteContainer").style.height = (collPaletteCanvas.height + 2) + "px";
+  cpctx.clearRect(0, 0, collPaletteCanvas.width, collPaletteCanvas.height);
+  for (let i = 0; i < collBlockset.length; i++) {
+    drawCollPaletteCell(i, false);
+  }
+}
+
+let collPaletteHoverIdx = -1;
+
+collPaletteCanvas.addEventListener("mousemove", e => {
+  if (!collBlockImageCache) return;
+  const rect = collPaletteCanvas.getBoundingClientRect();
+  const col  = Math.floor((e.clientX - rect.left) / PALETTE_BLOCK);
+  const row  = Math.floor((e.clientY - rect.top)  / PALETTE_BLOCK);
+  const idx  = row * PALETTE_COLS + col;
+
+  if (collPaletteHoverIdx >= 0) {
+    const aside = document.querySelector("aside");
+    const asideRect = aside.getBoundingClientRect();
+    paletteTooltip.style.left = (e.clientX - asideRect.left + 12) + "px";
+    paletteTooltip.style.top  = (e.clientY - asideRect.top  - 22 + aside.scrollTop) + "px";
+  }
+
+  if (idx === collPaletteHoverIdx) return;
+
+  const prev = collPaletteHoverIdx;
+  collPaletteHoverIdx = (idx >= 0 && idx < collBlockset.length) ? idx : -1;
+
+  if (prev >= 0 && prev < collBlockset.length) drawCollPaletteCell(prev, false);
+  if (collPaletteHoverIdx >= 0) {
+    drawCollPaletteCell(collPaletteHoverIdx, true);
+    paletteTooltip.textContent = `Block ${collPaletteHoverIdx}`;
+    paletteTooltip.style.opacity = 1;
+    const aside = document.querySelector("aside");
+    const asideRect = aside.getBoundingClientRect();
+    paletteTooltip.style.left = (e.clientX - asideRect.left + 12) + "px";
+    paletteTooltip.style.top  = (e.clientY - asideRect.top  - 22 + aside.scrollTop) + "px";
+  } else {
+    paletteTooltip.style.opacity = 0;
+  }
+});
+
+collPaletteCanvas.addEventListener("mouseleave", () => {
+  if (collPaletteHoverIdx >= 0 && collPaletteHoverIdx < collBlockset.length) {
+    const prev = collPaletteHoverIdx;
+    collPaletteHoverIdx = -1;
+    drawCollPaletteCell(prev, false);
+  }
+  paletteTooltip.style.opacity = 0;
+});
+
+collPaletteCanvas.addEventListener("click", e => {
+  if (!collBlockImageCache) return;
+  const rect = collPaletteCanvas.getBoundingClientRect();
+  const col  = Math.floor((e.clientX - rect.left) / PALETTE_BLOCK);
+  const row  = Math.floor((e.clientY - rect.top)  / PALETTE_BLOCK);
+  const idx  = row * PALETTE_COLS + col;
+  if (idx < 0 || idx >= collBlockset.length) return;
+
+  const prev = selectedCollBlock;
+  selectedCollBlock = idx;
+  activePalette = 'coll';
+  updateActivePaletteLabels();
+
+  if (prev !== idx) drawCollPaletteCell(prev, collPaletteHoverIdx === prev);
+  drawCollPaletteCell(idx, collPaletteHoverIdx === idx);
+
+  // Remove yellow highlight from map palette selected block
+  drawPaletteCell(selectedBlock, paletteHoverIdx === selectedBlock);
+});
+
+function updateActivePaletteLabels() {
+  document.getElementById("activePaletteLabel").textContent      = activePalette === 'map'  ? "(active)" : "";
+  document.getElementById("activeCollPaletteLabel").textContent  = activePalette === 'coll' ? "(active)" : "";
+  // Also update hover outline color on canvas to reflect mode
+  hctx.strokeStyle = activePalette === 'coll' ? "#00ffaa" : "#ffcc00";
+}
+
+/* ---------- Tooltip ---------- */
+function showTooltip(x, y, mapBlockId, collBlockId, mouseX, mouseY) {
+  const mode = document.getElementById("viewMode").value;
+  if (mode === "collision") {
+    tooltip.textContent = `(${x}, ${y}) — Coll Block ${collBlockId}`;
+  } else if (mode === "both") {
+    tooltip.textContent = `(${x}, ${y}) — Block ${mapBlockId}  |  Coll ${collBlockId ?? "—"}`;
+  } else {
+    tooltip.textContent = `(${x}, ${y}) — Block ${mapBlockId}`;
+  }
+  tooltip.dataset.x = x;
+  tooltip.dataset.y = y;
+  tooltip.style.opacity = 1;
+  if (mouseX !== undefined) updateTooltipPosition(mouseX, mouseY);
+}
+
+function hideTooltip() {
+  tooltip.style.opacity = 0;
+  lastHoverMapCell = { x: -1, y: -1 };
+}
+
+function updateTooltipPosition(mouseX, mouseY) {
+  // mouseX/Y are clientX/Y — convert to coords relative to canvas-container
+  const containerRect = canvasContainer.getBoundingClientRect();
+  const left = mouseX - containerRect.left + canvasContainer.scrollLeft + 14;
+  const top  = mouseY - containerRect.top  + canvasContainer.scrollTop  - 28;
+  tooltip.style.transform = `translate(${left}px, ${top}px)`;
+}
+
+/* ---------- Zoom ---------- */
+zoomSlider.addEventListener("input", e => {
+  const z = e.target.value;
+  document.getElementById("zoomLabel").textContent = z + "×";
+  mapCanvas.style.transform = `scale(${z})`;
+  hoverCanvas.style.transform = `scale(${z})`;
+});
+
+canvasContainer.addEventListener("scroll", () => {
+  // Tooltip follows live mouse, nothing to update on scroll
+});
+
+/* ---------- Grid toggle ---------- */
+const toggleGridBtn = document.getElementById("toggleGrid");
+toggleGridBtn.addEventListener("click", () => {
+  showGrid = !showGrid;
+  if (!parsedMap || !blockImageCache) return;
+  composite();
+  drawHoverOutline(lastHoverMapCell.x, lastHoverMapCell.y);
+});
+
+/* ---------- View mode + opacity sliders ---------- */
+function updateOpacityVisibility() {
+  const mode = document.getElementById("viewMode").value;
+  document.getElementById("opacityControls").classList.toggle("visible", mode === "both");
+}
+
+document.getElementById("viewMode").addEventListener("change", () => {
+  updateOpacityVisibility();
+  redrawMap();
+});
+
+document.getElementById("mapOpacity").addEventListener("input", e => {
+  document.getElementById("mapOpacityLabel").textContent = Math.round(e.target.value * 100) + "%";
+  if (parsedMap && blockImageCache) composite();
+});
+
+document.getElementById("collOpacity").addEventListener("input", e => {
+  document.getElementById("collOpacityLabel").textContent = Math.round(e.target.value * 100) + "%";
+  if (collMap) composite();
+});
+
+function drawGridlines() {
+  const width  = +document.getElementById("width").value;
+  const height = +document.getElementById("height").value;
+  ctx.strokeStyle = "rgba(255,255,255,0.45)";
+  ctx.lineWidth = 1;
+  for (let x = 0; x <= width; x++) {
+    ctx.beginPath(); ctx.moveTo(x*BLOCK_SIZE, 0); ctx.lineTo(x*BLOCK_SIZE, height*BLOCK_SIZE); ctx.stroke();
+  }
+  for (let y = 0; y <= height; y++) {
+    ctx.beginPath(); ctx.moveTo(0, y*BLOCK_SIZE); ctx.lineTo(width*BLOCK_SIZE, y*BLOCK_SIZE); ctx.stroke();
+  }
+}
+
+// Init opacity visibility
+updateOpacityVisibility();
+
+/* ---------- File Loading ---------- */
+function handleFileLoad(fileInput, callback) {
+  const file = fileInput.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => callback(new Uint8Array(reader.result));
+  reader.readAsArrayBuffer(file);
+}
+
+/* ---------- Auto-guess map dimensions from file size ---------- */
+function guessMapDimensions(byteLength) {
+  // Find all divisor pairs (w, h) where w*h == byteLength,
+  // then pick the one whose aspect ratio is closest to 1:1 (most square).
+  const n = byteLength;
+  let bestW = n, bestH = 1, bestScore = Infinity;
+  for (let w = 1; w <= Math.sqrt(n); w++) {
+    if (n % w !== 0) continue;
+    const h = n / w;
+    // Score = how far from square (1.0 = perfect square)
+    const score = Math.max(w, h) / Math.min(w, h);
+    if (score < bestScore) { bestScore = score; bestW = Math.max(w, h); bestH = Math.min(w, h); }
+  }
+  // GBC maps are typically wider than tall — if best pair isn't obviously portrait, keep wider as width
+  return { width: bestW, height: bestH };
+}
+
+document.getElementById("map").addEventListener("change", e => {
+  handleFileLoad(e.target, data => {
+    mapData = data;
+    parsedMap = null;
+    const { width, height } = guessMapDimensions(data.length);
+    document.getElementById("width").value  = width;
+    document.getElementById("height").value = height;
+    redrawMap();
+  });
+});
+document.getElementById("extmap").addEventListener("change", e => {
+  handleFileLoad(e.target, data => { extMapData = data; parsedMap = null; redrawMap(); });
+});
+document.getElementById("blockset").addEventListener("change", e => {
+  handleFileLoad(e.target, data => {
+    blockset = parseBlockset(data);
+    invalidateCaches();
+    redrawMap();
+    if (tilesetImg && tileCache) blockEdLoad(0);
+  });
+});
+document.getElementById("palette").addEventListener("change", e => {
+  handleFileLoad(e.target, data => {
+    palettes = parsePalettes(data);
+    invalidateCaches();
+    redrawMap();
+    buildPaletteSwatches();
+  });
+});
+document.getElementById("collBlockset").addEventListener("change", e => {
+  handleFileLoad(e.target, data => {
+    collBlockset = parseCollisionBlockset(data);
+    invalidateCollCache();
+    redrawMap();
+    if (collTilesetImg) collBlockEdLoad(0);
+  });
+});
+document.getElementById("collMap").addEventListener("change", e => {
+  handleFileLoad(e.target, data => {
+    collMapRaw = data;
+    redrawMap();
+  });
+});
+
+/* ---------- "New" buttons — create data from scratch ---------- */
+
+function newEmptyBlock() {
+  // One block: tileIDs all 0, attrs all 0
+  return { tileIDs: new Uint16Array(4), attrs: new Uint8Array(4) };
+}
+
+document.getElementById("newBlockset").addEventListener("click", () => {
+  if (!tilesetImg || !palettes.length) {
+    alert("Load a Tileset (PNG) and Palette first, then create a new blockset.");
+    return;
+  }
+  blockset = [newEmptyBlock()];
+  // Build caches explicitly — don't rely on redrawMap which may bail if no mapData
+  tileCache       = buildTileCache(tilesetImg, palettes);
+  blockImageCache = buildBlockImageCache(blockset, tileCache);
+  drawBlockPaletteFull();
+  blockEdLoad(0);
+});
+
+document.getElementById("newMap").addEventListener("click", () => {
+  if (!blockset.length) {
+    alert("Load or create a Blockset first, then create a new map.");
+    return;
+  }
+  const width  = +document.getElementById("width").value;
+  const height = +document.getElementById("height").value;
+  const size   = width * height;
+  mapData    = new Uint8Array(size);    // all block 0
+  extMapData = new Uint8Array(size);
+  parsedMap  = null;
+  redrawMap();
+});
+
+document.getElementById("newCollBlockset").addEventListener("click", () => {
+  if (!collTilesetImg) {
+    alert("Load a Collision Tileset (PNG) first, then create a new collision blockset.");
+    return;
+  }
+  collBlockset = [[0, 0, 0, 0]];
+  collBlockImageCache = buildCollBlockImageCache(collBlockset, collTilesetImg);
+  drawCollBlockPaletteFull();
+  collBlockEdLoad(0);
+});
+
+document.getElementById("newCollMap").addEventListener("click", () => {
+  if (!collBlockset.length) {
+    alert("Load or create a Collision Blockset first, then create a new collision map.");
+    return;
+  }
+  const width  = +document.getElementById("width").value;
+  const height = +document.getElementById("height").value;
+  collMapRaw = new Uint8Array(width * height); // all block 0
+  collMap    = null;
+  redrawMap();
+});
+
+/* ---------- "Add Block" buttons in block editors ---------- */
+
+document.getElementById("blockEdAddBlock").addEventListener("click", () => {
+  if (!tilesetImg || !palettes.length) {
+    alert("Need a tileset and palette loaded to add blocks.");
+    return;
+  }
+  blockset.push(newEmptyBlock());
+  // If no cache yet, build fully; otherwise patch just the new entry
+  if (!tileCache) tileCache = buildTileCache(tilesetImg, palettes);
+  if (!blockImageCache) {
+    blockImageCache = buildBlockImageCache(blockset, tileCache);
+  } else {
+    rebuildSingleBlockCache(blockset.length - 1);
+  }
+  drawBlockPaletteFull();
+  blockEdLoad(blockset.length - 1);
+});
+
+document.getElementById("collBlockEdAddBlock").addEventListener("click", () => {
+  if (!collTilesetImg) {
+    alert("Need a collision tileset loaded to add blocks.");
+    return;
+  }
+  collBlockset.push([0, 0, 0, 0]);
+  if (!collBlockImageCache) {
+    collBlockImageCache = buildCollBlockImageCache(collBlockset, collTilesetImg);
+  } else {
+    rebuildSingleCollBlockCache(collBlockset.length - 1);
+  }
+  drawCollBlockPaletteFull();
+  collBlockEdLoad(collBlockset.length - 1);
+});
+/* ---------- Remove Block ---------- */
+document.getElementById("blockEdRemoveBlock").addEventListener("click", () => {
+  if (blockset.length <= 1) { alert("Cannot remove the last block."); return; }
+  blockset.splice(blockEdBlock, 1);
+  // Fully rebuild caches since indices shifted
+  blockImageCache = buildBlockImageCache(blockset, tileCache);
+  drawBlockPaletteFull();
+  blockEdLoad(Math.min(blockEdBlock, blockset.length - 1));
+  renderMapLayer();
+  composite();
+});
+
+document.getElementById("collBlockEdRemoveBlock").addEventListener("click", () => {
+  if (collBlockset.length <= 1) { alert("Cannot remove the last block."); return; }
+  collBlockset.splice(collBlockEdBlock, 1);
+  collBlockImageCache = buildCollBlockImageCache(collBlockset, collTilesetImg);
+  drawCollBlockPaletteFull();
+  collBlockEdLoad(Math.min(collBlockEdBlock, collBlockset.length - 1));
+  renderCollLayer();
+  composite();
+});
+
+/* ---------- New Palette (sidebar button) ---------- */
+function addNewPalette() {
+  palettes.push([[0,0,0],[0,0,0],[0,0,0],[0,0,0]]);
+  buildPaletteSwatches();
+  // If we now have enough to build caches (tileset + blockset), do it
+  if (tilesetImg && blockset.length) {
+    tileCache = buildTileCache(tilesetImg, palettes);
+    blockImageCache = buildBlockImageCache(blockset, tileCache);
+    drawBlockPaletteFull();
+    blockEdLoad(blockEdBlock);
+  }
+}
+document.getElementById("newPalette").addEventListener("click", () => {
+  addNewPalette();
+  // Switch to palette editor tab so user sees what was created
+  document.querySelectorAll(".editor-tab").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".editor-pane").forEach(p => p.classList.remove("active"));
+  document.querySelector("[data-tab='palEd']").classList.add("active");
+  document.getElementById("palEd").classList.add("active");
+});
+
+/* ---------- Palette editor: Add / Remove palette row ---------- */
+document.getElementById("palEdAddPalette").addEventListener("click", () => {
+  addNewPalette();
+});
+
+function removePaletteAt(idx) {
+  if (palettes.length <= 1) { alert("Cannot remove the last palette."); return; }
+  palettes.splice(idx, 1);
+  // Clamp selection in case removed row was selected
+  palEdPal = Math.min(palEdPal, palettes.length - 1);
+  document.getElementById("palColorEditor").style.display = "none";
+  buildPaletteSwatches();
+  // Rebuild tile/block caches since palette indices shifted
+  if (tilesetImg && blockset.length) {
+    tileCache = null; blockImageCache = null;
+    if (ensureCaches()) { drawBlockPaletteFull(); renderMapLayer(); composite(); }
+  }
+}
+
+document.getElementById("tileset").addEventListener("change", e => {
+  const file = e.target.files[0]; if (!file) return;
+  const img = new Image();
+  img.onload = () => {
+    tilesetImg = img;
+    invalidateCaches();
+    redrawMap();
+    drawEditorTileset();
+    if (blockset.length) blockEdLoad(blockEdBlock);
+  };
+  img.src = URL.createObjectURL(file);
+});
+document.getElementById("collTileset").addEventListener("change", e => {
+  const file = e.target.files[0]; if (!file) return;
+  const img = new Image();
+  img.onload = () => {
+    collTilesetImg = img;
+    invalidateCollCache();
+    redrawMap();
+    drawEditorCollTileset();
+    if (collBlockset.length) collBlockEdLoad(collBlockEdBlock);
+  };
+  img.src = URL.createObjectURL(file);
+});
+
+/* ---------- Render button ---------- */
+document.getElementById("render").addEventListener("click", () => {
+  undoStack = [];
+  collUndoStack = [];
+  updateUndoButton();
+  redrawMap();
+});
+
+// Init undo button state
+updateUndoButton();
+// Init active palette labels
+updateActivePaletteLabels();
+
+/* ================================================================
+   EDITOR PANEL — Tabs, Block Editor, Coll Block Editor, Palette Editor
+   ================================================================ */
+
+/* ---- Tab switching ---- */
+document.querySelectorAll(".editor-tab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".editor-tab").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".editor-pane").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.tab).classList.add("active");
+  });
+});
+
+/* ================================================================
+   BLOCK EDITOR
+   ================================================================ */
+let blockEdBlock = 0;    // which block we're editing
+let blockEdSlot  = 0;    // which tile slot (0–3) is selected
+// Working copy of the block being edited (not committed until Apply)
+let blockEdWorking = null; // { tileIDs: Uint16Array(4), attrs: Uint8Array(4) }
+
+const slotLabels = ["TL (0)", "TR (1)", "BL (2)", "BR (3)"];
+const bsCanvases = [0,1,2,3].map(i => document.getElementById("bs" + i));
+
+function blockEdLoad(idx) {
+  if (!blockset.length) return;
+  blockEdBlock = Math.max(0, Math.min(idx, blockset.length - 1));
+  document.getElementById("blockEdIdx").textContent = blockEdBlock;
+  // Deep copy block into working state
+  const b = blockset[blockEdBlock];
+  blockEdWorking = {
+    tileIDs: new Uint16Array(b.tileIDs),
+    attrs:   new Uint8Array(b.attrs)
+  };
+  blockEdSelectSlot(blockEdSlot);
+  blockEdDrawAllSlots();
+}
+
+function blockEdSelectSlot(slot) {
+  blockEdSlot = slot;
+  document.querySelectorAll("#blockSlots .tile-slot").forEach((el, i) => {
+    el.classList.toggle("selected-slot", i === slot);
+  });
+  document.getElementById("blockEdSlotLabel").textContent = slotLabels[slot];
+  if (!blockEdWorking) return;
+  const attr = blockEdWorking.attrs[slot];
+  document.getElementById("blockEdTileIdx").value = blockEdWorking.tileIDs[slot];
+  document.getElementById("blockEdPalIdx").value  = attr & 0x7;
+  document.getElementById("blockEdFlipH").checked = !!(attr & 0x20);
+  document.getElementById("blockEdFlipV").checked = !!(attr & 0x40);
+  // Redraw tileset with this slot's palette
+  drawEditorTileset(editorTilesetHoverTile);
+}
+
+function blockEdDrawSlot(slot) {
+  if (!blockEdWorking || !tileCache) return;
+  const c   = bsCanvases[slot];
+  const oc  = c.getContext("2d");
+  oc.clearRect(0, 0, 64, 64);
+  const ti    = blockEdWorking.tileIDs[slot];
+  const attr  = blockEdWorking.attrs[slot];
+  const palID = attr & 0x7;
+  const flipH = !!(attr & 0x20);
+  const flipV = !!(attr & 0x40);
+  if (!tileCache[ti]) return;
+  const palCount = tileCache[ti].length;
+  const imgData  = tileCache[ti][palID % palCount];
+  const scratch  = document.createElement("canvas");
+  scratch.width  = TILE_SIZE; scratch.height = TILE_SIZE;
+  scratch.getContext("2d").putImageData(imgData, 0, 0);
+  oc.save();
+  oc.translate(flipH ? 64 : 0, flipV ? 64 : 0);
+  oc.scale(flipH ? -1 : 1, flipV ? -1 : 1);
+  oc.imageSmoothingEnabled = false;
+  oc.drawImage(scratch, 0, 0, 64, 64);
+  oc.restore();
+}
+
+function blockEdDrawAllSlots() {
+  for (let s = 0; s < 4; s++) blockEdDrawSlot(s);
+}
+
+// Slot click + hover
+document.querySelectorAll("#blockSlots .tile-slot").forEach(el => {
+  el.addEventListener("click", () => blockEdSelectSlot(+el.dataset.slot));
+  el.addEventListener("mouseenter", () => el.classList.add("hover-slot"));
+  el.addEventListener("mouseleave", () => el.classList.remove("hover-slot"));
+});
+
+// Apply to slot
+document.getElementById("blockEdPalIdx").addEventListener("input", () => {
+  drawEditorTileset(editorTilesetHoverTile);
+});
+
+document.getElementById("blockEdApply").addEventListener("click", () => {
+  if (!blockEdWorking) return;
+  const s    = blockEdSlot;
+  let ti     = +document.getElementById("blockEdTileIdx").value;
+  const palID= +document.getElementById("blockEdPalIdx").value & 0x7;
+  const flipH= document.getElementById("blockEdFlipH").checked;
+  const flipV= document.getElementById("blockEdFlipV").checked;
+
+  // Store tileID with bank bit
+  blockEdWorking.tileIDs[s] = ti & 0x1FF;
+  let attr = (blockEdWorking.attrs[s] & ~0x6F) | (palID & 0x7);
+  if (flipH) attr |= 0x20;
+  if (flipV) attr |= 0x40;
+  // Bank bit in attrs (bit 3)
+  if (ti >= 0x100) attr |= 0x08; else attr &= ~0x08;
+  blockEdWorking.attrs[s] = attr;
+
+  blockEdDrawSlot(s);
+});
+
+// Save & update map
+document.getElementById("blockEdApplyAll").addEventListener("click", () => {
+  if (!blockEdWorking || !blockset.length) return;
+  // Commit working copy back to blockset
+  const b = blockset[blockEdBlock];
+  for (let s = 0; s < 4; s++) {
+    b.tileIDs[s] = blockEdWorking.tileIDs[s];
+    b.attrs[s]   = blockEdWorking.attrs[s];
+  }
+  // Rebuild only the affected block's cache entries
+  rebuildSingleBlockCache(blockEdBlock);
+  // Redraw palette cell
+  drawPaletteCell(blockEdBlock, paletteHoverIdx === blockEdBlock);
+  // Redraw map layer and composite
+  renderMapLayer();
+  composite();
+});
+
+function rebuildSingleBlockCache(idx) {
+  if (!tileCache || !blockImageCache) return;
+  const scratch = document.createElement("canvas");
+  scratch.width  = TILE_SIZE; scratch.height = TILE_SIZE;
+  const sctx = scratch.getContext("2d");
+  const block = blockset[idx];
+
+  const offMap = document.createElement("canvas");
+  offMap.width  = BLOCK_SIZE; offMap.height = BLOCK_SIZE;
+  const ocMap = offMap.getContext("2d");
+
+  const offPal = document.createElement("canvas");
+  offPal.width  = PALETTE_BLOCK; offPal.height = PALETTE_BLOCK;
+  const ocPal = offPal.getContext("2d");
+  ocPal.imageSmoothingEnabled = false;
+  const scale = PALETTE_BLOCK / BLOCK_SIZE;
+
+  for (let t = 0; t < 4; t++) {
+    const ti    = block.tileIDs[t];
+    const attr  = block.attrs[t];
+    const palID = attr & 0x7;
+    const flipH = !!(attr & 0x20);
+    const flipV = !!(attr & 0x40);
+    if (!tileCache[ti]) continue;
+    const palCount = tileCache[ti].length;
+    sctx.putImageData(tileCache[ti][palID % palCount], 0, 0);
+
+    const dx = (t % 2) * TILE_SIZE, dy = Math.floor(t / 2) * TILE_SIZE;
+    ocMap.save();
+    ocMap.translate(dx + (flipH ? TILE_SIZE : 0), dy + (flipV ? TILE_SIZE : 0));
+    ocMap.scale(flipH ? -1 : 1, flipV ? -1 : 1);
+    ocMap.drawImage(scratch, 0, 0); ocMap.restore();
+
+    const pdx = (t % 2) * TILE_SIZE * scale, pdy = Math.floor(t / 2) * TILE_SIZE * scale;
+    ocPal.save();
+    ocPal.translate(pdx + (flipH ? TILE_SIZE*scale : 0), pdy + (flipV ? TILE_SIZE*scale : 0));
+    ocPal.scale(flipH ? -scale : scale, flipV ? -scale : scale);
+    ocPal.drawImage(scratch, 0, 0); ocPal.restore();
+  }
+
+  blockImageCache.mapCache[idx]     = offMap;
+  blockImageCache.paletteCache[idx] = offPal;
+}
+
+// Prev/next block
+document.getElementById("blockEdPrev").addEventListener("click", () => blockEdLoad(blockEdBlock - 1));
+document.getElementById("blockEdNext").addEventListener("click", () => blockEdLoad(blockEdBlock + 1));
+
+// When map palette block is selected, sync block editor
+const _origPaletteClick = paletteCanvas.onclick;
+paletteCanvas.addEventListener("click", () => {
+  if (document.querySelector(".editor-tab.active")?.dataset.tab === "blockEd") {
+    setTimeout(() => blockEdLoad(selectedBlock), 0);
+  }
+});
+
+// Editor tileset canvas — draw and pick
+const editorTilesetCanvas = document.getElementById("editorTilesetCanvas");
+const editorTilesetTip    = document.getElementById("editorTilesetTip");
+let editorTilesetHoverTile = -1;
+
+function drawEditorTileset(hoverTile = -1) {
+  if (!tilesetImg) return;
+  const scale = 2;
+  const tw = TILE_SIZE * scale;
+  const tpr = Math.floor(tilesetImg.width  / TILE_SIZE);
+  const tpc = Math.floor(tilesetImg.height / TILE_SIZE);
+  const totalTiles = tpr * tpc;
+  editorTilesetCanvas.width  = tilesetImg.width  * scale;
+  editorTilesetCanvas.height = tilesetImg.height * scale;
+  const oc = editorTilesetCanvas.getContext("2d");
+  oc.imageSmoothingEnabled = false;
+
+  // Get current palette index from the palette selector (or 0 if no tileCache yet)
+  const palID = +document.getElementById("blockEdPalIdx").value || 0;
+
+  if (tileCache) {
+    // Draw each tile recolored with the selected palette
+    const scratch = document.createElement("canvas");
+    scratch.width = TILE_SIZE; scratch.height = TILE_SIZE;
+    const sc = scratch.getContext("2d");
+    for (let ti = 0; ti < totalTiles; ti++) {
+      if (!tileCache[ti]) continue;
+      const palCount = tileCache[ti].length;
+      sc.putImageData(tileCache[ti][palID % palCount], 0, 0);
+      const tx = (ti % tpr) * tw;
+      const ty = Math.floor(ti / tpr) * tw;
+      oc.drawImage(scratch, 0, 0, TILE_SIZE, TILE_SIZE, tx, ty, tw, tw);
+    }
+  } else {
+    // Fallback: raw image
+    oc.drawImage(tilesetImg, 0, 0, editorTilesetCanvas.width, editorTilesetCanvas.height);
+  }
+
+  // Grid
+  oc.strokeStyle = "rgba(255,255,255,0.2)";
+  oc.lineWidth = 1;
+  for (let x = 0; x <= tpr; x++) {
+    oc.beginPath(); oc.moveTo(x*tw, 0); oc.lineTo(x*tw, editorTilesetCanvas.height); oc.stroke();
+  }
+  for (let y = 0; y <= tpc; y++) {
+    oc.beginPath(); oc.moveTo(0, y*tw); oc.lineTo(editorTilesetCanvas.width, y*tw); oc.stroke();
+  }
+
+  // Hover highlight
+  if (hoverTile >= 0) {
+    const hx = (hoverTile % tpr) * tw;
+    const hy = Math.floor(hoverTile / tpr) * tw;
+    oc.fillStyle = "rgba(255,204,0,0.25)";
+    oc.fillRect(hx, hy, tw, tw);
+    oc.strokeStyle = "#ffcc00";
+    oc.lineWidth = 2;
+    oc.strokeRect(hx + 1, hy + 1, tw - 2, tw - 2);
+  }
+}
+
+function editorTilesetGetTile(e) {
+  const scale = 2, tw = TILE_SIZE * scale;
+  const rect = editorTilesetCanvas.getBoundingClientRect();
+  const px = (e.clientX - rect.left) * (editorTilesetCanvas.width / rect.width);
+  const py = (e.clientY - rect.top)  * (editorTilesetCanvas.height / rect.height);
+  const col = Math.floor(px / tw), row = Math.floor(py / tw);
+  const tpr = Math.floor(tilesetImg.width / TILE_SIZE);
+  const totalTiles = tpr * Math.floor(tilesetImg.height / TILE_SIZE);
+  const ti = row * tpr + col;
+  return (ti >= 0 && ti < totalTiles) ? ti : -1;
+}
+
+editorTilesetCanvas.addEventListener("mousemove", e => {
+  if (!tilesetImg) return;
+  const ti = editorTilesetGetTile(e);
+  // Always update tip position so it follows cursor
+  editorTilesetTip.style.left = (e.clientX + 12) + "px";
+  editorTilesetTip.style.top  = (e.clientY - 22) + "px";
+  if (ti === editorTilesetHoverTile) return;
+  editorTilesetHoverTile = ti;
+  drawEditorTileset(ti);
+  if (ti >= 0) {
+    editorTilesetTip.textContent = `Tile ${ti}`;
+    editorTilesetTip.style.opacity = 1;
+  } else {
+    editorTilesetTip.style.opacity = 0;
+  }
+});
+
+editorTilesetCanvas.addEventListener("mouseleave", () => {
+  editorTilesetHoverTile = -1;
+  drawEditorTileset(-1);
+  editorTilesetTip.style.opacity = 0;
+});
+
+editorTilesetCanvas.addEventListener("click", e => {
+  if (!tilesetImg) return;
+  const ti = editorTilesetGetTile(e);
+  if (ti < 0) return;
+  document.getElementById("blockEdTileIdx").value = ti;
+  document.getElementById("blockEdApply").click();
+});
+
+/* ================================================================
+   COLLISION BLOCK EDITOR
+   ================================================================ */
+let collBlockEdBlock = 0;
+let collBlockEdSlot  = 0;
+let collBlockEdWorking = null; // [ti0, ti1, ti2, ti3]
+
+const cbsCanvases = [0,1,2,3].map(i => document.getElementById("cbs" + i));
+
+function collBlockEdLoad(idx) {
+  if (!collBlockset.length) return;
+  collBlockEdBlock = Math.max(0, Math.min(idx, collBlockset.length - 1));
+  document.getElementById("collBlockEdIdx").textContent = collBlockEdBlock;
+  collBlockEdWorking = [...collBlockset[collBlockEdBlock]];
+  collBlockEdSelectSlot(collBlockEdSlot);
+  collBlockEdDrawAllSlots();
+}
+
+function collBlockEdSelectSlot(slot) {
+  collBlockEdSlot = slot;
+  document.querySelectorAll("#collBlockSlots .tile-slot").forEach((el, i) => {
+    el.classList.toggle("selected-slot", i === slot);
+  });
+  document.getElementById("collBlockEdSlotLabel").textContent = slotLabels[slot];
+  if (collBlockEdWorking) {
+    document.getElementById("collBlockEdTileIdx").value = collBlockEdWorking[slot];
+  }
+}
+
+function collBlockEdDrawSlot(slot) {
+  if (!collBlockEdWorking || !collTilesetImg) return;
+  const c  = cbsCanvases[slot];
+  const oc = c.getContext("2d");
+  oc.imageSmoothingEnabled = false;
+  oc.clearRect(0, 0, 64, 64);
+  const ti = collBlockEdWorking[slot];
+  const tpr = Math.floor(collTilesetImg.width / TILE_SIZE);
+  const tx  = (ti % tpr) * TILE_SIZE;
+  const ty  = Math.floor(ti / tpr) * TILE_SIZE;
+  oc.drawImage(collTilesetImg, tx, ty, TILE_SIZE, TILE_SIZE, 0, 0, 64, 64);
+}
+
+function collBlockEdDrawAllSlots() {
+  for (let s = 0; s < 4; s++) collBlockEdDrawSlot(s);
+}
+
+document.querySelectorAll("#collBlockSlots .tile-slot").forEach(el => {
+  el.addEventListener("click", () => collBlockEdSelectSlot(+el.dataset.slot));
+  el.addEventListener("mouseenter", () => el.classList.add("hover-slot"));
+  el.addEventListener("mouseleave", () => el.classList.remove("hover-slot"));
+});
+
+document.getElementById("collBlockEdApply").addEventListener("click", () => {
+  if (!collBlockEdWorking) return;
+  collBlockEdWorking[collBlockEdSlot] = +document.getElementById("collBlockEdTileIdx").value;
+  collBlockEdDrawSlot(collBlockEdSlot);
+});
+
+document.getElementById("collBlockEdApplyAll").addEventListener("click", () => {
+  if (!collBlockEdWorking || !collBlockset.length) return;
+  collBlockset[collBlockEdBlock] = [...collBlockEdWorking];
+  // Rebuild single coll block cache entry
+  rebuildSingleCollBlockCache(collBlockEdBlock);
+  drawCollPaletteCell(collBlockEdBlock, collPaletteHoverIdx === collBlockEdBlock);
+  renderCollLayer();
+  composite();
+});
+
+function rebuildSingleCollBlockCache(idx) {
+  if (!collBlockImageCache || !collTilesetImg) return;
+  const block = collBlockset[idx];
+  const tpr   = Math.floor(collTilesetImg.width  / TILE_SIZE);
+  const tpc   = Math.floor(collTilesetImg.height / TILE_SIZE);
+  const maxTI = tpr * tpc - 1;
+  const scale = PALETTE_BLOCK / BLOCK_SIZE;
+
+  const scratch = document.createElement("canvas");
+  scratch.width = TILE_SIZE; scratch.height = TILE_SIZE;
+  const sc = scratch.getContext("2d");
+
+  const offMap = document.createElement("canvas");
+  offMap.width = BLOCK_SIZE; offMap.height = BLOCK_SIZE;
+  const ocMap = offMap.getContext("2d");
+
+  const offPal = document.createElement("canvas");
+  offPal.width = PALETTE_BLOCK; offPal.height = PALETTE_BLOCK;
+  const ocPal = offPal.getContext("2d");
+  ocPal.imageSmoothingEnabled = false;
+
+  for (let t = 0; t < 4; t++) {
+    const ti = block[t];
+    if (ti > maxTI) continue;
+    const tx = (ti % tpr) * TILE_SIZE, ty = Math.floor(ti / tpr) * TILE_SIZE;
+    sc.clearRect(0, 0, TILE_SIZE, TILE_SIZE);
+    sc.drawImage(collTilesetImg, tx, ty, TILE_SIZE, TILE_SIZE, 0, 0, TILE_SIZE, TILE_SIZE);
+    const dx = (t%2)*TILE_SIZE, dy = Math.floor(t/2)*TILE_SIZE;
+    ocMap.drawImage(scratch, dx, dy);
+    ocPal.drawImage(scratch, (t%2)*TILE_SIZE*scale, Math.floor(t/2)*TILE_SIZE*scale, TILE_SIZE*scale, TILE_SIZE*scale);
+  }
+
+  collBlockImageCache.mapCache[idx]     = offMap;
+  collBlockImageCache.paletteCache[idx] = offPal;
+}
+
+document.getElementById("collBlockEdPrev").addEventListener("click", () => collBlockEdLoad(collBlockEdBlock - 1));
+document.getElementById("collBlockEdNext").addEventListener("click", () => collBlockEdLoad(collBlockEdBlock + 1));
+
+collPaletteCanvas.addEventListener("click", () => {
+  if (document.querySelector(".editor-tab.active")?.dataset.tab === "collBlockEd") {
+    setTimeout(() => collBlockEdLoad(selectedCollBlock), 0);
+  }
+});
+
+const editorCollTilesetCanvas = document.getElementById("editorCollTilesetCanvas");
+const editorCollTilesetTip    = document.getElementById("editorCollTilesetTip");
+let editorCollTilesetHoverTile = -1;
+
+function drawEditorCollTileset(hoverTile = -1) {
+  if (!collTilesetImg) return;
+  const scale = 2;
+  const tw = TILE_SIZE * scale;
+  const tpr = Math.floor(collTilesetImg.width / TILE_SIZE);
+  editorCollTilesetCanvas.width  = collTilesetImg.width  * scale;
+  editorCollTilesetCanvas.height = collTilesetImg.height * scale;
+  const oc = editorCollTilesetCanvas.getContext("2d");
+  oc.imageSmoothingEnabled = false;
+  oc.drawImage(collTilesetImg, 0, 0, editorCollTilesetCanvas.width, editorCollTilesetCanvas.height);
+  oc.strokeStyle = "rgba(255,255,255,0.2)";
+  oc.lineWidth = 1;
+  for (let x = 0; x <= collTilesetImg.width / TILE_SIZE; x++) {
+    oc.beginPath(); oc.moveTo(x*tw, 0); oc.lineTo(x*tw, editorCollTilesetCanvas.height); oc.stroke();
+  }
+  for (let y = 0; y <= collTilesetImg.height / TILE_SIZE; y++) {
+    oc.beginPath(); oc.moveTo(0, y*tw); oc.lineTo(editorCollTilesetCanvas.width, y*tw); oc.stroke();
+  }
+  if (hoverTile >= 0) {
+    const hx = (hoverTile % tpr) * tw;
+    const hy = Math.floor(hoverTile / tpr) * tw;
+    oc.fillStyle = "rgba(255,204,0,0.25)";
+    oc.fillRect(hx, hy, tw, tw);
+    oc.strokeStyle = "#ffcc00";
+    oc.lineWidth = 2;
+    oc.strokeRect(hx + 1, hy + 1, tw - 2, tw - 2);
+  }
+}
+
+function editorCollTilesetGetTile(e) {
+  const scale = 2, tw = TILE_SIZE * scale;
+  const rect = editorCollTilesetCanvas.getBoundingClientRect();
+  const px = (e.clientX - rect.left) * (editorCollTilesetCanvas.width / rect.width);
+  const py = (e.clientY - rect.top)  * (editorCollTilesetCanvas.height / rect.height);
+  const tpr = Math.floor(collTilesetImg.width / TILE_SIZE);
+  const totalTiles = tpr * Math.floor(collTilesetImg.height / TILE_SIZE);
+  const ti = Math.floor(py / tw) * tpr + Math.floor(px / tw);
+  return (ti >= 0 && ti < totalTiles) ? ti : -1;
+}
+
+editorCollTilesetCanvas.addEventListener("mousemove", e => {
+  if (!collTilesetImg) return;
+  const ti = editorCollTilesetGetTile(e);
+  editorCollTilesetTip.style.left = (e.clientX + 12) + "px";
+  editorCollTilesetTip.style.top  = (e.clientY - 22) + "px";
+  if (ti === editorCollTilesetHoverTile) return;
+  editorCollTilesetHoverTile = ti;
+  drawEditorCollTileset(ti);
+  if (ti >= 0) {
+    editorCollTilesetTip.textContent = `Tile ${ti}`;
+    editorCollTilesetTip.style.opacity = 1;
+  } else {
+    editorCollTilesetTip.style.opacity = 0;
+  }
+});
+
+editorCollTilesetCanvas.addEventListener("mouseleave", () => {
+  editorCollTilesetHoverTile = -1;
+  drawEditorCollTileset(-1);
+  editorCollTilesetTip.style.opacity = 0;
+});
+
+editorCollTilesetCanvas.addEventListener("click", e => {
+  if (!collTilesetImg) return;
+  const ti = editorCollTilesetGetTile(e);
+  if (ti < 0) return;
+  document.getElementById("collBlockEdTileIdx").value = ti;
+  document.getElementById("collBlockEdApply").click();
+});
+
+/* ================================================================
+   PALETTE EDITOR
+   ================================================================ */
+let palEdPal = 0, palEdCol = 0;
+
+function buildPaletteSwatches() {
+  const container = document.getElementById("palSwatches");
+  container.innerHTML = "";
+  palettes.forEach((pal, pi) => {
+    const row = document.createElement("div");
+    row.className = "pal-row";
+
+    const lbl = document.createElement("div");
+    lbl.className = "pal-row-label";
+    lbl.textContent = `Pal ${pi}`;
+    row.appendChild(lbl);
+
+    pal.forEach((col, ci) => {
+      const sw = document.createElement("div");
+      sw.className = "pal-swatch";
+      sw.style.background = `rgb(${col[0]},${col[1]},${col[2]})`;
+      sw.title = `Pal ${pi}, Color ${ci}`;
+      sw.addEventListener("click", () => palEdSelectSwatch(pi, ci));
+      row.appendChild(sw);
+    });
+
+    // Per-row remove button
+    const rmBtn = document.createElement("button");
+    rmBtn.textContent = "✕";
+    rmBtn.title = `Remove palette ${pi}`;
+    rmBtn.style.cssText = "margin-left:4px;padding:0 5px;font-size:11px;color:#f88;background:#2a2a2a;border:1px solid #555;cursor:pointer;flex-shrink:0;";
+    rmBtn.addEventListener("click", () => removePaletteAt(pi));
+    row.appendChild(rmBtn);
+
+    container.appendChild(row);
+  });
+}
+
+function palEdSelectSwatch(pi, ci) {
+  palEdPal = pi; palEdCol = ci;
+  document.querySelectorAll(".pal-swatch").forEach(s => s.classList.remove("selected-swatch"));
+  // Find and highlight the right swatch
+  const rows = document.querySelectorAll(".pal-row");
+  const sw   = rows[pi]?.querySelectorAll(".pal-swatch")[ci];
+  if (sw) sw.classList.add("selected-swatch");
+
+  document.getElementById("palColorEditor").style.display = "block";
+  document.getElementById("palEdPalIdx").textContent = pi;
+  document.getElementById("palEdColIdx").textContent = ci;
+  const [r, g, b] = palettes[pi][ci];
+  document.getElementById("palEdR").value = r;
+  document.getElementById("palEdG").value = g;
+  document.getElementById("palEdB").value = b;
+  updatePalPreview();}
+
+function updatePalPreview() {
+  const r = +document.getElementById("palEdR").value;
+  const g = +document.getElementById("palEdG").value;
+  const b = +document.getElementById("palEdB").value;
+  document.getElementById("palColorPreview").style.background = `rgb(${r},${g},${b})`;
+  // Keep hex input in sync
+  const hex = ((r << 16) | (g << 8) | b).toString(16).padStart(6, "0");
+  document.getElementById("palEdHex").value = hex;
+}
+
+["palEdR","palEdG","palEdB"].forEach(id => {
+  document.getElementById(id).addEventListener("input", updatePalPreview);
+});
+
+// Hex input → sliders
+document.getElementById("palEdHex").addEventListener("input", e => {
+  const raw = e.target.value.replace(/[^0-9a-fA-F]/g, "");
+  if (raw.length !== 6) return; // only apply when complete
+  const r = parseInt(raw.slice(0,2), 16);
+  const g = parseInt(raw.slice(2,4), 16);
+  const b = parseInt(raw.slice(4,6), 16);
+  // Snap to nearest GBC step (multiples of 8)
+  const snap = v => Math.min(248, Math.round(v / 8) * 8);
+  document.getElementById("palEdR").value = snap(r);
+  document.getElementById("palEdG").value = snap(g);
+  document.getElementById("palEdB").value = snap(b);
+  document.getElementById("palColorPreview").style.background = `rgb(${snap(r)},${snap(g)},${snap(b)})`;
+});
+
+// Apply color to palettes[] only, update swatch
+document.getElementById("palEdApply").addEventListener("click", () => {
+  const r = +document.getElementById("palEdR").value;
+  const g = +document.getElementById("palEdG").value;
+  const b = +document.getElementById("palEdB").value;
+  palettes[palEdPal][palEdCol] = [r, g, b];
+  // Update swatch color
+  const rows = document.querySelectorAll(".pal-row");
+  const sw   = rows[palEdPal]?.querySelectorAll(".pal-swatch")[palEdCol];
+  if (sw) sw.style.background = `rgb(${r},${g},${b})`;
+});
+
+// Apply & full rebuild
+document.getElementById("palEdApplyRebuild").addEventListener("click", () => {
+  document.getElementById("palEdApply").click();
+  // Only null the image caches, NOT parsedMap — we need it for renderMapLayer
+  tileCache       = null;
+  blockImageCache = null;
+  if (ensureCaches()) {
+    drawBlockPaletteFull();
+    renderMapLayer();
+    composite();
+    blockEdDrawAllSlots();
+    drawEditorTileset(editorTilesetHoverTile); // update tileset picker with new colors
+  }
+});
+
+
+
+
+document.getElementById("saveMap").addEventListener("click", async () => {
+  if (!mapData && !collMapRaw) return;
+
+  const zip = new JSZip();
+
+  if (mapData)    zip.file("map.bin",           mapData);
+  if (extMapData) zip.file("extmap.bin",         extMapData);
+  if (collMapRaw) zip.file("collision_map.bin",  collMapRaw);
+  if (blockset.length)     zip.file("blockset.bin",      serializeBlockset(blockset));
+  if (collBlockset.length) zip.file("coll_blockset.bin", serializeCollBlockset(collBlockset));
+  if (palettes.length)     zip.file("palette.bin",       serializePalettes(palettes));
+
+  // Helper: render a layer canvas to a PNG blob
+  function layerToBlob(layer) {
+    return new Promise(resolve => {
+      // layer is an offscreen canvas (mapLayer / collLayer)
+      layer.toBlob(resolve, "image/png");
+    });
+  }
+
+  if (mapLayer.width > 0 && parsedMap && blockImageCache) {
+    // Ensure mapLayer is up to date
+    renderMapLayer();
+    const pngBlob = await layerToBlob(mapLayer);
+    zip.file("map.png", pngBlob);
+  }
+
+  if (collLayer.width > 0 && collMap && collBlockImageCache) {
+    renderCollLayer();
+    const pngBlob = await layerToBlob(collLayer);
+    zip.file("collision_map.png", pngBlob);
+  }
+
+  const blob = await zip.generateAsync({ type: "blob" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href = url; a.download = "map_export.zip"; a.click();
+  URL.revokeObjectURL(url);
+});
+</script>
+</body>
+</html>

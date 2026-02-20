@@ -1,5 +1,3 @@
-;; Disassembled with BadBoy Disassembler: https://github.com/daid/BadBoy
-
 INCLUDE "constants/hardware.inc"
 INCLUDE "constants/macros.asm"
 INCLUDE "constants/constants.asm"
