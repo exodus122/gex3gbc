@@ -2170,7 +2170,7 @@ call_02_6965_ObjectAction_MadBomber_Unk5:
 
 call_02_6971_ObjectAction_Bomb_Unk0:
     ld   c,$55
-    call call_00_29b7_FindObjectByID_C
+    call call_00_29b7_GetActionIDOfObject_C
     ld   a,c
     cp   a,$02
     ld   a,$01
@@ -2298,7 +2298,7 @@ call_02_6a4c_ObjectAction_Bomb_Unk4:
     call call_00_2a5d_Object_Check5Flag2
     jp   nz,call_00_2b7a_ClearObjectThenJump
     ld   c,$55
-    call call_00_29b7_FindObjectByID_C
+    call call_00_29b7_GetActionIDOfObject_C
     ld   a,c
     cp   a,$04
     ret  nc
@@ -2722,12 +2722,12 @@ call_02_6d6d_ObjectAction_BrainOfOz_Unk0:
 call_02_6d85_ObjectAction_BrainOfOz_Unk2:
     call call_00_233e_Object_UpdatePatternedPositionFromVelocityTable
     ld   c,$69
-    call call_00_29b7_FindObjectByID_C
+    call call_00_29b7_GetActionIDOfObject_C
     ld   a,c
     cp   a,$00
     ret  nz
     ld   c,$68
-    call call_00_29b7_FindObjectByID_C
+    call call_00_29b7_GetActionIDOfObject_C
     inc  c
     ret  nz
     ld   a,[wDCD1_BrainOfOzFlag]
@@ -2757,7 +2757,7 @@ call_02_6dba_ObjectAction_BrainOfOz_Unk3:
     call call_00_2922_Object_Timer1ACountdown
     jr   nz,.label6DD2
     ld   c,$6A
-    call call_00_29ce_ObjectExistsCheck
+    call call_00_29ce_CheckObject_C_Exists
     ret  z
     ld   a,$01
     ld   [wDCD1_BrainOfOzFlag],a
@@ -2901,7 +2901,7 @@ call_02_6ec7_ObjectAction_CannonProjectile_Update:
     ld   c,$3C
     call nz,call_00_28dc_Object_SetYVelocity
     ld   c,$67
-    call call_00_29ce_ObjectExistsCheck
+    call call_00_29ce_CheckObject_C_Exists
     ret  nz
     ld   a,l
     or   a,$01
@@ -3012,7 +3012,7 @@ call_02_6f64_ObjectAction_Rez_Unk8:
     jp   call_00_3792_PrepareRelativeObjectSpawn
 .label6F93:
     ld   c,$71
-    call call_00_29ce_ObjectExistsCheck
+    call call_00_29ce_CheckObject_C_Exists
     ld   a,$00
     jp   nz,call_02_72ac_SetupNewAction
     ret  

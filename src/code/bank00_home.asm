@@ -510,7 +510,7 @@ call_00_05c7:
     ret                                                ;; 00:05f0 $c9
 .jr_00_05f1:
     ld   C, $1c                                        ;; 00:05f1 $0e $1c
-    call call_00_29ce_ObjectExistsCheck                                  ;; 00:05f3 $cd $ce $29
+    call call_00_29ce_CheckObject_C_Exists                                  ;; 00:05f3 $cd $ce $29
     ret  Z                                             ;; 00:05f6 $c8
     ld   HL, wDB6A                                     ;; 00:05f7 $21 $6a $db
     set  4, [HL]                                       ;; 00:05fa $cb $e6

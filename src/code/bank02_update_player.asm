@@ -3,7 +3,7 @@ call_02_4db1_CheckPlayerObjectXDistance:
 ; If the object is left of the player (carry set), branches to a special handler. If they are perfectly aligned, 
 ; it returns. Otherwise jumps to a general trigger routine.
 ; Purpose: Detects horizontal proximity for events.
-    call call_00_29ce_ObjectExistsCheck                                  ;; 02:4db1 $cd $ce $29
+    call call_00_29ce_CheckObject_C_Exists                                  ;; 02:4db1 $cd $ce $29
     ret  NZ                                            ;; 02:4db4 $c0
     ld   A, L                                          ;; 02:4db5 $7d
     or   A, $0e                                        ;; 02:4db6 $f6 $0e

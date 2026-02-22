@@ -53,7 +53,7 @@ call_02_708f_InitObjectsAndSpawnPlayer:
     ld   C, $19                                        ;; 02:70fa $0e $19
     call call_00_3792_PrepareRelativeObjectSpawn                                  ;; 02:70fc $cd $92 $37
     ld   C, $1b                                        ;; 02:70ff $0e $1b
-    call call_00_29ce_ObjectExistsCheck                                  ;; 02:7101 $cd $ce $29
+    call call_00_29ce_CheckObject_C_Exists                                  ;; 02:7101 $cd $ce $29
     jr   NZ, .jr_02_7115                               ;; 02:7104 $20 $0f
     ld   A, L                                          ;; 02:7106 $7d
     ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 02:7107 $ea $00 $da

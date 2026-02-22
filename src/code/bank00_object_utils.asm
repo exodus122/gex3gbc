@@ -9,7 +9,7 @@ call_00_21ef_PlayRemoteSpawnSFX:
 call_00_21f6_FindAndMarkObjectInList_TVButton:
 ; Switches to the bank containing the object list (wDC16_ObjectListBank).
 ; Reads the start of the object list (wDC17_ObjectListBankOffset).
-; Iterates through 16-byte object records, searching for objects of type $11 (Object_TVButton)
+; Iterates through 16-byte object records, searching for objects of type $11 (OBJECT_TV_BUTTON)
 ; whose parameter matches C.
 ; When found, it updates a D7xx structure at index B:
 ; Sets a nibble/flag ([DE] = ([DE] & $F0) | value).
@@ -34,7 +34,7 @@ call_00_21f6_FindAndMarkObjectInList_TVButton:
 .jr_00_220c:
     push HL                                            ;; 00:220c $e5
     ld   A, [HL]                                       ;; 00:220d $7e
-    cp   A, Object_TVButton                                        ;; 00:220e $fe $11
+    cp   A, OBJECT_TV_BUTTON                                        ;; 00:220e $fe $11
     jr   NZ, .jr_00_221a                               ;; 00:2210 $20 $08
     ld   DE, $0d                                       ;; 00:2212 $11 $0d $00
     add  HL, DE                                        ;; 00:2215 $19
@@ -90,7 +90,7 @@ call_00_21f6_FindAndMarkObjectInList_TVButton:
 call_00_2260_FindAndFlagObject_TVRemote:
 ; Switches to the object list bank and scans through object entries starting 
 ; from wDC17_ObjectListBankOffset.
-; For each entry, checks if the type byte is $12 (Object_TVRemote). If found, jumps 13 bytes 
+; For each entry, checks if the type byte is $12 (OBJECT_TV_REMOTE). If found, jumps 13 bytes 
 ; forward and compares that value to C.
 ; When a match is found, modifies a status nibble in the object’s status table ($D7xx) 
 ; to set bits $04 while preserving upper bits.
@@ -109,7 +109,7 @@ call_00_2260_FindAndFlagObject_TVRemote:
 .jr_00_2270:
     push HL                                            ;; 00:2270 $e5
     ld   A, [HL]                                       ;; 00:2271 $7e
-    cp   A, Object_TVRemote                                        ;; 00:2272 $fe $12
+    cp   A, OBJECT_TV_REMOTE                                       ;; 00:2272 $fe $12
     jr   NZ, .jr_00_227e                               ;; 00:2274 $20 $08
     ld   DE, $0d                                       ;; 00:2276 $11 $0d $00
     add  HL, DE                                        ;; 00:2279 $19
@@ -1564,40 +1564,39 @@ call_00_29ac_Object_CheckFacingPlayer:
     cp   [hl]
     ret  
 
-call_00_29b7_FindObjectByID_C:
+call_00_29b7_GetActionIDOfObject_C:
 ; Starts at object table base $D840.
 ; Iterates through entries (+20h each = 32 bytes per object) comparing [HL] to register C.
-; If a match is found, jumps to call_00_29C8_FetchObjectSecondaryValue.
+; If a match is found, jumps to call_00_29C8_FetchObjectActionID.
 ; If none, sets C=$FF and returns.
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   l,$40
-label29BB:
+    ld   h, HIGH(wD840_ObjectMemoryAfterPlayer)
+    ld   l, LOW(wD840_ObjectMemoryAfterPlayer)
+.jr_00_29BB:
     ld   a,[hl]
     cp   c
-    jr   z,call_00_29C8_FetchObjectSecondaryValue
+    jr   z,call_00_29C8_FetchObjectActionID
     ld   a,l
     add  a,$20
     ld   l,a
-    jr   nz,label29BB
+    jr   nz,.jr_00_29BB
     ld   c,$FF
     ret  
 
-call_00_29C8_FetchObjectSecondaryValue:
-; When a match is found: ORs L with $01 (moves to second byte in object record).
-; Loads [HL] into C (likely returns a pointer or secondary ID).
+call_00_29C8_FetchObjectActionID:
+; When a match is found, loads the action id for this object into C.
     ld   a,l
     or   a,$01
     ld   l,a
     ld   c,[hl]
     ret  
 
-call_00_29ce_ObjectExistsCheck:
+call_00_29ce_CheckObject_C_Exists:
 ; Almost identical to 29b7, but:
 ; Returns immediately if found (ret Z).
 ; If none found, loads $01 into A, ANDs A with itself, and returns 
 ; (effectively a false indicator).
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:29ce $26 $d8
-    ld   L, $40                                        ;; 00:29d0 $2e $40
+    ld   H, HIGH(wD840_ObjectMemoryAfterPlayer)                                        ;; 00:29ce $26 $d8
+    ld   L, LOW(wD840_ObjectMemoryAfterPlayer)                                        ;; 00:29d0 $2e $40
 .jr_00_29d2:
     ld   A, [HL]                                       ;; 00:29d2 $7e
     cp   A, C                                          ;; 00:29d3 $b9
@@ -2026,9 +2025,9 @@ call_00_2bbe_SpawnCollectibleObject:
     jr   Z, call_00_2b7a_ClearObjectThenJump                                 ;; 00:2bc3 $28 $b5
     bit  6, A                                          ;; 00:2bc5 $cb $77
     jr   Z, call_00_2b7a_ClearObjectThenJump                                 ;; 00:2bc7 $28 $b1
-    ld   C, Object_FlyCoinSpawn                                        ;; 00:2bc9 $0e $02
+    ld   C, OBJECT_FLY_COIN_SPAWN                                        ;; 00:2bc9 $0e $02
     call call_00_2930_Object_SetId                                  ;; 00:2bcb $cd $30 $29
-    ld   C, CollisionType_FlyCoin                                        ;; 00:2bce $0e $08
+    ld   C, COLLISION_TYPE_FLY_COIN                                        ;; 00:2bce $0e $08
     call call_00_288c_Object_SetCollisionType                                  ;; 00:2bd0 $cd $8c $28
     ld   C, $12                                        ;; 00:2bd3 $0e $12
     call call_00_2944_Object_SetWidth                                  ;; 00:2bd5 $cd $44 $29

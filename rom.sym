@@ -401,11 +401,11 @@
 00:2995 call_00_2995_Object_GetActionId
 00:299f call_00_299f_Object_TurnAround
 00:29ac call_00_29ac_Object_CheckFacingPlayer
-00:29b7 call_00_29b7_FindObjectByID_C
-00:29bb label29BB
-00:29c8 call_00_29C8_FetchObjectSecondaryValue
-00:29ce call_00_29ce_ObjectExistsCheck
-00:29d2 call_00_29ce_ObjectExistsCheck.jr_00_29d2
+00:29b7 call_00_29b7_GetActionIDOfObject_C
+00:29bb call_00_29b7_GetActionIDOfObject_C.jr_00_29BB
+00:29c8 call_00_29C8_FetchObjectActionID
+00:29ce call_00_29ce_CheckObject_C_Exists
+00:29d2 call_00_29ce_CheckObject_C_Exists.jr_00_29d2
 00:29df call_00_29df_Object_SetActiveFlag
 00:29ea call_00_29ea_Object_ClearActiveFlag
 00:29f5 call_00_29f5_Object_ClearActiveFlagAndCheck
@@ -2868,8 +2868,8 @@
 00:d400 wD400_TileBuffer
 00:d578 wD578_TileBuffer2
 00:d700 wD700_ObjectFlags
-00:d800 wD800_ObjectMemory
 00:d800 wD800_Player_Id
+00:d800 wD800_ObjectMemory
 00:d801 wD801_Player_ActionId
 00:d802 wD802_Player_ActionFunc
 00:d805 wD805_Player_SpriteFlags

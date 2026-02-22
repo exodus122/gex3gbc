@@ -1,7 +1,7 @@
 INCLUDE "constants/hardware.inc"
-INCLUDE "constants/macros.asm"
 INCLUDE "constants/constants.asm"
 INCLUDE "constants/memory.asm"
+INCLUDE "code/macros/macros.asm"
 
 SECTION "bank00", ROM0[$0000]
 INCLUDE "code/bank00_home.asm"

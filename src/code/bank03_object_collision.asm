@@ -394,7 +394,7 @@ call_03_4e89_Collision_EvilSantaProjectile:
     inc  A                                             ;; 03:4ea1 $3c
     ld   [HL], A                                       ;; 03:4ea2 $77
     ld   C, $1e                                        ;; 03:4ea3 $0e $1e
-    call call_00_29ce_ObjectExistsCheck                                  ;; 03:4ea5 $cd $ce $29
+    call call_00_29ce_CheckObject_C_Exists                                  ;; 03:4ea5 $cd $ce $29
     jp   NZ, call_00_2b80_ClearObjectMemoryEntry                              ;; 03:4ea8 $c2 $80 $2b
     ld   A, L                                          ;; 03:4eab $7d
     or   A, OBJECT_XPOS_OFFSET                                        ;; 03:4eac $f6 $0e
@@ -1167,7 +1167,7 @@ call_03_5406_Collision_BrainOfOz:
     cp   a,$06
     ret  nc
     ld   c,$68
-    call call_00_29ce_ObjectExistsCheck
+    call call_00_29ce_CheckObject_C_Exists
     ret  nz
     ld   a,l
     or   a,$1D
