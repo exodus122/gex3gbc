@@ -727,13 +727,13 @@ wDC79:
 wDC7A:
     ds 1                                               ;; dc7a
 
-wDC7B:
+wDC7B_CurrentObjectAddrLoAlt:
     ds 1                                               ;; dc7b
 
-wDC7C:
+wDC7C_PlayerCollisionUnusedFlag:
     ds 1                                               ;; dc7c
 
-wDC7D:
+wDC7D_PlayerCollisionUnkFlag:
     ds 1                                               ;; dc7d
 
 wDC7E_PlayerDamageCooldownTimer:

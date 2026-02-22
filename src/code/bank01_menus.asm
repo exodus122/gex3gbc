@@ -1048,35 +1048,35 @@ call_01_4722_MenuStateHandlerTable:
     dw   call_01_4acf_CountCollectedBitsForLevel                                  ;; 01:472c pP
     dw   call_01_4b0a_CountLowBitsForLevel                                  ;; 01:472e pP
     dw   call_01_4af9_IsLevelFlag4Set                                  ;; 01:4730 pP
-    dw   .call_01_4744                                 ;; 01:4732 pP
+    dw   .jp_01_4744                                 ;; 01:4732 pP
     dw   call_01_4ae7_CountLevelsWithFlag4                                  ;; 01:4734 pP
-    dw   .call_01_4748                                 ;; 01:4736 pP
+    dw   .jp_01_4748                                 ;; 01:4736 pP
     dw   call_01_4ab9_CountSetBitsInFlags                                  ;; 01:4738 pP
-    dw   .call_01_474c                                 ;; 01:473a pP
-    dw   .call_01_4756                                 ;; 01:473c pP
-    dw   .call_01_4759                                 ;; 01:473e pP
-    dw   .call_01_475c                                 ;; 01:4740 pP
+    dw   .jp_01_474c                                 ;; 01:473a pP
+    dw   .jp_01_4756                                 ;; 01:473c pP
+    dw   .jp_01_4759                                 ;; 01:473e pP
+    dw   .jp_01_475c                                 ;; 01:4740 pP
     dw   call_00_2f34_CountActiveCollectibles                                      ;; 01:4742 ??
-.call_01_4744:
+.jp_01_4744:
     ld   A, [wDC68_CollectibleCount]                                    ;; 01:4744 $fa $68 $dc
     ret                                                ;; 01:4747 $c9
-.call_01_4748:
+.jp_01_4748:
     ld   A, [wDCAF_PawCoinCounter]                                    ;; 01:4748 $fa $af $dc
     ret                                                ;; 01:474b $c9
-.call_01_474c:
+.jp_01_474c:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 01:474c $fa $1e $dc
     and  A, A                                          ;; 01:474f $a7
     ld   A, $01                                        ;; 01:4750 $3e $01
     ret  Z                                             ;; 01:4752 $c8
     ld   A, $04                                        ;; 01:4753 $3e $04
     ret                                                ;; 01:4755 $c9
-.call_01_4756:
+.jp_01_4756:
     ld   A, $03                                        ;; 01:4756 $3e $03
     ret                                                ;; 01:4758 $c9
-.call_01_4759:
+.jp_01_4759:
     ld   A, $01                                        ;; 01:4759 $3e $01
     ret                                                ;; 01:475b $c9
-.call_01_475c:
+.jp_01_475c:
     ld   A, [wDC4E_PlayerLivesRemaining]                                    ;; 01:475c $fa $4e $dc
     ret                                                ;; 01:475f $c9
 
@@ -1202,9 +1202,9 @@ call_01_4826_MenuState_UpdateCursorAlt:
     ld   a,[hl]
     and  c
     ld   c,$E4
-    jr   nz,.label4843
+    jr   nz,.jr_00_4843
     ld   c,$E8
-.label4843:
+.jr_00_4843:
     ld   a,c
     ld   [wDADF],a
     ld   a,[wDBA1_MenuCommandBuffer_Unk3]

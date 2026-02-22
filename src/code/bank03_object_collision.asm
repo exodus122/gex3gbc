@@ -207,20 +207,20 @@ call_03_4d44_Collision_PlayerHit_ActionChangeConditional:
     ld   a,[wD80E_PlayerXPosition+1]
     sbc  [hl]
     ld   a,$FF
-    jr   c,.label4D78
+    jr   c,.jr_00_4D78
     ld   a,$01
-.label4D78:
+.jr_00_4D78:
     ld   [wDC98],a
     ld   a,[wDB6C_CurrentMapId]
     cp   a,$07
     ld   a,$29
-    jr   z,.label4D8F
+    jr   z,.jr_00_4D8F
     ld   a,[wDB6C_CurrentMapId]
     cp   a,$08
     ld   a,$36
-    jr   z,.label4D8F
+    jr   z,.jr_00_4D8F
     ld   a,$09
-.label4D8F:
+.jr_00_4D8F:
     farcall call_02_54f9_SwitchPlayerAction
     ret  
 
@@ -235,7 +235,7 @@ call_03_4d9b_Collision_BonusCoin:
     add  HL, DE                                        ;; 03:4da8 $19
     set  4, [HL]                                       ;; 03:4da9 $cb $e6
     ld   A, SFX_ITEM_PICKUP                                        ;; 03:4dab $3e $02
-    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 03:4dad $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffect                                  ;; 03:4dad $cd $f5 $0f
     jp   call_03_5671_HandleObjectHitOrRespawn                                    ;; 03:4db0 $c3 $71 $56
 
 call_03_4db3_Collision_FlyCoin:
@@ -244,7 +244,7 @@ call_03_4db3_Collision_FlyCoin:
     ret  NC                                            ;; 03:4db6 $d0
     call call_00_0723_IncrementCollectibleCount                                  ;; 03:4db7 $cd $23 $07
     ld   A, SFX_ITEM_PICKUP                                        ;; 03:4dba $3e $02
-    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 03:4dbc $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffect                                  ;; 03:4dbc $cd $f5 $0f
     jp   call_03_5671_HandleObjectHitOrRespawn                                    ;; 03:4dbf $c3 $71 $56
 
 call_03_4dc2_Collision_PawCoin:
@@ -286,7 +286,7 @@ call_03_4dc2_Collision_PawCoin:
     set  1, [HL]                                       ;; 03:4df6 $cb $ce
 .jr_03_4df8:
     ld   A, SFX_ITEM_PICKUP                                        ;; 03:4df8 $3e $02
-    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 03:4dfa $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffect                                  ;; 03:4dfa $cd $f5 $0f
     jp   call_03_5671_HandleObjectHitOrRespawn                                    ;; 03:4dfd $c3 $71 $56
 .data_03_4e00:
     db   $00, $20, $40, $80
@@ -330,7 +330,7 @@ call_03_4e31_Collision_FlyTV:
     cp   a,$01
     ret  nz
     ld   a,SFX_FLY_TV
-    call call_00_0ff5_QueueSoundEffectWithPriority
+    call call_00_0ff5_QueueSoundEffect
     call call_03_5671_HandleObjectHitOrRespawn
     ld   c,$02
     jp   call_00_2299_SetObjectStatusLowNibble
@@ -351,7 +351,7 @@ call_03_4e4b_Collision_IceSculpture:
     cp   A, $01                                        ;; 03:4e55 $fe $01
     ret  NZ                                            ;; 03:4e57 $c0
     ld   A, SFX_SMALL_BANG                                        ;; 03:4e58 $3e $19
-    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 03:4e5a $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffect                                  ;; 03:4e5a $cd $f5 $0f
     call call_00_2962_Object_GetActionId                                  ;; 03:4e5d $cd $62 $29
     inc  A                                             ;; 03:4e60 $3c
     push AF                                            ;; 03:4e61 $f5
@@ -505,7 +505,7 @@ call_03_4f60_Collision_BloodCooler:
     ret  nz
     call call_03_5671_HandleObjectHitOrRespawn
     ld   a,SFX_SMALL_BANG
-    call call_00_0ff5_QueueSoundEffectWithPriority
+    call call_00_0ff5_QueueSoundEffect
     ld   c,$01
     call call_00_2299_SetObjectStatusLowNibble
     ld   hl,wDCC5_BloodCoolerCounter
@@ -616,24 +616,24 @@ call_03_5028_Collision_Cactus:
 ; Otherwise, for action 05, can trigger a player action change.
 ; If action < 4 and player within 0x28 in X vector → loads new object data (bank 5).
     call call_03_550e_CheckPlayerObjectInteraction
-    jr   nc,label504C
+    jr   nc,.jr_00_504C
     cp   a,$00
-    jr   z,label5044
+    jr   z,.jr_00_5044
     ld   hl,wDCA9_FlyTimerOrFlags4
     ldi  a,[hl]
     or   [hl]
     inc  hl
     or   [hl]
-    jr   z,label5044
+    jr   z,.jr_00_5044
     call call_00_2962_Object_GetActionId
     cp   a,$05
     call c,call_03_5671_HandleObjectHitOrRespawn
-    jr   label504C
-label5044:
+    jr   .jr_00_504C
+.jr_00_5044:
     call call_00_2962_Object_GetActionId
     cp   a,$05
     call z,call_03_4cea_Collision_DamagePlayer
-label504C:
+.jr_00_504C:
     call call_00_2962_Object_GetActionId
     cp   a,$04
     ret  nc
@@ -677,13 +677,13 @@ call_03_5085_Collision_HardHat:
     jp   nz,call_03_4cea_Collision_DamagePlayer
     call call_00_2962_Object_GetActionId
     cp   a,$02
-    jr   z,label50A8
+    jr   z,.jr_00_50A8
     cp   a,$01
     jp   z,call_03_5671_HandleObjectHitOrRespawn
     ld   a,$02
     farcall call_02_72ac_SetupNewAction
     ret  
-label50A8:
+.jr_00_50A8:
     ld   a,$01
     farcall call_02_72ac_SetupNewAction
     ret  
@@ -769,13 +769,13 @@ call_03_5116_Collision_Door:
     ret  nc
     call call_00_230f_ResolveObjectListIndex
     inc  c
-    jr   z,label5143
+    jr   z,.jr_00_5143
     call call_00_22d4_CheckObjectSlotFlag
     ld   a,SFX_DOOR2
-    jp   z,call_00_0ff5_QueueSoundEffectWithPriority
-label5143:
+    jp   z,call_00_0ff5_QueueSoundEffect
+.jr_00_5143:
     ld   a,SFX_DOOR1
-    call call_00_0ff5_QueueSoundEffectWithPriority
+    call call_00_0ff5_QueueSoundEffect
     ld   a,$01
     farcall call_02_72ac_SetupNewAction
     ret  
@@ -800,13 +800,13 @@ call_03_5156_Collision_Door2:
     ret  nc
     call call_00_230f_ResolveObjectListIndex
     inc  c
-    jr   z,label5183
+    jr   z,.jr_00_5183
     call call_00_22d4_CheckObjectSlotFlag
     ld   a,SFX_DOOR2
-    jp   z,call_00_0ff5_QueueSoundEffectWithPriority
-label5183:
+    jp   z,call_00_0ff5_QueueSoundEffect
+.jr_00_5183:
     ld   a,SFX_DOOR1
-    call call_00_0ff5_QueueSoundEffectWithPriority
+    call call_00_0ff5_QueueSoundEffect
     ld   a,$03
     farcall call_02_72ac_SetupNewAction
     ret  
@@ -839,7 +839,7 @@ call_03_51b8_Collision_SailorToonGirl:
     jp   nz,call_03_4cea_Collision_DamagePlayer
     call call_00_2962_Object_GetActionId
     cp   a,$02
-    jr   z,label51E3
+    jr   z,.jr_00_51E3
     call call_03_5671_HandleObjectHitOrRespawn
     call call_00_2962_Object_GetActionId
     cp   a,$02
@@ -848,7 +848,7 @@ call_03_51b8_Collision_SailorToonGirl:
     ld   a,$03
     farcall call_02_72ac_SetupNewAction
     ret  
-label51E3:
+.jr_00_51E3:
     call call_00_22ef_SetObjectSlotActive
     ld   c,$00
     call call_00_288c_Object_SetCollisionType
@@ -869,12 +869,12 @@ call_03_5201_Collision_BigSilverRobot:
     call call_03_550e_CheckPlayerObjectInteraction
     ret  nc
     cp   a,$01
-    jr   z,label5222
+    jr   z,.jr_00_5222
     call call_03_4cea_Collision_DamagePlayer
     ld   a,$02
     farcall call_02_72ac_SetupNewAction
     jp   call_00_2410_Object_SetFacingRelativeToPlayer
-label5222:
+.jr_00_5222:
     call call_00_2410_Object_SetFacingRelativeToPlayer
     call call_03_5671_HandleObjectHitOrRespawn
     call call_00_2962_Object_GetActionId
@@ -906,10 +906,10 @@ call_03_5231_Collision_Mech:
     call call_00_22e0_IncrementObjectSlot
     ld   a,[wDB6C_CurrentMapId]
     cp   a,$29
-    jr   z,label5258
+    jr   z,.jr_00_5258
     cp   a,$2A
     ret  nz
-label5258:
+.jr_00_5258:
     ld   hl,wDCCB_MechCounter
     inc  [hl]
     ld   a,[hl]
@@ -1070,11 +1070,11 @@ call_03_532f_Collision_GextremeSports_Elf:
     ld   hl,wDCD5_ElfHealth1
     ld   b,$05
     xor  a
-label536D:
+.jr_00_536D:
     or   [hl]
     inc  hl
     dec  b
-    jr   nz,label536D
+    jr   nz,.jr_00_536D
     and  a
     ret  nz
     ld   a,$01
@@ -1105,17 +1105,17 @@ call_03_538e_Collision_Bell:
     ret  nz
     call call_00_2962_Object_GetActionId
     cp   a,$00
-    jr   nz,label53B0
+    jr   nz,.jr_00_53B0
     ld   hl,wDCCC_BellCounter
     inc  [hl]
     ld   a,[hl]
     call call_00_2c09_Object_SpawnRelativeWithOffset6
     ld   a,[wDCCC_BellCounter]
     cp   a,$07
-    jr   nz,label53B0
+    jr   nz,.jr_00_53B0
     ld   a,$01
     ld   [wDCD2_FreestandingRemoteHitFlags],a
-label53B0:
+.jr_00_53B0:
     ld   a,$01
     farcall call_02_72ac_SetupNewAction
     ld   c,$02
@@ -1129,13 +1129,13 @@ call_03_53c2_Collision_RockHard:
     cp   a,$05
     ret  nc
     cp   a,$03
-    jr   z,label53D6
+    jr   z,.jr_00_53D6
     call call_03_550e_CheckPlayerObjectInteraction
     ret  nc
     cp   a,$01
     jp   z,call_03_5671_HandleObjectHitOrRespawn
     ret  
-label53D6:
+.jr_00_53D6:
     ld   a,[wDC88]
     and  a
     ret  nz
@@ -1288,15 +1288,15 @@ call_03_54a8_Collision_Rez:
     call call_00_28b4_Object_Get16
     ld   c,$03
     cp   a,$03
-    jr   z,.label54E1
+    jr   z,.jr_00_54E1
     cp   a,$06
-    jr   z,.label54E1
+    jr   z,.jr_00_54E1
     cp   a,$09
-    jr   z,.label54E1
+    jr   z,.jr_00_54E1
     cp   a,$0C
-    jr   z,.label54E1
+    jr   z,.jr_00_54E1
     ld   c,$09
-.label54E1:
+.jr_00_54E1:
     ld   a,c
     farcall call_02_72ac_SetupNewAction
     ret  
@@ -1566,13 +1566,13 @@ call_03_5671_HandleObjectHitOrRespawn:
     and  A, $3f                                        ;; 03:56a6 $e6 $3f
     farcall call_02_72ac_SetupNewAction
     ld   A, SFX_GEX_HIT2                                        ;; 03:56b3 $3e $10
-    jp   call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 03:56b5 $c3 $f5 $0f
+    jp   call_00_0ff5_QueueSoundEffect                                  ;; 03:56b5 $c3 $f5 $0f
 .jr_03_56b8:
     ld   [HL], A                                       ;; 03:56b8 $77
     dec  L                                             ;; 03:56b9 $2d
     ld   [HL], $3c                                     ;; 03:56ba $36 $3c
     ld   A, SFX_GEX_HIT1                                        ;; 03:56bc $3e $0f
-    jp   call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 03:56be $c3 $f5 $0f
+    jp   call_00_0ff5_QueueSoundEffect                                  ;; 03:56be $c3 $f5 $0f
 
 call_03_56c1_Collision_Platform:
 ; Early exit if the player’s ActionId is in certain states 
@@ -1599,9 +1599,9 @@ call_03_56c1_Collision_Platform:
     ld   e,a
     ld   d,$00
     bit  7,a
-    jr   z,label56E3
+    jr   z,.jr_00_56E3
     dec  d
-label56E3:
+.jr_00_56E3:
     ld   a,[wD810_PlayerYPosition]
     add  e
     ld   e,a
@@ -1619,7 +1619,7 @@ label56E3:
     ld   a,d
     sbc  [hl]
     ld   d,a
-    jr   c,label570D
+    jr   c,.jr_00_570D
     and  a
     jp   nz,call_03_57f8_ClearCollisionForObject
     inc  l
@@ -1628,8 +1628,8 @@ label56E3:
     add  a,$0F
     cp   e
     jp   c,call_03_57f8_ClearCollisionForObject
-    jr   label571F
-label570D:
+    jr   .jr_00_571F
+.jr_00_570D:
     xor  a
     sub  e
     ld   e,a
@@ -1642,8 +1642,8 @@ label570D:
     ldd  a,[hl]
     add  a,$0F
     cp   e
-    jr   c,label577C
-label571F:
+    jr   c,.jr_00_577C
+.jr_00_571F:
     ld   c,[hl]
     ld   a,l
     xor  a,$1C
@@ -1661,7 +1661,7 @@ label571F:
     ld   a,d
     adc  a,$00
     bit  7,a
-    jr   nz,label575D
+    jr   nz,.jr_00_575D
     and  a
     jp   nz,call_03_57f8_ClearCollisionForObject
     ld   a,e
@@ -1681,7 +1681,7 @@ label571F:
     and  a
     jp   z,call_03_580b_RegisterSecondaryCollision
     jp   call_03_57f8_ClearCollisionForObject
-label575D:
+.jr_00_575D:
     inc  d
     jp   nz,call_03_57f8_ClearCollisionForObject
     ld   a,e
@@ -1699,7 +1699,7 @@ label575D:
     and  a
     jp   z,call_03_580b_RegisterSecondaryCollision
     jp   call_03_57f8_ClearCollisionForObject
-label577C:
+.jr_00_577C:
     ldi  a,[hl]
     ld   c,a
     ld   b,[hl]
@@ -1734,9 +1734,9 @@ label577C:
     ld   e,a
     ld   d,$00
     bit  7,a
-    jr   z,label57AE
+    jr   z,.jr_00_57AE
     dec  d
-label57AE:
+.jr_00_57AE:
     ld   a,[wD810_PlayerYPosition]
     add  e
     ld   e,a
@@ -1775,49 +1775,49 @@ label57AE:
 
 call_03_57e6_ResolveCollision_Reset:
 ; Clears wDC88 (the player’s vertical delta).
-; Stores the current object ID (wDA00_CurrentObjectAddrLo) into wDC7B.
-; If that ID was already in wDC7D, resets it to zero.
+; Stores the current object ID (wDA00_CurrentObjectAddrLo) into wDC7B_CurrentObjectAddrLoAlt.
+; If that ID was already in wDC7D_PlayerCollisionUnkFlag, resets it to zero.
 ; Role: This looks like a collision resolution / reset routine. 
 ; It wipes motion and registers the colliding object as "current collision", 
 ; while clearing old records.
     xor  A, A                                          ;; 03:57e6 $af
     ld   [wDC88], A                                    ;; 03:57e7 $ea $88 $dc
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:57ea $fa $00 $da
-    ld   [wDC7B], A                                    ;; 03:57ed $ea $7b $dc
-    ld   HL, wDC7D                                     ;; 03:57f0 $21 $7d $dc
+    ld   [wDC7B_CurrentObjectAddrLoAlt], A                                    ;; 03:57ed $ea $7b $dc
+    ld   HL, wDC7D_PlayerCollisionUnkFlag                                     ;; 03:57f0 $21 $7d $dc
     cp   A, [HL]                                       ;; 03:57f3 $be
     ret  NZ                                            ;; 03:57f4 $c0
     ld   [HL], $00                                     ;; 03:57f5 $36 $00
     ret                                                ;; 03:57f7 $c9
 
 call_03_57f8_ClearCollisionForObject:
-; Compares the current object ID to the two “last touched object” slots (wDC7B and wDC7D).
+; Compares the current object ID to the two “last touched object” slots (wDC7B_CurrentObjectAddrLoAlt and wDC7D_PlayerCollisionUnkFlag).
 ; If it matches, clears those slots.
 ; Effectively means: “This object is no longer colliding with the player, remove it from tracking.”
 ; Role: Collision cleanup when no intersection occurs.
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:57f8 $fa $00 $da
-    ld   HL, wDC7B                                     ;; 03:57fb $21 $7b $dc
+    ld   HL, wDC7B_CurrentObjectAddrLoAlt                                     ;; 03:57fb $21 $7b $dc
     cp   A, [HL]                                       ;; 03:57fe $be
     jr   NZ, .jr_03_5803                               ;; 03:57ff $20 $02
     ld   [HL], $00                                     ;; 03:5801 $36 $00
 .jr_03_5803:
-    ld   HL, wDC7D                                     ;; 03:5803 $21 $7d $dc
+    ld   HL, wDC7D_PlayerCollisionUnkFlag                                     ;; 03:5803 $21 $7d $dc
     cp   A, [HL]                                       ;; 03:5806 $be
     ret  NZ                                            ;; 03:5807 $c0
     ld   [HL], $00                                     ;; 03:5808 $36 $00
     ret                                                ;; 03:580a $c9
 
 call_03_580b_RegisterSecondaryCollision:
-; Marks the current object as the “secondary” collision slot (wDC7D).
-; If it was in wDC7B, clears that first.
+; Marks the current object as the “secondary” collision slot (wDC7D_PlayerCollisionUnkFlag).
+; If it was in wDC7B_CurrentObjectAddrLoAlt, clears that first.
 ; Role: Assigns the object as the active secondary collision candidate.
     ld   a,[wDA00_CurrentObjectAddrLo]
-    ld   hl,wDC7B
+    ld   hl,wDC7B_CurrentObjectAddrLoAlt
     cp   [hl]
-    jr   nz,label5816
+    jr   nz,.jr_00_5816
     ld   [hl],$00
-label5816:
-    ld   [wDC7D],a
+.jr_00_5816:
+    ld   [wDC7D_PlayerCollisionUnkFlag],a
     ret  
 
 call_03_581a_Collision_TVButton:
@@ -1929,11 +1929,11 @@ call_03_58a9_ComputeCollisionOffset:
     dec  l
     dec  l
     bit  7,[hl]
-    jr   z,label58BB
+    jr   z,.jr_00_58BB
     xor  a
     sub  b
     ld   b,a
-    label58BB:
+    .jr_00_58BB:
     ld   a,[wDC84]
     ld   d,a
     ld   a,[wDC85]

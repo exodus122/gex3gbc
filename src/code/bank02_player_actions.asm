@@ -3,7 +3,7 @@ call_02_47b4_PlayerAction_Spawn:
 ; If the bit is not set, it returns. If set, it:
 ; Clears state variables (wDCA2_PlayerUnk1, wDCA3_PlayerUnk2, wDC87).
 ; Sets wDCA4_PlayerUnk3 = 05h (some delay or counter).
-; Plays sound effect $0E via call_00_0ff5_QueueSoundEffectWithPriority
+; Plays sound effect $0E via call_00_0ff5_QueueSoundEffect
     ld   HL, wD805_Player_SpriteFlags                                     ;; 02:47b4 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:47b7 $cb $66
     ret  Z                                             ;; 02:47b9 $c8
@@ -14,7 +14,7 @@ call_02_47b4_PlayerAction_Spawn:
     ld   A, $05                                        ;; 02:47c4 $3e $05
     ld   [wDCA4_PlayerUnk3], A                                    ;; 02:47c6 $ea $a4 $dc
     ld   A, SFX_GEX_SPAWN                                        ;; 02:47c9 $3e $0e
-    jp   call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 02:47cb $c3 $f5 $0f
+    jp   call_00_0ff5_QueueSoundEffect                                  ;; 02:47cb $c3 $f5 $0f
 
 call_02_47ce_PlayerAction_Idle:
 ; Also checks bit 4 of wD805_Player_SpriteFlags. If set:
@@ -103,7 +103,7 @@ call_02_483e:
     bit  4,[hl]
     ret  z
     ld   a,$05
-    call call_00_0ff5_QueueSoundEffectWithPriority
+    call call_00_0ff5_QueueSoundEffect
     xor  a
     jp   call_00_0624_SetFly_TimersAndFlags
 
@@ -116,7 +116,7 @@ call_02_484d:
     ld   [wDC8E], A                                    ;; 02:4859 $ea $8e $dc
     call call_02_4e01_SetOneTimeFlag                                  ;; 02:485c $cd $01 $4e
     ld   A, SFX_PLAYER_DAMAGED                                        ;; 02:485f $3e $0a
-    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 02:4861 $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffect                                  ;; 02:4861 $cd $f5 $0f
 .jr_02_4864:
     ld   A, $3c                                        ;; 02:4864 $3e $3c
     ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 02:4866 $ea $7e $dc
@@ -133,7 +133,7 @@ call_02_4873:
     xor  A, A                                          ;; 02:487a $af
     ld   [wDC87], A                                    ;; 02:487b $ea $87 $dc
     ld   A, $0d                                        ;; 02:487e $3e $0d
-    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 02:4880 $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffect                                  ;; 02:4880 $cd $f5 $0f
 .jr_02_4883:
     ld   A, $3c                                        ;; 02:4883 $3e $3c
     ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 02:4885 $ea $7e $dc
@@ -156,9 +156,9 @@ call_02_48a1:
     ld   HL, wD805_Player_SpriteFlags                                     ;; 02:48a1 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:48a4 $cb $66
     ld   A, $1d                                        ;; 02:48a6 $3e $1d
-    call NZ, call_00_0ff5_QueueSoundEffectWithPriority                              ;; 02:48a8 $c4 $f5 $0f
-    ld   C, $11                                        ;; 02:48ab $0e $11
-    jp   call_02_4db1_CheckPlayerObjectXDistance                                    ;; 02:48ad $c3 $b1 $4d
+    call NZ, call_00_0ff5_QueueSoundEffect                              ;; 02:48a8 $c4 $f5 $0f
+    ld   C, OBJECT_TV_BUTTON                                        ;; 02:48ab $0e $11
+    jp   call_02_4db1_CheckPlayerXDistanceFromObject                                    ;; 02:48ad $c3 $b1 $4d
 
 call_02_48b0:
     ld   A, [wD805_Player_SpriteFlags]                                    ;; 02:48b0 $fa $05 $d8
@@ -173,7 +173,7 @@ call_02_48bc:
     bit  4, [HL]                                       ;; 02:48bf $cb $66
     jr   Z, .jr_02_48d6                                ;; 02:48c1 $28 $13
     ld   A, $06                                        ;; 02:48c3 $3e $06
-    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 02:48c5 $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffect                                  ;; 02:48c5 $cd $f5 $0f
     ld   A, $2a                                        ;; 02:48c8 $3e $2a
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:48ca $ea $8c $dc
     ld   [wDC8E], A                                    ;; 02:48cd $ea $8e $dc
@@ -195,7 +195,7 @@ call_02_48e8:
     jr   Z, .jr_02_4902                                ;; 02:48ed $28 $13
 .jr_02_48ef:
     ld   A, $07                                        ;; 02:48ef $3e $07
-    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 02:48f1 $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffect                                  ;; 02:48f1 $cd $f5 $0f
     ld   A, $3e                                        ;; 02:48f4 $3e $3e
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:48f6 $ea $8c $dc
     ld   [wDC8E], A                                    ;; 02:48f9 $ea $8e $dc
@@ -215,7 +215,7 @@ call_02_4911:
     bit  4, [HL]                                       ;; 02:4914 $cb $66
     jr   Z, .jr_02_492a                                ;; 02:4916 $28 $12
     ld   A, $04                                        ;; 02:4918 $3e $04
-    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 02:491a $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffect                                  ;; 02:491a $cd $f5 $0f
     ld   HL, wDC80                                     ;; 02:491d $21 $80 $dc
     set  0, [HL]                                       ;; 02:4920 $cb $c6
     ld   A, $01                                        ;; 02:4922 $3e $01
@@ -267,7 +267,7 @@ call_02_497a:
     ld   HL, wD805_Player_SpriteFlags                                     ;; 02:497a $21 $05 $d8
     bit  4, [HL]                                       ;; 02:497d $cb $66
     ld   A, $08                                        ;; 02:497f $3e $08
-    call NZ, call_00_0ff5_QueueSoundEffectWithPriority                              ;; 02:4981 $c4 $f5 $0f
+    call NZ, call_00_0ff5_QueueSoundEffect                              ;; 02:4981 $c4 $f5 $0f
     xor  A, A                                          ;; 02:4984 $af
     ld   [wDC87], A                                    ;; 02:4985 $ea $87 $dc
     ret                                                ;; 02:4988 $c9
@@ -282,7 +282,7 @@ call_02_4989:
     call call_02_4e01_SetOneTimeFlag
     call call_00_06f6_DealDamageToPlayer
     ld   a,$0B
-    call call_00_0ff5_QueueSoundEffectWithPriority
+    call call_00_0ff5_QueueSoundEffect
     ld   a,$14
     call call_02_72ac_SetupNewAction
 
@@ -299,7 +299,7 @@ call_02_49b2:
 call_02_49b3:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
-    jr   z,.label49CE
+    jr   z,.jr_00_49CE
     ld   hl,wDC80
     set  6,[hl]
     xor  a
@@ -308,13 +308,13 @@ call_02_49b3:
     ld   [wDC8D],a
     ld   a,01
     ld   [wDC87],a
-.label49CE:
+.jr_00_49CE:
     call call_02_4ee7_MapCollisionFlags
     ld   hl,wDC9D
     cp   a,$FF
-    jr   z,.label49D9
+    jr   z,.jr_00_49D9
     ld   [hl],a
-.label49D9:
+.jr_00_49D9:
     ld   e,[hl]
     ld   d,$00
     ld   hl,.data_02_4a1d
@@ -331,15 +331,15 @@ call_02_49b3:
     ld   hl,wDC9C
     dec  [hl]
     bit  7,[hl]
-    jr   z,.label4A05
+    jr   z,.jr_00_4A05
     ld   [hl],$05
     ld   hl,wDC9B
     inc  [hl]
     ld   a,[hl]
     sub  a,$07
-    jr   nz,.label4A05
+    jr   nz,.jr_00_4A05
     ld   [hl],a
-.label4A05:
+.jr_00_4A05:
     ld   a,[wDC9B]
     add  c
     ld   hl,wD80A_Player_SpriteId
@@ -384,32 +384,32 @@ call_02_4a51:
 call_02_4a52:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
-    jr   z,label4A61
+    jr   z,.jr_00_4A61
     ld   a,$01
     ld   [wDC8E],a
     call call_02_4e01_SetOneTimeFlag
-label4A61:
+.jr_00_4A61:
     ld   a,[wDC8E]
     and  a
     jp   z,call_02_4dce_SetTriggerByLevel
     ret  
 
 call_02_4a69:
-    ld   c,$51
-    jp   call_02_4db1_CheckPlayerObjectXDistance
+    ld   c,OBJECT_ANIME_CHANNEL_ELEVATOR
+    jp   call_02_4db1_CheckPlayerXDistanceFromObject
 
 call_02_4a6e:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
-    jr   z,label4A87
+    jr   z,.jr_00_4A87
     ld   a,$04
-    call call_00_0ff5_QueueSoundEffectWithPriority
+    call call_00_0ff5_QueueSoundEffect
     ld   hl,wDC80
     set  0,[hl]
     ld   a,$01
     ld   [wDC7F],a
     ld   [wDC87],a
-label4A87:
+.jr_00_4A87:
     ld   a,[wD805_Player_SpriteFlags]
     and  a,$04
     ret  z
@@ -435,7 +435,7 @@ call_02_4aa1:
 call_02_4aac:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
-    jr   z,.label4ACC
+    jr   z,.jr_00_4ACC
     ld   hl,wDC80
     set  6,[hl]
     xor  a
@@ -446,7 +446,7 @@ call_02_4aac:
     ld   [wDC87],a
     ld   a,$00
     ld   [wDC9E],a
-.label4ACC:
+.jr_00_4ACC:
     ld   hl,wDC9E
     ld   l,[hl]
     ld   h,00
@@ -466,9 +466,9 @@ call_02_4adb:
     call call_02_4ee7_MapCollisionFlags
     ld   hl,wDCA1_PlayerUnk6
     cp   a,$FF
-    jr   z,.label4AEA
+    jr   z,.jr_00_4AEA
     ld   [hl],a
-.label4AEA:
+.jr_00_4AEA:
     ld   e,[hl]
     ld   d,00
     ld   hl,.data_02_4b5e
@@ -485,35 +485,35 @@ call_02_4adb:
     ld   hl,wDCA0_PlayerUnk7
     dec  [hl]
     bit  7,[hl]
-    jr   z,.label4B16
+    jr   z,.jr_00_4B16
     ld   [hl],$05
     ld   hl,wDC9F
     inc  [hl]
     ld   a,[hl]
     sub  a,$0A
-    jr   nz,.label4B16
+    jr   nz,.jr_00_4B16
     ld   [hl],a
-.label4B16:
+.jr_00_4B16:
     ld   a,[wDC9F]
     add  c
     ld   hl,wD80A_Player_SpriteId
     cp   [hl]
-    jr   z,.label4B26
+    jr   z,.jr_00_4B26
     ld   [hl],a
     ld   hl,wDB66_HDMATransferFlags
     set  0,[hl]
-.label4B26:
+.jr_00_4B26:
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,$02
-    jr   z,.label4B32
+    jr   z,.jr_00_4B32
     ld   a,$0E
     call call_02_54f9_SwitchPlayerAction
-.label4B32:
+.jr_00_4B32:
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,$01
-    jr   z,.call_02_4B55
+    jr   z,.jr_02_4B55
     ld   a,$04
-    call call_00_0ff5_QueueSoundEffectWithPriority
+    call call_00_0ff5_QueueSoundEffect
     ld   hl,wDC80
     set  0,[hl]
     call call_02_4e01_SetOneTimeFlag
@@ -524,7 +524,7 @@ call_02_4adb:
     ld   a,$01
     ld   [wDC7F],a
     ret  
-.call_02_4B55:
+.jr_02_4B55:
     ret  
 .data_02_4b56:
     db   $73, $d1, $c7, $db, $73, $db, $c7, $d1
@@ -535,17 +535,17 @@ call_02_4B66:
     call call_02_4ee7_MapCollisionFlags
     ld   hl,wDCA1_PlayerUnk6
     cp   a,$FF
-    jr   z,label4B71
+    jr   z,.jr_00_4B71
     ld   [hl],a
-label4B71:
+.jr_00_4B71:
     ld   hl,wDCA0_PlayerUnk7
     dec  [hl]
     bit  7,[hl]
-    jr   z,label4B7F
+    jr   z,.jr_00_4B7F
     ld   [hl],$02
     ld   hl,wDC9F
     inc  [hl]
-label4B7F:
+.jr_00_4B7F:
     ld   a,[wDC9F]
     ld   hl,wDCA1_PlayerUnk6
     add  [hl]
@@ -576,7 +576,7 @@ label4B7F:
 call_02_4bb7:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
-    jr   z,label4BDC
+    jr   z,.jr_00_4BDC
     ld   a,$03
     ld   [wDC87],a
     xor  a
@@ -589,7 +589,7 @@ call_02_4bb7:
     ld   [wDCA6_PlayerUnk5],a
     ld   hl,wDC80
     set  6,[hl]
-label4BDC:
+.jr_00_4BDC:
     ld   a,[wDC81_CurrentInputsAlt]
     bit  6,a
     call nz,call_00_1bbc_CheckForDoorAndEnter
@@ -605,13 +605,13 @@ label4BDC:
     cp   a,$01
     ret  nz
     ld   hl,call_02_4C16
-label4BFD:
+.jr_00_4BFD:
     inc  hl
     ldi  a,[hl]
     cp   a,$FF
     ret  z
     cp   c
-    jr   nz,label4BFD
+    jr   nz,.jr_00_4BFD
     ld   a,[wD80D_PlayerFacingDirection]
     cp   [hl]
     ret  nz
@@ -636,15 +636,15 @@ call_02_4C16:
 call_02_4c2c:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
-    jr   z,label4C46
+    jr   z,.jr_00_4C46
     ld   a,$06
-    call call_00_0ff5_QueueSoundEffectWithPriority
+    call call_00_0ff5_QueueSoundEffect
     ld   a,$2A
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E],a
     call call_02_4df6_FlagCollisionActive
     call call_02_4e01_SetOneTimeFlag
-label4C46:
+.jr_00_4C46:
     ld   a,[wDC8E]
     and  a
     ret  nz
@@ -657,15 +657,15 @@ label4C46:
 call_02_4c58:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
-    jr   z,label4C72
+    jr   z,.jr_00_4C72
     ld   a,$07
-    call call_00_0ff5_QueueSoundEffectWithPriority
+    call call_00_0ff5_QueueSoundEffect
     ld   a,$3E
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E],a
     call call_02_4df6_FlagCollisionActive
     call call_02_4e01_SetOneTimeFlag
-label4C72:
+.jr_00_4C72:
     ld   a,[wDC8E]
     and  a
     jp   z,call_02_4dce_SetTriggerByLevel
@@ -674,7 +674,7 @@ label4C72:
 call_02_4c7a:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
-    jr   z,label4CA1
+    jr   z,.jr_00_4CA1
     xor  a
     ld   [wDCA2_PlayerUnk1],a
     ld   a,$03
@@ -682,23 +682,23 @@ call_02_4c7a:
     ld   a,$0B
     ld   [wDCA4_PlayerUnk3],a
     ld   a,$04
-    call call_00_0ff5_QueueSoundEffectWithPriority
+    call call_00_0ff5_QueueSoundEffect
     ld   hl,wDC80
     set  0,[hl]
     ld   a,$01
     ld   [wDC7F],a
     call call_02_4e01_SetOneTimeFlag
-label4CA1:
+.jr_00_4CA1:
     jp   call_02_4E0C_UpdateActionSequence
 
 call_02_4ca4:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
-    jr   z,label4CB3
+    jr   z,.jr_00_4CB3
     ld   a,$01
     ld   [wDC8E],a
     call call_02_4e01_SetOneTimeFlag
-label4CB3:
+.jr_00_4CB3:
     ld   a,[wDC8E]
     and  a
     ld   a,$24
@@ -708,14 +708,14 @@ label4CB3:
 call_02_4cbd:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
-    jr   z,label4CD4
+    jr   z,.jr_00_4CD4
     ld   a,$1C
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E],a
     call call_02_4e01_SetOneTimeFlag
     ld   a,SFX_PLAYER_DAMAGED
-    call call_00_0ff5_QueueSoundEffectWithPriority
-label4CD4:
+    call call_00_0ff5_QueueSoundEffect
+.jr_00_4CD4:
     ld   a,$3C
     ld   [wDC7E_PlayerDamageCooldownTimer],a
     ld   a,[wDC8E]
@@ -726,7 +726,7 @@ label4CD4:
 
 call_02_4ce3:
     ld   a,$06
-    call call_00_0ff5_QueueSoundEffectWithPriority
+    call call_00_0ff5_QueueSoundEffect
     call call_02_4e01_SetOneTimeFlag
     ld   a,$31
     call call_02_54f9_SwitchPlayerAction
@@ -749,7 +749,7 @@ call_02_4d02:
 
 call_02_4d14:
     ld   a,$07
-    call call_00_0ff5_QueueSoundEffectWithPriority
+    call call_00_0ff5_QueueSoundEffect
     call call_02_4e01_SetOneTimeFlag
     ld   a,$33
     call call_02_54f9_SwitchPlayerAction
@@ -773,15 +773,15 @@ call_02_4d33:
 call_02_4d45:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
-    jr   z,label4D5E
+    jr   z,.jr_00_4D5E
     ld   a,$04
-    call call_00_0ff5_QueueSoundEffectWithPriority
+    call call_00_0ff5_QueueSoundEffect
     ld   hl,wDC80
     set  0,[hl]
     ld   a,$01
     ld   [wDC7F],a
     call call_02_4e01_SetOneTimeFlag
-label4D5E:
+.jr_00_4D5E:
     ld   a,[wD805_Player_SpriteFlags]
     and  a,$04
     ret  z
@@ -795,11 +795,11 @@ label4D5E:
 call_02_4d72:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
-    jr   z,label4D81
+    jr   z,.jr_00_4D81
     ld   a,$01
     ld   [wDC8E],a
     call call_02_4e01_SetOneTimeFlag
-label4D81:
+.jr_00_4D81:
     ld   a,[wDC8E]
     and  a
     ld   a,$30
@@ -809,14 +809,14 @@ label4D81:
 call_02_4d8b:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
-    jr   z,label4DA2
+    jr   z,.jr_00_4DA2
     ld   a,$1C
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E],a
     call call_02_4e01_SetOneTimeFlag
     ld   a,SFX_PLAYER_DAMAGED
-    call call_00_0ff5_QueueSoundEffectWithPriority
-label4DA2:
+    call call_00_0ff5_QueueSoundEffect
+.jr_00_4DA2:
     ld   a,$3C
     ld   [wDC7E_PlayerDamageCooldownTimer],a
     ld   a,[wDC8E]

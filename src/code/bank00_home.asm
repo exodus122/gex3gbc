@@ -652,7 +652,7 @@ call_00_06f6_DealDamageToPlayer:
     ld   HL, wDB69                                     ;; 00:06ff $21 $69 $db
     set  1, [HL]                                       ;; 00:0702 $cb $ce
     ld   A, SFX_PLAYER_DAMAGED                                        ;; 00:0704 $3e $0a
-    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 00:0706 $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffect                                  ;; 00:0706 $cd $f5 $0f
     ld   HL, wDC51                                     ;; 00:0709 $21 $51 $dc
     ld   A, [HL]                                       ;; 00:070c $7e
     and  A, A                                          ;; 00:070d $a7
@@ -679,7 +679,7 @@ call_00_0723_IncrementCollectibleCount:
     ld   HL, wDB69                                     ;; 00:0723 $21 $69 $db
     set  0, [HL]                                       ;; 00:0726 $cb $c6
     ld   A, SFX_ITEM_PICKUP                                        ;; 00:0728 $3e $02
-    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 00:072a $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffect                                  ;; 00:072a $cd $f5 $0f
     ld   HL, wDC68_CollectibleCount                                     ;; 00:072d $21 $68 $dc
     inc  [HL]                                          ;; 00:0730 $34
     ld   A, [HL]                                       ;; 00:0731 $7e
@@ -688,7 +688,7 @@ call_00_0723_IncrementCollectibleCount:
     cp   A, $64                                        ;; 00:0736 $fe $64
     ret  NZ                                            ;; 00:0738 $c0
     ld   A, SFX_REMOTE                                        ;; 00:0739 $3e $1e
-    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 00:073b $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffect                                  ;; 00:073b $cd $f5 $0f
     ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:073e $21 $1e $dc
     ld   L, [HL]                                       ;; 00:0741 $6e
     ld   H, $00                                        ;; 00:0742 $26 $00
@@ -898,17 +898,17 @@ call_00_0865_LoadFromTextBank1C_2:
     ld   h,[hl]
     ld   l,a
     ld   de,wDADC_WindowY
-label087A:
+.jr_00_087A:
     inc  de
     ld   a,[de]
     cp   a,$80
-    jr   nz,label087A
-label0880:
+    jr   nz,.jr_00_087A
+.jr_00_0880:
     ldi  a,[hl]
     ld   [de],a
     inc  de
     cp   a,$80
-    jr   nz,label0880
+    jr   nz,.jr_00_0880
     jp   call_00_0f08_RestoreBank
 
 call_00_088a_HDMA_BackgroundAnimator:
@@ -1822,9 +1822,9 @@ call_00_0e29_StartDMATransfer:
     ld   a,$D9
     ldh  [rDMA], a
     ld   a,$28
-label0E2F:
+.jr_00_0E2F:
     dec  a
-    jr   nz,label0E2F
+    jr   nz,.jr_00_0E2F
     ret                             ;; 00:0e30 ...
 
 call_00_0e33_SetLCDControlRegister:
@@ -2172,7 +2172,7 @@ call_00_0fd7_TriggerSoundEffect:
     ld   [wDE5F_CurrentSoundEffectPriority], A                                    ;; 00:0fef $ea $5f $de
     jp   call_00_0f08_RestoreBank                                  ;; 00:0ff2 $c3 $08 $0f
 
-call_00_0ff5_QueueSoundEffectWithPriority:
+call_00_0ff5_QueueSoundEffect:
 ; Accepts a sound effect code in A. If $FF, returns.
 ; Uses .data_00_1037 as a priority lookup table: B = priorityTable[A].
 ; Checks multiple channel-status bytes (wDF68–wDF72) to see if the sound hardware is busy.

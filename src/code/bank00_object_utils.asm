@@ -3,7 +3,7 @@ call_00_21ef_PlayRemoteSpawnSFX:
 ; Just plays the remote spawned/obtained sound effect
     push BC                                            ;; 00:21ef $c5
     ld   A, SFX_REMOTE                                        ;; 00:21f0 $3e $1e
-    call call_00_0ff5_QueueSoundEffectWithPriority                                  ;; 00:21f2 $cd $f5 $0f
+    call call_00_0ff5_QueueSoundEffect                                  ;; 00:21f2 $cd $f5 $0f
     pop  BC                                            ;; 00:21f5 $c1
 
 call_00_21f6_FindAndMarkObjectInList_TVButton:
@@ -290,13 +290,13 @@ call_00_233e_Object_UpdatePatternedPositionFromVelocityTable:
     inc  [hl]
     ld   a,[hl]
     sub  a,$2E
-    jr   nz,.label2352
+    jr   nz,.jr_00_2352
     ld   [hl],a
     inc  l
     inc  [hl]
     res  2,[hl]
     dec  l
-.label2352:
+.jr_00_2352:
     inc  l
     ldd  a,[hl]
     ld   l,[hl]
@@ -305,18 +305,18 @@ call_00_233e_Object_UpdatePatternedPositionFromVelocityTable:
     ld   de,.data_00_23B4_Velocities
     add  hl,de
     cp   a,$00
-    jr   z,.label2381
+    jr   z,.jr_00_2381
     cp   a,$01
-    jr   z,.label2379
+    jr   z,.jr_00_2379
     cp   a,$02
-    jr   z,.label236F
+    jr   z,.jr_00_236F
     ldi  a,[hl]
     cpl  
     inc  a
     ld   c,a
     ld   e,[hl]
-    jr   .label2384
-.label236F:
+    jr   .jr_00_2384
+.jr_00_236F:
     ldi  a,[hl]
     cpl  
     inc  a
@@ -325,20 +325,20 @@ call_00_233e_Object_UpdatePatternedPositionFromVelocityTable:
     cpl  
     inc  a
     ld   c,a
-    jr   .label2384
-.label2379:
+    jr   .jr_00_2384
+.jr_00_2379:
     ld   c,[hl]
     inc  hl
     ld   a,[hl]
     cpl  
     inc  a
     ld   e,a
-    jr   .label2384
-.label2381:
+    jr   .jr_00_2384
+.jr_00_2381:
     ld   e,[hl]
     inc  hl
     ld   c,[hl]
-.label2384:
+.jr_00_2384:
     ld   a,e
     cp   a,$80
     ld   a,$FF
@@ -404,9 +404,9 @@ call_00_2410_Object_SetFacingRelativeToPlayer:
     inc  hl
     ld   a,[wD80E_PlayerXPosition+1]
     sbc  [hl]
-    jr   c,label2427
+    jr   c,.jr_00_2427
     ld   c,OBJECT_LEFT_OF_GEX
-label2427:
+.jr_00_2427:
     ld   a,l
     xor  a,$02
     ld   l,a
@@ -427,9 +427,9 @@ call_00_242d_Object_SetFacingRelativeToPlayer_Inverse:
     inc  hl
     ld   a,[wD80E_PlayerXPosition+1]
     sbc  [hl]
-    jr   c,label2444
+    jr   c,.jr_00_2444
     ld   c,OBJECT_RIGHT_OF_GEX
-label2444:
+.jr_00_2444:
     ld   a,l
     xor  a,$02
     ld   l,a
@@ -476,11 +476,11 @@ call_00_2475_Object_ApplyGravityAndSnapToGround:
     ld   a,[hl]
     sub  a,$02
     bit  $7,a
-    jr   z,label248A
+    jr   z,.jr_00_248A
     cp   a,$C0
-    jr   nc,label248A
+    jr   nc,.jr_00_248A
     ld   a,$C0
-label248A:
+.jr_00_248A:
     ld   [hl],a
     sra  a
     sra  a
@@ -742,10 +742,10 @@ call_00_25CB_Object_IntegrateVelocity_Helper:
     ld   l,a
     ldi  a,[hl]
     bit  6,c
-    jr   nz,label25DF
+    jr   nz,.jr_00_25DF
     cpl  
     inc  a
-label25DF:
+.jr_00_25DF:
     add  [hl]
     ld   c,a
     and  a,$0F
@@ -807,7 +807,7 @@ call_00_2879_Object_SnapXPosition:
     sub  e
     ldd  a,[hl]
     sbc  d
-    jr   c,label2639
+    jr   c,.jr_00_2639
     call call_00_2846_Object_GetBoundingBoxXMax
     ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
@@ -819,7 +819,7 @@ call_00_2879_Object_SnapXPosition:
     sbc  d
     ret  c
     dec  de
-label2639:
+.jr_00_2639:
     ld   a,e
     sub  [hl]
     ld   [hl],e
@@ -837,7 +837,7 @@ call_00_2645_Object_AdjustXAgainstBounds:
 ; clamp its movement using XMin or XMax bounds.
 ; Writes the corrected position and adjusts velocity deltas accordingly.
     bit  $7,a
-    jr   nz,label265B
+    jr   nz,.jr_00_265B
     ld   b,$00
     call call_00_2846_Object_GetBoundingBoxXMax
     call call_00_2678_Object_AddOffsetToXPos
@@ -845,11 +845,11 @@ call_00_2645_Object_AdjustXAgainstBounds:
     sub  e
     ld   a,b
     sbc  d
-    jr   c,label266E
+    jr   c,.jr_00_266E
     ld   c,e
     ld   b,d
-    jr   label266E
-label265B:
+    jr   .jr_00_266E
+.jr_00_265B:
     xor  a
     sub  c
     ld   c,a
@@ -860,10 +860,10 @@ label265B:
     sub  c
     ld   a,d
     sbc  b
-    jr   c,label266E
+    jr   c,.jr_00_266E
     ld   c,e
     ld   b,d
-label266E:
+.jr_00_266E:
     ld   a,b
     ldd  [hl],a
     ld   [hl],c
@@ -895,7 +895,7 @@ call_00_2687_Object_AdjustYAgainstBounds:
 ; Uses YMin / YMax bounding box depending on facing bit 7, applies corrections, 
 ; updates object position, and checks velocity deltas.
     bit  $7,a
-    jr   nz,label269D
+    jr   nz,.jr_00_269D
     ld   b,$00
     call call_00_2804_Object_GetBoundingBoxYMin
     call call_00_26BA_Object_AddOffsetToYPos
@@ -903,11 +903,11 @@ call_00_2687_Object_AdjustYAgainstBounds:
     sub  e
     ld   a,b
     sbc  d
-    jr   c,label26B0
+    jr   c,.jr_00_26B0
     ld   c,e
     ld   b,d
-    jr   label26B0
-label269D:
+    jr   .jr_00_26B0
+.jr_00_269D:
     xor  a
     sub  c
     ld   c,a
@@ -918,10 +918,10 @@ label269D:
     sub  c
     ld   a,d
     sbc  b
-    jr   c,label26B0
+    jr   c,.jr_00_26B0
     ld   c,e
     ld   b,d
-label26B0:
+.jr_00_26B0:
     ld   a,b
     ldd  [hl],a
     ld   [hl],c
@@ -950,7 +950,7 @@ call_00_26BA_Object_AddOffsetToYPos:
 
 call_00_26c9_Object_InfluencePlayerX:
 ; Complex: Reads object’s X velocity, some state flags, and bounding values.
-; Compares against global state vars (wDC7B, wDC7D).
+; Compares against global state vars (wDC7B_CurrentObjectAddrLoAlt, wDC7D_PlayerCollisionUnkFlag).
 ; If conditions match, applies an adjustment to the player’s X position relative to the object (e.g. conveyor belts, pushers).
 ; Appears to handle environmental effects that “move the player.”
     ld   h, HIGH(wD800_ObjectMemory)
@@ -967,14 +967,14 @@ call_00_26c9_Object_InfluencePlayerX:
     ld   e,a
     ld   d,[hl]
     bit  $6,b
-    jr   nz,label26E3
+    jr   nz,.jr_00_26E3
     xor  a
     sub  c
     ld   c,a
-label26E3:
+.jr_00_26E3:
     ld   a,l
     and  a,$E0
-    ld   hl,wDC7B
+    ld   hl,wDC7B_CurrentObjectAddrLoAlt
     cp   [hl]
     jr   nz,call_00_26F1_Player_UpdateXFromObject
     ld   a,c
@@ -984,7 +984,7 @@ label26E3:
 call_00_26F1_Player_UpdateXFromObject:
 ; Update Player X Relative to Object
 ; Compares player position to the object and adjusts or clamps X.
-    ld   hl,wDC7D
+    ld   hl,wDC7D_PlayerCollisionUnkFlag
     cp   [hl]
     ret  nz
     ld   h, HIGH(wD800_ObjectMemory)
@@ -1138,14 +1138,14 @@ call_00_2799_Object_UpdateYFromXDisplacement:
     ld   a,[hl]
     sbc  d
     ld   d,a
-    jr   nc,label27B3
+    jr   nc,.jr_00_27B3
     xor  a
     sub  e
     ld   e,a
     ld   a,$00
     sbc  d
     ld   d,a
-label27B3:
+.jr_00_27B3:
     srl  d
     rr   e
     push de

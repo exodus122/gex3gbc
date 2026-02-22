@@ -1,4 +1,4 @@
-call_02_4db1_CheckPlayerObjectXDistance:
+call_02_4db1_CheckPlayerXDistanceFromObject:
 ; Checks whether an object exists (call_00_29ce), then compares the object’s X position to the player’s. 
 ; If the object is left of the player (carry set), branches to a special handler. If they are perfectly aligned, 
 ; it returns. Otherwise jumps to a general trigger routine.
@@ -75,48 +75,48 @@ call_02_4E0C_UpdateActionSequence:
     call call_02_4E7A_LookupFrameData
     inc  d
     dec  d
-    jr   nz,label4E24
+    jr   nz,.jr_00_4E24
     ld   hl,wDC93
     ld   e,[hl]
     call call_02_4E7A_LookupFrameData
-label4E24:
+.jr_00_4E24:
     ld   hl,wDCA5_PlayerUnk4
     ld   [hl],d
     ld   a,[wD801_Player_ActionId]
     cp   a,$27
-    jr   nz,label4E57
+    jr   nz,.jr_00_4E57
     ld   hl,wDCA3_PlayerUnk2
     dec  [hl]
     bit  7,[hl]
-    jr   z,label4E50
+    jr   z,.jr_00_4E50
     ld   [hl],$03
     ld   hl,wDCA2_PlayerUnk1
     inc  [hl]
     ld   a,[hl]
     cp   a,$08
-    jr   c,label4E50
+    jr   c,.jr_00_4E50
     xor  a
     ld   [wDC7F],a
     ld   hl,wDC80
     set  6,[hl]
     ld   a,$24
     jp   call_02_54f9_SwitchPlayerAction
-label4E50:
+.jr_00_4E50:
     ld   a,[wDCA2_PlayerUnk1]
     and  a,$07
-    jr   label4E6A
-label4E57:
+    jr   .jr_00_4E6A
+.jr_00_4E57:
     ld   hl,wDCA3_PlayerUnk2
     dec  [hl]
     bit  7,[hl]
-    jr   z,label4E65
+    jr   z,.jr_00_4E65
     ld   [hl],$09
     ld   hl,wDCA2_PlayerUnk1
     inc  [hl]
-label4E65:
+.jr_00_4E65:
     ld   a,[wDCA2_PlayerUnk1]
     and  a,$01
-label4E6A:
+.jr_00_4E6A:
     ld   hl,wDCA4_PlayerUnk3
     add  [hl]
     ld   hl,wD80A_Player_SpriteId
@@ -135,16 +135,16 @@ call_02_4E7A_LookupFrameData:
     ld   hl,.data_02_4EC3
     ld   a,[wD801_Player_ActionId]
     cp   a,$27
-    jr   z,.label4E89
+    jr   z,.jr_00_4E89
     ld   hl,.data_02_4EA3-2
-.label4E89:
+.jr_00_4E89:
     inc  hl
     inc  hl
     ldi  a,[hl]
     cp   a,$FF
     ret  z
     cp   e
-    jr   nz,.label4E89
+    jr   nz,.jr_00_4E89
     ld   d,e
     ld   c,[hl]
     inc  hl
@@ -152,9 +152,9 @@ call_02_4E7A_LookupFrameData:
     ld   a,[wD80D_PlayerFacingDirection]
     cp   a,$00
     ld   a,c
-    jr   z,.label4E9F
+    jr   z,.jr_00_4E9F
     ld   a,b
-.label4E9F:
+.jr_00_4E9F:
     ld   [wDCA4_PlayerUnk3],a
     ret  
 .data_02_4EA3:
@@ -176,20 +176,20 @@ call_02_4ee7_MapCollisionFlags:
 ; Purpose: Convert collision flags into an index or behavior code.
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,$F0
-    jr   z,.label4EFB
+    jr   z,.jr_00_4EFB
     ld   hl,.data_02_4F01
     ld   b,$08
-.label4EF3:
+.jr_00_4EF3:
     cp   [hl]
-    jr   z,.call_02_4EFE
+    jr   z,.jr_02_4EFE
     inc  hl
     inc  hl
     dec  b
-    jr   nz,.label4EF3
-.label4EFB:
+    jr   nz,.jr_00_4EF3
+.jr_00_4EFB:
     ld   a,$FF
     ret  
-.call_02_4EFE:
+.jr_02_4EFE:
     inc  hl
     ld   a,[hl]
     ret  
@@ -584,14 +584,14 @@ call_02_5100_Player_HorizontalMovementHandler:
 call_02_518a_ApplyLeftwardCollisionAdjustment:
 ; Purpose: Adjusts the player's X-position when moving left against solid tiles or obstacles.
 ; Details:
-; Checks flags (wDC7C, wDC7D) for collision state.
+; Checks flags (wDC7C_PlayerCollisionUnusedFlag, wDC7D_PlayerCollisionUnkFlag) for collision state.
 ; Computes the delta between player position and reference points.
 ; Writes corrected position back to wD80E_PlayerXPosition or clamps based on collision checks.
 ; Works together with call_02_5195_ResolveLeftwardTilePushback to fine-tune adjustments.
-    ld   A, [wDC7C]                                    ;; 02:518a $fa $7c $dc
+    ld   A, [wDC7C_PlayerCollisionUnusedFlag]                                    ;; 02:518a $fa $7c $dc
     and  A, A                                          ;; 02:518d $a7
     jr   NZ, call_02_51cb_CheckLeftCollisionAndStoreOffset                                ;; 02:518e $20 $3b
-    ld   A, [wDC7D]                                    ;; 02:5190 $fa $7d $dc
+    ld   A, [wDC7D_PlayerCollisionUnkFlag]                                    ;; 02:5190 $fa $7d $dc
     and  A, A                                          ;; 02:5193 $a7
     ret  NZ                                            ;; 02:5194 $c0
 
@@ -684,10 +684,10 @@ call_02_51f9_ApplyRightwardCollisionAdjustment:
 ; Details:
 ; Similar structure to 518a but uses addition instead of subtraction for position deltas.
 ; Works with call_02_5204_ResolveRightwardTilePushback for fine collision detection.
-    ld   A, [wDC7C]                                    ;; 02:51f9 $fa $7c $dc
+    ld   A, [wDC7C_PlayerCollisionUnusedFlag]                                    ;; 02:51f9 $fa $7c $dc
     and  A, A                                          ;; 02:51fc $a7
     jr   NZ, call_02_5238_CheckRightCollisionAndStoreOffset                                ;; 02:51fd $20 $39
-    ld   A, [wDC7D]                                    ;; 02:51ff $fa $7d $dc
+    ld   A, [wDC7D_PlayerCollisionUnkFlag]                                    ;; 02:51ff $fa $7d $dc
     and  A, A                                          ;; 02:5202 $a7
     ret  NZ                                            ;; 02:5203 $c0
 

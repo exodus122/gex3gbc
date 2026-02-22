@@ -37,7 +37,7 @@ call_03_4708_CollisionHandler_Sidescroller:
     ld   A, [HL]                                       ;; 03:470b $7e
     ld   [HL], $00                                     ;; 03:470c $36 $00
     ld   [wDABD_UnkBGCollisionFlags], A                                    ;; 03:470e $ea $bd $da
-    ld   A, [wDC7B]                                    ;; 03:4711 $fa $7b $dc
+    ld   A, [wDC7B_CurrentObjectAddrLoAlt]                                    ;; 03:4711 $fa $7b $dc
     and  A, A                                          ;; 03:4714 $a7
     jr   Z, .jr_03_471c                                ;; 03:4715 $28 $05
     ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 03:4717 $21 $be $da
@@ -302,7 +302,7 @@ call_03_48ad_CollisionHandler_TopDown:
 ; Handles top-down movement collisions.
 ; Always sets collision-active bit (set 7,[wDABE_UnkBGCollisionFlags2]).
 ; Uses wDC86 and wDC89 to determine direction/attempted movement.
-; Dispatches to one of several routines for checking walls/diagonals (.call_03_48E1_ResetDirectionState, .call_03_496B_CheckMove_UpLeft, etc.).
+; Dispatches to one of several routines for checking walls/diagonals (.jp_03_48E1_ResetDirectionState, .jp_03_496B_CheckMove_UpLeft, etc.).
 ; Updates collision status (wDC81_CurrentInputsAlt, wDC86, wDC89) depending on blocked directions.
     ld   hl,wDABE_UnkBGCollisionFlags2
     ld   a,[hl]
@@ -324,17 +324,17 @@ call_03_48ad_CollisionHandler_TopDown:
     ld   l,a
     jp   hl
 .data_03_48cf:
-    dw   .call_03_48E1_ResetDirectionState, .call_03_49ED_AdvanceAlongPath, .call_03_48E6_CheckMove_Up
-    dw   .call_03_49ED_AdvanceAlongPath, .call_03_491B_CheckMove_Down, .call_03_49ED_AdvanceAlongPath, .call_03_499F_CheckMove_DownLeft
-    dw   .call_03_49ED_AdvanceAlongPath, .call_03_496B_CheckMove_UpLeft
-.call_03_48E1_ResetDirectionState:
+    dw   .jp_03_48E1_ResetDirectionState, .jp_03_49ED_AdvanceAlongPath, .jp_03_48E6_CheckMove_Up
+    dw   .jp_03_49ED_AdvanceAlongPath, .jp_03_491B_CheckMove_Down, .jp_03_49ED_AdvanceAlongPath, .jp_03_499F_CheckMove_DownLeft
+    dw   .jp_03_49ED_AdvanceAlongPath, .jp_03_496B_CheckMove_UpLeft
+.jp_03_48E1_ResetDirectionState:
 ; ResetDirection
 ; Clears wDC86 (direction attempt counter) and returns.
 ; Purpose: Resets movement attempt state.
     xor  a
     ld   [wDC86],a
     ret  
-.call_03_48E6_CheckMove_Up:
+.jp_03_48E6_CheckMove_Up:
 ; TryMoveUp
 ; Probes upward tiles (C=1, B=FF then C=2,B=FE) using call_03_4b4c_TileCollisionCheck.
 ; If blocked, branches to TryUpSideAlternatives or triggers call_03_4A15.
@@ -342,33 +342,33 @@ call_03_48ad_CollisionHandler_TopDown:
     ld   c,$01
     ld   b,$FF
     call call_03_4b4c_TileCollisionCheck
-    jr   nz,.call_03_4900_Fallback_UpBlocked
+    jr   nz,.jp_03_4900_Fallback_UpBlocked
     ld   a,[wDC86]
     cp   a,$02
     ret  c
     ld   c,$02
     ld   b,$FE
     call call_03_4b4c_TileCollisionCheck
-    jp   nz,.call_03_4A15_ForceSingleStep
+    jp   nz,.jp_03_4A15_ForceSingleStep
     ret  
-.call_03_4900_Fallback_UpBlocked:
+.jp_03_4900_Fallback_UpBlocked:
 ; HandleUpBlocked
 ; Called if up movement blocked. Probes horizontal fallback (C=0,B=FF).
 ; If successful, sets bit 6 (0x40) in wDC81_CurrentInputsAlt (collision flags), stores 1 to wDC89 (direction), 
-; then goes to .call_03_49ED_AdvanceAlongPath for path stepping.
+; then goes to .jp_03_49ED_AdvanceAlongPath for path stepping.
     ld   c,$00
     ld   b,$FF
     call call_03_4b4c_TileCollisionCheck
-    jr   nz,.call_03_4950_CheckMove_StraightHorizontal
+    jr   nz,.jp_03_4950_CheckMove_StraightHorizontal
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,$0F
     or   a,$40
     ld   [wDC81_CurrentInputsAlt],a
     ld   a,$01
     ld   [wDC89],a
-    jp   .call_03_49ED_AdvanceAlongPath
+    jp   .jp_03_49ED_AdvanceAlongPath
 
-.call_03_491B_CheckMove_Down:
+.jp_03_491B_CheckMove_Down:
 ; TryMoveDown
 ; Probes downward tiles (C=1,B=1 then C=2,B=2).
 ; Similar logic to Up, with branch to HandleDownBlocked.
@@ -376,124 +376,124 @@ call_03_48ad_CollisionHandler_TopDown:
     ld   c,$01
     ld   b,$01
     call call_03_4b4c_TileCollisionCheck
-    jr   nz,.call_03_4935_Fallback_DownBlocked
+    jr   nz,.jp_03_4935_Fallback_DownBlocked
     ld   a,[wDC86]
     cp   a,$02
     ret  c
     ld   c,$02
     ld   b,$02
     call call_03_4b4c_TileCollisionCheck
-    jp   nz,.call_03_4A15_ForceSingleStep
+    jp   nz,.jp_03_4A15_ForceSingleStep
     ret  
-.call_03_4935_Fallback_DownBlocked:
+.jp_03_4935_Fallback_DownBlocked:
 ; HandleDownBlocked
 ; Handles blocked down movement by probing horizontal (C=0,B=1).
-; If clear, sets bit 7 (0x80) in wDC81_CurrentInputsAlt, stores 5 to wDC89, jumps to .call_03_49ED_AdvanceAlongPath.
+; If clear, sets bit 7 (0x80) in wDC81_CurrentInputsAlt, stores 5 to wDC89, jumps to .jp_03_49ED_AdvanceAlongPath.
     ld   c,$00
     ld   b,$01
     call call_03_4b4c_TileCollisionCheck
-    jr   nz,.call_03_4950_CheckMove_StraightHorizontal
+    jr   nz,.jp_03_4950_CheckMove_StraightHorizontal
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,$0F
     or   a,$80
     ld   [wDC81_CurrentInputsAlt],a
     ld   a,$05
     ld   [wDC89],a
-    jp   .call_03_49ED_AdvanceAlongPath
-.call_03_4950_CheckMove_StraightHorizontal:
+    jp   .jp_03_49ED_AdvanceAlongPath
+.jp_03_4950_CheckMove_StraightHorizontal:
 ; TryMoveSideways
 ; Probes straight horizontal (C=1,B=0).
 ; If blocked, jumps back to reset; else sets bit 4 (0x10) in wDC81_CurrentInputsAlt, stores 3 to wDC89.
     ld   c,$01
     ld   b,$00
     call call_03_4b4c_TileCollisionCheck
-    jr   nz,.call_03_48E1_ResetDirectionState
+    jr   nz,.jp_03_48E1_ResetDirectionState
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,$0F
     or   a,$10
     ld   [wDC81_CurrentInputsAlt],a
     ld   a,$03
     ld   [wDC89],a
-    jp   .call_03_49ED_AdvanceAlongPath
+    jp   .jp_03_49ED_AdvanceAlongPath
 
-.call_03_496B_CheckMove_UpLeft:
+.jp_03_496B_CheckMove_UpLeft:
 ; TryMoveUpLeft
 ; Checks diagonal up-left movement (C=FF,B=FF etc.).
-; Uses same two-step probe, branches to alternatives or .call_03_4A15_ForceSingleStep.
+; Uses same two-step probe, branches to alternatives or .jp_03_4A15_ForceSingleStep.
     ld   c,$FF
     ld   b,$FF
     call call_03_4b4c_TileCollisionCheck
-    jr   nz,.call_03_4985_Fallback_UpLeftBlocked
+    jr   nz,.jp_03_4985_Fallback_UpLeftBlocked
     ld   a,[wDC86]
     cp   a,$02
     ret  c
     ld   c,$02
     ld   b,$FE
     call call_03_4b4c_TileCollisionCheck
-    jp   nz,.call_03_4A15_ForceSingleStep
+    jp   nz,.jp_03_4A15_ForceSingleStep
     ret  
-.call_03_4985_Fallback_UpLeftBlocked:
+.jp_03_4985_Fallback_UpLeftBlocked:
 ; HandleUpLeftBlocked
 ; If up-left blocked, probes vertical fallback (C=0,B=FF), 
-; sets bit 6 (0x40) and direction 1, jumps to .call_03_49ED_AdvanceAlongPath.
+; sets bit 6 (0x40) and direction 1, jumps to .jp_03_49ED_AdvanceAlongPath.
     ld   c,$00
     ld   b,$FF
     call call_03_4b4c_TileCollisionCheck
-    jr   nz,.call_03_49D2_CheckMove_Left
+    jr   nz,.jp_03_49D2_CheckMove_Left
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,$0F
     or   a,$40
     ld   [wDC81_CurrentInputsAlt],a
     ld   a,$01
     ld   [wDC89],a
-    jr   .call_03_49ED_AdvanceAlongPath
+    jr   .jp_03_49ED_AdvanceAlongPath
 
-.call_03_499F_CheckMove_DownLeft:
+.jp_03_499F_CheckMove_DownLeft:
 ; TryMoveDownLeft
 ; Checks diagonal down-left (C=FF,B=1 then C=2,B=2).
     ld   c,$FF
     ld   b,$01
     call call_03_4b4c_TileCollisionCheck
-    jr   nz,.call_03_49B8_Fallback_DownLeftBlocked
+    jr   nz,.jp_03_49B8_Fallback_DownLeftBlocked
     ld   a,[wDC86]
     cp   a,$02
     ret  c
     ld   c,$02
     ld   b,$02
     call call_03_4b4c_TileCollisionCheck
-    jr   nz,.call_03_4A15_ForceSingleStep
+    jr   nz,.jp_03_4A15_ForceSingleStep
     ret  
-.call_03_49B8_Fallback_DownLeftBlocked:
+.jp_03_49B8_Fallback_DownLeftBlocked:
 ; HandleDownLeftBlocked
 ; If blocked, probes vertical fallback (C=0,B=1), sets bit 7 (0x80), 
-; direction 5, jumps to .call_03_49ED_AdvanceAlongPath.
+; direction 5, jumps to .jp_03_49ED_AdvanceAlongPath.
     ld   c,$00
     ld   b,$01
     call call_03_4b4c_TileCollisionCheck
-    jr   nz,.call_03_49D2_CheckMove_Left
+    jr   nz,.jp_03_49D2_CheckMove_Left
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,$0F
     or   a,$80
     ld   [wDC81_CurrentInputsAlt],a
     ld   a,$05
     ld   [wDC89],a
-    jr   .call_03_49ED_AdvanceAlongPath
-.call_03_49D2_CheckMove_Left:
+    jr   .jp_03_49ED_AdvanceAlongPath
+.jp_03_49D2_CheckMove_Left:
 ; TryMoveLeft
 ; Probes straight left (C=FF,B=0).
 ; If free, sets bit 5 (0x20) and direction 7; else resets direction.
     ld   c,$FF
     ld   b,$00
     call call_03_4b4c_TileCollisionCheck
-    jp   nz,.call_03_48E1_ResetDirectionState
+    jp   nz,.jp_03_48E1_ResetDirectionState
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,$0F
     or   a,$20
     ld   [wDC81_CurrentInputsAlt],a
     ld   a,$07
     ld   [wDC89],a
-    jr   .call_03_49ED_AdvanceAlongPath
-.call_03_49ED_AdvanceAlongPath:
+    jr   .jp_03_49ED_AdvanceAlongPath
+.jp_03_49ED_AdvanceAlongPath:
 ; MultiStepAdvance
 ; Performs multi-step tile probing for diagonal/complex movement.
 ; Uses wDC89 as index into .data_03_4a1b for offset pairs.
@@ -510,11 +510,11 @@ call_03_48ad_CollisionHandler_TopDown:
     ld   e,$00
     ld   a,[wDC86]
     ld   d,a
-.call_03_49FF_PathStepLoop_CheckTiles:
+.jp_03_49FF_PathStepLoop_CheckTiles:
 ; PathStepLoop
 ; Reads pairs of X/Y offsets from .data_03_4a1b, pushes them through call_03_4b4c_TileCollisionCheck repeatedly.
 ; Increments E on success, decrements D (remaining steps). Loops until blocked or out of attempts.
-; At .call_03_4A10_CommitStepCount, writes the total successful steps (E) back to wDC86.
+; At .jp_03_4A10_CommitStepCount, writes the total successful steps (E) back to wDC86.
     ldi  a,[hl]
     ld   c,a
     ldi  a,[hl]
@@ -524,17 +524,17 @@ call_03_48ad_CollisionHandler_TopDown:
     call call_03_4b4c_TileCollisionCheck
     pop  de
     pop  hl
-    jr   nz,.call_03_4A10_CommitStepCount
+    jr   nz,.jp_03_4A10_CommitStepCount
     inc  e
     dec  d
-    jr   nz,.call_03_49FF_PathStepLoop_CheckTiles
-.call_03_4A10_CommitStepCount:
+    jr   nz,.jp_03_49FF_PathStepLoop_CheckTiles
+.jp_03_4A10_CommitStepCount:
 ; CommitStepCount
 ; Ends the path-stepping loop, commits the successful step count (E) to wDC86, then returns.
     ld   a,e
     ld   [wDC86],a
     ret  
-.call_03_4A15_ForceSingleStep:
+.jp_03_4A15_ForceSingleStep:
 ; ForceStep
 ; Sets wDC86 to 1 and returns—used when blocked to ensure 
 ; at least one movement attempt is registered.
