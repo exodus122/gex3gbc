@@ -17,49 +17,68 @@ call_03_6c89_LoadMapData:
     ld   BC, $1f                                       ;; 03:6c9a $01 $1f $00
     jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 03:6c9d $c3 $6e $07
 .data_03_6ca0_LevelData:
-    dw   .data_03_6d1a_LevelDataGexCave1
-    dw   .data_03_6d96_LevelDataHolidayTV1
-    dw   .data_03_6e12_LevelDataMysteryTV1
-    dw   .data_03_6f48_LevelDataTutTV1
-    dw   .data_03_7021_LevelWesternStation
-    dw   .data_03_7138_LevelAnimeChannel
-    dw   .data_03_724f_LevelSuperheroShow
-    dw   .data_03_7309_LevelGextremeSports
-    dw   .data_03_7385_LevelMarsupialMadness
-    dw   .data_03_73a4_LevelWWGexWrestling
-    dw   .data_03_73c3_LevelLizardOfOz
-    dw   .data_03_73e2_LevelChannelZ
-    dw   .data_03_6d39_LevelDataGexCave2
-    dw   .data_03_6d58_LevelDataGexCave3
-    dw   .data_03_6d77_LevelDataGexCave4
-    dw   .data_03_6db5_LevelDataHolidayTV2
-    dw   .data_03_6dd4_LevelDataHolidayTV3
-    dw   .data_03_6df3_LevelDataHolidayTV4
-    dw   .data_03_6e31_LevelDataMysteryTV2
-    dw   .data_03_6e50_LevelDataMysteryTV3
-    dw   .data_03_6e6f_LevelDataMysteryTV4
-    dw   .data_03_6e8e_LevelDataMysteryTV5
-    dw   .data_03_6ead_LevelDataMysteryTV6
-    dw   .data_03_6ecc_LevelDataMysteryTV7
-    dw   .data_03_6eeb_LevelDataMysteryTV8
-    dw   .data_03_6f0a_LevelDataMysteryTV9
-    dw   .data_03_6f29_LevelDataMysteryTV10
-    dw   .data_03_6f67_LevelDataTutTV2
-    dw   .data_03_6f86_LevelDataTutTV3
-    dw   .data_03_6fa5_LevelDataTutTV4
-    dw   .data_03_6fc4_LevelDataTutTV5
-    dw   .data_03_6fe3_LevelDataTutTV6
-    dw   .data_03_7002_LevelDataTutTV7
-    db   $40, $70, $5f, $70, $7e, $70        ;; 03:6ce0 ????????
-    db   $9d, $70, $bc, $70, $db, $70, $fa, $70        ;; 03:6ce8 ????????
-    db   $19, $71, $57, $71, $76, $71, $95, $71        ;; 03:6cf0 ????????
-    db   $b4, $71, $d3, $71, $f2, $71, $11, $72        ;; 03:6cf8 ????????
-    db   $30, $72, $6e, $72, $8d, $72, $ac, $72        ;; 03:6d00 ????????
-    db   $cb, $72, $ea, $72, $28, $73, $47, $73        ;; 03:6d08 ????????
-    db   $66, $73, $01, $74, $20, $74, $3f, $74        ;; 03:6d10 ????????
-    db   $5e, $74
-
-.data_03_6d1a_LevelDataGexCave1:
+    dw   .data_03_6d1a_LevelData_GexCave1
+    dw   .data_03_6d96_LevelData_HolidayTV1
+    dw   .data_03_6e12_LevelData_MysteryTV1
+    dw   .data_03_6f48_LevelData_TutTV1
+    dw   .data_03_7021_LevelData_WesternStation1
+    dw   .data_03_7138_LevelData_AnimeChannel1
+    dw   .data_03_724f_LevelData_SuperheroShow1
+    dw   .data_03_7309_LevelData_GextremeSports1
+    dw   .data_03_7385_LevelData_MarsupialMadness1
+    dw   .data_03_73a4_LevelData_WWGexWrestling1
+    dw   .data_03_73c3_LevelData_LizardOfOz1
+    dw   .data_03_73e2_LevelData_ChannelZ1
+    dw   .data_03_6d39_LevelData_GexCave2
+    dw   .data_03_6d58_LevelData_GexCave3
+    dw   .data_03_6d77_LevelData_GexCave4
+    dw   .data_03_6db5_LevelData_HolidayTV2
+    dw   .data_03_6dd4_LevelData_HolidayTV3
+    dw   .data_03_6df3_LevelData_HolidayTV4
+    dw   .data_03_6e31_LevelData_MysteryTV2
+    dw   .data_03_6e50_LevelData_MysteryTV3
+    dw   .data_03_6e6f_LevelData_MysteryTV4
+    dw   .data_03_6e8e_LevelData_MysteryTV5
+    dw   .data_03_6ead_LevelData_MysteryTV6
+    dw   .data_03_6ecc_LevelData_MysteryTV7
+    dw   .data_03_6eeb_LevelData_MysteryTV8
+    dw   .data_03_6f0a_LevelData_MysteryTV9
+    dw   .data_03_6f29_LevelData_MysteryTV10
+    dw   .data_03_6f67_LevelData_TutTV2
+    dw   .data_03_6f86_LevelData_TutTV3
+    dw   .data_03_6fa5_LevelData_TutTV4
+    dw   .data_03_6fc4_LevelData_TutTV5
+    dw   .data_03_6fe3_LevelData_TutTV6
+    dw   .data_03_7002_LevelData_TutTV7
+    dw   .data_03_7040_LevelData_WesternStation2
+    dw   .data_03_705f_LevelData_WesternStation3
+    dw   .data_03_707e_LevelData_WesternStation4
+    dw   .data_03_709d_LevelData_WesternStation5
+    dw   .data_03_70bc_LevelData_WesternStation6
+    dw   .data_03_70db_LevelData_WesternStation7
+    dw   .data_03_70fa_LevelData_WesternStation8
+    dw   .data_03_7119_LevelData_WesternStation9
+    dw   .data_03_7157_LevelData_AnimeChannel2
+    dw   .data_03_7176_LevelData_AnimeChannel3
+    dw   .data_03_7195_LevelData_AnimeChannel4
+    dw   .data_03_71b4_LevelData_AnimeChannel5
+    dw   .data_03_71d3_LevelData_AnimeChannel6
+    dw   .data_03_71f2_LevelData_AnimeChannel7
+    dw   .data_03_7211_LevelData_AnimeChannel8
+    dw   .data_03_7230_LevelData_AnimeChannel9
+    dw   .data_03_726e_LevelData_SuperheroShow2
+    dw   .data_03_728d_LevelData_SuperheroShow3
+    dw   .data_03_72ac_LevelData_SuperheroShow4
+    dw   .data_03_72cb_LevelData_SuperheroShow5
+    dw   .data_03_72ea_LevelData_SuperheroShow6
+    dw   .data_03_7328_LevelData_GextremeSports2
+    dw   .data_03_7347_LevelData_GextremeSports3
+    dw   .data_03_7366_LevelData_GextremeSports4
+    dw   .data_03_7401_LevelData_ChannelZ2
+    dw   .data_03_7420_LevelData_ChannelZ3
+    dw   .data_03_743f_LevelData_ChannelZ4
+    dw   .data_03_745e_LevelData_ChannelZ5
+.data_03_6d1a_LevelData_GexCave1:
     db   BANK(GexCave_1_map)
     dw   GexCave_1_map
     db   BANK(GexCave_1_map_extended)
@@ -79,7 +98,7 @@ call_03_6c89_LoadMapData:
     db   BANK(GexCave_collectible_list)
     dw   GexCave_collectible_list
     db   $1e, $11, $00, $00
-.data_03_6d39_LevelDataGexCave2:
+.data_03_6d39_LevelData_GexCave2:
     db   BANK(GexCave_2_map)
     dw   GexCave_2_map
     db   BANK(GexCave_2_map_extended)
@@ -99,7 +118,7 @@ call_03_6c89_LoadMapData:
     db   BANK(GexCave_collectible_list)
     dw   GexCave_collectible_list
     db   $1e, $11, $00, $00
-.data_03_6d58_LevelDataGexCave3:
+.data_03_6d58_LevelData_GexCave3:
     db   BANK(GexCave_3_map)
     dw   GexCave_3_map
     db   BANK(GexCave_3_map_extended)
@@ -119,7 +138,7 @@ call_03_6c89_LoadMapData:
     db   BANK(GexCave_collectible_list)
     dw   GexCave_collectible_list
     db   $1e, $11, $00, $00
-.data_03_6d77_LevelDataGexCave4:
+.data_03_6d77_LevelData_GexCave4:
     db   BANK(GexCave_4_map)
     dw   GexCave_4_map
     db   BANK(GexCave_4_map_extended)
@@ -139,7 +158,7 @@ call_03_6c89_LoadMapData:
     db   BANK(GexCave_collectible_list)
     dw   GexCave_collectible_list
     db   $1e, $11, $00, $00
-.data_03_6d96_LevelDataHolidayTV1:
+.data_03_6d96_LevelData_HolidayTV1:
     db   BANK(HolidayTV_1_map)
     dw   HolidayTV_1_map
     db   BANK(HolidayTV_1_map_extended)
@@ -159,7 +178,7 @@ call_03_6c89_LoadMapData:
     db   BANK(HolidayTV_collectible_list)
     dw   HolidayTV_collectible_list
     db   $a0, $50, $01, $00
-.data_03_6db5_LevelDataHolidayTV2:
+.data_03_6db5_LevelData_HolidayTV2:
     db   BANK(HolidayTV_2_map)
     dw   HolidayTV_2_map
     db   BANK(HolidayTV_2_map_extended)
@@ -179,7 +198,7 @@ call_03_6c89_LoadMapData:
     db   BANK(HolidayTV_collectible_list)
     dw   HolidayTV_collectible_list
     db   $14, $16, $01, $00
-.data_03_6dd4_LevelDataHolidayTV3:
+.data_03_6dd4_LevelData_HolidayTV3:
     db   BANK(HolidayTV_2_map)
     dw   HolidayTV_2_map
     db   BANK(HolidayTV_2_map_extended)
@@ -199,7 +218,7 @@ call_03_6c89_LoadMapData:
     db   BANK(HolidayTV_collectible_list)
     dw   HolidayTV_collectible_list
     db   $14, $16, $01, $00
-.data_03_6df3_LevelDataHolidayTV4:
+.data_03_6df3_LevelData_HolidayTV4:
     db   BANK(HolidayTV_4_map)
     dw   HolidayTV_4_map
     db   BANK(HolidayTV_4_map_extended)
@@ -219,7 +238,7 @@ call_03_6c89_LoadMapData:
     db   BANK(HolidayTV_collectible_list)
     dw   HolidayTV_collectible_list
     db   $14, $9, $01, $00
-.data_03_6e12_LevelDataMysteryTV1:
+.data_03_6e12_LevelData_MysteryTV1:
     db   BANK(MysteryTV_1_map)
     dw   MysteryTV_1_map
     db   BANK(MysteryTV_1_map_extended)
@@ -239,7 +258,7 @@ call_03_6c89_LoadMapData:
     db   BANK(MysteryTV_collectible_list)
     dw   MysteryTV_collectible_list
     db   $2d, $2d, $02, $00
-.data_03_6e31_LevelDataMysteryTV2:
+.data_03_6e31_LevelData_MysteryTV2:
     db   BANK(MysteryTV_2_map)
     dw   MysteryTV_2_map
     db   BANK(MysteryTV_2_map_extended)
@@ -259,7 +278,7 @@ call_03_6c89_LoadMapData:
     db   BANK(MysteryTV_collectible_list)
     dw   MysteryTV_collectible_list
     db   $28, $32, $02, $01
-.data_03_6e50_LevelDataMysteryTV3:
+.data_03_6e50_LevelData_MysteryTV3:
     db   BANK(MysteryTV_3_map)
     dw   MysteryTV_3_map
     db   BANK(MysteryTV_3_map_extended)
@@ -279,7 +298,7 @@ call_03_6c89_LoadMapData:
     db   BANK(MysteryTV_collectible_list)
     dw   MysteryTV_collectible_list
     db   $2d, $1e, $02, $00
-.data_03_6e6f_LevelDataMysteryTV4:
+.data_03_6e6f_LevelData_MysteryTV4:
     db   BANK(MysteryTV_4_map)
     dw   MysteryTV_4_map
     db   BANK(MysteryTV_4_map_extended)
@@ -299,7 +318,7 @@ call_03_6c89_LoadMapData:
     db   BANK(MysteryTV_collectible_list)
     dw   MysteryTV_collectible_list
     db   $14, $2a, $02, $00
-.data_03_6e8e_LevelDataMysteryTV5:
+.data_03_6e8e_LevelData_MysteryTV5:
     db   BANK(MysteryTV_4_map)
     dw   MysteryTV_4_map
     db   BANK(MysteryTV_4_map_extended)
@@ -319,7 +338,7 @@ call_03_6c89_LoadMapData:
     db   BANK(MysteryTV_collectible_list)
     dw   MysteryTV_collectible_list
     db   $14, $2a, $02, $00
-.data_03_6ead_LevelDataMysteryTV6:
+.data_03_6ead_LevelData_MysteryTV6:
     db   BANK(MysteryTV_4_map)
     dw   MysteryTV_4_map
     db   BANK(MysteryTV_4_map_extended)
@@ -339,7 +358,7 @@ call_03_6c89_LoadMapData:
     db   BANK(MysteryTV_collectible_list)
     dw   MysteryTV_collectible_list
     db   $14, $2a, $02, $00
-.data_03_6ecc_LevelDataMysteryTV7:
+.data_03_6ecc_LevelData_MysteryTV7:
     db   BANK(MysteryTV_7_map)
     dw   MysteryTV_7_map
     db   BANK(MysteryTV_7_map_extended)
@@ -359,7 +378,7 @@ call_03_6c89_LoadMapData:
     db   BANK(MysteryTV_collectible_list)
     dw   MysteryTV_collectible_list
     db   $0a, $08, $02, $01
-.data_03_6eeb_LevelDataMysteryTV8:
+.data_03_6eeb_LevelData_MysteryTV8:
     db   BANK(MysteryTV_8_map)
     dw   MysteryTV_8_map
     db   BANK(MysteryTV_8_map_extended)
@@ -379,7 +398,7 @@ call_03_6c89_LoadMapData:
     db   BANK(MysteryTV_collectible_list)
     dw   MysteryTV_collectible_list
     db   $0a, $09, $02, $01
-.data_03_6f0a_LevelDataMysteryTV9:
+.data_03_6f0a_LevelData_MysteryTV9:
     db   BANK(MysteryTV_4_map)
     dw   MysteryTV_4_map
     db   BANK(MysteryTV_4_map_extended)
@@ -399,7 +418,7 @@ call_03_6c89_LoadMapData:
     db   BANK(MysteryTV_collectible_list)
     dw   MysteryTV_collectible_list
     db   $14, $2a, $02, $00
-.data_03_6f29_LevelDataMysteryTV10:
+.data_03_6f29_LevelData_MysteryTV10:
     db   BANK(MysteryTV_2_map)
     dw   MysteryTV_2_map
     db   BANK(MysteryTV_2_map_extended)
@@ -419,7 +438,7 @@ call_03_6c89_LoadMapData:
     db   BANK(MysteryTV_collectible_list)
     dw   MysteryTV_collectible_list
     db   $28, $32, $02, $01
-.data_03_6f48_LevelDataTutTV1:
+.data_03_6f48_LevelData_TutTV1:
     db   BANK(TutTV_1_map)
     dw   TutTV_1_map
     db   BANK(TutTV_1_map_extended)
@@ -439,7 +458,7 @@ call_03_6c89_LoadMapData:
     db   BANK(TutTV_collectible_list)
     dw   TutTV_collectible_list
     db   $27, $13, $03, $00
-.data_03_6f67_LevelDataTutTV2:
+.data_03_6f67_LevelData_TutTV2:
     db   BANK(TutTV_2_map)
     dw   TutTV_2_map
     db   BANK(TutTV_2_map_extended)
@@ -459,7 +478,7 @@ call_03_6c89_LoadMapData:
     db   BANK(TutTV_collectible_list)
     dw   TutTV_collectible_list
     db   $34, $33, $03, $00
-.data_03_6f86_LevelDataTutTV3:
+.data_03_6f86_LevelData_TutTV3:
     db   BANK(TutTV_3_map)
     dw   TutTV_3_map
     db   BANK(TutTV_3_map_extended)
@@ -479,7 +498,7 @@ call_03_6c89_LoadMapData:
     db   BANK(TutTV_collectible_list)
     dw   TutTV_collectible_list
     db   $64, $17, $03, $00
-.data_03_6fa5_LevelDataTutTV4:
+.data_03_6fa5_LevelData_TutTV4:
     db   BANK(TutTV_4_map)
     dw   TutTV_4_map
     db   BANK(TutTV_4_map_extended)
@@ -499,7 +518,7 @@ call_03_6c89_LoadMapData:
     db   BANK(TutTV_collectible_list)
     dw   TutTV_collectible_list
     db   $4a, $13, $03, $00
-.data_03_6fc4_LevelDataTutTV5:
+.data_03_6fc4_LevelData_TutTV5:
     db   BANK(TutTV_5_map)
     dw   TutTV_5_map
     db   BANK(TutTV_5_map_extended)
@@ -519,7 +538,7 @@ call_03_6c89_LoadMapData:
     db   BANK(TutTV_collectible_list)
     dw   TutTV_collectible_list
     db   $0a, $09, $03, $00
-.data_03_6fe3_LevelDataTutTV6:
+.data_03_6fe3_LevelData_TutTV6:
     db   BANK(TutTV_6_map)
     dw   TutTV_6_map
     db   BANK(TutTV_6_map_extended)
@@ -539,7 +558,7 @@ call_03_6c89_LoadMapData:
     db   BANK(TutTV_collectible_list)
     dw   TutTV_collectible_list
     db   $14, $09, $03, $00
-.data_03_7002_LevelDataTutTV7:
+.data_03_7002_LevelData_TutTV7:
     db   BANK(TutTV_7_map)
     dw   TutTV_7_map
     db   BANK(TutTV_7_map_extended)
@@ -558,213 +577,724 @@ call_03_6c89_LoadMapData:
     dw   TutTV_object_list
     db   BANK(TutTV_collectible_list)
     dw   TutTV_collectible_list
-    db   $32, $19, $03, $00
-.data_03_7021_LevelWesternStation:    
-    db   $2f, $47        ;; 03:7021 ??????..
-    db   $55, $2e, $47, $55, $42, $00, $40, $25        ;; 03:7023 ........
-    db   $20, $67, $30, $47, $55, $23, $cc, $44        ;; 03:702b ........
-    db   $21, $c0, $45, $22, $94, $48, $21, $c2        ;; 03:7033 ........
-    db   $4f, $28, $16, $04, $00
-    
-    db   $2f, $df, $58        ;; 03:7040 ...w.???
-    db   $2e, $df, $58, $42, $90, $5a, $25, $30        ;; 03:7043 ????????
-    db   $6f, $30, $df, $58, $23, $b0, $45, $21        ;; 03:704b ????????
-    db   $00, $46, $22, $94, $48, $21, $c2, $4f        ;; 03:7053 ????????
+    db   $32, $19, $03, $00  
+.data_03_7021_LevelData_WesternStation1:
+    db   BANK(WesternStation_1_map)
+    dw   WesternStation_1_map
+    db   BANK(WesternStation_1_map_extended)
+    dw   WesternStation_1_map_extended
+    db   BANK(WesternStation_1_tileset)
+    dw   WesternStation_1_tileset
+    db   BANK(WesternStation_1_blockset)
+    dw   WesternStation_1_blockset
+    db   BANK(WesternStation_1_collision)
+    dw   WesternStation_1_collision
+    db   BANK(WesternStation_1_collision_blockset)
+    dw   WesternStation_1_collision_blockset
+    db   BANK(WesternStation_1_palette)
+    dw   WesternStation_1_palette
+    db   BANK(WesternStation_object_list)
+    dw   WesternStation_object_list
+    db   BANK(WesternStation_collectible_list)
+    dw   WesternStation_collectible_list
+    db   $28, $16, $04, $00
+.data_03_7040_LevelData_WesternStation2:
+    db   BANK(WesternStation_2_map)
+    dw   WesternStation_2_map
+    db   BANK(WesternStation_2_map_extended)
+    dw   WesternStation_2_map_extended
+    db   BANK(WesternStation_2_tileset)
+    dw   WesternStation_2_tileset
+    db   BANK(WesternStation_2_blockset)
+    dw   WesternStation_2_blockset
+    db   BANK(WesternStation_2_collision)
+    dw   WesternStation_2_collision
+    db   BANK(WesternStation_2_collision_blockset)
+    dw   WesternStation_2_collision_blockset
+    db   BANK(WesternStation_2_palette)
+    dw   WesternStation_2_palette
+    db   BANK(WesternStation_object_list)
+    dw   WesternStation_object_list
+    db   BANK(WesternStation_collectible_list)
+    dw   WesternStation_collectible_list
     db   $26, $16, $04, $00
-    
-    db   $2f, $23, $5c, $2e        ;; 03:705f ????????
-    db   $23, $5c, $41, $00, $40, $25, $f0, $74        ;; 03:7063 ????????
-    db   $30, $23, $5c, $23, $04, $46, $21, $40        ;; 03:706b ????????
-    db   $46, $22, $94, $48, $21, $c2, $4f, $14        ;; 03:7073 ????????
-    db   $0b, $04, $00
-    
-    db   $2f, $ff, $5c, $2e, $ff        ;; 03:707e ????????
-    db   $5c, $4b, $00, $40, $25, $20, $7b, $30        ;; 03:7083 ????????
-    db   $ff, $5c, $23, $40, $46, $21, $80, $46        ;; 03:708b ????????
-    db   $22, $94, $48, $21, $c2, $4f, $0a, $12        ;; 03:7093 ????????
-    db   $04, $00
-    
-    db   $2f, $b3, $5d, $2e, $b3, $5d        ;; 03:709d ????????
-    db   $4b, $80, $56, $27, $f8, $77, $30, $b3        ;; 03:70a3 ????????
-    db   $5d, $23, $7c, $46, $21, $c0, $46, $22        ;; 03:70ab ????????
-    db   $94, $48, $21, $c2, $4f, $50, $12, $04        ;; 03:70b3 ????????
-    db   $00
-    
-    db   $2f, $53, $63, $2e, $53, $63, $4f        ;; 03:70bc ????????
-    db   $20, $57, $28, $58, $59, $30, $53, $63        ;; 03:70c3 ????????
-    db   $23, $f0, $46, $21, $00, $47, $22, $94        ;; 03:70cb ????????
-    db   $48, $21, $c2, $4f, $7d, $33, $04, $00        ;; 03:70d3 ????????
-
-    db   $2f, $ff, $5c, $2e, $ff, $5c, $4b, $00        ;; 03:70db ????????
-    db   $40, $25, $20, $7b, $30, $ff, $5c, $23        ;; 03:70e3 ????????
-    db   $40, $46, $21, $80, $46, $22, $94, $48        ;; 03:70eb ????????
-    db   $21, $c2, $4f, $0a, $12, $04, $00
-    
-    db   $2f        ;; 03:70fa ????????
-    db   $ff, $5c, $2e, $ff, $5c, $4b, $00, $40        ;; 03:70fb ????????
-    db   $25, $20, $7b, $30, $ff, $5c, $23, $40        ;; 03:7103 ????????
-    db   $46, $21, $80, $46, $22, $94, $48, $21        ;; 03:710b ????????
-    db   $c2, $4f, $0a, $12, $04, $00
-    
-    db   $2f, $ff        ;; 03:7119 ????????
-    db   $5c, $2e, $ff, $5c, $4b, $00, $40, $25        ;; 03:711b ????????
-    db   $20, $7b, $30, $ff, $5c, $23, $40, $46        ;; 03:7123 ????????
-    db   $21, $80, $46, $22, $94, $48, $21, $c2        ;; 03:712b ????????
-    db   $4f, $0a, $12, $04, $00
-.data_03_7138_LevelAnimeChannel:     
-    db   $38, $00, $40        ;; 03:7138 ?????...
-    db   $37, $00, $40, $40, $00, $40, $26, $00        ;; 03:713b ........
-    db   $40, $39, $00, $40, $23, $d0, $47, $21        ;; 03:7143 ........
-    db   $40, $47, $22, $45, $4c, $21, $a6, $50        ;; 03:714b ........
-    db   $3e, $1e, $05, $00
-    
-    db   $38, $44, $47, $37        ;; 03:7157 ..w.????
-    db   $44, $47, $40, $50, $59, $26, $10, $45        ;; 03:715b ????????
-    db   $39, $44, $47, $23, $fc, $47, $21, $80        ;; 03:7163 ????????
-    db   $47, $22, $45, $4c, $21, $a6, $50, $30        ;; 03:716b ????????
-    db   $1e, $05, $00
-    
-    db   $38, $e4, $4c, $37, $e4        ;; 03:7176 ????????
-    db   $4c, $48, $00, $40, $26, $08, $4b, $39        ;; 03:717b ????????
-    db   $e4, $4c, $23, $50, $48, $21, $c0, $47        ;; 03:7183 ????????
-    db   $22, $45, $4c, $21, $a6, $50, $38, $13        ;; 03:718b ????????
-    db   $05, $00
-    
-    db   $38, $0c, $51, $37, $0c, $51        ;; 03:7195 ????????
-    db   $41, $a0, $5e, $26, $68, $50, $39, $0c        ;; 03:719b ????????
-    db   $51, $23, $d8, $48, $21, $00, $48, $22        ;; 03:71a3 ????????
-    db   $45, $4c, $21, $a6, $50, $5e, $2a, $05        ;; 03:71ab ????????
-    db   $00
-    
-    db   $38, $78, $60, $37, $78, $60, $48        ;; 03:71b4 ????????
-    db   $f0, $55, $26, $28, $56, $39, $78, $60        ;; 03:71bb ????????
-    db   $23, $7c, $49, $21, $40, $48, $22, $45        ;; 03:71c3 ????????
-    db   $4c, $21, $a6, $50, $f5, $16, $05, $00        ;; 03:71cb ????????
-
-    db   $38, $86, $75, $37, $86, $75, $4d, $00        ;; 03:71d3 ????????
-    db   $40, $26, $58, $5c, $39, $86, $75, $23        ;; 03:71db ????????
-    db   $10, $4a, $21, $80, $48, $22, $45, $4c        ;; 03:71e3 ????????
-    db   $21, $a6, $50, $1e, $33, $05, $00
-    
-    db   $38        ;; 03:71f2 ????????
-    db   $86, $75, $37, $86, $75, $4d, $00, $40        ;; 03:71f3 ????????
-    db   $26, $58, $5c, $39, $86, $75, $23, $10        ;; 03:71fb ????????
-    db   $4a, $21, $80, $48, $22, $45, $4c, $21        ;; 03:7203 ????????
-    db   $a6, $50, $1e, $33, $05, $00
-    
-    db   $38, $86        ;; 03:7211 ????????
-    db   $75, $37, $86, $75, $4d, $00, $40, $26        ;; 03:7213 ????????
-    db   $58, $5c, $39, $86, $75, $23, $10, $4a        ;; 03:721b ????????
-    db   $21, $80, $48, $22, $45, $4c, $21, $a6        ;; 03:7223 ????????
-    db   $50, $1e, $33, $05, $00
-    
-    db   $38, $78, $60        ;; 03:7230 ????????
-    db   $37, $78, $60, $48, $f0, $55, $26, $28        ;; 03:7233 ????????
-    db   $56, $39, $78, $60, $23, $7c, $49, $21        ;; 03:723b ????????
-    db   $40, $48, $22, $45, $4c, $21, $a6, $50        ;; 03:7243 ????????
+.data_03_705f_LevelData_WesternStation3:
+    db   BANK(WesternStation_3_map)
+    dw   WesternStation_3_map
+    db   BANK(WesternStation_3_map_extended)
+    dw   WesternStation_3_map_extended
+    db   BANK(WesternStation_3_tileset)
+    dw   WesternStation_3_tileset
+    db   BANK(WesternStation_3_blockset)
+    dw   WesternStation_3_blockset
+    db   BANK(WesternStation_3_collision)
+    dw   WesternStation_3_collision
+    db   BANK(WesternStation_3_collision_blockset)
+    dw   WesternStation_3_collision_blockset
+    db   BANK(WesternStation_3_palette)
+    dw   WesternStation_3_palette
+    db   BANK(WesternStation_object_list)
+    dw   WesternStation_object_list
+    db   BANK(WesternStation_collectible_list)
+    dw   WesternStation_collectible_list
+    db   $14, $0b, $04, $00
+.data_03_707e_LevelData_WesternStation4:
+    db   BANK(WesternStation_4_map)
+    dw   WesternStation_4_map
+    db   BANK(WesternStation_4_map_extended)
+    dw   WesternStation_4_map_extended
+    db   BANK(WesternStation_4_tileset)
+    dw   WesternStation_4_tileset
+    db   BANK(WesternStation_4_blockset)
+    dw   WesternStation_4_blockset
+    db   BANK(WesternStation_4_collision)
+    dw   WesternStation_4_collision
+    db   BANK(WesternStation_4_collision_blockset)
+    dw   WesternStation_4_collision_blockset
+    db   BANK(WesternStation_4_palette)
+    dw   WesternStation_4_palette
+    db   BANK(WesternStation_object_list)
+    dw   WesternStation_object_list
+    db   BANK(WesternStation_collectible_list)
+    dw   WesternStation_collectible_list
+    db   $0a, $12, $04, $00
+.data_03_709d_LevelData_WesternStation5:
+    db   BANK(WesternStation_5_map)
+    dw   WesternStation_5_map
+    db   BANK(WesternStation_5_map_extended)
+    dw   WesternStation_5_map_extended
+    db   BANK(WesternStation_5_tileset)
+    dw   WesternStation_5_tileset
+    db   BANK(WesternStation_5_blockset)
+    dw   WesternStation_5_blockset
+    db   BANK(WesternStation_5_collision)
+    dw   WesternStation_5_collision
+    db   BANK(WesternStation_5_collision_blockset)
+    dw   WesternStation_5_collision_blockset
+    db   BANK(WesternStation_5_palette)
+    dw   WesternStation_5_palette
+    db   BANK(WesternStation_object_list)
+    dw   WesternStation_object_list
+    db   BANK(WesternStation_collectible_list)
+    dw   WesternStation_collectible_list
+    db   $50, $12, $04, $00
+.data_03_70bc_LevelData_WesternStation6:
+    db   BANK(WesternStation_6_map)
+    dw   WesternStation_6_map
+    db   BANK(WesternStation_6_map_extended)
+    dw   WesternStation_6_map_extended
+    db   BANK(WesternStation_6_tileset)
+    dw   WesternStation_6_tileset
+    db   BANK(WesternStation_6_blockset)
+    dw   WesternStation_6_blockset
+    db   BANK(WesternStation_6_collision)
+    dw   WesternStation_6_collision
+    db   BANK(WesternStation_6_collision_blockset)
+    dw   WesternStation_6_collision_blockset
+    db   BANK(WesternStation_6_palette)
+    dw   WesternStation_6_palette
+    db   BANK(WesternStation_object_list)
+    dw   WesternStation_object_list
+    db   BANK(WesternStation_collectible_list)
+    dw   WesternStation_collectible_list
+    db   $7d, $33, $04, $00
+.data_03_70db_LevelData_WesternStation7:
+    db   BANK(WesternStation_4_map)
+    dw   WesternStation_4_map
+    db   BANK(WesternStation_4_map_extended)
+    dw   WesternStation_4_map_extended
+    db   BANK(WesternStation_4_tileset)
+    dw   WesternStation_4_tileset
+    db   BANK(WesternStation_4_blockset)
+    dw   WesternStation_4_blockset
+    db   BANK(WesternStation_4_collision)
+    dw   WesternStation_4_collision
+    db   BANK(WesternStation_4_collision_blockset)
+    dw   WesternStation_4_collision_blockset
+    db   BANK(WesternStation_4_palette)
+    dw   WesternStation_4_palette
+    db   BANK(WesternStation_object_list)
+    dw   WesternStation_object_list
+    db   BANK(WesternStation_collectible_list)
+    dw   WesternStation_collectible_list
+    db   $0a, $12, $04, $00
+.data_03_70fa_LevelData_WesternStation8:
+    db   BANK(WesternStation_4_map)
+    dw   WesternStation_4_map
+    db   BANK(WesternStation_4_map_extended)
+    dw   WesternStation_4_map_extended
+    db   BANK(WesternStation_4_tileset)
+    dw   WesternStation_4_tileset
+    db   BANK(WesternStation_4_blockset)
+    dw   WesternStation_4_blockset
+    db   BANK(WesternStation_4_collision)
+    dw   WesternStation_4_collision
+    db   BANK(WesternStation_4_collision_blockset)
+    dw   WesternStation_4_collision_blockset
+    db   BANK(WesternStation_4_palette)
+    dw   WesternStation_4_palette
+    db   BANK(WesternStation_object_list)
+    dw   WesternStation_object_list
+    db   BANK(WesternStation_collectible_list)
+    dw   WesternStation_collectible_list
+    db   $0a, $12, $04, $00
+.data_03_7119_LevelData_WesternStation9:
+    db   BANK(WesternStation_4_map)
+    dw   WesternStation_4_map
+    db   BANK(WesternStation_4_map_extended)
+    dw   WesternStation_4_map_extended
+    db   BANK(WesternStation_4_tileset)
+    dw   WesternStation_4_tileset
+    db   BANK(WesternStation_4_blockset)
+    dw   WesternStation_4_blockset
+    db   BANK(WesternStation_4_collision)
+    dw   WesternStation_4_collision
+    db   BANK(WesternStation_4_collision_blockset)
+    dw   WesternStation_4_collision_blockset
+    db   BANK(WesternStation_4_palette)
+    dw   WesternStation_4_palette
+    db   BANK(WesternStation_object_list)
+    dw   WesternStation_object_list
+    db   BANK(WesternStation_collectible_list)
+    dw   WesternStation_collectible_list
+    db   $0a, $12, $04, $00
+.data_03_7138_LevelData_AnimeChannel1:     
+    db   BANK(AnimeChannel_1_map)
+    dw   AnimeChannel_1_map
+    db   BANK(AnimeChannel_1_map_extended)
+    dw   AnimeChannel_1_map_extended
+    db   BANK(AnimeChannel_1_tileset)
+    dw   AnimeChannel_1_tileset
+    db   BANK(AnimeChannel_1_blockset)
+    dw   AnimeChannel_1_blockset
+    db   BANK(AnimeChannel_1_collision)
+    dw   AnimeChannel_1_collision
+    db   BANK(AnimeChannel_1_collision_blockset)
+    dw   AnimeChannel_1_collision_blockset
+    db   BANK(AnimeChannel_1_palette)
+    dw   AnimeChannel_1_palette
+    db   BANK(AnimeChannel_object_list)
+    dw   AnimeChannel_object_list
+    db   BANK(AnimeChannel_collectible_list)
+    dw   AnimeChannel_collectible_list
+    db   $3e, $1e, $05, $00   
+.data_03_7157_LevelData_AnimeChannel2:
+    db   BANK(AnimeChannel_2_map)
+    dw   AnimeChannel_2_map
+    db   BANK(AnimeChannel_2_map_extended)
+    dw   AnimeChannel_2_map_extended
+    db   BANK(AnimeChannel_2_tileset)
+    dw   AnimeChannel_2_tileset
+    db   BANK(AnimeChannel_2_blockset)
+    dw   AnimeChannel_2_blockset
+    db   BANK(AnimeChannel_2_collision)
+    dw   AnimeChannel_2_collision
+    db   BANK(AnimeChannel_2_collision_blockset)
+    dw   AnimeChannel_2_collision_blockset
+    db   BANK(AnimeChannel_2_palette)
+    dw   AnimeChannel_2_palette
+    db   BANK(AnimeChannel_object_list)
+    dw   AnimeChannel_object_list
+    db   BANK(AnimeChannel_collectible_list)
+    dw   AnimeChannel_collectible_list
+    db   $30, $1e, $05, $00
+.data_03_7176_LevelData_AnimeChannel3:
+    db   BANK(AnimeChannel_3_map)
+    dw   AnimeChannel_3_map
+    db   BANK(AnimeChannel_3_map_extended)
+    dw   AnimeChannel_3_map_extended
+    db   BANK(AnimeChannel_3_tileset)
+    dw   AnimeChannel_3_tileset
+    db   BANK(AnimeChannel_3_blockset)
+    dw   AnimeChannel_3_blockset
+    db   BANK(AnimeChannel_3_collision)
+    dw   AnimeChannel_3_collision
+    db   BANK(AnimeChannel_3_collision_blockset)
+    dw   AnimeChannel_3_collision_blockset
+    db   BANK(AnimeChannel_3_palette)
+    dw   AnimeChannel_3_palette
+    db   BANK(AnimeChannel_object_list)
+    dw   AnimeChannel_object_list
+    db   BANK(AnimeChannel_collectible_list)
+    dw   AnimeChannel_collectible_list
+    db   $38, $13, $05, $00
+.data_03_7195_LevelData_AnimeChannel4:
+    db   BANK(AnimeChannel_4_map)
+    dw   AnimeChannel_4_map
+    db   BANK(AnimeChannel_4_map_extended)
+    dw   AnimeChannel_4_map_extended
+    db   BANK(AnimeChannel_4_tileset)
+    dw   AnimeChannel_4_tileset
+    db   BANK(AnimeChannel_4_blockset)
+    dw   AnimeChannel_4_blockset
+    db   BANK(AnimeChannel_4_collision)
+    dw   AnimeChannel_4_collision
+    db   BANK(AnimeChannel_4_collision_blockset)
+    dw   AnimeChannel_4_collision_blockset
+    db   BANK(AnimeChannel_4_palette)
+    dw   AnimeChannel_4_palette
+    db   BANK(AnimeChannel_object_list)
+    dw   AnimeChannel_object_list
+    db   BANK(AnimeChannel_collectible_list)
+    dw   AnimeChannel_collectible_list
+    db   $5e, $2a, $05, $00
+.data_03_71b4_LevelData_AnimeChannel5:
+    db   BANK(AnimeChannel_5_map)
+    dw   AnimeChannel_5_map
+    db   BANK(AnimeChannel_5_map_extended)
+    dw   AnimeChannel_5_map_extended
+    db   BANK(AnimeChannel_5_tileset)
+    dw   AnimeChannel_5_tileset
+    db   BANK(AnimeChannel_5_blockset)
+    dw   AnimeChannel_5_blockset
+    db   BANK(AnimeChannel_5_collision)
+    dw   AnimeChannel_5_collision
+    db   BANK(AnimeChannel_5_collision_blockset)
+    dw   AnimeChannel_5_collision_blockset
+    db   BANK(AnimeChannel_5_palette)
+    dw   AnimeChannel_5_palette
+    db   BANK(AnimeChannel_object_list)
+    dw   AnimeChannel_object_list
+    db   BANK(AnimeChannel_collectible_list)
+    dw   AnimeChannel_collectible_list
     db   $f5, $16, $05, $00
-.data_03_724f_LevelSuperheroShow:    
-    db   $3e, $00, $40, $3d        ;; 03:724f ????....
-    db   $00, $40, $49, $00, $40, $26, $00, $60        ;; 03:7253 ........
-    db   $3f, $00, $40, $23, $94, $4a, $21, $c0        ;; 03:725b ........
-    db   $48, $22, $b6, $53, $21, $a2, $51, $bf        ;; 03:7263 ........
-    db   $1e, $06, $00
-    
-    db   $3b, $00, $40, $3a, $00        ;; 03:726e .w.?????
-    db   $40, $49, $50, $5f, $26, $40, $67, $3c        ;; 03:7273 ????????
-    db   $00, $40, $23, $0c, $4b, $21, $00, $49        ;; 03:727b ????????
-    db   $22, $b6, $53, $21, $a2, $51, $c2, $44        ;; 03:7283 ????????
-    db   $06, $00
-    
-    db   $3e, $62, $56, $3d, $62, $56        ;; 03:728d ????????
-    db   $4a, $00, $40, $26, $b8, $6e, $3f, $62        ;; 03:7293 ????????
-    db   $56, $23, $78, $4b, $21, $40, $49, $22        ;; 03:729b ????????
-    db   $b6, $53, $21, $a2, $51, $43, $1e, $06        ;; 03:72a3 ????????
-    db   $00                                           ;; 03:72ab ?
-
-    db   $3e, $3c, $5e, $3d, $3c, $5e, $4a, $40        ;; 03:72ac ????????
-    db   $58, $26, $48, $74, $3f, $3c, $5e, $23        ;; 03:72b4 ????????
-    db   $d8, $4b, $21, $80, $49, $22, $b6, $53        ;; 03:72bc ????????
-    db   $21, $a2, $51, $60, $1e, $06, $00
-    
-    db   $3e        ;; 03:72cb ????????
-    db   $7c, $69, $3d, $7c, $69, $47, $80, $6b        ;; 03:72cc ????????
-    db   $26, $00, $7a, $3f, $7c, $69, $23, $30        ;; 03:72d4 ????????
-    db   $4c, $21, $c0, $49, $22, $b6, $53, $21        ;; 03:72dc ????????
-    db   $a2, $51, $30, $22, $06, $00
-    
-    db   $3e, $dc        ;; 03:72e4 ????????
-    db   $6f, $3d, $dc, $6f, $4a, $50, $7c, $26        ;; 03:72ec ????????
-    db   $b8, $7e, $3f, $dc, $6f, $23, $58, $4c        ;; 03:72f4 ????????
-    db   $21, $00, $4a, $22, $b6, $53, $21, $a2        ;; 03:72fc ????????
-    db   $51, $0a, $08, $06, $00
-.data_03_7309_LevelGextremeSports:     
-    db   $3b, $88, $73        ;; 03:7309 ????????
-    db   $3a, $88, $73, $4d, $10, $51, $27, $00        ;; 03:730c ????????
-    db   $40, $3c, $88, $73, $23, $74, $4c, $21        ;; 03:7314 ????????
-    db   $40, $4a, $22, $87, $59, $21, $44, $52        ;; 03:731c ????????
+.data_03_71d3_LevelData_AnimeChannel6:
+    db   BANK(AnimeChannel_6_map)
+    dw   AnimeChannel_6_map
+    db   BANK(AnimeChannel_6_map_extended)
+    dw   AnimeChannel_6_map_extended
+    db   BANK(AnimeChannel_6_tileset)
+    dw   AnimeChannel_6_tileset
+    db   BANK(AnimeChannel_6_blockset)
+    dw   AnimeChannel_6_blockset
+    db   BANK(AnimeChannel_6_collision)
+    dw   AnimeChannel_6_collision
+    db   BANK(AnimeChannel_6_collision_blockset)
+    dw   AnimeChannel_6_collision_blockset
+    db   BANK(AnimeChannel_6_palette)
+    dw   AnimeChannel_6_palette
+    db   BANK(AnimeChannel_object_list)
+    dw   AnimeChannel_object_list
+    db   BANK(AnimeChannel_collectible_list)
+    dw   AnimeChannel_collectible_list
+    db   $1e, $33, $05, $00
+.data_03_71f2_LevelData_AnimeChannel7:
+    db   BANK(AnimeChannel_6_map)
+    dw   AnimeChannel_6_map
+    db   BANK(AnimeChannel_6_map_extended)
+    dw   AnimeChannel_6_map_extended
+    db   BANK(AnimeChannel_6_tileset)
+    dw   AnimeChannel_6_tileset
+    db   BANK(AnimeChannel_6_blockset)
+    dw   AnimeChannel_6_blockset
+    db   BANK(AnimeChannel_6_collision)
+    dw   AnimeChannel_6_collision
+    db   BANK(AnimeChannel_6_collision_blockset)
+    dw   AnimeChannel_6_collision_blockset
+    db   BANK(AnimeChannel_6_palette)
+    dw   AnimeChannel_6_palette
+    db   BANK(AnimeChannel_object_list)
+    dw   AnimeChannel_object_list
+    db   BANK(AnimeChannel_collectible_list)
+    dw   AnimeChannel_collectible_list
+    db   $1e, $33, $05, $00
+.data_03_7211_LevelData_AnimeChannel8:
+    db   BANK(AnimeChannel_6_map)
+    dw   AnimeChannel_6_map
+    db   BANK(AnimeChannel_6_map_extended)
+    dw   AnimeChannel_6_map_extended
+    db   BANK(AnimeChannel_6_tileset)
+    dw   AnimeChannel_6_tileset
+    db   BANK(AnimeChannel_6_blockset)
+    dw   AnimeChannel_6_blockset
+    db   BANK(AnimeChannel_6_collision)
+    dw   AnimeChannel_6_collision
+    db   BANK(AnimeChannel_6_collision_blockset)
+    dw   AnimeChannel_6_collision_blockset
+    db   BANK(AnimeChannel_6_palette)
+    dw   AnimeChannel_6_palette
+    db   BANK(AnimeChannel_object_list)
+    dw   AnimeChannel_object_list
+    db   BANK(AnimeChannel_collectible_list)
+    dw   AnimeChannel_collectible_list
+    db   $1e, $33, $05, $00
+.data_03_7230_LevelData_AnimeChannel9:
+    db   BANK(AnimeChannel_5_map)
+    dw   AnimeChannel_5_map
+    db   BANK(AnimeChannel_5_map_extended)
+    dw   AnimeChannel_5_map_extended
+    db   BANK(AnimeChannel_5_tileset)
+    dw   AnimeChannel_5_tileset
+    db   BANK(AnimeChannel_5_blockset)
+    dw   AnimeChannel_5_blockset
+    db   BANK(AnimeChannel_5_collision)
+    dw   AnimeChannel_5_collision
+    db   BANK(AnimeChannel_5_collision_blockset)
+    dw   AnimeChannel_5_collision_blockset
+    db   BANK(AnimeChannel_5_palette)
+    dw   AnimeChannel_5_palette
+    db   BANK(AnimeChannel_object_list)
+    dw   AnimeChannel_object_list
+    db   BANK(AnimeChannel_collectible_list)
+    dw   AnimeChannel_collectible_list
+    db   $f5, $16, $05, $00
+.data_03_724f_LevelData_SuperheroShow1:
+    db   BANK(SuperheroShow_1_map)
+    dw   SuperheroShow_1_map
+    db   BANK(SuperheroShow_1_map_extended)
+    dw   SuperheroShow_1_map_extended
+    db   BANK(SuperheroShow_1_tileset)
+    dw   SuperheroShow_1_tileset
+    db   BANK(SuperheroShow_1_blockset)
+    dw   SuperheroShow_1_blockset
+    db   BANK(SuperheroShow_1_collision)
+    dw   SuperheroShow_1_collision
+    db   BANK(SuperheroShow_1_collision_blockset)
+    dw   SuperheroShow_1_collision_blockset
+    db   BANK(SuperheroShow_1_palette)
+    dw   SuperheroShow_1_palette
+    db   BANK(SuperheroShow_object_list)
+    dw   SuperheroShow_object_list
+    db   BANK(SuperheroShow_collectible_list)
+    dw   SuperheroShow_collectible_list
+    db   $bf, $1e, $06, $00
+.data_03_726e_LevelData_SuperheroShow2:
+    db   BANK(SuperheroShow_2_map)
+    dw   SuperheroShow_2_map
+    db   BANK(SuperheroShow_2_map_extended)
+    dw   SuperheroShow_2_map_extended
+    db   BANK(SuperheroShow_2_tileset)
+    dw   SuperheroShow_2_tileset
+    db   BANK(SuperheroShow_2_blockset)
+    dw   SuperheroShow_2_blockset
+    db   BANK(SuperheroShow_2_collision)
+    dw   SuperheroShow_2_collision
+    db   BANK(SuperheroShow_2_collision_blockset)
+    dw   SuperheroShow_2_collision_blockset
+    db   BANK(SuperheroShow_2_palette)
+    dw   SuperheroShow_2_palette
+    db   BANK(SuperheroShow_object_list)
+    dw   SuperheroShow_object_list
+    db   BANK(SuperheroShow_collectible_list)
+    dw   SuperheroShow_collectible_list
+    db   $c2, $44, $06, $00
+.data_03_728d_LevelData_SuperheroShow3:
+    db   BANK(SuperheroShow_3_map)
+    dw   SuperheroShow_3_map
+    db   BANK(SuperheroShow_3_map_extended)
+    dw   SuperheroShow_3_map_extended
+    db   BANK(SuperheroShow_3_tileset)
+    dw   SuperheroShow_3_tileset
+    db   BANK(SuperheroShow_3_blockset)
+    dw   SuperheroShow_3_blockset
+    db   BANK(SuperheroShow_3_collision)
+    dw   SuperheroShow_3_collision
+    db   BANK(SuperheroShow_3_collision_blockset)
+    dw   SuperheroShow_3_collision_blockset
+    db   BANK(SuperheroShow_3_palette)
+    dw   SuperheroShow_3_palette
+    db   BANK(SuperheroShow_object_list)
+    dw   SuperheroShow_object_list
+    db   BANK(SuperheroShow_collectible_list)
+    dw   SuperheroShow_collectible_list
+    db   $43, $1e, $06, $00
+.data_03_72ac_LevelData_SuperheroShow4:
+    db   BANK(SuperheroShow_4_map)
+    dw   SuperheroShow_4_map
+    db   BANK(SuperheroShow_4_map_extended)
+    dw   SuperheroShow_4_map_extended
+    db   BANK(SuperheroShow_4_tileset)
+    dw   SuperheroShow_4_tileset
+    db   BANK(SuperheroShow_4_blockset)
+    dw   SuperheroShow_4_blockset
+    db   BANK(SuperheroShow_4_collision)
+    dw   SuperheroShow_4_collision
+    db   BANK(SuperheroShow_4_collision_blockset)
+    dw   SuperheroShow_4_collision_blockset
+    db   BANK(SuperheroShow_4_palette)
+    dw   SuperheroShow_4_palette
+    db   BANK(SuperheroShow_object_list)
+    dw   SuperheroShow_object_list
+    db   BANK(SuperheroShow_collectible_list)
+    dw   SuperheroShow_collectible_list
+    db   $60, $1e, $06, $00
+.data_03_72cb_LevelData_SuperheroShow5:
+    db   BANK(SuperheroShow_5_map)
+    dw   SuperheroShow_5_map
+    db   BANK(SuperheroShow_5_map_extended)
+    dw   SuperheroShow_5_map_extended
+    db   BANK(SuperheroShow_5_tileset)
+    dw   SuperheroShow_5_tileset
+    db   BANK(SuperheroShow_5_blockset)
+    dw   SuperheroShow_5_blockset
+    db   BANK(SuperheroShow_5_collision)
+    dw   SuperheroShow_5_collision
+    db   BANK(SuperheroShow_5_collision_blockset)
+    dw   SuperheroShow_5_collision_blockset
+    db   BANK(SuperheroShow_5_palette)
+    dw   SuperheroShow_5_palette
+    db   BANK(SuperheroShow_object_list)
+    dw   SuperheroShow_object_list
+    db   BANK(SuperheroShow_collectible_list)
+    dw   SuperheroShow_collectible_list
+    db   $30, $22, $06, $00
+.data_03_72ea_LevelData_SuperheroShow6:
+    db   BANK(SuperheroShow_6_map)
+    dw   SuperheroShow_6_map
+    db   BANK(SuperheroShow_6_map_extended)
+    dw   SuperheroShow_6_map_extended
+    db   BANK(SuperheroShow_6_tileset)
+    dw   SuperheroShow_6_tileset
+    db   BANK(SuperheroShow_6_blockset)
+    dw   SuperheroShow_6_blockset
+    db   BANK(SuperheroShow_6_collision)
+    dw   SuperheroShow_6_collision
+    db   BANK(SuperheroShow_6_collision_blockset)
+    dw   SuperheroShow_6_collision_blockset
+    db   BANK(SuperheroShow_6_palette)
+    dw   SuperheroShow_6_palette
+    db   BANK(SuperheroShow_object_list)
+    dw   SuperheroShow_object_list
+    db   BANK(SuperheroShow_collectible_list)
+    dw   SuperheroShow_collectible_list
+    db   $0a, $08, $06, $00
+.data_03_7309_LevelData_GextremeSports1:
+    db   BANK(GextremeSports_1_map)
+    dw   GextremeSports_1_map
+    db   BANK(GextremeSports_1_map_extended)
+    dw   GextremeSports_1_map_extended
+    db   BANK(GextremeSports_1_tileset)
+    dw   GextremeSports_1_tileset
+    db   BANK(GextremeSports_1_blockset)
+    dw   GextremeSports_1_blockset
+    db   BANK(GextremeSports_1_collision)
+    dw   GextremeSports_1_collision
+    db   BANK(GextremeSports_1_collision_blockset)
+    dw   GextremeSports_1_collision_blockset
+    db   BANK(GextremeSports_1_palette)
+    dw   GextremeSports_1_palette
+    db   BANK(GextremeSports_object_list)
+    dw   GextremeSports_object_list
+    db   BANK(GextremeSports_collectible_list)
+    dw   GextremeSports_collectible_list
     db   $30, $30, $07, $00
-    
-    db   $32, $9c, $7a, $31        ;; 03:7328 ????????
-    db   $9c, $7a, $43, $00, $5c, $25, $00, $40        ;; 03:732c ????????
-    db   $33, $9c, $7a, $23, $0c, $41, $21, $80        ;; 03:7334 ????????
-    db   $41, $22, $87, $59, $21, $44, $52, $14        ;; 03:733c ????????
-    db   $16, $07, $00
-    
-    db   $32, $9c, $7a, $31, $9c        ;; 03:7347 ????????
-    db   $7a, $43, $00, $5c, $25, $00, $40, $33        ;; 03:734c ????????
-    db   $9c, $7a, $23, $0c, $41, $21, $80, $41        ;; 03:7354 ????????
-    db   $22, $87, $59, $21, $44, $52, $14, $16        ;; 03:735c ????????
-    db   $07, $00
-    
-    db   $32, $9c, $7a, $31, $9c, $7a        ;; 03:7366 ????????
-    db   $43, $00, $5c, $25, $00, $40, $33, $9c        ;; 03:736c ????????
-    db   $7a, $23, $0c, $41, $21, $80, $41, $22        ;; 03:7374 ????????
-    db   $87, $59, $21, $44, $52, $14, $16, $07        ;; 03:737c ????????
-    db   $00
-.data_03_7385_LevelMarsupialMadness:     
-    db   $35, $b4, $72, $34, $b4, $72, $40        ;; 03:7385 ????????
-    db   $30, $72, $27, $d8, $4d, $36, $b4, $72        ;; 03:738c ????????
-    db   $23, $08, $4d, $21, $80, $4a, $22, $18        ;; 03:7394 ????????
-    db   $5a, $21, $47, $52, $20, $42, $08, $00        ;; 03:739c ????????
-.data_03_73a4_LevelWWGexWrestling: 
-    db   $35, $f4, $7a, $34, $f4, $7a, $4f, $00        ;; 03:73a4 ????????
-    db   $40, $28, $d8, $53, $36, $f4, $7a, $23        ;; 03:73ac ????????
-    db   $8c, $4d, $21, $c0, $4a, $22, $f9, $5a        ;; 03:73b4 ????????
-    db   $21, $4a, $52, $18, $12, $09, $01
-.data_03_73c3_LevelLizardOfOz:
-    db   $38        ;; 03:73c3 ????????
-    db   $80, $7b, $37, $80, $7b, $41, $70, $79        ;; 03:73c4 ????????
-    db   $25, $10, $7e, $39, $80, $7b, $23, $bc        ;; 03:73cc ????????
-    db   $4d, $21, $00, $4b, $22, $0a, $5b, $21        ;; 03:73d4 ????????
-    db   $4d, $52, $0f, $08, $0a, $00
-.data_03_73e2_LevelChannelZ:
-    db   $2f, $00        ;; 03:73e2 ????????
-    db   $40, $2e, $00, $40, $4c, $00, $40, $27        ;; 03:73e4 ????????
-    db   $68, $6a, $30, $00, $40, $23, $d8, $4d        ;; 03:73ec ????????
-    db   $21, $40, $4b, $22, $2b, $5b, $21, $50        ;; 03:73f4 ????????
-    db   $52, $28, $38, $0b, $00
-    
-    db   $2f, $c0, $48        ;; 03:7301 ????????
-    db   $2e, $c0, $48, $4c, $00, $60, $27, $90        ;; 03:7404 ????????
-    db   $6f, $30, $c0, $48, $23, $08, $4e, $21        ;; 03:740c ????????
-    db   $80, $4b, $22, $2b, $5b, $21, $50, $52        ;; 03:7414 ????????
+.data_03_7328_LevelData_GextremeSports2:
+    db   BANK(HolidayTV_2_map)
+    dw   HolidayTV_2_map
+    db   BANK(HolidayTV_2_map_extended)
+    dw   HolidayTV_2_map_extended
+    db   BANK(HolidayTV_2_tileset)
+    dw   HolidayTV_2_tileset
+    db   BANK(HolidayTV_2_blockset)
+    dw   HolidayTV_2_blockset
+    db   BANK(HolidayTV_2_collision)
+    dw   HolidayTV_2_collision
+    db   BANK(HolidayTV_2_collision_blockset)
+    dw   HolidayTV_2_collision_blockset
+    db   BANK(HolidayTV_3_palette_4180)
+    dw   HolidayTV_3_palette_4180
+    db   BANK(GextremeSports_object_list)
+    dw   GextremeSports_object_list
+    db   BANK(GextremeSports_collectible_list)
+    dw   GextremeSports_collectible_list
+    db   $14, $16, $07, $00
+.data_03_7347_LevelData_GextremeSports3:
+    db   BANK(HolidayTV_2_map)
+    dw   HolidayTV_2_map
+    db   BANK(HolidayTV_2_map_extended)
+    dw   HolidayTV_2_map_extended
+    db   BANK(HolidayTV_2_tileset)
+    dw   HolidayTV_2_tileset
+    db   BANK(HolidayTV_2_blockset)
+    dw   HolidayTV_2_blockset
+    db   BANK(HolidayTV_2_collision)
+    dw   HolidayTV_2_collision
+    db   BANK(HolidayTV_2_collision_blockset)
+    dw   HolidayTV_2_collision_blockset
+    db   BANK(HolidayTV_3_palette_4180)
+    dw   HolidayTV_3_palette_4180
+    db   BANK(GextremeSports_object_list)
+    dw   GextremeSports_object_list
+    db   BANK(GextremeSports_collectible_list)
+    dw   GextremeSports_collectible_list
+    db   $14, $16, $07, $00
+.data_03_7366_LevelData_GextremeSports4:
+    db   BANK(HolidayTV_2_map)
+    dw   HolidayTV_2_map
+    db   BANK(HolidayTV_2_map_extended)
+    dw   HolidayTV_2_map_extended
+    db   BANK(HolidayTV_2_tileset)
+    dw   HolidayTV_2_tileset
+    db   BANK(HolidayTV_2_blockset)
+    dw   HolidayTV_2_blockset
+    db   BANK(HolidayTV_2_collision)
+    dw   HolidayTV_2_collision
+    db   BANK(HolidayTV_2_collision_blockset)
+    dw   HolidayTV_2_collision_blockset
+    db   BANK(HolidayTV_3_palette_4180)
+    dw   HolidayTV_3_palette_4180
+    db   BANK(GextremeSports_object_list)
+    dw   GextremeSports_object_list
+    db   BANK(GextremeSports_collectible_list)
+    dw   GextremeSports_collectible_list
+    db   $14, $16, $07, $00
+.data_03_7385_LevelData_MarsupialMadness1:
+    db   BANK(MarsupialMadness_1_map)
+    dw   MarsupialMadness_1_map
+    db   BANK(MarsupialMadness_1_map_extended)
+    dw   MarsupialMadness_1_map_extended
+    db   BANK(MarsupialMadness_1_tileset)
+    dw   MarsupialMadness_1_tileset
+    db   BANK(MarsupialMadness_1_blockset)
+    dw   MarsupialMadness_1_blockset
+    db   BANK(MarsupialMadness_1_collision)
+    dw   MarsupialMadness_1_collision
+    db   BANK(MarsupialMadness_1_collision_blockset)
+    dw   MarsupialMadness_1_collision_blockset
+    db   BANK(MarsupialMadness_1_palette)
+    dw   MarsupialMadness_1_palette
+    db   BANK(MarsupialMadness_object_list)
+    dw   MarsupialMadness_object_list
+    db   BANK(MarsupialMadness_collectible_list)
+    dw   MarsupialMadness_collectible_list
+    db   $20, $42, $08, $00
+.data_03_73a4_LevelData_WWGexWrestling1:
+    db   BANK(WWGexWrestling_1_map)
+    dw   WWGexWrestling_1_map
+    db   BANK(WWGexWrestling_1_map_extended)
+    dw   WWGexWrestling_1_map_extended
+    db   BANK(WWGexWrestling_1_tileset)
+    dw   WWGexWrestling_1_tileset
+    db   BANK(WWGexWrestling_1_blockset)
+    dw   WWGexWrestling_1_blockset
+    db   BANK(WWGexWrestling_1_collision)
+    dw   WWGexWrestling_1_collision
+    db   BANK(WWGexWrestling_1_collision_blockset)
+    dw   WWGexWrestling_1_collision_blockset
+    db   BANK(WWGexWrestling_1_palette)
+    dw   WWGexWrestling_1_palette
+    db   BANK(WWGexWrestling_object_list)
+    dw   WWGexWrestling_object_list
+    db   BANK(WWGexWrestling_collectible_list)
+    dw   WWGexWrestling_collectible_list
+    db   $18, $12, $09, $01
+.data_03_73c3_LevelData_LizardOfOz1:
+    db   BANK(LizardOfOz_1_map)
+    dw   LizardOfOz_1_map
+    db   BANK(LizardOfOz_1_map_extended)
+    dw   LizardOfOz_1_map_extended
+    db   BANK(LizardOfOz_1_tileset)
+    dw   LizardOfOz_1_tileset
+    db   BANK(LizardOfOz_1_blockset)
+    dw   LizardOfOz_1_blockset
+    db   BANK(LizardOfOz_1_collision)
+    dw   LizardOfOz_1_collision
+    db   BANK(LizardOfOz_1_collision_blockset)
+    dw   LizardOfOz_1_collision_blockset
+    db   BANK(LizardOfOz_1_palette)
+    dw   LizardOfOz_1_palette
+    db   BANK(LizardOfOz_object_list)
+    dw   LizardOfOz_object_list
+    db   BANK(LizardOfOz_collectible_list)
+    dw   LizardOfOz_collectible_list
+    db   $0f, $08, $0a, $00
+.data_03_73e2_LevelData_ChannelZ1:
+    db   BANK(ChannelZ_1_map)
+    dw   ChannelZ_1_map
+    db   BANK(ChannelZ_1_map_extended)
+    dw   ChannelZ_1_map_extended
+    db   BANK(ChannelZ_1_tileset)
+    dw   ChannelZ_1_tileset
+    db   BANK(ChannelZ_1_blockset)
+    dw   ChannelZ_1_blockset
+    db   BANK(ChannelZ_1_collision)
+    dw   ChannelZ_1_collision
+    db   BANK(ChannelZ_1_collision_blockset)
+    dw   ChannelZ_1_collision_blockset
+    db   BANK(ChannelZ_1_palette)
+    dw   ChannelZ_1_palette
+    db   BANK(ChannelZ_object_list)
+    dw   ChannelZ_object_list
+    db   BANK(ChannelZ_collectible_list)
+    dw   ChannelZ_collectible_list
+    db   $28, $38, $0b, $00
+.data_03_7401_LevelData_ChannelZ2:
+    db   BANK(ChannelZ_2_map)
+    dw   ChannelZ_2_map
+    db   BANK(ChannelZ_2_map_extended)
+    dw   ChannelZ_2_map_extended
+    db   BANK(ChannelZ_2_tileset)
+    dw   ChannelZ_2_tileset
+    db   BANK(ChannelZ_2_blockset)
+    dw   ChannelZ_2_blockset
+    db   BANK(ChannelZ_2_collision)
+    dw   ChannelZ_2_collision
+    db   BANK(ChannelZ_2_collision_blockset)
+    dw   ChannelZ_2_collision_blockset
+    db   BANK(ChannelZ_2_palette)
+    dw   ChannelZ_2_palette
+    db   BANK(ChannelZ_object_list)
+    dw   ChannelZ_object_list
+    db   BANK(ChannelZ_collectible_list)
+    dw   ChannelZ_collectible_list
     db   $1f, $11, $0b, $00
-    
-    db   $2f, $cf, $4a, $2e        ;; 03:7420 ????????
-    db   $cf, $4a, $4c, $c0, $68, $27, $58, $72        ;; 03:7424 ????????
-    db   $30, $cf, $4a, $23, $1c, $4e, $21, $c0        ;; 03:742c ????????
-    db   $4b, $22, $2b, $5b, $21, $50, $52, $28        ;; 03:7434 ????????
-    db   $20, $0b, $00
-    
-    db   $2f, $cf, $4f, $2e, $cf        ;; 03:743f ????????
-    db   $4f, $4f, $f0, $4a, $27, $b0, $74, $30        ;; 03:7444 ????????
-    db   $cf, $4f, $23, $44, $4e, $21, $00, $4c        ;; 03:744c ????????
-    db   $22, $2b, $5b, $21, $50, $52, $28, $20        ;; 03:7454 ????????
-    db   $0b, $00
-    
-    db   $2f, $cf, $54, $2e, $cf, $54        ;; 03:745e ????????
-    db   $4c, $f0, $74, $27, $10, $77, $30, $cf        ;; 03:7464 ????????
-    db   $54, $23, $6c, $4e, $21, $40, $4c, $22        ;; 03:746c ????????
-    db   $2b, $5b, $21, $50, $52, $0f, $08, $0b        ;; 03:7474 ????????
-    db   $00                                           ;; 03:747c ?
+.data_03_7420_LevelData_ChannelZ3:
+    db   BANK(ChannelZ_3_map)
+    dw   ChannelZ_3_map
+    db   BANK(ChannelZ_3_map_extended)
+    dw   ChannelZ_3_map_extended
+    db   BANK(ChannelZ_3_tileset)
+    dw   ChannelZ_3_tileset
+    db   BANK(ChannelZ_3_blockset)
+    dw   ChannelZ_3_blockset
+    db   BANK(ChannelZ_3_collision)
+    dw   ChannelZ_3_collision
+    db   BANK(ChannelZ_3_collision_blockset)
+    dw   ChannelZ_3_collision_blockset
+    db   BANK(ChannelZ_3_palette)
+    dw   ChannelZ_3_palette
+    db   BANK(ChannelZ_object_list)
+    dw   ChannelZ_object_list
+    db   BANK(ChannelZ_collectible_list)
+    dw   ChannelZ_collectible_list
+    db   $28, $20, $0b, $00
+.data_03_743f_LevelData_ChannelZ4:
+    db   BANK(ChannelZ_4_map)
+    dw   ChannelZ_4_map
+    db   BANK(ChannelZ_4_map_extended)
+    dw   ChannelZ_4_map_extended
+    db   BANK(ChannelZ_4_tileset)
+    dw   ChannelZ_4_tileset
+    db   BANK(ChannelZ_4_blockset)
+    dw   ChannelZ_4_blockset
+    db   BANK(ChannelZ_4_collision)
+    dw   ChannelZ_4_collision
+    db   BANK(ChannelZ_4_collision_blockset)
+    dw   ChannelZ_4_collision_blockset
+    db   BANK(ChannelZ_4_palette)
+    dw   ChannelZ_4_palette
+    db   BANK(ChannelZ_object_list)
+    dw   ChannelZ_object_list
+    db   BANK(ChannelZ_collectible_list)
+    dw   ChannelZ_collectible_list
+    db   $28, $20, $0b, $00
+.data_03_745e_LevelData_ChannelZ5:
+    db   BANK(ChannelZ_5_map)
+    dw   ChannelZ_5_map
+    db   BANK(ChannelZ_5_map_extended)
+    dw   ChannelZ_5_map_extended
+    db   BANK(ChannelZ_5_tileset)
+    dw   ChannelZ_5_tileset
+    db   BANK(ChannelZ_5_blockset)
+    dw   ChannelZ_5_blockset
+    db   BANK(ChannelZ_5_collision)
+    dw   ChannelZ_5_collision
+    db   BANK(ChannelZ_5_collision_blockset)
+    dw   ChannelZ_5_collision_blockset
+    db   BANK(ChannelZ_5_palette)
+    dw   ChannelZ_5_palette
+    db   BANK(ChannelZ_object_list)
+    dw   ChannelZ_object_list
+    db   BANK(ChannelZ_collectible_list)
+    dw   ChannelZ_collectible_list
+    db   $0f, $08, $0b, $00
