@@ -428,11 +428,11 @@
 00:2b5d call_00_2b5d_DeactivateObjectSlot
 00:2b7a call_00_2b7a_ClearObject
 00:2b80 call_00_2b80_ClearObjectMemoryEntry
-00:2b8b call_00_2b8b_HandleObjectFlag6ClearOrInit
+00:2b8b call_00_2b8b_AttemptToSetObjectStatusTo50
 00:2b94 call_00_2b94_ClearObjectStatus
 00:2ba9 call_00_2ba9_SetObjectStatusTo50
-00:2bbe call_00_2bbe_SpawnCollectibleObject
-00:2c01 call_00_2bbe_SpawnCollectibleObject.data_02_2c01
+00:2bbe call_00_2bbe_AttemptToConvertObjectToCollectible
+00:2c01 call_00_2bbe_AttemptToConvertObjectToCollectible.data_02_2c01
 00:2c09 call_00_2c09_Object_SpawnRelativeWithOffset6
 00:2c0f call_00_2c0f_AssignObjectPaletteId
 00:2c20 call_00_2c20_Object_CopyPaletteToBuffer
@@ -500,7 +500,7 @@
 00:3258 data_00_3258
 00:3259 data_00_3259
 00:325f data_00_325F
-00:35e8 call_00_35e8_GetObjectTypeIndex
+00:35e8 call_00_35e8_GetObjectCollisionFlags
 00:35fa call_00_35fa_WaitForLineThenSpawnObject
 00:3600 call_00_35fa_WaitForLineThenSpawnObject.jr_00_3600
 00:360c call_00_360c_SpawnObjectOnceImmediate

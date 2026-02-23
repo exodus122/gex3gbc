@@ -362,7 +362,7 @@ call_03_48ad_CollisionHandler_TopDown:
     jr   nz,.jp_03_4950_CheckMove_StraightHorizontal
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,$0F
-    or   a,$40
+    or   a,PADF_UP
     ld   [wDC81_CurrentInputsAlt],a
     ld   a,$01
     ld   [wDC89],a
@@ -395,7 +395,7 @@ call_03_48ad_CollisionHandler_TopDown:
     jr   nz,.jp_03_4950_CheckMove_StraightHorizontal
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,$0F
-    or   a,$80
+    or   a,PADF_DOWN
     ld   [wDC81_CurrentInputsAlt],a
     ld   a,$05
     ld   [wDC89],a
@@ -410,7 +410,7 @@ call_03_48ad_CollisionHandler_TopDown:
     jr   nz,.jp_03_48E1_ResetDirectionState
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,$0F
-    or   a,$10
+    or   a,PADF_RIGHT
     ld   [wDC81_CurrentInputsAlt],a
     ld   a,$03
     ld   [wDC89],a
@@ -442,7 +442,7 @@ call_03_48ad_CollisionHandler_TopDown:
     jr   nz,.jp_03_49D2_CheckMove_Left
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,$0F
-    or   a,$40
+    or   a,PADF_UP
     ld   [wDC81_CurrentInputsAlt],a
     ld   a,$01
     ld   [wDC89],a
@@ -473,7 +473,7 @@ call_03_48ad_CollisionHandler_TopDown:
     jr   nz,.jp_03_49D2_CheckMove_Left
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,$0F
-    or   a,$80
+    or   a,PADF_DOWN
     ld   [wDC81_CurrentInputsAlt],a
     ld   a,$05
     ld   [wDC89],a
@@ -488,7 +488,7 @@ call_03_48ad_CollisionHandler_TopDown:
     jp   nz,.jp_03_48E1_ResetDirectionState
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,$0F
-    or   a,$20
+    or   a,PADF_LEFT
     ld   [wDC81_CurrentInputsAlt],a
     ld   a,$07
     ld   [wDC89],a

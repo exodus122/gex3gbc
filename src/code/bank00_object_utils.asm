@@ -1771,11 +1771,12 @@ call_00_2b80_ClearObjectMemoryEntry:
     ld   [HL], $ff                                     ;; 00:2b88 $36 $ff
     ret                                                ;; 00:2b8a $c9
 
-call_00_2b8b_HandleObjectFlag6ClearOrInit:
-; Calls call_00_35e8_GetObjectTypeIndex (likely reads or updates object state), tests bit 6 of A. If clear, 
-; jumps to call_00_2b94_ClearObjectStatus (zero related data). If set, jumps to call_00_2ba9_SetObjectStatusTo50 to initialize a 
+call_00_2b8b_AttemptToSetObjectStatusTo50:
+; Get the object's collision flags, tests bit 6 of A. If clear, 
+; jumps to call_00_2b94_ClearObjectStatus (zero related data). If set, 
+; jumps to call_00_2ba9_SetObjectStatusTo50 to initialize a 
 ; status value. Used to decide whether to zero or set $50.
-    call call_00_35e8_GetObjectTypeIndex                                  ;; 00:2b8b $cd $e8 $35
+    call call_00_35e8_GetObjectCollisionFlags                                  ;; 00:2b8b $cd $e8 $35
     bit  6, A                                          ;; 00:2b8e $cb $77
     jr   Z, call_00_2b94_ClearObjectStatus                                 ;; 00:2b90 $28 $02
     jr   call_00_2ba9_SetObjectStatusTo50                                  ;; 00:2b92 $18 $15
@@ -1814,15 +1815,15 @@ call_00_2ba9_SetObjectStatusTo50:
     ld   [HL], $50                                     ;; 00:2bbb $36 $50
     ret                                                ;; 00:2bbd $c9
 
-call_00_2bbe_SpawnCollectibleObject:
+call_00_2bbe_AttemptToConvertObjectToCollectible:
 ; Full object creation routine:
-; Validates current object value via call_00_35e8_GetObjectTypeIndex.
+; If collision flags are $ff, clear the object without spawning a collectible
 ; If not $FF and bit 6 is set, sets up multiple object parameters 
 ; (ObjectSetId, Object_Set14, palette, facing direction, etc.).
 ; Updates its status to $50, resets return bank, calls an alternate bank function (call_02_72ac_SetObjectAction), 
 ; and copies a palette (call_00_2c20_Object_CopyPaletteToBuffer).
 ; This is the main “spawn/setup object” function.
-    call call_00_35e8_GetObjectTypeIndex                                  ;; 00:2bbe $cd $e8 $35
+    call call_00_35e8_GetObjectCollisionFlags                                  ;; 00:2bbe $cd $e8 $35
     cp   A, $ff                                        ;; 00:2bc1 $fe $ff
     jr   Z, call_00_2b7a_ClearObject                                 ;; 00:2bc3 $28 $b5
     bit  6, A                                          ;; 00:2bc5 $cb $77

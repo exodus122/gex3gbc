@@ -466,7 +466,7 @@ call_03_4f23_Collision_HolidayTV_Elf:
     dec  [HL]                                          ;; 03:4f45 $35
     ret  NZ                                            ;; 03:4f46 $c0
     call call_00_288c_Object_ClearCollisionType                                  ;; 03:4f47 $cd $8a $28
-    call call_00_2b8b_HandleObjectFlag6ClearOrInit                                  ;; 03:4f4a $cd $8b $2b
+    call call_00_2b8b_AttemptToSetObjectStatusTo50                                  ;; 03:4f4a $cd $8b $2b
     ld   HL, wDCC8_ElfCounter                                     ;; 03:4f4d $21 $c8 $dc
     inc  [HL]                                          ;; 03:4f50 $34
     ld   A, [HL]                                       ;; 03:4f51 $7e
@@ -1050,7 +1050,7 @@ call_03_532f_Collision_GextremeSports_Elf:
     dec  [hl]
     ret  nz
     call call_00_288c_Object_ClearCollisionType
-    call call_00_2b8b_HandleObjectFlag6ClearOrInit
+    call call_00_2b8b_AttemptToSetObjectStatusTo50
     ld   hl,wDCC8_ElfCounter
     inc  [hl]
     ld   a,[hl]
@@ -1491,7 +1491,7 @@ call_03_5671_HandleObjectHit:
 ; Otherwise decrements $16.
 ; If it reaches 0:
 ; - Clears it.
-; - Looks up object type (call_00_35e8_GetObjectTypeIndex).
+; - Clears the object if the collision flags are $ff
 ; - If invalid, removes object (call_00_2b7a_ClearObject).
 ; - If valid:
 ;   - If high bit set → sets facing direction, initializes particles (burst effect), 
@@ -1520,7 +1520,7 @@ call_03_5671_HandleObjectHit:
     jr   NC, .jr_03_56b8                               ;; 03:5687 $30 $2f
 .jr_03_5689:
     ld   [HL], $00                                     ;; 03:5689 $36 $00
-    call call_00_35e8_GetObjectTypeIndex                                  ;; 03:568b $cd $e8 $35
+    call call_00_35e8_GetObjectCollisionFlags                                  ;; 03:568b $cd $e8 $35
     cp   A, $ff                                        ;; 03:568e $fe $ff
     jp   Z, call_00_2b7a_ClearObject                                 ;; 03:5690 $ca $7a $2b
     bit  7, A                                          ;; 03:5693 $cb $7f

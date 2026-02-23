@@ -22,7 +22,7 @@ call_02_4db1_CheckPlayerXDistanceFromObject:
 
 call_02_4dce_SetTriggerByLevel:
 ; Sets flag wDC80 bit 6, then selects a trigger value based on the current level (wDB6C_CurrentMapId). 
-; Uses collision flags (wDC81_CurrentInputsAlt) to decide between trigger IDs, then jumps to call_02_54f9_SwitchPlayerAction.
+; Uses inputs (wDC81_CurrentInputsAlt) to decide between trigger IDs, then jumps to call_02_54f9_SwitchPlayerAction.
 ; Purpose: Level-specific event/door trigger.
     ld   HL, wDC80                                     ;; 02:4dce $21 $80 $dc
     set  6, [HL]                                       ;; 02:4dd1 $cb $f6
@@ -519,12 +519,12 @@ call_02_5100_Player_HorizontalMovementHandler:
     ld   HL, wDC86                                     ;; 02:5113 $21 $86 $dc
     ld   C, [HL]                                       ;; 02:5116 $4e
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:5117 $fa $81 $dc
-    and  A, $10                                        ;; 02:511a $e6 $10
+    and  A, PADF_RIGHT                                        ;; 02:511a $e6 $10
     call NZ, call_02_51f9_ApplyRightwardCollisionAdjustment                              ;; 02:511c $c4 $f9 $51
     ld   HL, wDC86                                     ;; 02:511f $21 $86 $dc
     ld   C, [HL]                                       ;; 02:5122 $4e
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:5123 $fa $81 $dc
-    and  A, $20                                        ;; 02:5126 $e6 $20
+    and  A, PADF_LEFT                                        ;; 02:5126 $e6 $20
     call NZ, call_02_518a_ApplyLeftwardCollisionAdjustment                              ;; 02:5128 $c4 $8a $51
     call call_02_553b_PollForSpecialInput                                  ;; 02:512b $cd $3b $55
     jr   Z, .jr_02_513a                                ;; 02:512e $28 $0a
@@ -538,7 +538,7 @@ call_02_5100_Player_HorizontalMovementHandler:
     ld   C, [HL]                                       ;; 02:513d $4e
     ld   B, $00                                        ;; 02:513e $06 $00
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:5140 $fa $81 $dc
-    and  A, $80                                        ;; 02:5143 $e6 $80
+    and  A, PADF_DOWN                                        ;; 02:5143 $e6 $80
     call NZ, call_02_53e7_ApplyVerticalMovementAndClamp                              ;; 02:5145 $c4 $e7 $53
     ld   A, [wDC86]                                    ;; 02:5148 $fa $86 $dc
     cpl                                                ;; 02:514b $2f
@@ -546,7 +546,7 @@ call_02_5100_Player_HorizontalMovementHandler:
     ld   C, A                                          ;; 02:514d $4f
     ld   B, $ff                                        ;; 02:514e $06 $ff
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:5150 $fa $81 $dc
-    and  A, $40                                        ;; 02:5153 $e6 $40
+    and  A, PADF_UP                                        ;; 02:5153 $e6 $40
     call NZ, call_02_53e7_ApplyVerticalMovementAndClamp                              ;; 02:5155 $c4 $e7 $53
     ret                                                ;; 02:5158 $c9
 .jr_02_5159:
@@ -1067,7 +1067,7 @@ call_02_5431_HandleActionTriggersAndEvents:
     jr   NZ, .jr_02_54a7                               ;; 02:546c $20 $39
 .jr_02_546e:
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:546e $fa $81 $dc
-    and  A, $40                                        ;; 02:5471 $e6 $40
+    and  A, PADF_UP                                        ;; 02:5471 $e6 $40
     jr   Z, .jr_02_54a7                                ;; 02:5473 $28 $32
     ld   A, [wDC92]                                    ;; 02:5475 $fa $92 $dc
     cp   A, $36                                        ;; 02:5478 $fe $36
@@ -1094,7 +1094,7 @@ call_02_5431_HandleActionTriggersAndEvents:
     call call_02_54f9_SwitchPlayerAction                                  ;; 02:54a4 $cd $f9 $54
 .jr_02_54a7:
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:54a7 $fa $81 $dc
-    and  A, $40                                        ;; 02:54aa $e6 $40
+    and  A, PADF_UP                                        ;; 02:54aa $e6 $40
     jr   Z, .jr_02_54d0                                ;; 02:54ac $28 $22
     ld   A, [wD801_Player_ActionId]                                    ;; 02:54ae $fa $01 $d8
     cp   A, $22                                        ;; 02:54b1 $fe $22

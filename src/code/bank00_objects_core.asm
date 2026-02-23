@@ -793,7 +793,16 @@ data_00_3258:
 ; 4 = OBJECT_UNK16_OFFSET
 ; 5 = extra flags default value (always 00)
 ; 6 = always FF, appears unused?
-; 7 = flags used for collision detection (call_00_35e8_GetObjectTypeIndex)
+; 7 = flags used for collision detection (call_00_35e8_GetObjectCollisionFlags)
+;     bit 0 = ?
+;     bit 1 = ?
+;     bit 2 = ?
+;     bit 3 = ?
+;     bit 4 = ?
+;     bit 5 = ?
+;     bit 6 = ?
+;     bit 7 = spawn particles
+;     $ff = clear object immediately without spawning collectible
     db   $00
 data_00_3259:
     db   $00, $00, COLLISION_TYPE_NONE, $00, $00, $00
@@ -913,7 +922,7 @@ data_00_325F:
     db   $01, $0c, $0c, COLLISION_TYPE_METEOR, $02, $00, $ff, $82 ; 00:35d8 ???????? ; OBJECT_CHANNEL_Z_METEOR
     db   $01, $0a, $0a, COLLISION_TYPE_DAMAGE_AND_REMAIN, $02, $00, $ff, $81 ; 00:35e0 ???????? ; OBJECT_CHANNEL_Z_REZ_PROJECTILE
 
-call_00_35e8_GetObjectTypeIndex:
+call_00_35e8_GetObjectCollisionFlags:
 ; loads index*[7] into data_00_3258 table
 ; Follows a chain of lookups based on the current object address (wDA00_CurrentObjectAddrLo) to compute an index into data_00_325F.
 ; Shifts HL left three times (x8), adds the table base, and returns the byte at that location.

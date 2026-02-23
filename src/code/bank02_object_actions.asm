@@ -3,9 +3,9 @@ call_02_582e_ObjectAction_None:
 
 call_02_582f_ObjectAction_DestroyWithoutParticles:
     call call_00_288c_Object_ClearCollisionType
-    call call_00_2b8b_HandleObjectFlag6ClearOrInit
+    call call_00_2b8b_AttemptToSetObjectStatusTo50
     call call_00_2a5d_Object_Check5Flag2
-    jp   nz,call_00_2bbe_SpawnCollectibleObject
+    jp   nz,call_00_2bbe_AttemptToConvertObjectToCollectible
     ret  
 
 call_02_583c_ObjectAction_Destroy:
@@ -14,11 +14,11 @@ call_02_583c_ObjectAction_Destroy:
     ld   HL, .data_02_5857_ParticlesPalette                             ;; 02:5841 $21 $57 $58
     call call_00_2c20_Object_CopyPaletteToBuffer                                  ;; 02:5844 $cd $20 $2c
     call call_00_288c_Object_ClearCollisionType                                  ;; 02:5847 $cd $8a $28
-    call call_00_2b8b_HandleObjectFlag6ClearOrInit                                  ;; 02:584a $cd $8b $2b
+    call call_00_2b8b_AttemptToSetObjectStatusTo50                                  ;; 02:584a $cd $8b $2b
     call call_00_2c67_Particle_InitBurst                                  ;; 02:584d $cd $67 $2c
 .jr_02_5850:
     call call_00_2c89_Particle_UpdateBurst                                  ;; 02:5850 $cd $89 $2c
-    jp   Z, call_00_2bbe_SpawnCollectibleObject                                 ;; 02:5853 $ca $be $2b
+    jp   Z, call_00_2bbe_AttemptToConvertObjectToCollectible                                 ;; 02:5853 $ca $be $2b
     ret                                                ;; 02:5856 $c9
 .data_02_5857_ParticlesPalette:
     db   $00, $00, $08, $02, $04, $01, $ff, $7f        ;; 02:5857 ........
@@ -470,7 +470,7 @@ call_02_5bfa_ObjectAction_FreestandingRemote_unk2:
     ld   HL, .data_02_5c3b                             ;; 02:5c04 $21 $3b $5c
     call call_00_2c20_Object_CopyPaletteToBuffer                                  ;; 02:5c07 $cd $20 $2c
     call call_00_288c_Object_ClearCollisionType                                  ;; 02:5c0a $cd $8a $28
-    call call_00_2b8b_HandleObjectFlag6ClearOrInit                                  ;; 02:5c0d $cd $8b $2b
+    call call_00_2b8b_AttemptToSetObjectStatusTo50                                  ;; 02:5c0d $cd $8b $2b
     call call_00_2c67_Particle_InitBurst                                  ;; 02:5c10 $cd $67 $2c
     ld   C, $3c                                        ;; 02:5c13 $0e $3c
     call call_00_290d_Object_SetTimer1A                                  ;; 02:5c15 $cd $0d $29
@@ -2731,7 +2731,7 @@ call_02_6e09_ObjectAction_BrainOfOz_Unk8:
     ld   hl,.data_6e3c
     call call_00_2c20_Object_CopyPaletteToBuffer
     call call_00_288c_Object_ClearCollisionType
-    call call_00_2b8b_HandleObjectFlag6ClearOrInit
+    call call_00_2b8b_AttemptToSetObjectStatusTo50
     call call_00_2c67_Particle_InitBurst
     ld   c,$3C
     call call_00_290d_Object_SetTimer1A
@@ -2992,7 +2992,7 @@ call_02_6FD3_Rez_unk:
 
 call_02_7002_Rez_unk2:
     call call_00_2475_Object_ApplyVerticalVelocity_Clamped
-    ld   de,isrSerial
+    ld   de,$0058
     LOAD_OBJ_FIELD_TO_HL OBJECT_YPOS_OFFSET
     ldi  a,[hl]
     sub  e
