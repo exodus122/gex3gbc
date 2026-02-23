@@ -170,9 +170,9 @@ call_00_0150_Init:
     call call_00_0b92_WaitForInterrupt                                  ;; 00:0259 $cd $92 $0b
     farcall call_01_4f7e_SeedTileLookupTable
 .jp_00_0267:
-    ld   A, SONG_UNK00                                        ;; 00:0267 $3e $00
+    ld   A, SONG_EMPTY                                        ;; 00:0267 $3e $00
     call call_00_0fa2_PlaySong                                  ;; 00:0269 $cd $a2 $0f
-    ld   A, SFX_UNK00                                        ;; 00:026c $3e $00
+    ld   A, SFX_EMPTY                                        ;; 00:026c $3e $00
     call call_00_0fd7_TriggerSoundEffect                                  ;; 00:026e $cd $d7 $0f
     ld   A, MENU_OPENING_CREDITS_1                                        ;; 00:0271 $3e $11
     farcall call_01_4000_MenuHandler_LoadAndProcess
@@ -210,7 +210,7 @@ call_00_0150_Init:
 .jr_00_02ed:
     xor  A, A                                          ;; 00:02ed $af
     ld   [wDB6C_CurrentMapId], A                                    ;; 00:02ee $ea $6c $db
-    ld   [wDC5B], A                                    ;; 00:02f1 $ea $5b $dc
+    ld   [wDC5B_TVButtonLevelMissionRelated], A                                    ;; 00:02f1 $ea $5b $dc
     ld   [wDC69_PlayerSpawnIdInLevel], A                                    ;; 00:02f4 $ea $69 $dc
     ld   [wDB6A], A                                    ;; 00:02f7 $ea $6a $db
     call call_00_0e3b_ClearGameStateVariables                                  ;; 00:02fa $cd $3b $0e
@@ -246,7 +246,7 @@ call_00_0150_Init:
     ld   [wDB6C_CurrentMapId], A                                    ;; 00:035a $ea $6c $db
     farcall call_03_6c89_LoadMapData
     xor  A, A                                          ;; 00:0368 $af
-    ld   [wDC51], A                                    ;; 00:0369 $ea $51 $dc
+    ld   [wDC51_CurrentFlyRelated], A                                    ;; 00:0369 $ea $51 $dc
     ld   [wDCA9_FlyTimerOrFlags4], A                                    ;; 00:036c $ea $a9 $dc
     ld   [wDCAA_FlyTimerOrFlags1], A                                    ;; 00:036f $ea $aa $dc
     ld   [wDCAB_FlyTimerOrFlags2], A                                    ;; 00:0372 $ea $ab $dc
@@ -255,7 +255,7 @@ call_00_0150_Init:
     add  A, $04                                        ;; 00:037b $c6 $04
     ld   [wDC50_PlayerHealth], A                                    ;; 00:037d $ea $50 $dc
     ld   A, $00                                        ;; 00:0380 $3e $00
-    ld   [wDC78], A                                    ;; 00:0382 $ea $78 $dc
+    ld   [wDC78_PlayerActionIdRelated], A                                    ;; 00:0382 $ea $78 $dc
     call call_00_0e3b_ClearGameStateVariables                                  ;; 00:0385 $cd $3b $0e
     call call_00_2f85_LoadAndSortCollectibleData                                  ;; 00:0388 $cd $85 $2f
     call call_00_2ff8_InitLevelObjectsAndConfig                                  ;; 00:038b $cd $f8 $2f
@@ -264,7 +264,7 @@ call_00_0150_Init:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:0399 $fa $1e $dc
     cp   A, $07                                        ;; 00:039c $fe $07
     jr   NZ, .jr_00_03b6                               ;; 00:039e $20 $16
-    ld   A, [wDC78]                                    ;; 00:03a0 $fa $78 $dc
+    ld   A, [wDC78_PlayerActionIdRelated]                                    ;; 00:03a0 $fa $78 $dc
     cp   A, $00                                        ;; 00:03a3 $fe $00
     ld   A, $23                                        ;; 00:03a5 $3e $23
     jr   Z, .jr_00_03e8                                ;; 00:03a7 $28 $3f
@@ -282,7 +282,7 @@ call_00_0150_Init:
     ld   A, [wDC1F]                                    ;; 00:03bf $fa $1f $dc
     cp   A, $01                                        ;; 00:03c2 $fe $01
     jr   Z, .jr_00_03d6                                ;; 00:03c4 $28 $10
-    ld   A, [wDC78]                                    ;; 00:03c6 $fa $78 $dc
+    ld   A, [wDC78_PlayerActionIdRelated]                                    ;; 00:03c6 $fa $78 $dc
     cp   A, $00                                        ;; 00:03c9 $fe $00
     jr   Z, .jr_00_03e8                                ;; 00:03cb $28 $1b
     ld   A, [wD801_Player_ActionId]                                    ;; 00:03cd $fa $01 $d8
@@ -290,7 +290,7 @@ call_00_0150_Init:
     jr   C, .jr_00_03eb                                ;; 00:03d2 $38 $17
     jr   .jr_00_03e8                                   ;; 00:03d4 $18 $12
 .jr_00_03d6:
-    ld   A, [wDC78]                                    ;; 00:03d6 $fa $78 $dc
+    ld   A, [wDC78_PlayerActionIdRelated]                                    ;; 00:03d6 $fa $78 $dc
     cp   A, $00                                        ;; 00:03d9 $fe $00
     ld   A, $3c                                        ;; 00:03db $3e $3c
     jr   Z, .jr_00_03e8                                ;; 00:03dd $28 $09
@@ -299,7 +299,7 @@ call_00_0150_Init:
     jr   NC, .jr_00_03eb                               ;; 00:03e4 $30 $05
     add  A, $3c                                        ;; 00:03e6 $c6 $3c
 .jr_00_03e8:
-    ld   [wDC78], A                                    ;; 00:03e8 $ea $78 $dc
+    ld   [wDC78_PlayerActionIdRelated], A                                    ;; 00:03e8 $ea $78 $dc
 .jr_00_03eb:
     xor  A, A                                          ;; 00:03eb $af
     ld   [wDC29_SkipMapWindowUpdateFlag], A                                    ;; 00:03ec $ea $29 $dc
@@ -354,9 +354,9 @@ call_00_0150_Init:
     jr   NZ, .jr_00_04d8                               ;; 00:0494 $20 $42
     call call_00_0f80_CheckInputStart                                  ;; 00:0496 $cd $80 $0f
     jr   Z, .jr_00_04d8                                ;; 00:0499 $28 $3d
-    ld   A, SONG_UNK00                                        ;; 00:049b $3e $00
+    ld   A, SONG_EMPTY                                        ;; 00:049b $3e $00
     call call_00_0fa2_PlaySong                                  ;; 00:049d $cd $a2 $0f
-    ld   A, SFX_UNK00                                        ;; 00:04a0 $3e $00
+    ld   A, SFX_EMPTY                                        ;; 00:04a0 $3e $00
     call call_00_0fd7_TriggerSoundEffect                                  ;; 00:04a2 $cd $d7 $0f
     farcall call_02_7132_BackupObjectTable
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:04b0 $fa $1e $dc
@@ -520,7 +520,7 @@ call_00_05c7:
 call_00_05fd_CheckForEatFly:
     call call_00_0f8b_CheckInputSelect                                  ;; 00:05fd $cd $8b $0f
     ret  Z                                             ;; 00:0600 $c8
-    ld   A, [wDC51]                                    ;; 00:0601 $fa $51 $dc
+    ld   A, [wDC51_CurrentFlyRelated]                                    ;; 00:0601 $fa $51 $dc
     and  A, A                                          ;; 00:0604 $a7
     ret  Z                                             ;; 00:0605 $c8
     ld   A, [wD801_Player_ActionId]                                    ;; 00:0606 $fa $01 $d8
@@ -539,12 +539,12 @@ call_00_05fd_CheckForEatFly:
 
 call_00_0624_SetFly_TimersAndFlags:
 ; Acts like a state setter for variables around wDC5x–wDCAx.
-; Reads current state from wDC51, swaps with A, and depending on the old state (01–05) 
+; Reads current state from wDC51_CurrentFlyRelated, swaps with A, and depending on the old state (01–05) 
 ; initializes timers/flags (wDCAA_FlyTimerOrFlags1, wDCAB_FlyTimerOrFlags2, wDCA8_FlyTimerOrFlags3, 
 ; wDCA9_FlyTimerOrFlags4, wDCAE_FlyTimerOrFlags5).
 ; Special case for state 03: increments a counter, sets a flag in wDB69.
 ; Looks like it initializes different “modes” or “phases” (timers controlling durations).
-    ld   hl,wDC51
+    ld   hl,wDC51_CurrentFlyRelated
     ld   c,[hl]
     ld   [hl],a
     ld   a,c
@@ -644,7 +644,7 @@ jp_00_06e8:
 call_00_06f6_DealDamageToPlayer:
 ; Returns if player is currently in damage cooldown.
 ; If passes: sets timer wDC7E_PlayerDamageCooldownTimer=3C, sets flag bit1 in wDB69, plays sound 0A.
-; Then manipulates wDC51 and wDC50_PlayerHealth counters, decrementing until zero. If it hits 0, jumps to jp_00_0693.
+; Then manipulates wDC51_CurrentFlyRelated and wDC50_PlayerHealth counters, decrementing until zero. If it hits 0, jumps to jp_00_0693.
 ; This is a hit/interaction response handler with timers, sound, and state decrement.
     call call_00_0759_IsPlayerDamageCooldownActive                                  ;; 00:06f6 $cd $59 $07
     ret  NZ                                            ;; 00:06f9 $c0
@@ -654,7 +654,7 @@ call_00_06f6_DealDamageToPlayer:
     set  1, [HL]                                       ;; 00:0702 $cb $ce
     ld   A, SFX_PLAYER_DAMAGED                                        ;; 00:0704 $3e $0a
     call call_00_0ff5_QueueSoundEffect                                  ;; 00:0706 $cd $f5 $0f
-    ld   HL, wDC51                                     ;; 00:0709 $21 $51 $dc
+    ld   HL, wDC51_CurrentFlyRelated                                     ;; 00:0709 $21 $51 $dc
     ld   A, [HL]                                       ;; 00:070c $7e
     and  A, A                                          ;; 00:070d $a7
     jr   Z, .jr_00_0713                                ;; 00:070e $28 $03
@@ -924,7 +924,7 @@ call_00_088a_HDMA_BackgroundAnimator:
     ret  Z                                             ;; 00:088e $c8
     ld   A, BANK_0A_OBJECT_SPRITES                                        ;; 00:088f $3e $0a
     call call_00_0eee_SwitchBank                                  ;; 00:0891 $cd $ee $0e
-    ld   HL, wDC72                                     ;; 00:0894 $21 $72 $dc
+    ld   HL, wDC72_FrameCounter2                                     ;; 00:0894 $21 $72 $dc
     inc  [HL]                                          ;; 00:0897 $34
     ld   A, [HL]                                       ;; 00:0898 $7e
     sub  A, $0a                                        ;; 00:0899 $d6 $0a
@@ -940,7 +940,7 @@ call_00_088a_HDMA_BackgroundAnimator:
     ld   A, [DE]                                       ;; 00:08a6 $1a
     inc  DE                                            ;; 00:08a7 $13
     ld   H, A                                          ;; 00:08a8 $67
-    ld   A, [wDC72]                                    ;; 00:08a9 $fa $72 $dc
+    ld   A, [wDC72_FrameCounter2]                                    ;; 00:08a9 $fa $72 $dc
     and  A, A                                          ;; 00:08ac $a7
     jr   NZ, .jr_00_08b5                               ;; 00:08ad $20 $06
     inc  [HL]                                          ;; 00:08af $34
@@ -1196,13 +1196,13 @@ call_00_08f8_SetupObjectVRAMTransfer:
     dw   .jr_00_09f0, .jr_00_0a01, .jr_00_0a41        ;; 00:0a64 pP
 
 call_00_0a6a_LoadMapConfigAndWaitVBlank:
-; This function loads configuration data for a map or scene, stores it in working memory (wDC2B), 
+; This function loads configuration data for a map or scene, stores it in working memory (wDC2B_HDMATransferRelated1), 
 ; adjusts tile bank offsets if needed, and waits for bit 2 of wDB66_HDMATransferFlags to clear, 
 ; likely indicating VBlank or scene loading finished.
 ;
 ; Key Actions:
 ; - Indexes into .data_00_0aa9_TilesetLoadConfigTable using a value in register C to get map/scene config.
-; - Copies 8 bytes of data to wDC2B.
+; - Copies 8 bytes of data to wDC2B_HDMATransferRelated1.
 ; - If a certain flag is unset (wDC31_TilesetBankRelated == $FF), calculates and writes tile offsets and assigns tile bank (wDC07).
 ; - Sets bits 2 and 7 in wDB66_HDMATransferFlags.
 ; - Waits for VBlank or completion signal (bit 2 of wDB66_HDMATransferFlags cleared).
@@ -1213,13 +1213,13 @@ call_00_0a6a_LoadMapConfigAndWaitVBlank:
     add  HL, HL                                        ;; 00:0a6f $29
     ld   DE, .data_00_0aa9_TilesetLoadConfigTable                                      ;; 00:0a70 $11 $a9 $0a
     add  HL, DE                                        ;; 00:0a73 $19
-    ld   DE, wDC2B                                     ;; 00:0a74 $11 $2b $dc
+    ld   DE, wDC2B_HDMATransferRelated1                                     ;; 00:0a74 $11 $2b $dc
     ld   BC, $08                                       ;; 00:0a77 $01 $08 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:0a7a $cd $6e $07
     ld   A, [wDC31_TilesetBankRelated]                                    ;; 00:0a7d $fa $31 $dc
     cp   A, $ff                                        ;; 00:0a80 $fe $ff
     jr   NZ, .jr_00_0a94                               ;; 00:0a82 $20 $10
-    ld   HL, wDC2B                                     ;; 00:0a84 $21 $2b $dc
+    ld   HL, wDC2B_HDMATransferRelated1                                     ;; 00:0a84 $21 $2b $dc
     ld   A, [wDC08_TilesetBankOffset]                                    ;; 00:0a87 $fa $08 $dc
     add  A, [HL]                                       ;; 00:0a8a $86
     ld   [HL+], A                                      ;; 00:0a8b $22
@@ -1536,7 +1536,7 @@ call_00_0c6a_HandlePendingHDMATransfers:
 ; Depending on bits, it sets up HDMA transfers from different sources:
 ; Bit 0 → copy tiles from wDAC0_GeneralPurposeDMASourceAddress–wDAC2_DMATransferLength.
 ; Bit 1 → copy tiles from wDB64_VRAMTransferSource–wDB64_VRAMTransferSource+1.
-; Bit 2 → perform a variable-length transfer using wDC2B–wDC32.
+; Bit 2 → perform a variable-length transfer using wDC2B_HDMATransferRelated1–wDC32.
 ; Manages VBK for VRAM bank selection when needed.
 ; Clears the trigger bits after performing the transfer.
     xor  A, A                                          ;; 00:0c6a $af
@@ -1631,15 +1631,15 @@ call_00_0c6a_HandlePendingHDMATransfers:
     call call_00_0f25_AltSwitchBank                                  ;; 00:0d17 $cd $25 $0f
     ld   A, [wDC32_VRAMBank]                                    ;; 00:0d1a $fa $32 $dc
     ldh  [rVBK], A                                     ;; 00:0d1d $e0 $4f
-    ld   A, [wDC2C]                                    ;; 00:0d1f $fa $2c $dc
+    ld   A, [wDC2C_HDMATransferRelated2]                                    ;; 00:0d1f $fa $2c $dc
     ldh  [rHDMA1], A                                   ;; 00:0d22 $e0 $51
-    ld   A, [wDC2B]                                    ;; 00:0d24 $fa $2b $dc
+    ld   A, [wDC2B_HDMATransferRelated1]                                    ;; 00:0d24 $fa $2b $dc
     ldh  [rHDMA2], A                                   ;; 00:0d27 $e0 $52
-    ld   A, [wDC2E]                                    ;; 00:0d29 $fa $2e $dc
+    ld   A, [wDC2E_HDMATransferRelated4]                                    ;; 00:0d29 $fa $2e $dc
     ldh  [rHDMA3], A                                   ;; 00:0d2c $e0 $53
-    ld   A, [wDC2D]                                    ;; 00:0d2e $fa $2d $dc
+    ld   A, [wDC2D_HDMATransferRelated3]                                    ;; 00:0d2e $fa $2d $dc
     ldh  [rHDMA4], A                                   ;; 00:0d31 $e0 $54
-    ld   HL, wDC2F                                     ;; 00:0d33 $21 $2f $dc
+    ld   HL, wDC2F_HDMATransferRelated5                                     ;; 00:0d33 $21 $2f $dc
     ld   A, [HL+]                                      ;; 00:0d36 $2a
     ld   E, A                                          ;; 00:0d37 $5f
     ld   D, [HL]                                       ;; 00:0d38 $56
@@ -1673,21 +1673,21 @@ call_00_0c6a_HandlePendingHDMATransfers:
     add  HL, HL                                        ;; 00:0d62 $29
     ld   E, L                                          ;; 00:0d63 $5d
     ld   D, H                                          ;; 00:0d64 $54
-    ld   HL, wDC2B                                     ;; 00:0d65 $21 $2b $dc
+    ld   HL, wDC2B_HDMATransferRelated1                                     ;; 00:0d65 $21 $2b $dc
     ld   A, [HL]                                       ;; 00:0d68 $7e
     add  A, E                                          ;; 00:0d69 $83
     ld   [HL+], A                                      ;; 00:0d6a $22
     ld   A, [HL]                                       ;; 00:0d6b $7e
     adc  A, D                                          ;; 00:0d6c $8a
     ld   [HL], A                                       ;; 00:0d6d $77
-    ld   HL, wDC2D                                     ;; 00:0d6e $21 $2d $dc
+    ld   HL, wDC2D_HDMATransferRelated3                                     ;; 00:0d6e $21 $2d $dc
     ld   A, [HL]                                       ;; 00:0d71 $7e
     add  A, E                                          ;; 00:0d72 $83
     ld   [HL+], A                                      ;; 00:0d73 $22
     ld   A, [HL]                                       ;; 00:0d74 $7e
     adc  A, D                                          ;; 00:0d75 $8a
     ld   [HL], A                                       ;; 00:0d76 $77
-    ld   HL, wDC2F                                     ;; 00:0d77 $21 $2f $dc
+    ld   HL, wDC2F_HDMATransferRelated5                                     ;; 00:0d77 $21 $2f $dc
     ld   A, [HL]                                       ;; 00:0d7a $7e
     sub  A, E                                          ;; 00:0d7b $93
     ld   [HL+], A                                      ;; 00:0d7c $22
@@ -1849,7 +1849,7 @@ call_00_0e3b_ClearGameStateVariables:
     ld   [wDB66_HDMATransferFlags], A                                    ;; 00:0e42 $ea $66 $db
     ld   [wDB69], A                                    ;; 00:0e45 $ea $69 $db
     ld   [wDBEF_UnkCounter], A                                    ;; 00:0e48 $ea $ef $db
-    ld   [wDC72], A                                    ;; 00:0e4b $ea $72 $dc
+    ld   [wDC72_FrameCounter2], A                                    ;; 00:0e4b $ea $72 $dc
     ld   [wDBE3], A                                    ;; 00:0e4e $ea $e3 $db
     ld   [wDD6B], A                                    ;; 00:0e51 $ea $6b $dd
     farcall call_02_7123_ClearObjectSlotsExcludingPlayer
@@ -2175,7 +2175,7 @@ call_00_0fd7_TriggerSoundEffect:
 
 call_00_0ff5_QueueSoundEffect:
 ; Accepts a sound effect code in A. If $FF, returns.
-; Uses .data_00_1037 as a priority lookup table: B = priorityTable[A].
+; Uses .data_00_1037_SFXPriorities as a priority lookup table: B = priorityTable[A].
 ; Checks multiple channel-status bytes (wDF68–wDF72) to see if the sound hardware is busy.
 ; If any channel active, compares B against wDE5F_CurrentSoundEffectPriority (currently playing effect priority) 
 ; and returns early if the new effect is lower priority.
@@ -2187,7 +2187,7 @@ call_00_0ff5_QueueSoundEffect:
     ret  Z                                             ;; 00:0ff7 $c8
     ld   C, A                                          ;; 00:0ff8 $4f
     ld   B, $00                                        ;; 00:0ff9 $06 $00
-    ld   HL, .data_00_1037                                     ;; 00:0ffb $21 $37 $10
+    ld   HL, .data_00_1037_SFXPriorities                                     ;; 00:0ffb $21 $37 $10
     add  HL, BC                                        ;; 00:0ffe $09
     ld   B, [HL]                                       ;; 00:0fff $46
     xor  A, A                                          ;; 00:1000 $af
@@ -2226,7 +2226,7 @@ call_00_0ff5_QueueSoundEffect:
     ld   HL, wDE5E_QueuedSoundEffectPriority                                     ;; 00:1032 $21 $5e $de
     ld   [HL], B                                       ;; 00:1035 $70
     ret                                                ;; 00:1036 $c9
-.data_00_1037:
+.data_00_1037_SFXPriorities:
     db   $11, $01, $08, $08, $01, $01, $01, $01        ;; 00:1037 ??.?.?..
     db   $01, $01, $01, $01, $01, $10, $10, $07        ;; 00:103f .?.??..?
     db   $07, $01, $01, $01, $08, $08, $01, $08        ;; 00:1047 .???????

@@ -268,7 +268,7 @@ wDB66_HDMATransferFlags:
 ; - This looks like sprite/animation tiles for NPCs or items.
 ; Bit 2 set →
 ; Perform a variable-length streaming transfer.
-; - Uses wDC2B–wDC32 as a little “DMA job struct”: source address, destination, length, VRAM bank, and continuation fields.
+; - Uses wDC2B_HDMATransferRelated1–wDC32 as a little “DMA job struct”: source address, destination, length, VRAM bank, and continuation fields.
 ; - After copying, it updates the struct so the next frame continues where this left off until finished.
 ; - When finished, clears bit 2.
 ; - Looks like it’s used for big transfers (maybe level backgrounds, cutscene art, or font pages).
@@ -567,15 +567,15 @@ wDC29_SkipMapWindowUpdateFlag: ; if set to 1, don't update the player window map
 wDC2A_MapBoundaryIndex:
     ds 1                                               ;; dc2a
 
-wDC2B:
+wDC2B_HDMATransferRelated1:
     ds 1                                               ;; dc2b
-wDC2C:
+wDC2C_HDMATransferRelated2:
     ds 1                                               ;; dc2c
-wDC2D:
+wDC2D_HDMATransferRelated3:
     ds 1                                               ;; dc2d
-wDC2E:
+wDC2E_HDMATransferRelated4:
     ds 1                                               ;; dc2e
-wDC2F:
+wDC2F_HDMATransferRelated5:
     ds 2                                               ;; dc2f
 wDC31_TilesetBankRelated:
     ds 1                                               ;; dc31
@@ -619,49 +619,41 @@ wDC42_MapBoundaryYMaxLoPlus78:
 wDC43_MapBoundaryYMaxHiPlus0:
     ds 1                                               ;; dc43
 
-wDC44:
+wDC44_UnkGraphicsBuffer:
     ds 8                                               ;; dc44
-
-wDC4C:
+wDC4C_UnkGraphicsFlags:
     ds 1                                               ;; dc4c
-
-wDC4D:
+wDC4D_UnkGraphicsCounter:
     ds 1                                               ;; dc4d
 
 wDC4E_PlayerLivesRemaining:
     ds 1                                               ;; dc4e
-
 wDC4F_PawCoinExtraHealth:
     ds 1                                               ;; dc4f
-
 wDC50_PlayerHealth:
     ds 1                                               ;; dc50
 
-wDC51:
+wDC51_CurrentFlyRelated:
     ds 1                                               ;; dc51
 
-wDC52:
+wDC52_GexSpriteRelated:
     ds 1                                               ;; dc52
-
-wDC53:
+wDC53_GexSpriteRelated2:
     ds 1                                               ;; dc53
 
-wDC54:
+wDC54_CachedTileXCoord:
     ds 2                                               ;; dc54
-
-wDC56:
+wDC56_CachedTileYCoord:
     ds 2                                               ;; dc56
 
-wDC58:
+wDC58_ObjectCollisionUnkFlags:
     ds 1                                               ;; dc58
 
-wDC59:
+wDC59_NumRemotesOnMissionSelectMenu:
     ds 1                                               ;; dc59
-
-wDC5A:
+wDC5A_MissionNumberSelected:
     ds 1                                               ;; dc5a
-
-wDC5B:
+wDC5B_TVButtonLevelMissionRelated:
     ds 1                                               ;; dc5b
 
 wDC5C_ProgressFlags:
@@ -688,25 +680,22 @@ wDC6C_CheckpointStoredY:
 ; unused?
     ds 1                                               ;; dc6e
 
-wDC6F:
+wDC6F_ObjectSpriteRelated:
     ds 1                                               ;; dc6f
-
-wDC70:
+wDC70_ObjectSpriteRelated2:
     ds 1                                               ;; dc70
 
 wDC71_FrameCounter:
     ds 1                                               ;; dc71
-
-wDC72:
+wDC72_FrameCounter2:
     ds 1                                               ;; dc72
-
-wDC73:
+wDC73_FrameCounter3:
     ds 5                                               ;; dc73
-
-wDC78:
+    
+; Misc player variables
+wDC78_PlayerActionIdRelated:
     ds 1                                               ;; dc78
 
-; Misc player variables
 wDC79:
     ds 1                                               ;; dc79
 

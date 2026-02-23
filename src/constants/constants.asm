@@ -151,11 +151,11 @@ DEF OBJECT_GEX                                         EQU $00
 DEF OBJECT_BONUS_COIN                                  EQU $01
 DEF OBJECT_FLY_COIN_SPAWN                              EQU $02
 DEF OBJECT_PAW_COIN                                    EQU $03
-DEF OBJECT_UNK04                                       EQU $04 ; probably tv fly
-DEF OBJECT_UNK05                                       EQU $05 ; probably tv fly
-DEF OBJECT_UNK06                                       EQU $06 ; probably tv fly
-DEF OBJECT_UNK07                                       EQU $07 ; probably tv fly
-DEF OBJECT_UNK08                                       EQU $08 ; probably tv fly
+DEF OBJECT_UNK04                                       EQU $04
+DEF OBJECT_UNK05                                       EQU $05
+DEF OBJECT_UNK06                                       EQU $06
+DEF OBJECT_UNK07                                       EQU $07
+DEF OBJECT_UNK08                                       EQU $08
 DEF OBJECT_GREEN_FLY_TV                                EQU $09
 DEF OBJECT_PURPLE_FLY_TV                               EQU $0A
 DEF OBJECT_UNK0B                                       EQU $0B
@@ -349,23 +349,23 @@ DEF MENU_END_CREDITS_6                    EQU $1A
 DEF MENU_UNK1B                            EQU $1B ; used but unknown
 
 ; Sound Effects
-DEF SFX_UNK00                              EQU $00
+DEF SFX_EMPTY                              EQU $00
 DEF SFX_MENU_SCROLL                        EQU $01
 DEF SFX_ITEM_PICKUP                        EQU $02 ; fly coins, paw coins, bonus coins
 DEF SFX_FLY_TV                             EQU $03
-DEF SFX_UNK04                              EQU $04
-DEF SFX_UNK05                              EQU $05
-DEF SFX_UNK06                              EQU $06
-DEF SFX_UNK07                              EQU $07
-DEF SFX_UNK08                              EQU $08
+DEF SFX_GEX_TAIL_SPIN                      EQU $04
+DEF SFX_UNK05                              EQU $05 ; unknown, but sounds similar to tail spin?
+DEF SFX_GEX_JUMP                           EQU $06
+DEF SFX_GEX_DOUBLE_JUMP                    EQU $07
+DEF SFX_UNK08                              EQU $08 ; hit something with tail maybe?
 DEF SFX_UNK09                              EQU $09
 DEF SFX_PLAYER_DAMAGED                     EQU $0A
 DEF SFX_UNK0B                              EQU $0B
 DEF SFX_UNK0C                              EQU $0C
 DEF SFX_UNK0D                              EQU $0D
 DEF SFX_GEX_SPAWN                          EQU $0E
-DEF SFX_GEX_HIT1                           EQU $0F
-DEF SFX_GEX_HIT2                           EQU $10
+DEF SFX_ENEMY_DAMAGED                      EQU $0F
+DEF SFX_ENEMY_KILLED                       EQU $10
 DEF SFX_UNK11                              EQU $11
 DEF SFX_UNK12                              EQU $12
 DEF SFX_METEOR                             EQU $13
@@ -384,7 +384,7 @@ DEF SFX_UNK1F                              EQU $1F
 DEF SFX_NONE                               EQU $FF ; no sfx queued
 
 ; Songs
-DEF SONG_UNK00                             EQU $00
+DEF SONG_EMPTY                             EQU $00
 DEF SONG_UNK01                             EQU $01
 DEF SONG_HOLIDAY_TV                        EQU $02
 DEF SONG_WESTERN_STATION                   EQU $03

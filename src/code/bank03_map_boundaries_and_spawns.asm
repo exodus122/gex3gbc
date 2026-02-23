@@ -6,10 +6,10 @@ call_03_6203_LoadLevelBoundariesFromId:
 ; Fills a series of wDC34_MapBoundaryXMinLo–wDC43_MapBoundaryYMaxHiPlus0 registers with the level’s rectangle bounds 
 ; (left/right/top/bottom and offsets for scrolling and collision).
 ; Usage: Called whenever a new level or respawn is set to update collision/window limits.
-    ld   HL, wDB6C_CurrentMapId                                     ;; 03:6203 $21 $6c $db
+    ld   HL, wDB6C_CurrentMapId                        ;; 03:6203 $21 $6c $db
     ld   L, [HL]                                       ;; 03:6206 $6e
     ld   H, $00                                        ;; 03:6207 $26 $00
-    ld   DE, .data_03_6210_MapBoundaryIndices                             ;; 03:6209 $11 $10 $62
+    ld   DE, .data_03_6210_MapBoundaryIndices          ;; 03:6209 $11 $10 $62
     add  HL, DE                                        ;; 03:620c $19
     ld   C, [HL]                                       ;; 03:620d $4e
     jr   .jr_03_624d                                   ;; 03:620e $18 $3d
@@ -66,17 +66,12 @@ call_03_6203_LoadLevelBoundariesFromId:
     ld   [wDC43_MapBoundaryYMaxHiPlus0], A                                    ;; 03:62a0 $ea $43 $dc
     ret                                                ;; 03:62a3 $c9
 .data_03_62a4:
-    db   $00, $00, $00, $00, $04, $02, $73, $03        ;; 03:62a4 ????????
-    db   $00, $00                                      ;; 03:62ac ..
-    dw   $0140                                         ;; 03:62ae wW
-    db   $00, $00                                      ;; 03:62b0 ..
-    dw   $0090                                         ;; 03:62b2 wW
-    db   $00, $00, $60, $09, $01, $00, $7f, $04        ;; 03:62b4 ........
-    db   $00, $00                                      ;; 03:62bc ..
-    dw   $00a0                                         ;; 03:62be wW
-    db   $01, $00, $2f, $00, $00, $00, $a0, $00        ;; 03:62c0 ....????
-    db   $b1, $00, $df, $00, $00, $00                  ;; 03:62c8 ????..
-    dw   $00a0                                         ;; 03:62ce wW
+    dw   $0000, $0000, $0204, $0373                    ;; 03:62a4 ????????
+    dw   $0000, $0140, $0000, $0090                    ;; 03:62ac wW
+    dw   $0000, $0960, $0001, $047f                    ;; 03:62b4 ........
+    dw   $0000, $00a0, $0001, $002f                    ;; 03:62bc ????????
+    dw   $0000, $00a0, $00b1, $00df                    ;; 03:62c4 ????????
+    dw   $0000, $00a0                                  ;; 03:62cc wW
     db   $00, $00, $00, $00, $00, $00, $30, $02        ;; 03:62d0 .W..????
     db   $01, $00, $4f, $02, $00, $00, $e0, $01        ;; 03:62d8 ????????
     db   $01, $00, $ef, $01, $00, $00, $30, $02        ;; 03:62e0 ????????
@@ -179,7 +174,7 @@ call_03_647c_InitPlayerPositionAndLevel:
     call call_03_6203_LoadLevelBoundariesFromId                                  ;; 03:64c6 $cd $03 $62
     jp   call_00_10de_UpdatePlayerMapWindow                                  ;; 03:64c9 $c3 $de $10
 .jr_03_64cc:
-    ld   HL, wDC5B                                     ;; 03:64cc $21 $5b $dc
+    ld   HL, wDC5B_TVButtonLevelMissionRelated                                     ;; 03:64cc $21 $5b $dc
     ld   L, [HL]                                       ;; 03:64cf $6e
     ld   H, $00                                        ;; 03:64d0 $26 $00
     ld   DE, .data_03_652b                             ;; 03:64d2 $11 $2b $65
@@ -187,7 +182,7 @@ call_03_647c_InitPlayerPositionAndLevel:
     ld   A, [HL]                                       ;; 03:64d6 $7e
     ld   [wDB6C_CurrentMapId], A                                    ;; 03:64d7 $ea $6c $db
     call call_03_6c89_LoadMapData                                  ;; 03:64da $cd $89 $6c
-    ld   HL, wDC5B                                     ;; 03:64dd $21 $5b $dc
+    ld   HL, wDC5B_TVButtonLevelMissionRelated                                     ;; 03:64dd $21 $5b $dc
     ld   L, [HL]                                       ;; 03:64e0 $6e
     ld   H, $00                                        ;; 03:64e1 $26 $00
     add  HL, HL                                        ;; 03:64e3 $29

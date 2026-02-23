@@ -19,15 +19,15 @@ call_00_2cbf_LoadObjectPalettes:
 
 call_00_2ce2_BuildGexSpriteDrawList:
 ; This is a complex sprite/OAM population routine. It:
-; Sets wDAC2_DMATransferLength=1 and combines the player’s facing direction with a state byte (wDC7A) into wDC53.
+; Sets wDAC2_DMATransferLength=1 and combines the player’s facing direction with a state byte (wDC7A) into wDC53_GexSpriteRelated2.
 ; Switches banks to retrieve sprite graphics metadata based on the current level (wDB6C_CurrentMapId).
 ; Computes the address of Gex’s sprite frame data (using offsets and increments).
 ; Reads sprite tiles, positions, and attributes, adjusting for the player’s position 
 ; relative to the map (wDBF9, wDBFB, wD80E, wD810).
-; Handles flipped and mirrored variants depending on direction bits (bits 5 and 6 in wDC53).
+; Handles flipped and mirrored variants depending on direction bits (bits 5 and 6 in wDC53_GexSpriteRelated2).
 ; Writes formatted sprite entries (X, Y, tile index, attributes) into a buffer at D9xx.
-; Optionally writes extra entries if a certain flag (wDC51) is set, using offsets from data_00_2f14.
-; Updates wDC6F with the new buffer pointer and restores the previous ROM bank.
+; Optionally writes extra entries if a certain flag (wDC51_CurrentFlyRelated) is set, using offsets from data_00_2f14.
+; Updates wDC6F_ObjectSpriteRelated with the new buffer pointer and restores the previous ROM bank.
 ; Usage:
 ; Populates the hardware sprite list for Gex’s current animation frame, handling mirroring, flipping, 
 ; and level-specific offsets.
@@ -36,7 +36,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     ld   A, [wD80D_PlayerFacingDirection]                                    ;; 00:2ce7 $fa $0d $d8
     ld   HL, wDC7A                                     ;; 00:2cea $21 $7a $dc
     or   A, [HL]                                       ;; 00:2ced $b6
-    ld   [wDC53], A                                    ;; 00:2cee $ea $53 $dc
+    ld   [wDC53_GexSpriteRelated2], A                                    ;; 00:2cee $ea $53 $dc
     ld   A, BANK_7F_OBJECT_PALETTES                                        ;; 00:2cf1 $3e $7f
     call call_00_0eee_SwitchBank                                  ;; 00:2cf3 $cd $ee $0e
     ld   HL, wDB6C_CurrentMapId                                     ;; 00:2cf6 $21 $6c $db
@@ -80,11 +80,11 @@ call_00_2ce2_BuildGexSpriteDrawList:
     ld   A, [HL+]                                      ;; 00:2d36 $2a
     ld   [wDAC0_GeneralPurposeDMASourceAddress+1], A                                    ;; 00:2d37 $ea $c1 $da
     xor  A, A                                          ;; 00:2d3a $af
-    ld   [wDC52], A                                    ;; 00:2d3b $ea $52 $dc
-    ld   A, [wDC6F]                                    ;; 00:2d3e $fa $6f $dc
+    ld   [wDC52_GexSpriteRelated], A                                    ;; 00:2d3b $ea $52 $dc
+    ld   A, [wDC6F_ObjectSpriteRelated]                                    ;; 00:2d3e $fa $6f $dc
     ld   E, A                                          ;; 00:2d41 $5f
     ld   D, $d9                                        ;; 00:2d42 $16 $d9
-    ld   A, [wDC53]                                    ;; 00:2d44 $fa $53 $dc
+    ld   A, [wDC53_GexSpriteRelated2]                                    ;; 00:2d44 $fa $53 $dc
     bit  6, A                                          ;; 00:2d47 $cb $77
     jp   NZ, .jp_00_2e0b                               ;; 00:2d49 $c2 $0b $2e
     bit  5, A                                          ;; 00:2d4c $cb $6f
@@ -127,12 +127,12 @@ call_00_2ce2_BuildGexSpriteDrawList:
     add  A, C                                          ;; 00:2d90 $81
     ld   [DE], A                                       ;; 00:2d91 $12
     inc  E                                             ;; 00:2d92 $1c
-    ld   A, [wDC52]                                    ;; 00:2d93 $fa $52 $dc
+    ld   A, [wDC52_GexSpriteRelated]                                    ;; 00:2d93 $fa $52 $dc
     ld   [DE], A                                       ;; 00:2d96 $12
     add  A, $02                                        ;; 00:2d97 $c6 $02
-    ld   [wDC52], A                                    ;; 00:2d99 $ea $52 $dc
+    ld   [wDC52_GexSpriteRelated], A                                    ;; 00:2d99 $ea $52 $dc
     inc  E                                             ;; 00:2d9c $1c
-    ld   A, [wDC53]                                    ;; 00:2d9d $fa $53 $dc
+    ld   A, [wDC53_GexSpriteRelated2]                                    ;; 00:2d9d $fa $53 $dc
     or   A, [HL]                                       ;; 00:2da0 $b6
     ld   [DE], A                                       ;; 00:2da1 $12
     inc  E                                             ;; 00:2da2 $1c
@@ -184,12 +184,12 @@ call_00_2ce2_BuildGexSpriteDrawList:
     add  A, C                                          ;; 00:2def $81
     ld   [DE], A                                       ;; 00:2df0 $12
     inc  E                                             ;; 00:2df1 $1c
-    ld   A, [wDC52]                                    ;; 00:2df2 $fa $52 $dc
+    ld   A, [wDC52_GexSpriteRelated]                                    ;; 00:2df2 $fa $52 $dc
     ld   [DE], A                                       ;; 00:2df5 $12
     add  A, $02                                        ;; 00:2df6 $c6 $02
-    ld   [wDC52], A                                    ;; 00:2df8 $ea $52 $dc
+    ld   [wDC52_GexSpriteRelated], A                                    ;; 00:2df8 $ea $52 $dc
     inc  E                                             ;; 00:2dfb $1c
-    ld   A, [wDC53]                                    ;; 00:2dfc $fa $53 $dc
+    ld   A, [wDC53_GexSpriteRelated2]                                    ;; 00:2dfc $fa $53 $dc
     or   A, [HL]                                       ;; 00:2dff $b6
     ld   [DE], A                                       ;; 00:2e00 $12
     inc  E                                             ;; 00:2e01 $1c
@@ -243,12 +243,12 @@ call_00_2ce2_BuildGexSpriteDrawList:
     add  A, C                                          ;; 00:2e53 $81
     ld   [DE], A                                       ;; 00:2e54 $12
     inc  E                                             ;; 00:2e55 $1c
-    ld   A, [wDC52]                                    ;; 00:2e56 $fa $52 $dc
+    ld   A, [wDC52_GexSpriteRelated]                                    ;; 00:2e56 $fa $52 $dc
     ld   [DE], A                                       ;; 00:2e59 $12
     add  A, $02                                        ;; 00:2e5a $c6 $02
-    ld   [wDC52], A                                    ;; 00:2e5c $ea $52 $dc
+    ld   [wDC52_GexSpriteRelated], A                                    ;; 00:2e5c $ea $52 $dc
     inc  E                                             ;; 00:2e5f $1c
-    ld   A, [wDC53]                                    ;; 00:2e60 $fa $53 $dc
+    ld   A, [wDC53_GexSpriteRelated2]                                    ;; 00:2e60 $fa $53 $dc
     or   A, [HL]                                       ;; 00:2e63 $b6
     ld   [DE], A                                       ;; 00:2e64 $12
     inc  E                                             ;; 00:2e65 $1c
@@ -303,12 +303,12 @@ call_00_2ce2_BuildGexSpriteDrawList:
     add  A, C                                          ;; 00:2eb5 $81
     ld   [DE], A                                       ;; 00:2eb6 $12
     inc  E                                             ;; 00:2eb7 $1c
-    ld   A, [wDC52]                                    ;; 00:2eb8 $fa $52 $dc
+    ld   A, [wDC52_GexSpriteRelated]                                    ;; 00:2eb8 $fa $52 $dc
     ld   [DE], A                                       ;; 00:2ebb $12
     add  A, $02                                        ;; 00:2ebc $c6 $02
-    ld   [wDC52], A                                    ;; 00:2ebe $ea $52 $dc
+    ld   [wDC52_GexSpriteRelated], A                                    ;; 00:2ebe $ea $52 $dc
     inc  E                                             ;; 00:2ec1 $1c
-    ld   A, [wDC53]                                    ;; 00:2ec2 $fa $53 $dc
+    ld   A, [wDC53_GexSpriteRelated2]                                    ;; 00:2ec2 $fa $53 $dc
     or   A, [HL]                                       ;; 00:2ec5 $b6
     ld   [DE], A                                       ;; 00:2ec6 $12
     inc  E                                             ;; 00:2ec7 $1c
@@ -318,7 +318,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     dec  A                                             ;; 00:2ecb $3d
     jr   NZ, .jr_00_2ea7                               ;; 00:2ecc $20 $d9
 .jp_00_2ece:
-    ld   A, [wDC51]                                    ;; 00:2ece $fa $51 $dc
+    ld   A, [wDC51_CurrentFlyRelated]                                    ;; 00:2ece $fa $51 $dc
     and  A, A                                          ;; 00:2ed1 $a7
     jr   Z, .jr_00_2ef9                                ;; 00:2ed2 $28 $25
     ld   A, [wDC71_FrameCounter]                                    ;; 00:2ed4 $fa $71 $dc
@@ -347,7 +347,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     inc  E                                             ;; 00:2ef8 $1c
 .jr_00_2ef9:
     ld   A, E                                          ;; 00:2ef9 $7b
-    ld   [wDC6F], A                                    ;; 00:2efa $ea $6f $dc
+    ld   [wDC6F_ObjectSpriteRelated], A                                    ;; 00:2efa $ea $6f $dc
     jp   call_00_0f08_RestoreBank                                  ;; 00:2efd $c3 $08 $0f
 
 call_00_2f00_CallBank2_Helper_AndCheckBit8:
@@ -1092,10 +1092,7 @@ call_00_3618_HandleObjectSpawn:
     add  HL, BC                                        ;; 00:36d7 $09
     ld   C, L                                          ;; 00:36d8 $4d
     ld   B, H                                          ;; 00:36d9 $44
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:36da $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:36dc $fa $00 $da
-    or   A, $0e                                        ;; 00:36df $f6 $0e
-    ld   L, A                                          ;; 00:36e1 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_XPOS_OFFSET
     ld   A, [DE]                                       ;; 00:36e2 $1a
     ld   [HL+], A                                      ;; 00:36e3 $22
     ld   [BC], A                                       ;; 00:36e4 $02
@@ -1156,10 +1153,7 @@ call_00_3618_HandleObjectSpawn:
     ld   BC, data_00_3258                                     ;; 00:3723 $01 $58 $32
     add  HL, BC                                        ;; 00:3726 $09
     ld   A, [HL+]                                      ;; 00:3727 $2a
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:3728 $fa $00 $da
-    or   A, OBJECT_ID_OFFSET                                        ;; 00:372b $f6 $00
-    ld   E, A                                          ;; 00:372d $5f
-    ld   D, HIGH(wD800_ObjectMemory)                                        ;; 00:372e $16 $d8
+    LOAD_OBJ_FIELD_TO_DE_ALT OBJECT_ID_OFFSET
     ld   A, [wDABB_CurrentObjectId]                                    ;; 00:3730 $fa $bb $da
     ld   [DE], A                                       ;; 00:3733 $12
     ld   A, E                                          ;; 00:3734 $7b
@@ -1218,7 +1212,7 @@ call_00_3618_HandleObjectSpawn:
     or   A, $40                                        ;; 00:3776 $f6 $40
     ld   [HL], A                                       ;; 00:3778 $77
     and  A, $0f                                        ;; 00:3779 $e6 $0f
-    farcall call_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetObjectAction
     farcall call_03_687c_AssignObjectPalette
     ret                                                ;; 00:3791 $c9
 
@@ -1378,7 +1372,7 @@ call_00_37a0_SpawnObjectRelative:
     ld   [DE], A                                       ;; 00:384e $12
     call call_00_2a03_ResetObjectTempSlot                                  ;; 00:384f $cd $03 $2a
     xor  A, A                                          ;; 00:3852 $af
-    farcall call_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetObjectAction
     farcall call_03_687c_AssignObjectPalette
     pop  AF                                            ;; 00:3869 $f1
     ld   HL, wDA00_CurrentObjectAddrLo                                     ;; 00:386a $21 $00 $da

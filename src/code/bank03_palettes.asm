@@ -2,14 +2,14 @@ call_03_6567_SetupObjectPalettes:
 ; Purpose: Chooses which object palette set to load based on state flags.
 ; Behavior:
 ; If wDCAB_FlyTimerOrFlags2 non-zero, uses default palette table .data_03_658c.
-; Otherwise, checks wDC51, indexes .data_03_6594, and resolves an HL pointer to palette data.
+; Otherwise, checks wDC51_CurrentFlyRelated, indexes .data_03_6594, and resolves an HL pointer to palette data.
 ; Copies 8 bytes into wDD2A_ObjectPalettes.
 ; Usage: Called when loading or switching level themes/objects.
     ld   HL, .data_03_658c                             ;; 03:6567 $21 $8c $65
     ld   A, [wDCAB_FlyTimerOrFlags2]                                    ;; 03:656a $fa $ab $dc
     and  A, A                                          ;; 03:656d $a7
     jr   NZ, .jr_03_6583                               ;; 03:656e $20 $13
-    ld   A, [wDC51]                                    ;; 03:6570 $fa $51 $dc
+    ld   A, [wDC51_CurrentFlyRelated]                                    ;; 03:6570 $fa $51 $dc
     and  A, A                                          ;; 03:6573 $a7
     jp   Z, call_00_2cbf_LoadObjectPalettes                               ;; 03:6574 $ca $bf $2c
     dec  A                                             ;; 03:6577 $3d
@@ -121,7 +121,7 @@ call_03_6833:
     dec  a
     ld   c,a
     call call_00_28aa_Object_Set16
-    ld   c,$00
+    ld   c,OBJECT_FACING_RIGHT
     call call_00_2958_Object_SetFacingDirection
     pop  bc
     ld   l,c
@@ -133,7 +133,7 @@ call_03_6833:
     add  hl,de
     call call_00_2c20_Object_CopyPaletteToBuffer
     xor  a
-    farcall call_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetObjectAction
     ret  
 
 call_03_687c_AssignObjectPalette:
@@ -143,10 +143,7 @@ call_03_687c_AssignObjectPalette:
 ; Stores the palette ID in wDAAE_ObjectPaletteIds.
 ; Calculates an address into wDD2A_ObjectPalettes, then copies 8 palette bytes from data_03_68f9.
 ; Usage: Ensures each on-screen object uses the correct colors.
-    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:687c $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:687e $fa $00 $da
-    or   A, OBJECT_SPRITE_FLAGS_OFFSET                                        ;; 03:6881 $f6 $05
-    ld   L, A                                          ;; 03:6883 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_SPRITE_FLAGS_OFFSET                                     ;; 03:6883 $6f
     ld   C, $00                                        ;; 03:6884 $0e $00
     bit  7, [HL]                                       ;; 03:6886 $cb $7e
     jr   NZ, .jr_03_6893                               ;; 03:6888 $20 $09
@@ -176,10 +173,7 @@ call_03_687c_AssignObjectPalette:
     add  HL, DE                                        ;; 03:68ac $19
     ld   E, L                                          ;; 03:68ad $5d
     ld   D, H                                          ;; 03:68ae $54
-    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:68af $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:68b1 $fa $00 $da
-    or   A, OBJECT_ID_OFFSET                                        ;; 03:68b4 $f6 $00
-    ld   L, A                                          ;; 03:68b6 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_ID_OFFSET
     ld   L, [HL]                                       ;; 03:68b7 $6e
     ld   H, $00                                        ;; 03:68b8 $26 $00
     add  HL, HL                                        ;; 03:68ba $29
@@ -237,6 +231,7 @@ call_03_68d9_AssignAllObjectPalettes:
     add  A, $20                                        ;; 03:68f4 $c6 $20
     jr   NZ, .jr_03_68db                               ;; 03:68f6 $20 $e3
     ret                                                ;; 03:68f8 $c9
+
 data_03_68f9:
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 03:68f9 ????????
     db   $00, $00, $00, $00, $1f, $00, $ff, $03        ;; 03:6901 ........

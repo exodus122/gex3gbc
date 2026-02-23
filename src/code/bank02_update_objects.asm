@@ -2,23 +2,23 @@ call_02_708f_InitObjectsAndSpawnPlayer:
 ; Purpose: Initializes core object-related state when entering a level or respawning the player.
 ; Details:
 ; Clears many object/flag variables (wDC84–wDC8F, wDABD_UnkBGCollisionFlags–wDABE_UnkBGCollisionFlags2, etc.).
-; If a pending object ID exists in wDC78, spawns it using call_02_72ac_SetupNewAction.
+; If a pending action ID exists in wDC78_PlayerActionIdRelated, sets it up it using call_02_72ac_SetObjectAction.
 ; Resets player-facing direction and flags, calls call_02_7123_ClearObjectSlotsExcludingPlayer to clear object slots, 
 ; and spawns required relative objects.
 ; Loops through call_00_360c_SpawnObjectOnceImmediate until the player object (wDAB8_ObjectCounter == 1) is spawned.
     xor  A, A                                          ;; 02:708f $af
     ld   [wDB6A], A                                    ;; 02:7090 $ea $6a $db
-    ld   A, [wDC78]                                    ;; 02:7093 $fa $78 $dc
+    ld   A, [wDC78_PlayerActionIdRelated]                                    ;; 02:7093 $fa $78 $dc
     cp   A, $ff                                        ;; 02:7096 $fe $ff
     jr   Z, .jr_02_70d1                                ;; 02:7098 $28 $37
     xor  A, A                                          ;; 02:709a $af
     ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 02:709b $ea $00 $da
     ld   A, $00                                        ;; 02:709e $3e $00
     ld   [wD800_Player_Id], A                                    ;; 02:70a0 $ea $00 $d8
-    ld   A, [wDC78]                                    ;; 02:70a3 $fa $78 $dc
-    call call_02_72ac_SetupNewAction                                  ;; 02:70a6 $cd $ac $72
+    ld   A, [wDC78_PlayerActionIdRelated]                                    ;; 02:70a3 $fa $78 $dc
+    call call_02_72ac_SetObjectAction                                  ;; 02:70a6 $cd $ac $72
     ld   A, $ff                                        ;; 02:70a9 $3e $ff
-    ld   [wDC78], A                                    ;; 02:70ab $ea $78 $dc
+    ld   [wDC78_PlayerActionIdRelated], A                                    ;; 02:70ab $ea $78 $dc
     ld   A, $00                                        ;; 02:70ae $3e $00
     ld   [wDC7A], A                                    ;; 02:70b0 $ea $7a $dc
     ld   A, $00                                        ;; 02:70b3 $3e $00
@@ -246,10 +246,7 @@ call_02_7152_UpdateObjects:
     ld   L, A                                          ;; 02:7228 $6f
     call call_00_0f22_JumpHL                                  ;; 02:7229 $cd $22 $0f
 .jr_02_722c:
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:722c $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:722e $fa $00 $da
-    or   A, OBJECT_ID_OFFSET                                        ;; 02:7231 $f6 $00
-    ld   L, A                                          ;; 02:7233 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_ID_OFFSET
     ld   A, [HL]                                       ;; 02:7234 $7e
     cp   A, $ff                                        ;; 02:7235 $fe $ff
     call NZ, call_02_724d_UpdateObjectAnimationTimersAndSpriteId                              ;; 02:7237 $c4 $4d $72
@@ -264,12 +261,9 @@ call_02_724d_UpdateObjectAnimationTimersAndSpriteId:
 ; Purpose: Handles countdown timers, state flags, and transitions for an individual object slot.
 ; Details:
 ; Decrements a timer; when it reaches zero, reloads counters, updates flags (set 2, set 1), and fetches new data from tables.
-; Can trigger reinitialization via call_02_54f9_SwitchPlayerAction or call_02_72ac_SetupNewAction.
+; Can trigger reinitialization via call_02_54f9_SwitchPlayerAction or call_02_72ac_SetObjectAction.
 ; Updates related memory locations with new object state values.
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:724d $fa $00 $da
-    or   A, OBJECT_SPRITE_FLAGS2_OFFSET                                        ;; 02:7250 $f6 $04
-    ld   L, A                                          ;; 02:7252 $6f
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:7253 $26 $d8
+    LOAD_OBJ_FIELD_TO_HL_ALT OBJECT_SPRITE_FLAGS2_OFFSET
     ld   E, [HL]                                       ;; 02:7255 $5e ; e = flags (04)
     inc  L                                             ;; 02:7256 $2c
     res  2, [HL]                                       ;; 02:7257 $cb $96 ; unset bit 2 in unk05
@@ -296,7 +290,7 @@ call_02_724d_UpdateObjectAnimationTimersAndSpriteId:
     and  A, A                                          ;; 02:7274 $a7
     ld   A, E                                          ;; 02:7275 $7b
     jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:7276 $ca $f9 $54
-    jp   call_02_72ac_SetupNewAction                                  ;; 02:7279 $c3 $ac $72
+    jp   call_02_72ac_SetObjectAction                                  ;; 02:7279 $c3 $ac $72
 .jr_02_727c:
     bit  3, B                                          ;; 02:727c $cb $58 ; check if bit 3 of unk05 is set
     jr   Z, .jr_02_7282                                ;; 02:727e $28 $02
@@ -341,7 +335,7 @@ call_02_72a1_CheckIfPlayerActorUpdatedAction:
     set  0, [HL]                                       ;; 02:72a9 $cb $c6
     ret                                                ;; 02:72ab $c9
 
-call_02_72ac_SetupNewAction:
+call_02_72ac_SetObjectAction:
 ; Purpose: Loads an object's initialization data from a data table 
 ; (data_02_4000) into its slot in working memory.
 ; Details:
@@ -369,10 +363,7 @@ call_02_72ac_SetupNewAction:
     add  HL, DE                                        ;; 02:72c6 $19
     ld   C, L                                          ;; 02:72c7 $4d
     ld   B, H                                          ;; 02:72c8 $44 ; HL and BC are ptrs to an object action table entry
-    ld   A, [wDA00_CurrentObjectAddrLo]                  ;; 02:72c9 $fa $00 $da 
-    or   A, OBJECT_ACTIONPTR_OFFSET                    ;; 02:72cc $f6 $02
-    ld   L, A                                          ;; 02:72ce $6f
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:72cf $26 $d8
+    LOAD_OBJ_FIELD_TO_HL_ALT OBJECT_ACTIONPTR_OFFSET
     ld   A, [BC]                                       ;; 02:72d1 $0a
     ld   [HL+], A                                      ;; 02:72d2 $22
     inc  BC                                            ;; 02:72d3 $03

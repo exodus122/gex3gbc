@@ -284,7 +284,7 @@ call_02_4989_PlayerAction_Unk19:
     ld   a,$0B
     call call_00_0ff5_QueueSoundEffect
     ld   a,$14
-    call call_02_72ac_SetupNewAction
+    call call_02_72ac_SetObjectAction
 
 call_02_49a8_PlayerAction_Unk20:
     ld   a,[wDC8E]

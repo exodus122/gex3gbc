@@ -942,10 +942,14 @@ call_00_1633_HandleLevelWarpOrExit:
     ld   [HL], D                                       ;; 00:16a0 $72
     ret                                                ;; 00:16a1 $c9
 .data_00_16a2_PlayerSpawnPositions:
-    dw   .data_00_16c2                                         ;; 00:16a2 wW
-    dw   .data_00_16f2                                         ;; 00:16a4 wW
-    dw   .data_00_1722, .data_00_17e2, .data_00_184a, .data_00_18d2        ;; 00:16a6 ????????
-    dw   .data_00_1962, .data_00_19b2
+    dw   .data_00_16c2
+    dw   .data_00_16f2
+    dw   .data_00_1722
+    dw   .data_00_17e2
+    dw   .data_00_184a
+    dw   .data_00_18d2
+    dw   .data_00_1962
+    dw   .data_00_19b2
     dw   .data_00_16ba
     dw   .data_00_16ba
     dw   .data_00_16ba
@@ -1613,7 +1617,7 @@ call_00_1bbc_CheckForDoorAndEnter:
     db   $38, $01, $80, $01, $ff                       ;; 00:1e9b ?????
 
 call_00_1ea0_LoadAndRunMissionPreviewCutscene:
-; Uses the current level number (wDC1E_CurrentLevelNumber) and sub-index (wDC5A) 
+; Uses the current level number (wDC1E_CurrentLevelNumber) and sub-index (wDC5A_MissionNumberSelected) 
 ; to select an entry from .data_00_1fc0.
 ; Retrieves a pointer from .data_00_1ff0 to a level setup script (data_2014, 202a, 2040, …).
 ; Temporarily stores the current level ID, loads a new one from the script, and swaps 
@@ -1637,7 +1641,7 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
     add  HL, HL                                        ;; 00:1ea7 $29
     ld   DE, .data_00_1fc0                                     ;; 00:1ea8 $11 $c0 $1f
     add  HL, DE                                        ;; 00:1eab $19
-    ld   A, [wDC5A]                                    ;; 00:1eac $fa $5a $dc
+    ld   A, [wDC5A_MissionNumberSelected]                                    ;; 00:1eac $fa $5a $dc
     ld   E, A                                          ;; 00:1eaf $5f
     ld   D, $00                                        ;; 00:1eb0 $16 $00
     add  HL, DE                                        ;; 00:1eb2 $19
@@ -1680,7 +1684,7 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
     xor  A, A                                          ;; 00:1ee1 $af
     ld   [wDCA7_DrawGexFlag], A                                    ;; 00:1ee2 $ea $a7 $dc
     ld   A, $00                                        ;; 00:1ee5 $3e $00
-    ld   [wDC78], A                                    ;; 00:1ee7 $ea $78 $dc
+    ld   [wDC78_PlayerActionIdRelated], A                                    ;; 00:1ee7 $ea $78 $dc
     call call_00_04fb                                  ;; 00:1eea $cd $fb $04
     farcall call_03_6c89_LoadMapData
     farcall call_03_6203_LoadLevelBoundariesFromId

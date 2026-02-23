@@ -161,7 +161,7 @@ call_00_22b1_HandleObjectStateChange:
 ; Similar indexing logic as 2299, but:
 ; Compares the current low nibble with C.
 ; If different, stores the old low nibble to wDAD6_ReturnBank.
-; Then calls an alternate-bank routine (call_02_72ac_SetupNewAction)
+; Then calls an alternate-bank routine (call_02_72ac_SetObjectAction)
 ; Purpose: Detect a change in the object’s state nibble and, if changed, 
 ; trigger an alternate-bank handler for state transitions.
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:22b1 $fa $00 $da
@@ -179,7 +179,7 @@ call_00_22b1_HandleObjectStateChange:
     and  A, $0f                                        ;; 00:22c4 $e6 $0f
     cp   A, C                                          ;; 00:22c6 $b9
     ret  Z                                             ;; 00:22c7 $c8
-    farcall call_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetObjectAction
     ret                                                ;; 00:22d3 $c9
     
 call_00_22d4_CheckObjectSlotFlag:
@@ -283,10 +283,7 @@ call_00_233e_Object_UpdatePatternedPositionFromVelocityTable:
 ; Computes a signed (Δx, Δy) vector, adds it to the object’s initial position, 
 ; and stores the new position into the object’s X/Y position fields.
 ; Effectively produces oscillating or patterned movement along a predefined velocity curve.
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_XVEL_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_XVEL_OFFSET
     inc  [hl]
     ld   a,[hl]
     sub  a,$2E
@@ -361,10 +358,7 @@ call_00_233e_Object_UpdatePatternedPositionFromVelocityTable:
     push hl
     pop  bc
     pop  de
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_XPOS_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_XPOS_OFFSET
     ld   a,e
     ldi  [hl],a
     ld   a,d
@@ -394,10 +388,7 @@ call_00_2410_Object_SetFacingRelativeToPlayer:
 ; Sets a nearby state byte (L xor $02) to $20 if the player is 
 ; left of the object, otherwise $00.
 ; Purpose: A left/right proximity flag to influence AI.
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_XPOS_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_XPOS_OFFSET
     ld   c,OBJECT_RIGHT_OF_GEX
     ld   a,[wD80E_PlayerXPosition]
     sub  [hl]
@@ -417,10 +408,7 @@ call_00_242d_Object_SetFacingRelativeToPlayer_Inverse:
 ; Same comparison as 2410 but reversed:
 ; Sets the flag to $20 if the player is right of the object, otherwise $00.
 ; Purpose: Mirror of the above for right-side checking.
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_XPOS_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_XPOS_OFFSET
     ld   c,OBJECT_LEFT_OF_GEX
     ld   a,[wD80E_PlayerXPosition]
     sub  [hl]
@@ -439,10 +427,7 @@ call_00_242d_Object_SetFacingRelativeToPlayer_Inverse:
 call_00_2475_Object_ApplyVerticalVelocity_Clamped:
 ; Updates vertical velocity with a clamp (min cap at $C0), then derives a fractional 
 ; step (shifted velocity), and finally applies it to Y position.
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:244a $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:244c $fa $00 $da
-    or   A, OBJECT_YVEL_OFFSET                                        ;; 00:244f $f6 $1d
-    ld   L, A                                          ;; 00:2451 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_YVEL_OFFSET
     ld   A, [HL]                                       ;; 00:2452 $7e
     sub  A, $02                                        ;; 00:2453 $d6 $02
     bit  7, A                                          ;; 00:2455 $cb $7f
@@ -469,10 +454,7 @@ call_00_2475_Object_ApplyGravityAndSnapToGround:
 ; Applies gravity to the object’s vertical velocity (with clamp), integrates it into 
 ; the object’s Y position using subpixel precision, and compares against a stored ground reference. 
 ; If the object falls past this reference, its Y position is snapped back and velocity is reset to zero.
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_YVEL_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_YVEL_OFFSET
     ld   a,[hl]
     sub  a,$02
     bit  $7,a
@@ -501,10 +483,7 @@ call_00_2475_Object_ApplyGravityAndSnapToGround:
     adc  b
     ld   [hl],a
     call call_00_27f3_Object_GetInitialYPos
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_YPOS_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_YPOS_OFFSET
     ld   a,e
     sub  [hl]
     inc  hl
@@ -523,10 +502,7 @@ call_00_2475_Object_ApplyGravityAndSnapToGround:
 
 call_00_24c0_Object_IntegrateXVelocity:
 ; Accumulates subpixels from X velocity, shifts them into actual pixel delta, and updates X position.
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:24c0 $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:24c2 $fa $00 $da
-    or   A, OBJECT_XVEL_OFFSET                                        ;; 00:24c5 $f6 $1b
-    ld   L, A                                          ;; 00:24c7 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_XVEL_OFFSET
     ld   A, [HL+]                                      ;; 00:24c8 $2a
     add  A, [HL]                                       ;; 00:24c9 $86
     ld   C, A                                          ;; 00:24ca $4f
@@ -543,10 +519,7 @@ call_00_24c0_Object_IntegrateXVelocity:
     adc  A, $00                                        ;; 00:24dc $ce $00
     ld   B, A                                          ;; 00:24de $47
 call_00_24df_Object_UpdateXPosition:
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:24df $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:24e1 $fa $00 $da
-    or   A, OBJECT_XPOS_OFFSET                                        ;; 00:24e4 $f6 $0e
-    ld   L, A                                          ;; 00:24e6 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_XPOS_OFFSET
     ld   A, [HL]                                       ;; 00:24e7 $7e
     add  A, C                                          ;; 00:24e8 $81
     ld   [HL+], A                                      ;; 00:24e9 $22
@@ -558,10 +531,7 @@ call_00_24df_Object_UpdateXPosition:
 call_00_24ee_Object_IntegrateYVelocity:
 ; Same logic as call_00_24c0_Object_IntegrateXVelocity but for Y axis. 
 ; Calls into the common Y position updater (250d).
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:24ee $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:24f0 $fa $00 $da
-    or   A, OBJECT_YVEL_OFFSET                                        ;; 00:24f3 $f6 $1d
-    ld   L, A                                          ;; 00:24f5 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_YVEL_OFFSET
     ld   A, [HL+]                                      ;; 00:24f6 $2a
     add  A, [HL]                                       ;; 00:24f7 $86
     ld   C, A                                          ;; 00:24f8 $4f
@@ -578,10 +548,7 @@ call_00_24ee_Object_IntegrateYVelocity:
     adc  A, $00                                        ;; 00:250a $ce $00
     ld   B, A                                          ;; 00:250c $47
 call_00_250d_Object_UpdateYPosition:
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:250d $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:250f $fa $00 $da
-    or   A, OBJECT_YPOS_OFFSET                                        ;; 00:2512 $f6 $10
-    ld   L, A                                          ;; 00:2514 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_YPOS_OFFSET
     ld   A, [HL]                                       ;; 00:2515 $7e
     add  A, C                                          ;; 00:2516 $81
     ld   [HL+], A                                      ;; 00:2517 $22
@@ -617,10 +584,7 @@ call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing:
     xor  A, A                                          ;; 00:253c $af
     ret                                                ;; 00:253d $c9
 .jr_00_253e:
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:253e $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2540 $fa $00 $da
-    or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 00:2543 $f6 $0d
-    ld   L, A                                          ;; 00:2545 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_FACINGDIRECTION_OFFSET
     ld   A, [HL]                                       ;; 00:2546 $7e
     ld   [HL], C                                       ;; 00:2547 $71
     cp   A, C                                          ;; 00:2548 $b9
@@ -629,15 +593,9 @@ call_00_251c_Object_CheckHorizontalBoundingBox_UpdateFacing:
 call_00_254a_Object_AdvancePosition_XDelta:
 ; Calculates X delta based on facing direction and velocity, 
 ; saves it to wDA13_ObjectXVelocityDelta, and advances object position.
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:254a $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:254c $fa $00 $da
-    or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 00:254f $f6 $0d
-    ld   L, A                                          ;; 00:2551 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_FACINGDIRECTION_OFFSET
     ld   C, [HL]                                       ;; 00:2552 $4e
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2553 $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2555 $fa $00 $da
-    or   A, OBJECT_XVEL_OFFSET                                        ;; 00:2558 $f6 $1b
-    ld   L, A                                          ;; 00:255a $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_XVEL_OFFSET
     ld   A, [HL+]                                      ;; 00:255b $2a
     bit  5, C                                          ;; 00:255c $cb $69
     jr   Z, .jr_00_2562                                ;; 00:255e $28 $02
@@ -674,10 +632,7 @@ call_00_254a_Object_AdvancePosition_XDelta:
 
 call_00_2588_Object_ApproachXVelocity:
 ; Increments/decrements the object’s X velocity by 1 until it equals a target C.
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2588 $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:258a $fa $00 $da
-    or   A, OBJECT_XVEL_OFFSET                                        ;; 00:258d $f6 $1b
-    ld   L, A                                          ;; 00:258f $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_XVEL_OFFSET
     ld   A, [HL]                                       ;; 00:2590 $7e
     cp   A, C                                          ;; 00:2591 $b9
     ret  Z                                             ;; 00:2592 $c8
@@ -720,10 +675,7 @@ call_00_259d_Object_CheckVerticalBoundingBox_UpdateState:
 
 call_00_25BF_Object_SetAndCompareState:
 ; Writes a new state flag into object and returns whether it changed.
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_FACINGDIRECTION_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_FACINGDIRECTION_OFFSET
     ld   a,[hl]
     ld   [hl],c
     cp   c
@@ -732,10 +684,7 @@ call_00_25BF_Object_SetAndCompareState:
 call_00_25CB_Object_IntegrateVelocity_Helper:
 ; Internal helper for fractional velocity integration (handles facing, 
 ; subpixel carry, writes X position + velocity delta to DE).
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_FACINGDIRECTION_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_FACINGDIRECTION_OFFSET
     ld   c,[hl]
     ld   a,l
     xor  a,$10
@@ -777,10 +726,7 @@ call_00_2602_Object_ApproachYVelocity:
 ; Compares current Y velocity against a target (C).
 ; Increments or decrements the Y velocity by 1 until it matches.
 ; This gives smooth acceleration/deceleration to the desired speed.
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_YVEL_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_YVEL_OFFSET
     ld   a,[hl]
     cp   c
     ret  z
@@ -799,20 +745,14 @@ call_00_2879_Object_SnapXPosition:
 ; Compares the object's X position with the bounding box limits (XMin and XMax) and adjusts 
 ; the position if necessary, updating the velocity delta and position.
     call call_00_2857_Object_GetBoundingBoxXMin
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_XPOS_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_XPOS_OFFSET
     ldi  a,[hl]
     sub  e
     ldd  a,[hl]
     sbc  d
     jr   c,.jr_00_2639
     call call_00_2846_Object_GetBoundingBoxXMax
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_XPOS_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_XPOS_OFFSET
     ldi  a,[hl]
     sub  e
     ldd  a,[hl]
@@ -878,10 +818,7 @@ call_00_2645_Object_AdjustXAgainstBounds:
 call_00_2678_Object_AddOffsetToXPos:
 ; Helper: adds (c,b) offset to the object’s current X position.
 ; Used by the bounding adjustment routines.
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_XPOS_OFFSET
-    ld   l,a
-    ld   h, HIGH(wD800_ObjectMemory)
+    LOAD_OBJ_FIELD_TO_HL_ALT OBJECT_XPOS_OFFSET
     ldi  a,[hl]
     add  c
     ld   c,a
@@ -936,10 +873,7 @@ call_00_2687_Object_AdjustYAgainstBounds:
 call_00_26BA_Object_AddOffsetToYPos:
 ; Helper: adds (c,b) offset to the object’s current Y position.
 ; Parallel to 2678.
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_YPOS_OFFSET
-    ld   l,a
-    ld   h, HIGH(wD800_ObjectMemory)
+    LOAD_OBJ_FIELD_TO_HL_ALT OBJECT_YPOS_OFFSET
     ldi  a,[hl]
     add  c
     ld   c,a
@@ -953,10 +887,7 @@ call_00_26c9_Object_InfluencePlayerX:
 ; Compares against global state vars (wDC7B_CurrentObjectAddrLoAlt, wDC7D_PlayerCollisionUnkFlag).
 ; If conditions match, applies an adjustment to the player’s X position relative to the object (e.g. conveyor belts, pushers).
 ; Appears to handle environmental effects that “move the player.”
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_XVEL_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_XVEL_OFFSET
     ld   c,[hl]
     xor  a,$02
     ld   l,a
@@ -987,10 +918,7 @@ call_00_26F1_Player_UpdateXFromObject:
     ld   hl,wDC7D_PlayerCollisionUnkFlag
     cp   [hl]
     ret  nz
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_WIDTH_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_WIDTH_OFFSET
     ld   a,[wD80E_PlayerXPosition]
     sub  e
     ld   a,[wD80E_PlayerXPosition+1]
@@ -1082,10 +1010,7 @@ call_00_2766_Object_ResetYIfAboveStart:
 ; clears a related state flag.
 ; Used to “reset” vertical displacement (like platforms that return).
     call call_00_27f3_Object_GetInitialYPos                                  ;; 00:2766 $cd $f3 $27
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2769 $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:276b $fa $00 $da
-    or   A, OBJECT_YPOS_OFFSET                                        ;; 00:276e $f6 $10
-    ld   L, A                                          ;; 00:2770 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_YPOS_OFFSET
     ld   A, [HL+]                                      ;; 00:2771 $2a
     sub  A, E                                          ;; 00:2772 $93
     ld   A, [HL]                                       ;; 00:2773 $7e
@@ -1112,10 +1037,7 @@ call_00_2780_Object_CheckBelowMapViewport:
     add  hl,de
     ld   e,l
     ld   d,h
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_YPOS_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_YPOS_OFFSET
     ldi  a,[hl]
     sub  e
     ld   a,[hl]
@@ -1128,10 +1050,7 @@ call_00_2799_Object_UpdateYFromXDisplacement:
 ; Uses it as an offset to add to the object’s initial Y position, and updates the current Y accordingly.
 ; Looks like it enforces an arc/trajectory path (parabola-like).
     call call_00_2835_Object_GetInitialXPos
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_XPOS_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_XPOS_OFFSET
     ldi  a,[hl]
     sub  e
     ld   e,a
@@ -1152,10 +1071,7 @@ call_00_2799_Object_UpdateYFromXDisplacement:
     call call_00_27f3_Object_GetInitialYPos
     pop  hl
     add  hl,de
-    ld   d,HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_YPOS_OFFSET
-    ld   e,a
+    LOAD_OBJ_FIELD_TO_DE OBJECT_YPOS_OFFSET
     ld   a,l
     ld   [de],a
     inc  e
@@ -1167,10 +1083,7 @@ call_00_27cb_Object_PositionAboveViewport:
 ; Sets object’s Y position relative to the map scroll (YPositionInMap - 0x14).
 ; If underflows, clamps to zero.
 ; Likely spawns or aligns the object a bit above the current viewport.
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_YPOS_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_YPOS_OFFSET
     ld   a,[wDBFB_YPositionInMap]
     sub  a,$14
     ldi  [hl],a
@@ -1185,10 +1098,7 @@ call_00_27cb_Object_PositionAboveViewport:
 
 call_00_27e4_Object_ResetToInitialYPos:
     call call_00_27f3_Object_GetInitialYPos
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_YPOS_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_YPOS_OFFSET
     ld   a,e
     ldi  [hl],a
     ld   [hl],d
@@ -1238,10 +1148,7 @@ call_00_2815_Object_GetBoundingBoxYMax:
 call_00_2826_Object_ResetToInitialXPos:
 ; Gets object's initial x pos and stores it in the object’s $D8:xx0E slot (X position).
     call call_00_2835_Object_GetInitialXPos
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_XPOS_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_XPOS_OFFSET
     ld   a,e
     ldi  [hl],a
     ld   [hl],d
@@ -1322,101 +1229,65 @@ call_00_288c_Object_ClearCollisionType:
 ; object’s $D8:xx14 slot, likely a state/timer field.
     ld   C, $00                                        ;; 00:288a $0e $00
 call_00_288c_Object_SetCollisionType:
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:288c $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:288e $fa $00 $da
-    or   A, OBJECT_COLLISION_TYPE_OFFSET                                        ;; 00:2891 $f6 $14
-    ld   L, A                                          ;; 00:2893 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_COLLISION_TYPE_OFFSET
     ld   [HL], C                                       ;; 00:2894 $71
     ret                                                ;; 00:2895 $c9
 
 call_00_2896_Object_Set15:
 ; Writes C into the object’s $D8:xx15 slot—another per-object state byte.
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_UNK15_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_UNK15_OFFSET
     ld   [hl],c
     ret  
 
 call_00_28a0_Object_Get15:
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_UNK15_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_UNK15_OFFSET
     ld   a,[hl]
     ret  
 
 call_00_28aa_Object_Set16:
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:28aa $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:28ac $fa $00 $da
-    or   A, OBJECT_UNK16_OFFSET                                        ;; 00:28af $f6 $16
-    ld   L, A                                          ;; 00:28b1 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_UNK16_OFFSET
     ld   [HL], C                                       ;; 00:28b2 $71
     ret                                                ;; 00:28b3 $c9
 
 call_00_28b4_Object_Get16:
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_UNK16_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_UNK16_OFFSET
     ld   a,[hl]
     ret  
 
 call_00_28be_Object_GetXVelocity:
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:28be $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:28c0 $fa $00 $da
-    or   A, OBJECT_XVEL_OFFSET                                        ;; 00:28c3 $f6 $1b
-    ld   L, A                                          ;; 00:28c5 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_XVEL_OFFSET
     ld   A, [HL]                                       ;; 00:28c6 $7e
     ret                                                ;; 00:28c7 $c9
 
 call_00_28c8_Object_SetXVelocity:
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:28c8 $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:28ca $fa $00 $da
-    or   A, OBJECT_XVEL_OFFSET                                        ;; 00:28cd $f6 $1b
-    ld   L, A                                          ;; 00:28cf $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_XVEL_OFFSET
     ld   [HL], C                                       ;; 00:28d0 $71
     ret                                                ;; 00:28d1 $c9
 
 call_00_28d2_Object_GetYVelocity:
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:28d2 $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:28d4 $fa $00 $da
-    or   A, OBJECT_YVEL_OFFSET                                        ;; 00:28d7 $f6 $1d
-    ld   L, A                                          ;; 00:28d9 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_YVEL_OFFSET
     ld   A, [HL]                                       ;; 00:28da $7e
     ret                                                ;; 00:28db $c9
 
 call_00_28dc_Object_SetYVelocity:
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:28dc $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:28de $fa $00 $da
-    or   A, OBJECT_YVEL_OFFSET                                        ;; 00:28e1 $f6 $1d
-    ld   L, A                                          ;; 00:28e3 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_YVEL_OFFSET
     ld   [HL], C                                       ;; 00:28e4 $71
     ret                                                ;; 00:28e5 $c9
 
 call_00_28e6_Object_CheckIfXVelocityIsZero:
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_XVEL_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_XVEL_OFFSET
     ld   a,[hl]
     and  a
     ret  
 
 call_00_28f1_Object_CheckIfYVelocityIsZero:
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_YVEL_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_YVEL_OFFSET
     ld   a,[hl]
     and  a
     ret  
 
 call_00_28fc_Object_UpdateExtraFlags:
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_EXTRA_FLAGS_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_EXTRA_FLAGS_OFFSET
     ld   a,[hl]
     inc  [hl]
     and  a,$03
@@ -1426,27 +1297,18 @@ call_00_28fc_Object_UpdateExtraFlags:
     ld   c,[hl]
 
 call_00_290d_Object_SetTimer1A:
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:290d $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:290f $fa $00 $da
-    or   A, OBJECT_TIMER1A_OFFSET                                        ;; 00:2912 $f6 $1a
-    ld   L, A                                          ;; 00:2914 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_TIMER1A_OFFSET
     ld   [HL], C                                       ;; 00:2915 $71
     ret                                                ;; 00:2916 $c9
 
 call_00_2917_Object_CheckIfTimer1AIsZero:
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_TIMER1A_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_TIMER1A_OFFSET
     ld   a,[hl]
     and  a
     ret  
 
 call_00_2922_Object_Timer1ACountdown:
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2922 $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2924 $fa $00 $da
-    or   A, OBJECT_TIMER1A_OFFSET                                        ;; 00:2927 $f6 $1a
-    ld   L, A                                          ;; 00:2929 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_TIMER1A_OFFSET
     ld   A, [HL]                                       ;; 00:292a $7e
     and  A, A                                          ;; 00:292b $a7
     ret  Z                                             ;; 00:292c $c8
@@ -1455,100 +1317,64 @@ call_00_2922_Object_Timer1ACountdown:
     ret                                                ;; 00:292f $c9
 
 call_00_2930_Object_SetId:
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2930 $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2932 $fa $00 $da
-    or   A, OBJECT_ID_OFFSET                                        ;; 00:2935 $f6 $00
-    ld   L, A                                          ;; 00:2937 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_ID_OFFSET
     ld   [HL], C                                       ;; 00:2938 $71
     ret                                                ;; 00:2939 $c9
 
 call_00_293a_Object_GetId:
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_ID_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_ID_OFFSET
     ld   a,[hl]
     ret  
 
 call_00_2944_Object_SetWidth:
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2944 $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2946 $fa $00 $da
-    or   A, OBJECT_WIDTH_OFFSET                                        ;; 00:2949 $f6 $12
-    ld   L, A                                          ;; 00:294b $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_WIDTH_OFFSET
     ld   [HL], C                                       ;; 00:294c $71
     ret                                                ;; 00:294d $c9
 
 call_00_294e_Object_SetHeight:
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:294e $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2950 $fa $00 $da
-    or   A, OBJECT_HEIGHT_OFFSET                                        ;; 00:2953 $f6 $13
-    ld   L, A                                          ;; 00:2955 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_HEIGHT_OFFSET
     ld   [HL], C                                       ;; 00:2956 $71
     ret                                                ;; 00:2957 $c9
 
 call_00_2958_Object_SetFacingDirection:
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2958 $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:295a $fa $00 $da
-    or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 00:295d $f6 $0d
-    ld   L, A                                          ;; 00:295f $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_FACINGDIRECTION_OFFSET
     ld   [HL], C                                       ;; 00:2960 $71
     ret                                                ;; 00:2961 $c9
 
 call_00_2962_Object_GetActionId:
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2962 $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2964 $fa $00 $da
-    or   A, OBJECT_ACTIONID_OFFSET                                        ;; 00:2967 $f6 $01
-    ld   L, A                                          ;; 00:2969 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_ACTIONID_OFFSET
     ld   A, [HL]                                       ;; 00:296a $7e
     ret                                                ;; 00:296b $c9
 
 call_00_296c_Object_GetSpriteCounter:
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_SPRITE_COUNTER_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_SPRITE_COUNTER_OFFSET
     ld   a,[hl]
     ret  
 
 call_00_2976_Object_GetFacingDirection:
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2976 $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2978 $fa $00 $da
-    or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 00:297b $f6 $0d
-    ld   L, A                                          ;; 00:297d $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_FACINGDIRECTION_OFFSET
     ld   A, [HL]                                       ;; 00:297e $7e
     ret                                                ;; 00:297f $c9
 
 call_00_2980_Object_SetExtraFlags:
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2980 $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2982 $fa $00 $da
-    or   A, OBJECT_EXTRA_FLAGS_OFFSET                                        ;; 00:2985 $f6 $19
-    ld   L, A                                          ;; 00:2987 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_EXTRA_FLAGS_OFFSET
     ld   [HL], C                                       ;; 00:2988 $71
     ret                                                ;; 00:2989 $c9
 
 call_00_298a_Object_GetExtraFlags:
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:298a $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:298c $fa $00 $da
-    or   A, OBJECT_EXTRA_FLAGS_OFFSET                                        ;; 00:298f $f6 $19
-    ld   L, A                                          ;; 00:2991 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_EXTRA_FLAGS_OFFSET
     ld   A, [HL]                                       ;; 00:2992 $7e
     and  A, A                                          ;; 00:2993 $a7
     ret                                                ;; 00:2994 $c9
 
 call_00_2995_Object_GetActionId:
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_ACTIONID_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_ACTIONID_OFFSET
     ld   a,[hl]
     ret  
 
 call_00_299f_Object_TurnAround:
 ; flips facing direction from $00 to $20 or $20 to $00
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:299f $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:29a1 $fa $00 $da
-    or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 00:29a4 $f6 $0d
-    ld   L, A                                          ;; 00:29a6 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_FACINGDIRECTION_OFFSET
     ld   A, [HL]                                       ;; 00:29a7 $7e
     xor  A, OBJECT_FACING_LEFT                                        ;; 00:29a8 $ee $20
     ld   [HL], A                                       ;; 00:29aa $77
@@ -1612,19 +1438,13 @@ call_00_29ce_CheckObject_C_Exists:
 call_00_29df_Object_SetActiveFlag:
 ; Computes HL = $D80D + current object index.
 ; Sets bit 7 of [HL] (marking object as “active,” “visible,” or “flagged”).
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_FACINGDIRECTION_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_FACINGDIRECTION_OFFSET
     set  7,[hl]
     ret  
 
 call_00_29ea_Object_ClearActiveFlag:
 ; Same indexing, but clears bit 7 instead of setting it.
-    ld   h, HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_FACINGDIRECTION_OFFSET
-    ld   l,a
+    LOAD_OBJ_FIELD_TO_HL OBJECT_FACINGDIRECTION_OFFSET
     res  7,[hl]
     ret  
 
@@ -1632,10 +1452,7 @@ call_00_29f5_Object_ClearActiveFlagAndCheck:
 ; Gets object entry byte at $D805+index.
 ; Clears bit 4 in memory.
 ; Returns with carry based on the old bit 4 state (bit 4,A).
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:29f5 $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:29f7 $fa $00 $da
-    or   A, OBJECT_SPRITE_FLAGS_OFFSET                                        ;; 00:29fa $f6 $05
-    ld   L, A                                          ;; 00:29fc $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_SPRITE_FLAGS_OFFSET
     ld   A, [HL]                                       ;; 00:29fd $7e
     res  4, [HL]                                       ;; 00:29fe $cb $a6
     bit  4, A                                          ;; 00:2a00 $cb $67
@@ -1721,10 +1538,7 @@ call_00_2a5d_Object_Check5Flag2:
 ; Computes HL = D805 + current object index.
 ; Tests bit 2 of the object’s flags.
 ; Purpose: Checks a particular state flag (likely “grounded,” “active,” or similar).
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2a5d $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2a5f $fa $00 $da
-    or   A, OBJECT_SPRITE_FLAGS_OFFSET                                        ;; 00:2a62 $f6 $05
-    ld   L, A                                          ;; 00:2a64 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_SPRITE_FLAGS_OFFSET
     bit  2, [HL]                                       ;; 00:2a65 $cb $56
     ret                                                ;; 00:2a67 $c9
 
@@ -1735,10 +1549,7 @@ call_00_2a68_Object_ComputePlayerXProximity:
 ; and direction in wDA12_ObjectDirectionRelativeToPlayer, and returns.
 ; Purpose: Prepares relative X-direction info for later checks.
     ld   C, OBJECT_LEFT_OF_GEX                                        ;; 00:2a68 $0e $00
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2a6a $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2a6c $fa $00 $da
-    or   A, OBJECT_XPOS_OFFSET                                        ;; 00:2a6f $f6 $0e
-    ld   L, A                                          ;; 00:2a71 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_XPOS_OFFSET
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2a72 $fa $0e $d8
     sub  A, [HL]                                       ;; 00:2a75 $96
     ld   E, A                                          ;; 00:2a76 $5f
@@ -1771,7 +1582,7 @@ call_00_2a98_HandlePlayerObjectInteraction:
 ; Resolves an object list index, computes a pointer to an object’s bounding box/metadata in memory.
 ; Compares the player’s X/Y positions against that object’s bounding box (series of sub/sbc, add, cp checks).
 ; If inside bounds, copies several bytes from the object’s data into the current object’s D8xx structure and 
-; triggers a banked function (call_02_72ac_SetupNewAction)
+; triggers a banked function (call_02_72ac_SetObjectAction)
 ; Purpose: Detects when the player collides with or interacts with a special object and dispatches a handler.
     push de
     call call_00_230f_ResolveObjectListIndex
@@ -1825,10 +1636,7 @@ call_00_2a98_HandlePlayerObjectInteraction:
     ld   a,e
     cp   d
     ret  nc
-    ld   d,HIGH(wD800_ObjectMemory)
-    ld   a,[wDA00_CurrentObjectAddrLo]
-    or   a,OBJECT_TIMER1A_OFFSET
-    ld   e,a
+    LOAD_OBJ_FIELD_TO_DE OBJECT_TIMER1A_OFFSET
     ldi  a,[hl]
     ld   [de],a
     inc  de
@@ -1844,7 +1652,7 @@ call_00_2a98_HandlePlayerObjectInteraction:
     xor  a
     ld   [de],a
     ld   a,[hl]
-    farcall call_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetObjectAction
     ret  
 
 call_00_2afc_FindFreeObjectSlot:
@@ -1934,10 +1742,7 @@ call_00_2b5d_DeactivateObjectSlot:
 ; Marks the current object slot as inactive by writing $FF to wD8xx. Then computes a related index 
 ; from the slot address to access another table (wDA01_ObjectListIndexesForCurrentObjects → wD7xx) and clears bit 6 of its status 
 ; byte—likely removing an “active” or “visible” flag for that object.
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2b5d $fa $00 $da
-    or   A, OBJECT_ID_OFFSET                                        ;; 00:2b60 $f6 $00
-    ld   L, A                                          ;; 00:2b62 $6f
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2b63 $26 $d8
+    LOAD_OBJ_FIELD_TO_HL_ALT OBJECT_ID_OFFSET
     ld   [HL], $ff                                     ;; 00:2b65 $36 $ff
     ld   A, L                                          ;; 00:2b67 $7d
     rlca                                               ;; 00:2b68 $07
@@ -1953,32 +1758,29 @@ call_00_2b5d_DeactivateObjectSlot:
     res  6, [HL]                                       ;; 00:2b77 $cb $b6
     ret                                                ;; 00:2b79 $c9
 
-call_00_2b7a_ClearObjectThenJump:
-; Calls call_00_2b80_ClearObjectMemoryEntry (sets slot to $FF), then jumps to call_00_2b94_ZeroObjectStatusEntry (zeroes a related entry in wD7xx). 
+call_00_2b7a_ClearObject:
+; Calls call_00_2b80_ClearObjectMemoryEntry (sets slot to $FF), then jumps to call_00_2b94_ClearObjectStatus (zeroes a related entry in wD7xx). 
 ; Used as a branch to fully clear an object before continuing.
     call call_00_2b80_ClearObjectMemoryEntry                                  ;; 00:2b7a $cd $80 $2b
-    jp   call_00_2b94_ZeroObjectStatusEntry                                    ;; 00:2b7d $c3 $94 $2b
+    jp   call_00_2b94_ClearObjectStatus                                    ;; 00:2b7d $c3 $94 $2b
 
 call_00_2b80_ClearObjectMemoryEntry:
 ; Writes $FF to the current object’s wD8xx slot. This is a lightweight variant 
 ; of call_00_2b5d without touching flags.
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:2b80 $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2b82 $fa $00 $da
-    or   A, OBJECT_ID_OFFSET                                        ;; 00:2b85 $f6 $00
-    ld   L, A                                          ;; 00:2b87 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_ID_OFFSET
     ld   [HL], $ff                                     ;; 00:2b88 $36 $ff
     ret                                                ;; 00:2b8a $c9
 
 call_00_2b8b_HandleObjectFlag6ClearOrInit:
 ; Calls call_00_35e8_GetObjectTypeIndex (likely reads or updates object state), tests bit 6 of A. If clear, 
-; jumps to call_00_2b94_ZeroObjectStatusEntry (zero related data). If set, jumps to call_00_2ba9_SetObjectStatusTo50 to initialize a 
+; jumps to call_00_2b94_ClearObjectStatus (zero related data). If set, jumps to call_00_2ba9_SetObjectStatusTo50 to initialize a 
 ; status value. Used to decide whether to zero or set $50.
     call call_00_35e8_GetObjectTypeIndex                                  ;; 00:2b8b $cd $e8 $35
     bit  6, A                                          ;; 00:2b8e $cb $77
-    jr   Z, call_00_2b94_ZeroObjectStatusEntry                                 ;; 00:2b90 $28 $02
+    jr   Z, call_00_2b94_ClearObjectStatus                                 ;; 00:2b90 $28 $02
     jr   call_00_2ba9_SetObjectStatusTo50                                  ;; 00:2b92 $18 $15
 
-call_00_2b94_ZeroObjectStatusEntry:
+call_00_2b94_ClearObjectStatus:
 ; Computes an index from the object address and writes $00 to a corresponding wD7xx status 
 ; byte—used to mark an object as inactive or reset its state.
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2b94 $fa $00 $da
@@ -1996,7 +1798,7 @@ call_00_2b94_ZeroObjectStatusEntry:
     ret                                                ;; 00:2ba8 $c9
 
 call_00_2ba9_SetObjectStatusTo50:
-; Like call_00_2b94_ZeroObjectStatusEntry, but writes $50 instead of $00. 
+; Like call_00_2b94_ClearObjectStatus, but writes $50 instead of $00. 
 ; Likely initializes or flags an object as partially active.
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:2ba9 $fa $00 $da
     rlca                                               ;; 00:2bac $07
@@ -2017,14 +1819,14 @@ call_00_2bbe_SpawnCollectibleObject:
 ; Validates current object value via call_00_35e8_GetObjectTypeIndex.
 ; If not $FF and bit 6 is set, sets up multiple object parameters 
 ; (ObjectSetId, Object_Set14, palette, facing direction, etc.).
-; Updates its status to $50, resets return bank, calls an alternate bank function (call_02_72ac_SetupNewAction), 
+; Updates its status to $50, resets return bank, calls an alternate bank function (call_02_72ac_SetObjectAction), 
 ; and copies a palette (call_00_2c20_Object_CopyPaletteToBuffer).
 ; This is the main “spawn/setup object” function.
     call call_00_35e8_GetObjectTypeIndex                                  ;; 00:2bbe $cd $e8 $35
     cp   A, $ff                                        ;; 00:2bc1 $fe $ff
-    jr   Z, call_00_2b7a_ClearObjectThenJump                                 ;; 00:2bc3 $28 $b5
+    jr   Z, call_00_2b7a_ClearObject                                 ;; 00:2bc3 $28 $b5
     bit  6, A                                          ;; 00:2bc5 $cb $77
-    jr   Z, call_00_2b7a_ClearObjectThenJump                                 ;; 00:2bc7 $28 $b1
+    jr   Z, call_00_2b7a_ClearObject                                 ;; 00:2bc7 $28 $b1
     ld   C, OBJECT_FLY_COIN_SPAWN                                        ;; 00:2bc9 $0e $02
     call call_00_2930_Object_SetId                                  ;; 00:2bcb $cd $30 $29
     ld   C, COLLISION_TYPE_FLY_COIN                                        ;; 00:2bce $0e $08
@@ -2041,7 +1843,7 @@ call_00_2bbe_SpawnCollectibleObject:
     call call_00_2299_SetObjectStatusLowNibble                                  ;; 00:2be9 $cd $99 $22
     call call_00_2ba9_SetObjectStatusTo50                                  ;; 00:2bec $cd $a9 $2b
     xor  A, A                                          ;; 00:2bef $af
-    farcall call_02_72ac_SetupNewAction
+    farcall call_02_72ac_SetObjectAction
     ld   HL, .data_02_2c01                                     ;; 00:2bfb $21 $01 $2c
     jp   call_00_2c20_Object_CopyPaletteToBuffer                                  ;; 00:2bfe $c3 $20 $2c
 .data_02_2c01:

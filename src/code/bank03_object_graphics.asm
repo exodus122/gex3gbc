@@ -248,10 +248,10 @@ call_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
 ; Calls IsObjectRenderableFlag and, if set, runs ObjectSpriteSetup.
 ; Builds Gex’s own sprite draw list when required.
 ; Clears unused sprite slots, sets up collectibles, and updates collision for all objects.
-; Sorts or reorders objects (wDC44 sorting loop) for sprite priority.
+; Sorts or reorders objects (wDC44_UnkGraphicsBuffer sorting loop) for sprite priority.
 ; This is the game’s primary per-frame object graphics pipeline.
     ld   A, $08                                        ;; 03:5ec1 $3e $08
-    ld   [wDC6F], A                                    ;; 03:5ec3 $ea $6f $dc
+    ld   [wDC6F_ObjectSpriteRelated], A                                    ;; 03:5ec3 $ea $6f $dc
     ld   A, [wDC1F]                                    ;; 03:5ec6 $fa $1f $dc
     cp   A, $01                                        ;; 03:5ec9 $fe $01
     jr   NZ, .jr_03_5ed8                               ;; 03:5ecb $20 $0b
@@ -311,7 +311,7 @@ call_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     jr   NZ, .jr_03_5f1f                               ;; 03:5f32 $20 $eb
     ret                                                ;; 03:5f34 $c9
 .jr_03_5f35:
-    ld   HL, wDC44                                     ;; 03:5f35 $21 $44 $dc
+    ld   HL, wDC44_UnkGraphicsBuffer                                     ;; 03:5f35 $21 $44 $dc
     ld   D, HIGH(wD800_ObjectMemory)                                        ;; 03:5f38 $16 $d8
     ld   B, $00                                        ;; 03:5f3a $06 $00
     ld   A, $00                                        ;; 03:5f3c $3e $00
@@ -331,15 +331,15 @@ call_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     add  A, $20                                        ;; 03:5f4e $c6 $20
     jr   NZ, .jr_03_5f3e                               ;; 03:5f50 $20 $ec
     ld   A, B                                          ;; 03:5f52 $78
-    ld   [wDC4D], A                                    ;; 03:5f53 $ea $4d $dc
+    ld   [wDC4D_UnkGraphicsCounter], A                                    ;; 03:5f53 $ea $4d $dc
     dec  B                                             ;; 03:5f56 $05
     jr   Z, .jr_03_5f90                                ;; 03:5f57 $28 $37
     bit  7, B                                          ;; 03:5f59 $cb $78
     jr   NZ, .jr_03_5f90                               ;; 03:5f5b $20 $33
 .jr_03_5f5d:
     xor  A, A                                          ;; 03:5f5d $af
-    ld   [wDC4C], A                                    ;; 03:5f5e $ea $4c $dc
-    ld   HL, wDC44                                     ;; 03:5f61 $21 $44 $dc
+    ld   [wDC4C_UnkGraphicsFlags], A                                    ;; 03:5f5e $ea $4c $dc
+    ld   HL, wDC44_UnkGraphicsBuffer                                     ;; 03:5f61 $21 $44 $dc
     ld   D, HIGH(wD800_ObjectMemory)                                        ;; 03:5f64 $16 $d8
     push BC                                            ;; 03:5f66 $c5
 .jr_03_5f67:
@@ -365,23 +365,23 @@ call_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     ld   [HL-], A                                      ;; 03:5f7d $32
     ld   [HL], E                                       ;; 03:5f7e $73
     ld   A, $01                                        ;; 03:5f7f $3e $01
-    ld   [wDC4C], A                                    ;; 03:5f81 $ea $4c $dc
+    ld   [wDC4C_UnkGraphicsFlags], A                                    ;; 03:5f81 $ea $4c $dc
 .jr_03_5f84:
     pop  HL                                            ;; 03:5f84 $e1
     inc  HL                                            ;; 03:5f85 $23
     dec  B                                             ;; 03:5f86 $05
     jr   NZ, .jr_03_5f67                               ;; 03:5f87 $20 $de
     pop  BC                                            ;; 03:5f89 $c1
-    ld   A, [wDC4C]                                    ;; 03:5f8a $fa $4c $dc
+    ld   A, [wDC4C_UnkGraphicsFlags]                                    ;; 03:5f8a $fa $4c $dc
     and  A, A                                          ;; 03:5f8d $a7
     jr   NZ, .jr_03_5f5d                               ;; 03:5f8e $20 $cd
 .jr_03_5f90:
-    ld   HL, wDC4D                                     ;; 03:5f90 $21 $4d $dc
+    ld   HL, wDC4D_UnkGraphicsCounter                                     ;; 03:5f90 $21 $4d $dc
     ld   B, [HL]                                       ;; 03:5f93 $46
     inc  B                                             ;; 03:5f94 $04
     dec  B                                             ;; 03:5f95 $05
     jp   Z, .jp_03_5f17                                ;; 03:5f96 $ca $17 $5f
-    ld   HL, wDC44                                     ;; 03:5f99 $21 $44 $dc
+    ld   HL, wDC44_UnkGraphicsBuffer                                     ;; 03:5f99 $21 $44 $dc
 .jr_03_5f9c:
     push BC                                            ;; 03:5f9c $c5
     push HL                                            ;; 03:5f9d $e5
@@ -416,7 +416,7 @@ call_03_5fc2_SetupObjectSprite:
 ; Computes screen-relative X/Y distances vs. the camera (wDBF9, wDBFB).
 ; Checks if it’s within the visible window; deactivates it if far outside.
 ; Handles bounding-box collision tests.
-; Prepares OAM (sprite) entries: calculates tile indices, attributes, flips, and writes to the sprite buffer (wDC6F pointer).
+; Prepares OAM (sprite) entries: calculates tile indices, attributes, flips, and writes to the sprite buffer (wDC6F_ObjectSpriteRelated pointer).
 ; Has a branch for special particle effects (call_03_60e6_SetupParticleSprite).
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5fc2 $fa $00 $da
     rlca                                               ;; 03:5fc5 $07
@@ -428,17 +428,11 @@ call_03_5fc2_SetupObjectSprite:
     ld   DE, wDAAE_ObjectPaletteIds                                     ;; 03:5fcd $11 $ae $da
     add  HL, DE                                        ;; 03:5fd0 $19
     ld   E, [HL]                                       ;; 03:5fd1 $5e
-    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:5fd2 $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5fd4 $fa $00 $da
-    or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 03:5fd7 $f6 $0d
-    ld   L, A                                          ;; 03:5fd9 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_FACINGDIRECTION_OFFSET                                        ;; 03:5fd9 $6f
     ld   A, [HL]                                       ;; 03:5fda $7e
     or   A, E                                          ;; 03:5fdb $b3
     ld   [wDAB6_SpriteFlags], A                                    ;; 03:5fdc $ea $b6 $da
-    ld   D, HIGH(wD800_ObjectMemory)                                        ;; 03:5fdf $16 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5fe1 $fa $00 $da
-    or   A, OBJECT_XPOS_OFFSET                                        ;; 03:5fe4 $f6 $0e
-    ld   E, A                                          ;; 03:5fe6 $5f
+    LOAD_OBJ_FIELD_TO_DE OBJECT_XPOS_OFFSET
     ld   HL, wDBF9_XPositionInMap                                     ;; 03:5fe7 $21 $f9 $db
     ld   A, [DE]                                       ;; 03:5fea $1a
     sub  A, [HL]                                       ;; 03:5feb $96
@@ -498,10 +492,7 @@ call_03_5fc2_SetupObjectSprite:
     call C, call_00_2b5d_DeactivateObjectSlot                               ;; 03:603a $dc $5d $2b
     ret                                                ;; 03:603d $c9
 .jr_03_603e:
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:603e $fa $00 $da
-    or   A, OBJECT_UNK15_OFFSET                                        ;; 03:6041 $f6 $15
-    ld   L, A                                          ;; 03:6043 $6f
-    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:6044 $26 $d8
+    LOAD_OBJ_FIELD_TO_HL_ALT OBJECT_UNK15_OFFSET
     ld   A, [HL]                                       ;; 03:6046 $7e
     and  A, A                                          ;; 03:6047 $a7
     jr   Z, .jr_03_6050                                ;; 03:6048 $28 $06
@@ -541,11 +532,8 @@ call_03_5fc2_SetupObjectSprite:
     rrca                                               ;; 03:6080 $0f
     and  A, $70                                        ;; 03:6081 $e6 $70
 .jr_03_6083:
-    ld   [wDC70], A                                    ;; 03:6083 $ea $70 $dc
-    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:6086 $26 $d8
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:6088 $fa $00 $da
-    or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 03:608b $f6 $0d
-    ld   L, A                                          ;; 03:608d $6f
+    ld   [wDC70_ObjectSpriteRelated2], A                                    ;; 03:6083 $ea $70 $dc
+    LOAD_OBJ_FIELD_TO_HL OBJECT_FACINGDIRECTION_OFFSET
     ld   A, [HL]                                       ;; 03:608e $7e
     swap A                                             ;; 03:608f $cb $37
     rrca                                               ;; 03:6091 $0f
@@ -574,7 +562,7 @@ call_03_5fc2_SetupObjectSprite:
 .jr_03_60b4:
     ld   DE, data_03_59ea_SpriteData                              ;; 03:60b4 $11 $ea $59
     call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 03:60b7 $cd $77 $07
-    ld   A, [wDC6F]                                    ;; 03:60ba $fa $6f $dc
+    ld   A, [wDC6F_ObjectSpriteRelated]                                    ;; 03:60ba $fa $6f $dc
     ld   E, A                                          ;; 03:60bd $5f
     ld   D, $d9                                        ;; 03:60be $16 $d9
     ld   A, [HL+]                                      ;; 03:60c0 $2a
@@ -591,7 +579,7 @@ call_03_5fc2_SetupObjectSprite:
     add  A, C                                          ;; 03:60cc $81
     ld   [DE], A                                       ;; 03:60cd $12
     inc  E                                             ;; 03:60ce $1c
-    ld   A, [wDC70]                                    ;; 03:60cf $fa $70 $dc
+    ld   A, [wDC70_ObjectSpriteRelated2]                                    ;; 03:60cf $fa $70 $dc
     add  A, [HL]                                       ;; 03:60d2 $86
     ld   [DE], A                                       ;; 03:60d3 $12
     inc  HL                                            ;; 03:60d4 $23
@@ -606,7 +594,7 @@ call_03_5fc2_SetupObjectSprite:
     dec  A                                             ;; 03:60de $3d
     jr   NZ, .jr_03_60c1                               ;; 03:60df $20 $e0
     ld   A, E                                          ;; 03:60e1 $7b
-    ld   [wDC6F], A                                    ;; 03:60e2 $ea $6f $dc
+    ld   [wDC6F_ObjectSpriteRelated], A                                    ;; 03:60e2 $ea $6f $dc
     ret                                                ;; 03:60e5 $c9
 
 call_03_60e6_SetupParticleSprite:
@@ -638,7 +626,7 @@ call_03_60e6_SetupParticleSprite:
     ld   A, [wDAB6_SpriteFlags]                                    ;; 03:6105 $fa $b6 $da
     or   A, $08                                        ;; 03:6108 $f6 $08
     ld   [wDAB6_SpriteFlags], A                                    ;; 03:610a $ea $b6 $da
-    ld   A, [wDC6F]                                    ;; 03:610d $fa $6f $dc
+    ld   A, [wDC6F_ObjectSpriteRelated]                                    ;; 03:610d $fa $6f $dc
     ld   E, A                                          ;; 03:6110 $5f
     ld   D, $d9                                        ;; 03:6111 $16 $d9
     ld   A, $03                                        ;; 03:6113 $3e $03
@@ -674,18 +662,18 @@ call_03_60e6_SetupParticleSprite:
     dec  A                                             ;; 03:6138 $3d
     jr   NZ, .jr_03_6115                               ;; 03:6139 $20 $da
     ld   A, E                                          ;; 03:613b $7b
-    ld   [wDC6F], A                                    ;; 03:613c $ea $6f $dc
+    ld   [wDC6F_ObjectSpriteRelated], A                                    ;; 03:613c $ea $6f $dc
     ret                                                ;; 03:613f $c9
 .data_03_6140:
     db   $34, $36, $38, $3a, $3a, $3a, $3a, $3a        ;; 03:6140 ........
 
 call_03_6148_ClearUnusedSpriteSlots:
-; Purpose: Iterates through sprite attribute table memory, starting at wDC6F/$D900, 
+; Purpose: Iterates through sprite attribute table memory, starting at wDC6F_ObjectSpriteRelated/$D900, 
 ; and fills unused slots with zero until a boundary ($9F) is reached. This clears out 
 ; leftover OAM/sprite data to prevent rendering glitches.
 ; Summary: Clears inactive sprite slots in VRAM.
     ld   A, $9f                                        ;; 03:6148 $3e $9f
-    ld   HL, wDC6F                                     ;; 03:614a $21 $6f $dc
+    ld   HL, wDC6F_ObjectSpriteRelated                                     ;; 03:614a $21 $6f $dc
     ld   L, [HL]                                       ;; 03:614d $6e
     cp   A, L                                          ;; 03:614e $bd
     ret  C                                             ;; 03:614f $d8
@@ -790,9 +778,9 @@ call_03_61db_LoadCollectibleSprite:
 ; Purpose:
 ; Inserts a collectible’s sprite data (two 8×8 tiles forming the collectible graphic) into OAM memory.
 ; Adjusts X/Y coordinates slightly (−8 offset) for correct placement.
-; Updates wDC6F pointer to the next available sprite slot.
+; Updates wDC6F_ObjectSpriteRelated pointer to the next available sprite slot.
 ; Summary: Writes a collectible sprite’s graphics and position into the sprite buffer.
-    ld   A, [wDC6F]                                    ;; 03:61db $fa $6f $dc
+    ld   A, [wDC6F_ObjectSpriteRelated]                                    ;; 03:61db $fa $6f $dc
     cp   A, $9c                                        ;; 03:61de $fe $9c
     ret  NC                                            ;; 03:61e0 $d0
     ld   L, A                                          ;; 03:61e1 $6f
@@ -817,6 +805,6 @@ call_03_61db_LoadCollectibleSprite:
     ld   A, $08                                        ;; 03:61fb $3e $08
     ld   [HL+], A                                      ;; 03:61fd $22
     ld   A, L                                          ;; 03:61fe $7d
-    ld   [wDC6F], A                                    ;; 03:61ff $ea $6f $dc
+    ld   [wDC6F_ObjectSpriteRelated], A                                    ;; 03:61ff $ea $6f $dc
     ret                                                ;; 03:6202 $c9
     

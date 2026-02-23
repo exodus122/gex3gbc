@@ -131,18 +131,18 @@ call_03_74f5_DrawTwoDigitNumber:
     ret                                                ;; 03:753d $c9
 
 call_03_753e_AnimatedBackground_HDMA:
-; If bit 4 of wDB69 is set, advances frame counters (wDC72/wDC73) and uses HDMA to copy a 
+; If bit 4 of wDB69 is set, advances frame counters (wDC72_FrameCounter2/wDC73_FrameCounter3) and uses HDMA to copy a 
 ; tile graphic from image_003_4400 into VRAM bank 1. Provides a cycling background or HUD animation.
     ld   HL, wDB69                                     ;; 03:753e $21 $69 $db
     bit  4, [HL]                                       ;; 03:7541 $cb $66
     ret  Z                                             ;; 03:7543 $c8
-    ld   HL, wDC72                                     ;; 03:7544 $21 $72 $dc
+    ld   HL, wDC72_FrameCounter2                                     ;; 03:7544 $21 $72 $dc
     inc  [HL]                                          ;; 03:7547 $34
     ld   A, [HL]                                       ;; 03:7548 $7e
     sub  A, $08                                        ;; 03:7549 $d6 $08
     ret  NZ                                            ;; 03:754b $c0
     ld   [HL], A                                       ;; 03:754c $77
-    ld   HL, wDC73                                     ;; 03:754d $21 $73 $dc
+    ld   HL, wDC73_FrameCounter3                                     ;; 03:754d $21 $73 $dc
     inc  [HL]                                          ;; 03:7550 $34
     ld   A, [HL]                                       ;; 03:7551 $7e
     sub  A, $06                                        ;; 03:7552 $d6 $06

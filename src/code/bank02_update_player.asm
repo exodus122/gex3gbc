@@ -307,7 +307,7 @@ call_02_4f32_PlayerUpdateMain:
     ld   A, [HL]                                       ;; 02:4fd4 $7e
     ld   [HL], $ff                                     ;; 02:4fd5 $36 $ff
     cp   A, $ff                                        ;; 02:4fd7 $fe $ff
-    call NZ, call_02_72ac_SetupNewAction                              ;; 02:4fd9 $c4 $ac $72
+    call NZ, call_02_72ac_SetObjectAction                              ;; 02:4fd9 $c4 $ac $72
     ld   HL, wD802_Player_ActionFunc                                     ;; 02:4fdc $21 $02 $d8
     ld   A, [HL+]                                      ;; 02:4fdf $2a
     ld   H, [HL]                                       ;; 02:4fe0 $66
@@ -386,7 +386,7 @@ call_02_503d_Player_ApplyYDelta:
 
 call_02_5047_CachePlayerTileCoords:
 ; Shifts the player’s X and Y positions right by 4 (div 16) to convert from subpixel 
-; to tile coordinates, then stores them in wDC54–wDC56.
+; to tile coordinates, then stores them in wDC54_CachedTileXCoord–wDC56_CachedTileYCoord.
 ; Purpose: Cache tilemap indices for collision lookups.
     ld   HL, wD80E_PlayerXPosition                                     ;; 02:5047 $21 $0e $d8
     ld   A, [HL+]                                      ;; 02:504a $2a
@@ -401,7 +401,7 @@ call_02_5047_CachePlayerTileCoords:
     srl  D                                             ;; 02:5059 $cb $3a
     rr   E                                             ;; 02:505b $cb $1b
     ld   A, E                                          ;; 02:505d $7b
-    ld   HL, wDC54                                     ;; 02:505e $21 $54 $dc
+    ld   HL, wDC54_CachedTileXCoord                                     ;; 02:505e $21 $54 $dc
     ld   A, E                                          ;; 02:5061 $7b
     ld   [HL+], A                                      ;; 02:5062 $22
     ld   [HL], D                                       ;; 02:5063 $72
@@ -417,7 +417,7 @@ call_02_5047_CachePlayerTileCoords:
     rr   E                                             ;; 02:5074 $cb $1b
     srl  D                                             ;; 02:5076 $cb $3a
     rr   E                                             ;; 02:5078 $cb $1b
-    ld   HL, wDC56                                     ;; 02:507a $21 $56 $dc
+    ld   HL, wDC56_CachedTileYCoord                                     ;; 02:507a $21 $56 $dc
     ld   A, E                                          ;; 02:507d $7b
     ld   [HL+], A                                      ;; 02:507e $22
     ld   [HL], D                                       ;; 02:507f $72

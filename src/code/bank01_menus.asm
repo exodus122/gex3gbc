@@ -20,7 +20,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
 ; - Background setup:
 ;   - Calls call_03_6c89_CopyLevelData (or similar) to copy map data so the menu’s background appears.
 ;   - Loads background and object palettes for the menu screen.
-;   - Resets the OAM pointer (wDC6F) and clears unused sprite slots.
+;   - Resets the OAM pointer (wDC6F_ObjectSpriteRelated) and clears unused sprite slots.
 ;
 ; 2. Main Menu Loop
 ; - This loop runs each frame while the menu is active:
@@ -486,8 +486,8 @@ call_01_432b_SetLevelMenuAndPalette:
 ; Behavior:
 ; Checks wDB6C_CurrentMapId. If zero, returns. Otherwise requests song bank 04 and plays it, 
 ; compares level ID to $07, and:
-; For ≥ $07: sets wDC59=1, loads menu $05, and stores a value into wDC5A.
-; For < $07: sets wDC59=3, loads menu $07, and stores the same palette value.
+; For ≥ $07: sets wDC59_NumRemotesOnMissionSelectMenu=1, loads menu $05, and stores a value into wDC5A_MissionNumberSelected.
+; For < $07: sets wDC59_NumRemotesOnMissionSelectMenu=3, loads menu $07, and stores the same palette value.
 ; Likely Purpose: Chooses which menu/palette to display depending on current level group.
     ld   A, [wDB6C_CurrentMapId]                                    ;; 01:432b $fa $6c $db
     and  A, A                                          ;; 01:432e $a7
@@ -498,26 +498,26 @@ call_01_432b_SetLevelMenuAndPalette:
     cp   A, $07                                        ;; 01:4338 $fe $07
     jr   C, .jr_01_434d                                ;; 01:433a $38 $11
     ld   A, $01                                        ;; 01:433c $3e $01
-    ld   [wDC59], A                                    ;; 01:433e $ea $59 $dc
+    ld   [wDC59_NumRemotesOnMissionSelectMenu], A                                    ;; 01:433e $ea $59 $dc
     ld   A, MENU_MISSION_SELECT_1_REMOTE                                        ;; 01:4341 $3e $05
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4343 $cd $00 $40
     ld   A, [wDBEC_MenuRowSelected]                                    ;; 01:4346 $fa $ec $db
-    ld   [wDC5A], A                                    ;; 01:4349 $ea $5a $dc
+    ld   [wDC5A_MissionNumberSelected], A                                    ;; 01:4349 $ea $5a $dc
     ret                                                ;; 01:434c $c9
 .jr_01_434d:
     ld   A, $03                                        ;; 01:434d $3e $03
-    ld   [wDC59], A                                    ;; 01:434f $ea $59 $dc
+    ld   [wDC59_NumRemotesOnMissionSelectMenu], A                                    ;; 01:434f $ea $59 $dc
     ld   A, MENU_MISSION_SELECT_3_REMOTES                                        ;; 01:4352 $3e $07
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4354 $cd $00 $40
     ld   A, [wDBEC_MenuRowSelected]                                    ;; 01:4357 $fa $ec $db
-    ld   [wDC5A], A                                    ;; 01:435a $ea $5a $dc
+    ld   [wDC5A_MissionNumberSelected], A                                    ;; 01:435a $ea $5a $dc
     ret                                                ;; 01:435d $c9
 
 call_01_435e_HandleLevelTransitionMenu:
 ; Behavior:
 ; Clears a flag bit in wDB6A.
 ; Copies CurrentLevelNumber to CurrentLevelId.
-; If that ID is 0, restores it from wDC5B and returns.
+; If that ID is 0, restores it from wDC5B_TVButtonLevelMissionRelated and returns.
 ; Otherwise, branching logic:
 ;  - If [wDB6D] != 0:
 ;    - If bit 5 of wDB6A is set: clear it, request song 15, load menu 0A.
@@ -571,7 +571,7 @@ call_01_435e_HandleLevelTransitionMenu:
     ld   [wDB6C_CurrentMapId], A                                    ;; 01:43af $ea $6c $db
     ret                                                ;; 01:43b2 $c9
 .jr_01_43b3:
-    ld   A, [wDC5B]                                    ;; 01:43b3 $fa $5b $dc
+    ld   A, [wDC5B_TVButtonLevelMissionRelated]                                    ;; 01:43b3 $fa $5b $dc
     ld   [wDB6C_CurrentMapId], A                                    ;; 01:43b6 $ea $6c $db
     ret                                                ;; 01:43b9 $c9
 
