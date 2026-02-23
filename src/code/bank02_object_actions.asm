@@ -239,13 +239,13 @@ call_02_5a1c_ObjectAction_TVButton_unk2:
     call call_02_72ac_SetObjectAction                                  ;; 02:5a2e $cd $ac $72
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:5a31 $fa $6c $db
     cp   A, $07                                        ;; 02:5a34 $fe $07
-    ld   A, $2c                                        ;; 02:5a36 $3e $2c
+    ld   A, PLAYERACTION_STAND_ON_TV_BUTTON_2                                        ;; 02:5a36 $3e $2c
     jr   Z, .jr_02_5a45                                ;; 02:5a38 $28 $0b
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:5a3a $fa $6c $db
     cp   A, $08                                        ;; 02:5a3d $fe $08
-    ld   A, $39                                        ;; 02:5a3f $3e $39
+    ld   A, PLAYERACTION_STAND_ON_TV_BUTTON_3                                        ;; 02:5a3f $3e $39
     jr   Z, .jr_02_5a45                                ;; 02:5a41 $28 $02
-    ld   A, $0c                                        ;; 02:5a43 $3e $0c
+    ld   A, PLAYERACTION_STAND_ON_TV_BUTTON                                        ;; 02:5a43 $3e $0c
 .jr_02_5a45:
     call call_02_54f9_SwitchPlayerAction                                  ;; 02:5a45 $cd $f9 $54
     call call_00_230f_ResolveObjectListIndex                                  ;; 02:5a48 $cd $0f $23
@@ -1968,8 +1968,8 @@ call_02_67c2_ObjectAction_Elevator_Update:
     ld   a,[de]
     ld   [hl],a
     ld   a,[wD801_Player_ActionId]
-    cp   a,$1E
-    ld   a,$01
+    cp   a,PLAYERACTION_UNK30
+    ld   a,PLAYERACTION_IDLE
     jp   z,call_02_54f9_SwitchPlayerAction
     ret  
 .jr_00_6842:
@@ -1978,7 +1978,7 @@ call_02_67c2_ObjectAction_Elevator_Update:
 .jr_00_6847:
     ld   bc,$0001
 .jr_00_684A:
-    ld   a,$1E
+    ld   a,PLAYERACTION_UNK30
     ld   hl,wD801_Player_ActionId
     cp   [hl]
     jp   nz,call_02_54f9_SwitchPlayerAction

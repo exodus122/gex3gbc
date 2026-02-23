@@ -1452,7 +1452,7 @@ call_00_29f5_Object_ClearActiveFlagAndCheck:
 ; Gets object entry byte at $D805+index.
 ; Clears bit 4 in memory.
 ; Returns with carry based on the old bit 4 state (bit 4,A).
-    LOAD_OBJ_FIELD_TO_HL OBJECT_SPRITE_FLAGS_OFFSET
+    LOAD_OBJ_FIELD_TO_HL OBJECT_MOVEMENT_FLAGS_OFFSET
     ld   A, [HL]                                       ;; 00:29fd $7e
     res  4, [HL]                                       ;; 00:29fe $cb $a6
     bit  4, A                                          ;; 00:2a00 $cb $67
@@ -1538,7 +1538,7 @@ call_00_2a5d_Object_Check5Flag2:
 ; Computes HL = D805 + current object index.
 ; Tests bit 2 of the object’s flags.
 ; Purpose: Checks a particular state flag (likely “grounded,” “active,” or similar).
-    LOAD_OBJ_FIELD_TO_HL OBJECT_SPRITE_FLAGS_OFFSET
+    LOAD_OBJ_FIELD_TO_HL OBJECT_MOVEMENT_FLAGS_OFFSET
     bit  2, [HL]                                       ;; 00:2a65 $cb $56
     ret                                                ;; 00:2a67 $c9
 

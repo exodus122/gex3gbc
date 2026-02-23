@@ -153,13 +153,13 @@ call_03_4cea_Collision_DamagePlayer:
     ld   [wDC98], A                                    ;; 03:4d15 $ea $98 $dc
     ld   A, [wDB6C_CurrentMapId]                                    ;; 03:4d18 $fa $6c $db
     cp   A, $07                                        ;; 03:4d1b $fe $07
-    ld   A, $29                                        ;; 03:4d1d $3e $29
+    ld   A, PLAYERACTION_UNK41                                        ;; 03:4d1d $3e $29
     jr   Z, .jr_03_4d2c                                ;; 03:4d1f $28 $0b
     ld   A, [wDB6C_CurrentMapId]                                    ;; 03:4d21 $fa $6c $db
     cp   A, $08                                        ;; 03:4d24 $fe $08
-    ld   A, $36                                        ;; 03:4d26 $3e $36
+    ld   A, PLAYERACTION_UNK54                                        ;; 03:4d26 $3e $36
     jr   Z, .jr_03_4d2c                                ;; 03:4d28 $28 $02
-    ld   A, $09                                        ;; 03:4d2a $3e $09
+    ld   A, PLAYERACTION_TAKE_DAMAGE                                        ;; 03:4d2a $3e $09
 .jr_03_4d2c:
     farcall call_02_54f9_SwitchPlayerAction
     ret                                                ;; 03:4d37 $c9
@@ -204,13 +204,13 @@ call_03_4d44_Collision_PlayerHit_ActionChangeConditional:
     ld   [wDC98],a
     ld   a,[wDB6C_CurrentMapId]
     cp   a,$07
-    ld   a,$29
+    ld   a,PLAYERACTION_UNK41
     jr   z,.jr_00_4D8F
     ld   a,[wDB6C_CurrentMapId]
     cp   a,$08
-    ld   a,$36
+    ld   a,PLAYERACTION_UNK54
     jr   z,.jr_00_4D8F
-    ld   a,$09
+    ld   a,PLAYERACTION_TAKE_DAMAGE
 .jr_00_4D8F:
     farcall call_02_54f9_SwitchPlayerAction
     ret  

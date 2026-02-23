@@ -28,7 +28,7 @@ call_02_708f_InitObjectsAndSpawnPlayer:
     ld   [wDC87], A                                    ;; 02:70bc $ea $87 $dc
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:70bf $ea $8c $dc
     ld   [wDC8D], A                                    ;; 02:70c2 $ea $8d $dc
-    ld   [wDC8E], A                                    ;; 02:70c5 $ea $8e $dc
+    ld   [wDC8E_InitialYVelocity], A                                    ;; 02:70c5 $ea $8e $dc
     ld   [wDC8F], A                                    ;; 02:70c8 $ea $8f $dc
     ld   [wDC88], A                                    ;; 02:70cb $ea $88 $dc
     ld   [wDC80], A                                    ;; 02:70ce $ea $80 $dc

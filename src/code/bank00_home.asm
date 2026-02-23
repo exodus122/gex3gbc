@@ -533,7 +533,7 @@ call_00_05fd_CheckForEatFly:
     cp   A, $3f                                        ;; 00:0613 $fe $3f
     ret  NC                                            ;; 00:0615 $d0
 .jr_00_0616:
-    ld   A, $08                                        ;; 00:0616 $3e $08
+    ld   A, PLAYERACTION_UNK8                                        ;; 00:0616 $3e $08
     farcall call_02_54f9_SwitchPlayerAction
     ret                                                ;; 00:0623 $c9
 
@@ -607,37 +607,37 @@ jp_00_0693:
     jr   NZ, .jr_00_06ba                               ;; 00:0698 $20 $20
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:069a $fa $6c $db
     cp   A, $07                                        ;; 00:069d $fe $07
-    ld   A, $2e                                        ;; 00:069f $3e $2e
+    ld   A, PLAYERACTION_UNK26_2                                        ;; 00:069f $3e $2e
     jr   Z, .jr_00_06ae                                ;; 00:06a1 $28 $0b
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:06a3 $fa $6c $db
     cp   A, $08                                        ;; 00:06a6 $fe $08
-    ld   A, $3b                                        ;; 00:06a8 $3e $3b
+    ld   A, PLAYERACTION_UNK26_3                                        ;; 00:06a8 $3e $3b
     jr   Z, .jr_00_06ae                                ;; 00:06aa $28 $02
-    ld   A, $1a                                        ;; 00:06ac $3e $1a
+    ld   A, PLAYERACTION_UNK26                                        ;; 00:06ac $3e $1a
 .jr_00_06ae:
     farcall call_02_54f9_SwitchPlayerAction
     ret                                                ;; 00:06b9 $c9
 .jr_00_06ba:
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:06ba $fa $6c $db
     cp   A, $07                                        ;; 00:06bd $fe $07
-    ld   A, $2a                                        ;; 00:06bf $3e $2a
+    ld   A, PLAYERACTION_DIE_2                                        ;; 00:06bf $3e $2a
     jr   Z, .jr_00_06ce                                ;; 00:06c1 $28 $0b
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:06c3 $fa $6c $db
     cp   A, $08                                        ;; 00:06c6 $fe $08
-    ld   A, $37                                        ;; 00:06c8 $3e $37
+    ld   A, PLAYERACTION_DIE_3                                        ;; 00:06c8 $3e $37
     jr   Z, .jr_00_06ce                                ;; 00:06ca $28 $02
-    ld   A, $0a                                        ;; 00:06cc $3e $0a
+    ld   A, PLAYERACTION_DIE                                        ;; 00:06cc $3e $0a
 .jr_00_06ce:
     farcall call_02_54f9_SwitchPlayerAction
     ret                                                ;; 00:06d9 $c9
 
 jp_00_06da:
-    ld   A, $1b                                        ;; 00:06da $3e $1b
+    ld   A, PLAYERACTION_DIE_IN_PIT                                        ;; 00:06da $3e $1b
     farcall call_02_54f9_SwitchPlayerAction
     ret                                                ;; 00:06e7 $c9
 
 jp_00_06e8:
-    ld   A, $13                                        ;; 00:06e8 $3e $13
+    ld   A, PLAYERACTION_UNK19                                        ;; 00:06e8 $3e $13
     farcall call_02_54f9_SwitchPlayerAction
     ret                                                ;; 00:06f5 $c9
 
@@ -1580,7 +1580,7 @@ call_00_0c6a_HandlePendingHDMATransfers:
     call call_00_0f25_AltSwitchBank                                  ;; 00:0cb4 $cd $25 $0f
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:0cb7 $26 $d8
     ld   A, [wDB61_ActiveObjectSlot]                                    ;; 00:0cb9 $fa $61 $db
-    or   A, OBJECT_SPRITE_FLAGS_OFFSET                                        ;; 00:0cbc $f6 $05
+    or   A, OBJECT_MOVEMENT_FLAGS_OFFSET                                        ;; 00:0cbc $f6 $05
     ld   L, A                                          ;; 00:0cbe $6f
     bit  5, [HL]                                       ;; 00:0cbf $cb $6e
     jr   NZ, .jr_00_0ceb                               ;; 00:0cc1 $20 $28

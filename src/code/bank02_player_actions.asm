@@ -1,10 +1,10 @@
 call_02_47b4_PlayerAction_Spawn:
-; Checks bit 4 of wD805_Player_SpriteFlags (a flag for spawning in a level). 
+; Checks bit 4 of wD805_Player_MovementFlags (a flag for spawning in a level). 
 ; If the bit is not set, it returns. If set, it:
 ; Clears state variables (wDCA2_PlayerUnk1, wDCA3_PlayerUnk2, wDC87).
 ; Sets wDCA4_PlayerUnk3 = 05h (some delay or counter).
 ; Plays sound effect $0E via call_00_0ff5_QueueSoundEffect
-    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:47b4 $21 $05 $d8
+    ld   HL, wD805_Player_MovementFlags                                     ;; 02:47b4 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:47b7 $cb $66
     ret  Z                                             ;; 02:47b9 $c8
     xor  A, A                                          ;; 02:47ba $af
@@ -17,14 +17,14 @@ call_02_47b4_PlayerAction_Spawn:
     jp   call_00_0ff5_QueueSoundEffect                                  ;; 02:47cb $c3 $f5 $0f
 
 call_02_47ce_PlayerAction_Idle:
-; Also checks bit 4 of wD805_Player_SpriteFlags. If set:
+; Also checks bit 4 of wD805_Player_MovementFlags. If set:
 ; Sets bit 6 of wDC80 (marking a new sub-state).
 ; Clears wDC86, wDC8C_PlayerYVelocity, and wDC87.
 ; Sets wDC83 = F0h (a countdown timer).
 ; Regardless, it checks if wDC81_CurrentInputsAlt == PADF_UP and, if so, calls call_00_1bbc_CheckForDoorAndEnter.
 ; It then calls call_02_4f11 to potentially switch actions.
 ; Finally, it decrements the countdown timer at wDC83. If it hits zero, it switches player action to $02.
-    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:47ce $21 $05 $d8
+    ld   HL, wD805_Player_MovementFlags                                     ;; 02:47ce $21 $05 $d8
     bit  4, [HL]                                       ;; 02:47d1 $cb $66
     jr   Z, .jr_02_47e9                                ;; 02:47d3 $28 $14
     ld   HL, wDC80                                     ;; 02:47d5 $21 $80 $dc
@@ -42,7 +42,7 @@ call_02_47ce_PlayerAction_Idle:
     call call_02_4f11_ChooseNextActionBasedOnLevel                                  ;; 02:47f1 $cd $11 $4f
     ld   HL, wDC83                                     ;; 02:47f4 $21 $83 $dc
     dec  [HL]                                          ;; 02:47f7 $35
-    ld   A, $02                                        ;; 02:47f8 $3e $02
+    ld   A, PLAYERACTION_IDLE_ANIMATION                                        ;; 02:47f8 $3e $02
     jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:47fa $ca $f9 $54
     ret                                                ;; 02:47fd $c9
 
@@ -55,10 +55,10 @@ call_02_47fe_PlayerAction_IdleAnimation:
     call call_02_4f11_ChooseNextActionBasedOnLevel                                  ;; 02:4806 $cd $11 $4f
     ret                                                ;; 02:4809 $c9
 
-call_02_480a_PlayerAction_Unk3:
-; Checks bit 4 of wD805_Player_SpriteFlags. If set, sets wDC87 = 02h (possibly a movement or animation flag). 
+call_02_480a_PlayerAction_Walk:
+; Checks bit 4 of wD805_Player_MovementFlags. If set, sets wDC87 = 02h (possibly a movement or animation flag). 
 ; Then calls call_02_4f11.
-    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:480a $21 $05 $d8
+    ld   HL, wD805_Player_MovementFlags                                     ;; 02:480a $21 $05 $d8
     bit  4, [HL]                                       ;; 02:480d $cb $66
     jr   Z, .jr_02_4816                                ;; 02:480f $28 $05
     ld   A, $02                                        ;; 02:4811 $3e $02
@@ -67,14 +67,14 @@ call_02_480a_PlayerAction_Unk3:
     call call_02_4f11_ChooseNextActionBasedOnLevel                                  ;; 02:4816 $cd $11 $4f
     ret                                                ;; 02:4819 $c9
 
-call_02_481a_PlayerAction_Unk4:
+call_02_481a_PlayerAction_StartCrouch:
 ; Simply clears wDC87 (writes 0) and returns. 
 ; Used to reset a temporary player state or movement flag.
     xor  A, A                                          ;; 02:481a $af
     ld   [wDC87], A                                    ;; 02:481b $ea $87 $dc
     ret                                                ;; 02:481e $c9
 
-call_02_481f_PlayerAction_IncrementDCACWithClamp:
+call_02_481f_PlayerAction_CrouchLookDown:
 ; Increments wDCAC by 2 but clamps the value to a maximum of $41. 
 ; Used for a position, animation frame, or velocity value that should not exceed a limit.
     ld   A, [wDCAC]                                    ;; 02:481f $fa $ac $dc
@@ -99,7 +99,7 @@ call_02_482e_PlayerAction_Unk7:
     ret                                                ;; 02:483d $c9
 
 call_02_483e_PlayerAction_Unk8:
-    ld   hl,wD805_Player_SpriteFlags
+    ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     ret  z
     ld   a,SFX_UNK05
@@ -107,27 +107,27 @@ call_02_483e_PlayerAction_Unk8:
     xor  a
     jp   call_00_0624_SetFly_TimersAndFlags
 
-call_02_484d_PlayerAction_Unk9:
-    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:484d $21 $05 $d8
+call_02_484d_PlayerAction_TakeDamage:
+    ld   HL, wD805_Player_MovementFlags                                     ;; 02:484d $21 $05 $d8
     bit  4, [HL]                                       ;; 02:4850 $cb $66
     jr   Z, .jr_02_4864                                ;; 02:4852 $28 $10
     ld   A, $1c                                        ;; 02:4854 $3e $1c
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:4856 $ea $8c $dc
-    ld   [wDC8E], A                                    ;; 02:4859 $ea $8e $dc
+    ld   [wDC8E_InitialYVelocity], A                                    ;; 02:4859 $ea $8e $dc
     call call_02_4e01_SetOneTimeFlag                                  ;; 02:485c $cd $01 $4e
     ld   A, SFX_PLAYER_DAMAGED                                        ;; 02:485f $3e $0a
     call call_00_0ff5_QueueSoundEffect                                  ;; 02:4861 $cd $f5 $0f
 .jr_02_4864:
     ld   A, $3c                                        ;; 02:4864 $3e $3c
     ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 02:4866 $ea $7e $dc
-    ld   A, [wDC8E]                                    ;; 02:4869 $fa $8e $dc
+    ld   A, [wDC8E_InitialYVelocity]                                    ;; 02:4869 $fa $8e $dc
     and  A, A                                          ;; 02:486c $a7
-    ld   A, $01                                        ;; 02:486d $3e $01
+    ld   A, PLAYERACTION_IDLE                                        ;; 02:486d $3e $01
     jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:486f $ca $f9 $54
     ret                                                ;; 02:4872 $c9
 
-call_02_4873_PlayerAction_Unk10:
-    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:4873 $21 $05 $d8
+call_02_4873_PlayerAction_Die:
+    ld   HL, wD805_Player_MovementFlags                                     ;; 02:4873 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:4876 $cb $66
     jr   Z, .jr_02_4883                                ;; 02:4878 $28 $09
     xor  A, A                                          ;; 02:487a $af
@@ -139,12 +139,12 @@ call_02_4873_PlayerAction_Unk10:
     ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 02:4885 $ea $7e $dc
     ret                                                ;; 02:4888 $c9
 
-call_02_4889_PlayerAction_Unk11:
+call_02_4889_PlayerAction_DieWarp:
     xor  A, A                                          ;; 02:4889 $af
     ld   [wDC87], A                                    ;; 02:488a $ea $87 $dc
     ld   A, $3c                                        ;; 02:488d $3e $3c
     ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 02:488f $ea $7e $dc
-    ld   A, [wD805_Player_SpriteFlags]                                    ;; 02:4892 $fa $05 $d8
+    ld   A, [wD805_Player_MovementFlags]                                    ;; 02:4892 $fa $05 $d8
     and  A, $04                                        ;; 02:4895 $e6 $04
     ret  Z                                             ;; 02:4897 $c8
     ld   A, [wDB6A]                                    ;; 02:4898 $fa $6a $db
@@ -152,45 +152,45 @@ call_02_4889_PlayerAction_Unk11:
     ld   [wDB6A], A                                    ;; 02:489d $ea $6a $db
     ret                                                ;; 02:48a0 $c9
 
-call_02_48a1_PlayerAction_Unk12:
-    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:48a1 $21 $05 $d8
+call_02_48a1_PlayerAction_StandOnTVButton:
+    ld   HL, wD805_Player_MovementFlags                                     ;; 02:48a1 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:48a4 $cb $66
     ld   A, SFX_UNK1D                                        ;; 02:48a6 $3e $1d
     call NZ, call_00_0ff5_QueueSoundEffect                              ;; 02:48a8 $c4 $f5 $0f
     ld   C, OBJECT_TV_BUTTON                                        ;; 02:48ab $0e $11
     jp   call_02_4db1_CheckPlayerXDistanceFromObject                                    ;; 02:48ad $c3 $b1 $4d
 
-call_02_48b0_PlayerAction_Unk13:
-    ld   A, [wD805_Player_SpriteFlags]                                    ;; 02:48b0 $fa $05 $d8
+call_02_48b0_PlayerAction_EnterTV:
+    ld   A, [wD805_Player_MovementFlags]                                    ;; 02:48b0 $fa $05 $d8
     and  A, $04                                        ;; 02:48b3 $e6 $04
     ret  Z                                             ;; 02:48b5 $c8
     ld   HL, wDB6A                                     ;; 02:48b6 $21 $6a $db
     set  4, [HL]                                       ;; 02:48b9 $cb $e6
     ret                                                ;; 02:48bb $c9
 
-call_02_48bc_PlayerAction_Unk14:
-    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:48bc $21 $05 $d8
+call_02_48bc_PlayerAction_Jump:
+    ld   HL, wD805_Player_MovementFlags                                     ;; 02:48bc $21 $05 $d8
     bit  4, [HL]                                       ;; 02:48bf $cb $66
     jr   Z, .jr_02_48d6                                ;; 02:48c1 $28 $13
     ld   A, SFX_GEX_JUMP                                        ;; 02:48c3 $3e $06
     call call_00_0ff5_QueueSoundEffect                                  ;; 02:48c5 $cd $f5 $0f
     ld   A, $2a                                        ;; 02:48c8 $3e $2a
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:48ca $ea $8c $dc
-    ld   [wDC8E], A                                    ;; 02:48cd $ea $8e $dc
+    ld   [wDC8E_InitialYVelocity], A                                    ;; 02:48cd $ea $8e $dc
     call call_02_4df6_FlagCollisionActive                                  ;; 02:48d0 $cd $f6 $4d
     call call_02_4e01_SetOneTimeFlag                                  ;; 02:48d3 $cd $01 $4e
 .jr_02_48d6:
-    ld   A, [wDC8E]                                    ;; 02:48d6 $fa $8e $dc
+    ld   A, [wDC8E_InitialYVelocity]                                    ;; 02:48d6 $fa $8e $dc
     and  A, A                                          ;; 02:48d9 $a7
     ret  NZ                                            ;; 02:48da $c0
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:48db $fa $81 $dc
     and  A, PADF_B                                        ;; 02:48de $e6 $02
-    ld   A, $0f                                        ;; 02:48e0 $3e $0f
+    ld   A, PLAYERACTION_DOUBLE_JUMP                                        ;; 02:48e0 $3e $0f
     jp   NZ, call_02_54f9_SwitchPlayerAction                              ;; 02:48e2 $c2 $f9 $54
     jp   call_02_4dce_SetTriggerByLevel                                    ;; 02:48e5 $c3 $ce $4d
 
-call_02_48e8_PlayerAction_Unk15:
-    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:48e8 $21 $05 $d8
+call_02_48e8_PlayerAction_DoubleJump:
+    ld   HL, wD805_Player_MovementFlags                                     ;; 02:48e8 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:48eb $cb $66
     jr   Z, .jr_02_4902                                ;; 02:48ed $28 $13
 .jr_02_48ef:
@@ -198,11 +198,11 @@ call_02_48e8_PlayerAction_Unk15:
     call call_00_0ff5_QueueSoundEffect                                  ;; 02:48f1 $cd $f5 $0f
     ld   A, $3e                                        ;; 02:48f4 $3e $3e
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:48f6 $ea $8c $dc
-    ld   [wDC8E], A                                    ;; 02:48f9 $ea $8e $dc
+    ld   [wDC8E_InitialYVelocity], A                                    ;; 02:48f9 $ea $8e $dc
     call call_02_4df6_FlagCollisionActive                                  ;; 02:48fc $cd $f6 $4d
     call call_02_4e01_SetOneTimeFlag                                  ;; 02:48ff $cd $01 $4e
 .jr_02_4902:
-    ld   A, [wDC8E]                                    ;; 02:4902 $fa $8e $dc
+    ld   A, [wDC8E_InitialYVelocity]                                    ;; 02:4902 $fa $8e $dc
     and  A, A                                          ;; 02:4905 $a7
     ret  NZ                                            ;; 02:4906 $c0
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:4907 $fa $81 $dc
@@ -210,8 +210,8 @@ call_02_48e8_PlayerAction_Unk15:
     jr   NZ, .jr_02_48ef                               ;; 02:490c $20 $e1
     jp   call_02_4dce_SetTriggerByLevel                                    ;; 02:490e $c3 $ce $4d
 
-call_02_4911_PlayerAction_Unk16:
-    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:4911 $21 $05 $d8
+call_02_4911_PlayerAction_TailSpin:
+    ld   HL, wD805_Player_MovementFlags                                     ;; 02:4911 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:4914 $cb $66
     jr   Z, .jr_02_492a                                ;; 02:4916 $28 $12
     ld   A, SFX_GEX_TAIL_SPIN                                        ;; 02:4918 $3e $04
@@ -222,7 +222,7 @@ call_02_4911_PlayerAction_Unk16:
     ld   [wDC7F], A                                    ;; 02:4924 $ea $7f $dc
     call call_02_4e01_SetOneTimeFlag                                  ;; 02:4927 $cd $01 $4e
 .jr_02_492a:
-    ld   A, [wD805_Player_SpriteFlags]                                    ;; 02:492a $fa $05 $d8
+    ld   A, [wD805_Player_MovementFlags]                                    ;; 02:492a $fa $05 $d8
     and  A, $04                                        ;; 02:492d $e6 $04
     ret  Z                                             ;; 02:492f $c8
     xor  A, A                                          ;; 02:4930 $af
@@ -232,39 +232,39 @@ call_02_4911_PlayerAction_Unk16:
     ret  Z                                             ;; 02:4939 $c8
     ld   HL, wDC80                                     ;; 02:493a $21 $80 $dc
     set  6, [HL]                                       ;; 02:493d $cb $f6
-    ld   C, $11                                        ;; 02:493f $0e $11
+    ld   C, PLAYERACTION_FALL                                        ;; 02:493f $0e $11
     ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 02:4941 $21 $be $da
     bit  7, [HL]                                       ;; 02:4944 $cb $7e
     jr   Z, .jr_02_4953                                ;; 02:4946 $28 $0b
-    ld   C, $01                                        ;; 02:4948 $0e $01
+    ld   C, PLAYERACTION_IDLE                                        ;; 02:4948 $0e $01
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:494a $fa $81 $dc
     and  A, $30                                        ;; 02:494d $e6 $30
     jr   Z, .jr_02_4953                                ;; 02:494f $28 $02
-    ld   C, $03                                        ;; 02:4951 $0e $03
+    ld   C, PLAYERACTION_WALK                                        ;; 02:4951 $0e $03
 .jr_02_4953:
     ld   A, C                                          ;; 02:4953 $79
     jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:4954 $c3 $f9 $54
 
-call_02_4957_PlayerAction_Unk17:
-    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:4957 $21 $05 $d8
+call_02_4957_PlayerAction_Fall:
+    ld   HL, wD805_Player_MovementFlags                                     ;; 02:4957 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:495a $cb $66
     jr   Z, .jr_02_4966                                ;; 02:495c $28 $08
     ld   A, $01                                        ;; 02:495e $3e $01
-    ld   [wDC8E], A                                    ;; 02:4960 $ea $8e $dc
+    ld   [wDC8E_InitialYVelocity], A                                    ;; 02:4960 $ea $8e $dc
     call call_02_4e01_SetOneTimeFlag                                  ;; 02:4963 $cd $01 $4e
 .jr_02_4966:
-    ld   A, [wDC8E]                                    ;; 02:4966 $fa $8e $dc
+    ld   A, [wDC8E_InitialYVelocity]                                    ;; 02:4966 $fa $8e $dc
     and  A, A                                          ;; 02:4969 $a7
     ret  NZ                                            ;; 02:496a $c0
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:496b $fa $81 $dc
     and  A, $30                                        ;; 02:496e $e6 $30
-    ld   A, $03                                        ;; 02:4970 $3e $03
+    ld   A, PLAYERACTION_WALK                                        ;; 02:4970 $3e $03
     jp   NZ, call_02_54f9_SwitchPlayerAction                              ;; 02:4972 $c2 $f9 $54
-    ld   A, $01                                        ;; 02:4975 $3e $01
+    ld   A, PLAYERACTION_IDLE                                        ;; 02:4975 $3e $01
     jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:4977 $c3 $f9 $54
 
-call_02_497a_PlayerAction_Unk18:
-    ld   HL, wD805_Player_SpriteFlags                                     ;; 02:497a $21 $05 $d8
+call_02_497a_PlayerAction_FallingLand:
+    ld   HL, wD805_Player_MovementFlags                                     ;; 02:497a $21 $05 $d8
     bit  4, [HL]                                       ;; 02:497d $cb $66
     ld   A, SFX_UNK08                                        ;; 02:497f $3e $08
     call NZ, call_00_0ff5_QueueSoundEffect                              ;; 02:4981 $c4 $f5 $0f
@@ -273,12 +273,12 @@ call_02_497a_PlayerAction_Unk18:
     ret                                                ;; 02:4988 $c9
 
 call_02_4989_PlayerAction_Unk19:
-    ld   hl,wD805_Player_SpriteFlags
+    ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,call_02_49a8_PlayerAction_Unk20
     ld   a,$30
     ld   [wDC8C_PlayerYVelocity],a
-    ld   [wDC8E],a
+    ld   [wDC8E_InitialYVelocity],a
     call call_02_4e01_SetOneTimeFlag
     call call_00_06f6_DealDamageToPlayer
     ld   a,SFX_UNK0B
@@ -287,9 +287,9 @@ call_02_4989_PlayerAction_Unk19:
     call call_02_72ac_SetObjectAction
 
 call_02_49a8_PlayerAction_Unk20:
-    ld   a,[wDC8E]
+    ld   a,[wDC8E_InitialYVelocity]
     and  a
-    ld   a,$01
+    ld   a,PLAYERACTION_IDLE
     jp   z,call_02_54f9_SwitchPlayerAction
     ret  
     
@@ -297,7 +297,7 @@ call_02_49b2_PlayerAction_Unk21To24:
     ret  
 
 call_02_49b3_PlayerAction_Unk25:
-    ld   hl,wD805_Player_SpriteFlags
+    ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_49CE
     ld   hl,wDC80
@@ -364,7 +364,7 @@ call_02_4a25_PlayerAction_Unk26:
     jp   z,jp_00_06da
     ret  
 
-call_02_4a37_PlayerAction_Unk27:
+call_02_4a37_PlayerAction_DieInPit:
     xor  A, A                                          ;; 02:4a37 $af
     ld   [wDC87], A                                    ;; 02:4a38 $ea $87 $dc
     ld   A, $3c                                        ;; 02:4a3b $3e $3c
@@ -382,14 +382,14 @@ call_02_4a51_PlayerAction_Unk28:
     ret  
 
 call_02_4a52_PlayerAction_Unk29:
-    ld   hl,wD805_Player_SpriteFlags
+    ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4A61
     ld   a,$01
-    ld   [wDC8E],a
+    ld   [wDC8E_InitialYVelocity],a
     call call_02_4e01_SetOneTimeFlag
 .jr_00_4A61:
-    ld   a,[wDC8E]
+    ld   a,[wDC8E_InitialYVelocity]
     and  a
     jp   z,call_02_4dce_SetTriggerByLevel
     ret  
@@ -399,7 +399,7 @@ call_02_4a69_PlayerAction_Unk30:
     jp   call_02_4db1_CheckPlayerXDistanceFromObject
 
 call_02_4a6e_PlayerAction_Unk31:
-    ld   hl,wD805_Player_SpriteFlags
+    ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4A87
     ld   a,SFX_GEX_TAIL_SPIN
@@ -410,14 +410,14 @@ call_02_4a6e_PlayerAction_Unk31:
     ld   [wDC7F],a
     ld   [wDC87],a
 .jr_00_4A87:
-    ld   a,[wD805_Player_SpriteFlags]
+    ld   a,[wD805_Player_MovementFlags]
     and  a,$04
     ret  z
     xor  a
     ld   [wDC7F],a
     ld   hl,wDC80
     set  6,[hl]
-    ld   a,$19
+    ld   a,PLAYERACTION_UNK25
     jp   call_02_54f9_SwitchPlayerAction
 
 call_02_4a9b_PlayerAction_Unk32:
@@ -433,7 +433,7 @@ call_02_4aa1_PlayerAction_Unk33:
     ret  
 
 call_02_4aac_PlayerAction_Unk34:
-    ld   hl,wD805_Player_SpriteFlags
+    ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4ACC
     ld   hl,wDC80
@@ -506,7 +506,7 @@ call_02_4adb_Player_Unk34_Sub:
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,PADF_B
     jr   z,.jr_00_4B32
-    ld   a,$0E
+    ld   a,PLAYERACTION_JUMP
     call call_02_54f9_SwitchPlayerAction
 .jr_00_4B32:
     ld   a,[wDC81_CurrentInputsAlt]
@@ -574,7 +574,7 @@ call_02_4B66: ; unreferenced function?
     ret  
 
 call_02_4bb7_PlayerAction_Unk36:
-    ld   hl,wD805_Player_SpriteFlags
+    ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4BDC
     ld   a,$03
@@ -632,45 +632,45 @@ call_02_4bb7_PlayerAction_Unk36:
     db   $20, $0f, $20, $10, $20, $ff
 
 call_02_4c2c_PlayerAction_Unk37:
-    ld   hl,wD805_Player_SpriteFlags
+    ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4C46
     ld   a,SFX_GEX_JUMP
     call call_00_0ff5_QueueSoundEffect
     ld   a,$2A
     ld   [wDC8C_PlayerYVelocity],a
-    ld   [wDC8E],a
+    ld   [wDC8E_InitialYVelocity],a
     call call_02_4df6_FlagCollisionActive
     call call_02_4e01_SetOneTimeFlag
 .jr_00_4C46:
-    ld   a,[wDC8E]
+    ld   a,[wDC8E_InitialYVelocity]
     and  a
     ret  nz
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,PADF_B
-    ld   a,$26
+    ld   a,PLAYERACTION_UNK38
     jp   nz,call_02_54f9_SwitchPlayerAction
     jp   call_02_4dce_SetTriggerByLevel
 
 call_02_4c58_PlayerAction_Unk38:
-    ld   hl,wD805_Player_SpriteFlags
+    ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4C72
     ld   a,SFX_GEX_DOUBLE_JUMP
     call call_00_0ff5_QueueSoundEffect
     ld   a,$3E
     ld   [wDC8C_PlayerYVelocity],a
-    ld   [wDC8E],a
+    ld   [wDC8E_InitialYVelocity],a
     call call_02_4df6_FlagCollisionActive
     call call_02_4e01_SetOneTimeFlag
 .jr_00_4C72:
-    ld   a,[wDC8E]
+    ld   a,[wDC8E_InitialYVelocity]
     and  a
     jp   z,call_02_4dce_SetTriggerByLevel
     ret  
 
 call_02_4c7a_PlayerAction_Unk39:
-    ld   hl,wD805_Player_SpriteFlags
+    ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4CA1
     xor  a
@@ -690,35 +690,35 @@ call_02_4c7a_PlayerAction_Unk39:
     jp   call_02_4E0C_UpdateActionSequence
 
 call_02_4ca4_PlayerAction_Unk40:
-    ld   hl,wD805_Player_SpriteFlags
+    ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4CB3
     ld   a,$01
-    ld   [wDC8E],a
+    ld   [wDC8E_InitialYVelocity],a
     call call_02_4e01_SetOneTimeFlag
 .jr_00_4CB3:
-    ld   a,[wDC8E]
+    ld   a,[wDC8E_InitialYVelocity]
     and  a
-    ld   a,$24
+    ld   a,PLAYERACTION_UNK36
     jp   z,call_02_54f9_SwitchPlayerAction
     ret  
 
 call_02_4cbd_PlayerAction_Unk41:
-    ld   hl,wD805_Player_SpriteFlags
+    ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4CD4
     ld   a,$1C
     ld   [wDC8C_PlayerYVelocity],a
-    ld   [wDC8E],a
+    ld   [wDC8E_InitialYVelocity],a
     call call_02_4e01_SetOneTimeFlag
     ld   a,SFX_PLAYER_DAMAGED
     call call_00_0ff5_QueueSoundEffect
 .jr_00_4CD4:
     ld   a,$3C
     ld   [wDC7E_PlayerDamageCooldownTimer],a
-    ld   a,[wDC8E]
+    ld   a,[wDC8E_InitialYVelocity]
     and  a
-    ld   a,$24
+    ld   a,PLAYERACTION_UNK36
     jp   z,call_02_54f9_SwitchPlayerAction
     ret  
 
@@ -726,7 +726,7 @@ call_02_4ce3_PlayerAction_Unk48:
     ld   a,SFX_GEX_JUMP
     call call_00_0ff5_QueueSoundEffect
     call call_02_4e01_SetOneTimeFlag
-    ld   a,$31
+    ld   a,PLAYERACTION_UNK49
     call call_02_54f9_SwitchPlayerAction
     call call_02_4df6_FlagCollisionActive
     ld   hl,wDABE_UnkBGCollisionFlags2
@@ -734,14 +734,14 @@ call_02_4ce3_PlayerAction_Unk48:
     jr   z,call_02_4d02_PlayerAction_Unk49
     ld   a,$1E
     ld   [wDC8C_PlayerYVelocity],a
-    ld   [wDC8E],a
+    ld   [wDC8E_InitialYVelocity],a
 call_02_4d02_PlayerAction_Unk49:
-    ld   a,[wDC8E]
+    ld   a,[wDC8E_InitialYVelocity]
     and  a
     ret  nz
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,PADF_B
-    ld   a,$32
+    ld   a,PLAYERACTION_UNK50
     jp   nz,call_02_54f9_SwitchPlayerAction
     jp   call_02_4dce_SetTriggerByLevel
 
@@ -749,7 +749,7 @@ call_02_4d14_PlayerAction_Unk50:
     ld   a,SFX_GEX_DOUBLE_JUMP
     call call_00_0ff5_QueueSoundEffect
     call call_02_4e01_SetOneTimeFlag
-    ld   a,$33
+    ld   a,PLAYERACTION_UNK51
     call call_02_54f9_SwitchPlayerAction
     call call_02_4df6_FlagCollisionActive
     ld   hl,wDABE_UnkBGCollisionFlags2
@@ -757,19 +757,19 @@ call_02_4d14_PlayerAction_Unk50:
     jr   z,call_02_4d33_PlayerAction_Unk51
     ld   a,$36
     ld   [wDC8C_PlayerYVelocity],a
-    ld   [wDC8E],a
+    ld   [wDC8E_InitialYVelocity],a
 call_02_4d33_PlayerAction_Unk51:
-    ld   a,[wDC8E]
+    ld   a,[wDC8E_InitialYVelocity]
     and  a
     ret  nz
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,PADF_B
-    ld   a,$32
+    ld   a,PLAYERACTION_UNK50
     jp   nz,call_02_54f9_SwitchPlayerAction
     jp   call_02_4dce_SetTriggerByLevel
 
 call_02_4d45_PlayerAction_Unk52:
-    ld   hl,wD805_Player_SpriteFlags
+    ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4D5E
     ld   a,SFX_GEX_TAIL_SPIN
@@ -780,45 +780,45 @@ call_02_4d45_PlayerAction_Unk52:
     ld   [wDC7F],a
     call call_02_4e01_SetOneTimeFlag
 .jr_00_4D5E:
-    ld   a,[wD805_Player_SpriteFlags]
+    ld   a,[wD805_Player_MovementFlags]
     and  a,$04
     ret  z
     xor  a
     ld   [wDC7F],a
     ld   hl,wDC80
     set  6,[hl]
-    ld   a,$30
+    ld   a,PLAYERACTION_UNK48
     jp   call_02_54f9_SwitchPlayerAction
 
 call_02_4d72_PlayerAction_Unk53:
-    ld   hl,wD805_Player_SpriteFlags
+    ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4D81
     ld   a,$01
-    ld   [wDC8E],a
+    ld   [wDC8E_InitialYVelocity],a
     call call_02_4e01_SetOneTimeFlag
 .jr_00_4D81:
-    ld   a,[wDC8E]
+    ld   a,[wDC8E_InitialYVelocity]
     and  a
-    ld   a,$30
+    ld   a,PLAYERACTION_UNK48
     jp   z,call_02_54f9_SwitchPlayerAction
     ret  
 
 call_02_4d8b_PlayerAction_Unk54:
-    ld   hl,wD805_Player_SpriteFlags
+    ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4DA2
     ld   a,$1C
     ld   [wDC8C_PlayerYVelocity],a
-    ld   [wDC8E],a
+    ld   [wDC8E_InitialYVelocity],a
     call call_02_4e01_SetOneTimeFlag
     ld   a,SFX_PLAYER_DAMAGED
     call call_00_0ff5_QueueSoundEffect
 .jr_00_4DA2:
     ld   a,$3C
     ld   [wDC7E_PlayerDamageCooldownTimer],a
-    ld   a,[wDC8E]
+    ld   a,[wDC8E_InitialYVelocity]
     and  a
-    ld   a,$30
+    ld   a,PLAYERACTION_UNK48
     jp   z,call_02_54f9_SwitchPlayerAction
     ret  

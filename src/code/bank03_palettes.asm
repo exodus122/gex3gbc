@@ -143,7 +143,7 @@ call_03_687c_AssignObjectPalette:
 ; Stores the palette ID in wDAAE_ObjectPaletteIds.
 ; Calculates an address into wDD2A_ObjectPalettes, then copies 8 palette bytes from data_03_68f9.
 ; Usage: Ensures each on-screen object uses the correct colors.
-    LOAD_OBJ_FIELD_TO_HL OBJECT_SPRITE_FLAGS_OFFSET                                     ;; 03:6883 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_MOVEMENT_FLAGS_OFFSET                                     ;; 03:6883 $6f
     ld   C, $00                                        ;; 03:6884 $0e $00
     bit  7, [HL]                                       ;; 03:6886 $cb $7e
     jr   NZ, .jr_03_6893                               ;; 03:6888 $20 $09

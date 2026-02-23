@@ -117,22 +117,22 @@ data_02_4000:
     dw   call_02_47b4_PlayerAction_Spawn, data_02_739b
     dw   call_02_47ce_PlayerAction_Idle, data_02_73ab
     dw   call_02_47fe_PlayerAction_IdleAnimation, data_02_73b1
-    dw   call_02_480a_PlayerAction_Unk3, data_02_73c5
-    dw   call_02_481a_PlayerAction_Unk4, data_02_73da
-    dw   call_02_481f_PlayerAction_IncrementDCACWithClamp, data_02_73e6
+    dw   call_02_480a_PlayerAction_Walk, data_02_73c5
+    dw   call_02_481a_PlayerAction_StartCrouch, data_02_73da
+    dw   call_02_481f_PlayerAction_CrouchLookDown, data_02_73e6
     dw   call_02_582e_ObjectAction_None, data_02_73ef
     dw   call_02_482e_PlayerAction_Unk7, data_02_73da
     dw   call_02_483e_PlayerAction_Unk8, data_02_73fb
-    dw   call_02_484d_PlayerAction_Unk9, data_02_7401
-    dw   call_02_4873_PlayerAction_Unk10, data_02_7408
-    dw   call_02_4889_PlayerAction_Unk11, data_02_7411
-    dw   call_02_48a1_PlayerAction_Unk12, data_02_7422
-    dw   call_02_48b0_PlayerAction_Unk13, data_02_7428
-    dw   call_02_48bc_PlayerAction_Unk14, data_02_7435
-    dw   call_02_48e8_PlayerAction_Unk15, data_02_7442
-    dw   call_02_4911_PlayerAction_Unk16, data_02_744e
-    dw   call_02_4957_PlayerAction_Unk17, data_02_745b
-    dw   call_02_497a_PlayerAction_Unk18, data_02_746d
+    dw   call_02_484d_PlayerAction_TakeDamage, data_02_7401
+    dw   call_02_4873_PlayerAction_Die, data_02_7408
+    dw   call_02_4889_PlayerAction_DieWarp, data_02_7411
+    dw   call_02_48a1_PlayerAction_StandOnTVButton, data_02_7422
+    dw   call_02_48b0_PlayerAction_EnterTV, data_02_7428
+    dw   call_02_48bc_PlayerAction_Jump, data_02_7435
+    dw   call_02_48e8_PlayerAction_DoubleJump, data_02_7442
+    dw   call_02_4911_PlayerAction_TailSpin, data_02_744e
+    dw   call_02_4957_PlayerAction_Fall, data_02_745b
+    dw   call_02_497a_PlayerAction_FallingLand, data_02_746d
     dw   call_02_4989_PlayerAction_Unk19, data_02_7473
     dw   call_02_49a8_PlayerAction_Unk20, data_02_7473
     dw   call_02_49b2_PlayerAction_Unk21To24, data_02_7479
@@ -141,7 +141,7 @@ data_02_4000:
     dw   call_02_49b2_PlayerAction_Unk21To24, data_02_749f
     dw   call_02_49b3_PlayerAction_Unk25, data_02_74a5
     dw   call_02_4a25_PlayerAction_Unk26, data_02_745b
-    dw   call_02_4a37_PlayerAction_Unk27, data_02_74ab
+    dw   call_02_4a37_PlayerAction_DieInPit, data_02_74ab
     dw   call_02_4a51_PlayerAction_Unk28, data_02_74bd
     dw   call_02_4a52_PlayerAction_Unk29, data_02_74c8
     dw   call_02_4a69_PlayerAction_Unk30, data_02_74ce
@@ -156,10 +156,10 @@ data_02_4000:
     dw   call_02_4c7a_PlayerAction_Unk39, data_02_754b
     dw   call_02_4ca4_PlayerAction_Unk40, data_02_7551
     dw   call_02_4cbd_PlayerAction_Unk41, data_02_7513
-    dw   call_02_4873_PlayerAction_Unk10, data_02_7519
-    dw   call_02_4889_PlayerAction_Unk11, data_02_7522
-    dw   call_02_48a1_PlayerAction_Unk12, data_02_7528
-    dw   call_02_48b0_PlayerAction_Unk13, data_02_752e
+    dw   call_02_4873_PlayerAction_Die, data_02_7519
+    dw   call_02_4889_PlayerAction_DieWarp, data_02_7522
+    dw   call_02_48a1_PlayerAction_StandOnTVButton, data_02_7528
+    dw   call_02_48b0_PlayerAction_EnterTV, data_02_752e
     dw   call_02_4a25_PlayerAction_Unk26, data_02_7551
     dw   call_02_47b4_PlayerAction_Spawn, data_02_7559
     dw   call_02_4ce3_PlayerAction_Unk48, data_02_758e
@@ -169,30 +169,30 @@ data_02_4000:
     dw   call_02_4d45_PlayerAction_Unk52, data_02_75ae
     dw   call_02_4d72_PlayerAction_Unk53, data_02_75bb
     dw   call_02_4d8b_PlayerAction_Unk54, data_02_7569
-    dw   call_02_4873_PlayerAction_Unk10, data_02_756f
-    dw   call_02_4889_PlayerAction_Unk11, data_02_7576
-    dw   call_02_48a1_PlayerAction_Unk12, data_02_757c
-    dw   call_02_48b0_PlayerAction_Unk13, data_02_7582
+    dw   call_02_4873_PlayerAction_Die, data_02_756f
+    dw   call_02_4889_PlayerAction_DieWarp, data_02_7576
+    dw   call_02_48a1_PlayerAction_StandOnTVButton, data_02_757c
+    dw   call_02_48b0_PlayerAction_EnterTV, data_02_7582
     dw   call_02_4a25_PlayerAction_Unk26, data_02_75bb
     dw   call_02_47b4_PlayerAction_Spawn, data_02_739b
     dw   call_02_47ce_PlayerAction_Idle, data_02_73ab
     dw   call_02_47fe_PlayerAction_IdleAnimation, data_02_73b1
-    dw   call_02_480a_PlayerAction_Unk3, data_02_73c5
-    dw   call_02_481a_PlayerAction_Unk4, data_02_73da
+    dw   call_02_480a_PlayerAction_Walk, data_02_73c5
+    dw   call_02_481a_PlayerAction_StartCrouch, data_02_73da
     dw   call_02_582e_ObjectAction_None, data_02_73e6
     dw   call_02_582e_ObjectAction_None, data_02_73ef
     dw   call_02_482e_PlayerAction_Unk7, data_02_73da
     dw   call_02_483e_PlayerAction_Unk8, data_02_73fb
-    dw   call_02_484d_PlayerAction_Unk9, data_02_7401
-    dw   call_02_4873_PlayerAction_Unk10, data_02_7408
-    dw   call_02_4889_PlayerAction_Unk11, data_02_7411
-    dw   call_02_48a1_PlayerAction_Unk12, data_02_7422
-    dw   call_02_48b0_PlayerAction_Unk13, data_02_7428
-    dw   call_02_48bc_PlayerAction_Unk14, data_02_7435
-    dw   call_02_48e8_PlayerAction_Unk15, data_02_7442
-    dw   call_02_4911_PlayerAction_Unk16, data_02_744e
-    dw   call_02_4957_PlayerAction_Unk17, data_02_745b
-    dw   call_02_497a_PlayerAction_Unk18, data_02_746d
+    dw   call_02_484d_PlayerAction_TakeDamage, data_02_7401
+    dw   call_02_4873_PlayerAction_Die, data_02_7408
+    dw   call_02_4889_PlayerAction_DieWarp, data_02_7411
+    dw   call_02_48a1_PlayerAction_StandOnTVButton, data_02_7422
+    dw   call_02_48b0_PlayerAction_EnterTV, data_02_7428
+    dw   call_02_48bc_PlayerAction_Jump, data_02_7435
+    dw   call_02_48e8_PlayerAction_DoubleJump, data_02_7442
+    dw   call_02_4911_PlayerAction_TailSpin, data_02_744e
+    dw   call_02_4957_PlayerAction_Fall, data_02_745b
+    dw   call_02_497a_PlayerAction_FallingLand, data_02_746d
     dw   call_02_4989_PlayerAction_Unk19, data_02_7473
     dw   call_02_49a8_PlayerAction_Unk20, data_02_7473
     dw   call_02_49b2_PlayerAction_Unk21To24, data_02_7479
@@ -201,7 +201,7 @@ data_02_4000:
     dw   call_02_49b2_PlayerAction_Unk21To24, data_02_749f
     dw   call_02_49b3_PlayerAction_Unk25, data_02_74a5
     dw   call_02_4a25_PlayerAction_Unk26, data_02_745b
-    dw   call_02_4a37_PlayerAction_Unk27, data_02_74ab
+    dw   call_02_4a37_PlayerAction_DieInPit, data_02_74ab
     dw   call_02_4a51_PlayerAction_Unk28, data_02_74bd
     dw   call_02_4a52_PlayerAction_Unk29, data_02_74c8
     dw   call_02_4a69_PlayerAction_Unk30, data_02_74ce
@@ -216,10 +216,10 @@ data_02_4000:
     dw   call_02_4c7a_PlayerAction_Unk39, data_02_754b
     dw   call_02_4ca4_PlayerAction_Unk40, data_02_7551
     dw   call_02_4cbd_PlayerAction_Unk41, data_02_7513
-    dw   call_02_4873_PlayerAction_Unk10, data_02_7519
-    dw   call_02_4889_PlayerAction_Unk11, data_02_7522
-    dw   call_02_48a1_PlayerAction_Unk12, data_02_7528
-    dw   call_02_48b0_PlayerAction_Unk13, data_02_752e
+    dw   call_02_4873_PlayerAction_Die, data_02_7519
+    dw   call_02_4889_PlayerAction_DieWarp, data_02_7522
+    dw   call_02_48a1_PlayerAction_StandOnTVButton, data_02_7528
+    dw   call_02_48b0_PlayerAction_EnterTV, data_02_752e
     dw   call_02_4a25_PlayerAction_Unk26, data_02_7551
     dw   call_02_47b4_PlayerAction_Spawn, data_02_7559
     dw   call_02_4ce3_PlayerAction_Unk48, data_02_758e
@@ -229,10 +229,10 @@ data_02_4000:
     dw   call_02_4d45_PlayerAction_Unk52, data_02_75ae
     dw   call_02_4d72_PlayerAction_Unk53, data_02_75bb
     dw   call_02_4d8b_PlayerAction_Unk54, data_02_7569
-    dw   call_02_4873_PlayerAction_Unk10, data_02_756f
-    dw   call_02_4889_PlayerAction_Unk11, data_02_7576
-    dw   call_02_48a1_PlayerAction_Unk12, data_02_757c
-    dw   call_02_48b0_PlayerAction_Unk13, data_02_7582
+    dw   call_02_4873_PlayerAction_Die, data_02_756f
+    dw   call_02_4889_PlayerAction_DieWarp, data_02_7576
+    dw   call_02_48a1_PlayerAction_StandOnTVButton, data_02_757c
+    dw   call_02_48b0_PlayerAction_EnterTV, data_02_7582
     dw   call_02_4a25_PlayerAction_Unk26, data_02_75bb
 .data_02_42c4:
     dw   call_02_582e_ObjectAction_None, data_02_75c8

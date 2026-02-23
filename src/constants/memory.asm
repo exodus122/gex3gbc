@@ -60,7 +60,7 @@ wD801_Player_ActionId:
     ds 1                                               ;; d801
 wD802_Player_ActionFunc:
     ds 3                                               ;; d802
-wD805_Player_SpriteFlags:
+wD805_Player_MovementFlags:
     ds 4                                               ;; d805
 wD809_Player_SpriteCounter:
     ds 1                                               ;; d809
@@ -263,7 +263,7 @@ wDB66_HDMATransferFlags:
 ; Bit 1 set →
 ; Copy tiles for the current interaction object.
 ; - Uses wDB64/65 as the source pointer.
-; - Source bank depends on the object’s data (OBJECT_SPRITE_FLAGS_OFFSET, plus a VBK = 1 path if “extended” graphics).
+; - Source bank depends on the object’s data (OBJECT_MOVEMENT_FLAGS_OFFSET, plus a VBK = 1 path if “extended” graphics).
 ; - Length depends on the object’s type (wDB63_ActiveObjectType).
 ; - This looks like sprite/animation tiles for NPCs or items.
 ; Bit 2 set →
@@ -753,10 +753,10 @@ wDC8B:
 wDC8C_PlayerYVelocity: ; can freeze to levitate
     ds 1                                               ;; dc8c
 
-wDC8D:
+wDC8D: ; set to $c0 when falling? maybe related to holding B for another jump
     ds 1                                               ;; dc8d
 
-wDC8E:
+wDC8E_InitialYVelocity: ; the y velocity gex had when he left the ground?
     ds 1                                               ;; dc8e
 
 wDC8F:
