@@ -55,7 +55,7 @@ call_02_47fe_PlayerAction_IdleAnimation:
     call call_02_4f11_ChooseNextActionBasedOnLevel                                  ;; 02:4806 $cd $11 $4f
     ret                                                ;; 02:4809 $c9
 
-call_02_480a:
+call_02_480a_PlayerAction_Unk3:
 ; Checks bit 4 of wD805_Player_SpriteFlags. If set, sets wDC87 = 02h (possibly a movement or animation flag). 
 ; Then calls call_02_4f11.
     ld   HL, wD805_Player_SpriteFlags                                     ;; 02:480a $21 $05 $d8
@@ -67,14 +67,14 @@ call_02_480a:
     call call_02_4f11_ChooseNextActionBasedOnLevel                                  ;; 02:4816 $cd $11 $4f
     ret                                                ;; 02:4819 $c9
 
-call_02_481a:
+call_02_481a_PlayerAction_Unk4:
 ; Simply clears wDC87 (writes 0) and returns. 
 ; Used to reset a temporary player state or movement flag.
     xor  A, A                                          ;; 02:481a $af
     ld   [wDC87], A                                    ;; 02:481b $ea $87 $dc
     ret                                                ;; 02:481e $c9
 
-call_02_481f_IncrementDCACWithClamp:
+call_02_481f_PlayerAction_IncrementDCACWithClamp:
 ; Increments wDCAC by 2 but clamps the value to a maximum of $41. 
 ; Used for a position, animation frame, or velocity value that should not exceed a limit.
     ld   A, [wDCAC]                                    ;; 02:481f $fa $ac $dc
@@ -86,7 +86,7 @@ call_02_481f_IncrementDCACWithClamp:
     ld   [wDCAC], A                                    ;; 02:482a $ea $ac $dc
     ret                                                ;; 02:482d $c9
 
-call_02_482e:
+call_02_482e_PlayerAction_Unk7:
     ld   A, [wD809_Player_SpriteCounter]                                    ;; 02:482e $fa $09 $d8
     srl  A                                             ;; 02:4831 $cb $3f
     ld   C, A                                          ;; 02:4833 $4f
@@ -98,7 +98,7 @@ call_02_482e:
     ld   [wDC87], A                                    ;; 02:483a $ea $87 $dc
     ret                                                ;; 02:483d $c9
 
-call_02_483e:
+call_02_483e_PlayerAction_Unk8:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     ret  z
@@ -107,7 +107,7 @@ call_02_483e:
     xor  a
     jp   call_00_0624_SetFly_TimersAndFlags
 
-call_02_484d:
+call_02_484d_PlayerAction_Unk9:
     ld   HL, wD805_Player_SpriteFlags                                     ;; 02:484d $21 $05 $d8
     bit  4, [HL]                                       ;; 02:4850 $cb $66
     jr   Z, .jr_02_4864                                ;; 02:4852 $28 $10
@@ -126,7 +126,7 @@ call_02_484d:
     jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:486f $ca $f9 $54
     ret                                                ;; 02:4872 $c9
 
-call_02_4873:
+call_02_4873_PlayerAction_Unk10:
     ld   HL, wD805_Player_SpriteFlags                                     ;; 02:4873 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:4876 $cb $66
     jr   Z, .jr_02_4883                                ;; 02:4878 $28 $09
@@ -139,7 +139,7 @@ call_02_4873:
     ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 02:4885 $ea $7e $dc
     ret                                                ;; 02:4888 $c9
 
-call_02_4889:
+call_02_4889_PlayerAction_Unk11:
     xor  A, A                                          ;; 02:4889 $af
     ld   [wDC87], A                                    ;; 02:488a $ea $87 $dc
     ld   A, $3c                                        ;; 02:488d $3e $3c
@@ -152,7 +152,7 @@ call_02_4889:
     ld   [wDB6A], A                                    ;; 02:489d $ea $6a $db
     ret                                                ;; 02:48a0 $c9
 
-call_02_48a1:
+call_02_48a1_PlayerAction_Unk12:
     ld   HL, wD805_Player_SpriteFlags                                     ;; 02:48a1 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:48a4 $cb $66
     ld   A, $1d                                        ;; 02:48a6 $3e $1d
@@ -160,7 +160,7 @@ call_02_48a1:
     ld   C, OBJECT_TV_BUTTON                                        ;; 02:48ab $0e $11
     jp   call_02_4db1_CheckPlayerXDistanceFromObject                                    ;; 02:48ad $c3 $b1 $4d
 
-call_02_48b0:
+call_02_48b0_PlayerAction_Unk13:
     ld   A, [wD805_Player_SpriteFlags]                                    ;; 02:48b0 $fa $05 $d8
     and  A, $04                                        ;; 02:48b3 $e6 $04
     ret  Z                                             ;; 02:48b5 $c8
@@ -168,7 +168,7 @@ call_02_48b0:
     set  4, [HL]                                       ;; 02:48b9 $cb $e6
     ret                                                ;; 02:48bb $c9
 
-call_02_48bc:
+call_02_48bc_PlayerAction_Unk14:
     ld   HL, wD805_Player_SpriteFlags                                     ;; 02:48bc $21 $05 $d8
     bit  4, [HL]                                       ;; 02:48bf $cb $66
     jr   Z, .jr_02_48d6                                ;; 02:48c1 $28 $13
@@ -189,7 +189,7 @@ call_02_48bc:
     jp   NZ, call_02_54f9_SwitchPlayerAction                              ;; 02:48e2 $c2 $f9 $54
     jp   call_02_4dce_SetTriggerByLevel                                    ;; 02:48e5 $c3 $ce $4d
 
-call_02_48e8:
+call_02_48e8_PlayerAction_Unk15:
     ld   HL, wD805_Player_SpriteFlags                                     ;; 02:48e8 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:48eb $cb $66
     jr   Z, .jr_02_4902                                ;; 02:48ed $28 $13
@@ -210,7 +210,7 @@ call_02_48e8:
     jr   NZ, .jr_02_48ef                               ;; 02:490c $20 $e1
     jp   call_02_4dce_SetTriggerByLevel                                    ;; 02:490e $c3 $ce $4d
 
-call_02_4911:
+call_02_4911_PlayerAction_Unk16:
     ld   HL, wD805_Player_SpriteFlags                                     ;; 02:4911 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:4914 $cb $66
     jr   Z, .jr_02_492a                                ;; 02:4916 $28 $12
@@ -245,7 +245,7 @@ call_02_4911:
     ld   A, C                                          ;; 02:4953 $79
     jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:4954 $c3 $f9 $54
 
-call_02_4957:
+call_02_4957_PlayerAction_Unk17:
     ld   HL, wD805_Player_SpriteFlags                                     ;; 02:4957 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:495a $cb $66
     jr   Z, .jr_02_4966                                ;; 02:495c $28 $08
@@ -263,7 +263,7 @@ call_02_4957:
     ld   A, $01                                        ;; 02:4975 $3e $01
     jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:4977 $c3 $f9 $54
 
-call_02_497a:
+call_02_497a_PlayerAction_Unk18:
     ld   HL, wD805_Player_SpriteFlags                                     ;; 02:497a $21 $05 $d8
     bit  4, [HL]                                       ;; 02:497d $cb $66
     ld   A, $08                                        ;; 02:497f $3e $08
@@ -272,10 +272,10 @@ call_02_497a:
     ld   [wDC87], A                                    ;; 02:4985 $ea $87 $dc
     ret                                                ;; 02:4988 $c9
 
-call_02_4989:
+call_02_4989_PlayerAction_Unk19:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
-    jr   z,call_02_49a8
+    jr   z,call_02_49a8_PlayerAction_Unk20
     ld   a,$30
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E],a
@@ -286,17 +286,17 @@ call_02_4989:
     ld   a,$14
     call call_02_72ac_SetupNewAction
 
-call_02_49a8:
+call_02_49a8_PlayerAction_Unk20:
     ld   a,[wDC8E]
     and  a
     ld   a,$01
     jp   z,call_02_54f9_SwitchPlayerAction
     ret  
     
-call_02_49b2:  
+call_02_49b2_PlayerAction_Unk21To24:  
     ret  
 
-call_02_49b3:
+call_02_49b3_PlayerAction_Unk25:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,.jr_00_49CE
@@ -354,7 +354,7 @@ call_02_49b3:
 .data_02_4a1d:
     db   $00, $00, $00, $00, $60, $20, $20, $20        ;; 02:4a19 ????????
 
-call_02_4a25:
+call_02_4a25_PlayerAction_Unk26:
     xor  a
     ld   [wDC87],a
     ld   a,$3C
@@ -364,13 +364,13 @@ call_02_4a25:
     jp   z,jp_00_06da
     ret  
 
-call_02_4a37:
+call_02_4a37_PlayerAction_Unk27:
     xor  A, A                                          ;; 02:4a37 $af
     ld   [wDC87], A                                    ;; 02:4a38 $ea $87 $dc
     ld   A, $3c                                        ;; 02:4a3b $3e $3c
     ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 02:4a3d $ea $7e $dc
     ld   A, $01                                        ;; 02:4a40 $3e $01
-    ld   [wDC29], A                                    ;; 02:4a42 $ea $29 $dc
+    ld   [wDC29_SkipMapWindowUpdateFlag], A                                    ;; 02:4a42 $ea $29 $dc
     ld   A, [wDC91]                                    ;; 02:4a45 $fa $91 $dc
     cp   A, $b0                                        ;; 02:4a48 $fe $b0
     ret  C                                             ;; 02:4a4a $d8
@@ -378,10 +378,10 @@ call_02_4a37:
     set  1, [HL]                                       ;; 02:4a4e $cb $ce
     ret                                                ;; 02:4a50 $c9
 
-call_02_4a51:
+call_02_4a51_PlayerAction_Unk28:
     ret  
 
-call_02_4a52:
+call_02_4a52_PlayerAction_Unk29:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,.jr_00_4A61
@@ -394,11 +394,11 @@ call_02_4a52:
     jp   z,call_02_4dce_SetTriggerByLevel
     ret  
 
-call_02_4a69:
+call_02_4a69_PlayerAction_Unk30:
     ld   c,OBJECT_ANIME_CHANNEL_ELEVATOR
     jp   call_02_4db1_CheckPlayerXDistanceFromObject
 
-call_02_4a6e:
+call_02_4a6e_PlayerAction_Unk31:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,.jr_00_4A87
@@ -420,19 +420,19 @@ call_02_4a6e:
     ld   a,$19
     jp   call_02_54f9_SwitchPlayerAction
 
-call_02_4a9b:
+call_02_4a9b_PlayerAction_Unk32:
     ld   a,$01
     ld   [wDC87],a
     ret  
 
-call_02_4aa1:
+call_02_4aa1_PlayerAction_Unk33:
     ld   a,$01
     ld   [wDC87],a
     ld   a,$04
     ld   [wDC9D],a
     ret  
 
-call_02_4aac:
+call_02_4aac_PlayerAction_Unk34:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,.jr_00_4ACC
@@ -451,14 +451,14 @@ call_02_4aac:
     ld   l,[hl]
     ld   h,00
     add  hl,hl
-    ld   de,call_02_4adb
+    ld   de,call_02_4adb_Player_Unk34_Sub
     add  hl,de
     ldi  a,[hl]
     ld   h,[hl]
     ld   l,a
     jp   hl
 
-call_02_4adb:
+call_02_4adb_Player_Unk34_Sub:
     rst  $18
     ld   c,d
     ld   h,[hl]
@@ -531,7 +531,7 @@ call_02_4adb:
 .data_02_4b5e:
     db   $00, $00, $00, $00, $60, $20, $20, $20
 
-call_02_4B66:
+call_02_4B66: ; unreferenced function?
     call call_02_4ee7_MapCollisionFlags
     ld   hl,wDCA1_PlayerUnk6
     cp   a,$FF
@@ -573,7 +573,7 @@ call_02_4B66:
     set  6,[hl]
     ret  
 
-call_02_4bb7:
+call_02_4bb7_PlayerAction_Unk36:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,.jr_00_4BDC
@@ -596,15 +596,15 @@ call_02_4bb7:
     call call_02_4E0C_UpdateActionSequence
     ld   a,[wDCA5_PlayerUnk4]
     and  a
-    jr   z,call_02_4C11
+    jr   z,.jr_02_4C11
     ld   a,[wDCA6_PlayerUnk5]
     and  a
-    jr   z,call_02_4C10
+    jr   z,.jr_02_4C10
     ld   c,a
     ld   a,[wDCA5_PlayerUnk4]
     cp   a,$01
     ret  nz
-    ld   hl,call_02_4C16
+    ld   hl,.jr_02_4C16
 .jr_00_4BFD:
     inc  hl
     ldi  a,[hl]
@@ -618,22 +618,20 @@ call_02_4bb7:
     ld   a,$20
     ld   [wDC8C_PlayerYVelocity],a
     ret  
-
-call_02_4C10:
+.jr_02_4C10:
     ret  
-
-call_02_4C11:
+.jr_02_4C11:
     ld   a,[wDCA6_PlayerUnk5]
     and  a
     ret  z
-call_02_4C16:
+.jr_02_4C16:
     ret  
     
     db   $06, $00, $0d, $00, $09, $00, $0a        ;; 02:4c17 ????????
     db   $00, $05, $20, $0b, $20, $0c, $20, $0e        ;; 02:4c1e ????????
     db   $20, $0f, $20, $10, $20, $ff
 
-call_02_4c2c:
+call_02_4c2c_PlayerAction_Unk37:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,.jr_00_4C46
@@ -654,7 +652,7 @@ call_02_4c2c:
     jp   nz,call_02_54f9_SwitchPlayerAction
     jp   call_02_4dce_SetTriggerByLevel
 
-call_02_4c58:
+call_02_4c58_PlayerAction_Unk38:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,.jr_00_4C72
@@ -671,7 +669,7 @@ call_02_4c58:
     jp   z,call_02_4dce_SetTriggerByLevel
     ret  
 
-call_02_4c7a:
+call_02_4c7a_PlayerAction_Unk39:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,.jr_00_4CA1
@@ -691,7 +689,7 @@ call_02_4c7a:
 .jr_00_4CA1:
     jp   call_02_4E0C_UpdateActionSequence
 
-call_02_4ca4:
+call_02_4ca4_PlayerAction_Unk40:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,.jr_00_4CB3
@@ -705,7 +703,7 @@ call_02_4ca4:
     jp   z,call_02_54f9_SwitchPlayerAction
     ret  
 
-call_02_4cbd:
+call_02_4cbd_PlayerAction_Unk41:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,.jr_00_4CD4
@@ -724,7 +722,7 @@ call_02_4cbd:
     jp   z,call_02_54f9_SwitchPlayerAction
     ret  
 
-call_02_4ce3:
+call_02_4ce3_PlayerAction_Unk48:
     ld   a,$06
     call call_00_0ff5_QueueSoundEffect
     call call_02_4e01_SetOneTimeFlag
@@ -733,11 +731,11 @@ call_02_4ce3:
     call call_02_4df6_FlagCollisionActive
     ld   hl,wDABE_UnkBGCollisionFlags2
     bit  7,[hl]
-    jr   z,call_02_4d02
+    jr   z,call_02_4d02_PlayerAction_Unk49
     ld   a,$1E
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E],a
-call_02_4d02:
+call_02_4d02_PlayerAction_Unk49:
     ld   a,[wDC8E]
     and  a
     ret  nz
@@ -747,7 +745,7 @@ call_02_4d02:
     jp   nz,call_02_54f9_SwitchPlayerAction
     jp   call_02_4dce_SetTriggerByLevel
 
-call_02_4d14:
+call_02_4d14_PlayerAction_Unk50:
     ld   a,$07
     call call_00_0ff5_QueueSoundEffect
     call call_02_4e01_SetOneTimeFlag
@@ -756,11 +754,11 @@ call_02_4d14:
     call call_02_4df6_FlagCollisionActive
     ld   hl,wDABE_UnkBGCollisionFlags2
     bit  7,[hl]
-    jr   z,call_02_4d33
+    jr   z,call_02_4d33_PlayerAction_Unk51
     ld   a,$36
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E],a
-call_02_4d33:
+call_02_4d33_PlayerAction_Unk51:
     ld   a,[wDC8E]
     and  a
     ret  nz
@@ -770,7 +768,7 @@ call_02_4d33:
     jp   nz,call_02_54f9_SwitchPlayerAction
     jp   call_02_4dce_SetTriggerByLevel
 
-call_02_4d45:
+call_02_4d45_PlayerAction_Unk52:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,.jr_00_4D5E
@@ -792,7 +790,7 @@ call_02_4d45:
     ld   a,$30
     jp   call_02_54f9_SwitchPlayerAction
 
-call_02_4d72:
+call_02_4d72_PlayerAction_Unk53:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,.jr_00_4D81
@@ -806,7 +804,7 @@ call_02_4d72:
     jp   z,call_02_54f9_SwitchPlayerAction
     ret  
 
-call_02_4d8b:
+call_02_4d8b_PlayerAction_Unk54:
     ld   hl,wD805_Player_SpriteFlags
     bit  4,[hl]
     jr   z,.jr_00_4DA2

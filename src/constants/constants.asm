@@ -350,7 +350,7 @@ DEF MENU_UNK1B                            EQU $1B ; used but unknown
 
 ; Sound Effects
 DEF SFX_UNK00                              EQU $00
-DEF SFX_UNK01                              EQU $01
+DEF SFX_MENU_SCROLL                        EQU $01
 DEF SFX_ITEM_PICKUP                        EQU $02 ; fly coins, paw coins, bonus coins
 DEF SFX_FLY_TV                             EQU $03
 DEF SFX_UNK04                              EQU $04
@@ -381,6 +381,36 @@ DEF SFX_BOMB                               EQU $1C
 DEF SFX_UNK1D                              EQU $1D
 DEF SFX_REMOTE                             EQU $1E
 DEF SFX_UNK1F                              EQU $1F
+DEF SFX_NONE                               EQU $FF ; no sfx queued
+
+; Songs
+DEF SONG_UNK00                             EQU $00
+DEF SONG_UNK01                             EQU $01
+DEF SONG_HOLIDAY_TV                        EQU $02
+DEF SONG_WESTERN_STATION                   EQU $03
+DEF SONG_GEX_CAVE                          EQU $04
+DEF SONG_TUT_TV                            EQU $05
+DEF SONG_UNK06                             EQU $06
+DEF SONG_UNK07                             EQU $07
+DEF SONG_UNK08                             EQU $08
+DEF SONG_UNK09                             EQU $09
+DEF SONG_UNK0A                             EQU $0A
+DEF SONG_UNK0B                             EQU $0B
+DEF SONG_UNK0C                             EQU $0C
+DEF SONG_UNK0D                             EQU $0D
+DEF SONG_UNK0E                             EQU $0E
+DEF SONG_UNK0F                             EQU $0F
+DEF SONG_UNK10                             EQU $10
+DEF SONG_BOSS                              EQU $11
+DEF SONG_MYSTERY_TV                        EQU $12
+DEF SONG_UNK13                             EQU $13
+DEF SONG_ANIME_CHANNEL                     EQU $14
+DEF SONG_UNK15                             EQU $15
+DEF SONG_BONUS_CHANNEL                     EQU $16
+DEF SONG_SUPERHERO_SHOW                    EQU $17
+DEF SONG_CHANNEL_Z                         EQU $18
+DEF SONG_UNK19                             EQU $19
+DEF SONG_NONE                              EQU $FF
 
 ; Collision Types
 DEF COLLISION_TYPE_NONE                      EQU $00

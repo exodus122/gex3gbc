@@ -337,7 +337,7 @@ wDB99_MenuTypeData_Unk7:
     ds 2                                               ;; db99
 wDB9B_MenuTypeData_Unk9:
     ds 1                                               ;; db9b
-wDB9C_MenuTypeData_UnkB:
+wDB9C_MenuDynamicHandlerPtr:
     ds 2                                               ;; db9c
 wDB9E_MenuCommandBuffer_Unk0:
     ds 1                                               ;; db9e
@@ -561,10 +561,10 @@ wDC27:
 wDC28:
     ds 1                                               ;; dc28
 
-wDC29:
+wDC29_SkipMapWindowUpdateFlag: ; if set to 1, don't update the player window map
     ds 1                                               ;; dc29
 
-wDC2A:
+wDC2A_MapBoundaryIndex:
     ds 1                                               ;; dc2a
 
 wDC2B:
@@ -582,55 +582,41 @@ wDC31_TilesetBankRelated:
 wDC32_VRAMBank:
     ds 1                                               ;; dc32
 
-wDC33:
+wDC33_BgMapRelated:
     ds 1                                               ;; dc33
 
-wDC34:
+; Map rectangle bounds, and extended ones
+wDC34_MapBoundaryXMinLo:
     ds 1                                               ;; dc34
-
-wDC35:
+wDC35_MapBoundaryXMinHi:
     ds 1                                               ;; dc35
-
-wDC36:
+wDC36_MapBoundaryXMaxLo:
     ds 1                                               ;; dc36
-
-wDC37:
+wDC37_MapBoundaryXMaxHi:
     ds 1                                               ;; dc37
-
-wDC38:
+wDC38_MapBoundaryYMinLo:
     ds 1                                               ;; dc38
-
-wDC39:
+wDC39_MapBoundaryYMinHi:
     ds 1                                               ;; dc39
-
-wDC3A:
+wDC3A_MapBoundaryYMaxLo:
     ds 1                                               ;; dc3a
-
-wDC3B:
+wDC3B_MapBoundaryYMaxHi:
     ds 1                                               ;; dc3b
-
-wDC3C:
+wDC3C_MapBoundaryXMinLoPlus10:
     ds 1                                               ;; dc3c
-
-wDC3D:
+wDC3D_MapBoundaryXMinHiPlus0:
     ds 1                                               ;; dc3d
-
-wDC3E:
+wDC3E_MapBoundaryXMaxLoPlus90:
     ds 1                                               ;; dc3e
-
-wDC3F:
+wDC3F_MapBoundaryXMaxHiPlus0:
     ds 1                                               ;; dc3f
-
-wDC40:
+wDC40_MapBoundaryYMinLoPlus10:
     ds 1                                               ;; dc40
-
-wDC41:
+wDC41_MapBoundaryYMinHiPlus00:
     ds 1                                               ;; dc41
-
-wDC42:
+wDC42_MapBoundaryYMaxLoPlus78:
     ds 1                                               ;; dc42
-
-wDC43:
+wDC43_MapBoundaryYMaxHiPlus0:
     ds 1                                               ;; dc43
 
 wDC44:

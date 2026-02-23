@@ -117,123 +117,123 @@ data_02_4000:
     dw   call_02_47b4_PlayerAction_Spawn, data_02_739b
     dw   call_02_47ce_PlayerAction_Idle, data_02_73ab
     dw   call_02_47fe_PlayerAction_IdleAnimation, data_02_73b1
-    dw   call_02_480a, data_02_73c5
-    dw   call_02_481a, data_02_73da
-    dw   call_02_481f_IncrementDCACWithClamp, data_02_73e6
+    dw   call_02_480a_PlayerAction_Unk3, data_02_73c5
+    dw   call_02_481a_PlayerAction_Unk4, data_02_73da
+    dw   call_02_481f_PlayerAction_IncrementDCACWithClamp, data_02_73e6
     dw   call_02_582e_ObjectAction_None, data_02_73ef
-    dw   call_02_482e, data_02_73da
-    dw   call_02_483e, data_02_73fb
-    dw   call_02_484d, data_02_7401
-    dw   call_02_4873, data_02_7408
-    dw   call_02_4889, data_02_7411
-    dw   call_02_48a1, data_02_7422
-    dw   call_02_48b0, data_02_7428
-    dw   call_02_48bc, data_02_7435
-    dw   call_02_48e8, data_02_7442
-    dw   call_02_4911, data_02_744e
-    dw   call_02_4957, data_02_745b
-    dw   call_02_497a, data_02_746d
-    dw   call_02_4989, data_02_7473
-    dw   call_02_49a8, data_02_7473
-    dw   call_02_49b2, data_02_7479
-    dw   call_02_49b2, data_02_747f
-    dw   call_02_49b2, data_02_748f
-    dw   call_02_49b2, data_02_749f
-    dw   call_02_49b3, data_02_74a5
-    dw   call_02_4a25, data_02_745b
-    dw   call_02_4a37, data_02_74ab
-    dw   call_02_4a51, data_02_74bd
-    dw   call_02_4a52, data_02_74c8
-    dw   call_02_4a69, data_02_74ce
-    dw   call_02_4a6e, data_02_74d4
-    dw   call_02_4a9b, data_02_74e1
-    dw   call_02_4aa1, data_02_74ed
-    dw   call_02_4aac, data_02_74f7
+    dw   call_02_482e_PlayerAction_Unk7, data_02_73da
+    dw   call_02_483e_PlayerAction_Unk8, data_02_73fb
+    dw   call_02_484d_PlayerAction_Unk9, data_02_7401
+    dw   call_02_4873_PlayerAction_Unk10, data_02_7408
+    dw   call_02_4889_PlayerAction_Unk11, data_02_7411
+    dw   call_02_48a1_PlayerAction_Unk12, data_02_7422
+    dw   call_02_48b0_PlayerAction_Unk13, data_02_7428
+    dw   call_02_48bc_PlayerAction_Unk14, data_02_7435
+    dw   call_02_48e8_PlayerAction_Unk15, data_02_7442
+    dw   call_02_4911_PlayerAction_Unk16, data_02_744e
+    dw   call_02_4957_PlayerAction_Unk17, data_02_745b
+    dw   call_02_497a_PlayerAction_Unk18, data_02_746d
+    dw   call_02_4989_PlayerAction_Unk19, data_02_7473
+    dw   call_02_49a8_PlayerAction_Unk20, data_02_7473
+    dw   call_02_49b2_PlayerAction_Unk21To24, data_02_7479
+    dw   call_02_49b2_PlayerAction_Unk21To24, data_02_747f
+    dw   call_02_49b2_PlayerAction_Unk21To24, data_02_748f
+    dw   call_02_49b2_PlayerAction_Unk21To24, data_02_749f
+    dw   call_02_49b3_PlayerAction_Unk25, data_02_74a5
+    dw   call_02_4a25_PlayerAction_Unk26, data_02_745b
+    dw   call_02_4a37_PlayerAction_Unk27, data_02_74ab
+    dw   call_02_4a51_PlayerAction_Unk28, data_02_74bd
+    dw   call_02_4a52_PlayerAction_Unk29, data_02_74c8
+    dw   call_02_4a69_PlayerAction_Unk30, data_02_74ce
+    dw   call_02_4a6e_PlayerAction_Unk31, data_02_74d4
+    dw   call_02_4a9b_PlayerAction_Unk32, data_02_74e1
+    dw   call_02_4aa1_PlayerAction_Unk33, data_02_74ed
+    dw   call_02_4aac_PlayerAction_Unk34, data_02_74f7
     dw   call_02_47b4_PlayerAction_Spawn, data_02_74fd
-    dw   call_02_4bb7, data_02_750d
-    dw   call_02_4c2c, data_02_753b
-    dw   call_02_4c58, data_02_7543
-    dw   call_02_4c7a, data_02_754b
-    dw   call_02_4ca4, data_02_7551
-    dw   call_02_4cbd, data_02_7513
-    dw   call_02_4873, data_02_7519
-    dw   call_02_4889, data_02_7522
-    dw   call_02_48a1, data_02_7528
-    dw   call_02_48b0, data_02_752e
-    dw   call_02_4a25, data_02_7551
+    dw   call_02_4bb7_PlayerAction_Unk36, data_02_750d
+    dw   call_02_4c2c_PlayerAction_Unk37, data_02_753b
+    dw   call_02_4c58_PlayerAction_Unk38, data_02_7543
+    dw   call_02_4c7a_PlayerAction_Unk39, data_02_754b
+    dw   call_02_4ca4_PlayerAction_Unk40, data_02_7551
+    dw   call_02_4cbd_PlayerAction_Unk41, data_02_7513
+    dw   call_02_4873_PlayerAction_Unk10, data_02_7519
+    dw   call_02_4889_PlayerAction_Unk11, data_02_7522
+    dw   call_02_48a1_PlayerAction_Unk12, data_02_7528
+    dw   call_02_48b0_PlayerAction_Unk13, data_02_752e
+    dw   call_02_4a25_PlayerAction_Unk26, data_02_7551
     dw   call_02_47b4_PlayerAction_Spawn, data_02_7559
-    dw   call_02_4ce3, data_02_758e
-    dw   call_02_4d02, data_02_7594
-    dw   call_02_4d14, data_02_759f
-    dw   call_02_4d33, data_02_75a5
-    dw   call_02_4d45, data_02_75ae
-    dw   call_02_4d72, data_02_75bb
-    dw   call_02_4d8b, data_02_7569
-    dw   call_02_4873, data_02_756f
-    dw   call_02_4889, data_02_7576
-    dw   call_02_48a1, data_02_757c
-    dw   call_02_48b0, data_02_7582
-    dw   call_02_4a25, data_02_75bb
+    dw   call_02_4ce3_PlayerAction_Unk48, data_02_758e
+    dw   call_02_4d02_PlayerAction_Unk49, data_02_7594
+    dw   call_02_4d14_PlayerAction_Unk50, data_02_759f
+    dw   call_02_4d33_PlayerAction_Unk51, data_02_75a5
+    dw   call_02_4d45_PlayerAction_Unk52, data_02_75ae
+    dw   call_02_4d72_PlayerAction_Unk53, data_02_75bb
+    dw   call_02_4d8b_PlayerAction_Unk54, data_02_7569
+    dw   call_02_4873_PlayerAction_Unk10, data_02_756f
+    dw   call_02_4889_PlayerAction_Unk11, data_02_7576
+    dw   call_02_48a1_PlayerAction_Unk12, data_02_757c
+    dw   call_02_48b0_PlayerAction_Unk13, data_02_7582
+    dw   call_02_4a25_PlayerAction_Unk26, data_02_75bb
     dw   call_02_47b4_PlayerAction_Spawn, data_02_739b
     dw   call_02_47ce_PlayerAction_Idle, data_02_73ab
     dw   call_02_47fe_PlayerAction_IdleAnimation, data_02_73b1
-    dw   call_02_480a, data_02_73c5
-    dw   call_02_481a, data_02_73da
+    dw   call_02_480a_PlayerAction_Unk3, data_02_73c5
+    dw   call_02_481a_PlayerAction_Unk4, data_02_73da
     dw   call_02_582e_ObjectAction_None, data_02_73e6
     dw   call_02_582e_ObjectAction_None, data_02_73ef
-    dw   call_02_482e, data_02_73da
-    dw   call_02_483e, data_02_73fb
-    dw   call_02_484d, data_02_7401
-    dw   call_02_4873, data_02_7408
-    dw   call_02_4889, data_02_7411
-    dw   call_02_48a1, data_02_7422
-    dw   call_02_48b0, data_02_7428
-    dw   call_02_48bc, data_02_7435
-    dw   call_02_48e8, data_02_7442
-    dw   call_02_4911, data_02_744e
-    dw   call_02_4957, data_02_745b
-    dw   call_02_497a, data_02_746d
-    dw   call_02_4989, data_02_7473
-    dw   call_02_49a8, data_02_7473
-    dw   call_02_49b2, data_02_7479
-    dw   call_02_49b2, data_02_747f
-    dw   call_02_49b2, data_02_748f
-    dw   call_02_49b2, data_02_749f
-    dw   call_02_49b3, data_02_74a5
-    dw   call_02_4a25, data_02_745b
-    dw   call_02_4a37, data_02_74ab
-    dw   call_02_4a51, data_02_74bd
-    dw   call_02_4a52, data_02_74c8
-    dw   call_02_4a69, data_02_74ce
-    dw   call_02_4a6e, data_02_74d4
-    dw   call_02_4a9b, data_02_74e1
-    dw   call_02_4aa1, data_02_74ed
-    dw   call_02_4aac, data_02_74f7
+    dw   call_02_482e_PlayerAction_Unk7, data_02_73da
+    dw   call_02_483e_PlayerAction_Unk8, data_02_73fb
+    dw   call_02_484d_PlayerAction_Unk9, data_02_7401
+    dw   call_02_4873_PlayerAction_Unk10, data_02_7408
+    dw   call_02_4889_PlayerAction_Unk11, data_02_7411
+    dw   call_02_48a1_PlayerAction_Unk12, data_02_7422
+    dw   call_02_48b0_PlayerAction_Unk13, data_02_7428
+    dw   call_02_48bc_PlayerAction_Unk14, data_02_7435
+    dw   call_02_48e8_PlayerAction_Unk15, data_02_7442
+    dw   call_02_4911_PlayerAction_Unk16, data_02_744e
+    dw   call_02_4957_PlayerAction_Unk17, data_02_745b
+    dw   call_02_497a_PlayerAction_Unk18, data_02_746d
+    dw   call_02_4989_PlayerAction_Unk19, data_02_7473
+    dw   call_02_49a8_PlayerAction_Unk20, data_02_7473
+    dw   call_02_49b2_PlayerAction_Unk21To24, data_02_7479
+    dw   call_02_49b2_PlayerAction_Unk21To24, data_02_747f
+    dw   call_02_49b2_PlayerAction_Unk21To24, data_02_748f
+    dw   call_02_49b2_PlayerAction_Unk21To24, data_02_749f
+    dw   call_02_49b3_PlayerAction_Unk25, data_02_74a5
+    dw   call_02_4a25_PlayerAction_Unk26, data_02_745b
+    dw   call_02_4a37_PlayerAction_Unk27, data_02_74ab
+    dw   call_02_4a51_PlayerAction_Unk28, data_02_74bd
+    dw   call_02_4a52_PlayerAction_Unk29, data_02_74c8
+    dw   call_02_4a69_PlayerAction_Unk30, data_02_74ce
+    dw   call_02_4a6e_PlayerAction_Unk31, data_02_74d4
+    dw   call_02_4a9b_PlayerAction_Unk32, data_02_74e1
+    dw   call_02_4aa1_PlayerAction_Unk33, data_02_74ed
+    dw   call_02_4aac_PlayerAction_Unk34, data_02_74f7
     dw   call_02_47b4_PlayerAction_Spawn, data_02_74fd
-    dw   call_02_4bb7, data_02_750d
-    dw   call_02_4c2c, data_02_753b
-    dw   call_02_4c58, data_02_7543
-    dw   call_02_4c7a, data_02_754b
-    dw   call_02_4ca4, data_02_7551
-    dw   call_02_4cbd, data_02_7513
-    dw   call_02_4873, data_02_7519
-    dw   call_02_4889, data_02_7522
-    dw   call_02_48a1, data_02_7528
-    dw   call_02_48b0, data_02_752e
-    dw   call_02_4a25, data_02_7551
+    dw   call_02_4bb7_PlayerAction_Unk36, data_02_750d
+    dw   call_02_4c2c_PlayerAction_Unk37, data_02_753b
+    dw   call_02_4c58_PlayerAction_Unk38, data_02_7543
+    dw   call_02_4c7a_PlayerAction_Unk39, data_02_754b
+    dw   call_02_4ca4_PlayerAction_Unk40, data_02_7551
+    dw   call_02_4cbd_PlayerAction_Unk41, data_02_7513
+    dw   call_02_4873_PlayerAction_Unk10, data_02_7519
+    dw   call_02_4889_PlayerAction_Unk11, data_02_7522
+    dw   call_02_48a1_PlayerAction_Unk12, data_02_7528
+    dw   call_02_48b0_PlayerAction_Unk13, data_02_752e
+    dw   call_02_4a25_PlayerAction_Unk26, data_02_7551
     dw   call_02_47b4_PlayerAction_Spawn, data_02_7559
-    dw   call_02_4ce3, data_02_758e
-    dw   call_02_4d02, data_02_7594
-    dw   call_02_4d14, data_02_759f
-    dw   call_02_4d33, data_02_75a5
-    dw   call_02_4d45, data_02_75ae
-    dw   call_02_4d72, data_02_75bb
-    dw   call_02_4d8b, data_02_7569
-    dw   call_02_4873, data_02_756f
-    dw   call_02_4889, data_02_7576
-    dw   call_02_48a1, data_02_757c
-    dw   call_02_48b0, data_02_7582
-    dw   call_02_4a25, data_02_75bb
+    dw   call_02_4ce3_PlayerAction_Unk48, data_02_758e
+    dw   call_02_4d02_PlayerAction_Unk49, data_02_7594
+    dw   call_02_4d14_PlayerAction_Unk50, data_02_759f
+    dw   call_02_4d33_PlayerAction_Unk51, data_02_75a5
+    dw   call_02_4d45_PlayerAction_Unk52, data_02_75ae
+    dw   call_02_4d72_PlayerAction_Unk53, data_02_75bb
+    dw   call_02_4d8b_PlayerAction_Unk54, data_02_7569
+    dw   call_02_4873_PlayerAction_Unk10, data_02_756f
+    dw   call_02_4889_PlayerAction_Unk11, data_02_7576
+    dw   call_02_48a1_PlayerAction_Unk12, data_02_757c
+    dw   call_02_48b0_PlayerAction_Unk13, data_02_7582
+    dw   call_02_4a25_PlayerAction_Unk26, data_02_75bb
 .data_02_42c4:
     dw   call_02_582e_ObjectAction_None, data_02_75c8
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
@@ -244,7 +244,7 @@ data_02_4000:
     dw   call_02_582e_ObjectAction_None, data_02_75dc
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_42dc:
-    dw   call_02_5918, data_02_75e9
+    dw   call_02_5918_ObjectAction_Unk_unk, data_02_75e9
 .data_02_42e0:
     dw   call_02_582e_ObjectAction_None, data_02_75ef
     dw   call_02_582e_ObjectAction_None, data_02_75f5
@@ -252,11 +252,11 @@ data_02_4000:
     dw   call_02_59aa_ObjectAction_FlyTV_Reset, data_02_760b
     dw   call_02_582e_ObjectAction_None, data_02_7611
 .data_02_42f4:
-    dw   call_02_59ed, data_02_7627
+    dw   call_02_59ed_ObjectAction_Unk_unk, data_02_7627
 .data_02_42f8:
-    dw   call_02_59ed, data_02_762d
+    dw   call_02_59ed_ObjectAction_Unk_unk, data_02_762d
 .data_02_42fc:
-    dw   call_02_59ed, data_02_7633
+    dw   call_02_59ed_ObjectAction_Unk_unk, data_02_7633
 .data_02_4300:
     dw   call_02_5a04_ObjectAction_TVButton_unk, data_02_7639
     dw   call_02_5a1c_ObjectAction_TVButton_unk2, data_02_7639
@@ -626,7 +626,7 @@ data_02_4000:
 .data_02_475c:
     dw   call_02_6e44_ObjectAction_BrainOfOzProjectile_Update, data_02_7e53
 .data_02_4760:
-    dw   call_02_6f07, data_02_7e5e
+    dw   call_02_6f07_ObjectAction_Unk_unk, data_02_7e5e
 .data_02_4764:
     dw   call_02_6f0e_ObjectAction_Unk_None, data_02_7e67
 .data_02_4768:

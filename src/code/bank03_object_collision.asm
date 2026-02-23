@@ -1310,7 +1310,7 @@ call_03_54ee_Collision_RaStatueProjectile:
     farcall call_02_72ac_SetupNewAction
     ret  
 
-call_03_54f9:
+call_03_54f9: ; unreferenced function?
 ; Writes 0x3C to byte at offset 15.
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_UNK15_OFFSET

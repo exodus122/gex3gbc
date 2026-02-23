@@ -132,7 +132,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   HL, wDAD7_CurrentInputs                                     ;; 01:408d $21 $d7 $da
     bit  2, [HL]                                       ;; 01:4090 $cb $56
     jr   Z, .jr_01_40ad                                ;; 01:4092 $28 $19
-    ld   A, $01                                        ;; 01:4094 $3e $01
+    ld   A, SFX_MENU_SCROLL                                        ;; 01:4094 $3e $01
     call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4096 $cd $d7 $0f
     ld   A, [wDBE8]                                    ;; 01:4099 $fa $e8 $db
     ld   [wDB6C_CurrentMapId], A                                    ;; 01:409c $ea $6c $db
@@ -188,7 +188,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     jr   Z, .jr_01_4109                                ;; 01:4105 $28 $02
     ld   [HL], $01                                     ;; 01:4107 $36 $01
 .jr_01_4109:
-    ld   A, $01                                        ;; 01:4109 $3e $01
+    ld   A, SFX_MENU_SCROLL                                        ;; 01:4109 $3e $01
     call call_00_0fd7_TriggerSoundEffect                                  ;; 01:410b $cd $d7 $0f
     jp   .jp_01_4070                                   ;; 01:410e $c3 $70 $40
 .jr_01_4111:
@@ -232,16 +232,16 @@ call_01_4000_MenuHandler_LoadAndProcess:
     jr   NZ, .jr_01_4153                               ;; 01:4150 $20 $01
     ld   [HL], A                                       ;; 01:4152 $77
 .jr_01_4153:
-    ld   A, $01                                        ;; 01:4153 $3e $01
+    ld   A, SFX_MENU_SCROLL                                        ;; 01:4153 $3e $01
     call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4155 $cd $d7 $0f
     jp   .jp_01_4070                                   ;; 01:4158 $c3 $70 $40
 .jp_01_415b:
     call call_01_505a_ValidatePassword                                  ;; 01:415b $cd $5a $50
     push AF                                            ;; 01:415e $f5
     cp   A, $20                                        ;; 01:415f $fe $20
-    ld   A, $ff                                        ;; 01:4161 $3e $ff
+    ld   A, SFX_NONE                                        ;; 01:4161 $3e $ff
     jr   Z, .jr_01_4167                                ;; 01:4163 $28 $02
-    ld   A, $ff                                        ;; 01:4165 $3e $ff
+    ld   A, SFX_NONE                                        ;; 01:4165 $3e $ff
 .jr_01_4167:
     call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4167 $cd $d7 $0f
     ld   B, $3c                                        ;; 01:416a $06 $3c
@@ -295,7 +295,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     jr   Z, .jr_01_41c3                                ;; 01:41bf $28 $02
     ld   [HL], $02                                     ;; 01:41c1 $36 $02
 .jr_01_41c3:
-    ld   A, $01                                        ;; 01:41c3 $3e $01
+    ld   A, SFX_MENU_SCROLL                                        ;; 01:41c3 $3e $01
     call call_00_0fd7_TriggerSoundEffect                                  ;; 01:41c5 $cd $d7 $0f
     jp   .jp_01_4070                                   ;; 01:41c8 $c3 $70 $40
 .jp_01_41cb:
@@ -320,7 +320,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     jr   Z, .jp_01_41fc                                ;; 01:41ee $28 $0c
     inc  [HL]                                          ;; 01:41f0 $34
 .jr_01_41f1:
-    ld   A, $01                                        ;; 01:41f1 $3e $01
+    ld   A, SFX_MENU_SCROLL                                        ;; 01:41f1 $3e $01
     call call_00_0fd7_TriggerSoundEffect                                  ;; 01:41f3 $cd $d7 $0f
     call call_01_43ba_JumpToDynamicHandler                                  ;; 01:41f6 $cd $ba $43
     jp   .jp_01_4070                                   ;; 01:41f9 $c3 $70 $40
@@ -350,13 +350,13 @@ call_01_4000_MenuHandler_LoadAndProcess:
     farcall call_03_6c89_LoadMapData
     ld   HL, data_01_5692                              ;; 01:422e $21 $92 $56
     call call_01_4454_SetMenuPointer                                  ;; 01:4231 $cd $54 $44
-    ld   A, $01                                        ;; 01:4234 $3e $01
+    ld   A, SFX_MENU_SCROLL                                        ;; 01:4234 $3e $01
     call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4236 $cd $d7 $0f
     jp   .jp_01_4070                                   ;; 01:4239 $c3 $70 $40
 .jr_01_423c:
     call call_00_0f9c_CheckInputB                                  ;; 01:423c $cd $9c $0f
     jp   Z, .jp_01_4078                                ;; 01:423f $ca $78 $40
-    ld   A, $01                                        ;; 01:4242 $3e $01
+    ld   A, SFX_MENU_SCROLL                                        ;; 01:4242 $3e $01
     call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4244 $cd $d7 $0f
     call call_00_0f5e_WaitUntilNoInputPressed                                  ;; 01:4247 $cd $5e $0f
     ld   A, [wDBE8]                                    ;; 01:424a $fa $e8 $db
@@ -449,14 +449,14 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   A, [wDAD7_CurrentInputs]                                    ;; 01:42f2 $fa $d7 $da
     and  A, A                                          ;; 01:42f5 $a7
     jr   Z, .jr_01_42e5                                ;; 01:42f6 $28 $ed
-    ld   A, $01                                        ;; 01:42f8 $3e $01
+    ld   A, SFX_MENU_SCROLL                                        ;; 01:42f8 $3e $01
     jp   call_00_0fd7_TriggerSoundEffect                                  ;; 01:42fa $c3 $d7 $0f
 
 call_01_42fd_LoadMenu03_InitSong15:
 ; Behavior:
 ; Requests song bank 15 and starts playback, then immediately jumps to LoadMenu with ID $03.
 ; Likely Purpose: Entry point to show a specific menu screen (e.g., pause/options).
-    ld   A, $15                                        ;; 01:42fd $3e $15
+    ld   A, SONG_UNK15                                        ;; 01:42fd $3e $15
     call call_00_0fa2_PlaySong                                  ;; 01:42ff $cd $a2 $0f
     ld   A, MENU_GAME_OVER                                        ;; 01:4302 $3e $03
     jp   call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4304 $c3 $00 $40
@@ -466,7 +466,7 @@ call_01_4307_PreloadMenus_15to1A:
 ; Requests song bank 19 and plays it, then sequentially loads menus $15–$1A.
 ; Likely Purpose: Preloads multiple menu assets into VRAM (like caching 
 ; graphics for level select or transitions).
-    ld   A, $19                                        ;; 01:4307 $3e $19
+    ld   A, SONG_UNK19                                        ;; 01:4307 $3e $19
     call call_00_0fa2_PlaySong                                  ;; 01:4309 $cd $a2 $0f
     ld   A, MENU_END_CREDITS_1                                        ;; 01:430c $3e $15
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:430e $cd $00 $40
@@ -492,7 +492,7 @@ call_01_432b_SetLevelMenuAndPalette:
     ld   A, [wDB6C_CurrentMapId]                                    ;; 01:432b $fa $6c $db
     and  A, A                                          ;; 01:432e $a7
     ret  Z                                             ;; 01:432f $c8
-    ld   A, $04                                        ;; 01:4330 $3e $04
+    ld   A, SONG_GEX_CAVE                                        ;; 01:4330 $3e $04
     call call_00_0fa2_PlaySong                                  ;; 01:4332 $cd $a2 $0f
     ld   A, [wDB6C_CurrentMapId]                                    ;; 01:4335 $fa $6c $db
     cp   A, $07                                        ;; 01:4338 $fe $07
@@ -540,13 +540,13 @@ call_01_435e_HandleLevelTransitionMenu:
     bit  5, [HL]                                       ;; 01:4372 $cb $6e
     jr   Z, .jr_01_4384                                ;; 01:4374 $28 $0e
     res  5, [HL]                                       ;; 01:4376 $cb $ae
-    ld   A, $15                                        ;; 01:4378 $3e $15
+    ld   A, SONG_UNK15                                        ;; 01:4378 $3e $15
     call call_00_0fa2_PlaySong                                  ;; 01:437a $cd $a2 $0f
     ld   A, MENU_UNK0A                                        ;; 01:437d $3e $0a
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:437f $cd $00 $40
     jr   .jr_01_43ae                                   ;; 01:4382 $18 $2a
 .jr_01_4384:
-    ld   A, $13                                        ;; 01:4384 $3e $13
+    ld   A, SONG_UNK13                                        ;; 01:4384 $3e $13
     call call_00_0fa2_PlaySong                                  ;; 01:4386 $cd $a2 $0f
     ld   A, MENU_UNK1B                                        ;; 01:4389 $3e $1b
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:438b $cd $00 $40
@@ -562,7 +562,7 @@ call_01_435e_HandleLevelTransitionMenu:
     call call_01_4307_PreloadMenus_15to1A                                  ;; 01:439f $cd $07 $43
     jr   .jr_01_43ae                                   ;; 01:43a2 $18 $0a
 .jr_01_43a4:
-    ld   A, $13                                        ;; 01:43a4 $3e $13
+    ld   A, SONG_UNK13                                        ;; 01:43a4 $3e $13
     call call_00_0fa2_PlaySong                                  ;; 01:43a6 $cd $a2 $0f
     ld   A, MENU_UNK09                                        ;; 01:43a9 $3e $09
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:43ab $cd $00 $40
@@ -577,9 +577,9 @@ call_01_435e_HandleLevelTransitionMenu:
 
 call_01_43ba_JumpToDynamicHandler:
 ; Behavior:
-; Reads a pointer from wDB9C_MenuTypeData_UnkB/wDB9D; if nonzero, jumps there.
+; Reads a pointer from wDB9C_MenuDynamicHandlerPtr; if nonzero, jumps there.
 ; Likely Purpose: Generic “execute callback” mechanism for menu or level-specific code.
-    ld   HL, wDB9C_MenuTypeData_UnkB                                     ;; 01:43ba $21 $9c $db
+    ld   HL, wDB9C_MenuDynamicHandlerPtr                                     ;; 01:43ba $21 $9c $db
     ld   A, [HL+]                                      ;; 01:43bd $2a
     ld   H, [HL]                                       ;; 01:43be $66
     ld   L, A                                          ;; 01:43bf $6f
@@ -738,7 +738,7 @@ call_01_446b_ExecuteMenuCommand:
 .jr_01_44cd:
     ld   A, [wDBAA_MenuCommandBuffer2_Unk6]                                    ;; 01:44cd $fa $aa $db
     and  A, $02                                        ;; 01:44d0 $e6 $02
-    call NZ, call_01_4875_ProcessTilemapOrCollectibles                              ;; 01:44d2 $c4 $75 $48
+    call NZ, call_01_4875_ProcessTextTilemap                              ;; 01:44d2 $c4 $75 $48
     ld   A, [wDBAA_MenuCommandBuffer2_Unk6]                                    ;; 01:44d5 $fa $aa $db
     and  A, $20                                        ;; 01:44d8 $e6 $20
     jr   Z, .jr_01_448c                                ;; 01:44da $28 $b0
@@ -1231,10 +1231,10 @@ call_01_4826_MenuState_UpdateCursorAlt:
 .data_01_4871:
     db   $01, $02, $04, $08             ;; 01:486e ???????
 
-call_01_4875_ProcessTilemapOrCollectibles:
+call_01_4875_ProcessTextTilemap:
 ; Description: Loads object/sprite data from a table into wDBAB_MenuCommandBuffer3_Unk0, calls call_01_49bb_FormatAndPaginateText for setup, 
 ; iterates through tile data at wDBA7_MenuCommandBuffer2_Unk3, performs collision/bitmask checks, updates wDBA4_MenuCommandBuffer2_Unk0 and wDBA5_MenuCommandBuffer2_Unk1, 
-; and repeatedly calls call_01_48cd_TilemapXorCopy. Appears to process tilemap collisions or update collectible graphics.
+; and repeatedly calls call_01_48cd_TextTilemapXorCopy. Appears to process tilemap collisions or update collectible graphics.
     ld   HL, wDBA6_MenuCommandBuffer2_Unk2                                     ;; 01:4875 $21 $a6 $db
     ld   L, [HL]                                       ;; 01:4878 $6e
     ld   H, $00                                        ;; 01:4879 $26 $00
@@ -1275,7 +1275,7 @@ call_01_4875_ProcessTilemapOrCollectibles:
 .jr_01_48b5:
     ld   A, [HL+]                                      ;; 01:48b5 $2a
     push HL                                            ;; 01:48b6 $e5
-    call call_01_48cd_TilemapXorCopy                                  ;; 01:48b7 $cd $cd $48
+    call call_01_48cd_TextTilemapXorCopy                                  ;; 01:48b7 $cd $cd $48
     pop  HL                                            ;; 01:48ba $e1
     bit  7, [HL]                                       ;; 01:48bb $cb $7e
     jr   Z, .jr_01_48b5                                ;; 01:48bd $28 $f6
@@ -1287,7 +1287,7 @@ call_01_4875_ProcessTilemapOrCollectibles:
     ld   [HL], A                                       ;; 01:48ca $77
     jr   .jr_01_488e                                   ;; 01:48cb $18 $c1
 
-call_01_48cd_TilemapXorCopy:
+call_01_48cd_TextTilemapXorCopy:
 ; Description: Performs bit manipulation to combine map data (uses wDBA4_MenuCommandBuffer2_Unk0, wDBA5_MenuCommandBuffer2_Unk1, wDB9E_MenuCommandBuffer_Unk0) with tile memory. 
 ; Does multiple shifts and XOR writes—likely draws or updates tile graphics.
     call call_01_4a7f_GetCharTileAddress                                  ;; 01:48cd $cd $7f $4a
@@ -2383,810 +2383,3 @@ call_01_4f67_CopyTileBufferToBgMap:
     dec  B                                             ;; 01:4f7a $05
     jr   NZ, .jr_01_4f6c                               ;; 01:4f7b $20 $ef
     ret                                                ;; 01:4f7d $c9
-
-call_01_4f7e_SeedTileLookupTable:
-; Description:
-; Initializes wDB7E_PasswordValues with $20 and copies it forward 17 bytes, 
-; clearing or seeding a lookup table used by map computations.
-    ld   HL, wDB7E_PasswordValues                                     ;; 01:4f7e $21 $7e $db
-    ld   DE, wDB7E_PasswordValues+1                                     ;; 01:4f81 $11 $7f $db
-    ld   BC, $11                                       ;; 01:4f84 $01 $11 $00
-    ld   [HL], $20                                     ;; 01:4f87 $36 $20
-    jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4f89 $c3 $6e $07
-
-call_01_4f8c_BuildPasswordBitfieldAndChecksum:
-; Description:
-; Clears wDB72_PasswordEncodedBuffer–wDB7D, seeds wDB73_PasswordLivesRemaining–wDB75_PasswordPawCoinExtraHealth from wDC4E_PlayerLivesRemaining/AF/4F, then iterates through DC5C/DC5D data, 
-; checking bit masks (.data_01_5013 and .data_01_501f) to build bitfields in wDB76_PasswordEncodedBuffer+. 
-; Sums values for a checksum in wDB72_PasswordEncodedBuffer and sets a completion flag wDB91_PasswordCompletionFlag.
-    ld   HL, wDB72_PasswordEncodedBuffer                                     ;; 01:4f8c $21 $72 $db
-    ld   B, $0c                                        ;; 01:4f8f $06 $0c
-    xor  A, A                                          ;; 01:4f91 $af
-.jr_01_4f92:
-    ld   [HL+], A                                      ;; 01:4f92 $22
-    dec  B                                             ;; 01:4f93 $05
-    jr   NZ, .jr_01_4f92                               ;; 01:4f94 $20 $fc
-    xor  A, A                                          ;; 01:4f96 $af
-    ld   [wDB72_PasswordEncodedBuffer], A                                    ;; 01:4f97 $ea $72 $db
-    ld   A, [wDC4E_PlayerLivesRemaining]                                    ;; 01:4f9a $fa $4e $dc
-    ld   [wDB73_PasswordLivesRemaining], A                                    ;; 01:4f9d $ea $73 $db
-    ld   A, [wDCAF_PawCoinCounter]                                    ;; 01:4fa0 $fa $af $dc
-    ld   [wDB74_PasswordPawCoinCounter], A                                    ;; 01:4fa3 $ea $74 $db
-    ld   A, [wDC4F_PawCoinExtraHealth]                                    ;; 01:4fa6 $fa $4f $dc
-    ld   [wDB75_PasswordPawCoinExtraHealth], A                                    ;; 01:4fa9 $ea $75 $db
-    xor  A, A                                          ;; 01:4fac $af
-    ld   [wDB90_PasswordCounter], A                                    ;; 01:4fad $ea $90 $db
-    ld   DE, $00                                       ;; 01:4fb0 $11 $00 $00
-.jr_01_4fb3:
-    push DE                                            ;; 01:4fb3 $d5
-    ld   HL, wDC5C_ProgressFlags                                     ;; 01:4fb4 $21 $5c $dc
-    add  HL, DE                                        ;; 01:4fb7 $19
-    ld   C, [HL]                                       ;; 01:4fb8 $4e
-    ld   HL, .data_01_5013                             ;; 01:4fb9 $21 $13 $50
-    add  HL, DE                                        ;; 01:4fbc $19
-    ld   B, [HL]                                       ;; 01:4fbd $46
-    ld   A, $08                                        ;; 01:4fbe $3e $08
-.jr_01_4fc0:
-    push AF                                            ;; 01:4fc0 $f5
-    bit  7, B                                          ;; 01:4fc1 $cb $78
-    jr   Z, .jr_01_4fee                                ;; 01:4fc3 $28 $29
-    bit  7, C                                          ;; 01:4fc5 $cb $79
-    jr   Z, .jr_01_4fea                                ;; 01:4fc7 $28 $21
-    ld   A, [wDB90_PasswordCounter]                                    ;; 01:4fc9 $fa $90 $db
-    srl  A                                             ;; 01:4fcc $cb $3f
-    srl  A                                             ;; 01:4fce $cb $3f
-    srl  A                                             ;; 01:4fd0 $cb $3f
-    ld   E, A                                          ;; 01:4fd2 $5f
-    ld   D, $00                                        ;; 01:4fd3 $16 $00
-    ld   HL, wDB76_PasswordEncodedBuffer                                     ;; 01:4fd5 $21 $76 $db
-    add  HL, DE                                        ;; 01:4fd8 $19
-    push HL                                            ;; 01:4fd9 $e5
-    ld   A, [wDB90_PasswordCounter]                                    ;; 01:4fda $fa $90 $db
-    and  A, $07                                        ;; 01:4fdd $e6 $07
-    ld   E, A                                          ;; 01:4fdf $5f
-    ld   D, $00                                        ;; 01:4fe0 $16 $00
-    ld   HL, .data_01_501f                             ;; 01:4fe2 $21 $1f $50
-    add  HL, DE                                        ;; 01:4fe5 $19
-    ld   A, [HL]                                       ;; 01:4fe6 $7e
-    pop  HL                                            ;; 01:4fe7 $e1
-    or   A, [HL]                                       ;; 01:4fe8 $b6
-    ld   [HL], A                                       ;; 01:4fe9 $77
-.jr_01_4fea:
-    ld   HL, wDB90_PasswordCounter                                     ;; 01:4fea $21 $90 $db
-    inc  [HL]                                          ;; 01:4fed $34
-.jr_01_4fee:
-    sla  C                                             ;; 01:4fee $cb $21
-    sla  B                                             ;; 01:4ff0 $cb $20
-    pop  AF                                            ;; 01:4ff2 $f1
-    dec  A                                             ;; 01:4ff3 $3d
-    jr   NZ, .jr_01_4fc0                               ;; 01:4ff4 $20 $ca
-    pop  DE                                            ;; 01:4ff6 $d1
-    inc  E                                             ;; 01:4ff7 $1c
-    ld   A, E                                          ;; 01:4ff8 $7b
-    cp   A, $0c                                        ;; 01:4ff9 $fe $0c
-    jr   C, .jr_01_4fb3                                ;; 01:4ffb $38 $b6
-    ld   HL, wDB73_PasswordLivesRemaining                                     ;; 01:4ffd $21 $73 $db
-    ld   B, $0b                                        ;; 01:5000 $06 $0b
-    xor  A, A                                          ;; 01:5002 $af
-.jr_01_5003:
-    add  A, [HL]                                       ;; 01:5003 $86
-    inc  HL                                            ;; 01:5004 $23
-    dec  B                                             ;; 01:5005 $05
-    jr   NZ, .jr_01_5003                               ;; 01:5006 $20 $fb
-    xor  A, $b6                                        ;; 01:5008 $ee $b6
-    ld   [wDB72_PasswordEncodedBuffer], A                                    ;; 01:500a $ea $72 $db
-    ld   A, $01                                        ;; 01:500d $3e $01
-    ld   [wDB91_PasswordCompletionFlag], A                                    ;; 01:500f $ea $91 $db
-    ret                                                ;; 01:5012 $c9
-.data_01_5013:
-    db   $f1, $ff, $ff, $ff, $ff, $ff, $ff, $01        ;; 01:5013 ........
-    db   $01, $01, $01, $01                            ;; 01:501b ....
-.data_01_501f:
-    db   $80, $40, $20, $10, $08, $04, $02, $01        ;; 01:501f ??.?.???
-
-call_01_5027_BuildPasswordBufferFromBitfield:
-; Description:
-; Initializes the buffer at wDB7E_PasswordValues to zeros, then iterates through bits in wDB72_PasswordEncodedBuffer to set flags in the buffer. 
-; It scans wDB72_PasswordEncodedBuffer bitfields (masking with $80, $40, etc.) and for each set bit, ORs $10 into the corresponding 
-; entry in wDB7E_PasswordValues. Essentially, it maps a bitfield of collision/attribute flags into a tile-flag buffer.
-    ld   HL, wDB7E_PasswordValues                                     ;; 01:5027 $21 $7e $db
-    ld   DE, wDB7E_PasswordValues+1                                     ;; 01:502a $11 $7f $db
-    ld   BC, $11                                       ;; 01:502d $01 $11 $00
-    ld   [HL], $00                                     ;; 01:5030 $36 $00
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:5032 $cd $6e $07
-    ld   HL, wDB72_PasswordEncodedBuffer                                     ;; 01:5035 $21 $72 $db
-    ld   B, $80                                        ;; 01:5038 $06 $80
-    ld   DE, wDB7E_PasswordValues                                     ;; 01:503a $11 $7e $db
-    ld   C, $10                                        ;; 01:503d $0e $10
-    ld   A, $5a                                        ;; 01:503f $3e $5a
-.jr_01_5041:
-    push AF                                            ;; 01:5041 $f5
-    ld   A, [HL]                                       ;; 01:5042 $7e
-    and  A, B                                          ;; 01:5043 $a0
-    jr   Z, .jr_01_5049                                ;; 01:5044 $28 $03
-    ld   A, [DE]                                       ;; 01:5046 $1a
-    or   A, C                                          ;; 01:5047 $b1
-    ld   [DE], A                                       ;; 01:5048 $12
-.jr_01_5049:
-    rrc  C                                             ;; 01:5049 $cb $09
-    jr   NC, .jr_01_5050                               ;; 01:504b $30 $03
-    inc  DE                                            ;; 01:504d $13
-    ld   C, $10                                        ;; 01:504e $0e $10
-.jr_01_5050:
-    rrc  B                                             ;; 01:5050 $cb $08
-    jr   NC, .jr_01_5055                               ;; 01:5052 $30 $01
-    inc  HL                                            ;; 01:5054 $23
-.jr_01_5055:
-    pop  AF                                            ;; 01:5055 $f1
-    dec  A                                             ;; 01:5056 $3d
-    jr   NZ, .jr_01_5041                               ;; 01:5057 $20 $e8
-    ret                                                ;; 01:5059 $c9
-
-call_01_505a_ValidatePassword:
-; Description:
-; Checks wDB7E_PasswordValues for any tile flagged $20. If found early, returns 0. If not found after scanning $12 entries, 
-; it resets buffers (wDB72_PasswordEncodedBuffer–wDB7D), then reconstructs bitfields from wDB7E_PasswordValues back into wDB72_PasswordEncodedBuffer. It sums these values, 
-; XORs with $B6, and compares to wDB72_PasswordEncodedBuffer as a checksum. On match, it calls call_01_50b5_SetProgressFlagsFromPasswordMasks 
-; (which rebuilds DC5C/DC4E tile password data) and returns $20; otherwise, returns 0.
-    ld   HL, wDB7E_PasswordValues                                     ;; 01:505a $21 $7e $db
-    ld   B, $12                                        ;; 01:505d $06 $12
-.jr_01_505f:
-    ld   A, [HL+]                                      ;; 01:505f $2a
-    cp   A, $20                                        ;; 01:5060 $fe $20
-    jr   Z, .jr_01_50b2                                ;; 01:5062 $28 $4e
-    dec  B                                             ;; 01:5064 $05
-    jr   NZ, .jr_01_505f                               ;; 01:5065 $20 $f8
-    ld   HL, wDB72_PasswordEncodedBuffer                                     ;; 01:5067 $21 $72 $db
-    ld   DE, wDB73_PasswordLivesRemaining                                     ;; 01:506a $11 $73 $db
-    ld   BC, $0b                                       ;; 01:506d $01 $0b $00
-    ld   [HL], $00                                     ;; 01:5070 $36 $00
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:5072 $cd $6e $07
-    ld   HL, wDB72_PasswordEncodedBuffer                                     ;; 01:5075 $21 $72 $db
-    ld   B, $80                                        ;; 01:5078 $06 $80
-    ld   DE, wDB7E_PasswordValues                                     ;; 01:507a $11 $7e $db
-    ld   C, $10                                        ;; 01:507d $0e $10
-    ld   A, $5a                                        ;; 01:507f $3e $5a
-.jr_01_5081:
-    push AF                                            ;; 01:5081 $f5
-    ld   A, [DE]                                       ;; 01:5082 $1a
-    and  A, C                                          ;; 01:5083 $a1
-    jr   Z, .jr_01_5089                                ;; 01:5084 $28 $03
-    ld   A, [HL]                                       ;; 01:5086 $7e
-    or   A, B                                          ;; 01:5087 $b0
-    ld   [HL], A                                       ;; 01:5088 $77
-.jr_01_5089:
-    rrc  C                                             ;; 01:5089 $cb $09
-    jr   NC, .jr_01_5090                               ;; 01:508b $30 $03
-    inc  DE                                            ;; 01:508d $13
-    ld   C, $10                                        ;; 01:508e $0e $10
-.jr_01_5090:
-    rrc  B                                             ;; 01:5090 $cb $08
-    jr   NC, .jr_01_5095                               ;; 01:5092 $30 $01
-    inc  HL                                            ;; 01:5094 $23
-.jr_01_5095:
-    pop  AF                                            ;; 01:5095 $f1
-    dec  A                                             ;; 01:5096 $3d
-    jr   NZ, .jr_01_5081                               ;; 01:5097 $20 $e8
-    ld   HL, wDB73_PasswordLivesRemaining                                     ;; 01:5099 $21 $73 $db
-    ld   B, $0b                                        ;; 01:509c $06 $0b
-    xor  A, A                                          ;; 01:509e $af
-.jr_01_509f:
-    add  A, [HL]                                       ;; 01:509f $86
-    inc  HL                                            ;; 01:50a0 $23
-    dec  B                                             ;; 01:50a1 $05
-    jr   NZ, .jr_01_509f                               ;; 01:50a2 $20 $fb
-    xor  A, $b6                                        ;; 01:50a4 $ee $b6
-    ld   HL, wDB72_PasswordEncodedBuffer                                     ;; 01:50a6 $21 $72 $db
-    cp   A, [HL]                                       ;; 01:50a9 $be
-    jr   NZ, .jr_01_50b2                               ;; 01:50aa $20 $06
-    call call_01_50b5_SetProgressFlagsFromPasswordMasks                                  ;; 01:50ac $cd $b5 $50
-    ld   A, $20                                        ;; 01:50af $3e $20
-    ret                                                ;; 01:50b1 $c9
-.jr_01_50b2:
-    ld   A, $00                                        ;; 01:50b2 $3e $00
-    ret                                                ;; 01:50b4 $c9
-
-call_01_50b5_SetProgressFlagsFromPasswordMasks:
-; Description:
-; Builds a password lookup table (wDC5C_ProgressFlags) from static mask tables 
-; .data_01_511a_PasswordColumnMaskTable and .data_01_5126_BitMaskLut_80to01. 
-; It iterates through each mask byte, rotates bits, checks wDB76_PasswordEncodedBuffer bitfields, and sets password bits 
-; in a temporary register (C). Once a row is processed, it stores the result into wDC5C_ProgressFlags, repeating 
-; for 12 entries. Finally, it updates wDC4E_PlayerLivesRemaining/AF/4F with values from wDB73_PasswordLivesRemaining–wDB75_PasswordPawCoinExtraHealth.
-    xor  A, A                                          ;; 01:50b5 $af
-    ld   [wDB90_PasswordCounter], A                                    ;; 01:50b6 $ea $90 $db
-    ld   DE, $00                                       ;; 01:50b9 $11 $00 $00
-.jr_01_50bc:
-    push DE                                            ;; 01:50bc $d5
-    ld   HL, .data_01_511a_PasswordColumnMaskTable                             ;; 01:50bd $21 $1a $51
-    add  HL, DE                                        ;; 01:50c0 $19
-    ld   B, [HL]                                       ;; 01:50c1 $46
-    ld   C, $00                                        ;; 01:50c2 $0e $00
-    ld   A, $08                                        ;; 01:50c4 $3e $08
-.jr_01_50c6:
-    push AF                                            ;; 01:50c6 $f5
-    bit  7, B                                          ;; 01:50c7 $cb $78
-    jr   Z, .jr_01_50f3                                ;; 01:50c9 $28 $28
-    ld   A, [wDB90_PasswordCounter]                                    ;; 01:50cb $fa $90 $db
-    srl  A                                             ;; 01:50ce $cb $3f
-    srl  A                                             ;; 01:50d0 $cb $3f
-    srl  A                                             ;; 01:50d2 $cb $3f
-    ld   E, A                                          ;; 01:50d4 $5f
-    ld   D, $00                                        ;; 01:50d5 $16 $00
-    ld   HL, wDB76_PasswordEncodedBuffer                                     ;; 01:50d7 $21 $76 $db
-    add  HL, DE                                        ;; 01:50da $19
-    push HL                                            ;; 01:50db $e5
-    ld   A, [wDB90_PasswordCounter]                                    ;; 01:50dc $fa $90 $db
-    and  A, $07                                        ;; 01:50df $e6 $07
-    ld   E, A                                          ;; 01:50e1 $5f
-    ld   D, $00                                        ;; 01:50e2 $16 $00
-    ld   HL, .data_01_5126_BitMaskLut_80to01                             ;; 01:50e4 $21 $26 $51
-    add  HL, DE                                        ;; 01:50e7 $19
-    ld   A, [HL]                                       ;; 01:50e8 $7e
-    pop  HL                                            ;; 01:50e9 $e1
-    and  A, [HL]                                       ;; 01:50ea $a6
-    jr   Z, .jr_01_50ef                                ;; 01:50eb $28 $02
-    set  7, C                                          ;; 01:50ed $cb $f9
-.jr_01_50ef:
-    ld   HL, wDB90_PasswordCounter                                     ;; 01:50ef $21 $90 $db
-    inc  [HL]                                          ;; 01:50f2 $34
-.jr_01_50f3:
-    rlc  C                                             ;; 01:50f3 $cb $01
-    sla  B                                             ;; 01:50f5 $cb $20
-    pop  AF                                            ;; 01:50f7 $f1
-    dec  A                                             ;; 01:50f8 $3d
-    jr   NZ, .jr_01_50c6                               ;; 01:50f9 $20 $cb
-    pop  DE                                            ;; 01:50fb $d1
-    ld   HL, wDC5C_ProgressFlags                                     ;; 01:50fc $21 $5c $dc
-    add  HL, DE                                        ;; 01:50ff $19
-    ld   [HL], C                                       ;; 01:5100 $71
-    inc  E                                             ;; 01:5101 $1c
-    ld   A, E                                          ;; 01:5102 $7b
-    cp   A, $0c                                        ;; 01:5103 $fe $0c
-    jr   C, .jr_01_50bc                                ;; 01:5105 $38 $b5
-    ld   A, [wDB73_PasswordLivesRemaining]                                    ;; 01:5107 $fa $73 $db
-    ld   [wDC4E_PlayerLivesRemaining], A                                    ;; 01:510a $ea $4e $dc
-    ld   A, [wDB74_PasswordPawCoinCounter]                                    ;; 01:510d $fa $74 $db
-    ld   [wDCAF_PawCoinCounter], A                                    ;; 01:5110 $ea $af $dc
-    ld   A, [wDB75_PasswordPawCoinExtraHealth]                                    ;; 01:5113 $fa $75 $db
-    ld   [wDC4F_PawCoinExtraHealth], A                                    ;; 01:5116 $ea $4f $dc
-    ret                                                ;; 01:5119 $c9
-.data_01_511a_PasswordColumnMaskTable:
-; Description:
-; A static table of bit masks used by call_01_50b5 to control which password checks 
-; to perform for each column. Likely a column mask pattern for map rows.
-    db   $f1, $ff, $ff, $ff, $ff, $ff, $ff, $01        ;; 01:511a ????????
-    db   $01, $01, $01, $01                            ;; 01:5122 ????
-.data_01_5126_BitMaskLut_80to01:
-; Description:
-; A standard bitmask lookup table for individual bits ($80, $40, $20 … $01). 
-; Used for testing individual tile bits in wDB76_PasswordEncodedBuffer.
-    db   $80, $40, $20, $10, $08, $04, $02, $01        ;; 01:5126 ????????
-
-data_01_512e:
-    db   $02, $02, $01, $04, $98, $07, $00, $00        ;; 01:512e ..ww..??
-    db   $02, $02, $04, $04, $9c, $07, $00, $00        ;; 01:5136 ..ww..??
-    db   $02, $02, $07, $04, $a0, $07, $00, $00        ;; 01:513e ..ww..??
-    db   $02, $02, $0a, $04, $a4, $07, $00, $00        ;; 01:5146 ..ww..??
-    db   $02, $02, $0d, $04, $a8, $07, $00, $00        ;; 01:514e ..ww..??
-    db   $02, $02, $10, $04, $ac, $07, $00, $00        ;; 01:5156 ..ww..??
-    db   $02, $02, $01, $07, $b0, $07, $00, $00        ;; 01:515e ..ww..??
-    db   $02, $02, $04, $07, $b4, $07, $00, $00        ;; 01:5166 ..ww..??
-    db   $02, $02, $07, $07, $b8, $07, $00, $00        ;; 01:516e ..ww..??
-    db   $02, $02, $0a, $07, $bc, $07, $00, $00        ;; 01:5176 ..ww..??
-    db   $02, $02, $0d, $07, $c0, $07, $00, $00        ;; 01:517e ..ww..??
-    db   $02, $02, $10, $07, $c4, $07, $00, $00        ;; 01:5186 ..ww..??
-    db   $02, $02, $01, $0a, $c8, $07, $00, $00        ;; 01:518e ..ww..??
-    db   $02, $02, $04, $0a, $cc, $07, $00, $00        ;; 01:5196 ..ww..??
-    db   $02, $02, $07, $0a, $d0, $07, $00, $00        ;; 01:519e ..ww..??
-    db   $02, $02, $0a, $0a, $d4, $07, $00, $00        ;; 01:51a6 ..ww..??
-    db   $02, $02, $0d, $0a, $d8, $07, $00, $00        ;; 01:51ae ..ww..??
-    db   $02, $02, $10, $0a, $dc, $07, $00, $00        ;; 01:51b6 ..ww..??
-    db   $10, $01, $01, $01, $e0, $07, $00, $00        ;; 01:51be w.www.??
-    db   $10, $01, $01, $02, $f0, $07, $00, $00        ;; 01:51c6 w.www.??
-    db   $08, $01, $06, $0b, $d0, $00, $00, $00        ;; 01:51ce w...w.??
-    db   $08, $01, $06, $0d, $d8, $00, $00, $00        ;; 01:51d6 w...w.??
-    db   $08, $06, $01, $00, $01, $ff, $00, $00        ;; 01:51de ..ww..??
-    db   $0b, $02, $09, $01, $31, $01, $00, $00        ;; 01:51e6 w.www.??
-    db   $0b, $02, $09, $04, $47, $02, $00, $00        ;; 01:51ee w.www.??
-    db   $10, $02, $04, $07, $5d, $02, $00, $00        ;; 01:51f6 w.www.??
-    db   $10, $02, $04, $0a, $7d, $02, $00, $00        ;; 01:51fe w.www.??
-    db   $10, $02, $04, $0d, $9d, $02, $00, $00        ;; 01:5206 w.www.??
-    db   $12, $02, $01, $10, $bd, $02, $00, $00        ;; 01:520e w.www.??
-    db   $0b, $03, $09, $04, $47, $02, $00, $00        ;; 01:5216 ????????
-    db   $0c, $02, $04, $01, $01, $01, $00, $00        ;; 01:521e w.www.??
-    db   $0c, $02, $04, $03, $19, $02, $00, $00        ;; 01:5226 w.www.??
-    db   $14, $01, $00, $0f, $31, $02, $00, $00        ;; 01:522e w.www.??
-    db   $14, $02, $00, $10, $45, $02, $00, $00        ;; 01:5236 w.www.??
-    db   $01, $01, $0b, $06, $6d, $02, $00, $00        ;; 01:523e w.www.??
-    db   $01, $02, $0c, $06, $6e, $02, $00, $00        ;; 01:5246 w.www.??
-    db   $01, $01, $0d, $07, $70, $02, $00, $00        ;; 01:524e w.www.??
-    db   $01, $01, $0b, $09, $71, $02, $00, $00        ;; 01:5256 w.www.??
-    db   $01, $02, $0c, $09, $72, $02, $00, $00        ;; 01:525e w.www.??
-    db   $01, $01, $0d, $0a, $74, $02, $00, $00        ;; 01:5266 w.www.??
-    db   $01, $01, $0b, $0c, $75, $02, $00, $00        ;; 01:526e w.www.??
-    db   $01, $02, $0c, $0c, $76, $02, $00, $00        ;; 01:5276 w.www.??
-    db   $01, $01, $0d, $0d, $78, $02, $00, $00        ;; 01:527e w.www.??
-    db   $02, $02, $07, $06, $f8, $04, $00, $00        ;; 01:5286 ..www.??
-    db   $02, $02, $07, $09, $f4, $07, $00, $00        ;; 01:528e ..www.??
-    db   $02, $02, $07, $0c, $ec, $05, $00, $00        ;; 01:5296 ..www.??
-    db   $10, $02, $02, $00, $01, $01, $00, $00        ;; 01:529e ????????
-    db   $12, $02, $01, $05, $21, $02, $00, $00        ;; 01:52a6 w.www.??
-    db   $14, $02, $00, $10, $45, $02, $00, $00        ;; 01:52ae ????????
-    db   $02, $01, $07, $0a, $6d, $02, $00, $00        ;; 01:52b6 ????????
-    db   $02, $02, $09, $0a, $6f, $02, $00, $00        ;; 01:52be ????????
-    db   $02, $01, $0b, $0b, $73, $02, $00, $00        ;; 01:52c6 ????????
-    db   $02, $02, $04, $0e, $75, $02, $00, $00        ;; 01:52ce ????????
-    db   $02, $02, $0e, $0e, $79, $02, $00, $00        ;; 01:52d6 ????????
-    db   $02, $02, $09, $08, $f0, $06, $00, $00        ;; 01:52de ????????
-    db   $02, $02, $04, $0c, $ec, $05, $00, $00        ;; 01:52e6 ????????
-    db   $02, $02, $0e, $0c, $f4, $07, $00, $00        ;; 01:52ee ????????
-    db   $02, $02, $03, $03, $7d, $03, $00, $00        ;; 01:52f6 ????????
-    db   $02, $02, $07, $03, $81, $03, $00, $00        ;; 01:52fe ????????
-    db   $02, $02, $0b, $03, $85, $03, $00, $00        ;; 01:5306 ????????
-    db   $02, $02, $0f, $03, $89, $03, $00, $00        ;; 01:530e ????????
-    db   $0e, $02, $03, $04                            ;; 01:5316 w.ww
-    db   %00000001                                     ;; 01:531a $01
-
-    db   $01, $00, $00, $0e, $02, $03, $06, $1d        ;; 01:531b .??w.www
-    db   $01, $00, $00, $0e, $02, $03, $08, $39        ;; 01:5323 .??w.www
-    db   $01, $00, $00, $0e, $02, $03, $0a             ;; 01:532b .??w.ww
-    db   %01010101                                     ;; 01:5332 $55
-
-    db   $01, $00, $00, $02, $02, $03, $10, $71        ;; 01:5333 .??w.www
-    db   $02, $00, $00, $02, $02, $07, $10, $75        ;; 01:533b .??w.www
-    db   $02, $00, $00, $02, $02, $0b, $10, $79        ;; 01:5343 .??w.www
-    db   $02, $00, $00, $02, $02, $0f, $10, $7d        ;; 01:534b .??w.www
-    db   $02, $00, $00, $02, $02, $03, $01             ;; 01:5353 .??w.ww
-    db   %10000001                                     ;; 01:535a $81
-
-    db   $02, $00, $00, $02, $02, $03, $0e             ;; 01:535b .??..ww
-    db   %11110000                                     ;; 01:5362 $f0
-
-    db   $06, $00, $00, $02, $02, $07, $0e             ;; 01:5363 .??..ww
-    db   %11110100                                     ;; 01:536a $f4
-
-    db   $07, $00, $00, $02, $02, $0b, $0e             ;; 01:536b .??..ww
-    db   %11101100                                     ;; 01:5372 $ec
-
-    db   $05, $00, $00, $02, $02, $0f, $0e             ;; 01:5373 .??..ww
-    db   %11111000                                     ;; 01:537a $f8
-
-    db   $04, $00, $00, $02, $01, $01, $01             ;; 01:537b .??..ww
-    db   %10000101                                     ;; 01:5382 $85
-
-    db   $03, $00, $00, $02, $01, $01, $02             ;; 01:5383 .??..ww
-    db   %10000111                                     ;; 01:538a $87
-
-    db   $00, $00, $00, $14, $03, $00, $08, $01        ;; 01:538b .??w.www
-    db   $01, $00, $00, $0a, $02, $0a, $02, $80        ;; 01:5393 .???????
-    db   $03, $00, $00, $0a, $02, $0a, $05, $94        ;; 01:539b ????????
-    db   $03, $00, $00, $0a, $02, $0a, $08, $a8        ;; 01:53a3 ????????
-    db   $03, $00, $00, $0a, $02, $0a, $0b, $bc        ;; 01:53ab ????????
-    db   $03, $00, $00, $0a, $02, $0a, $0e, $d0        ;; 01:53b3 ????????
-    db   $03, $00, $00, $10, $10, $02, $01, $01        ;; 01:53bb ???w.www
-    db   $02, $00, $00                                 ;; 01:53c3 .??
-
-data_01_53c6_MenuTypeData:
-    dw   data_01_559a                                  ;; 01:53c6 pP
-    db   $00, $02, $20, $54, $00, $10, $d3, $04        ;; 01:53c8 ........
-    dw   call_01_43c3_LoadMenuObjectPalette                                  ;; 01:53d0 pP
-    db   $00, $00, $00, $00                            ;; 01:53d2 ????
-    dw   data_01_55c3                                  ;; 01:53d6 pP
-    db   $01, $12, $08, $20, $18, $18, $d3, $07        ;; 01:53d8 ........
-    db   $00, $00, $00, $00, $00, $00                  ;; 01:53e0 ..????
-    dw   data_01_55ec                                  ;; 01:53e6 pP
-    db   $01, $00, $00, $00, $00, $00, $d3, $07        ;; 01:53e8 ........
-    db   $00, $00, $00, $00, $00, $00                  ;; 01:53f0 ..????
-    dw   data_01_55fd                                  ;; 01:53f6 pP
-    db   $08, $00, $00, $00, $00, $00, $d3, $01        ;; 01:53f8 ........
-    db   $00, $00, $00, $00, $00, $00                  ;; 01:5400 ..????
-    dw   data_01_5606                                  ;; 01:5406 pP
-    db   $08, $00, $00, $00, $00, $00, $d3, $01        ;; 01:5408 ........
-    db   $00, $00, $00, $00, $00, $00, $0f, $56        ;; 01:5410 ..??????
-    db   $00, $01, $00, $50, $00, $18, $d3, $80        ;; 01:5418 ????????
-    db   $00, $00, $00, $00, $00, $00, $48, $56        ;; 01:5420 ????????
-    db   $00, $02, $00, $40, $00, $20, $d3, $80        ;; 01:5428 ????????
-    db   $00, $00, $00, $00, $00, $00                  ;; 01:5430 ??????
-    dw   data_01_5649                                  ;; 01:5436 pP
-    db   $00, $03, $00, $38, $00, $18, $d3, $80        ;; 01:5438 ........
-    db   $00, $00, $00, $00, $00, $00                  ;; 01:5440 ..????
-    dw   data_01_5692                                  ;; 01:5446 pP
-    db   $10, $00, $00, $00, $00, $00, $d3, $01        ;; 01:5448 ........
-    db   $00, $00, $00, $00, $00, $00, $1b, $57        ;; 01:5450 ..??????
-    db   $00, $00, $00, $00, $00, $00, $d3, $01        ;; 01:5458 ????????
-    db   $00, $00, $00, $00, $00, $00, $a4, $57        ;; 01:5460 ????????
-    db   $00, $00, $00, $00, $00, $00, $d3, $01        ;; 01:5468 ????????
-    db   $00, $00, $00, $00, $00, $00, $ad, $57        ;; 01:5470 ????????
-    db   $00, $04, $08, $20, $00, $10, $d3, $01        ;; 01:5478 ????????
-    db   $00, $00, $00, $00, $00, $00, $be, $57        ;; 01:5480 ????????
-    db   $00, $02, $08, $30, $00, $10, $d3, $01        ;; 01:5488 ????????
-    db   $00, $00, $00, $00, $00, $00                  ;; 01:5490 ??????
-    dw   data_01_57d7                                  ;; 01:5496 pP
-    db   $00, $04, $08, $20, $00, $10, $d3, $01        ;; 01:5498 ........
-    db   $00, $00, $00, $00, $00, $00                  ;; 01:54a0 ..????
-    dw   data_01_57e8                                  ;; 01:54a6 pP
-    db   $00, $02, $08, $30, $00, $10, $d3, $01        ;; 01:54a8 ........
-    db   $00, $00, $00, $00, $00, $00                  ;; 01:54b0 ..????
-    dw   data_01_5801                                  ;; 01:54b6 pP
-    db   $04, $00, $00, $00, $00, $00, $d3, $02        ;; 01:54b8 ........
-    db   $00, $00, $00, $00, $00, $00, $0a, $58        ;; 01:54c0 ..??????
-    db   $00, $05, $18, $10, $00, $18, $d3, $03        ;; 01:54c8 ????????
-    db   $00, $00, $00, $00, $00, $00                  ;; 01:54d0 ??????
-    dw   data_01_5843                                  ;; 01:54d6 pP
-    db   $02, $00, $00, $00, $00, $00, $d3, $01        ;; 01:54d8 ........
-    db   $00, $00, $00, $00, $00, $00                  ;; 01:54e0 ..????
-    dw   data_01_586c                                  ;; 01:54e6 pP
-    db   $04, $00, $00, $00, $00, $00, $d3, $01        ;; 01:54e8 ........
-    db   $00, $00, $00, $00, $00, $00                  ;; 01:54f0 ..????
-    dw   data_01_588d                                  ;; 01:54f6 pP
-    db   $04, $00, $00, $00, $00, $00, $d3, $05        ;; 01:54f8 ........
-    db   $00, $00, $00, $00, $00, $00                  ;; 01:5500 ..????
-    dw   data_01_5896                                  ;; 01:5506 pP
-    db   $04, $00, $00, $00, $00, $00, $d3, $06        ;; 01:5508 ........
-    db   $00, $00, $00, $00, $00, $00, $9f, $58        ;; 01:5510 ..??????
-    db   $04, $00, $00, $00, $00, $00, $d3, $01        ;; 01:5518 ????????
-    db   $00, $00, $00, $00, $00, $00, $b8, $58        ;; 01:5520 ????????
-    db   $04, $00, $00, $00, $00, $00, $d3, $01        ;; 01:5528 ????????
-    db   $00, $00, $00, $00, $00, $00, $29, $59        ;; 01:5530 ????????
-    db   $04, $00, $00, $00, $00, $00, $d3, $01        ;; 01:5538 ????????
-    db   $00, $00, $00, $00, $00, $00, $a2, $59        ;; 01:5540 ????????
-    db   $04, $00, $00, $00, $00, $00, $d3, $01        ;; 01:5548 ????????
-    db   $00, $00, $00, $00, $00, $00, $c3, $59        ;; 01:5550 ????????
-    db   $04, $00, $00, $00, $00, $00, $d3, $01        ;; 01:5558 ????????
-    db   $00, $00, $00, $00, $00, $00, $14, $5a        ;; 01:5560 ????????
-    db   $04, $00, $00, $00, $00, $00, $d3, $01        ;; 01:5568 ????????
-    db   $00, $00, $00, $00, $00, $00, $35, $5a        ;; 01:5570 ????????
-    db   $00, $00, $00, $00, $00, $00, $d3, $01        ;; 01:5578 ????????
-    db   $00, $00, $00, $00, $00, $00, $3e, $5a        ;; 01:5580 ????????
-    db   $04, $00, $20, $54, $00, $10, $d3, $08        ;; 01:5588 ????????
-    db   $00, $00, $00, $00, $00, $00                  ;; 01:5590 ??????
-
-data_01_5596:
-    dw   data_01_5a47                                  ;; 01:5596 pP
-    dw   data_01_5ad8                                  ;; 01:5598 pP
-
-data_01_559a:
-    db   $00, $00, $00, $00, $02, $ed, $0f, $60        ;; 01:559a w...w...
-    db   $14, $fe, $fe, $00                            ;; 01:55a2 w..w
-    dw   $477c                                         ;; 01:55a6 wW
-    db   $10, $63, $00, $00, $00, $00, $03, $e9        ;; 01:55a8 ..w...w.
-    db   $0f, $60, $15, $fe, $fe, $00                  ;; 01:55b0 ..w..w
-    dw   $47c7                                         ;; 01:55b6 wW
-    db   $21, $63, $00, $00, $00, $fc, $02, $e6        ;; 01:55b8 ..w..ww.
-    db   $0f, $e0, $ff                                 ;; 01:55c0 ...
-
-data_01_55c3:
-    db   $00, $00, $00, $00, $05, $ed, $0f, $60        ;; 01:55c3 w...w...
-    db   $12, $fe, $fe, $02                            ;; 01:55cb w..w
-    dw   $4e62                                         ;; 01:55cf wW
-    db   $0f, $23, $13, $fe, $fe, $02                  ;; 01:55d1 ..w..w
-    dw   $4e7d                                         ;; 01:55d7 wW
-    db   $0f, $23, $00, $00, $00, $fc, $01, $e6        ;; 01:55d9 ..w..ww.
-    db   $0f, $60, $00, $00, $00, $00, $00, $ec        ;; 01:55e1 ..w...w.
-    db   $0f, $60, $ff                                 ;; 01:55e9 ...
-
-data_01_55ec:
-    db   $00, $00, $00, $00, $05, $ed, $0f, $60        ;; 01:55ec w...w...
-    db   $00, $00, $00, $00, $00, $ec, $0f, $60        ;; 01:55f4 w...w...
-    db   $ff                                           ;; 01:55fc .
-
-data_01_55fd:
-    db   $4c, $fe, $fe, $01                            ;; 01:55fd w..w
-    dw   $4c09                                         ;; 01:5601 wW
-    db   $0f, $a3, $ff                                 ;; 01:5603 ...
-
-data_01_5606:
-    db   $2f, $fe, $fe, $00                            ;; 01:5606 w..w
-    dw   $4e03                                         ;; 01:560a wW
-    db   $0f, $a3, $ff, $1a, $00, $fe, $00, $00        ;; 01:560c ...?????
-    db   $e5, $00, $23, $1c, $fe, $fe, $00, $16        ;; 01:5614 ????????
-    db   $49, $0f, $23, $17, $fe, $fe, $01, $00        ;; 01:561c ????????
-    db   $e3, $0f, $23, $1d, $fe, $fe, $00, $00        ;; 01:5624 ????????
-    db   $e4, $0f, $23, $16, $00, $00, $01, $00        ;; 01:562c ????????
-    db   $e2, $0f, $20, $00, $00, $00, $e4, $04        ;; 01:5634 ????????
-    db   $e1, $0f, $60, $00, $00, $00, $fc, $02        ;; 01:563c ????????
-    db   $e6, $0f, $e0, $ff, $ff                       ;; 01:5644 ?????
-
-data_01_5649:
-    db   $19, $00, $fe, $00, $00, $e5, $00, $23        ;; 01:5649 w..ww...
-    db   $1a, $00, $fe, $00, $01, $e5, $01, $23        ;; 01:5651 w..ww...
-    db   $1b, $00, $fe, $00, $02, $e5, $02, $23        ;; 01:5659 w..ww...
-    db   $1c, $fe, $fe, $00                            ;; 01:5661 w..w
-    dw   $4803                                         ;; 01:5665 wW
-    db   $0f, $23, $17, $fe, $fe, $01, $00, $e3        ;; 01:5667 ..w..w..
-    db   $0f, $23, $18, $fe, $fe, $00, $00, $e4        ;; 01:566f ..w..w..
-    db   $0f, $23, $16, $00, $00, $01, $00, $e2        ;; 01:5677 ..w.....
-    db   $0f, $20, $00, $00, $00, $e4, $04, $e1        ;; 01:567f ..w..ww.
-    db   $0f, $60, $00, $00, $00, $fc, $02, $e6        ;; 01:5687 ..w..ww.
-    db   $0f, $e0, $ff                                 ;; 01:568f ...
-
-data_01_5692:
-    db   $1e, $fe, $fe, $01, $00, $e3, $0f, $23        ;; 01:5692 w..w....
-    db   $1f, $fe, $fe, $00, $00, $e4, $0f, $23        ;; 01:569a w..w....
-    db   $20, $fe, $fe, $00                            ;; 01:56a2 w..w
-    dw   $49cb                                         ;; 01:56a6 wW
-    db   $0f, $23, $21, $fe, $fe, $00                  ;; 01:56a8 ..w..w
-    dw   $4916                                         ;; 01:56ae wW
-    db   $0f, $23, $22, $fe, $fe, $00, $00, $e8        ;; 01:56b0 ..w..ww.
-    db   $0f, $23, $23, $fe, $fe, $00                  ;; 01:56b8 ..w..w
-    dw   $4a63                                         ;; 01:56be wW
-    db   $0f, $23, $24, $fe, $fe, $00, $07, $e8        ;; 01:56c0 ..w..ww.
-    db   $0f, $23, $25, $fe, $fe, $00, $01, $e8        ;; 01:56c8 ..w..ww.
-    db   $0f, $23, $26, $fe, $fe, $00                  ;; 01:56d0 ..w..w
-    dw   $4a63                                         ;; 01:56d6 wW
-    db   $0f, $23, $27, $fe, $fe, $00, $08, $e8        ;; 01:56d8 ..w..ww.
-    db   $0f, $23, $28, $fe, $fe, $00, $02, $e8        ;; 01:56e0 ..w..ww.
-    db   $0f, $23, $29, $fe, $fe, $00                  ;; 01:56e8 ..w..w
-    dw   $4a63                                         ;; 01:56ee wW
-    db   $0f, $23, $2a, $fe, $fe, $00, $09, $e8        ;; 01:56f0 ..w..ww.
-    db   $0f, $23, $2b, $00, $00, $00, $00, $00        ;; 01:56f8 ..w.....
-    db   $0f, $25, $2c, $00, $00, $00, $00, $00        ;; 01:5700 ..w.....
-    db   $0f, $25, $2d, $00, $00, $00, $00, $00        ;; 01:5708 ..w.....
-    db   $0f, $25, $00, $00, $00, $00, $00, $e7        ;; 01:5710 ..w.....
-    db   $0f, $e0, $ff, $2e, $fe, $fe, $01, $6f        ;; 01:5718 ...?????
-    db   $4a, $0f, $23, $2f, $fe, $fe, $00, $00        ;; 01:5720 ????????
-    db   $ee, $0f, $23, $30, $fe, $fe, $00, $16        ;; 01:5728 ????????
-    db   $49, $0f, $23, $31, $fe, $fe, $00, $03        ;; 01:5730 ????????
-    db   $e8, $0f, $23, $32, $fe, $fe, $00, $63        ;; 01:5738 ????????
-    db   $4a, $0f, $23, $33, $fe, $fe, $00, $0b        ;; 01:5740 ????????
-    db   $e8, $0f, $23, $34, $fe, $fe, $00, $04        ;; 01:5748 ????????
-    db   $e8, $0f, $23, $35, $fe, $fe, $00, $05        ;; 01:5750 ????????
-    db   $e8, $0f, $23, $36, $00, $00, $00, $00        ;; 01:5758 ????????
-    db   $00, $0f, $25, $37, $00, $00, $00, $00        ;; 01:5760 ????????
-    db   $00, $0f, $25, $38, $00, $00, $00, $00        ;; 01:5768 ????????
-    db   $00, $0f, $25, $39, $00, $00, $00, $00        ;; 01:5770 ????????
-    db   $f0, $0f, $60, $3a, $00, $00, $00, $01        ;; 01:5778 ????????
-    db   $f0, $0f, $60, $3b, $00, $00, $00, $02        ;; 01:5780 ????????
-    db   $f0, $0f, $60, $3c, $00, $00, $00, $03        ;; 01:5788 ????????
-    db   $f0, $0f, $60, $00, $00, $00, $e4, $04        ;; 01:5790 ????????
-    db   $e1, $0f, $60, $00, $00, $00, $00, $00        ;; 01:5798 ????????
-    db   $e7, $0f, $e0, $ff, $3f, $fe, $fe, $01        ;; 01:57a0 ????????
-    db   $79, $4b, $0f, $a3, $ff, $40, $fe, $fe        ;; 01:57a8 ????????
-    db   $01, $bf, $4c, $53, $23, $00, $00, $00        ;; 01:57b0 ????????
-    db   $00, $01, $ec, $0f, $60, $ff, $3e, $fe        ;; 01:57b8 ????????
-    db   $fe, $01, $bf, $4c, $60, $23, $3f, $fe        ;; 01:57c0 ????????
-    db   $fe, $01, $b6, $4d, $01, $23, $00, $00        ;; 01:57c8 ????????
-    db   $00, $fc, $02, $e6, $0f, $e0, $ff             ;; 01:57d0 ???????
-
-data_01_57d7:
-    db   $40, $fe, $fe, $01                            ;; 01:57d7 w..w
-    dw   $4d63                                         ;; 01:57db wW
-    db   $53, $23, $00, $00, $00, $00, $01, $ec        ;; 01:57dd ..w...w.
-    db   $0f, $60, $ff                                 ;; 01:57e5 ...
-
-data_01_57e8:
-    db   $3e, $fe, $fe, $01                            ;; 01:57e8 w..w
-    dw   $4d63                                         ;; 01:57ec wW
-    db   $60, $23, $3f, $fe, $fe, $01                  ;; 01:57ee ..w..w
-    dw   $4db6                                         ;; 01:57f4 wW
-    db   $01, $23, $00, $00, $00, $fc, $02, $e6        ;; 01:57f6 ..w..ww.
-    db   $0f, $e0, $ff                                 ;; 01:57fe ...
-
-data_01_5801:
-    db   $00, $00, $00, $00, $00, $ed, $0f, $e0        ;; 01:5801 w...w...
-    db   $ff, $00, $00, $00, $00, $01, $ed, $0f        ;; 01:5809 .???????
-    db   $e0, $4d, $fe, $fe, $01, $20, $47, $00        ;; 01:5811 ????????
-    db   $23, $4e, $fe, $fe, $01, $32, $47, $01        ;; 01:5819 ????????
-    db   $23, $4f, $fe, $fe, $01, $45, $47, $02        ;; 01:5821 ????????
-    db   $23, $50, $fe, $fe, $01, $57, $47, $03        ;; 01:5829 ????????
-    db   $23, $51, $fe, $fe, $01, $69, $47, $04        ;; 01:5831 ????????
-    db   $23, $00, $00, $00, $fc, $00, $e6, $0f        ;; 01:5839 ????????
-    db   $e0, $ff                                      ;; 01:5841 ??
-
-data_01_5843:
-    db   $52, $fe, $00, $00                            ;; 01:5843 w..w
-    dw   $4000                                         ;; 01:5847 wW
-    db   $0f, $23, $52, $fe, $17, $00                  ;; 01:5849 ..w..w
-    dw   $4022                                         ;; 01:584f wW
-    db   $0f, $22, $52, $fe, $35, $00                  ;; 01:5851 ..w..w
-    dw   $404f                                         ;; 01:5857 wW
-    db   $0f, $22, $52, $fe, $53, $00                  ;; 01:5859 ..w..w
-    dw   $4082                                         ;; 01:585f wW
-    db   $0f, $22, $52, $fe, $78, $00                  ;; 01:5861 ..w..w
-    dw   $40d9                                         ;; 01:5867 wW
-    db   $0f, $a2, $ff                                 ;; 01:5869 ...
-
-data_01_586c:
-    db   $52, $fe, $05, $00                            ;; 01:586c w..w
-    dw   $40f8                                         ;; 01:5870 wW
-    db   $0f, $23, $52, $fe, $29, $00                  ;; 01:5872 ..w..w
-    dw   $4171                                         ;; 01:5878 wW
-    db   $0f, $22, $52, $fe, $45, $00                  ;; 01:587a ..w..w
-    dw   $41bf                                         ;; 01:5880 wW
-    db   $0f, $22, $52, $fe, $69, $00                  ;; 01:5882 ..w..w
-    dw   $422a                                         ;; 01:5888 wW
-    db   $0f, $a2, $ff                                 ;; 01:588a ...
-
-data_01_588d:
-    db   $00, $00, $00, $00, $03, $ed, $0f, $e0        ;; 01:588d w...w...
-    db   $ff                                           ;; 01:5895 .
-
-data_01_5896:
-    db   $00, $00, $00, $00, $04, $ed, $0f, $e0        ;; 01:5896 w...w...
-    db   $ff, $52, $fe, $08, $00, $69, $42, $0f        ;; 01:589e .???????
-    db   $23, $52, $fe, $36, $00, $8c, $42, $0f        ;; 01:58a6 ????????
-    db   $22, $52, $fe, $40, $00, $a9, $42, $0f        ;; 01:58ae ????????
-    db   $a2, $ff, $52, $fe, $00, $00, $be, $42        ;; 01:58b6 ????????
-    db   $0f, $23, $52, $fe, $08, $00, $d5, $42        ;; 01:58be ????????
-    db   $0f, $22, $52, $fe, $18, $00, $e9, $42        ;; 01:58c6 ????????
-    db   $0f, $22, $52, $fe, $20, $00, $ff, $42        ;; 01:58ce ????????
-    db   $0f, $22, $52, $fe, $31, $00, $16, $43        ;; 01:58d6 ????????
-    db   $0f, $22, $52, $fe, $39, $00, $28, $43        ;; 01:58de ????????
-    db   $0f, $22, $52, $fe, $41, $00, $41, $43        ;; 01:58e6 ????????
-    db   $0f, $22, $52, $fe, $49, $00, $57, $43        ;; 01:58ee ????????
-    db   $0f, $22, $52, $fe, $51, $00, $6e, $43        ;; 01:58f6 ????????
-    db   $0f, $22, $52, $fe, $59, $00, $82, $43        ;; 01:58fe ????????
-    db   $0f, $22, $52, $fe, $61, $00, $99, $43        ;; 01:5906 ????????
-    db   $0f, $22, $52, $fe, $69, $00, $b1, $43        ;; 01:590e ????????
-    db   $0f, $22, $52, $fe, $71, $00, $ca, $43        ;; 01:5916 ????????
-    db   $0f, $22, $52, $fe, $79, $00, $e1, $43        ;; 01:591e ????????
-    db   $0f, $a2, $ff, $52, $fe, $00, $00, $f6        ;; 01:5926 ????????
-    db   $43, $0f, $23, $52, $fe, $08, $00, $1a        ;; 01:592e ????????
-    db   $44, $0f, $22, $52, $fe, $19, $00, $32        ;; 01:5936 ????????
-    db   $44, $0f, $22, $52, $fe, $21, $00, $4e        ;; 01:593e ????????
-    db   $44, $0f, $22, $52, $fe, $29, $00, $67        ;; 01:5946 ????????
-    db   $44, $0f, $22, $52, $fe, $31, $00, $7f        ;; 01:594e ????????
-    db   $44, $0f, $22, $52, $fe, $39, $00, $92        ;; 01:5956 ????????
-    db   $44, $0f, $22, $52, $fe, $41, $00, $a6        ;; 01:595e ????????
-    db   $44, $0f, $22, $52, $fe, $49, $00, $bb        ;; 01:5966 ????????
-    db   $44, $0f, $22, $52, $fe, $51, $00, $d5        ;; 01:596e ????????
-    db   $44, $0f, $22, $52, $fe, $59, $00, $eb        ;; 01:5976 ????????
-    db   $44, $0f, $22, $52, $fe, $61, $00, $02        ;; 01:597e ????????
-    db   $45, $0f, $22, $52, $fe, $69, $00, $18        ;; 01:5986 ????????
-    db   $45, $0f, $22, $52, $fe, $71, $00, $2e        ;; 01:598e ????????
-    db   $45, $0f, $22, $52, $fe, $79, $00, $47        ;; 01:5996 ????????
-    db   $45, $0f, $a2, $ff, $52, $fe, $08, $00        ;; 01:599e ????????
-    db   $60, $45, $0f, $23, $52, $fe, $18, $00        ;; 01:59a6 ????????
-    db   $92, $45, $0f, $22, $52, $fe, $36, $00        ;; 01:59ae ????????
-    db   $ac, $45, $0f, $22, $52, $fe, $40, $00        ;; 01:59b6 ????????
-    db   $d1, $45, $0f, $a2, $ff, $52, $fe, $00        ;; 01:59be ????????
-    db   $00, $e7, $45, $0f, $23, $52, $fe, $08        ;; 01:59c6 ????????
-    db   $00, $fd, $45, $0f, $22, $52, $fe, $1a        ;; 01:59ce ????????
-    db   $00, $0b, $46, $0f, $22, $52, $fe, $22        ;; 01:59d6 ????????
-    db   $00, $23, $46, $0f, $22, $52, $fe, $34        ;; 01:59de ????????
-    db   $00, $3a, $46, $0f, $22, $52, $fe, $3c        ;; 01:59e6 ????????
-    db   $00, $50, $46, $0f, $22, $52, $fe, $4e        ;; 01:59ee ????????
-    db   $00, $64, $46, $0f, $22, $52, $fe, $56        ;; 01:59f6 ????????
-    db   $00, $7d, $46, $0f, $22, $52, $fe, $68        ;; 01:59fe ????????
-    db   $00, $95, $46, $0f, $22, $52, $fe, $70        ;; 01:5a06 ????????
-    db   $00, $a7, $46, $0f, $a2, $ff, $52, $fe        ;; 01:5a0e ????????
-    db   $2e, $00, $bd, $46, $0f, $23, $52, $fe        ;; 01:5a16 ????????
-    db   $36, $00, $d9, $46, $0f, $22, $52, $fe        ;; 01:5a1e ????????
-    db   $3e, $00, $f3, $46, $0f, $22, $52, $fe        ;; 01:5a26 ????????
-    db   $46, $00, $08, $47, $0f, $a2, $ff, $3f        ;; 01:5a2e ????????
-    db   $fe, $fe, $01, $c5, $4b, $0f, $a3, $ff        ;; 01:5a36 ????????
-    db   $00, $00, $00, $00, $06, $ed, $0f, $e0        ;; 01:5a3e ????????
-    db   $ff                                           ;; 01:5a46 ?
-
-data_01_5a47:
-    db   $00, $00, $00, $03, $00, $eb, $0f, $24        ;; 01:5a47 w...w...
-    db   $01, $00, $00, $03, $01, $eb, $0f, $24        ;; 01:5a4f w...w...
-    db   $02, $00, $00, $03, $02, $eb, $0f, $24        ;; 01:5a57 w...w...
-    db   $03, $00, $00, $03, $03, $eb, $0f, $24        ;; 01:5a5f w...w...
-    db   $04, $00, $00, $03, $04, $eb, $0f, $24        ;; 01:5a67 w...w...
-    db   $05, $00, $00, $03, $05, $eb, $0f, $24        ;; 01:5a6f w...w...
-    db   $06, $00, $00, $03, $06, $eb, $0f, $24        ;; 01:5a77 w...w...
-    db   $07, $00, $00, $03, $07, $eb, $0f, $24        ;; 01:5a7f w...w...
-    db   $08, $00, $00, $03, $08, $eb, $0f, $24        ;; 01:5a87 w...w...
-    db   $09, $00, $00, $03, $09, $eb, $0f, $24        ;; 01:5a8f w...w...
-    db   $0a, $00, $00, $03, $0a, $eb, $0f, $24        ;; 01:5a97 w...w...
-    db   $0b, $00, $00, $03, $0b, $eb, $0f, $24        ;; 01:5a9f w...w...
-    db   $0c, $00, $00, $03, $0c, $eb, $0f, $24        ;; 01:5aa7 w...w...
-    db   $0d, $00, $00, $03, $0d, $eb, $0f, $24        ;; 01:5aaf w...w...
-    db   $0e, $00, $00, $03, $0e, $eb, $0f, $24        ;; 01:5ab7 w...w...
-    db   $0f, $00, $00, $03, $0f, $eb, $0f, $24        ;; 01:5abf w...w...
-    db   $10, $00, $00, $03, $10, $eb, $0f, $24        ;; 01:5ac7 w...w...
-    db   $11, $00, $00, $03, $11, $eb, $0f, $a4        ;; 01:5acf w...w...
-    db   $ff                                           ;; 01:5ad7 .
-
-data_01_5ad8:
-    db   $3d, $fe, $fe, $01                            ;; 01:5ad8 w..w
-    dw   $4c56                                         ;; 01:5adc wW
-    db   $00, $23, $3e, $fe, $fe, $01                  ;; 01:5ade ..w..w
-    dw   $4d0f                                         ;; 01:5ae4 wW
-    db   $31, $23, $3f, $fe, $fe, $01                  ;; 01:5ae6 ..w..w
-    dw   $4c8f                                         ;; 01:5aec wW
-    db   $72, $23, $41, $fe, $fe, $00, $03, $e8        ;; 01:5aee ..w..ww.
-    db   $0f, $23, $42, $fe, $fe, $00, $05, $e8        ;; 01:5af6 ..w..ww.
-    db   $0f, $23, $43, $fe, $fe, $00, $04, $e8        ;; 01:5afe ..w..ww.
-    db   $0f, $23, $44, $fe, $fe, $00, $06, $e8        ;; 01:5b06 ..w..ww.
-    db   $0f, $23, $45, $fe, $fe, $00, $0a, $e8        ;; 01:5b0e ..w..ww.
-    db   $0f, $23, $46, $00, $00, $00, $00, $00        ;; 01:5b16 ..w.....
-    db   $0f, $25, $47, $00, $00, $00, $00, $00        ;; 01:5b1e ..w.....
-    db   $0f, $25, $48, $00, $00, $00, $00, $00        ;; 01:5b26 ..w.....
-    db   $0f, $25, $49, $00, $00, $00, $00, $00        ;; 01:5b2e ..w.....
-    db   $0f, $25, $4a, $00, $00, $00, $00, $00        ;; 01:5b36 ..w.....
-    db   $0f, $21, $4b, $00, $00, $00, $00, $00        ;; 01:5b3e ..w.....
-    db   $0f, $21, $00, $00, $00, $85, $05, $e1        ;; 01:5b46 ..w..ww.
-    db   $0f, $60, $00, $00, $00, $00, $00, $e7        ;; 01:5b4e ..w.....
-    db   $0f, $60, $00, $00, $00, $fc, $02, $e6        ;; 01:5b56 ..w..ww.
-    db   $0f, $e0, $ff                                 ;; 01:5b5e ...
-
-data_01_5b61:
-    db   $bf, $db, $bf, $db, $bf, $db, $69, $5b        ;; 01:5b61 ??????..
-    db   $04, $58, $34, $d0, $04, $08, $01, $68        ;; 01:5b69 w.......
-    db   $34, $d8, $05, $08, $01, $ff                  ;; 01:5b71 ......
-
-data_01_5b77:
-    dw   data_01_5c79                                  ;; 01:5b77 pP
-    dw   data_01_5b97                                         ;; 01:5b79 wW
-    db   $01, $07, $00, $00                            ;; 01:5b7b ..??
-
-    dw   data_01_6069                                  ;; 01:5b7f pP
-    dw   data_01_5bde                                         ;; 01:5b81 wW
-    db   $01, $08, $00, $00                            ;; 01:5b83 ..??
-
-    dw   data_01_64e9                                  ;; 01:5b87 pP
-    dw   data_01_5c25                                         ;; 01:5b89 wW
-    db   $01, $08, $00, $00
-
-    dw   data_01_66f9
-    dw   data_01_5c4f        ;; 01:5b8b ..??????
-    db   $02, $10, $00, $00
-data_01_5b97:
-    db   $01, $03, $03, $03        ;; 01:5b97 ????..ww
-    db   $03, $03, $03, $03, $03, $01, $03, $03        ;; 01:5b9b ww.www?.
-    db   $03, $05, $04, $03, $03, $04, $03, $03        ;; 01:5ba3 wwwww?ww
-    db   $03, $03, $05, $05, $03, $03, $03, $03        ;; 01:5bab w.ww...w
-    db   $03, $03, $03, $03, $03, $03, $03, $03        ;; 01:5bb3 wwww.???
-    db   $03, $03, $03, $03, $03, $03, $03, $03        ;; 01:5bbb .???????
-    db   $02, $03, $03, $03, $03, $03, $03, $03        ;; 01:5bc3 ????????
-    db   $03, $03, $03, $03, $03, $03, $02, $02        ;; 01:5bcb ??????.?
-    db   $03, $04, $01, $02, $03, $03, $02, $02        ;; 01:5bd3 ??...w..
-    db   $02, $08, $06
-data_01_5bde:
-    db   $06, $06, $06, $06, $06        ;; 01:5bde ?.w.w?..
-    db   $06, $06, $06, $06, $02, $05, $06, $06        ;; 01:5be3 .www.??.
-    db   $07, $07, $06, $06, $06, $06, $06, $06        ;; 01:5beb w...?www
-    db   $06, $07, $07, $07, $08, $06, $07, $03        ;; 01:5bf3 ..w..???
-    db   $06, $06, $06, $06, $06, $06, $06, $06        ;; 01:5bfb ????????
-    db   $08, $05, $05, $06, $06, $07, $05, $04        ;; 01:5c03 ????????
-    db   $06, $06, $07, $05, $04, $06, $06, $07        ;; 01:5c0b ????????
-    db   $05, $03, $06, $06, $06, $02, $02, $06        ;; 01:5c13 ?????.??
-    db   $06, $02, $03, $04, $04, $03, $03, $03        ;; 01:5c1b ????????
-    db   $08, $07
-data_01_5c25:
-    db   $07, $07, $07, $07, $07, $07        ;; 01:5c25 ??w.....
-    db   $07, $07, $07, $07, $07, $07, $07, $07        ;; 01:5c2b ........
-    db   $07, $07, $07, $07, $07, $07, $07, $07        ;; 01:5c33 ..w.....
-    db   $07, $07, $07, $07, $07, $07, $07, $07        ;; 01:5c3b ........
-    db   $07, $07, $07, $07, $07, $07, $07, $07        ;; 01:5c43 ..??????
-    db   $07, $07, $07, $07
-data_01_5c4f:
-    db   $10, $10, $10, $10        ;; 01:5c4f ????????
-    db   $10, $10, $10, $10, $10, $10, $10, $10        ;; 01:5c53 ????????
-    db   $10, $10, $10, $10, $10, $10, $10, $10        ;; 01:5c5b ????????
-    db   $10, $10, $10, $10, $10, $10, $10, $10        ;; 01:5c63 ????????
-    db   $10, $10, $10, $10, $10, $10, $10, $10        ;; 01:5c6b ????????
-    db   $10, $10, $10, $10, $10, $10                  ;; 01:5c73 ??????
-
-data_01_5c79:
-    INCBIN ".gfx/misc_sprites/image_001_5c79.bin"
-
-data_01_6069:
-    INCBIN ".gfx/misc_sprites/image_001_6069.bin"
-
-data_01_64e9:
-    INCBIN ".gfx/misc_sprites/image_001_64e9.bin"
-
-data_01_66f9:
-    INCBIN ".gfx/misc_sprites/image_001_66f9.bin"
-
-data_01_6f39:
-    dw   .data_01_6f45, .data_01_6f88, .data_01_6f45, .data_01_6f8b
-    dw   .data_01_6fce, .data_01_7051
-.data_01_6f45:
-    db   $02, $02, $00
-    INCBIN ".gfx/misc_sprites/image_001_6f48.bin"
-.data_01_6f88:
-    db   $02, $02, $ff
-.data_01_6f8b:
-    db   $02, $02, $00
-    INCBIN ".gfx/misc_sprites/image_001_6f8e.bin"
-.data_01_6fce:
-    db   $04, $02, $00
-    INCBIN ".gfx/misc_sprites/image_001_6fd1.bin"
-.data_01_7051:
-    db   $02, $02, $00
-    INCBIN ".gfx/misc_sprites_horizontal/image_001_7054.bin"

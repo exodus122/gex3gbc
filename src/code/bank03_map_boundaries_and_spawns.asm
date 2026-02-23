@@ -2,18 +2,18 @@ call_03_6203_LoadLevelBoundariesFromId:
 ; Purpose: Given the current level ID, looks up and stores the level’s screen/window boundaries.
 ; Behavior:
 ; Reads wDB6C_CurrentMapId.
-; Indexes .data_03_6210 and .data_03_62a4 tables.
-; Fills a series of wDC34–wDC43 registers with the level’s rectangle bounds 
+; Indexes .data_03_6210_MapBoundaryIndices and .data_03_62a4 tables.
+; Fills a series of wDC34_MapBoundaryXMinLo–wDC43_MapBoundaryYMaxHiPlus0 registers with the level’s rectangle bounds 
 ; (left/right/top/bottom and offsets for scrolling and collision).
 ; Usage: Called whenever a new level or respawn is set to update collision/window limits.
     ld   HL, wDB6C_CurrentMapId                                     ;; 03:6203 $21 $6c $db
     ld   L, [HL]                                       ;; 03:6206 $6e
     ld   H, $00                                        ;; 03:6207 $26 $00
-    ld   DE, .data_03_6210                             ;; 03:6209 $11 $10 $62
+    ld   DE, .data_03_6210_MapBoundaryIndices                             ;; 03:6209 $11 $10 $62
     add  HL, DE                                        ;; 03:620c $19
     ld   C, [HL]                                       ;; 03:620d $4e
     jr   .jr_03_624d                                   ;; 03:620e $18 $3d
-.data_03_6210:
+.data_03_6210_MapBoundaryIndices:
     db   $01, $02, $06, $10, $17, $20, $29, $2f        ;; 03:6210 ww??????
     db   $33, $34, $35, $36, $01, $01, $01, $03        ;; 03:6218 ????wwww
     db   $04, $05, $07, $08, $09, $0a, $0b, $0c        ;; 03:6220 ?w??????
@@ -23,7 +23,7 @@ call_03_6203_LoadLevelBoundariesFromId:
     db   $28, $2a, $2b, $2c, $2d, $2e, $30, $31        ;; 03:6240 ????????
     db   $32, $37, $38, $39, $3a                       ;; 03:6248 ?????
 .jr_03_624d:
-    ld   HL, wDC2A                                     ;; 03:624d $21 $2a $dc
+    ld   HL, wDC2A_MapBoundaryIndex                    ;; 03:624d $21 $2a $dc
     ld   [HL], C                                       ;; 03:6250 $71
     ld   L, C                                          ;; 03:6251 $69
     ld   H, $00                                        ;; 03:6252 $26 $00
@@ -33,37 +33,37 @@ call_03_6203_LoadLevelBoundariesFromId:
     ld   DE, .data_03_62a4                             ;; 03:6257 $11 $a4 $62
     add  HL, DE                                        ;; 03:625a $19
     ld   A, [HL+]                                      ;; 03:625b $2a
-    ld   [wDC34], A                                    ;; 03:625c $ea $34 $dc
+    ld   [wDC34_MapBoundaryXMinLo], A                                    ;; 03:625c $ea $34 $dc
     add  A, $10                                        ;; 03:625f $c6 $10
-    ld   [wDC3C], A                                    ;; 03:6261 $ea $3c $dc
+    ld   [wDC3C_MapBoundaryXMinLoPlus10], A                                    ;; 03:6261 $ea $3c $dc
     ld   A, [HL+]                                      ;; 03:6264 $2a
-    ld   [wDC35], A                                    ;; 03:6265 $ea $35 $dc
+    ld   [wDC35_MapBoundaryXMinHi], A                                    ;; 03:6265 $ea $35 $dc
     adc  A, $00                                        ;; 03:6268 $ce $00
-    ld   [wDC3D], A                                    ;; 03:626a $ea $3d $dc
+    ld   [wDC3D_MapBoundaryXMinHiPlus0], A                                    ;; 03:626a $ea $3d $dc
     ld   A, [HL+]                                      ;; 03:626d $2a
-    ld   [wDC36], A                                    ;; 03:626e $ea $36 $dc
+    ld   [wDC36_MapBoundaryXMaxLo], A                                    ;; 03:626e $ea $36 $dc
     add  A, $90                                        ;; 03:6271 $c6 $90
-    ld   [wDC3E], A                                    ;; 03:6273 $ea $3e $dc
+    ld   [wDC3E_MapBoundaryXMaxLoPlus90], A                                    ;; 03:6273 $ea $3e $dc
     ld   A, [HL+]                                      ;; 03:6276 $2a
-    ld   [wDC37], A                                    ;; 03:6277 $ea $37 $dc
+    ld   [wDC37_MapBoundaryXMaxHi], A                                    ;; 03:6277 $ea $37 $dc
     adc  A, $00                                        ;; 03:627a $ce $00
-    ld   [wDC3F], A                                    ;; 03:627c $ea $3f $dc
+    ld   [wDC3F_MapBoundaryXMaxHiPlus0], A                                    ;; 03:627c $ea $3f $dc
     ld   A, [HL+]                                      ;; 03:627f $2a
-    ld   [wDC38], A                                    ;; 03:6280 $ea $38 $dc
+    ld   [wDC38_MapBoundaryYMinLo], A                                    ;; 03:6280 $ea $38 $dc
     add  A, $10                                        ;; 03:6283 $c6 $10
-    ld   [wDC40], A                                    ;; 03:6285 $ea $40 $dc
+    ld   [wDC40_MapBoundaryYMinLoPlus10], A                                    ;; 03:6285 $ea $40 $dc
     ld   A, [HL+]                                      ;; 03:6288 $2a
-    ld   [wDC39], A                                    ;; 03:6289 $ea $39 $dc
+    ld   [wDC39_MapBoundaryYMinHi], A                                    ;; 03:6289 $ea $39 $dc
     adc  A, $00                                        ;; 03:628c $ce $00
-    ld   [wDC41], A                                    ;; 03:628e $ea $41 $dc
+    ld   [wDC41_MapBoundaryYMinHiPlus00], A                                    ;; 03:628e $ea $41 $dc
     ld   A, [HL+]                                      ;; 03:6291 $2a
-    ld   [wDC3A], A                                    ;; 03:6292 $ea $3a $dc
+    ld   [wDC3A_MapBoundaryYMaxLo], A                                    ;; 03:6292 $ea $3a $dc
     add  A, $78                                        ;; 03:6295 $c6 $78
-    ld   [wDC42], A                                    ;; 03:6297 $ea $42 $dc
+    ld   [wDC42_MapBoundaryYMaxLoPlus78], A                                    ;; 03:6297 $ea $42 $dc
     ld   A, [HL+]                                      ;; 03:629a $2a
-    ld   [wDC3B], A                                    ;; 03:629b $ea $3b $dc
+    ld   [wDC3B_MapBoundaryYMaxHi], A                                    ;; 03:629b $ea $3b $dc
     adc  A, $00                                        ;; 03:629e $ce $00
-    ld   [wDC43], A                                    ;; 03:62a0 $ea $43 $dc
+    ld   [wDC43_MapBoundaryYMaxHiPlus0], A                                    ;; 03:62a0 $ea $43 $dc
     ret                                                ;; 03:62a3 $c9
 .data_03_62a4:
     db   $00, $00, $00, $00, $04, $02, $73, $03        ;; 03:62a4 ????????

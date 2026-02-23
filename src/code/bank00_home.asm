@@ -170,9 +170,9 @@ call_00_0150_Init:
     call call_00_0b92_WaitForInterrupt                                  ;; 00:0259 $cd $92 $0b
     farcall call_01_4f7e_SeedTileLookupTable
 .jp_00_0267:
-    ld   A, $00                                        ;; 00:0267 $3e $00
+    ld   A, SONG_UNK00                                        ;; 00:0267 $3e $00
     call call_00_0fa2_PlaySong                                  ;; 00:0269 $cd $a2 $0f
-    ld   A, $00                                        ;; 00:026c $3e $00
+    ld   A, SFX_UNK00                                        ;; 00:026c $3e $00
     call call_00_0fd7_TriggerSoundEffect                                  ;; 00:026e $cd $d7 $0f
     ld   A, MENU_OPENING_CREDITS_1                                        ;; 00:0271 $3e $11
     farcall call_01_4000_MenuHandler_LoadAndProcess
@@ -185,7 +185,7 @@ call_00_0150_Init:
     ld   A, MENU_DAVID_A_PALMER                                        ;; 00:02a5 $3e $0f
     farcall call_01_4000_MenuHandler_LoadAndProcess
 .jp_00_02b2:
-    ld   A, $01                                        ;; 00:02b2 $3e $01
+    ld   A, SONG_UNK01                                        ;; 00:02b2 $3e $01
     call call_00_0fa2_PlaySong                                  ;; 00:02b4 $cd $a2 $0f
     ld   A, MENU_TITLE_SCREEN                                        ;; 00:02b7 $3e $00
     farcall call_01_4000_MenuHandler_LoadAndProcess
@@ -302,7 +302,7 @@ call_00_0150_Init:
     ld   [wDC78], A                                    ;; 00:03e8 $ea $78 $dc
 .jr_00_03eb:
     xor  A, A                                          ;; 00:03eb $af
-    ld   [wDC29], A                                    ;; 00:03ec $ea $29 $dc
+    ld   [wDC29_SkipMapWindowUpdateFlag], A                                    ;; 00:03ec $ea $29 $dc
     ld   A, $01                                        ;; 00:03ef $3e $01
     ld   [wDCA7_DrawGexFlag], A                                    ;; 00:03f1 $ea $a7 $dc
     call call_00_04fb                                  ;; 00:03f4 $cd $fb $04
@@ -354,9 +354,9 @@ call_00_0150_Init:
     jr   NZ, .jr_00_04d8                               ;; 00:0494 $20 $42
     call call_00_0f80_CheckInputStart                                  ;; 00:0496 $cd $80 $0f
     jr   Z, .jr_00_04d8                                ;; 00:0499 $28 $3d
-    ld   A, $00                                        ;; 00:049b $3e $00
+    ld   A, SONG_UNK00                                        ;; 00:049b $3e $00
     call call_00_0fa2_PlaySong                                  ;; 00:049d $cd $a2 $0f
-    ld   A, $00                                        ;; 00:04a0 $3e $00
+    ld   A, SFX_UNK00                                        ;; 00:04a0 $3e $00
     call call_00_0fd7_TriggerSoundEffect                                  ;; 00:04a2 $cd $d7 $0f
     farcall call_02_7132_BackupObjectTable
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:04b0 $fa $1e $dc
@@ -470,8 +470,9 @@ call_00_0595_PlaySongBasedOnLevel:
     ld   A, [HL]                                       ;; 00:059f $7e
     jp   call_00_0fa2_PlaySong                                  ;; 00:05a0 $c3 $a2 $0f
 .data_00_05a3:
-    db   $04, $02, $12, $05, $03, $14, $17, $16        ;; 00:05a3 ..??????
-    db   $16, $11, $11, $18                            ;; 00:05ab ????
+    db   SONG_GEX_CAVE, SONG_HOLIDAY_TV, SONG_MYSTERY_TV, SONG_TUT_TV
+    db   SONG_WESTERN_STATION, SONG_ANIME_CHANNEL, SONG_SUPERHERO_SHOW
+    db   SONG_BONUS_CHANNEL, SONG_BONUS_CHANNEL, SONG_BOSS, SONG_BOSS, SONG_CHANNEL_Z
 
 call_00_05af_LoadMapPalettes:
     ld   A, [wDC13_BgPaletteBank]                                    ;; 00:05af $fa $13 $dc
@@ -2111,14 +2112,14 @@ call_00_0f9c_CheckInputB:
 
 call_00_0fa2_PlaySong:
 ; Accepts a song ID in A.
-; If $FF (no song) or equal to the current song (wDE5C_CurrentSong), it does nothing.
+; If SONG_NONE (no song) or equal to the current song (wDE5C_CurrentSong), it does nothing.
 ; Otherwise, it stores the new code in wDE5C_CurrentSong.
 ; Waits for an interrupt (call_00_0b92_WaitForInterrupt)—this syncs playback changes to a safe frame.
 ; Derives wDE60_AudioBankCurrent as (wDE5C_CurrentSong >> 4) & $0F (bank group) and uses it +4 to switch to the appropriate ROM bank.
 ; Then isolates the lower nibble and calls call_04_4006_Audio in bank 04 to start the track.
 ; Finally restores the original bank (call_00_0f08_RestoreBank).
 ; Summary: Changes music track safely by switching banks and calling the main audio engine.
-    cp   A, $ff                                        ;; 00:0fa2 $fe $ff
+    cp   A, SONG_NONE                                        ;; 00:0fa2 $fe $ff
     ret  Z                                             ;; 00:0fa4 $c8
     ld   HL, wDE5C_CurrentSong                                     ;; 00:0fa5 $21 $5c $de
     cp   A, [HL]                                       ;; 00:0fa8 $be
@@ -2137,27 +2138,27 @@ call_00_0fa2_PlaySong:
     jp   call_00_0f08_RestoreBank                                  ;; 00:0fc5 $c3 $08 $0f
 
 call_00_0fc8_ProcessQueuedSoundEffect:
-; Loads the queued effect ID from wDE5D_QueuedSoundEffect and clears that slot to $FF.
-; If it was $FF (none queued), clears wDE5E_QueuedSoundEffectPriority (priority) and exits.
+; Loads the queued effect ID from wDE5D_QueuedSoundEffect and clears that slot to SFX_NONE.
+; If it was SFX_NONE (none queued), clears wDE5E_QueuedSoundEffectPriority (priority) and exits.
 ; Otherwise branches to call_00_0fd7_TriggerSoundEffect.
     ld   HL, wDE5D_QueuedSoundEffect                                     ;; 00:0fc8 $21 $5d $de
     ld   A, [HL]                                       ;; 00:0fcb $7e
-    ld   [HL], $ff                                     ;; 00:0fcc $36 $ff
-    cp   A, $ff                                        ;; 00:0fce $fe $ff
+    ld   [HL], SFX_NONE                                     ;; 00:0fcc $36 $ff
+    cp   A, SFX_NONE                                        ;; 00:0fce $fe $ff
     jr   NZ, call_00_0fd7_TriggerSoundEffect                              ;; 00:0fd0 $20 $05
     xor  A, A                                          ;; 00:0fd2 $af
     ld   [wDE5E_QueuedSoundEffectPriority], A                                    ;; 00:0fd3 $ea $5e $de
     ret                                                ;; 00:0fd6 $c9
 
 call_00_0fd7_TriggerSoundEffect:
-; Re-validates ID (not $FF).
+; Re-validates ID (not SFX_NONE).
 ; Bank-switches to 04, calls call_04_4024_Audio twice:
 ; First with A=$00 (resets/flushes channels?),
 ; Then with A=effect ID (plays the new effect).
 ; Moves wDE5E_QueuedSoundEffectPriority (effect priority) into wDE5F_CurrentSoundEffectPriority after zeroing wDE5E_QueuedSoundEffectPriority.
 ; Restores bank and exits.
 ; Summary: Handles actually starting a queued sound effect in the audio engine.
-    cp   A, $ff                                        ;; 00:0fd7 $fe $ff
+    cp   A, SFX_NONE                                        ;; 00:0fd7 $fe $ff
     ret  Z                                             ;; 00:0fd9 $c8
     push AF                                            ;; 00:0fda $f5
     ld   A, BANK_04_AUDIO_CODE_1                                        ;; 00:0fdb $3e $04
@@ -2182,7 +2183,7 @@ call_00_0ff5_QueueSoundEffect:
 ; wDE5E_QueuedSoundEffectPriority (last queued priority) when a sound is already queued.
 ; If it passes priority checks, stores the effect code in wDE5D_QueuedSoundEffect and its priority in wDE5E_QueuedSoundEffectPriority.
 ; Summary: Decides whether a new effect should replace the current/queued effect based on priority.
-    cp   A, $ff                                        ;; 00:0ff5 $fe $ff
+    cp   A, SFX_NONE                                        ;; 00:0ff5 $fe $ff
     ret  Z                                             ;; 00:0ff7 $c8
     ld   C, A                                          ;; 00:0ff8 $4f
     ld   B, $00                                        ;; 00:0ff9 $06 $00

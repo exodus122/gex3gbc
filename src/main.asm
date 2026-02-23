@@ -11,6 +11,8 @@ INCLUDE "code/bank00_objects_core.asm"
 
 SECTION "bank01", ROMX[$4000], BANK[$01]
 INCLUDE "code/bank01_menus.asm"
+INCLUDE "code/bank01_password_menu.asm"
+INCLUDE "code/bank01_menu_data.asm"
 
 SECTION "bank02", ROMX[$4000], BANK[$02]
 INCLUDE "code/bank02_object_pointer_tables.asm"

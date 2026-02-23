@@ -1502,7 +1502,7 @@ call_00_2962_Object_GetActionId:
     ld   A, [HL]                                       ;; 00:296a $7e
     ret                                                ;; 00:296b $c9
 
-call_00_296c_Object_Get9:
+call_00_296c_Object_GetSpriteCounter:
     ld   h, HIGH(wD800_ObjectMemory)
     ld   a,[wDA00_CurrentObjectAddrLo]
     or   a,OBJECT_SPRITE_COUNTER_OFFSET

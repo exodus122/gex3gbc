@@ -598,10 +598,10 @@ call_02_518a_ApplyLeftwardCollisionAdjustment:
 call_02_5195_ResolveLeftwardTilePushback:
 ; Purpose: Performs fine collision resolution when pushing left into a block.
 ; Details:
-; Calculates distance between player and tile edges (wDC3C, wD80E_PlayerXPosition).
+; Calculates distance between player and tile edges (wDC3C_MapBoundaryXMinLoPlus10, wD80E_PlayerXPosition).
 ; Updates temporary velocity/direction flags (wDC8A).
 ; Chooses whether to store adjusted coordinates or preserve original deltas based on flags.
-    ld   HL, wDC3C                                     ;; 02:5195 $21 $3c $dc
+    ld   HL, wDC3C_MapBoundaryXMinLoPlus10                                     ;; 02:5195 $21 $3c $dc
     ld   A, [HL+]                                      ;; 02:5198 $2a
     ld   D, [HL]                                       ;; 02:5199 $56
     ld   E, A                                          ;; 02:519a $5f
@@ -626,7 +626,7 @@ call_02_5195_ResolveLeftwardTilePushback:
     ld   D, B                                          ;; 02:51b5 $50
 .jr_02_51b6:
     ld   HL, wD80E_PlayerXPosition                                     ;; 02:51b6 $21 $0e $d8
-    ld   A, [wDC2A]                                    ;; 02:51b9 $fa $2a $dc
+    ld   A, [wDC2A_MapBoundaryIndex]                                    ;; 02:51b9 $fa $2a $dc
     cp   A, $00                                        ;; 02:51bc $fe $00
     jr   Z, .jr_02_51c4                                ;; 02:51be $28 $04
     ld   A, E                                          ;; 02:51c0 $7b
@@ -696,7 +696,7 @@ call_02_5204_ResolveRightwardTilePushback:
 ; Details:
 ; Uses positive deltas to adjust player’s X-position when moving right.
 ; pdates flags (wDC8A) and writes corrected values to player position.
-    ld   HL, wDC3E                                     ;; 02:5204 $21 $3e $dc
+    ld   HL, wDC3E_MapBoundaryXMaxLoPlus90                                     ;; 02:5204 $21 $3e $dc
     ld   A, [HL+]                                      ;; 02:5207 $2a
     ld   D, [HL]                                       ;; 02:5208 $56
     ld   E, A                                          ;; 02:5209 $5f
@@ -720,7 +720,7 @@ call_02_5204_ResolveRightwardTilePushback:
     ld   D, B                                          ;; 02:5222 $50
 .jr_02_5223:
     ld   HL, wD80E_PlayerXPosition                                     ;; 02:5223 $21 $0e $d8
-    ld   A, [wDC2A]                                    ;; 02:5226 $fa $2a $dc
+    ld   A, [wDC2A_MapBoundaryIndex]                                    ;; 02:5226 $fa $2a $dc
     cp   A, $00                                        ;; 02:5229 $fe $00
     jr   Z, .jr_02_5231                                ;; 02:522b $28 $04
     ld   A, E                                          ;; 02:522d $7b
@@ -984,7 +984,7 @@ call_02_53e7_ApplyVerticalMovementAndClamp:
 ; Purpose: Updates Y position and prevents moving outside bounds or through solids.
 ; Behavior:
 ; Adds (C,B) delta to Y coordinates (wD810–wD811).
-; If player isn’t in a special action (≠ $1B), compares the new position against stored map window bounds (wDC40–wDC43).
+; If player isn’t in a special action (≠ $1B), compares the new position against stored map window bounds (wDC40_MapBoundaryYMinLoPlus10–wDC43_MapBoundaryYMaxHiPlus0).
 ; If out of bounds, clamps Y to the limit and sets wDC8A as a collision indicator.
     ld   HL, wD810_PlayerYPosition                                     ;; 02:53e7 $21 $10 $d8
     ld   A, [HL]                                       ;; 02:53ea $7e
@@ -1000,7 +1000,7 @@ call_02_53e7_ApplyVerticalMovementAndClamp:
     ret  Z                                             ;; 02:53f7 $c8
     bit  7, B                                          ;; 02:53f8 $cb $78
     jr   NZ, .jr_02_541f                               ;; 02:53fa $20 $23
-    ld   HL, wDC40                                     ;; 02:53fc $21 $40 $dc
+    ld   HL, wDC40_MapBoundaryYMinLoPlus10                                     ;; 02:53fc $21 $40 $dc
     ld   A, C                                          ;; 02:53ff $79
     sub  A, [HL]                                       ;; 02:5400 $96
     inc  HL                                            ;; 02:5401 $23
@@ -1014,17 +1014,17 @@ call_02_53e7_ApplyVerticalMovementAndClamp:
     ld   A, B                                          ;; 02:540a $78
     sbc  A, [HL]                                       ;; 02:540b $9e
     ret  C                                             ;; 02:540c $d8
-    ld   A, [wDC42]                                    ;; 02:540d $fa $42 $dc
+    ld   A, [wDC42_MapBoundaryYMaxLoPlus78]                                    ;; 02:540d $fa $42 $dc
     ld   [wD810_PlayerYPosition], A                                    ;; 02:5410 $ea $10 $d8
-    ld   A, [wDC43]                                    ;; 02:5413 $fa $43 $dc
+    ld   A, [wDC43_MapBoundaryYMaxHiPlus0]                                    ;; 02:5413 $fa $43 $dc
     ld   [wD810_PlayerYPosition+1], A                                    ;; 02:5416 $ea $11 $d8
     ld   A, $01                                        ;; 02:5419 $3e $01
     ld   [wDC8A], A                                    ;; 02:541b $ea $8a $dc
     ret                                                ;; 02:541e $c9
 .jr_02_541f:
-    ld   A, [wDC40]                                    ;; 02:541f $fa $40 $dc
+    ld   A, [wDC40_MapBoundaryYMinLoPlus10]                                    ;; 02:541f $fa $40 $dc
     ld   [wD810_PlayerYPosition], A                                    ;; 02:5422 $ea $10 $d8
-    ld   A, [wDC41]                                    ;; 02:5425 $fa $41 $dc
+    ld   A, [wDC41_MapBoundaryYMinHiPlus00]                                    ;; 02:5425 $fa $41 $dc
     ld   [wD810_PlayerYPosition+1], A                                    ;; 02:5428 $ea $11 $d8
     ld   A, $00                                        ;; 02:542b $3e $00
     ld   [wDC8A], A                                    ;; 02:542d $ea $8a $dc

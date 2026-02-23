@@ -496,7 +496,7 @@ call_02_7337_CheckHorizontalMapScroll:
     jr   C, .jr_02_737b                                ;; 02:7357 $38 $22
     or   A, E                                          ;; 02:7359 $b3
     ret  Z                                             ;; 02:735a $c8
-    ld   A, [wDC2A]                                    ;; 02:735b $fa $2a $dc
+    ld   A, [wDC2A_MapBoundaryIndex]                                    ;; 02:735b $fa $2a $dc
     cp   A, $00                                        ;; 02:735e $fe $00
     jr   NZ, .jr_02_7373                               ;; 02:7360 $20 $11
     ld   HL, wDBFD_XPositionRelated                                     ;; 02:7362 $21 $fd $db
@@ -517,7 +517,7 @@ call_02_7337_CheckHorizontalMapScroll:
     ld   [HL], A                                       ;; 02:7379 $77
     ret                                                ;; 02:737a $c9
 .jr_02_737b:
-    ld   A, [wDC2A]                                    ;; 02:737b $fa $2a $dc
+    ld   A, [wDC2A_MapBoundaryIndex]                                    ;; 02:737b $fa $2a $dc
     cp   A, $00                                        ;; 02:737e $fe $00
     jr   NZ, .jr_02_7393                               ;; 02:7380 $20 $11
     ld   A, C                                          ;; 02:7382 $79

@@ -75,10 +75,10 @@ call_00_10de_UpdatePlayerMapWindow:
 ; and calculates visible window extents. Stores several intermediate values 
 ; (e.g., wDA14_CameraPos_Left–wDA1A_CameraPos_Bottom+1, wDBF9–wDBFC) used for scrolling and collision.
 ; Why: Prepares all map-relative coordinates for rendering and collision based on the player’s position.
-    ld   A, [wDC29]                                    ;; 00:10de $fa $29 $dc
+    ld   A, [wDC29_SkipMapWindowUpdateFlag]                                    ;; 00:10de $fa $29 $dc
     and  A, A                                          ;; 00:10e1 $a7
     ret  NZ                                            ;; 00:10e2 $c0
-    ld   HL, wDC34                                     ;; 00:10e3 $21 $34 $dc
+    ld   HL, wDC34_MapBoundaryXMinLo                                     ;; 00:10e3 $21 $34 $dc
     ld   A, [HL+]                                      ;; 00:10e6 $2a
     ld   E, A                                          ;; 00:10e7 $5f
     ld   A, [HL+]                                      ;; 00:10e8 $2a
@@ -106,7 +106,7 @@ call_00_10de_UpdatePlayerMapWindow:
     ld   E, C                                          ;; 00:1107 $59
     ld   D, B                                          ;; 00:1108 $50
 .jr_00_1109:
-    ld   A, [wDC2A]                                    ;; 00:1109 $fa $2a $dc
+    ld   A, [wDC2A_MapBoundaryIndex]                                    ;; 00:1109 $fa $2a $dc
     cp   A, $00                                        ;; 00:110c $fe $00
     jr   NZ, .jr_00_1115                               ;; 00:110e $20 $05
     ld   E, C                                          ;; 00:1110 $59
@@ -159,7 +159,7 @@ call_00_10de_UpdatePlayerMapWindow:
     ld   A, [wD810_PlayerYPosition+1]                                    ;; 00:115f $fa $11 $d8
     adc  A, [HL]                                       ;; 00:1162 $8e
     ld   B, A                                          ;; 00:1163 $47
-    ld   HL, wDC38                                     ;; 00:1164 $21 $38 $dc
+    ld   HL, wDC38_MapBoundaryYMinLo                                     ;; 00:1164 $21 $38 $dc
     ld   A, [HL+]                                      ;; 00:1167 $2a
     ld   E, A                                          ;; 00:1168 $5f
     ld   A, [HL+]                                      ;; 00:1169 $2a
@@ -1090,7 +1090,7 @@ call_00_1a22_LoadInitialBgMap:
 ; Initialize Background Map Rows
 ; Loops 22 times ($16), each time calling LoadBgMapInitial2, then increments the map’s Y position by 8 pixels, 
 ; effectively filling the initial BG map rows. After finishing, it subtracts $b0 from Y to restore the pointer.
-    ld   [wDC33], A                                    ;; 00:1a22 $ea $33 $dc
+    ld   [wDC33_BgMapRelated], A                                    ;; 00:1a22 $ea $33 $dc
     ld   A, $16                                        ;; 00:1a25 $3e $16
 .jr_00_1a27:
     push AF                                            ;; 00:1a27 $f5
@@ -1154,13 +1154,13 @@ call_00_1a46_LoadBgMapRow:
     rrca                                               ;; 00:1a77 $0f
     and  A, $02                                        ;; 00:1a78 $e6 $02
     ld   E, A                                          ;; 00:1a7a $5f
-    ld   A, [wDC33]                                    ;; 00:1a7b $fa $33 $dc
+    ld   A, [wDC33_BgMapRelated]                                    ;; 00:1a7b $fa $33 $dc
     and  A, $7f                                        ;; 00:1a7e $e6 $7f
     or   A, E                                          ;; 00:1a80 $b3
     ld   E, A                                          ;; 00:1a81 $5f
     ld   D, $00                                        ;; 00:1a82 $16 $00
     push DE                                            ;; 00:1a84 $d5
-    ld   A, [wDC33]                                    ;; 00:1a85 $fa $33 $dc
+    ld   A, [wDC33_BgMapRelated]                                    ;; 00:1a85 $fa $33 $dc
     bit  7, A                                          ;; 00:1a88 $cb $7f
     jp   NZ, .jp_00_1b40                               ;; 00:1a8a $c2 $40 $1b
     ld   A, [wDC01_MapBank]                                    ;; 00:1a8d $fa $01 $dc
