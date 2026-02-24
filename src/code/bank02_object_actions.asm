@@ -42,7 +42,7 @@ call_02_585f_ObjectAction_MovePlatformHorizontally:
     and  a,$7F
     xor  a,$40
     ld   [hl],a
-    call call_00_230f_GetObjectParameter
+    call call_00_230f_Object_GetParameter
     jp   call_00_290d_Object_SetMiscTimer
 .jr_00_588C:
     ld   c,$01
@@ -87,7 +87,7 @@ call_02_58bd_ObjectAction_MovePlatformVertically:
     and  a,$7F
     xor  a,$40
     ld   [hl],a
-    call call_00_230f_GetObjectParameter
+    call call_00_230f_Object_GetParameter
     jp   call_00_290d_Object_SetMiscTimer
 .jr_00_58EA:
     ld   c,$01
@@ -174,7 +174,7 @@ call_02_59aa_ObjectAction_FlyTV_Reset:
     call call_02_59D2_FlyTV_unk
     call call_00_2b10_Object_FindDuplicateInstance
     ret  nz
-    call call_00_230f_GetObjectParameter
+    call call_00_230f_Object_GetParameter
     ld   a,c
     and  a
     ret  z
@@ -221,7 +221,7 @@ call_02_5a04_ObjectAction_TVButton_unk:
     call call_00_29f5_Object_ClearGraphicsFlag4AndCheck                                  ;; 02:5a04 $cd $f5 $29
     jr   NZ, call_02_5a83_ObjectAction_TVButton_unk4                                ;; 02:5a07 $20 $7a
     ld   C, $00                                        ;; 02:5a09 $0e $00
-    call call_00_22b1_UpdateFlagsAndSetAction                                  ;; 02:5a0b $cd $b1 $22
+    call call_00_22b1_Object_UpdateFlagsAndSetAction                                  ;; 02:5a0b $cd $b1 $22
     ld   HL, .data_02_5a14                             ;; 02:5a0e $21 $14 $5a
     jp   call_00_2c20_Object_CopyPaletteToBuffer                                  ;; 02:5a11 $c3 $20 $2c
 .data_02_5a14:
@@ -248,7 +248,7 @@ call_02_5a1c_ObjectAction_TVButton_unk2:
     ld   A, PLAYERACTION_STAND_ON_TV_BUTTON                                        ;; 02:5a43 $3e $0c
 .jr_02_5a45:
     call call_02_54f9_SwitchPlayerAction                                  ;; 02:5a45 $cd $f9 $54
-    call call_00_230f_GetObjectParameter                                  ;; 02:5a48 $cd $0f $23
+    call call_00_230f_Object_GetParameter                                  ;; 02:5a48 $cd $0f $23
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 02:5a4b $fa $1e $dc
     and  A, A                                          ;; 02:5a4e $a7
     jr   Z, .jr_02_5a6a                                ;; 02:5a4f $28 $19
@@ -284,7 +284,7 @@ call_02_5a83_ObjectAction_TVButton_unk4:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 02:5a83 $fa $1e $dc
     and  A, A                                          ;; 02:5a86 $a7
     ret  NZ                                            ;; 02:5a87 $c0
-    call call_00_230f_GetObjectParameter                                  ;; 02:5a88 $cd $0f $23
+    call call_00_230f_Object_GetParameter                                  ;; 02:5a88 $cd $0f $23
     ld   B, $00                                        ;; 02:5a8b $06 $00
     ld   HL, data_00_0b19                                      ;; 02:5a8d $21 $19 $0b
     add  HL, BC                                        ;; 02:5a90 $09
@@ -325,25 +325,25 @@ call_02_5ada_ObjectAction_TVRemote_unk:
     call call_00_29f5_Object_ClearGraphicsFlag4AndCheck                                  ;; 02:5ada $cd $f5 $29
     jr   NZ, call_02_5af8_ObjectAction_TVRemote_unk4                                ;; 02:5add $20 $19
     ld   C, $00                                        ;; 02:5adf $0e $00
-    jp   call_00_22b1_UpdateFlagsAndSetAction                                  ;; 02:5ae1 $c3 $b1 $22
+    jp   call_00_22b1_Object_UpdateFlagsAndSetAction                                  ;; 02:5ae1 $c3 $b1 $22
 
 call_02_5ae4_ObjectAction_TVRemote_unk2:
     call call_00_29f5_Object_ClearGraphicsFlag4AndCheck                                  ;; 02:5ae4 $cd $f5 $29
     jr   NZ, call_02_5af8_ObjectAction_TVRemote_unk4                                ;; 02:5ae7 $20 $0f
     ld   C, $01                                        ;; 02:5ae9 $0e $01
-    jp   call_00_22b1_UpdateFlagsAndSetAction         
+    jp   call_00_22b1_Object_UpdateFlagsAndSetAction         
 
 call_02_5aee_ObjectAction_TVRemote_unk3:    ;; 02:5aeb $c3 $b1 $22
     call call_00_29f5_Object_ClearGraphicsFlag4AndCheck
     jr   nz,call_02_5af8_ObjectAction_TVRemote_unk4
     ld   c,$02
-    jp   call_00_22b1_UpdateFlagsAndSetAction
+    jp   call_00_22b1_Object_UpdateFlagsAndSetAction
 
 call_02_5af8_ObjectAction_TVRemote_unk4:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 02:5af8 $fa $1e $dc
     and  A, A                                          ;; 02:5afb $a7
     ret  NZ                                            ;; 02:5afc $c0
-    call call_00_230f_GetObjectParameter                                  ;; 02:5afd $cd $0f $23
+    call call_00_230f_Object_GetParameter                                  ;; 02:5afd $cd $0f $23
     ld   B, $00                                        ;; 02:5b00 $06 $00
     ld   HL, data_00_0b19                                      ;; 02:5b02 $21 $19 $0b
     add  HL, BC                                        ;; 02:5b05 $09
@@ -372,7 +372,7 @@ call_02_5af8_ObjectAction_TVRemote_unk4:
     ld   A, $03                                        ;; 02:5b3b $3e $03
     call call_02_72ac_SetObjectAction                                  ;; 02:5b3d $cd $ac $72
 .jr_02_5b40:
-    call call_00_230f_GetObjectParameter                                  ;; 02:5b40 $cd $0f $23
+    call call_00_230f_Object_GetParameter                                  ;; 02:5b40 $cd $0f $23
     ld   B, $00                                        ;; 02:5b43 $06 $00
     ld   HL, .data_02_5b7e                             ;; 02:5b45 $21 $7e $5b
     add  HL, BC                                        ;; 02:5b48 $09
@@ -474,7 +474,7 @@ call_02_5bfa_ObjectAction_FreestandingRemote_unk2:
     call call_00_2c67_Particle_InitBurst                                  ;; 02:5c10 $cd $67 $2c
     ld   C, TIMER_AMOUNT_60_FRAMES                                        ;; 02:5c13 $0e $3c
     call call_00_290d_Object_SetMiscTimer                                  ;; 02:5c15 $cd $0d $29
-    call call_00_230f_GetObjectParameter                                  ;; 02:5c18 $cd $0f $23
+    call call_00_230f_Object_GetParameter                                  ;; 02:5c18 $cd $0f $23
     ld   B, $00                                        ;; 02:5c1b $06 $00
     ld   HL, wDC5C_ProgressFlags                                     ;; 02:5c1d $21 $5c $dc
     add  HL, BC                                        ;; 02:5c20 $09
@@ -484,7 +484,7 @@ call_02_5bfa_ObjectAction_FreestandingRemote_unk2:
     ret  NZ                                            ;; 02:5c26 $c0
     call call_00_2922_Object_MiscTimerCountdown                                  ;; 02:5c27 $cd $22 $29
     ret  NZ                                            ;; 02:5c2a $c0
-    call call_00_230f_GetObjectParameter                                  ;; 02:5c2b $cd $0f $23
+    call call_00_230f_Object_GetParameter                                  ;; 02:5c2b $cd $0f $23
     inc  C                                             ;; 02:5c2e $0c
     dec  C                                             ;; 02:5c2f $0d
     jp   Z, call_00_2b7a_DeactivateObject                                 ;; 02:5c30 $ca $7a $2b
@@ -755,7 +755,7 @@ call_02_5e34_ObjectAction_SkatingElf_Damaged:
     call Z, call_00_2588_Object_ApproachXVelocity                               ;; 02:5e51 $cc $88 $25
     call call_00_251c_Object_HandleHorizontalBoundingBoxTurnAround                                  ;; 02:5e54 $cd $1c $25
     ret  Z                                             ;; 02:5e57 $c8
-    call call_00_230f_GetObjectParameter                                  ;; 02:5e58 $cd $0f $23
+    call call_00_230f_Object_GetParameter                                  ;; 02:5e58 $cd $0f $23
     ld   B, $00                                        ;; 02:5e5b $06 $00
     ld   HL, wDCD5_ElfHealth1                                     ;; 02:5e5d $21 $d5 $dc
     add  HL, BC                                        ;; 02:5e60 $09
@@ -1434,7 +1434,7 @@ call_02_642e_ObjectAction_Rock_Unk0:
     ld   hl,wDA00_CurrentObjectAddrLo
     cp   [hl]
     ret  nz
-    call call_00_230f_GetObjectParameter
+    call call_00_230f_Object_GetParameter
     jp   call_00_290d_Object_SetMiscTimer
 .jr_00_6450:
     call call_00_2922_Object_MiscTimerCountdown
@@ -2035,7 +2035,7 @@ call_02_68b2_ObjectAction_Grenade_Unk0:
     ld   b,$00
     call call_00_24df_Object_UpdateXPosition
     call call_00_27e4_Object_ResetToInitialYPos
-    call call_00_230f_GetObjectParameter
+    call call_00_230f_Object_GetParameter
     ld   b,$FF
     call call_00_250d_Object_UpdateYPosition
     ld   c,TIMER_AMOUNT_GRENADE
@@ -2318,7 +2318,7 @@ call_02_6add_ObjectAction_ConvictProjectile_Update:
 call_02_6b03_ObjectAction_Spider_Unk0:
     call call_00_29f5_Object_ClearGraphicsFlag4AndCheck
     jr   z,.jr_00_6B0E
-    call call_00_230f_GetObjectParameter
+    call call_00_230f_Object_GetParameter
     call call_00_290d_Object_SetMiscTimer
 .jr_00_6B0E:
     ld   bc,$0002
@@ -2333,7 +2333,7 @@ call_02_6b03_ObjectAction_Spider_Unk0:
 call_02_6b20_ObjectAction_Spider_Unk1:
     ld   bc,$FFFF
     call call_00_250d_Object_UpdateYPosition
-    call call_00_230f_GetObjectParameter
+    call call_00_230f_Object_GetParameter
     call call_00_2917_Object_CheckIfMiscTimerIsZero
     inc  a
     ld   [hl],a
@@ -2402,7 +2402,7 @@ call_02_6ba3_ObjectAction_ChomperTV_Unk0:
     jr   z,.jr_00_6BB3
     ld   c,$04
     call call_00_28c8_Object_SetXVelocity
-    call call_00_230f_GetObjectParameter
+    call call_00_230f_Object_GetParameter
     call call_00_290d_Object_SetMiscTimer
 .jr_00_6BB3:
     call call_00_251c_Object_HandleHorizontalBoundingBoxTurnAround
@@ -2431,7 +2431,7 @@ call_02_6bc8_ObjectAction_ChomperTV_Unk2:
     call call_00_251c_Object_HandleHorizontalBoundingBoxTurnAround
 
 call_02_6be4_ObjectAction_ChomperTV_Unk1:
-    call call_00_230f_GetObjectParameter
+    call call_00_230f_Object_GetParameter
     call call_00_2917_Object_CheckIfMiscTimerIsZero
     cp   c
     ld   a,$00
@@ -2517,7 +2517,7 @@ call_02_6c73_ObjectAction_GextremeSportsElf_Unk4:
     call z,call_00_2588_Object_ApproachXVelocity
     call call_00_251c_Object_HandleHorizontalBoundingBoxTurnAround
     ret  z
-    call call_00_230f_GetObjectParameter
+    call call_00_230f_Object_GetParameter
     ld   b,$00
     ld   hl,wDCD5_ElfHealth1
     add  hl,bc
@@ -2538,7 +2538,7 @@ call_02_6c73_ObjectAction_GextremeSportsElf_Unk4:
 call_02_6cbb_ObjectAction_Bird_Update:
     call call_00_29f5_Object_ClearGraphicsFlag4AndCheck
     jr   z,.jr_00_6CC6
-    call call_00_230f_GetObjectParameter
+    call call_00_230f_Object_GetParameter
     call call_00_2958_Object_SetFacingDirection
 .jr_00_6CC6:
     call call_00_27f3_Object_GetInitialYPos

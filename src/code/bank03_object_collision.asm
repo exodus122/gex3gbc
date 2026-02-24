@@ -247,7 +247,7 @@ call_03_4dc2_Collision_PawCoin:
 ; This is basically a collectible counter with milestones.
     call call_03_550e_CheckPlayerObjectInteraction                                  ;; 03:4dc2 $cd $0e $55
     ret  NC                                            ;; 03:4dc5 $d0
-    call call_00_230f_GetObjectParameter                                  ;; 03:4dc6 $cd $0f $23
+    call call_00_230f_Object_GetParameter                                  ;; 03:4dc6 $cd $0f $23
     ld   B, $00                                        ;; 03:4dc9 $06 $00
     ld   HL, .data_03_4e00                             ;; 03:4dcb $21 $00 $4e
     add  HL, BC                                        ;; 03:4dce $09
@@ -455,7 +455,7 @@ call_03_4f23_Collision_HolidayTV_Elf:
     jp   NZ, call_03_4cea_Collision_DamagePlayer                               ;; 03:4f29 $c2 $ea $4c
     ld   A, $04                                        ;; 03:4f2c $3e $04
     farcall call_02_72ac_SetObjectAction
-    call call_00_230f_GetObjectParameter                                  ;; 03:4f39 $cd $0f $23
+    call call_00_230f_Object_GetParameter                                  ;; 03:4f39 $cd $0f $23
     ld   B, $00                                        ;; 03:4f3c $06 $00
     ld   HL, wDCD5_ElfHealth1                                     ;; 03:4f3e $21 $d5 $dc
     add  HL, BC                                        ;; 03:4f41 $09
@@ -754,7 +754,7 @@ call_03_5116_Collision_Door:
     ret  c
     cp   a,$03
     ret  nc
-    call call_00_230f_GetObjectParameter
+    call call_00_230f_Object_GetParameter
     inc  c
     jr   z,.jr_00_5143
     call call_00_22d4_Object_CheckTriggerFlag
@@ -785,7 +785,7 @@ call_03_5156_Collision_Door2:
     ret  c
     cp   a,$03
     ret  nc
-    call call_00_230f_GetObjectParameter
+    call call_00_230f_Object_GetParameter
     inc  c
     jr   z,.jr_00_5183
     call call_00_22d4_Object_CheckTriggerFlag
@@ -1039,7 +1039,7 @@ call_03_532f_Collision_GextremeSports_Elf:
     jp   nz,call_03_4cea_Collision_DamagePlayer
     ld   a,$04
     farcall call_02_72ac_SetObjectAction
-    call call_00_230f_GetObjectParameter
+    call call_00_230f_Object_GetParameter
     ld   b,$00
     ld   hl,wDCD5_ElfHealth1
     add  hl,bc
@@ -1076,7 +1076,7 @@ call_03_537a_Collision_BonusTimeCoin:
     ret  nc
     cp   a,$01
     ret  nz
-    call call_00_230f_GetObjectParameter
+    call call_00_230f_Object_GetParameter
     ld   a,[wDB6E]
     add  c
     ld   [wDB6E],a

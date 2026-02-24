@@ -157,7 +157,7 @@ call_00_2299_Object_UpdateFlags:
     ld   [HL], A                                       ;; 00:22af $77
     ret                                                ;; 00:22b0 $c9
 
-call_00_22b1_UpdateFlagsAndSetAction:
+call_00_22b1_Object_UpdateFlagsAndSetAction:
 ; Similar indexing logic as 2299, but:
 ; Compares the current low nibble with C.
 ; If different, stores the old low nibble to wDAD6_ReturnBank.
@@ -187,7 +187,7 @@ call_00_22d4_Object_CheckTriggerFlag:
 ; Uses that param to look up a byte in the table at wDCB1_LevelTriggerBuffer.
 ; Returns with A = value at that slot (flags zero/non-zero).
 ; Purpose: Check if a flag/slot for this object is set.
-    call call_00_230f_GetObjectParameter
+    call call_00_230f_Object_GetParameter
     ld   b,$00
     ld   hl,wDCB1_LevelTriggerBuffer
     add  hl,bc
@@ -199,7 +199,7 @@ call_00_22e0_Object_IncrementTriggerFlag:
 ; Gets object parameter via 230F.
 ; If parameter < $10, increments that object’s slot in wDCB1_LevelTriggerBuffer.
 ; Purpose: Increment a small counter for this object (capped at 16 slots).
-    call call_00_230f_GetObjectParameter
+    call call_00_230f_Object_GetParameter
     ld   a,c
     cp   a,$10
     ret  nc
@@ -213,7 +213,7 @@ call_00_22ef_Object_SetTriggerActive:
 ; Gets object parameter via 230F.
 ; If parameter < $10, sets that object’s slot to 1.
 ; Purpose: Mark the slot as “active” or “initialized.”
-    call call_00_230f_GetObjectParameter
+    call call_00_230f_Object_GetParameter
     ld   a,c
     cp   a,$10
     ret  nc
@@ -227,7 +227,7 @@ call_00_22ff_Object_SetTriggerInactive:
 ; Gets object parameter via 230F.
 ; If parameter < $10, clears that slot to 0.
 ; Purpose: Mark the slot as inactive/cleared.
-    call call_00_230f_GetObjectParameter
+    call call_00_230f_Object_GetParameter
     ld   a,c
     cp   a,$10
     ret  nc
@@ -237,7 +237,7 @@ call_00_22ff_Object_SetTriggerInactive:
     ld   [hl],$00
     ret  
 
-call_00_230f_GetObjectParameter:
+call_00_230f_Object_GetParameter:
 ; Switches to the object list bank (wDC16_ObjectListBank).
 ; Uses wDC17_ObjectListBankOffset and the current object’s ID (wDA00_CurrentObjectAddrLo) to compute 
 ; an index (C) into the object list.
@@ -1581,7 +1581,7 @@ call_00_2a98_RaStatueObject_PlayerInteraction:
 ; triggers a banked function (call_02_72ac_SetObjectAction)
 ; Purpose: Detects when the player collides with or interacts with a special object and dispatches a handler.
     push de
-    call call_00_230f_GetObjectParameter
+    call call_00_230f_Object_GetParameter
     ld   l,c
     ld   h,$00
     add  hl,hl
