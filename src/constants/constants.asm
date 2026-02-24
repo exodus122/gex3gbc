@@ -281,13 +281,13 @@ DEF OBJECT_YPOS_OFFSET                      EQU $10
 DEF OBJECT_WIDTH_OFFSET                     EQU $12 ; set to [1] into data_00_3258
 DEF OBJECT_HEIGHT_OFFSET                    EQU $13 ; set to [2] into data_00_3258
 DEF OBJECT_COLLISION_TYPE_OFFSET            EQU $14 ; set to [3] into data_00_3258
-DEF OBJECT_UNK15_OFFSET                     EQU $15 ; collision related, starts as 0
+DEF OBJECT_COOLDOWN_TIMER_OFFSET            EQU $15 ; defaults to 0, but might get set to $3c (same value as gex's cooldown timer)
 DEF OBJECT_UNK16_OFFSET                     EQU $16 ; collision related, starts as [4] into data_00_3258, minus 1
 DEF OBJECT_SPRITE_BANK_OFFSET               EQU $17
 DEF OBJECT_UNK18_OFFSET                     EQU $18 ; starts as 0
 DEF OBJECT_EXTRA_FLAGS_OFFSET               EQU $19 ; only used by moving platforms, skating elf health, and sec bot (?)
                                                     ; starts as [5] into data_00_3258
-DEF OBJECT_TIMER1A_OFFSET                   EQU $1A
+DEF OBJECT_MISC_TIMER_OFFSET                EQU $1A ; timer which can be used for varying purposes
 DEF OBJECT_XVEL_OFFSET                      EQU $1B
 DEF OBJECT_UNK1C_OFFSET                     EQU $1C
 DEF OBJECT_YVEL_OFFSET                      EQU $1D
@@ -302,7 +302,7 @@ DEF OBJECTSPAWN_BOUNDINGBOX_XMAX_OFFSET     EQU $05
 DEF OBJECTSPAWN_BOUNDINGBOX_XMIN_OFFSET     EQU $07
 DEF OBJECTSPAWN_BOUNDINGBOX_YMIN_OFFSET     EQU $09
 DEF OBJECTSPAWN_BOUNDINGBOX_YMAX_OFFSET     EQU $0B
-DEF OBJECTSPAWN_FLAGS_OFFSET                EQU $0D ; usually instance id, but sometimes contains other data
+DEF OBJECTSPAWN_PARAMETER_OFFSET            EQU $0D ; usually id used for collectibles, but sometimes contains a timer value
 DEF OBJECTSPAWN_MAP_OFFSET                  EQU $0F
 
 ; Object Facing Direction values
@@ -313,6 +313,31 @@ DEF OBJECT_FACING_UNK40      EQU $40
 ; Object position relative to Gex
 DEF OBJECT_LEFT_OF_GEX       EQU $00
 DEF OBJECT_RIGHT_OF_GEX      EQU $20
+
+; Object flags, used in wD700_ObjectFlags
+DEF OBJECT_FLAG_80_ACTIVE                  EQU $80
+
+; Frame timer values
+DEF TIMER_AMOUNT_0_FRAMES                  EQU $00
+DEF TIMER_AMOUNT_60_FRAMES                 EQU $3C
+DEF TIMER_AMOUNT_120_FRAMES                EQU $78
+DEF TIMER_AMOUNT_180_FRAMES                EQU $B4
+DEF TIMER_AMOUNT_240_FRAMES                EQU $F0
+DEF TIMER_AMOUNT_GHOST_KNIGHT              EQU $41
+DEF TIMER_AMOUNT_GHOST_KNIGHT_PROJECTILE   EQU $5A
+DEF TIMER_AMOUNT_RAFT                      EQU $28
+DEF TIMER_AMOUNT_SNAKE_PROJECTILE          EQU $40
+DEF TIMER_AMOUNT_SECBOT                    EQU $C1
+DEF TIMER_AMOUNT_SECBOT_2                  EQU $02
+DEF TIMER_AMOUNT_GRENADE                   EQU $04
+DEF TIMER_AMOUNT_BOMB                      EQU $2D
+DEF TIMER_AMOUNT_SPIDER                    EQU $08
+DEF TIMER_AMOUNT_BIRD_PROJECTILE           EQU $03
+DEF TIMER_AMOUNT_BRAINOFOZ1                EQU $49
+DEF TIMER_AMOUNT_BRAINOFOZ2                EQU $39
+DEF TIMER_AMOUNT_BRAINOFOZ3                EQU $29
+DEF TIMER_AMOUNT_CANNON                    EQU $FF
+DEF TIMER_AMOUNT_REZ                       EQU $06
 
 ; Object Action Ids
 DEF OBJECTACTION_PENGUIN_WALK_OR_RUN      EQU $00

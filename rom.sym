@@ -101,6 +101,7 @@
 00:0a94 call_00_0a6a_LoadMapConfigAndWaitVBlank.jr_00_0a94
 00:0a9e call_00_0a6a_LoadMapConfigAndWaitVBlank.jr_00_0a9e
 00:0aa9 call_00_0a6a_LoadMapConfigAndWaitVBlank.data_00_0aa9_TilesetLoadConfigTable
+00:0b19 data_00_0b19
 00:0b25 call_00_0b25_MainGameLoop_UpdateAndRenderFrame
 00:0b80 call_00_0b25_MainGameLoop_UpdateAndRenderFrame.jr_00_0b80
 00:0b88 call_00_0b25_MainGameLoop_UpdateAndRenderFrame.jr_00_0b88
@@ -309,7 +310,7 @@
 00:22e0 call_00_22e0_IncrementObjectSlot
 00:22ef call_00_22ef_SetObjectSlotActive
 00:22ff call_00_22ff_ClearObjectSlot
-00:230f call_00_230f_ResolveObjectListIndex
+00:230f call_00_230f_GetObjectParameter
 00:233e call_00_233e_Object_UpdatePatternedPositionFromVelocityTable
 00:2352 call_00_233e_Object_UpdatePatternedPositionFromVelocityTable.jr_00_2352
 00:236f call_00_233e_Object_UpdatePatternedPositionFromVelocityTable.jr_00_236F
@@ -374,8 +375,8 @@
 00:2879 call_00_2879_Object_SetBoundingBoxXMin
 00:288a call_00_288c_Object_ClearCollisionType
 00:288c call_00_288c_Object_SetCollisionType
-00:2896 call_00_2896_Object_Set15
-00:28a0 call_00_28a0_Object_Get15
+00:2896 call_00_2896_Object_SetCooldownTimer
+00:28a0 call_00_28a0_Object_GetCooldownTimer
 00:28aa call_00_28aa_Object_Set16
 00:28b4 call_00_28b4_Object_Get16
 00:28be call_00_28be_Object_GetXVelocity
@@ -385,9 +386,9 @@
 00:28e6 call_00_28e6_Object_CheckIfXVelocityIsZero
 00:28f1 call_00_28f1_Object_CheckIfYVelocityIsZero
 00:28fc call_00_28fc_Object_UpdateExtraFlags
-00:290d call_00_290d_Object_SetTimer1A
-00:2917 call_00_2917_Object_CheckIfTimer1AIsZero
-00:2922 call_00_2922_Object_Timer1ACountdown
+00:290d call_00_290d_Object_SetMiscTimer
+00:2917 call_00_2917_Object_CheckIfMiscTimerIsZero
+00:2922 call_00_2922_Object_MiscTimerCountdown
 00:2930 call_00_2930_Object_SetId
 00:293a call_00_293a_Object_GetId
 00:2944 call_00_2944_Object_SetWidth
@@ -481,8 +482,8 @@
 00:3096 call_00_2ff8_InitLevelObjectsAndConfig.jr_00_3096
 00:30a3 call_00_2ff8_InitLevelObjectsAndConfig.jr_00_30a3
 00:30ab call_00_2ff8_InitLevelObjectsAndConfig.jr_00_30ab
-00:30ba call_00_2ff8_InitLevelObjectsAndConfig.data_00_30ba
-00:317a call_00_2ff8_InitLevelObjectsAndConfig.data_00_317a
+00:30ba call_00_2ff8_InitLevelObjectsAndConfig.data_00_30ba_LevelTriggerInitialData
+00:317a call_00_2ff8_InitLevelObjectsAndConfig.data_00_317a_ElevatorObjectInitialData
 00:3180 call_00_3180_MarkInitialLevelObjects
 00:3190 call_00_3180_MarkInitialLevelObjects.jr_00_3190
 00:31a0 call_00_3180_MarkInitialLevelObjects.jr_00_31a0
@@ -1926,7 +1927,7 @@
 03:54a8 call_03_54a8_Collision_Rez
 03:54e1 call_03_54a8_Collision_Rez.jr_00_54E1
 03:54ee call_03_54ee_Collision_RaStatueProjectile
-03:5503 call_03_54f9
+03:5503 call_03_54f9_InitilializeObjectCooldownTimer
 03:550e call_03_550e_CheckPlayerObjectInteraction
 03:5541 call_03_550e_CheckPlayerObjectInteraction.jr_03_5541
 03:554d call_03_550e_CheckPlayerObjectInteraction.jr_03_554d
@@ -3203,7 +3204,7 @@
 00:dcad wDCAD
 00:dcae wDCAE_FlyTimerOrFlags5
 00:dcaf wDCAF_PawCoinCounter
-00:dcb1 wDCB1
+00:dcb1 wDCB1_LevelTriggerBuffer
 00:dcc1 wDCC1_EnterDoorRelated1
 00:dcc2 wDCC2_EnterDoorRelated2
 00:dcc3 wDCC3_IceSculptureCounter

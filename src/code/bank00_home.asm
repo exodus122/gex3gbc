@@ -648,7 +648,7 @@ call_00_06f6_DealDamageToPlayer:
 ; This is a hit/interaction response handler with timers, sound, and state decrement.
     call call_00_0759_IsPlayerDamageCooldownActive                                  ;; 00:06f6 $cd $59 $07
     ret  NZ                                            ;; 00:06f9 $c0
-    ld   A, $3c                                        ;; 00:06fa $3e $3c
+    ld   A, TIMER_AMOUNT_60_FRAMES                                        ;; 00:06fa $3e $3c
     ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 00:06fc $ea $7e $dc
     ld   HL, wDB69                                     ;; 00:06ff $21 $69 $db
     set  1, [HL]                                       ;; 00:0702 $cb $ce
@@ -1260,8 +1260,10 @@ call_00_0a6a_LoadMapConfigAndWaitVBlank:
     dw   $4000, $4000, $4350, $46a0                    ;; 00:0b01 .???????
     dw   $49f0, $4d40, $5090, $53e0                    ;; 00:0b09 .???????
     dw   $53e0, $5730, $5a80, $5dd0                    ;; 00:0b11 .???????
-    dw   $0100, $0502, $0d09, $8312                    ;; 00:0b19 .???????
-    dw   $0e87, $1713                                  ;; 00:0b21 .???????
+
+data_00_0b19:
+    db   $00, $01, $02, $05, $09, $0d, $12, $83                    ;; 00:0b19 .???????
+    db   $87, $0e, $13, $17                                  ;; 00:0b21 .???????
 
 call_00_0b25_MainGameLoop_UpdateAndRenderFrame:
 ; This function looks like the main game engine loop's frame handler, managing:

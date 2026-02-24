@@ -542,7 +542,7 @@ call_00_2ff8_InitLevelObjectsAndConfig:
     inc  [HL]                                          ;; 00:3011 $34
     ld   L, A                                          ;; 00:3012 $6f
     ld   H, HIGH(wD700_ObjectFlags)                                        ;; 00:3013 $26 $d7
-    ld   [HL], $80                                     ;; 00:3015 $36 $80
+    ld   [HL], OBJECT_FLAG_80_ACTIVE                                     ;; 00:3015 $36 $80
     pop  HL                                            ;; 00:3017 $e1
     ld   DE, $10                                       ;; 00:3018 $11 $10 $00
     add  HL, DE                                        ;; 00:301b $19
@@ -574,12 +574,12 @@ call_00_2ff8_InitLevelObjectsAndConfig:
     add  HL, HL                                        ;; 00:3059 $29
     add  HL, HL                                        ;; 00:305a $29
     add  HL, HL                                        ;; 00:305b $29
-    ld   DE, .data_00_30ba                                     ;; 00:305c $11 $ba $30
+    ld   DE, .data_00_30ba_LevelTriggerInitialData                                     ;; 00:305c $11 $ba $30
     add  HL, DE                                        ;; 00:305f $19
-    ld   DE, wDCB1                                     ;; 00:3060 $11 $b1 $dc
+    ld   DE, wDCB1_LevelTriggerBuffer                                     ;; 00:3060 $11 $b1 $dc
     ld   BC, $10                                       ;; 00:3063 $01 $10 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:3066 $cd $6e $07
-    ld   HL, .data_00_317a                                     ;; 00:3069 $21 $7a $31
+    ld   HL, .data_00_317a_ElevatorObjectInitialData                                     ;; 00:3069 $21 $7a $31
     ld   DE, wDCE2_ElevatorObjectUnkData                                     ;; 00:306c $11 $e2 $dc
     ld   BC, $06                                       ;; 00:306f $01 $06 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:3072 $cd $6e $07
@@ -613,7 +613,7 @@ call_00_2ff8_InitLevelObjectsAndConfig:
     call call_00_320d_CheckAndClearPawCoinObjectFlags                                  ;; 00:30b1 $cd $0d $32
     call call_00_3252_ResetObjectCounter                                  ;; 00:30b4 $cd $52 $32
     jp   call_00_0f08_RestoreBank                                  ;; 00:30b7 $c3 $08 $0f
-.data_00_30ba:
+.data_00_30ba_LevelTriggerInitialData:
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:30ba ........
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:30c2 ........
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:30ca ........
@@ -624,7 +624,7 @@ call_00_2ff8_InitLevelObjectsAndConfig:
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:30f2 ????????
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:30fa ????????
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:3102 ????????
-    db   $00, $01, $00, $00, $01, $00, $00, $00        ;; 00:310a ????????
+    db   $00, $01, $00, $00, $01, $00, $00, $00        ;; 00:310a ???????? ; anime channel
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:3112 ????????
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:311a ????????
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:3122 ????????
@@ -638,7 +638,7 @@ call_00_2ff8_InitLevelObjectsAndConfig:
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:3162 ????????
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:316a ????????
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:3172 ????????
-.data_00_317a:
+.data_00_317a_ElevatorObjectInitialData:
     db   $98, $02, $58, $01, $d8, $01                  ;; 00:317a ......
 
 call_00_3180_MarkInitialLevelObjects:

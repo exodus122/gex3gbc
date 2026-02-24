@@ -118,7 +118,7 @@ call_02_484d_PlayerAction_TakeDamage:
     ld   A, SFX_PLAYER_DAMAGED                                        ;; 02:485f $3e $0a
     call call_00_0ff5_QueueSoundEffect                                  ;; 02:4861 $cd $f5 $0f
 .jr_02_4864:
-    ld   A, $3c                                        ;; 02:4864 $3e $3c
+    ld   A, TIMER_AMOUNT_60_FRAMES                                        ;; 02:4864 $3e $3c
     ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 02:4866 $ea $7e $dc
     ld   A, [wDC8E_InitialYVelocity]                                    ;; 02:4869 $fa $8e $dc
     and  A, A                                          ;; 02:486c $a7
@@ -135,14 +135,14 @@ call_02_4873_PlayerAction_Die:
     ld   A, SFX_UNK0D                                        ;; 02:487e $3e $0d
     call call_00_0ff5_QueueSoundEffect                                  ;; 02:4880 $cd $f5 $0f
 .jr_02_4883:
-    ld   A, $3c                                        ;; 02:4883 $3e $3c
+    ld   A, TIMER_AMOUNT_60_FRAMES                                        ;; 02:4883 $3e $3c
     ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 02:4885 $ea $7e $dc
     ret                                                ;; 02:4888 $c9
 
 call_02_4889_PlayerAction_DieWarp:
     xor  A, A                                          ;; 02:4889 $af
     ld   [wDC87], A                                    ;; 02:488a $ea $87 $dc
-    ld   A, $3c                                        ;; 02:488d $3e $3c
+    ld   A, TIMER_AMOUNT_60_FRAMES                                        ;; 02:488d $3e $3c
     ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 02:488f $ea $7e $dc
     ld   A, [wD805_Player_MovementFlags]                                    ;; 02:4892 $fa $05 $d8
     and  A, $04                                        ;; 02:4895 $e6 $04
@@ -357,7 +357,7 @@ call_02_49b3_PlayerAction_Unk25:
 call_02_4a25_PlayerAction_Unk26:
     xor  a
     ld   [wDC87],a
-    ld   a,$3C
+    ld   a,TIMER_AMOUNT_60_FRAMES
     ld   [wDC7E_PlayerDamageCooldownTimer],a
     ld   a,[wDC93]
     cp   a,$28
@@ -367,7 +367,7 @@ call_02_4a25_PlayerAction_Unk26:
 call_02_4a37_PlayerAction_DieInPit:
     xor  A, A                                          ;; 02:4a37 $af
     ld   [wDC87], A                                    ;; 02:4a38 $ea $87 $dc
-    ld   A, $3c                                        ;; 02:4a3b $3e $3c
+    ld   A, TIMER_AMOUNT_60_FRAMES                                        ;; 02:4a3b $3e $3c
     ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 02:4a3d $ea $7e $dc
     ld   A, $01                                        ;; 02:4a40 $3e $01
     ld   [wDC29_SkipMapWindowUpdateFlag], A                                    ;; 02:4a42 $ea $29 $dc
@@ -714,7 +714,7 @@ call_02_4cbd_PlayerAction_Unk41:
     ld   a,SFX_PLAYER_DAMAGED
     call call_00_0ff5_QueueSoundEffect
 .jr_00_4CD4:
-    ld   a,$3C
+    ld   a,TIMER_AMOUNT_60_FRAMES
     ld   [wDC7E_PlayerDamageCooldownTimer],a
     ld   a,[wDC8E_InitialYVelocity]
     and  a
@@ -815,7 +815,7 @@ call_02_4d8b_PlayerAction_Unk54:
     ld   a,SFX_PLAYER_DAMAGED
     call call_00_0ff5_QueueSoundEffect
 .jr_00_4DA2:
-    ld   a,$3C
+    ld   a,TIMER_AMOUNT_60_FRAMES
     ld   [wDC7E_PlayerDamageCooldownTimer],a
     ld   a,[wDC8E_InitialYVelocity]
     and  a

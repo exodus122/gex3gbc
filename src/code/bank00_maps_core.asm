@@ -802,7 +802,7 @@ call_00_150f_CheckAndSetLevelTrigger:
 ; Level Event Trigger Checker
 ; Reads wDC8A as an event flag. If not already triggered (bit7 clear), it marks it triggered, 
 ; looks up a table (.data_00_153f) indexed by current level and offset E, and loads a value into wDC69_PlayerSpawnIdInLevel. 
-; It also sets bit2 of wDB6A. Handles special values $ff (no action) and $fe (conditional on wDCB1).
+; It also sets bit2 of wDB6A. Handles special values $ff (no action) and $fe (conditional on wDCB1_LevelTriggerBuffer).
     ld   HL, wDC8A                                     ;; 00:150f $21 $8a $dc
     ld   E, [HL]                                       ;; 00:1512 $5e
     bit  7, E                                          ;; 00:1513 $cb $7b
@@ -822,7 +822,7 @@ call_00_150f_CheckAndSetLevelTrigger:
     ret  Z                                             ;; 00:152a $c8
     cp   A, $fe                                        ;; 00:152b $fe $fe
     jr   NZ, .jr_00_1536                               ;; 00:152d $20 $07
-    ld   A, [wDCB1]                                    ;; 00:152f $fa $b1 $dc
+    ld   A, [wDCB1_LevelTriggerBuffer]                                    ;; 00:152f $fa $b1 $dc
     and  A, A                                          ;; 00:1532 $a7
     ret  Z                                             ;; 00:1533 $c8
     ld   A, $10                                        ;; 00:1534 $3e $10
@@ -1444,7 +1444,7 @@ call_00_1bbc_CheckForDoorAndEnter:
     jr   Z, .jr_00_1c27                                ;; 00:1c1b $28 $0a
     ld   E, A                                          ;; 00:1c1d $5f
     ld   D, $00                                        ;; 00:1c1e $16 $00
-    ld   HL, wDCB1                                     ;; 00:1c20 $21 $b1 $dc
+    ld   HL, wDCB1_LevelTriggerBuffer                                     ;; 00:1c20 $21 $b1 $dc
     add  HL, DE                                        ;; 00:1c23 $19
     ld   A, [HL]                                       ;; 00:1c24 $7e
     and  A, A                                          ;; 00:1c25 $a7

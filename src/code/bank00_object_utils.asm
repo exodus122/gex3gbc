@@ -183,67 +183,67 @@ call_00_22b1_HandleObjectStateChange:
     ret                                                ;; 00:22d3 $c9
     
 call_00_22d4_CheckObjectSlotFlag:
-; Calls call_00_230f_ResolveObjectListIndex to resolve the current object’s index (C).
-; Uses that index to look up a byte in the table at wDCB1.
+; Get the object's parameter (C).
+; Uses that param to look up a byte in the table at wDCB1_LevelTriggerBuffer.
 ; Returns with A = value at that slot (flags zero/non-zero).
 ; Purpose: Check if a flag/slot for this object is set.
-    call call_00_230f_ResolveObjectListIndex
+    call call_00_230f_GetObjectParameter
     ld   b,$00
-    ld   hl,wDCB1
+    ld   hl,wDCB1_LevelTriggerBuffer
     add  hl,bc
     ld   a,[hl]
     and  a
     ret  
 
 call_00_22e0_IncrementObjectSlot:
-; Gets object index via 230F.
-; If index < $10, increments that object’s slot in wDCB1.
+; Gets object parameter via 230F.
+; If parameter < $10, increments that object’s slot in wDCB1_LevelTriggerBuffer.
 ; Purpose: Increment a small counter for this object (capped at 16 slots).
-    call call_00_230f_ResolveObjectListIndex
+    call call_00_230f_GetObjectParameter
     ld   a,c
     cp   a,$10
     ret  nc
     ld   b,$00
-    ld   hl,wDCB1
+    ld   hl,wDCB1_LevelTriggerBuffer
     add  hl,bc
     inc  [hl]
     ret  
 
 call_00_22ef_SetObjectSlotActive:
-; Gets object index via 230F.
-; If index < $10, sets that object’s slot to 1.
+; Gets object parameter via 230F.
+; If parameter < $10, sets that object’s slot to 1.
 ; Purpose: Mark the slot as “active” or “initialized.”
-    call call_00_230f_ResolveObjectListIndex
+    call call_00_230f_GetObjectParameter
     ld   a,c
     cp   a,$10
     ret  nc
     ld   b,$00
-    ld   hl,wDCB1
+    ld   hl,wDCB1_LevelTriggerBuffer
     add  hl,bc
     ld   [hl],$01
     ret  
 
 call_00_22ff_ClearObjectSlot:
-; Gets object index via 230F.
-; If index < $10, clears that slot to 0.
+; Gets object parameter via 230F.
+; If parameter < $10, clears that slot to 0.
 ; Purpose: Mark the slot as inactive/cleared.
-    call call_00_230f_ResolveObjectListIndex
+    call call_00_230f_GetObjectParameter
     ld   a,c
     cp   a,$10
     ret  nc
     ld   b,$00
-    ld   hl,wDCB1
+    ld   hl,wDCB1_LevelTriggerBuffer
     add  hl,bc
     ld   [hl],$00
     ret  
 
-call_00_230f_ResolveObjectListIndex:
+call_00_230f_GetObjectParameter:
 ; Switches to the object list bank (wDC16_ObjectListBank).
 ; Uses wDC17_ObjectListBankOffset and the current object’s ID (wDA00_CurrentObjectAddrLo) to compute 
 ; an index (C) into the object list.
-; Performs bit shifts and offset calculations to get the proper entry pointer, then switches banks back.
-; Returns C = resolved index for the object.
-; Purpose: Resolve an object’s list index across banks.
+; Performs bit shifts and offset calculations to get the object's parameter in the spawn struct, then switches banks back.
+; Returns C = spawn parameter for the object.
+; Purpose: Resolve an object’s parameter across banks.
     ld   A, [wDC16_ObjectListBank]                                    ;; 00:230f $fa $16 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:2312 $cd $ee $0e
     ld   HL, wDC17_ObjectListBankOffset                                     ;; 00:2315 $21 $17 $dc
@@ -1233,14 +1233,14 @@ call_00_288c_Object_SetCollisionType:
     ld   [HL], C                                       ;; 00:2894 $71
     ret                                                ;; 00:2895 $c9
 
-call_00_2896_Object_Set15:
+call_00_2896_Object_SetCooldownTimer:
 ; Writes C into the object’s $D8:xx15 slot—another per-object state byte.
-    LOAD_OBJ_FIELD_TO_HL OBJECT_UNK15_OFFSET
+    LOAD_OBJ_FIELD_TO_HL OBJECT_COOLDOWN_TIMER_OFFSET
     ld   [hl],c
     ret  
 
-call_00_28a0_Object_Get15:
-    LOAD_OBJ_FIELD_TO_HL OBJECT_UNK15_OFFSET
+call_00_28a0_Object_GetCooldownTimer:
+    LOAD_OBJ_FIELD_TO_HL OBJECT_COOLDOWN_TIMER_OFFSET
     ld   a,[hl]
     ret  
 
@@ -1296,19 +1296,19 @@ call_00_28fc_Object_UpdateExtraFlags:
     add  hl,de
     ld   c,[hl]
 
-call_00_290d_Object_SetTimer1A:
-    LOAD_OBJ_FIELD_TO_HL OBJECT_TIMER1A_OFFSET
+call_00_290d_Object_SetMiscTimer:
+    LOAD_OBJ_FIELD_TO_HL OBJECT_MISC_TIMER_OFFSET
     ld   [HL], C                                       ;; 00:2915 $71
     ret                                                ;; 00:2916 $c9
 
-call_00_2917_Object_CheckIfTimer1AIsZero:
-    LOAD_OBJ_FIELD_TO_HL OBJECT_TIMER1A_OFFSET
+call_00_2917_Object_CheckIfMiscTimerIsZero:
+    LOAD_OBJ_FIELD_TO_HL OBJECT_MISC_TIMER_OFFSET
     ld   a,[hl]
     and  a
     ret  
 
-call_00_2922_Object_Timer1ACountdown:
-    LOAD_OBJ_FIELD_TO_HL OBJECT_TIMER1A_OFFSET
+call_00_2922_Object_MiscTimerCountdown:
+    LOAD_OBJ_FIELD_TO_HL OBJECT_MISC_TIMER_OFFSET
     ld   A, [HL]                                       ;; 00:292a $7e
     and  A, A                                          ;; 00:292b $a7
     ret  Z                                             ;; 00:292c $c8
@@ -1579,13 +1579,13 @@ call_00_2a68_Object_ComputePlayerXProximity:
     ret                                                ;; 00:2a97 $c9
 
 call_00_2a98_HandlePlayerObjectInteraction:
-; Resolves an object list index, computes a pointer to an object’s bounding box/metadata in memory.
+; Resolves the object's parameter, computes a pointer to an object’s bounding box/metadata in memory.
 ; Compares the player’s X/Y positions against that object’s bounding box (series of sub/sbc, add, cp checks).
 ; If inside bounds, copies several bytes from the object’s data into the current object’s D8xx structure and 
 ; triggers a banked function (call_02_72ac_SetObjectAction)
 ; Purpose: Detects when the player collides with or interacts with a special object and dispatches a handler.
     push de
-    call call_00_230f_ResolveObjectListIndex
+    call call_00_230f_GetObjectParameter
     ld   l,c
     ld   h,$00
     add  hl,hl
@@ -1636,7 +1636,7 @@ call_00_2a98_HandlePlayerObjectInteraction:
     ld   a,e
     cp   d
     ret  nc
-    LOAD_OBJ_FIELD_TO_DE OBJECT_TIMER1A_OFFSET
+    LOAD_OBJ_FIELD_TO_DE OBJECT_MISC_TIMER_OFFSET
     ldi  a,[hl]
     ld   [de],a
     inc  de

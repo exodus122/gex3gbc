@@ -492,7 +492,7 @@ call_03_5fc2_SetupObjectSprite:
     call C, call_00_2b5d_DeactivateObjectSlot                               ;; 03:603a $dc $5d $2b
     ret                                                ;; 03:603d $c9
 .jr_03_603e:
-    LOAD_OBJ_FIELD_TO_HL_ALT OBJECT_UNK15_OFFSET
+    LOAD_OBJ_FIELD_TO_HL_ALT OBJECT_COOLDOWN_TIMER_OFFSET
     ld   A, [HL]                                       ;; 03:6046 $7e
     and  A, A                                          ;; 03:6047 $a7
     jr   Z, .jr_03_6050                                ;; 03:6048 $28 $06

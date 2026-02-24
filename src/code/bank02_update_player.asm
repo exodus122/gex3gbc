@@ -334,10 +334,10 @@ call_02_4ffb_DecTimerEveryCycle:
     ld   A, [wDCA8_FlyTimerOrFlags3]                                    ;; 02:4ffe $fa $a8 $dc
     dec  A                                             ;; 02:5001 $3d
     jr   NZ, .jr_02_5006                               ;; 02:5002 $20 $02
-    ld   A, $3c                                        ;; 02:5004 $3e $3c
+    ld   A, TIMER_AMOUNT_60_FRAMES                                        ;; 02:5004 $3e $3c
 .jr_02_5006:
     ld   [wDCA8_FlyTimerOrFlags3], A                                    ;; 02:5006 $ea $a8 $dc
-    cp   A, $3c                                        ;; 02:5009 $fe $3c
+    cp   A, TIMER_AMOUNT_60_FRAMES                                        ;; 02:5009 $fe $3c
     ret  NZ                                            ;; 02:500b $c0
     dec  [HL]                                          ;; 02:500c $35
     ret                                                ;; 02:500d $c9
@@ -923,7 +923,7 @@ call_02_5374_LevelSpecificEventTrigger:
 ; Details:
 ; Filters on input state (and A,$08).
 ; Uses level number and index (wDC1E_CurrentLevelNumber) to find event tables (.data_02_53bf).
-; Compares collected values (wDCB1) to thresholds and modifies wDC8C_PlayerYVelocity (horizontal momentum or trigger accumulator).
+; Compares collected values (wDCB1_LevelTriggerBuffer) to thresholds and modifies wDC8C_PlayerYVelocity (horizontal momentum or trigger accumulator).
 ; Likely handles special pickups or doors that open based on conditions.
     call call_02_5541_GetActionPropertyByte                                  ;; 02:5374 $cd $41 $55
     and  A, $08                                        ;; 02:5377 $e6 $08
@@ -957,7 +957,7 @@ call_02_5374_LevelSpecificEventTrigger:
     jr   Z, .jr_02_53ac                                ;; 02:53a0 $28 $0a
     ld   L, A                                          ;; 02:53a2 $6f
     ld   H, $00                                        ;; 02:53a3 $26 $00
-    ld   DE, wDCB1                                     ;; 02:53a5 $11 $b1 $dc
+    ld   DE, wDCB1_LevelTriggerBuffer                                     ;; 02:53a5 $11 $b1 $dc
     add  HL, DE                                        ;; 02:53a8 $19
     ld   A, [HL]                                       ;; 02:53a9 $7e
     cp   A, C                                          ;; 02:53aa $b9

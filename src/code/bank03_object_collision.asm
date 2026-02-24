@@ -14,7 +14,7 @@ call_03_4c38_UpdateObjectCollision_Dispatch:
     ld   A, [wDCA7_DrawGexFlag]                                    ;; 03:4c38 $fa $a7 $dc
     and  A, A                                          ;; 03:4c3b $a7
     ret  Z                                             ;; 03:4c3c $c8
-    LOAD_OBJ_FIELD_TO_HL OBJECT_UNK15_OFFSET
+    LOAD_OBJ_FIELD_TO_HL OBJECT_COOLDOWN_TIMER_OFFSET
     ld   A, [HL]                                       ;; 03:4c45 $7e
     and  A, A                                          ;; 03:4c46 $a7
     jr   Z, .jr_03_4c4a                                ;; 03:4c47 $28 $01
@@ -189,7 +189,7 @@ call_03_4d44_Collision_PlayerHit_ActionChangeConditional:
     ret  nc
     cp   a,$01
     jp   z,call_03_5671_HandleObjectHit
-    ld   a,$3C
+    ld   a,TIMER_AMOUNT_60_FRAMES
     ld   [wDC7E_PlayerDamageCooldownTimer],a
     LOAD_OBJ_FIELD_TO_HL OBJECT_XPOS_OFFSET
     ld   a,[wD80E_PlayerXPosition]
@@ -240,7 +240,6 @@ call_03_4db3_Collision_FlyCoin:
 
 call_03_4dc2_Collision_PawCoin:
 ; If collision:
-; Resolves object index via call_00_230f_ResolveObjectListIndex.
 ; Looks up a flag mask (00, 20, 40, 80).
 ; ORs it into level data, increments wDCAF_PawCoinCounter.
 ; Every 4 collected, increments wDC4F_PawCoinExtraHealth (if <4), resets counter, sets flag in wDB69.
@@ -248,7 +247,7 @@ call_03_4dc2_Collision_PawCoin:
 ; This is basically a collectible counter with milestones.
     call call_03_550e_CheckPlayerObjectInteraction                                  ;; 03:4dc2 $cd $0e $55
     ret  NC                                            ;; 03:4dc5 $d0
-    call call_00_230f_ResolveObjectListIndex                                  ;; 03:4dc6 $cd $0f $23
+    call call_00_230f_GetObjectParameter                                  ;; 03:4dc6 $cd $0f $23
     ld   B, $00                                        ;; 03:4dc9 $06 $00
     ld   HL, .data_03_4e00                             ;; 03:4dcb $21 $00 $4e
     add  HL, BC                                        ;; 03:4dce $09
@@ -456,7 +455,7 @@ call_03_4f23_Collision_HolidayTV_Elf:
     jp   NZ, call_03_4cea_Collision_DamagePlayer                               ;; 03:4f29 $c2 $ea $4c
     ld   A, $04                                        ;; 03:4f2c $3e $04
     farcall call_02_72ac_SetObjectAction
-    call call_00_230f_ResolveObjectListIndex                                  ;; 03:4f39 $cd $0f $23
+    call call_00_230f_GetObjectParameter                                  ;; 03:4f39 $cd $0f $23
     ld   B, $00                                        ;; 03:4f3c $06 $00
     ld   HL, wDCD5_ElfHealth1                                     ;; 03:4f3e $21 $d5 $dc
     add  HL, BC                                        ;; 03:4f41 $09
@@ -755,7 +754,7 @@ call_03_5116_Collision_Door:
     ret  c
     cp   a,$03
     ret  nc
-    call call_00_230f_ResolveObjectListIndex
+    call call_00_230f_GetObjectParameter
     inc  c
     jr   z,.jr_00_5143
     call call_00_22d4_CheckObjectSlotFlag
@@ -786,7 +785,7 @@ call_03_5156_Collision_Door2:
     ret  c
     cp   a,$03
     ret  nc
-    call call_00_230f_ResolveObjectListIndex
+    call call_00_230f_GetObjectParameter
     inc  c
     jr   z,.jr_00_5183
     call call_00_22d4_CheckObjectSlotFlag
@@ -1040,7 +1039,7 @@ call_03_532f_Collision_GextremeSports_Elf:
     jp   nz,call_03_4cea_Collision_DamagePlayer
     ld   a,$04
     farcall call_02_72ac_SetObjectAction
-    call call_00_230f_ResolveObjectListIndex
+    call call_00_230f_GetObjectParameter
     ld   b,$00
     ld   hl,wDCD5_ElfHealth1
     add  hl,bc
@@ -1077,7 +1076,7 @@ call_03_537a_Collision_BonusTimeCoin:
     ret  nc
     cp   a,$01
     ret  nz
-    call call_00_230f_ResolveObjectListIndex
+    call call_00_230f_GetObjectParameter
     ld   a,[wDB6E]
     add  c
     ld   [wDB6E],a
@@ -1262,7 +1261,7 @@ call_03_54a8_Collision_Rez:
     cp   a,$01
     jp   nz,call_03_4cea_Collision_DamagePlayer
     call call_03_5671_HandleObjectHit
-    LOAD_OBJ_FIELD_TO_HL OBJECT_UNK15_OFFSET
+    LOAD_OBJ_FIELD_TO_HL OBJECT_COOLDOWN_TIMER_OFFSET
     ld   [hl],$00
     call call_00_2995_Object_GetActionId
     cp   a,$0A
@@ -1292,10 +1291,10 @@ call_03_54ee_Collision_RaStatueProjectile:
     farcall call_02_72ac_SetObjectAction
     ret  
 
-call_03_54f9: ; unreferenced function?
+call_03_54f9_InitilializeObjectCooldownTimer: ; unreferenced function?
 ; Writes 0x3C to byte at offset 15.
-    LOAD_OBJ_FIELD_TO_HL_ALT OBJECT_UNK15_OFFSET
-    ld   [hl],$3C
+    LOAD_OBJ_FIELD_TO_HL_ALT OBJECT_COOLDOWN_TIMER_OFFSET
+    ld   [hl],TIMER_AMOUNT_60_FRAMES
     ret  
 
 call_03_550e_CheckPlayerObjectInteraction:
@@ -1312,7 +1311,7 @@ call_03_550e_CheckPlayerObjectInteraction:
 ; - Bit 2 case: only triggers if the player is in certain action IDs ($0E,$0F,$25,$26), and if vertical velocity (wDC8C_PlayerYVelocity) is negative (jump/falling). Then sets wDC8C_PlayerYVelocity = $2A and returns $FF+3. This looks like a bounce effect (spring/booster tile).
 ; - Otherwise calls call_00_0759_IsPlayerDamageCooldownActive (probably a more general collision/interaction handler). If that succeeds, returns $FF+1.
 ; So this routine is the core collision handler for player–object interactions, with special cases for springs, breakables, pushables, etc., driven by data_03_55ff_ObjectInteractionFlagsTable.
-    LOAD_OBJ_FIELD_TO_BC OBJECT_UNK15_OFFSET
+    LOAD_OBJ_FIELD_TO_BC OBJECT_COOLDOWN_TIMER_OFFSET
     ld   A, [BC]                                       ;; 03:5516 $0a
     and  A, A                                          ;; 03:5517 $a7
     jp   NZ, call_03_55fd_ReturnNoInteraction                                ;; 03:5518 $c2 $fd $55
@@ -1486,7 +1485,7 @@ data_03_55ff_ObjectInteractionFlagsTable:
 
 call_03_5671_HandleObjectHit:
 ; Reads object state bytes at +$15/$16.
-; If $15 is nonzero, returns (object busy).
+; If COOLDOWN_TIMER is nonzero, returns (object busy).
 ; If $16 is $FF or 0, returns (inactive/dead).
 ; Otherwise decrements $16.
 ; If it reaches 0:
@@ -1501,15 +1500,15 @@ call_03_5671_HandleObjectHit:
 ;   - Plays sound effect $10.
 ; - If $16 didn’t reach 0:
 ;   - Writes it back.
-;   - Resets $15 to $3C (cooldown timer).
+;   - Resets COOLDOWN_TIMER to $3C (cooldown timer).
 ;   - Plays sound effect $0F.
 ; So this is an object interaction lifecycle handler: triggered when the player collides with certain objects, 
 ; decrements a counter, and either reloads/respawns the object, spawns particles, or plays sounds depending on conditions.
-    LOAD_OBJ_FIELD_TO_HL OBJECT_UNK15_OFFSET
+    LOAD_OBJ_FIELD_TO_HL OBJECT_COOLDOWN_TIMER_OFFSET
     ld   A, [HL]                                       ;; 03:5679 $7e
     and  A, A                                          ;; 03:567a $a7
     ret  NZ                                            ;; 03:567b $c0
-    inc  L                                             ;; 03:567c $2c
+    inc  L                                             ;; 03:567c $2c ; HL = OBJECT_UNK16_OFFSET
     ld   A, [HL]                                       ;; 03:567d $7e
     cp   A, $ff                                        ;; 03:567e $fe $ff
     ret  Z                                             ;; 03:5680 $c8
@@ -1539,8 +1538,8 @@ call_03_5671_HandleObjectHit:
     jp   call_00_0ff5_QueueSoundEffect                                  ;; 03:56b5 $c3 $f5 $0f
 .jr_03_56b8:
     ld   [HL], A                                       ;; 03:56b8 $77
-    dec  L                                             ;; 03:56b9 $2d
-    ld   [HL], $3c                                     ;; 03:56ba $36 $3c
+    dec  L                                             ;; 03:56b9 $2d ; HL = OBJECT_COOLDOWN_TIMER_OFFSET
+    ld   [HL], TIMER_AMOUNT_60_FRAMES                                     ;; 03:56ba $36 $3c
     ld   A, SFX_ENEMY_DAMAGED                                        ;; 03:56bc $3e $0f
     jp   call_00_0ff5_QueueSoundEffect                                  ;; 03:56be $c3 $f5 $0f
 

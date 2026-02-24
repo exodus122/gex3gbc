@@ -109,6 +109,7 @@ wDA00_CurrentObjectAddrLo:
     ds 1                                               ;; da00
 wDA01_ObjectListIndexesForCurrentObjects:
 ; stores the entry number in the object list, of all the currently loaded objects
+; the values stored here have 1 added to them though. so index 0 would have value 1 here
     ds 8                                               ;; da01
 wDA09_LoadedObjectIdsBackupBuffer:
     ds 8                                               ;; da09
@@ -844,7 +845,7 @@ wDCAF_PawCoinCounter: ; for every 4 collected, increment Gex's health
 ; unused?
     ds 1
 
-wDCB1:
+wDCB1_LevelTriggerBuffer:
     ds 16                                              ;; dcb1
 
 wDCC1_EnterDoorRelated1:
