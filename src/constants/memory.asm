@@ -264,7 +264,7 @@ wDB66_HDMATransferFlags:
 ; Bit 1 set →
 ; Copy tiles for the current interaction object.
 ; - Uses wDB64/65 as the source pointer.
-; - Source bank depends on the object’s data (OBJECT_MOVEMENT_FLAGS_OFFSET, plus a VBK = 1 path if “extended” graphics).
+; - Source bank depends on the object’s data (OBJECT_FIELD_GRAPHICS_FLAGS, plus a VBK = 1 path if “extended” graphics).
 ; - Length depends on the object’s type (wDB63_ActiveObjectType).
 ; - This looks like sprite/animation tiles for NPCs or items.
 ; Bit 2 set →
@@ -920,7 +920,7 @@ wDCE2_ElevatorObjectUnkData:
     ds 6                                               ;; dce2
 
 ; Object spawning related flags
-wDCE8:
+wDCE8_ParentObjectListIndex: ; used relative object spawns, such as projectiles and flies
     ds 1                                               ;; dce8
 wDCE9:
     ds 1                                               ;; dce9
@@ -944,21 +944,21 @@ wDD6B: ; unused except set to 0?
     ds 88                                             ;; dd6b
 
 ; Particle buffer
-wDDC4_ParticleSlot1Buffer:
+wDDC4_ParticleSlot1:
     ds 19
-wDDD7_ParticleSlot2Buffer:
+wDDD7_ParticleSlot2:
     ds 19
-wDDEA_ParticleSlot3Buffer:
+wDDEA_ParticleSlot3:
     ds 19
-wDDFD_ParticleSlot4Buffer:
+wDDFD_ParticleSlot4:
     ds 19
-wDE10_ParticleSlot5Buffer:
+wDE10_ParticleSlot5:
     ds 19
-wDE23_ParticleSlot6Buffer:
+wDE23_ParticleSlot6:
     ds 19
-wDE36_ParticleSlot7Buffer:
+wDE36_ParticleSlot7:
     ds 19
-wDE49_ParticleSlot8Buffer:
+wDE49_ParticleSlot8:
     ds 19
 
 ; Start of Audio wRAM section

@@ -151,16 +151,16 @@ DEF OBJECT_GEX                                         EQU $00
 DEF OBJECT_BONUS_COIN                                  EQU $01
 DEF OBJECT_FLY_COIN_SPAWN                              EQU $02
 DEF OBJECT_PAW_COIN                                    EQU $03
-DEF OBJECT_UNK04                                       EQU $04
-DEF OBJECT_UNK05                                       EQU $05
-DEF OBJECT_UNK06                                       EQU $06
-DEF OBJECT_UNK07                                       EQU $07
-DEF OBJECT_UNK08                                       EQU $08
+DEF OBJECT_FLY_1                                       EQU $04
+DEF OBJECT_FLY_2                                       EQU $05
+DEF OBJECT_FLY_3                                       EQU $06
+DEF OBJECT_FLY_4                                       EQU $07
+DEF OBJECT_FLY_5                                       EQU $08
 DEF OBJECT_GREEN_FLY_TV                                EQU $09
 DEF OBJECT_PURPLE_FLY_TV                               EQU $0A
-DEF OBJECT_UNK0B                                       EQU $0B
+DEF OBJECT_UNK_FLY_TV_3                                EQU $0B
 DEF OBJECT_BLUE_FLY_TV                                 EQU $0C
-DEF OBJECT_UNK0D                                       EQU $0D
+DEF OBJECT_UNK_FLY_TV_5                                EQU $0D
 DEF OBJECT_UNK0E                                       EQU $0E
 DEF OBJECT_UNK0F                                       EQU $0F
 DEF OBJECT_UNK10                                       EQU $10
@@ -264,58 +264,59 @@ DEF OBJECT_CHANNEL_Z_REZ_PROJECTILE                    EQU $71
 DEF OBJECT_LIST_TERMINATOR                             EQU $FF
 
 ; Object Instance Struct
-DEF OBJECT_ID_OFFSET                        EQU $00
-DEF OBJECT_ACTIONID_OFFSET                  EQU $01
-DEF OBJECT_ACTIONPTR_OFFSET                 EQU $02
-DEF OBJECT_SPRITE_FLAGS2_OFFSET             EQU $04
-DEF OBJECT_MOVEMENT_FLAGS_OFFSET            EQU $05
-DEF OBJECT_SPRITE_FRAME_COUNTER_MAX_OFFSET  EQU $06 ; how many frames to use this sprite
-DEF OBJECT_SPRITE_FRAME_COUNTER_OFFSET      EQU $07 ; counter for the above
-DEF OBJECT_SPRITE_COUNTER_MAX_OFFSET        EQU $08 ; total sprite frames for current action
-DEF OBJECT_SPRITE_COUNTER_OFFSET            EQU $09 ; counter for above
-DEF OBJECT_SPRITE_ID_OFFSET                 EQU $0A ; current sprite id
-DEF OBJECT_SPRITE_IDS_PTR_OFFSET            EQU $0B ; ptr to sprite data (in object_animation_data.asm)
-DEF OBJECT_FACINGDIRECTION_OFFSET           EQU $0D
-DEF OBJECT_XPOS_OFFSET                      EQU $0E
-DEF OBJECT_YPOS_OFFSET                      EQU $10
-DEF OBJECT_WIDTH_OFFSET                     EQU $12 ; set to [1] into data_00_3258
-DEF OBJECT_HEIGHT_OFFSET                    EQU $13 ; set to [2] into data_00_3258
-DEF OBJECT_COLLISION_TYPE_OFFSET            EQU $14 ; set to [3] into data_00_3258
-DEF OBJECT_COOLDOWN_TIMER_OFFSET            EQU $15 ; defaults to 0, but might get set to $3c (same value as gex's cooldown timer)
-DEF OBJECT_UNK16_OFFSET                     EQU $16 ; collision related, starts as [4] into data_00_3258, minus 1
-DEF OBJECT_SPRITE_BANK_OFFSET               EQU $17
-DEF OBJECT_UNK18_OFFSET                     EQU $18 ; starts as 0
-DEF OBJECT_EXTRA_FLAGS_OFFSET               EQU $19 ; only used by moving platforms, skating elf health, and sec bot (?)
-                                                    ; starts as [5] into data_00_3258
-DEF OBJECT_MISC_TIMER_OFFSET                EQU $1A ; timer which can be used for varying purposes
-DEF OBJECT_XVEL_OFFSET                      EQU $1B
-DEF OBJECT_UNK1C_OFFSET                     EQU $1C
-DEF OBJECT_YVEL_OFFSET                      EQU $1D
-DEF OBJECT_UNK1E_OFFSET                     EQU $1E
-DEF OBJECT_UNK1F_OFFSET                     EQU $1F ; collision related
+DEF OBJECT_FIELD_OBJECT_ID                  EQU $00
+DEF OBJECT_FIELD_ACTION_ID                  EQU $01
+DEF OBJECT_FIELD_ACTION_FUNC                EQU $02
+DEF OBJECT_FIELD_SPRITE_FLAGS2              EQU $04
+DEF OBJECT_FIELD_GRAPHICS_FLAGS             EQU $05
+DEF OBJECT_FIELD_SPRITE_FRAME_COUNTER_MAX   EQU $06 ; how many frames to use this sprite
+DEF OBJECT_FIELD_SPRITE_FRAME_COUNTER       EQU $07 ; counter for the above
+DEF OBJECT_FIELD_SPRITE_COUNTER_MAX         EQU $08 ; total sprite frames for current action
+DEF OBJECT_FIELD_SPRITE_COUNTER             EQU $09 ; counter for above
+DEF OBJECT_FIELD_SPRITE_ID                  EQU $0A ; current sprite id
+DEF OBJECT_FIELD_SPRITE_IDS_PTR             EQU $0B ; ptr to sprite data (in object_animation_data.asm)
+DEF OBJECT_FIELD_FACING_DIRECTION           EQU $0D
+DEF OBJECT_FIELD_XPOS                       EQU $0E
+DEF OBJECT_FIELD_YPOS                       EQU $10
+DEF OBJECT_FIELD_WIDTH                      EQU $12 ; set to [1] into data_00_3258
+DEF OBJECT_FIELD_HEIGHT                     EQU $13 ; set to [2] into data_00_3258
+DEF OBJECT_FIELD_COLLISION_TYPE             EQU $14 ; set to [3] into data_00_3258
+DEF OBJECT_FIELD_COOLDOWN_TIMER             EQU $15 ; defaults to 0, but might get set to $3c (same value as gex's cooldown timer)
+DEF OBJECT_FIELD_UNK16_COLLISION            EQU $16 ; collision related, starts as [4] into data_00_3258, minus 1
+DEF OBJECT_FIELD_SPRITE_BANK                EQU $17
+DEF OBJECT_FIELD_UNK18                      EQU $18 ; seems unused
+DEF OBJECT_FIELD_MISC_FLAGS                 EQU $19 ; only used by moving platforms, skating elf health, and sec bot?
+                                                    ; initially set to data_00_3258[object_id*8][5]
+DEF OBJECT_FIELD_MISC_TIMER                 EQU $1A ; timer which can be used for various purposes
+DEF OBJECT_FIELD_XVEL                       EQU $1B
+DEF OBJECT_FIELD_XVEL_RELATED               EQU $1C ; used with XVEL to calculate X delta
+DEF OBJECT_FIELD_YVEL                       EQU $1D
+DEF OBJECT_FIELD_UNK1E                      EQU $1E ; seems unused, likely would have been used for Y velocity delta
+DEF OBJECT_FIELD_PARENT                     EQU $1F ; stores object list index of this object's parent (used for projectiles, flies)
 
 ; Object Spawn Struct
-DEF OBJECTSPAWN_ID_OFFSET                   EQU $00
-DEF OBJECTSPAWN_XPOS_OFFSET                 EQU $01
-DEF OBJECTSPAWN_YPOS_OFFSET                 EQU $03
-DEF OBJECTSPAWN_BOUNDINGBOX_XMAX_OFFSET     EQU $05
-DEF OBJECTSPAWN_BOUNDINGBOX_XMIN_OFFSET     EQU $07
-DEF OBJECTSPAWN_BOUNDINGBOX_YMIN_OFFSET     EQU $09
-DEF OBJECTSPAWN_BOUNDINGBOX_YMAX_OFFSET     EQU $0B
-DEF OBJECTSPAWN_PARAMETER_OFFSET            EQU $0D ; usually id used for collectibles, but sometimes contains a timer value
-DEF OBJECTSPAWN_MAP_OFFSET                  EQU $0F
+DEF OBJECT_SPAWN_ID_OFFSET                  EQU $00
+DEF OBJECT_SPAWN_XPOS_OFFSET                EQU $01
+DEF OBJECT_SPAWN_YPOS_OFFSET                EQU $03
+DEF OBJECT_SPAWN_BOUNDINGBOX_XMAX_OFFSET    EQU $05
+DEF OBJECT_SPAWN_BOUNDINGBOX_XMIN_OFFSET    EQU $07
+DEF OBJECT_SPAWN_BOUNDINGBOX_YMIN_OFFSET    EQU $09
+DEF OBJECT_SPAWN_BOUNDINGBOX_YMAX_OFFSET    EQU $0B
+DEF OBJECT_SPAWN_PARAMETER_OFFSET           EQU $0D ; usually id used for collectibles, but sometimes contains a timer value
+DEF OBJECT_SPAWN_MAP_OFFSET                 EQU $0F
 
 ; Object Facing Direction values
-DEF OBJECT_FACING_RIGHT      EQU $00
-DEF OBJECT_FACING_LEFT       EQU $20
-DEF OBJECT_FACING_UNK40      EQU $40
+DEF OBJECT_FACING_RIGHT                 EQU $00
+DEF OBJECT_FACING_LEFT                  EQU $20
+DEF OBJECT_FACING_VERTICAL_CHANGE       EQU $40
+DEF OBJECT_FACING_UNK_FLAG              EQU $80
 
 ; Object position relative to Gex
 DEF OBJECT_LEFT_OF_GEX       EQU $00
 DEF OBJECT_RIGHT_OF_GEX      EQU $20
 
 ; Object flags, used in wD700_ObjectFlags
-DEF OBJECT_FLAG_80_ACTIVE                  EQU $80
+DEF OBJECT_FLAG_80_ACTIVE    EQU $80
 
 ; Frame timer values
 DEF TIMER_AMOUNT_0_FRAMES                  EQU $00

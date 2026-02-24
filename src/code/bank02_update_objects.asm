@@ -52,8 +52,8 @@ call_02_708f_InitObjectsAndSpawnPlayer:
     ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 02:70f7 $ea $00 $da
     ld   C, $19                                        ;; 02:70fa $0e $19
     call call_00_3792_PrepareRelativeObjectSpawn                                  ;; 02:70fc $cd $92 $37
-    ld   C, $1b                                        ;; 02:70ff $0e $1b
-    call call_00_29ce_CheckObject_C_Exists                                  ;; 02:7101 $cd $ce $29
+    ld   C, OBJECT_BONUS_STAGE_TIMER                                        ;; 02:70ff $0e $1b
+    call call_00_29ce_Object_CheckExists                                  ;; 02:7101 $cd $ce $29
     jr   NZ, .jr_02_7115                               ;; 02:7104 $20 $0f
     ld   A, L                                          ;; 02:7106 $7d
     ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 02:7107 $ea $00 $da
@@ -246,7 +246,7 @@ call_02_7152_UpdateObjects:
     ld   L, A                                          ;; 02:7228 $6f
     call call_00_0f22_JumpHL                                  ;; 02:7229 $cd $22 $0f
 .jr_02_722c:
-    LOAD_OBJ_FIELD_TO_HL OBJECT_ID_OFFSET
+    LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_OBJECT_ID
     ld   A, [HL]                                       ;; 02:7234 $7e
     cp   A, $ff                                        ;; 02:7235 $fe $ff
     call NZ, call_02_724d_UpdateObjectAnimationTimersAndSpriteId                              ;; 02:7237 $c4 $4d $72
@@ -263,7 +263,7 @@ call_02_724d_UpdateObjectAnimationTimersAndSpriteId:
 ; Decrements a timer; when it reaches zero, reloads counters, updates flags (set 2, set 1), and fetches new data from tables.
 ; Can trigger reinitialization via call_02_54f9_SwitchPlayerAction or call_02_72ac_SetObjectAction.
 ; Updates related memory locations with new object state values.
-    LOAD_OBJ_FIELD_TO_HL_ALT OBJECT_SPRITE_FLAGS2_OFFSET
+    LOAD_OBJ_FIELD_TO_HL_ALT OBJECT_FIELD_SPRITE_FLAGS2
     ld   E, [HL]                                       ;; 02:7255 $5e ; e = flags (04)
     inc  L                                             ;; 02:7256 $2c
     res  2, [HL]                                       ;; 02:7257 $cb $96 ; unset bit 2 in unk05
@@ -315,10 +315,10 @@ call_02_724d_UpdateObjectAnimationTimersAndSpriteId:
     inc  L                                             ;; 02:7297 $2c
     push HL                                            ;; 02:7298 $e5 ; push d8?a
     inc  L                                             ;; 02:7299 $2c
-    ld   A, [HL+]                                      ;; 02:729a $2a ; a = unk0b (OBJECT_SPRITE_IDS_PTR_OFFSET)
+    ld   A, [HL+]                                      ;; 02:729a $2a ; a = unk0b (OBJECT_FIELD_SPRITE_IDS_PTR)
     ld   H, [HL]                                       ;; 02:729b $66
-    ld   L, A                                          ;; 02:729c $6f ; hl = unk0b unk0c (OBJECT_SPRITE_IDS_PTR_OFFSET)
-    add  HL, DE                                        ;; 02:729d $19 ; hl = OBJECT_SPRITE_IDS_PTR_OFFSET + 0000 + unk09
+    ld   L, A                                          ;; 02:729c $6f ; hl = unk0b unk0c (OBJECT_FIELD_SPRITE_IDS_PTR)
+    add  HL, DE                                        ;; 02:729d $19 ; hl = OBJECT_FIELD_SPRITE_IDS_PTR + 0000 + unk09
     ld   A, [HL]                                       ;; 02:729e $7e ; a = [hl]
     pop  HL                                            ;; 02:729f $e1 ; pop d8?a
     ld   [HL], A                                       ;; 02:72a0 $77 ; d8?a = a
@@ -363,7 +363,7 @@ call_02_72ac_SetObjectAction:
     add  HL, DE                                        ;; 02:72c6 $19
     ld   C, L                                          ;; 02:72c7 $4d
     ld   B, H                                          ;; 02:72c8 $44 ; HL and BC are ptrs to an object action table entry
-    LOAD_OBJ_FIELD_TO_HL_ALT OBJECT_ACTIONPTR_OFFSET
+    LOAD_OBJ_FIELD_TO_HL_ALT OBJECT_FIELD_ACTION_FUNC
     ld   A, [BC]                                       ;; 02:72d1 $0a
     ld   [HL+], A                                      ;; 02:72d2 $22
     inc  BC                                            ;; 02:72d3 $03

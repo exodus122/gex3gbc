@@ -143,7 +143,7 @@ call_03_687c_AssignObjectPalette:
 ; Stores the palette ID in wDAAE_ObjectPaletteIds.
 ; Calculates an address into wDD2A_ObjectPalettes, then copies 8 palette bytes from data_03_68f9.
 ; Usage: Ensures each on-screen object uses the correct colors.
-    LOAD_OBJ_FIELD_TO_HL OBJECT_MOVEMENT_FLAGS_OFFSET                                     ;; 03:6883 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_GRAPHICS_FLAGS                                     ;; 03:6883 $6f
     ld   C, $00                                        ;; 03:6884 $0e $00
     bit  7, [HL]                                       ;; 03:6886 $cb $7e
     jr   NZ, .jr_03_6893                               ;; 03:6888 $20 $09
@@ -173,7 +173,7 @@ call_03_687c_AssignObjectPalette:
     add  HL, DE                                        ;; 03:68ac $19
     ld   E, L                                          ;; 03:68ad $5d
     ld   D, H                                          ;; 03:68ae $54
-    LOAD_OBJ_FIELD_TO_HL OBJECT_ID_OFFSET
+    LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_OBJECT_ID
     ld   L, [HL]                                       ;; 03:68b7 $6e
     ld   H, $00                                        ;; 03:68b8 $26 $00
     add  HL, HL                                        ;; 03:68ba $29
@@ -215,7 +215,7 @@ call_03_68d9_AssignAllObjectPalettes:
     ld   A, $40                                        ;; 03:68d9 $3e $40
 .jr_03_68db:
     ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 03:68db $ea $00 $da
-    or   A, OBJECT_ID_OFFSET                                        ;; 03:68de $f6 $00
+    or   A, OBJECT_FIELD_OBJECT_ID                                        ;; 03:68de $f6 $00
     ld   L, A                                          ;; 03:68e0 $6f
     ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:68e1 $26 $d8
     ld   A, [HL]                                       ;; 03:68e3 $7e

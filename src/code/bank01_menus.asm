@@ -1056,7 +1056,7 @@ call_01_4722_MenuStateHandlerTable:
     dw   .jp_01_4756                                 ;; 01:473c pP
     dw   .jp_01_4759                                 ;; 01:473e pP
     dw   .jp_01_475c                                 ;; 01:4740 pP
-    dw   call_00_2f34_CountActiveCollectibles                                      ;; 01:4742 ??
+    dw   call_00_2f34_CountActiveObjects                                      ;; 01:4742 ??
 .jp_01_4744:
     ld   A, [wDC68_CollectibleCount]                                    ;; 01:4744 $fa $68 $dc
     ret                                                ;; 01:4747 $c9

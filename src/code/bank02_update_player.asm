@@ -1,9 +1,9 @@
-call_02_4db1_CheckPlayerXDistanceFromObject:
+call_02_4db1_Player_CheckXDistanceFromObject:
 ; Checks whether an object exists (call_00_29ce), then compares the object’s X position to the player’s. 
 ; If the object is left of the player (carry set), branches to a special handler. If they are perfectly aligned, 
 ; it returns. Otherwise jumps to a general trigger routine.
 ; Purpose: Detects horizontal proximity for events.
-    call call_00_29ce_CheckObject_C_Exists                                  ;; 02:4db1 $cd $ce $29
+    call call_00_29ce_Object_CheckExists                                  ;; 02:4db1 $cd $ce $29
     ret  NZ                                            ;; 02:4db4 $c0
     ld   A, L                                          ;; 02:4db5 $7d
     or   A, $0e                                        ;; 02:4db6 $f6 $0e
@@ -648,7 +648,7 @@ call_02_51cb_CheckLeftCollisionAndStoreOffset:
 ; Compares the player’s X position to stored tile edge positions.
 ; If overlap exists, calls ResolveLeftwardTilePushback.
 ; Stores the corrected offset between player and solid edge back into the object table.
-    or   A, OBJECT_COLLISION_TYPE_OFFSET                                        ;; 02:51cb $f6 $14
+    or   A, OBJECT_FIELD_COLLISION_TYPE                                        ;; 02:51cb $f6 $14
     ld   L, A                                          ;; 02:51cd $6f
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:51ce $26 $d8
     bit  7, [HL]                                       ;; 02:51d0 $cb $7e
@@ -741,7 +741,7 @@ call_02_5238_CheckRightCollisionAndStoreOffset:
 ; Performs the same operations but for movement to the right.
 ; Calls ResolveRightwardTilePushback when needed.
 ; Updates the tile offset table after adjustment.
-    or   A, OBJECT_COLLISION_TYPE_OFFSET                                        ;; 02:5238 $f6 $14
+    or   A, OBJECT_FIELD_COLLISION_TYPE                                        ;; 02:5238 $f6 $14
     ld   L, A                                          ;; 02:523a $6f
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:523b $26 $d8
     bit  7, [HL]                                       ;; 02:523d $cb $7e

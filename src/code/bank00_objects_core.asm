@@ -371,12 +371,12 @@ data_00_2f14:
     db   $00, $02, $fe, $00, $fe, $fe, $fc, $fc        ;; 00:2f24 ????????
     db   $fa, $fa, $fc, $f8, $fe, $fa, $00, $fc        ;; 00:2f2c ????????
 
-call_00_2f34_CountActiveCollectibles:
-; Count Enabled Collectibles
-; Behavior: Switches to the collectible list bank, iterates through the list (step $0003), 
+call_00_2f34_CountActiveObjects:
+; Count Enabled Objects
+; Behavior: Switches to the object palette list bank, iterates through the list (step $0003), 
 ; counts active entries (!= 0), switches back and iterates object list comparing IDs against data_00_325F. 
-; Increments counter C for each collectible meeting bit-6 set criteria.
-; Purpose: Counts collectible items present for the current map.
+; Increments counter C for each Object meeting bit-6 set criteria.
+; Purpose: Counts objects present for the current map.
     ld   a,[wDC19_CollectibleListBank]
     call call_00_0eee_SwitchBank
     ld   hl,wDC1A_CollectibleListBankOffset
@@ -783,14 +783,13 @@ call_00_3252_ResetObjectCounter:
     ld   [wDAB8_ObjectCounter], A                                    ;; 00:3254 $ea $b8 $da
     ret                                                ;; 00:3257 $c9
 
-data_00_3258:
-; this table contains initialization data for each object
+; this table contains collision initialization data for each object
 ; 8 byte entries for each object:
-; 0 = unknown (1 for all objects except player)
+; 0 = probably used to distinguish player (0) and other objects (1)
 ; 1 = width
 ; 2 = height
 ; 3 = collision type
-; 4 = OBJECT_UNK16_OFFSET
+; 4 = OBJECT_FIELD_UNK16_COLLISION
 ; 5 = extra flags default value (always 00)
 ; 6 = always FF, appears unused?
 ; 7 = flags used for collision detection (call_00_35e8_GetObjectCollisionFlags)
@@ -803,24 +802,25 @@ data_00_3258:
 ;     bit 6 = ?
 ;     bit 7 = spawn particles
 ;     $ff = clear object immediately without spawning collectible
+data_00_3258:                                                      ; 00:3258 ???????? ; OBJECT_GEX
     db   $00
 data_00_3259:
     db   $00, $00, COLLISION_TYPE_NONE, $00, $00, $00
 data_00_325F:
-    db   $ff        ;; 00:3258 ???????? ; OBJECT_GEX
+    db   $ff        
     db   $01, $0c, $0c, COLLISION_TYPE_BONUS_COIN, $02, $00, $ff, $81 ; 00:3260 ......?? ; OBJECT_BONUS_COIN
     db   $01, $0c, $0c, COLLISION_TYPE_FLY_COIN, $02, $00, $ff, $81 ; 00:3268 ......?. ; OBJECT_FLY_COIN_SPAWN
     db   $01, $0c, $0c, COLLISION_TYPE_PAW_COIN, $02, $00, $ff, $81 ; 00:3270 ......?. ; OBJECT_PAW_COIN
-    db   $01, $0c, $0c, COLLISION_TYPE_FLY, $00, $00, $ff, $ff ; 00:3278 ???????? ; OBJECT_UNK04
-    db   $01, $0c, $0c, COLLISION_TYPE_FLY, $00, $00, $ff, $ff ; 00:3280 ???????? ; OBJECT_UNK05
-    db   $01, $0c, $0c, COLLISION_TYPE_FLY, $00, $00, $ff, $ff ; 00:3288 ???????? ; OBJECT_UNK06
-    db   $01, $0c, $0c, COLLISION_TYPE_FLY, $00, $00, $ff, $ff ; 00:3290 ???????? ; OBJECT_UNK07
-    db   $01, $0c, $0c, COLLISION_TYPE_FLY, $00, $00, $ff, $ff ; 00:3298 ???????? ; OBJECT_UNK08
+    db   $01, $0c, $0c, COLLISION_TYPE_FLY, $00, $00, $ff, $ff ; 00:3278 ???????? ; OBJECT_FLY_1
+    db   $01, $0c, $0c, COLLISION_TYPE_FLY, $00, $00, $ff, $ff ; 00:3280 ???????? ; OBJECT_FLY_2
+    db   $01, $0c, $0c, COLLISION_TYPE_FLY, $00, $00, $ff, $ff ; 00:3288 ???????? ; OBJECT_FLY_3
+    db   $01, $0c, $0c, COLLISION_TYPE_FLY, $00, $00, $ff, $ff ; 00:3290 ???????? ; OBJECT_FLY_4
+    db   $01, $0c, $0c, COLLISION_TYPE_FLY, $00, $00, $ff, $ff ; 00:3298 ???????? ; OBJECT_FLY_5
     db   $01, $0c, $10, COLLISION_TYPE_FLY_TV, $02, $00, $ff, $01 ; 00:32a0 ???????? ; OBJECT_GREEN_FLY_TV
     db   $01, $0c, $10, COLLISION_TYPE_FLY_TV, $02, $00, $ff, $01 ; 00:32a8 ???????? ; OBJECT_PURPLE_FLY_TV
-    db   $01, $0c, $10, COLLISION_TYPE_FLY_TV, $02, $00, $ff, $01 ; 00:32b0 ???????? ; OBJECT_UNK0B
+    db   $01, $0c, $10, COLLISION_TYPE_FLY_TV, $02, $00, $ff, $01 ; 00:32b0 ???????? ; OBJECT_UNK_FLY_TV_3
     db   $01, $0c, $10, COLLISION_TYPE_FLY_TV, $02, $00, $ff, $01 ; 00:32b8 ???????? ; OBJECT_BLUE_FLY_TV
-    db   $01, $0c, $10, COLLISION_TYPE_FLY_TV, $02, $00, $ff, $01 ; 00:32c0 ???????? ; OBJECT_UNK0D
+    db   $01, $0c, $10, COLLISION_TYPE_FLY_TV, $02, $00, $ff, $01 ; 00:32c0 ???????? ; OBJECT_UNK_FLY_TV_5
     db   $01, $08, $08, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:32c8 ???????? ; OBJECT_UNK0E
     db   $01, $08, $08, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:32d0 ???????? ; OBJECT_UNK0F
     db   $01, $08, $08, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:32d8 ???????? ; OBJECT_UNK10
@@ -1101,7 +1101,7 @@ call_00_3618_HandleObjectSpawn:
     add  HL, BC                                        ;; 00:36d7 $09
     ld   C, L                                          ;; 00:36d8 $4d
     ld   B, H                                          ;; 00:36d9 $44
-    LOAD_OBJ_FIELD_TO_HL OBJECT_XPOS_OFFSET
+    LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_XPOS
     ld   A, [DE]                                       ;; 00:36e2 $1a
     ld   [HL+], A                                      ;; 00:36e3 $22
     ld   [BC], A                                       ;; 00:36e4 $02
@@ -1162,7 +1162,7 @@ call_00_3618_HandleObjectSpawn:
     ld   BC, data_00_3258                                     ;; 00:3723 $01 $58 $32
     add  HL, BC                                        ;; 00:3726 $09
     ld   A, [HL+]                                      ;; 00:3727 $2a
-    LOAD_OBJ_FIELD_TO_DE_ALT OBJECT_ID_OFFSET
+    LOAD_OBJ_FIELD_TO_DE_ALT OBJECT_FIELD_OBJECT_ID
     ld   A, [wDABB_CurrentObjectId]                                    ;; 00:3730 $fa $bb $da
     ld   [DE], A                                       ;; 00:3733 $12
     ld   A, E                                          ;; 00:3734 $7b
@@ -1261,7 +1261,7 @@ call_00_37a0_SpawnObjectRelative:
     ld   DE, wDA01_ObjectListIndexesForCurrentObjects                                     ;; 00:37be $11 $01 $da
     add  HL, DE                                        ;; 00:37c1 $19
     ld   A, [HL]                                       ;; 00:37c2 $7e
-    ld   [wDCE8], A                                    ;; 00:37c3 $ea $e8 $dc
+    ld   [wDCE8_ParentObjectListIndex], A                                    ;; 00:37c3 $ea $e8 $dc
     pop  DE                                            ;; 00:37c6 $d1
     ld   L, C                                          ;; 00:37c7 $69
     ld   H, $00                                        ;; 00:37c8 $26 $00
@@ -1273,12 +1273,12 @@ call_00_37a0_SpawnObjectRelative:
     ld   A, [HL+]                                      ;; 00:37d1 $2a
     ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 00:37d2 $fa $00 $da
     push AF                                            ;; 00:37d5 $f5
-    or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 00:37d6 $f6 $0d
+    or   A, OBJECT_FIELD_FACING_DIRECTION                                        ;; 00:37d6 $f6 $0d
     ld   C, A                                          ;; 00:37d8 $4f
     ld   B, HIGH(wD800_ObjectMemory)                                        ;; 00:37d9 $06 $d8
     ld   A, D                                          ;; 00:37db $7a
     ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 00:37dc $ea $00 $da
-    or   A, OBJECT_FACINGDIRECTION_OFFSET                                        ;; 00:37df $f6 $0d
+    or   A, OBJECT_FIELD_FACING_DIRECTION                                        ;; 00:37df $f6 $0d
     ld   E, A                                          ;; 00:37e1 $5f
     ld   D, B                                          ;; 00:37e2 $50
     ld   A, [BC]                                       ;; 00:37e3 $0a
@@ -1345,41 +1345,41 @@ call_00_37a0_SpawnObjectRelative:
     ld   E, A                                          ;; 00:3828 $5f
     ld   A, [HL+]                                      ;; 00:3829 $2a
     ld   [DE], A                                       ;; 00:382a $12
-    inc  E                                             ;; 00:382b $1c
+    inc  E                                             ;; 00:382b $1c ; OBJECT_FIELD_HEIGHT
     ld   A, [HL+]                                      ;; 00:382c $2a
     ld   [DE], A                                       ;; 00:382d $12
-    inc  E                                             ;; 00:382e $1c
+    inc  E                                             ;; 00:382e $1c ; OBJECT_FIELD_COLLISION_TYPE
     ld   A, [HL+]                                      ;; 00:382f $2a
     ld   [DE], A                                       ;; 00:3830 $12
-    inc  E                                             ;; 00:3831 $1c
+    inc  E                                             ;; 00:3831 $1c ; OBJECT_FIELD_COOLDOWN_TIMER
     xor  A, A                                          ;; 00:3832 $af
     ld   [DE], A                                       ;; 00:3833 $12
-    inc  E                                             ;; 00:3834 $1c
+    inc  E                                             ;; 00:3834 $1c ; OBJECT_FIELD_UNK16_COLLISION
     ld   A, [HL+]                                      ;; 00:3835 $2a
     dec  A                                             ;; 00:3836 $3d
     ld   [DE], A                                       ;; 00:3837 $12
-    inc  E                                             ;; 00:3838 $1c
-    inc  E                                             ;; 00:3839 $1c
+    inc  E                                             ;; 00:3838 $1c ; OBJECT_FIELD_SPRITE_BANK
+    inc  E                                             ;; 00:3839 $1c ; OBJECT_FIELD_UNK18
     xor  A, A                                          ;; 00:383a $af
     ld   [DE], A                                       ;; 00:383b $12
-    inc  E                                             ;; 00:383c $1c
+    inc  E                                             ;; 00:383c $1c ; OBJECT_FIELD_MISC_FLAGS
     ld   A, [HL+]                                      ;; 00:383d $2a
     ld   [DE], A                                       ;; 00:383e $12
-    inc  E                                             ;; 00:383f $1c
+    inc  E                                             ;; 00:383f $1c ; OBJECT_FIELD_MISC_TIMER
     xor  A, A                                          ;; 00:3840 $af
     ld   [DE], A                                       ;; 00:3841 $12
-    inc  E                                             ;; 00:3842 $1c
+    inc  E                                             ;; 00:3842 $1c ; OBJECT_FIELD_XVEL
     ld   [DE], A                                       ;; 00:3843 $12
-    inc  E                                             ;; 00:3844 $1c
+    inc  E                                             ;; 00:3844 $1c ; OBJECT_FIELD_XVEL_RELATED
     ld   [DE], A                                       ;; 00:3845 $12
-    inc  E                                             ;; 00:3846 $1c
+    inc  E                                             ;; 00:3846 $1c ; OBJECT_FIELD_YVEL
     ld   [DE], A                                       ;; 00:3847 $12
-    inc  E                                             ;; 00:3848 $1c
+    inc  E                                             ;; 00:3848 $1c ; OBJECT_FIELD_UNK1E
     ld   [DE], A                                       ;; 00:3849 $12
-    inc  E                                             ;; 00:384a $1c
-    ld   A, [wDCE8]                                    ;; 00:384b $fa $e8 $dc
-    ld   [DE], A                                       ;; 00:384e $12
-    call call_00_2a03_ResetObjectTempSlot                                  ;; 00:384f $cd $03 $2a
+    inc  E                                             ;; 00:384a $1c ; OBJECT_FIELD_PARENT
+    ld   A, [wDCE8_ParentObjectListIndex]                                    ;; 00:384b $fa $e8 $dc
+    ld   [DE], A                                       ;; 00:384e $12 
+    call call_00_2a03_ResetObjectListIndex                                  ;; 00:384f $cd $03 $2a
     xor  A, A                                          ;; 00:3852 $af
     farcall call_02_72ac_SetObjectAction
     farcall call_03_687c_AssignObjectPalette

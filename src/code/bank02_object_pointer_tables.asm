@@ -3,16 +3,16 @@ data_02_4000:
    dw   .data_02_42c4 ; OBJECT_BONUS_COIN
    dw   .data_02_42cc ; OBJECT_FLY_COIN_SPAWN
    dw   .data_02_42d4 ; OBJECT_PAW_COIN
-   dw   .data_02_42dc ; OBJECT_UNK04
-   dw   .data_02_42dc ; OBJECT_UNK05
-   dw   .data_02_42dc ; OBJECT_UNK06
-   dw   .data_02_42dc ; OBJECT_UNK07
-   dw   .data_02_42dc ; OBJECT_UNK08
+   dw   .data_02_42dc ; OBJECT_FLY_1
+   dw   .data_02_42dc ; OBJECT_FLY_2
+   dw   .data_02_42dc ; OBJECT_FLY_3
+   dw   .data_02_42dc ; OBJECT_FLY_4
+   dw   .data_02_42dc ; OBJECT_FLY_5
    dw   .data_02_42e0 ; OBJECT_GREEN_FLY_TV
    dw   .data_02_42e0 ; OBJECT_PURPLE_FLY_TV
-   dw   .data_02_42e0 ; OBJECT_UNK0B
+   dw   .data_02_42e0 ; OBJECT_UNK_FLY_TV_3
    dw   .data_02_42e0 ; OBJECT_BLUE_FLY_TV
-   dw   .data_02_42e0 ; OBJECT_UNK0D
+   dw   .data_02_42e0 ; OBJECT_UNK_FLY_TV_5
    dw   .data_02_42f4 ; OBJECT_UNK0E
    dw   .data_02_42f8 ; OBJECT_UNK0F
    dw   .data_02_42fc ; OBJECT_UNK10
@@ -244,7 +244,7 @@ data_02_4000:
     dw   call_02_582e_ObjectAction_None, data_02_75dc
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2
 .data_02_42dc:
-    dw   call_02_5918_ObjectAction_Unk_unk, data_02_75e9
+    dw   call_02_5918_ObjectAction_Fly_Update, data_02_75e9
 .data_02_42e0:
     dw   call_02_582e_ObjectAction_None, data_02_75ef
     dw   call_02_582e_ObjectAction_None, data_02_75f5

@@ -332,7 +332,7 @@ call_00_0150_Init:
     bit  2, [HL]                                       ;; 00:0451 $cb $56
     jr   Z, .jr_00_045e                                ;; 00:0453 $28 $09
     call call_00_1633_HandleLevelWarpOrExit                                  ;; 00:0455 $cd $33 $16
-    call call_00_2b3d_SweepAndClearActiveObjects                                  ;; 00:0458 $cd $3d $2b
+    call call_00_2b3d_ClearAllObjectSlots                                  ;; 00:0458 $cd $3d $2b
     jp   .jp_00_038e                                   ;; 00:045b $c3 $8e $03
 .jr_00_045e:
     ld   HL, wDB6A                                     ;; 00:045e $21 $6a $db
@@ -510,8 +510,8 @@ call_00_05c7:
     set  5, [HL]                                       ;; 00:05ee $cb $ee
     ret                                                ;; 00:05f0 $c9
 .jr_00_05f1:
-    ld   C, $1c                                        ;; 00:05f1 $0e $1c
-    call call_00_29ce_CheckObject_C_Exists                                  ;; 00:05f3 $cd $ce $29
+    ld   C, OBJECT_FREESTANDING_REMOTE                                        ;; 00:05f1 $0e $1c
+    call call_00_29ce_Object_CheckExists                                  ;; 00:05f3 $cd $ce $29
     ret  Z                                             ;; 00:05f6 $c8
     ld   HL, wDB6A                                     ;; 00:05f7 $21 $6a $db
     set  4, [HL]                                       ;; 00:05fa $cb $e6
@@ -1576,13 +1576,13 @@ call_00_0c6a_HandlePendingHDMATransfers:
 .jr_00_0cab:
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:0cab $26 $d8
     ld   A, [wDB61_ActiveObjectSlot]                                    ;; 00:0cad $fa $61 $db
-    or   A, OBJECT_SPRITE_BANK_OFFSET                                        ;; 00:0cb0 $f6 $17
+    or   A, OBJECT_FIELD_SPRITE_BANK                                        ;; 00:0cb0 $f6 $17
     ld   L, A                                          ;; 00:0cb2 $6f
     ld   A, [HL]                                       ;; 00:0cb3 $7e
     call call_00_0f25_AltSwitchBank                                  ;; 00:0cb4 $cd $25 $0f
     ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:0cb7 $26 $d8
     ld   A, [wDB61_ActiveObjectSlot]                                    ;; 00:0cb9 $fa $61 $db
-    or   A, OBJECT_MOVEMENT_FLAGS_OFFSET                                        ;; 00:0cbc $f6 $05
+    or   A, OBJECT_FIELD_GRAPHICS_FLAGS                                        ;; 00:0cbc $f6 $05
     ld   L, A                                          ;; 00:0cbe $6f
     bit  5, [HL]                                       ;; 00:0cbf $cb $6e
     jr   NZ, .jr_00_0ceb                               ;; 00:0cc1 $20 $28

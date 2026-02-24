@@ -264,7 +264,7 @@ call_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     ld   A, $20                                        ;; 03:5ed8 $3e $20
 .jr_03_5eda:
     ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 03:5eda $ea $00 $da
-    or   A, OBJECT_ID_OFFSET                                        ;; 03:5edd $f6 $00
+    or   A, OBJECT_FIELD_OBJECT_ID                                        ;; 03:5edd $f6 $00
     ld   L, A                                          ;; 03:5edf $6f
     ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:5ee0 $26 $d8
     ld   A, [HL]                                       ;; 03:5ee2 $7e
@@ -282,7 +282,7 @@ call_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     ld   A, $20                                        ;; 03:5efb $3e $20
 .jr_03_5efd:
     ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 03:5efd $ea $00 $da
-    or   A, OBJECT_ID_OFFSET                                        ;; 03:5f00 $f6 $00
+    or   A, OBJECT_FIELD_OBJECT_ID                                        ;; 03:5f00 $f6 $00
     ld   L, A                                          ;; 03:5f02 $6f
     ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:5f03 $26 $d8
     ld   A, [HL]                                       ;; 03:5f05 $7e
@@ -300,7 +300,7 @@ call_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     ld   A, $20                                        ;; 03:5f1d $3e $20
 .jr_03_5f1f:
     ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 03:5f1f $ea $00 $da
-    or   A, OBJECT_ID_OFFSET                                        ;; 03:5f22 $f6 $00
+    or   A, OBJECT_FIELD_OBJECT_ID                                        ;; 03:5f22 $f6 $00
     ld   L, A                                          ;; 03:5f24 $6f
     ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:5f25 $26 $d8
     ld   A, [HL]                                       ;; 03:5f27 $7e
@@ -389,7 +389,7 @@ call_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 03:5f9f $ea $00 $da
     and  A, A                                          ;; 03:5fa2 $a7
     jr   Z, .jr_03_5fb2                                ;; 03:5fa3 $28 $0d
-    or   A, OBJECT_ID_OFFSET                                        ;; 03:5fa5 $f6 $00
+    or   A, OBJECT_FIELD_OBJECT_ID                                        ;; 03:5fa5 $f6 $00
     ld   L, A                                          ;; 03:5fa7 $6f
     ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:5fa8 $26 $d8
     ld   A, [HL]                                       ;; 03:5faa $7e
@@ -428,11 +428,11 @@ call_03_5fc2_SetupObjectSprite:
     ld   DE, wDAAE_ObjectPaletteIds                                     ;; 03:5fcd $11 $ae $da
     add  HL, DE                                        ;; 03:5fd0 $19
     ld   E, [HL]                                       ;; 03:5fd1 $5e
-    LOAD_OBJ_FIELD_TO_HL OBJECT_FACINGDIRECTION_OFFSET                                        ;; 03:5fd9 $6f
+    LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_FACING_DIRECTION                                        ;; 03:5fd9 $6f
     ld   A, [HL]                                       ;; 03:5fda $7e
     or   A, E                                          ;; 03:5fdb $b3
     ld   [wDAB6_SpriteFlags], A                                    ;; 03:5fdc $ea $b6 $da
-    LOAD_OBJ_FIELD_TO_DE OBJECT_XPOS_OFFSET
+    LOAD_OBJ_FIELD_TO_DE OBJECT_FIELD_XPOS
     ld   HL, wDBF9_XPositionInMap                                     ;; 03:5fe7 $21 $f9 $db
     ld   A, [DE]                                       ;; 03:5fea $1a
     sub  A, [HL]                                       ;; 03:5feb $96
@@ -489,10 +489,10 @@ call_03_5fc2_SetupObjectSprite:
     ld   [HL+], A                                      ;; 03:6035 $22
     ld   [HL], A                                       ;; 03:6036 $77
     call call_00_2a15_CheckCameraOverlapBoundingBox                                  ;; 03:6037 $cd $15 $2a
-    call C, call_00_2b5d_DeactivateObjectSlot                               ;; 03:603a $dc $5d $2b
+    call C, call_00_2b5d_ClearObjectSlot                               ;; 03:603a $dc $5d $2b
     ret                                                ;; 03:603d $c9
 .jr_03_603e:
-    LOAD_OBJ_FIELD_TO_HL_ALT OBJECT_COOLDOWN_TIMER_OFFSET
+    LOAD_OBJ_FIELD_TO_HL_ALT OBJECT_FIELD_COOLDOWN_TIMER
     ld   A, [HL]                                       ;; 03:6046 $7e
     and  A, A                                          ;; 03:6047 $a7
     jr   Z, .jr_03_6050                                ;; 03:6048 $28 $06
@@ -533,7 +533,7 @@ call_03_5fc2_SetupObjectSprite:
     and  A, $70                                        ;; 03:6081 $e6 $70
 .jr_03_6083:
     ld   [wDC70_ObjectSpriteRelated2], A                                    ;; 03:6083 $ea $70 $dc
-    LOAD_OBJ_FIELD_TO_HL OBJECT_FACINGDIRECTION_OFFSET
+    LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_FACING_DIRECTION
     ld   A, [HL]                                       ;; 03:608e $7e
     swap A                                             ;; 03:608f $cb $37
     rrca                                               ;; 03:6091 $0f
@@ -604,7 +604,7 @@ call_03_60e6_SetupParticleSprite:
 ; Gets particle buffer pointer (ParticleSlot_GetBufferPtr).
 ; Converts a velocity/magnitude value into a frame index using .data_03_6140.
 ; Updates wDAB6_SpriteFlags flags and writes three small sprite entries for the particle effect.
-    call call_00_2c53_ParticleSlot_GetBufferPtr                                  ;; 03:60e6 $cd $53 $2c
+    call call_00_2c53_Particle_GetSlotPtr                                  ;; 03:60e6 $cd $53 $2c
     ld   L, E                                          ;; 03:60e9 $6b
     ld   H, D                                          ;; 03:60ea $62
     ld   A, [HL+]                                      ;; 03:60eb $2a
