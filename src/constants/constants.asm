@@ -318,6 +318,11 @@ DEF OBJECT_RIGHT_OF_GEX      EQU $20
 ; Object flags, used in wD700_ObjectFlags
 DEF OBJECT_FLAG_80_ACTIVE    EQU $80
 
+; Player vs Object interactions
+DEF PLAYER_TOUCHED_OBJECT    EQU $00
+DEF PLAYER_ATTACKED_OBJECT   EQU $01
+DEF PLAYER_STOMPED_OBJECT    EQU $02
+
 ; Frame timer values
 DEF TIMER_AMOUNT_0_FRAMES                  EQU $00
 DEF TIMER_AMOUNT_60_FRAMES                 EQU $3C
@@ -339,10 +344,6 @@ DEF TIMER_AMOUNT_BRAINOFOZ2                EQU $39
 DEF TIMER_AMOUNT_BRAINOFOZ3                EQU $29
 DEF TIMER_AMOUNT_CANNON                    EQU $FF
 DEF TIMER_AMOUNT_REZ                       EQU $06
-
-; Object Action Ids
-DEF OBJECTACTION_PENGUIN_WALK_OR_RUN      EQU $00
-DEF OBJECTACTION_PENGUIN_JUMP             EQU $01
 
 ; Menu Types
 DEF MENU_TITLE_SCREEN                     EQU $00
@@ -441,11 +442,11 @@ DEF SONG_NONE                              EQU $FF
 ; Collision Types
 DEF COLLISION_TYPE_NONE                      EQU $00
 DEF COLLISION_TYPE_PLATFORM                  EQU $01
-DEF COLLISION_TYPE_DAMAGE_UNDERWATER         EQU $02 ; player is damaged, but do not change player's action or position
-DEF COLLISION_TYPE_DAMAGE_AND_DESTROY        EQU $03 ; player is damaged, and the object is destroyed
-DEF COLLISION_TYPE_DAMAGE_AND_REMAIN         EQU $04 ; player is damaged, but the object remains loaded
-DEF COLLISION_TYPE_UNK_05                    EQU $05 ; seems unused
-DEF COLLISION_TYPE_UNK_06                    EQU $06 ; seems unused
+DEF COLLISION_TYPE_INVULNERABLE_ENEMY        EQU $02 ; player can be damaged by this object, but cannot damage it
+DEF COLLISION_TYPE_PROJECTILE                EQU $03 ; the object is destroyed after damaging player 
+DEF COLLISION_TYPE_GENERIC_ENEMY             EQU $04 ; the object remains after damaging player. player can damage this enemy.
+DEF COLLISION_TYPE_GENERIC_ENEMY_UNUSED      EQU $05 ; seems unused
+DEF COLLISION_TYPE_DAMAGE_PLAYER_UNUSED      EQU $06 ; seems unused
 DEF COLLISION_TYPE_BONUS_COIN                EQU $07
 DEF COLLISION_TYPE_FLY_COIN                  EQU $08
 DEF COLLISION_TYPE_PAW_COIN                  EQU $09
@@ -616,3 +617,7 @@ DEF PLAYERACTION_DIE_WARP_6                     EQU $74
 DEF PLAYERACTION_STAND_ON_TV_BUTTON_6           EQU $75
 DEF PLAYERACTION_ENTER_TV_6                     EQU $76
 DEF PLAYERACTION_UNK26_6                        EQU $77
+
+; Object Action Ids
+DEF OBJECTACTION_PENGUIN_WALK_OR_RUN            EQU $00
+DEF OBJECTACTION_PENGUIN_JUMP                   EQU $01

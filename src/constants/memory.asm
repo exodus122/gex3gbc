@@ -709,7 +709,7 @@ wDC7B_CurrentObjectAddrLoAlt:
 wDC7C_PlayerCollisionUnusedFlag:
     ds 1                                               ;; dc7c
 
-wDC7D_PlayerCollisionUnkFlag:
+wDC7B_CurrentObjectAddrLoAlt2:
     ds 1                                               ;; dc7d
 
 wDC7E_PlayerDamageCooldownTimer:
@@ -724,15 +724,14 @@ wDC80_Player_UnkStates:
 wDC81_CurrentInputsAlt:
     ds 2                                               ;; dc81
 
-wDC83:
+wDC83_PlayerIdleTimer:
     ds 1                                               ;; dc83
 
+; Object collision related
 wDC84:
     ds 1                                               ;; dc84
-
 wDC85:
     ds 1                                               ;; dc85
-
 wDC86:
     ds 1                                               ;; dc86
 

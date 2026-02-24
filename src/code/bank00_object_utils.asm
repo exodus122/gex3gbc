@@ -884,7 +884,7 @@ call_00_26BA_Object_AddOffsetToYPos:
 
 call_00_26c9_Object_CarryPlayerHorizontally:
 ; Complex: Reads object’s X velocity, some state flags, and bounding values.
-; Compares against global state vars (wDC7B_CurrentObjectAddrLoAlt, wDC7D_PlayerCollisionUnkFlag).
+; Compares against global state vars (wDC7B_CurrentObjectAddrLoAlt, wDC7B_CurrentObjectAddrLoAlt2).
 ; If conditions match, applies an adjustment to the player’s X position relative to the object (e.g. conveyor belts, pushers).
 ; Appears to handle environmental effects that “move the player.”
     LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_XVEL
@@ -915,7 +915,7 @@ call_00_26c9_Object_CarryPlayerHorizontally:
 call_00_26F1_Object_UpdatePlayerXPosition:
 ; Update Player X Relative to Object
 ; Compares player position to the object and adjusts or clamps X.
-    ld   hl,wDC7D_PlayerCollisionUnkFlag
+    ld   hl,wDC7B_CurrentObjectAddrLoAlt2
     cp   [hl]
     ret  nz
     LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_WIDTH

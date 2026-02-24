@@ -584,14 +584,14 @@ call_02_5100_Player_HorizontalMovementHandler:
 call_02_518a_ApplyLeftwardCollisionAdjustment:
 ; Purpose: Adjusts the player's X-position when moving left against solid tiles or obstacles.
 ; Details:
-; Checks flags (wDC7C_PlayerCollisionUnusedFlag, wDC7D_PlayerCollisionUnkFlag) for collision state.
+; Checks flags (wDC7C_PlayerCollisionUnusedFlag, wDC7B_CurrentObjectAddrLoAlt2) for collision state.
 ; Computes the delta between player position and reference points.
 ; Writes corrected position back to wD80E_PlayerXPosition or clamps based on collision checks.
 ; Works together with call_02_5195_ResolveLeftwardTilePushback to fine-tune adjustments.
     ld   A, [wDC7C_PlayerCollisionUnusedFlag]                                    ;; 02:518a $fa $7c $dc
     and  A, A                                          ;; 02:518d $a7
     jr   NZ, call_02_51cb_CheckLeftCollisionAndStoreOffset                                ;; 02:518e $20 $3b
-    ld   A, [wDC7D_PlayerCollisionUnkFlag]                                    ;; 02:5190 $fa $7d $dc
+    ld   A, [wDC7B_CurrentObjectAddrLoAlt2]                                    ;; 02:5190 $fa $7d $dc
     and  A, A                                          ;; 02:5193 $a7
     ret  NZ                                            ;; 02:5194 $c0
 
@@ -687,7 +687,7 @@ call_02_51f9_ApplyRightwardCollisionAdjustment:
     ld   A, [wDC7C_PlayerCollisionUnusedFlag]                                    ;; 02:51f9 $fa $7c $dc
     and  A, A                                          ;; 02:51fc $a7
     jr   NZ, call_02_5238_CheckRightCollisionAndStoreOffset                                ;; 02:51fd $20 $39
-    ld   A, [wDC7D_PlayerCollisionUnkFlag]                                    ;; 02:51ff $fa $7d $dc
+    ld   A, [wDC7B_CurrentObjectAddrLoAlt2]                                    ;; 02:51ff $fa $7d $dc
     and  A, A                                          ;; 02:5202 $a7
     ret  NZ                                            ;; 02:5203 $c0
 

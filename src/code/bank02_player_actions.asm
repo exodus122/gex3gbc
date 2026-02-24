@@ -20,10 +20,10 @@ call_02_47ce_PlayerAction_Idle:
 ; Also checks bit 4 of wD805_Player_MovementFlags. If set:
 ; Sets bit 6 of wDC80_Player_UnkStates (marking a new sub-state).
 ; Clears wDC86, wDC8C_PlayerYVelocity, and wDC87.
-; Sets wDC83 = F0h (a countdown timer).
+; Sets wDC83_PlayerIdleTimer = F0h (a countdown timer).
 ; Regardless, it checks if wDC81_CurrentInputsAlt == PADF_UP and, if so, calls call_00_1bbc_CheckForDoorAndEnter.
 ; It then calls call_02_4f11 to potentially switch actions.
-; Finally, it decrements the countdown timer at wDC83. If it hits zero, it switches player action to $02.
+; Finally, it decrements the countdown timer at wDC83_PlayerIdleTimer. If it hits zero, it switches player action to $02.
     ld   HL, wD805_Player_MovementFlags                                     ;; 02:47ce $21 $05 $d8
     bit  4, [HL]                                       ;; 02:47d1 $cb $66
     jr   Z, .jr_02_47e9                                ;; 02:47d3 $28 $14
@@ -33,14 +33,14 @@ call_02_47ce_PlayerAction_Idle:
     ld   [wDC86], A                                    ;; 02:47db $ea $86 $dc
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:47de $ea $8c $dc
     ld   [wDC87], A                                    ;; 02:47e1 $ea $87 $dc
-    ld   A, $f0                                        ;; 02:47e4 $3e $f0
-    ld   [wDC83], A                                    ;; 02:47e6 $ea $83 $dc
+    ld   A, TIMER_AMOUNT_240_FRAMES                                        ;; 02:47e4 $3e $f0
+    ld   [wDC83_PlayerIdleTimer], A                                    ;; 02:47e6 $ea $83 $dc
 .jr_02_47e9:
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:47e9 $fa $81 $dc
     cp   A, PADF_UP                                        ;; 02:47ec $fe $40
     call Z, call_00_1bbc_CheckForDoorAndEnter                               ;; 02:47ee $cc $bc $1b
     call call_02_4f11_ChooseNextActionBasedOnLevel                                  ;; 02:47f1 $cd $11 $4f
-    ld   HL, wDC83                                     ;; 02:47f4 $21 $83 $dc
+    ld   HL, wDC83_PlayerIdleTimer                                     ;; 02:47f4 $21 $83 $dc
     dec  [HL]                                          ;; 02:47f7 $35
     ld   A, PLAYERACTION_IDLE_ANIMATION                                        ;; 02:47f8 $3e $02
     jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:47fa $ca $f9 $54
