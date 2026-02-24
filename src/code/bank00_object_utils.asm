@@ -448,7 +448,7 @@ call_00_2475_Object_ApplyVerticalVelocity:
     ld   A, $ff                                        ;; 00:246d $3e $ff
     adc  A, $00                                        ;; 00:246f $ce $00
     ld   B, A                                          ;; 00:2471 $47
-    jp   call_00_250d_Object_UpdateYPosition                                    ;; 00:2472 $c3 $0d $25
+    jp   call_00_250d_Object_AdjustYPosition                                    ;; 00:2472 $c3 $0d $25
 
 call_00_2475_Object_ApplyGravityAndSnapToGround:
 ; Applies gravity to the object’s vertical velocity (with clamp), integrates it into 
@@ -518,7 +518,7 @@ call_00_24c0_Object_ApplyXVelocity:
     ld   A, $ff                                        ;; 00:24da $3e $ff
     adc  A, $00                                        ;; 00:24dc $ce $00
     ld   B, A                                          ;; 00:24de $47
-call_00_24df_Object_UpdateXPosition:
+call_00_24df_Object_AdjustXPosition:
     LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_XPOS
     ld   A, [HL]                                       ;; 00:24e7 $7e
     add  A, C                                          ;; 00:24e8 $81
@@ -547,7 +547,7 @@ call_00_24ee_Object_ApplyYVelocity_NoClip:
     ld   A, $ff                                        ;; 00:2508 $3e $ff
     adc  A, $00                                        ;; 00:250a $ce $00
     ld   B, A                                          ;; 00:250c $47
-call_00_250d_Object_UpdateYPosition:
+call_00_250d_Object_AdjustYPosition:
     LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_YPOS
     ld   A, [HL]                                       ;; 00:2515 $7e
     add  A, C                                          ;; 00:2516 $81
@@ -1241,12 +1241,12 @@ call_00_28a0_Object_GetCooldownTimer:
     ret  
 
 call_00_28aa_Object_Set16:
-    LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_UNK16_COLLISION
+    LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_DAMAGE_STATE
     ld   [HL], C
     ret  
 
 call_00_28b4_Object_Get16:
-    LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_UNK16_COLLISION
+    LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_DAMAGE_STATE
     ld   a,[hl]
     ret  
 

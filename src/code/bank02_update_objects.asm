@@ -30,8 +30,8 @@ call_02_708f_InitObjectsAndSpawnPlayer:
     ld   [wDC8D], A                                    ;; 02:70c2 $ea $8d $dc
     ld   [wDC8E_InitialYVelocity], A                                    ;; 02:70c5 $ea $8e $dc
     ld   [wDC8F], A                                    ;; 02:70c8 $ea $8f $dc
-    ld   [wDC88], A                                    ;; 02:70cb $ea $88 $dc
-    ld   [wDC80], A                                    ;; 02:70ce $ea $80 $dc
+    ld   [wDC88_CurrentObject_UnkVerticalOffset], A                                    ;; 02:70cb $ea $88 $dc
+    ld   [wDC80_Player_UnkStates], A                                    ;; 02:70ce $ea $80 $dc
 .jr_02_70d1:
     xor  A, A                                          ;; 02:70d1 $af
     ld   [wDC85], A                                    ;; 02:70d2 $ea $85 $dc

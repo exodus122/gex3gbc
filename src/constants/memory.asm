@@ -647,7 +647,7 @@ wDC54_CachedTileXCoord:
 wDC56_CachedTileYCoord:
     ds 2                                               ;; dc56
 
-wDC58_ObjectCollisionUnkFlags:
+wDC58_CurrentObjectInteractionFlags:
     ds 1                                               ;; dc58
 
 wDC59_NumRemotesOnMissionSelectMenu:
@@ -715,10 +715,10 @@ wDC7D_PlayerCollisionUnkFlag:
 wDC7E_PlayerDamageCooldownTimer:
     ds 1                                               ;; dc7e
 
-wDC7F:
+wDC7F_Player_IsAttacking: ; set to 1 when using tail spin
     ds 1                                               ;; dc7f
 
-wDC80:
+wDC80_Player_UnkStates:
     ds 1                                               ;; dc80
 
 wDC81_CurrentInputsAlt:
@@ -739,7 +739,7 @@ wDC86:
 wDC87:
     ds 1                                               ;; dc87
 
-wDC88:
+wDC88_CurrentObject_UnkVerticalOffset:
     ds 1                                               ;; dc88
 
 wDC89:

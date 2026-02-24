@@ -18,7 +18,7 @@ call_02_47b4_PlayerAction_Spawn:
 
 call_02_47ce_PlayerAction_Idle:
 ; Also checks bit 4 of wD805_Player_MovementFlags. If set:
-; Sets bit 6 of wDC80 (marking a new sub-state).
+; Sets bit 6 of wDC80_Player_UnkStates (marking a new sub-state).
 ; Clears wDC86, wDC8C_PlayerYVelocity, and wDC87.
 ; Sets wDC83 = F0h (a countdown timer).
 ; Regardless, it checks if wDC81_CurrentInputsAlt == PADF_UP and, if so, calls call_00_1bbc_CheckForDoorAndEnter.
@@ -27,7 +27,7 @@ call_02_47ce_PlayerAction_Idle:
     ld   HL, wD805_Player_MovementFlags                                     ;; 02:47ce $21 $05 $d8
     bit  4, [HL]                                       ;; 02:47d1 $cb $66
     jr   Z, .jr_02_47e9                                ;; 02:47d3 $28 $14
-    ld   HL, wDC80                                     ;; 02:47d5 $21 $80 $dc
+    ld   HL, wDC80_Player_UnkStates                                     ;; 02:47d5 $21 $80 $dc
     set  6, [HL]                                       ;; 02:47d8 $cb $f6
     xor  A, A                                          ;; 02:47da $af
     ld   [wDC86], A                                    ;; 02:47db $ea $86 $dc
@@ -216,21 +216,21 @@ call_02_4911_PlayerAction_TailSpin:
     jr   Z, .jr_02_492a                                ;; 02:4916 $28 $12
     ld   A, SFX_GEX_TAIL_SPIN                                        ;; 02:4918 $3e $04
     call call_00_0ff5_QueueSoundEffect                                  ;; 02:491a $cd $f5 $0f
-    ld   HL, wDC80                                     ;; 02:491d $21 $80 $dc
+    ld   HL, wDC80_Player_UnkStates                                     ;; 02:491d $21 $80 $dc
     set  0, [HL]                                       ;; 02:4920 $cb $c6
     ld   A, $01                                        ;; 02:4922 $3e $01
-    ld   [wDC7F], A                                    ;; 02:4924 $ea $7f $dc
+    ld   [wDC7F_Player_IsAttacking], A                                    ;; 02:4924 $ea $7f $dc
     call call_02_4e01_SetOneTimeFlag                                  ;; 02:4927 $cd $01 $4e
 .jr_02_492a:
     ld   A, [wD805_Player_MovementFlags]                                    ;; 02:492a $fa $05 $d8
     and  A, $04                                        ;; 02:492d $e6 $04
     ret  Z                                             ;; 02:492f $c8
     xor  A, A                                          ;; 02:4930 $af
-    ld   [wDC7F], A                                    ;; 02:4931 $ea $7f $dc
+    ld   [wDC7F_Player_IsAttacking], A                                    ;; 02:4931 $ea $7f $dc
     ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 02:4934 $21 $be $da
     bit  7, [HL]                                       ;; 02:4937 $cb $7e
     ret  Z                                             ;; 02:4939 $c8
-    ld   HL, wDC80                                     ;; 02:493a $21 $80 $dc
+    ld   HL, wDC80_Player_UnkStates                                     ;; 02:493a $21 $80 $dc
     set  6, [HL]                                       ;; 02:493d $cb $f6
     ld   C, PLAYERACTION_FALL                                        ;; 02:493f $0e $11
     ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 02:4941 $21 $be $da
@@ -300,7 +300,7 @@ call_02_49b3_PlayerAction_Unk25:
     ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_49CE
-    ld   hl,wDC80
+    ld   hl,wDC80_Player_UnkStates
     set  6,[hl]
     xor  a
     ld   [wDC9B],a
@@ -404,18 +404,18 @@ call_02_4a6e_PlayerAction_Unk31:
     jr   z,.jr_00_4A87
     ld   a,SFX_GEX_TAIL_SPIN
     call call_00_0ff5_QueueSoundEffect
-    ld   hl,wDC80
+    ld   hl,wDC80_Player_UnkStates
     set  0,[hl]
     ld   a,$01
-    ld   [wDC7F],a
+    ld   [wDC7F_Player_IsAttacking],a
     ld   [wDC87],a
 .jr_00_4A87:
     ld   a,[wD805_Player_MovementFlags]
     and  a,$04
     ret  z
     xor  a
-    ld   [wDC7F],a
-    ld   hl,wDC80
+    ld   [wDC7F_Player_IsAttacking],a
+    ld   hl,wDC80_Player_UnkStates
     set  6,[hl]
     ld   a,PLAYERACTION_UNK25
     jp   call_02_54f9_SwitchPlayerAction
@@ -436,7 +436,7 @@ call_02_4aac_PlayerAction_Unk34:
     ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4ACC
-    ld   hl,wDC80
+    ld   hl,wDC80_Player_UnkStates
     set  6,[hl]
     xor  a
     ld   [wDC9F],a
@@ -514,7 +514,7 @@ call_02_4adb_Player_Unk34_Sub:
     jr   z,.jr_02_4B55
     ld   a,SFX_GEX_TAIL_SPIN
     call call_00_0ff5_QueueSoundEffect
-    ld   hl,wDC80
+    ld   hl,wDC80_Player_UnkStates
     set  0,[hl]
     call call_02_4e01_SetOneTimeFlag
     ld   a,$01
@@ -522,7 +522,7 @@ call_02_4adb_Player_Unk34_Sub:
     xor  a
     ld   [wDC9F],a
     ld   a,$01
-    ld   [wDC7F],a
+    ld   [wDC7F_Player_IsAttacking],a
     ret  
 .jr_02_4B55:
     ret  
@@ -568,8 +568,8 @@ call_02_4B66: ; unreferenced function?
     ld   [wDC9E],a
     xor  a
     ld   [wDC9F],a
-    ld   [wDC7F],a
-    ld   hl,wDC80
+    ld   [wDC7F_Player_IsAttacking],a
+    ld   hl,wDC80_Player_UnkStates
     set  6,[hl]
     ret  
 
@@ -587,7 +587,7 @@ call_02_4bb7_PlayerAction_Unk36:
     ld   a,$01
     ld   [wDCA5_PlayerUnk4],a
     ld   [wDCA6_PlayerUnk5],a
-    ld   hl,wDC80
+    ld   hl,wDC80_Player_UnkStates
     set  6,[hl]
 .jr_00_4BDC:
     ld   a,[wDC81_CurrentInputsAlt]
@@ -681,10 +681,10 @@ call_02_4c7a_PlayerAction_Unk39:
     ld   [wDCA4_PlayerUnk3],a
     ld   a,SFX_GEX_TAIL_SPIN
     call call_00_0ff5_QueueSoundEffect
-    ld   hl,wDC80
+    ld   hl,wDC80_Player_UnkStates
     set  0,[hl]
     ld   a,$01
-    ld   [wDC7F],a
+    ld   [wDC7F_Player_IsAttacking],a
     call call_02_4e01_SetOneTimeFlag
 .jr_00_4CA1:
     jp   call_02_4E0C_UpdateActionSequence
@@ -774,18 +774,18 @@ call_02_4d45_PlayerAction_Unk52:
     jr   z,.jr_00_4D5E
     ld   a,SFX_GEX_TAIL_SPIN
     call call_00_0ff5_QueueSoundEffect
-    ld   hl,wDC80
+    ld   hl,wDC80_Player_UnkStates
     set  0,[hl]
     ld   a,$01
-    ld   [wDC7F],a
+    ld   [wDC7F_Player_IsAttacking],a
     call call_02_4e01_SetOneTimeFlag
 .jr_00_4D5E:
     ld   a,[wD805_Player_MovementFlags]
     and  a,$04
     ret  z
     xor  a
-    ld   [wDC7F],a
-    ld   hl,wDC80
+    ld   [wDC7F_Player_IsAttacking],a
+    ld   hl,wDC80_Player_UnkStates
     set  6,[hl]
     ld   a,PLAYERACTION_UNK48
     jp   call_02_54f9_SwitchPlayerAction

@@ -1162,7 +1162,7 @@ call_02_6214_ObjectAction_Raft_ResetAndWait:
     ld   c,OBJECT_FACING_RIGHT
     call call_00_2958_Object_SetFacingDirection
     ld   bc,$0028
-    call call_00_250d_Object_UpdateYPosition
+    call call_00_250d_Object_AdjustYPosition
     ld   c,TIMER_AMOUNT_RAFT
     call call_00_290d_Object_SetMiscTimer
 .jr_00_6239:
@@ -1170,7 +1170,7 @@ call_02_6214_ObjectAction_Raft_ResetAndWait:
     and  a,$03
     ret  nz
     ld   bc,$FFFF
-    call call_00_250d_Object_UpdateYPosition
+    call call_00_250d_Object_AdjustYPosition
     call call_00_2922_Object_MiscTimerCountdown
     ld   a,$01
     jp   z,call_02_72ac_SetObjectAction
@@ -1192,7 +1192,7 @@ call_02_624e_ObjectAction_Raft_MoveRightAndCarryPlayer:
     ld   c,$01
     call call_00_28c8_Object_SetXVelocity
     ld   bc,$0001
-    call call_00_24df_Object_UpdateXPosition
+    call call_00_24df_Object_AdjustXPosition
     call call_00_26c9_Object_CarryPlayerHorizontally
     LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_XPOS
     ldi  a,[hl]
@@ -1240,7 +1240,7 @@ call_02_6293_ObjectAction_Raft_DriftDown:
     and  a,$03
     ret  nz
     ld   bc,$0001
-    call call_00_250d_Object_UpdateYPosition
+    call call_00_250d_Object_AdjustYPosition
     call call_00_2922_Object_MiscTimerCountdown
     ld   a,$00
     jp   z,call_02_72ac_SetObjectAction
@@ -1468,7 +1468,8 @@ call_02_647b_ObjectAction_Rock_Unk3:
 .data_02_6489:
     db   $02, $04, $06, $08, $0a, $0c, $0e, $10
 
-call_02_6491_ObjectAction_HardHat_Unk0:
+call_02_6491_ObjectAction_HardHat_Walk:
+; If HardHat gets close enough to the player (<48 px), it speeds up and eventually transitions to the Jump action.
     call call_00_2722_Object_IsNearPlayer
     jr   z,.jr_00_64A0
     call call_00_2a68_Object_ComputeXDistanceFromPlayer
@@ -1498,7 +1499,7 @@ call_02_6491_ObjectAction_HardHat_Unk0:
     ld   a,$01
     jp   call_02_72ac_SetObjectAction
 
-call_02_64cd_ObjectAction_HardHat_Unk1:
+call_02_64cd_ObjectAction_HardHat_Jump:
     call call_00_29f5_Object_ClearGraphicsFlag4AndCheck
     ld   c,$20
     call nz,call_00_28dc_Object_SetYVelocity
@@ -1655,7 +1656,7 @@ call_02_65d7_ObjectAction_AnimeRisingPlatform_Update:
     ret  nc
     inc  [hl]
     ld   bc,$FFFF
-    jp   call_00_250d_Object_UpdateYPosition
+    jp   call_00_250d_Object_AdjustYPosition
 .jr_00_65F8:
     ld   a,[wDC71_FrameCounter]
     and  a,$03
@@ -1664,7 +1665,7 @@ call_02_65d7_ObjectAction_AnimeRisingPlatform_Update:
     ret  z
     dec  [hl]
     ld   bc,$0001
-    jp   call_00_250d_Object_UpdateYPosition
+    jp   call_00_250d_Object_AdjustYPosition
 
 call_02_659d_ObjectAction_OnSwitch_Unk0:
     call call_00_22d4_Object_CheckTriggerFlag
@@ -1857,7 +1858,7 @@ call_02_6768_ObjectAction_Secbot_Unk1:
     jr   z,.jr_00_6776
     inc  [hl]
     ld   bc,$FFFF
-    call call_00_250d_Object_UpdateYPosition
+    call call_00_250d_Object_AdjustYPosition
 .jr_00_6776:
     call call_00_29f5_Object_ClearGraphicsFlag4AndCheck
     ld   c,TIMER_AMOUNT_0_FRAMES
@@ -1990,7 +1991,7 @@ call_02_67c2_ObjectAction_Elevator_Update:
     ld   a,[wD80E_PlayerXPosition+1]
     sbc  [hl]
     or   e
-    jp   z,call_00_250d_Object_UpdateYPosition
+    jp   z,call_00_250d_Object_AdjustYPosition
     ret  
 .data_02_686a:    
     db   $00, $a0, $01, $98, $02        ;; 02:6867 ????????
@@ -2033,11 +2034,11 @@ call_02_68b2_ObjectAction_Grenade_Unk0:
     and  a,$0F
     ld   c,a
     ld   b,$00
-    call call_00_24df_Object_UpdateXPosition
+    call call_00_24df_Object_AdjustXPosition
     call call_00_27e4_Object_ResetToInitialYPos
     call call_00_230f_Object_GetParameter
     ld   b,$FF
-    call call_00_250d_Object_UpdateYPosition
+    call call_00_250d_Object_AdjustYPosition
     ld   c,TIMER_AMOUNT_GRENADE
     call call_00_290d_Object_SetMiscTimer
     ld   c,$00
@@ -2081,7 +2082,7 @@ call_02_68ed_ObjectAction_Grenade_Unk1:
 call_02_6928_ObjectAction_Grenade_Unk2:
     call call_00_29f5_Object_ClearGraphicsFlag4AndCheck
     ld   bc,$0008
-    call nz,call_00_250d_Object_UpdateYPosition
+    call nz,call_00_250d_Object_AdjustYPosition
     ld   hl,.data_02_6937
     jp   call_00_2c20_Object_CopyPaletteToBuffer
 .data_02_6937:
@@ -2260,7 +2261,7 @@ call_02_6a91_ObjectAction_WaterTowerTank_Unk0:
     call call_00_29f5_Object_ClearGraphicsFlag4AndCheck
     jr   z,.jr_00_6AA1
     ld   bc,$FFD0
-    call call_00_250d_Object_UpdateYPosition
+    call call_00_250d_Object_AdjustYPosition
     ld   c,$28
     call call_00_294e_Object_SetHeight
 .jr_00_6AA1:
@@ -2322,7 +2323,7 @@ call_02_6b03_ObjectAction_Spider_Unk0:
     call call_00_290d_Object_SetMiscTimer
 .jr_00_6B0E:
     ld   bc,$0002
-    call call_00_250d_Object_UpdateYPosition
+    call call_00_250d_Object_AdjustYPosition
     call call_00_2917_Object_CheckIfMiscTimerIsZero
     sub  a,$02
     ld   [hl],a
@@ -2332,7 +2333,7 @@ call_02_6b03_ObjectAction_Spider_Unk0:
 
 call_02_6b20_ObjectAction_Spider_Unk1:
     ld   bc,$FFFF
-    call call_00_250d_Object_UpdateYPosition
+    call call_00_250d_Object_AdjustYPosition
     call call_00_230f_Object_GetParameter
     call call_00_2917_Object_CheckIfMiscTimerIsZero
     inc  a
@@ -2407,7 +2408,7 @@ call_02_6ba3_ObjectAction_ChomperTV_Unk0:
 .jr_00_6BB3:
     call call_00_251c_Object_HandleHorizontalBoundingBoxTurnAround
     ld   bc,$0002
-    call call_00_250d_Object_UpdateYPosition
+    call call_00_250d_Object_AdjustYPosition
     call call_00_2917_Object_CheckIfMiscTimerIsZero
     sub  a,$02
     ld   [hl],a
@@ -2440,7 +2441,7 @@ call_02_6be4_ObjectAction_ChomperTV_Unk1:
     inc  a
     ld   [hl],a
     ld   bc,$FFFF
-    jp   call_00_250d_Object_UpdateYPosition
+    jp   call_00_250d_Object_AdjustYPosition
 
 call_02_6bfb_ObjectAction_CrumblingFloor_Unk0:
     ld   a,[wDC7B_CurrentObjectAddrLoAlt]

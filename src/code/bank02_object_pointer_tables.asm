@@ -426,8 +426,8 @@ data_02_4000:
     dw   call_02_646f_ObjectAction_Rock_Unk2, data_02_79a5
     dw   call_02_647b_ObjectAction_Rock_Unk3, data_02_79ab
 .data_02_44fc:
-    dw   call_02_6491_ObjectAction_HardHat_Unk0, data_02_79b8
-    dw   call_02_64cd_ObjectAction_HardHat_Unk1, data_02_79c3
+    dw   call_02_6491_ObjectAction_HardHat_Walk, data_02_79b8
+    dw   call_02_64cd_ObjectAction_HardHat_Jump, data_02_79c3
     dw   call_02_582e_ObjectAction_None, data_02_79c9
     dw   call_02_582e_ObjectAction_None, data_02_79de
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2

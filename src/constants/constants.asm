@@ -282,7 +282,7 @@ DEF OBJECT_FIELD_WIDTH                      EQU $12 ; set to [1] into data_00_32
 DEF OBJECT_FIELD_HEIGHT                     EQU $13 ; set to [2] into data_00_3258
 DEF OBJECT_FIELD_COLLISION_TYPE             EQU $14 ; set to [3] into data_00_3258
 DEF OBJECT_FIELD_COOLDOWN_TIMER             EQU $15 ; defaults to 0, but might get set to $3c (same value as gex's cooldown timer)
-DEF OBJECT_FIELD_UNK16_COLLISION            EQU $16 ; collision related, starts as [4] into data_00_3258, minus 1
+DEF OBJECT_FIELD_DAMAGE_STATE               EQU $16 ; stores current health or other damage states
 DEF OBJECT_FIELD_SPRITE_BANK                EQU $17
 DEF OBJECT_FIELD_UNK18                      EQU $18 ; seems unused
 DEF OBJECT_FIELD_MISC_FLAGS                 EQU $19 ; only used by moving platforms, skating elf health, and sec bot?

@@ -104,7 +104,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     ld   [wDC91], A                                    ;; 00:2d69 $ea $91 $dc
     add  A, $10                                        ;; 00:2d6c $c6 $10
     ld   B, A                                          ;; 00:2d6e $47
-    ld   A, [wDC88]                                    ;; 00:2d6f $fa $88 $dc
+    ld   A, [wDC88_CurrentObject_UnkVerticalOffset]                                    ;; 00:2d6f $fa $88 $dc
     add  A, B                                          ;; 00:2d72 $80
     ld   B, A                                          ;; 00:2d73 $47
     call call_00_2f00_CallBank2_Helper_AndCheckBit8                                  ;; 00:2d74 $cd $00 $2f
@@ -158,7 +158,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     ld   [wDC91], A                                    ;; 00:2dc4 $ea $91 $dc
     add  A, $10                                        ;; 00:2dc7 $c6 $10
     ld   B, A                                          ;; 00:2dc9 $47
-    ld   A, [wDC88]                                    ;; 00:2dca $fa $88 $dc
+    ld   A, [wDC88_CurrentObject_UnkVerticalOffset]                                    ;; 00:2dca $fa $88 $dc
     add  A, B                                          ;; 00:2dcd $80
     ld   B, A                                          ;; 00:2dce $47
     call call_00_2f00_CallBank2_Helper_AndCheckBit8                                  ;; 00:2dcf $cd $00 $2f
@@ -217,7 +217,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     ld   [wDC91], A                                    ;; 00:2e28 $ea $91 $dc
     add  A, $10                                        ;; 00:2e2b $c6 $10
     ld   B, A                                          ;; 00:2e2d $47
-    ld   A, [wDC88]                                    ;; 00:2e2e $fa $88 $dc
+    ld   A, [wDC88_CurrentObject_UnkVerticalOffset]                                    ;; 00:2e2e $fa $88 $dc
     add  A, B                                          ;; 00:2e31 $80
     ld   B, A                                          ;; 00:2e32 $47
     call call_00_2f00_CallBank2_Helper_AndCheckBit8                                  ;; 00:2e33 $cd $00 $2f
@@ -274,7 +274,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     ld   [wDC91], A                                    ;; 00:2e87 $ea $91 $dc
     add  A, $10                                        ;; 00:2e8a $c6 $10
     ld   B, A                                          ;; 00:2e8c $47
-    ld   A, [wDC88]                                    ;; 00:2e8d $fa $88 $dc
+    ld   A, [wDC88_CurrentObject_UnkVerticalOffset]                                    ;; 00:2e8d $fa $88 $dc
     add  A, B                                          ;; 00:2e90 $80
     ld   B, A                                          ;; 00:2e91 $47
     call call_00_2f00_CallBank2_Helper_AndCheckBit8                                  ;; 00:2e92 $cd $00 $2f
@@ -789,18 +789,18 @@ call_00_3252_ResetObjectCounter:
 ; 1 = width
 ; 2 = height
 ; 3 = collision type
-; 4 = OBJECT_FIELD_UNK16_COLLISION
+; 4 = OBJECT_FIELD_DAMAGE_STATE (also used for health + 1)
 ; 5 = extra flags default value (always 00)
 ; 6 = always FF, appears unused?
 ; 7 = flags used for collision detection (call_00_35e8_GetObjectCollisionFlags)
-;     bit 0 = ?
-;     bit 1 = ?
-;     bit 2 = ?
-;     bit 3 = ?
-;     bit 4 = ?
-;     bit 5 = ?
-;     bit 6 = ?
-;     bit 7 = spawn particles
+;     bit 0 (01) = ?
+;     bit 1 (02) = ?
+;     bit 2 (04) = ?
+;     bit 3 (08) = ?
+;     bit 4 (10) = ?
+;     bit 5 (20) = ?
+;     bit 6 (40) = ?
+;     bit 7 (80) = spawn particles
 ;     $ff = clear object immediately without spawning collectible
 data_00_3258:                                                      ; 00:3258 ???????? ; OBJECT_GEX
     db   $00
@@ -1354,7 +1354,7 @@ call_00_37a0_SpawnObjectRelative:
     inc  E                                             ;; 00:3831 $1c ; OBJECT_FIELD_COOLDOWN_TIMER
     xor  A, A                                          ;; 00:3832 $af
     ld   [DE], A                                       ;; 00:3833 $12
-    inc  E                                             ;; 00:3834 $1c ; OBJECT_FIELD_UNK16_COLLISION
+    inc  E                                             ;; 00:3834 $1c ; OBJECT_FIELD_DAMAGE_STATE
     ld   A, [HL+]                                      ;; 00:3835 $2a
     dec  A                                             ;; 00:3836 $3d
     ld   [DE], A                                       ;; 00:3837 $12

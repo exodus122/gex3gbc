@@ -21,10 +21,10 @@ call_02_4db1_Player_CheckXDistanceFromObject:
     jp   call_02_518a_ApplyLeftwardCollisionAdjustment                                  ;; 02:4dcb $c3 $8a $51
 
 call_02_4dce_SetTriggerByLevel:
-; Sets flag wDC80 bit 6, then selects a trigger value based on the current level (wDB6C_CurrentMapId). 
+; Sets flag wDC80_Player_UnkStates bit 6, then selects a trigger value based on the current level (wDB6C_CurrentMapId). 
 ; Uses inputs (wDC81_CurrentInputsAlt) to decide between trigger IDs, then jumps to call_02_54f9_SwitchPlayerAction.
 ; Purpose: Level-specific event/door trigger.
-    ld   HL, wDC80                                     ;; 02:4dce $21 $80 $dc
+    ld   HL, wDC80_Player_UnkStates                                     ;; 02:4dce $21 $80 $dc
     set  6, [HL]                                       ;; 02:4dd1 $cb $f6
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:4dd3 $fa $6c $db
     cp   A, $07                                        ;; 02:4dd6 $fe $07
@@ -44,12 +44,12 @@ call_02_4dce_SetTriggerByLevel:
     jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:4df3 $c3 $f9 $54
 
 call_02_4df6_FlagCollisionActive:
-; Masks the lower nibble of wDC80, forces the high bit, and stores it back.
+; Masks the lower nibble of wDC80_Player_UnkStates, forces the high bit, and stores it back.
 ; Purpose: Marks that a collision/event state is active.
-    ld   A, [wDC80]                                    ;; 02:4df6 $fa $80 $dc
+    ld   A, [wDC80_Player_UnkStates]                                    ;; 02:4df6 $fa $80 $dc
     and  A, $0f                                        ;; 02:4df9 $e6 $0f
     or   A, $80                                        ;; 02:4dfb $f6 $80
-    ld   [wDC80], A                                    ;; 02:4dfd $ea $80 $dc
+    ld   [wDC80_Player_UnkStates], A                                    ;; 02:4dfd $ea $80 $dc
     ret                                                ;; 02:4e00 $c9
 
 call_02_4e01_SetOneTimeFlag:
@@ -65,7 +65,7 @@ call_02_4e01_SetOneTimeFlag:
 call_02_4E0C_UpdateActionSequence:
 ; Updates counters (wDCA2_PlayerUnk1–wDCA6_PlayerUnk5) for a repeating animation or scripted sequence. 
 ; Uses call_02_4E7A_LookupFrameData to fetch frame data from tables at $4EA1/$4EC3. Handles two cases: 
-; when the player’s action ID is $27 (special move) or any other action. Sets flags (wDC7F, wDC80), 
+; when the player’s action ID is $27 (special move) or any other action. Sets flags (wDC7F_Player_IsAttacking, wDC80_Player_UnkStates), 
 ; triggers sound/action (call_02_54f9_SwitchPlayerAction) when counters overflow, and sets wDB66_HDMATransferFlags to signal a redraw.
 ; Purpose: Manage complex animation or event sequences based on timers and player state.
     ld   a,[wDCA5_PlayerUnk4]
@@ -96,8 +96,8 @@ call_02_4E0C_UpdateActionSequence:
     cp   a,$08
     jr   c,.jr_00_4E50
     xor  a
-    ld   [wDC7F],a
-    ld   hl,wDC80
+    ld   [wDC7F_Player_IsAttacking],a
+    ld   hl,wDC80_Player_UnkStates
     set  6,[hl]
     ld   a,PLAYERACTION_UNK36
     jp   call_02_54f9_SwitchPlayerAction
@@ -225,7 +225,7 @@ call_02_4f11_ChooseNextActionBasedOnLevel:
 call_02_4f32_PlayerUpdateMain:
 ; The main per-frame player update.
 ; Actions:
-; - Processes inputs, clearing or setting bits in wDC80/wDC81_CurrentInputsAlt.
+; - Processes inputs, clearing or setting bits in wDC80_Player_UnkStates/wDC81_CurrentInputsAlt.
 ; - Manages timers (wDC7E_PlayerDamageCooldownTimer, wDCA9_FlyTimerOrFlags4–wDCAB_FlyTimerOrFlags2) using call_02_4ffb_DecTimerEveryCycle.
 ; - Calls palette setup (call_03_6567_SetupObjectPalettes), BG collision update, object caching, and object loading.
 ; - Jumps to the player action function (wD802_Player_ActionFunc).
@@ -234,7 +234,7 @@ call_02_4f32_PlayerUpdateMain:
     ld   A, [wDAD7_CurrentInputs]                                    ;; 02:4f32 $fa $d7 $da
     ld   C, A                                          ;; 02:4f35 $4f
     ld   E, A                                          ;; 02:4f36 $5f
-    ld   HL, wDC80                                     ;; 02:4f37 $21 $80 $dc
+    ld   HL, wDC80_Player_UnkStates                                     ;; 02:4f37 $21 $80 $dc
     bit  0, [HL]                                       ;; 02:4f3a $cb $46
     jr   Z, .jr_02_4f46                                ;; 02:4f3c $28 $08
     bit  0, E                                          ;; 02:4f3e $cb $43
@@ -908,7 +908,7 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     jr   Z, .jr_02_5366                                ;; 02:5362 $28 $02
     or   A, $f0                                        ;; 02:5364 $f6 $f0
 .jr_02_5366:
-    ld   HL, wDC88                                     ;; 02:5366 $21 $88 $dc
+    ld   HL, wDC88_CurrentObject_UnkVerticalOffset                                     ;; 02:5366 $21 $88 $dc
     add  A, [HL]                                       ;; 02:5369 $86
     bit  7, A                                          ;; 02:536a $cb $7f
     jr   NZ, .jr_02_5372                               ;; 02:536c $20 $04
@@ -1145,7 +1145,7 @@ call_02_54f9_SwitchPlayerAction:
 ; Adjusts action index if in special level/bank.
 ; Avoids redundant switches if already in that action.
 ; Validates against flags in data_02_554d.
-; Writes new action ID to wDC79 and resets auxiliary timers (wDC7F, wDC7A).
+; Writes new action ID to wDC79 and resets auxiliary timers (wDC7F_Player_IsAttacking, wDC7A).
     ld   L, A                                          ;; 02:54f9 $6f
     cp   A, $3c                                        ;; 02:54fa $fe $3c
     jr   NC, .jr_02_5509                               ;; 02:54fc $30 $0b
@@ -1180,7 +1180,7 @@ call_02_54f9_SwitchPlayerAction:
 .jr_02_552e:
     ld   [wDC79], A                                    ;; 02:552e $ea $79 $dc
     xor  A, A                                          ;; 02:5531 $af
-    ld   [wDC7F], A                                    ;; 02:5532 $ea $7f $dc
+    ld   [wDC7F_Player_IsAttacking], A                                    ;; 02:5532 $ea $7f $dc
     ld   A, $00                                        ;; 02:5535 $3e $00
     ld   [wDC7A], A                                    ;; 02:5537 $ea $7a $dc
     ret                                                ;; 02:553a $c9
