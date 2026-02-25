@@ -166,7 +166,7 @@ data_02_4000:
 
     ; Kangaroo actions
     dw   call_02_47b4_PlayerAction_Spawn, data_02_7559
-    dw   call_02_4ce3_PlayerAction_Kangaroo_LandFromHop, data_02_758e
+    dw   call_02_4ce3_PlayerAction_Kangaroo_Idle, data_02_758e
     dw   call_02_4d02_PlayerAction_Kangaroo_Hopping, data_02_7594
     dw   call_02_4d14_PlayerAction_Kangaroo_StartJump, data_02_759f
     dw   call_02_4d33_PlayerAction_Kangaroo_Jump, data_02_75a5
@@ -235,7 +235,7 @@ data_02_4000:
 
     ; Kangaroo actions
     dw   call_02_47b4_PlayerAction_Spawn, data_02_7559
-    dw   call_02_4ce3_PlayerAction_Kangaroo_LandFromHop, data_02_758e
+    dw   call_02_4ce3_PlayerAction_Kangaroo_Idle, data_02_758e
     dw   call_02_4d02_PlayerAction_Kangaroo_Hopping, data_02_7594
     dw   call_02_4d14_PlayerAction_Kangaroo_StartJump, data_02_759f
     dw   call_02_4d33_PlayerAction_Kangaroo_Jump, data_02_75a5

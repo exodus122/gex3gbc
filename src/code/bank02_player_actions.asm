@@ -722,7 +722,7 @@ call_02_4cbd_PlayerAction_Snowboarding_TakeDamage:
     jp   z,call_02_54f9_SwitchPlayerAction
     ret  
 
-call_02_4ce3_PlayerAction_Kangaroo_LandFromHop:
+call_02_4ce3_PlayerAction_Kangaroo_Idle:
     ld   a,SFX_GEX_JUMP
     call call_00_0ff5_QueueSoundEffect
     call call_02_4e01_SetOneTimeFlag
@@ -787,7 +787,7 @@ call_02_4d45_PlayerAction_Kangaroo_TailSpin:
     ld   [wDC7F_Player_IsAttacking],a
     ld   hl,wDC80_Player_UnkStates
     set  6,[hl]
-    ld   a,PLAYERACTION_KANGAROO_LAND_FROM_HOP
+    ld   a,PLAYERACTION_KANGAROO_IDLE
     jp   call_02_54f9_SwitchPlayerAction
 
 call_02_4d72_PlayerAction_Kangaroo_Fall:
@@ -800,7 +800,7 @@ call_02_4d72_PlayerAction_Kangaroo_Fall:
 .jr_00_4D81:
     ld   a,[wDC8E_InitialYVelocity]
     and  a
-    ld   a,PLAYERACTION_KANGAROO_LAND_FROM_HOP
+    ld   a,PLAYERACTION_KANGAROO_IDLE
     jp   z,call_02_54f9_SwitchPlayerAction
     ret  
 
@@ -819,6 +819,6 @@ call_02_4d8b_PlayerAction_Kangaroo_TakeDamage:
     ld   [wDC7E_PlayerDamageCooldownTimer],a
     ld   a,[wDC8E_InitialYVelocity]
     and  a
-    ld   a,PLAYERACTION_KANGAROO_LAND_FROM_HOP
+    ld   a,PLAYERACTION_KANGAROO_IDLE
     jp   z,call_02_54f9_SwitchPlayerAction
     ret  

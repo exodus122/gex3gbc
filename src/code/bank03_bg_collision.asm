@@ -195,7 +195,7 @@ call_03_4708_BgCollisionHandler_Sidescroller:
     jr   Z, .jr_03_4876                                ;; 03:4808 $28 $6c
 .jr_03_480a:
     ld   A, [wD801_Player_ActionId]                                    ;; 03:480a $fa $01 $d8
-    cp   A, $1b                                        ;; 03:480d $fe $1b
+    cp   A, PLAYERACTION_DEATH_IN_PIT                                        ;; 03:480d $fe $1b
     ld   A, $04                                        ;; 03:480f $3e $04
     jr   Z, .jr_03_486e                                ;; 03:4811 $28 $5b
     ld   B, $00                                        ;; 03:4813 $06 $00
@@ -560,13 +560,13 @@ call_03_4a3f_BgCollisionHandler_ByAction:
     set  7, [HL]                                       ;; 03:4a48 $cb $fe
     ld   A, [wD801_Player_ActionId]                                    ;; 03:4a4a $fa $01 $d8
     ld   L, $03                                        ;; 03:4a4d $2e $03
-    cp   A, $1f                                        ;; 03:4a4f $fe $1f
+    cp   A, PLAYERACTION_WATER_TAIL_SPIN                                        ;; 03:4a4f $fe $1f
     jr   Z, .jr_03_4a61                                ;; 03:4a51 $28 $0e
     ld   L, $02                                        ;; 03:4a53 $2e $02
-    cp   A, $21                                        ;; 03:4a55 $fe $21
+    cp   A, PLAYERACTION_WATER_DIVING                                        ;; 03:4a55 $fe $21
     jr   Z, .jr_03_4a61                                ;; 03:4a57 $28 $08
     ld   L, $01                                        ;; 03:4a59 $2e $01
-    cp   A, $20                                        ;; 03:4a5b $fe $20
+    cp   A, PLAYERACTION_WATER_TREADING                                        ;; 03:4a5b $fe $20
     jr   Z, .jr_03_4a61                                ;; 03:4a5d $28 $02
     ld   L, $00                                        ;; 03:4a5f $2e $00
 .jr_03_4a61:

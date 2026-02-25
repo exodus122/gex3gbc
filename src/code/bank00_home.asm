@@ -524,9 +524,9 @@ call_00_05fd_CheckForEatFly:
     and  A, A                                          ;; 00:0604 $a7
     ret  Z                                             ;; 00:0605 $c8
     ld   A, [wD801_Player_ActionId]                                    ;; 00:0606 $fa $01 $d8
-    cp   A, $01                                        ;; 00:0609 $fe $01
+    cp   A, PLAYERACTION_IDLE                                        ;; 00:0609 $fe $01
     ret  C                                             ;; 00:060b $d8
-    cp   A, $03                                        ;; 00:060c $fe $03
+    cp   A, PLAYERACTION_WALK                                        ;; 00:060c $fe $03
     jr   C, .jr_00_0616                                ;; 00:060e $38 $06
     cp   A, $3d                                        ;; 00:0610 $fe $3d
     ret  C                                             ;; 00:0612 $d8

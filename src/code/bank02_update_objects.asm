@@ -148,11 +148,11 @@ call_02_7152_UpdateObjects:
     ld   HL, wDC98                                     ;; 02:717f $21 $98 $dc
     ld   C, [HL]                                       ;; 02:7182 $4e
     ld   A, [wD801_Player_ActionId]                                    ;; 02:7183 $fa $01 $d8
-    cp   A, $09                                        ;; 02:7186 $fe $09
+    cp   A, PLAYERACTION_TAKE_DAMAGE                                        ;; 02:7186 $fe $09
     jr   Z, .jr_02_71a5                                ;; 02:7188 $28 $1b
-    cp   A, $29                                        ;; 02:718a $fe $29
+    cp   A, PLAYERACTION_SNOWBOARDING_TAKE_DAMAGE                                        ;; 02:718a $fe $29
     jr   Z, .jr_02_71a5                                ;; 02:718c $28 $17
-    cp   A, $36                                        ;; 02:718e $fe $36
+    cp   A, PLAYERACTION_KANGAROO_TAKE_DAMAGE                                        ;; 02:718e $fe $36
     jr   Z, .jr_02_71a5                                ;; 02:7190 $28 $13
     ld   C, $00                                        ;; 02:7192 $0e $00
     jr   .jr_02_71a5                                   ;; 02:7194 $18 $0f
