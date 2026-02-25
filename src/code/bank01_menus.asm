@@ -238,7 +238,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
 .jp_01_415b:
     call call_01_505a_ValidatePassword                                  ;; 01:415b $cd $5a $50
     push AF                                            ;; 01:415e $f5
-    cp   A, $20                                        ;; 01:415f $fe $20
+    cp   A, PASSWORD_VALID                                        ;; 01:415f $fe $20
     ld   A, SFX_NONE                                        ;; 01:4161 $3e $ff
     jr   Z, .jr_01_4167                                ;; 01:4163 $28 $02
     ld   A, SFX_NONE                                        ;; 01:4165 $3e $ff
@@ -252,7 +252,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     dec  B                                             ;; 01:4171 $05
     jr   NZ, .jr_01_416c                               ;; 01:4172 $20 $f8
     pop  AF                                            ;; 01:4174 $f1
-    cp   A, $20                                        ;; 01:4175 $fe $20
+    cp   A, PASSWORD_VALID                                        ;; 01:4175 $fe $20
     ret  Z                                             ;; 01:4177 $c8
     ld   A, MENU_BAD_PASSWORD                                        ;; 01:4178 $3e $04
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:417a $cd $00 $40
@@ -452,7 +452,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   A, SFX_MENU_SCROLL                                        ;; 01:42f8 $3e $01
     jp   call_00_0fd7_TriggerSoundEffect                                  ;; 01:42fa $c3 $d7 $0f
 
-call_01_42fd_LoadMenu03_InitSong15:
+call_01_42fd_LoadMenu_GameOver:
 ; Behavior:
 ; Requests song bank 15 and starts playback, then immediately jumps to LoadMenu with ID $03.
 ; Likely Purpose: Entry point to show a specific menu screen (e.g., pause/options).
@@ -515,12 +515,12 @@ call_01_432b_SetLevelMenuAndPalette:
 
 call_01_435e_HandleLevelTransitionMenu:
 ; Behavior:
-; Clears a flag bit in wDB6A.
+; Clears a flag bit in wDB6A_WarpFlags.
 ; Copies CurrentLevelNumber to CurrentLevelId.
 ; If that ID is 0, restores it from wDC5B_TVButtonLevelMissionRelated and returns.
 ; Otherwise, branching logic:
 ;  - If [wDB6D] != 0:
-;    - If bit 5 of wDB6A is set: clear it, request song 15, load menu 0A.
+;    - If bit 5 of wDB6A_WarpFlags is set: clear it, request song 15, load menu 0A.
 ;  - Else: request song 13, load menu 1B.
 ;  - If [wDB6D] == 0:
 ;    - If LevelId ≥ 07 but not 09 or 0A → preload menus 15–1A.
@@ -528,7 +528,7 @@ call_01_435e_HandleLevelTransitionMenu:
 ;    - Else (exact 09 or 0A) → same as above “song 13/menu 1B”.
 ; At the end, clears wDB6C_CurrentMapId (so the menu system takes over).
 ; Likely Purpose: Manages menu/graphics updates when transitioning between levels.
-    ld   HL, wDB6A                                     ;; 01:435e $21 $6a $db
+    ld   HL, wDB6A_WarpFlags                                     ;; 01:435e $21 $6a $db
     res  4, [HL]                                       ;; 01:4361 $cb $a6
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 01:4363 $fa $1e $dc
     ld   [wDB6C_CurrentMapId], A                                    ;; 01:4366 $ea $6c $db
@@ -1077,7 +1077,7 @@ call_01_4722_MenuStateHandlerTable:
     ld   A, $01                                        ;; 01:4759 $3e $01
     ret                                                ;; 01:475b $c9
 .jp_01_475c:
-    ld   A, [wDC4E_PlayerLivesRemaining]                                    ;; 01:475c $fa $4e $dc
+    ld   A, [wDC4E_LivesRemaining]                                    ;; 01:475c $fa $4e $dc
     ret                                                ;; 01:475f $c9
 
 call_01_4760_MenuState_SubmenuHandler:

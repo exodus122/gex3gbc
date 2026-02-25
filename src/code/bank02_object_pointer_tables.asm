@@ -122,10 +122,10 @@ data_02_4000:
     dw   call_02_481f_PlayerAction_CrouchLookDown, data_02_73e6
     dw   call_02_582e_ObjectAction_None, data_02_73ef
     dw   call_02_482e_PlayerAction_Unk7, data_02_73da
-    dw   call_02_483e_PlayerAction_Unk8, data_02_73fb
+    dw   call_02_483e_PlayerAction_EatFly, data_02_73fb
     dw   call_02_484d_PlayerAction_TakeDamage, data_02_7401
-    dw   call_02_4873_PlayerAction_Die, data_02_7408
-    dw   call_02_4889_PlayerAction_DieWarp, data_02_7411
+    dw   call_02_4873_PlayerAction_Death, data_02_7408
+    dw   call_02_4889_PlayerAction_DeathSetUpWarp, data_02_7411
     dw   call_02_48a1_PlayerAction_StandOnTVButton, data_02_7422
     dw   call_02_48b0_PlayerAction_EnterTV, data_02_7428
     dw   call_02_48bc_PlayerAction_Jump, data_02_7435
@@ -134,46 +134,55 @@ data_02_4000:
     dw   call_02_4957_PlayerAction_Fall, data_02_745b
     dw   call_02_497a_PlayerAction_FallingLand, data_02_746d
     dw   call_02_4989_PlayerAction_Unk19, data_02_7473
-    dw   call_02_49a8_PlayerAction_Unk20, data_02_7473
-    dw   call_02_49b2_PlayerAction_Unk21To24, data_02_7479
-    dw   call_02_49b2_PlayerAction_Unk21To24, data_02_747f
-    dw   call_02_49b2_PlayerAction_Unk21To24, data_02_748f
-    dw   call_02_49b2_PlayerAction_Unk21To24, data_02_749f
-    dw   call_02_49b3_PlayerAction_Unk25, data_02_74a5
-    dw   call_02_4a25_PlayerAction_Unk26, data_02_745b
-    dw   call_02_4a37_PlayerAction_DieInPit, data_02_74ab
-    dw   call_02_4a51_PlayerAction_Unk28, data_02_74bd
-    dw   call_02_4a52_PlayerAction_Unk29, data_02_74c8
-    dw   call_02_4a69_PlayerAction_Unk30, data_02_74ce
-    dw   call_02_4a6e_PlayerAction_Unk31, data_02_74d4
-    dw   call_02_4a9b_PlayerAction_Unk32, data_02_74e1
-    dw   call_02_4aa1_PlayerAction_Unk33, data_02_74ed
-    dw   call_02_4aac_PlayerAction_Unk34, data_02_74f7
+    dw   call_02_49a8_PlayerAction_EnterIdle, data_02_7473
+    dw   call_02_49b2_PlayerAction_None, data_02_7479
+    dw   call_02_49b2_PlayerAction_None, data_02_747f
+    dw   call_02_49b2_PlayerAction_None, data_02_748f
+    dw   call_02_49b2_PlayerAction_None, data_02_749f
+    dw   call_02_49b3_PlayerAction_Water_Swimming, data_02_74a5
+    dw   call_02_4a25_PlayerAction_DeathInPitAlt, data_02_745b
+    dw   call_02_4a37_PlayerAction_DeathInPit, data_02_74ab
+    dw   call_02_4a51_PlayerAction_None2, data_02_74bd
+    dw   call_02_4a52_PlayerAction_BlownUpwards, data_02_74c8
+    dw   call_02_4a69_PlayerAction_RidingElevator, data_02_74ce
+    dw   call_02_4a6e_PlayerAction_Water_TailSpin, data_02_74d4
+    dw   call_02_4a9b_PlayerAction_Water_Treading, data_02_74e1
+    dw   call_02_4aa1_PlayerAction_Water_Diving, data_02_74ed
+    dw   call_02_4aac_PlayerAction_Climbing, data_02_74f7
+
+    ; Snowboarding actions
     dw   call_02_47b4_PlayerAction_Spawn, data_02_74fd
-    dw   call_02_4bb7_PlayerAction_Unk36, data_02_750d
-    dw   call_02_4c2c_PlayerAction_Unk37, data_02_753b
-    dw   call_02_4c58_PlayerAction_Unk38, data_02_7543
-    dw   call_02_4c7a_PlayerAction_Unk39, data_02_754b
-    dw   call_02_4ca4_PlayerAction_Unk40, data_02_7551
-    dw   call_02_4cbd_PlayerAction_Unk41, data_02_7513
-    dw   call_02_4873_PlayerAction_Die, data_02_7519
-    dw   call_02_4889_PlayerAction_DieWarp, data_02_7522
+    dw   call_02_4bb7_PlayerAction_Snowboarding_StandOrWalk, data_02_750d
+    dw   call_02_4c2c_PlayerAction_Snowboarding_Jump, data_02_753b
+    dw   call_02_4c58_PlayerAction_Snowboarding_DoubleJump, data_02_7543
+    dw   call_02_4c7a_PlayerAction_Snowboarding_TailSpin, data_02_754b
+    dw   call_02_4ca4_PlayerAction_Snowboarding_Fall, data_02_7551
+    dw   call_02_4cbd_PlayerAction_Snowboarding_TakeDamage, data_02_7513
+    dw   call_02_4873_PlayerAction_Death, data_02_7519
+    dw   call_02_4889_PlayerAction_DeathSetUpWarp, data_02_7522
     dw   call_02_48a1_PlayerAction_StandOnTVButton, data_02_7528
     dw   call_02_48b0_PlayerAction_EnterTV, data_02_752e
-    dw   call_02_4a25_PlayerAction_Unk26, data_02_7551
+    dw   call_02_4a25_PlayerAction_DeathInPitAlt, data_02_7551
+
+    ; Kangaroo actions
     dw   call_02_47b4_PlayerAction_Spawn, data_02_7559
-    dw   call_02_4ce3_PlayerAction_Unk48, data_02_758e
-    dw   call_02_4d02_PlayerAction_Unk49, data_02_7594
-    dw   call_02_4d14_PlayerAction_Unk50, data_02_759f
-    dw   call_02_4d33_PlayerAction_Unk51, data_02_75a5
-    dw   call_02_4d45_PlayerAction_Unk52, data_02_75ae
-    dw   call_02_4d72_PlayerAction_Unk53, data_02_75bb
-    dw   call_02_4d8b_PlayerAction_Unk54, data_02_7569
-    dw   call_02_4873_PlayerAction_Die, data_02_756f
-    dw   call_02_4889_PlayerAction_DieWarp, data_02_7576
+    dw   call_02_4ce3_PlayerAction_Kangaroo_LandFromHop, data_02_758e
+    dw   call_02_4d02_PlayerAction_Kangaroo_Hopping, data_02_7594
+    dw   call_02_4d14_PlayerAction_Kangaroo_StartJump, data_02_759f
+    dw   call_02_4d33_PlayerAction_Kangaroo_Jump, data_02_75a5
+    dw   call_02_4d45_PlayerAction_Kangaroo_TailSpin, data_02_75ae
+    dw   call_02_4d72_PlayerAction_Kangaroo_Fall, data_02_75bb
+    dw   call_02_4d8b_PlayerAction_Kangaroo_TakeDamage, data_02_7569
+    dw   call_02_4873_PlayerAction_Death, data_02_756f
+    dw   call_02_4889_PlayerAction_DeathSetUpWarp, data_02_7576
     dw   call_02_48a1_PlayerAction_StandOnTVButton, data_02_757c
     dw   call_02_48b0_PlayerAction_EnterTV, data_02_7582
-    dw   call_02_4a25_PlayerAction_Unk26, data_02_75bb
+    dw   call_02_4a25_PlayerAction_DeathInPitAlt, data_02_75bb
+
+    ; Below is a second set of player actions, which is used for Top-Down sections of the game,
+    ; rather than sidescroller sections.
+    ; The only difference from the above set is that call_02_481f_PlayerAction_CrouchLookDown
+    ; is replaced by call_02_582e_ObjectAction_None
     dw   call_02_47b4_PlayerAction_Spawn, data_02_739b
     dw   call_02_47ce_PlayerAction_Idle, data_02_73ab
     dw   call_02_47fe_PlayerAction_IdleAnimation, data_02_73b1
@@ -182,10 +191,10 @@ data_02_4000:
     dw   call_02_582e_ObjectAction_None, data_02_73e6
     dw   call_02_582e_ObjectAction_None, data_02_73ef
     dw   call_02_482e_PlayerAction_Unk7, data_02_73da
-    dw   call_02_483e_PlayerAction_Unk8, data_02_73fb
+    dw   call_02_483e_PlayerAction_EatFly, data_02_73fb
     dw   call_02_484d_PlayerAction_TakeDamage, data_02_7401
-    dw   call_02_4873_PlayerAction_Die, data_02_7408
-    dw   call_02_4889_PlayerAction_DieWarp, data_02_7411
+    dw   call_02_4873_PlayerAction_Death, data_02_7408
+    dw   call_02_4889_PlayerAction_DeathSetUpWarp, data_02_7411
     dw   call_02_48a1_PlayerAction_StandOnTVButton, data_02_7422
     dw   call_02_48b0_PlayerAction_EnterTV, data_02_7428
     dw   call_02_48bc_PlayerAction_Jump, data_02_7435
@@ -194,46 +203,50 @@ data_02_4000:
     dw   call_02_4957_PlayerAction_Fall, data_02_745b
     dw   call_02_497a_PlayerAction_FallingLand, data_02_746d
     dw   call_02_4989_PlayerAction_Unk19, data_02_7473
-    dw   call_02_49a8_PlayerAction_Unk20, data_02_7473
-    dw   call_02_49b2_PlayerAction_Unk21To24, data_02_7479
-    dw   call_02_49b2_PlayerAction_Unk21To24, data_02_747f
-    dw   call_02_49b2_PlayerAction_Unk21To24, data_02_748f
-    dw   call_02_49b2_PlayerAction_Unk21To24, data_02_749f
-    dw   call_02_49b3_PlayerAction_Unk25, data_02_74a5
-    dw   call_02_4a25_PlayerAction_Unk26, data_02_745b
-    dw   call_02_4a37_PlayerAction_DieInPit, data_02_74ab
-    dw   call_02_4a51_PlayerAction_Unk28, data_02_74bd
-    dw   call_02_4a52_PlayerAction_Unk29, data_02_74c8
-    dw   call_02_4a69_PlayerAction_Unk30, data_02_74ce
-    dw   call_02_4a6e_PlayerAction_Unk31, data_02_74d4
-    dw   call_02_4a9b_PlayerAction_Unk32, data_02_74e1
-    dw   call_02_4aa1_PlayerAction_Unk33, data_02_74ed
-    dw   call_02_4aac_PlayerAction_Unk34, data_02_74f7
+    dw   call_02_49a8_PlayerAction_EnterIdle, data_02_7473
+    dw   call_02_49b2_PlayerAction_None, data_02_7479
+    dw   call_02_49b2_PlayerAction_None, data_02_747f
+    dw   call_02_49b2_PlayerAction_None, data_02_748f
+    dw   call_02_49b2_PlayerAction_None, data_02_749f
+    dw   call_02_49b3_PlayerAction_Water_Swimming, data_02_74a5
+    dw   call_02_4a25_PlayerAction_DeathInPitAlt, data_02_745b
+    dw   call_02_4a37_PlayerAction_DeathInPit, data_02_74ab
+    dw   call_02_4a51_PlayerAction_None2, data_02_74bd
+    dw   call_02_4a52_PlayerAction_BlownUpwards, data_02_74c8
+    dw   call_02_4a69_PlayerAction_RidingElevator, data_02_74ce
+    dw   call_02_4a6e_PlayerAction_Water_TailSpin, data_02_74d4
+    dw   call_02_4a9b_PlayerAction_Water_Treading, data_02_74e1
+    dw   call_02_4aa1_PlayerAction_Water_Diving, data_02_74ed
+    dw   call_02_4aac_PlayerAction_Climbing, data_02_74f7
+
+    ; Snowboarding actions
     dw   call_02_47b4_PlayerAction_Spawn, data_02_74fd
-    dw   call_02_4bb7_PlayerAction_Unk36, data_02_750d
-    dw   call_02_4c2c_PlayerAction_Unk37, data_02_753b
-    dw   call_02_4c58_PlayerAction_Unk38, data_02_7543
-    dw   call_02_4c7a_PlayerAction_Unk39, data_02_754b
-    dw   call_02_4ca4_PlayerAction_Unk40, data_02_7551
-    dw   call_02_4cbd_PlayerAction_Unk41, data_02_7513
-    dw   call_02_4873_PlayerAction_Die, data_02_7519
-    dw   call_02_4889_PlayerAction_DieWarp, data_02_7522
+    dw   call_02_4bb7_PlayerAction_Snowboarding_StandOrWalk, data_02_750d
+    dw   call_02_4c2c_PlayerAction_Snowboarding_Jump, data_02_753b
+    dw   call_02_4c58_PlayerAction_Snowboarding_DoubleJump, data_02_7543
+    dw   call_02_4c7a_PlayerAction_Snowboarding_TailSpin, data_02_754b
+    dw   call_02_4ca4_PlayerAction_Snowboarding_Fall, data_02_7551
+    dw   call_02_4cbd_PlayerAction_Snowboarding_TakeDamage, data_02_7513
+    dw   call_02_4873_PlayerAction_Death, data_02_7519
+    dw   call_02_4889_PlayerAction_DeathSetUpWarp, data_02_7522
     dw   call_02_48a1_PlayerAction_StandOnTVButton, data_02_7528
     dw   call_02_48b0_PlayerAction_EnterTV, data_02_752e
-    dw   call_02_4a25_PlayerAction_Unk26, data_02_7551
+    dw   call_02_4a25_PlayerAction_DeathInPitAlt, data_02_7551
+
+    ; Kangaroo actions
     dw   call_02_47b4_PlayerAction_Spawn, data_02_7559
-    dw   call_02_4ce3_PlayerAction_Unk48, data_02_758e
-    dw   call_02_4d02_PlayerAction_Unk49, data_02_7594
-    dw   call_02_4d14_PlayerAction_Unk50, data_02_759f
-    dw   call_02_4d33_PlayerAction_Unk51, data_02_75a5
-    dw   call_02_4d45_PlayerAction_Unk52, data_02_75ae
-    dw   call_02_4d72_PlayerAction_Unk53, data_02_75bb
-    dw   call_02_4d8b_PlayerAction_Unk54, data_02_7569
-    dw   call_02_4873_PlayerAction_Die, data_02_756f
-    dw   call_02_4889_PlayerAction_DieWarp, data_02_7576
+    dw   call_02_4ce3_PlayerAction_Kangaroo_LandFromHop, data_02_758e
+    dw   call_02_4d02_PlayerAction_Kangaroo_Hopping, data_02_7594
+    dw   call_02_4d14_PlayerAction_Kangaroo_StartJump, data_02_759f
+    dw   call_02_4d33_PlayerAction_Kangaroo_Jump, data_02_75a5
+    dw   call_02_4d45_PlayerAction_Kangaroo_TailSpin, data_02_75ae
+    dw   call_02_4d72_PlayerAction_Kangaroo_Fall, data_02_75bb
+    dw   call_02_4d8b_PlayerAction_Kangaroo_TakeDamage, data_02_7569
+    dw   call_02_4873_PlayerAction_Death, data_02_756f
+    dw   call_02_4889_PlayerAction_DeathSetUpWarp, data_02_7576
     dw   call_02_48a1_PlayerAction_StandOnTVButton, data_02_757c
     dw   call_02_48b0_PlayerAction_EnterTV, data_02_7582
-    dw   call_02_4a25_PlayerAction_Unk26, data_02_75bb
+    dw   call_02_4a25_PlayerAction_DeathInPitAlt, data_02_75bb
 .data_02_42c4:
     dw   call_02_582e_ObjectAction_None, data_02_75c8
     dw   call_02_583c_ObjectAction_Destroy, data_02_75c2

@@ -126,11 +126,11 @@ call_03_4cea_CollisionHandler_DamagePlayer:
     ld   A, [wD801_Player_ActionId]                                    ;; 03:4cea $fa $01 $d8
     cp   A, PLAYERACTION_TAKE_DAMAGE                                        ;; 03:4ced $fe $09
     jr   Z, .jr_03_4cfe                                ;; 03:4cef $28 $0d
-    cp   A, PLAYERACTION_UNK41                                        ;; 03:4cf1 $fe $29
+    cp   A, PLAYERACTION_SNOWBOARDING_TAKE_DAMAGE                                        ;; 03:4cf1 $fe $29
     jr   Z, .jr_03_4cfe                                ;; 03:4cf3 $28 $09
-    cp   A, PLAYERACTION_UNK54                                        ;; 03:4cf5 $fe $36
+    cp   A, PLAYERACTION_KANGAROO_TAKE_DAMAGE                                        ;; 03:4cf5 $fe $36
     jr   Z, .jr_03_4cfe                                ;; 03:4cf7 $28 $05
-    cp   A, PLAYERACTION_TAKE_DAMAGE_2                                        ;; 03:4cf9 $fe $45
+    cp   A, PLAYERACTION_TAKE_DAMAGE+$3C                                        ;; 03:4cf9 $fe $45
     call NZ, call_00_06f6_DealDamageToPlayer                              ;; 03:4cfb $c4 $f6 $06
 .jr_03_4cfe:
     LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_XPOS
@@ -146,11 +146,11 @@ call_03_4cea_CollisionHandler_DamagePlayer:
     ld   [wDC98], A                                    ;; 03:4d15 $ea $98 $dc
     ld   A, [wDB6C_CurrentMapId]                                    ;; 03:4d18 $fa $6c $db
     cp   A, $07                                        ;; 03:4d1b $fe $07
-    ld   A, PLAYERACTION_UNK41                                        ;; 03:4d1d $3e $29
+    ld   A, PLAYERACTION_SNOWBOARDING_TAKE_DAMAGE                                        ;; 03:4d1d $3e $29
     jr   Z, .jr_03_4d2c                                ;; 03:4d1f $28 $0b
     ld   A, [wDB6C_CurrentMapId]                                    ;; 03:4d21 $fa $6c $db
     cp   A, $08                                        ;; 03:4d24 $fe $08
-    ld   A, PLAYERACTION_UNK54                                        ;; 03:4d26 $3e $36
+    ld   A, PLAYERACTION_KANGAROO_TAKE_DAMAGE                                        ;; 03:4d26 $3e $36
     jr   Z, .jr_03_4d2c                                ;; 03:4d28 $28 $02
     ld   A, PLAYERACTION_TAKE_DAMAGE                                        ;; 03:4d2a $3e $09
 .jr_03_4d2c:
@@ -172,11 +172,11 @@ call_03_4d44_CollisionHandler_DamagePlayerUnused:
     ld   a,[wD801_Player_ActionId]
     cp   a,PLAYERACTION_TAKE_DAMAGE
     ret  z
-    cp   a,PLAYERACTION_UNK41
+    cp   a,PLAYERACTION_SNOWBOARDING_TAKE_DAMAGE
     ret  z
-    cp   a,PLAYERACTION_UNK54
+    cp   a,PLAYERACTION_KANGAROO_TAKE_DAMAGE
     ret  z
-    cp   a,PLAYERACTION_TAKE_DAMAGE_2
+    cp   a,PLAYERACTION_TAKE_DAMAGE+$3C
     ret  z
     call call_03_550e_Object_CheckPlayerInteraction
     ret  nc
@@ -197,11 +197,11 @@ call_03_4d44_CollisionHandler_DamagePlayerUnused:
     ld   [wDC98],a
     ld   a,[wDB6C_CurrentMapId]
     cp   a,MAP_GEXTREME_SPORTS1
-    ld   a,PLAYERACTION_UNK41
+    ld   a,PLAYERACTION_SNOWBOARDING_TAKE_DAMAGE
     jr   z,.jr_00_4D8F
     ld   a,[wDB6C_CurrentMapId]
     cp   a,MAP_MARSUPIAL_MADNESS1
-    ld   a,PLAYERACTION_UNK54
+    ld   a,PLAYERACTION_KANGAROO_TAKE_DAMAGE
     jr   z,.jr_00_4D8F
     ld   a,PLAYERACTION_TAKE_DAMAGE
 .jr_00_4D8F:
@@ -1309,7 +1309,7 @@ call_03_550e_Object_CheckPlayerInteraction:
     LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_OBJECT_ID
     ld   L, [HL]                                       ;; 03:5523 $6e
     ld   H, $00                                        ;; 03:5524 $26 $00
-    ld   DE, data_03_55ff_ObjectInteractionFlagsTable                              ;; 03:5526 $11 $ff $55
+    ld   DE, .data_03_55ff_ObjectInteractionFlagsTable                              ;; 03:5526 $11 $ff $55
     add  HL, DE                                        ;; 03:5529 $19
     ld   A, [HL]                                       ;; 03:552a $7e
     ld   [wDC58_CurrentObjectInteractionFlags], A                                    ;; 03:552b $ea $58 $dc
@@ -1426,9 +1426,9 @@ call_03_550e_Object_CheckPlayerInteraction:
     jr   Z, .jr_03_55e5                                ;; 03:55d7 $28 $0c
     cp   A, PLAYERACTION_DOUBLE_JUMP                                        ;; 03:55d9 $fe $0f
     jr   Z, .jr_03_55e5                                ;; 03:55db $28 $08
-    cp   A, PLAYERACTION_UNK37                                        ;; 03:55dd $fe $25
+    cp   A, PLAYERACTION_SNOWBOARDING_JUMP                                        ;; 03:55dd $fe $25
     jr   Z, .jr_03_55e5                                ;; 03:55df $28 $04
-    cp   A, PLAYERACTION_UNK38                                        ;; 03:55e1 $fe $26
+    cp   A, PLAYERACTION_SNOWBOARDING_DOUBLE_JUMP                                        ;; 03:55e1 $fe $26
     jr   NZ, .jr_03_55f3                               ;; 03:55e3 $20 $0e
 .jr_03_55e5:
     ld   HL, wDC8C_PlayerYVelocity                                     ;; 03:55e5 $21 $8c $dc
@@ -1449,8 +1449,7 @@ call_03_550e_Object_CheckPlayerInteraction:
 ; Acts as the “failed collision / no interaction” exit for call_03_550e.
     xor  A, A                                          ;; 03:55fd $af
     ret                                                ;; 03:55fe $c9
-
-data_03_55ff_ObjectInteractionFlagsTable:
+.data_03_55ff_ObjectInteractionFlagsTable:
 ; What it is:
 ; A lookup table of bytes, indexed by object type or subtype.
 ; Each value is stored in wDC58_CurrentObjectInteractionFlags and influences behavior bits:
@@ -1650,13 +1649,13 @@ call_03_56c1_CollisionHandler_Platform:
 ; Or to call_03_57f8_ClearCollisionForObject (clear/ignore collision).
 ; Role: The main “does the player collide with this object?” function.
     ld   a,[wD801_Player_ActionId]
-    cp   a,PLAYERACTION_UNK26
+    cp   a,PLAYERACTION_DEATH_IN_PIT_ALT
     jp   z,call_03_57f8_ClearCollisionForObject
-    cp   a,PLAYERACTION_UNK26_2
+    cp   a,PLAYERACTION_SNOWBOARDING_DEATH_IN_PIT_ALT
     jp   z,call_03_57f8_ClearCollisionForObject
-    cp   a,PLAYERACTION_UNK26_3
+    cp   a,PLAYERACTION_KANGAROO_DEATH_IN_PIT_ALT
     jp   z,call_03_57f8_ClearCollisionForObject
-    cp   a,PLAYERACTION_DIE_IN_PIT
+    cp   a,PLAYERACTION_DEATH_IN_PIT
     jp   z,call_03_57f8_ClearCollisionForObject
     ld   a,[wDC88_CurrentObject_UnkVerticalOffset]
     ld   e,a
@@ -1881,7 +1880,6 @@ call_03_580b_RegisterSecondaryCollision:
     ret  
 
 call_03_581a_CollisionHandler_TVButton:
-; Another collision test, but narrower than 56c1.
 ; Skips entirely if the player is in the same “ignore” action IDs.
 ; Uses the object’s width/height at $D8xx+12/+13 to test bounding-box intersection against the player.
 ; Again compares Y offset + vertical delta (wDC88_CurrentObject_UnkVerticalOffset).
@@ -1889,13 +1887,13 @@ call_03_581a_CollisionHandler_TVButton:
 ; Role: This is a simplified AABB collision test between the player and an object. 
 ; It’s likely for a different type of object (maybe platforms, triggers, or zones).
     ld   A, [wD801_Player_ActionId]                                    ;; 03:581a $fa $01 $d8
-    cp   A, PLAYERACTION_UNK26                                        ;; 03:581d $fe $1a
+    cp   A, PLAYERACTION_DEATH_IN_PIT_ALT                                        ;; 03:581d $fe $1a
     jp   Z, call_03_57f8_ClearCollisionForObject                                 ;; 03:581f $ca $f8 $57
-    cp   A, PLAYERACTION_UNK26_2                                        ;; 03:5822 $fe $2e
+    cp   A, PLAYERACTION_SNOWBOARDING_DEATH_IN_PIT_ALT                                        ;; 03:5822 $fe $2e
     jp   Z, call_03_57f8_ClearCollisionForObject                                 ;; 03:5824 $ca $f8 $57
-    cp   A, PLAYERACTION_UNK26_3                                        ;; 03:5827 $fe $3b
+    cp   A, PLAYERACTION_KANGAROO_DEATH_IN_PIT_ALT                                        ;; 03:5827 $fe $3b
     jp   Z, call_03_57f8_ClearCollisionForObject                                 ;; 03:5829 $ca $f8 $57
-    cp   A, PLAYERACTION_DIE_IN_PIT                                        ;; 03:582c $fe $1b
+    cp   A, PLAYERACTION_DEATH_IN_PIT                                        ;; 03:582c $fe $1b
     jp   Z, call_03_57f8_ClearCollisionForObject                                 ;; 03:582e $ca $f8 $57
     LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_WIDTH
     ld   A, [HL+]                                      ;; 03:5839 $2a

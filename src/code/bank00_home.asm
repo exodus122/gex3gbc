@@ -169,7 +169,7 @@ call_00_0150_Init:
     ei                                                 ;; 00:0258 $fb
     call call_00_0b92_WaitForInterrupt                                  ;; 00:0259 $cd $92 $0b
     farcall call_01_4f7e_SeedTileLookupTable
-.jp_00_0267:
+.jp_00_0267_SoftReset:
     ld   A, SONG_EMPTY                                        ;; 00:0267 $3e $00
     call call_00_0fa2_PlaySong                                  ;; 00:0269 $cd $a2 $0f
     ld   A, SFX_EMPTY                                        ;; 00:026c $3e $00
@@ -193,9 +193,9 @@ call_00_0150_Init:
     jr   Z, .jr_00_02ed                                ;; 00:02c6 $28 $25
     cp   A, $10                                        ;; 00:02c8 $fe $10
     jr   NZ, .jp_00_02b2                               ;; 00:02ca $20 $e6
-.jp_00_02cc:
+.jp_00_02cc_LoadMainMenuAfterGameOver:
     ld   A, $04                                        ;; 00:02cc $3e $04
-    ld   [wDC4E_PlayerLivesRemaining], A                                    ;; 00:02ce $ea $4e $dc
+    ld   [wDC4E_LivesRemaining], A                                    ;; 00:02ce $ea $4e $dc
     xor  A, A                                          ;; 00:02d1 $af
     ld   [wDCAF_PawCoinCounter], A                                    ;; 00:02d2 $ea $af $dc
     ld   [wDC4F_PawCoinExtraHealth], A                                    ;; 00:02d5 $ea $4f $dc
@@ -212,7 +212,7 @@ call_00_0150_Init:
     ld   [wDB6C_CurrentMapId], A                                    ;; 00:02ee $ea $6c $db
     ld   [wDC5B_TVButtonLevelMissionRelated], A                                    ;; 00:02f1 $ea $5b $dc
     ld   [wDC69_PlayerSpawnIdInLevel], A                                    ;; 00:02f4 $ea $69 $dc
-    ld   [wDB6A], A                                    ;; 00:02f7 $ea $6a $db
+    ld   [wDB6A_WarpFlags], A                                    ;; 00:02f7 $ea $6a $db
     call call_00_0e3b_ClearGameStateVariables                                  ;; 00:02fa $cd $3b $0e
     call call_00_0e62_ResetFlagsAndVRAMState                                  ;; 00:02fd $cd $62 $0e
     ld   C, $00                                        ;; 00:0300 $0e $00
@@ -224,7 +224,7 @@ call_00_0150_Init:
     ld   A, $e7                                        ;; 00:030f $3e $e7
     call call_00_0e33_SetLCDControlRegister                                  ;; 00:0311 $cd $33 $0e
 .jp_00_0314:
-    ld   A, [wDB6A]                                    ;; 00:0314 $fa $6a $db
+    ld   A, [wDB6A_WarpFlags]                                    ;; 00:0314 $fa $6a $db
     and  A, $10                                        ;; 00:0317 $e6 $10
     jr   Z, .jr_00_0326                                ;; 00:0319 $28 $0b
     farcall call_01_435e_HandleLevelTransitionMenu
@@ -241,7 +241,7 @@ call_00_0150_Init:
     call call_00_1ea0_LoadAndRunMissionPreviewCutscene                                  ;; 00:0350 $cd $a0 $1e
     xor  A, A                                          ;; 00:0353 $af
     ld   [wDC69_PlayerSpawnIdInLevel], A                                    ;; 00:0354 $ea $69 $dc
-.jp_00_0357:
+.jp_00_0357_RespawnAfterDeath:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:0357 $fa $1e $dc
     ld   [wDB6C_CurrentMapId], A                                    ;; 00:035a $ea $6c $db
     farcall call_03_6c89_LoadMapData
@@ -259,24 +259,24 @@ call_00_0150_Init:
     call call_00_0e3b_ClearGameStateVariables                                  ;; 00:0385 $cd $3b $0e
     call call_00_2f85_LoadAndSortCollectibleData                                  ;; 00:0388 $cd $85 $2f
     call call_00_2ff8_InitLevelObjectsAndConfig                                  ;; 00:038b $cd $f8 $2f
-.jp_00_038e:
+.jp_00_038e_LoadMap:
     farcall call_03_6c89_LoadMapData
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:0399 $fa $1e $dc
-    cp   A, $07                                        ;; 00:039c $fe $07
+    cp   A, LEVEL_GEXTREME_SPORTS                                        ;; 00:039c $fe $07
     jr   NZ, .jr_00_03b6                               ;; 00:039e $20 $16
     ld   A, [wDC78_PlayerActionIdRelated]                                    ;; 00:03a0 $fa $78 $dc
     cp   A, $00                                        ;; 00:03a3 $fe $00
     ld   A, $23                                        ;; 00:03a5 $3e $23
     jr   Z, .jr_00_03e8                                ;; 00:03a7 $28 $3f
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:03a9 $fa $6c $db
-    cp   A, $07                                        ;; 00:03ac $fe $07
+    cp   A, MAP_GEXTREME_SPORTS1                                        ;; 00:03ac $fe $07
     ld   A, $24                                        ;; 00:03ae $3e $24
     jr   Z, .jr_00_03e8                                ;; 00:03b0 $28 $36
     ld   A, $01                                        ;; 00:03b2 $3e $01
     jr   .jr_00_03e8                                   ;; 00:03b4 $18 $32
 .jr_00_03b6:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:03b6 $fa $1e $dc
-    cp   A, $08                                        ;; 00:03b9 $fe $08
+    cp   A, LEVEL_MARSUPIAL_MADNESS                                        ;; 00:03b9 $fe $08
     ld   A, $2f                                        ;; 00:03bb $3e $2f
     jr   Z, .jr_00_03e8                                ;; 00:03bd $28 $29
     ld   A, [wDC1F]                                    ;; 00:03bf $fa $1f $dc
@@ -311,11 +311,11 @@ call_00_0150_Init:
     farcall call_02_708f_InitObjectsAndSpawnPlayer
     call call_00_0513                                  ;; 00:0410 $cd $13 $05
     xor  A, A                                          ;; 00:0413 $af
-    ld   [wDB6A], A                                    ;; 00:0414 $ea $6a $db
+    ld   [wDB6A_WarpFlags], A                                    ;; 00:0414 $ea $6a $db
     ld   [wDCDB_EvilSantaHitByProjectileFlag], A                                    ;; 00:0417 $ea $db $dc
     ld   A, $ff                                        ;; 00:041a $3e $ff
     ld   [wDC8A], A                                    ;; 00:041c $ea $8a $dc
-    jr   .jp_00_0443                                   ;; 00:041f $18 $22
+    jr   .jp_00_0443_MainGameplayLoop                                   ;; 00:041f $18 $22
 .jp_00_0421:
     call call_00_0595_PlaySongBasedOnLevel                                  ;; 00:0421 $cd $95 $05
     call call_00_04fb                                  ;; 00:0424 $cd $fb $04
@@ -323,30 +323,30 @@ call_00_0150_Init:
     farcall call_02_7142_RestoreObjectTable
     farcall call_03_68d9_AssignAllObjectPalettes
     call call_00_0513                                  ;; 00:0440 $cd $13 $05
-.jp_00_0443:
+.jp_00_0443_MainGameplayLoop:
     call call_00_0b92_WaitForInterrupt                                  ;; 00:0443 $cd $92 $0b
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:0446 $fa $d7 $da
-    cp   A, $0f                                        ;; 00:0449 $fe $0f
-    jp   Z, .jp_00_0267                                ;; 00:044b $ca $67 $02
-    ld   HL, wDB6A                                     ;; 00:044e $21 $6a $db
+    cp   A, PADF_A | PADF_B | PADF_SELECT | PADF_START                                        ;; 00:0449 $fe $0f
+    jp   Z, .jp_00_0267_SoftReset                                ;; 00:044b $ca $67 $02
+    ld   HL, wDB6A_WarpFlags                                     ;; 00:044e $21 $6a $db
     bit  2, [HL]                                       ;; 00:0451 $cb $56
-    jr   Z, .jr_00_045e                                ;; 00:0453 $28 $09
+    jr   Z, .jr_00_045e_SkipLoadMap                                ;; 00:0453 $28 $09
     call call_00_1633_HandleLevelWarpOrExit                                  ;; 00:0455 $cd $33 $16
     call call_00_2b3d_ClearAllObjectSlots                                  ;; 00:0458 $cd $3d $2b
-    jp   .jp_00_038e                                   ;; 00:045b $c3 $8e $03
-.jr_00_045e:
-    ld   HL, wDB6A                                     ;; 00:045e $21 $6a $db
+    jp   .jp_00_038e_LoadMap                                   ;; 00:045b $c3 $8e $03
+.jr_00_045e_SkipLoadMap:
+    ld   HL, wDB6A_WarpFlags                                     ;; 00:045e $21 $6a $db
     bit  4, [HL]                                       ;; 00:0461 $cb $66
     jp   NZ, .jp_00_0314                               ;; 00:0463 $c2 $14 $03
-    ld   HL, wDB6A                                     ;; 00:0466 $21 $6a $db
+    ld   HL, wDB6A_WarpFlags                                     ;; 00:0466 $21 $6a $db
     bit  1, [HL]                                       ;; 00:0469 $cb $4e
     jr   Z, .jr_00_0487                                ;; 00:046b $28 $1a
-    ld   HL, wDC4E_PlayerLivesRemaining                                     ;; 00:046d $21 $4e $dc
+    ld   HL, wDC4E_LivesRemaining                                     ;; 00:046d $21 $4e $dc
     dec  [HL]                                          ;; 00:0470 $35
-    jp   NZ, .jp_00_0357                               ;; 00:0471 $c2 $57 $03
-    farcall call_01_42fd_LoadMenu03_InitSong15
+    jp   NZ, .jp_00_0357_RespawnAfterDeath                               ;; 00:0471 $c2 $57 $03
+    farcall call_01_42fd_LoadMenu_GameOver
     cp   A, $40                                        ;; 00:047f $fe $40
-    jp   Z, .jp_00_02cc                                ;; 00:0481 $ca $cc $02
+    jp   Z, .jp_00_02cc_LoadMainMenuAfterGameOver                                ;; 00:0481 $ca $cc $02
     jp   .jp_00_02b2                                   ;; 00:0484 $c3 $b2 $02
 .jr_00_0487:
     farcall call_02_5541_GetActionPropertyByte
@@ -383,7 +383,7 @@ call_00_0150_Init:
     call call_00_150f_CheckAndSetLevelTrigger                                  ;; 00:04ef $cd $0f $15
     call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:04f2 $cd $fa $35
     call call_00_08f8_SetupObjectVRAMTransfer                                  ;; 00:04f5 $cd $f8 $08
-    jp   .jp_00_0443                                   ;; 00:04f8 $c3 $43 $04
+    jp   .jp_00_0443_MainGameplayLoop                                   ;; 00:04f8 $c3 $43 $04
 
 call_00_04fb:
     xor  A, A                                          ;; 00:04fb $af
@@ -505,7 +505,7 @@ call_00_05c7:
     ld   [HL], A                                       ;; 00:05e5 $77
     ret  NC                                            ;; 00:05e6 $d0
     ld   [HL], $00                                     ;; 00:05e7 $36 $00
-    ld   HL, wDB6A                                     ;; 00:05e9 $21 $6a $db
+    ld   HL, wDB6A_WarpFlags                                     ;; 00:05e9 $21 $6a $db
     set  4, [HL]                                       ;; 00:05ec $cb $e6
     set  5, [HL]                                       ;; 00:05ee $cb $ee
     ret                                                ;; 00:05f0 $c9
@@ -513,7 +513,7 @@ call_00_05c7:
     ld   C, OBJECT_FREESTANDING_REMOTE                                        ;; 00:05f1 $0e $1c
     call call_00_29ce_Object_CheckExists                                  ;; 00:05f3 $cd $ce $29
     ret  Z                                             ;; 00:05f6 $c8
-    ld   HL, wDB6A                                     ;; 00:05f7 $21 $6a $db
+    ld   HL, wDB6A_WarpFlags                                     ;; 00:05f7 $21 $6a $db
     set  4, [HL]                                       ;; 00:05fa $cb $e6
     ret                                                ;; 00:05fc $c9
 
@@ -533,7 +533,7 @@ call_00_05fd_CheckForEatFly:
     cp   A, $3f                                        ;; 00:0613 $fe $3f
     ret  NC                                            ;; 00:0615 $d0
 .jr_00_0616:
-    ld   A, PLAYERACTION_UNK8                                        ;; 00:0616 $3e $08
+    ld   A, PLAYERACTION_EAT_FLY                                        ;; 00:0616 $3e $08
     farcall call_02_54f9_SwitchPlayerAction
     ret                                                ;; 00:0623 $c9
 
@@ -607,32 +607,32 @@ jp_00_0693:
     jr   NZ, .jr_00_06ba                               ;; 00:0698 $20 $20
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:069a $fa $6c $db
     cp   A, $07                                        ;; 00:069d $fe $07
-    ld   A, PLAYERACTION_UNK26_2                                        ;; 00:069f $3e $2e
+    ld   A, PLAYERACTION_SNOWBOARDING_DEATH_IN_PIT_ALT                                        ;; 00:069f $3e $2e
     jr   Z, .jr_00_06ae                                ;; 00:06a1 $28 $0b
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:06a3 $fa $6c $db
     cp   A, $08                                        ;; 00:06a6 $fe $08
-    ld   A, PLAYERACTION_UNK26_3                                        ;; 00:06a8 $3e $3b
+    ld   A, PLAYERACTION_KANGAROO_DEATH_IN_PIT_ALT                                        ;; 00:06a8 $3e $3b
     jr   Z, .jr_00_06ae                                ;; 00:06aa $28 $02
-    ld   A, PLAYERACTION_UNK26                                        ;; 00:06ac $3e $1a
+    ld   A, PLAYERACTION_DEATH_IN_PIT_ALT                                        ;; 00:06ac $3e $1a
 .jr_00_06ae:
     farcall call_02_54f9_SwitchPlayerAction
     ret                                                ;; 00:06b9 $c9
 .jr_00_06ba:
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:06ba $fa $6c $db
     cp   A, $07                                        ;; 00:06bd $fe $07
-    ld   A, PLAYERACTION_DIE_2                                        ;; 00:06bf $3e $2a
+    ld   A, PLAYERACTION_SNOWBOARDING_DIE                                        ;; 00:06bf $3e $2a
     jr   Z, .jr_00_06ce                                ;; 00:06c1 $28 $0b
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:06c3 $fa $6c $db
     cp   A, $08                                        ;; 00:06c6 $fe $08
-    ld   A, PLAYERACTION_DIE_3                                        ;; 00:06c8 $3e $37
+    ld   A, PLAYERACTION_KANGAROO_DEATH                                        ;; 00:06c8 $3e $37
     jr   Z, .jr_00_06ce                                ;; 00:06ca $28 $02
-    ld   A, PLAYERACTION_DIE                                        ;; 00:06cc $3e $0a
+    ld   A, PLAYERACTION_DEATH                                        ;; 00:06cc $3e $0a
 .jr_00_06ce:
     farcall call_02_54f9_SwitchPlayerAction
     ret                                                ;; 00:06d9 $c9
 
 jp_00_06da:
-    ld   A, PLAYERACTION_DIE_IN_PIT                                        ;; 00:06da $3e $1b
+    ld   A, PLAYERACTION_DEATH_IN_PIT                                        ;; 00:06da $3e $1b
     farcall call_02_54f9_SwitchPlayerAction
     ret                                                ;; 00:06e7 $c9
 
@@ -675,7 +675,7 @@ call_00_0723_IncrementCollectibleCount:
 ; Sets flag bit0 in wDB69, plays sound 02.
 ; Increments counter wDC68_CollectibleCount, triggers sound effects and sets a per-level 
 ; completion flag when it reaches 0x32 or 0x64.
-; Also increments wDC4E_PlayerLivesRemaining but caps at 63.
+; Also increments wDC4E_LivesRemaining but caps at 63.
 ; Looks like it manages collectible counters / progress milestones.
     ld   HL, wDB69                                     ;; 00:0723 $21 $69 $db
     set  0, [HL]                                       ;; 00:0726 $cb $c6
@@ -698,7 +698,7 @@ call_00_0723_IncrementCollectibleCount:
     set  3, [HL]                                       ;; 00:0748 $cb $de
     ret                                                ;; 00:074a $c9
 .jr_00_074b:
-    ld   HL, wDC4E_PlayerLivesRemaining                                     ;; 00:074b $21 $4e $dc
+    ld   HL, wDC4E_LivesRemaining                                     ;; 00:074b $21 $4e $dc
     ld   A, [HL]                                       ;; 00:074e $7e
     cp   A, $63                                        ;; 00:074f $fe $63
     ret  NC                                            ;; 00:0751 $d0

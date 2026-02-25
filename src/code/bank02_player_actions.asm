@@ -98,7 +98,7 @@ call_02_482e_PlayerAction_Unk7:
     ld   [wDC87], A                                    ;; 02:483a $ea $87 $dc
     ret                                                ;; 02:483d $c9
 
-call_02_483e_PlayerAction_Unk8:
+call_02_483e_PlayerAction_EatFly:
     ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     ret  z
@@ -126,7 +126,7 @@ call_02_484d_PlayerAction_TakeDamage:
     jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:486f $ca $f9 $54
     ret                                                ;; 02:4872 $c9
 
-call_02_4873_PlayerAction_Die:
+call_02_4873_PlayerAction_Death:
     ld   HL, wD805_Player_MovementFlags                                     ;; 02:4873 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:4876 $cb $66
     jr   Z, .jr_02_4883                                ;; 02:4878 $28 $09
@@ -139,7 +139,7 @@ call_02_4873_PlayerAction_Die:
     ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 02:4885 $ea $7e $dc
     ret                                                ;; 02:4888 $c9
 
-call_02_4889_PlayerAction_DieWarp:
+call_02_4889_PlayerAction_DeathSetUpWarp:
     xor  A, A                                          ;; 02:4889 $af
     ld   [wDC87], A                                    ;; 02:488a $ea $87 $dc
     ld   A, TIMER_AMOUNT_60_FRAMES                                        ;; 02:488d $3e $3c
@@ -147,9 +147,9 @@ call_02_4889_PlayerAction_DieWarp:
     ld   A, [wD805_Player_MovementFlags]                                    ;; 02:4892 $fa $05 $d8
     and  A, $04                                        ;; 02:4895 $e6 $04
     ret  Z                                             ;; 02:4897 $c8
-    ld   A, [wDB6A]                                    ;; 02:4898 $fa $6a $db
+    ld   A, [wDB6A_WarpFlags]                                    ;; 02:4898 $fa $6a $db
     or   A, $02                                        ;; 02:489b $f6 $02
-    ld   [wDB6A], A                                    ;; 02:489d $ea $6a $db
+    ld   [wDB6A_WarpFlags], A                                    ;; 02:489d $ea $6a $db
     ret                                                ;; 02:48a0 $c9
 
 call_02_48a1_PlayerAction_StandOnTVButton:
@@ -164,7 +164,7 @@ call_02_48b0_PlayerAction_EnterTV:
     ld   A, [wD805_Player_MovementFlags]                                    ;; 02:48b0 $fa $05 $d8
     and  A, $04                                        ;; 02:48b3 $e6 $04
     ret  Z                                             ;; 02:48b5 $c8
-    ld   HL, wDB6A                                     ;; 02:48b6 $21 $6a $db
+    ld   HL, wDB6A_WarpFlags                                     ;; 02:48b6 $21 $6a $db
     set  4, [HL]                                       ;; 02:48b9 $cb $e6
     ret                                                ;; 02:48bb $c9
 
@@ -275,7 +275,7 @@ call_02_497a_PlayerAction_FallingLand:
 call_02_4989_PlayerAction_Unk19:
     ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
-    jr   z,call_02_49a8_PlayerAction_Unk20
+    jr   z,call_02_49a8_PlayerAction_EnterIdle
     ld   a,$30
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E_InitialYVelocity],a
@@ -286,17 +286,17 @@ call_02_4989_PlayerAction_Unk19:
     ld   a,$14
     call call_02_72ac_SetObjectAction
 
-call_02_49a8_PlayerAction_Unk20:
+call_02_49a8_PlayerAction_EnterIdle:
     ld   a,[wDC8E_InitialYVelocity]
     and  a
     ld   a,PLAYERACTION_IDLE
     jp   z,call_02_54f9_SwitchPlayerAction
     ret  
     
-call_02_49b2_PlayerAction_Unk21To24:  
+call_02_49b2_PlayerAction_None:  
     ret  
 
-call_02_49b3_PlayerAction_Unk25:
+call_02_49b3_PlayerAction_Water_Swimming:
     ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_49CE
@@ -354,7 +354,7 @@ call_02_49b3_PlayerAction_Unk25:
 .data_02_4a1d:
     db   $00, $00, $00, $00, $60, $20, $20, $20        ;; 02:4a19 ????????
 
-call_02_4a25_PlayerAction_Unk26:
+call_02_4a25_PlayerAction_DeathInPitAlt:
     xor  a
     ld   [wDC87],a
     ld   a,TIMER_AMOUNT_60_FRAMES
@@ -364,7 +364,7 @@ call_02_4a25_PlayerAction_Unk26:
     jp   z,jp_00_06da
     ret  
 
-call_02_4a37_PlayerAction_DieInPit:
+call_02_4a37_PlayerAction_DeathInPit:
     xor  A, A                                          ;; 02:4a37 $af
     ld   [wDC87], A                                    ;; 02:4a38 $ea $87 $dc
     ld   A, TIMER_AMOUNT_60_FRAMES                                        ;; 02:4a3b $3e $3c
@@ -374,14 +374,14 @@ call_02_4a37_PlayerAction_DieInPit:
     ld   A, [wDC91]                                    ;; 02:4a45 $fa $91 $dc
     cp   A, $b0                                        ;; 02:4a48 $fe $b0
     ret  C                                             ;; 02:4a4a $d8
-    ld   HL, wDB6A                                     ;; 02:4a4b $21 $6a $db
+    ld   HL, wDB6A_WarpFlags                                     ;; 02:4a4b $21 $6a $db
     set  1, [HL]                                       ;; 02:4a4e $cb $ce
     ret                                                ;; 02:4a50 $c9
 
-call_02_4a51_PlayerAction_Unk28:
+call_02_4a51_PlayerAction_None2:
     ret  
 
-call_02_4a52_PlayerAction_Unk29:
+call_02_4a52_PlayerAction_BlownUpwards:
     ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4A61
@@ -394,11 +394,11 @@ call_02_4a52_PlayerAction_Unk29:
     jp   z,call_02_4dce_SetTriggerByLevel
     ret  
 
-call_02_4a69_PlayerAction_Unk30:
+call_02_4a69_PlayerAction_RidingElevator:
     ld   c,OBJECT_ANIME_CHANNEL_ELEVATOR
     jp   call_02_4db1_Player_CheckXDistanceFromObject
 
-call_02_4a6e_PlayerAction_Unk31:
+call_02_4a6e_PlayerAction_Water_TailSpin:
     ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4A87
@@ -417,22 +417,22 @@ call_02_4a6e_PlayerAction_Unk31:
     ld   [wDC7F_Player_IsAttacking],a
     ld   hl,wDC80_Player_UnkStates
     set  6,[hl]
-    ld   a,PLAYERACTION_UNK25
+    ld   a,PLAYERACTION_WATER_SWIMMING
     jp   call_02_54f9_SwitchPlayerAction
 
-call_02_4a9b_PlayerAction_Unk32:
+call_02_4a9b_PlayerAction_Water_Treading:
     ld   a,$01
     ld   [wDC87],a
     ret  
 
-call_02_4aa1_PlayerAction_Unk33:
+call_02_4aa1_PlayerAction_Water_Diving:
     ld   a,$01
     ld   [wDC87],a
     ld   a,$04
     ld   [wDC9D],a
     ret  
 
-call_02_4aac_PlayerAction_Unk34:
+call_02_4aac_PlayerAction_Climbing:
     ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4ACC
@@ -573,7 +573,7 @@ call_02_4B66: ; unreferenced function?
     set  6,[hl]
     ret  
 
-call_02_4bb7_PlayerAction_Unk36:
+call_02_4bb7_PlayerAction_Snowboarding_StandOrWalk:
     ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4BDC
@@ -631,7 +631,7 @@ call_02_4bb7_PlayerAction_Unk36:
     db   $00, $05, $20, $0b, $20, $0c, $20, $0e        ;; 02:4c1e ????????
     db   $20, $0f, $20, $10, $20, $ff
 
-call_02_4c2c_PlayerAction_Unk37:
+call_02_4c2c_PlayerAction_Snowboarding_Jump:
     ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4C46
@@ -648,11 +648,11 @@ call_02_4c2c_PlayerAction_Unk37:
     ret  nz
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,PADF_B
-    ld   a,PLAYERACTION_UNK38
+    ld   a,PLAYERACTION_SNOWBOARDING_DOUBLE_JUMP
     jp   nz,call_02_54f9_SwitchPlayerAction
     jp   call_02_4dce_SetTriggerByLevel
 
-call_02_4c58_PlayerAction_Unk38:
+call_02_4c58_PlayerAction_Snowboarding_DoubleJump:
     ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4C72
@@ -669,7 +669,7 @@ call_02_4c58_PlayerAction_Unk38:
     jp   z,call_02_4dce_SetTriggerByLevel
     ret  
 
-call_02_4c7a_PlayerAction_Unk39:
+call_02_4c7a_PlayerAction_Snowboarding_TailSpin:
     ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4CA1
@@ -689,7 +689,7 @@ call_02_4c7a_PlayerAction_Unk39:
 .jr_00_4CA1:
     jp   call_02_4E0C_UpdateActionSequence
 
-call_02_4ca4_PlayerAction_Unk40:
+call_02_4ca4_PlayerAction_Snowboarding_Fall:
     ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4CB3
@@ -699,11 +699,11 @@ call_02_4ca4_PlayerAction_Unk40:
 .jr_00_4CB3:
     ld   a,[wDC8E_InitialYVelocity]
     and  a
-    ld   a,PLAYERACTION_UNK36
+    ld   a,PLAYERACTION_SNOWBOARDING_STAND_OR_WALK
     jp   z,call_02_54f9_SwitchPlayerAction
     ret  
 
-call_02_4cbd_PlayerAction_Unk41:
+call_02_4cbd_PlayerAction_Snowboarding_TakeDamage:
     ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4CD4
@@ -718,57 +718,57 @@ call_02_4cbd_PlayerAction_Unk41:
     ld   [wDC7E_PlayerDamageCooldownTimer],a
     ld   a,[wDC8E_InitialYVelocity]
     and  a
-    ld   a,PLAYERACTION_UNK36
+    ld   a,PLAYERACTION_SNOWBOARDING_STAND_OR_WALK
     jp   z,call_02_54f9_SwitchPlayerAction
     ret  
 
-call_02_4ce3_PlayerAction_Unk48:
+call_02_4ce3_PlayerAction_Kangaroo_LandFromHop:
     ld   a,SFX_GEX_JUMP
     call call_00_0ff5_QueueSoundEffect
     call call_02_4e01_SetOneTimeFlag
-    ld   a,PLAYERACTION_UNK49
+    ld   a,PLAYERACTION_KANGAROO_HOPPING
     call call_02_54f9_SwitchPlayerAction
     call call_02_4df6_FlagCollisionActive
     ld   hl,wDABE_UnkBGCollisionFlags2
     bit  7,[hl]
-    jr   z,call_02_4d02_PlayerAction_Unk49
+    jr   z,call_02_4d02_PlayerAction_Kangaroo_Hopping
     ld   a,$1E
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E_InitialYVelocity],a
-call_02_4d02_PlayerAction_Unk49:
+call_02_4d02_PlayerAction_Kangaroo_Hopping:
     ld   a,[wDC8E_InitialYVelocity]
     and  a
     ret  nz
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,PADF_B
-    ld   a,PLAYERACTION_UNK50
+    ld   a,PLAYERACTION_KANGAROO_START_JUMP
     jp   nz,call_02_54f9_SwitchPlayerAction
     jp   call_02_4dce_SetTriggerByLevel
 
-call_02_4d14_PlayerAction_Unk50:
+call_02_4d14_PlayerAction_Kangaroo_StartJump:
     ld   a,SFX_GEX_DOUBLE_JUMP
     call call_00_0ff5_QueueSoundEffect
     call call_02_4e01_SetOneTimeFlag
-    ld   a,PLAYERACTION_UNK51
+    ld   a,PLAYERACTION_KANGAROO_JUMP
     call call_02_54f9_SwitchPlayerAction
     call call_02_4df6_FlagCollisionActive
     ld   hl,wDABE_UnkBGCollisionFlags2
     bit  7,[hl]
-    jr   z,call_02_4d33_PlayerAction_Unk51
+    jr   z,call_02_4d33_PlayerAction_Kangaroo_Jump
     ld   a,$36
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E_InitialYVelocity],a
-call_02_4d33_PlayerAction_Unk51:
+call_02_4d33_PlayerAction_Kangaroo_Jump:
     ld   a,[wDC8E_InitialYVelocity]
     and  a
     ret  nz
     ld   a,[wDC81_CurrentInputsAlt]
     and  a,PADF_B
-    ld   a,PLAYERACTION_UNK50
+    ld   a,PLAYERACTION_KANGAROO_START_JUMP
     jp   nz,call_02_54f9_SwitchPlayerAction
     jp   call_02_4dce_SetTriggerByLevel
 
-call_02_4d45_PlayerAction_Unk52:
+call_02_4d45_PlayerAction_Kangaroo_TailSpin:
     ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4D5E
@@ -787,10 +787,10 @@ call_02_4d45_PlayerAction_Unk52:
     ld   [wDC7F_Player_IsAttacking],a
     ld   hl,wDC80_Player_UnkStates
     set  6,[hl]
-    ld   a,PLAYERACTION_UNK48
+    ld   a,PLAYERACTION_KANGAROO_LAND_FROM_HOP
     jp   call_02_54f9_SwitchPlayerAction
 
-call_02_4d72_PlayerAction_Unk53:
+call_02_4d72_PlayerAction_Kangaroo_Fall:
     ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4D81
@@ -800,11 +800,11 @@ call_02_4d72_PlayerAction_Unk53:
 .jr_00_4D81:
     ld   a,[wDC8E_InitialYVelocity]
     and  a
-    ld   a,PLAYERACTION_UNK48
+    ld   a,PLAYERACTION_KANGAROO_LAND_FROM_HOP
     jp   z,call_02_54f9_SwitchPlayerAction
     ret  
 
-call_02_4d8b_PlayerAction_Unk54:
+call_02_4d8b_PlayerAction_Kangaroo_TakeDamage:
     ld   hl,wD805_Player_MovementFlags
     bit  4,[hl]
     jr   z,.jr_00_4DA2
@@ -819,6 +819,6 @@ call_02_4d8b_PlayerAction_Unk54:
     ld   [wDC7E_PlayerDamageCooldownTimer],a
     ld   a,[wDC8E_InitialYVelocity]
     and  a
-    ld   a,PLAYERACTION_UNK48
+    ld   a,PLAYERACTION_KANGAROO_LAND_FROM_HOP
     jp   z,call_02_54f9_SwitchPlayerAction
     ret  

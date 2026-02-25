@@ -239,11 +239,11 @@ call_02_5a1c_ObjectAction_TVButton_unk2:
     call call_02_72ac_SetObjectAction                                  ;; 02:5a2e $cd $ac $72
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:5a31 $fa $6c $db
     cp   A, $07                                        ;; 02:5a34 $fe $07
-    ld   A, PLAYERACTION_STAND_ON_TV_BUTTON_2                                        ;; 02:5a36 $3e $2c
+    ld   A, PLAYERACTION_SNOWBOARDING_STAND_ON_TV_BUTTON                                        ;; 02:5a36 $3e $2c
     jr   Z, .jr_02_5a45                                ;; 02:5a38 $28 $0b
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:5a3a $fa $6c $db
     cp   A, $08                                        ;; 02:5a3d $fe $08
-    ld   A, PLAYERACTION_STAND_ON_TV_BUTTON_3                                        ;; 02:5a3f $3e $39
+    ld   A, PLAYERACTION_KANGAROO_STAND_ON_TV_BUTTON                                        ;; 02:5a3f $3e $39
     jr   Z, .jr_02_5a45                                ;; 02:5a41 $28 $02
     ld   A, PLAYERACTION_STAND_ON_TV_BUTTON                                        ;; 02:5a43 $3e $0c
 .jr_02_5a45:
@@ -488,7 +488,7 @@ call_02_5bfa_ObjectAction_FreestandingRemote_unk2:
     inc  C                                             ;; 02:5c2e $0c
     dec  C                                             ;; 02:5c2f $0d
     jp   Z, call_00_2b7a_DeactivateObject                                 ;; 02:5c30 $ca $7a $2b
-    ld   HL, wDB6A                                     ;; 02:5c33 $21 $6a $db
+    ld   HL, wDB6A_WarpFlags                                     ;; 02:5c33 $21 $6a $db
     set  4, [HL]                                       ;; 02:5c36 $cb $e6
     jp   call_00_2b7a_DeactivateObject                                    ;; 02:5c38 $c3 $7a $2b
 .data_02_5c3b:
@@ -1969,7 +1969,7 @@ call_02_67c2_ObjectAction_Elevator_Update:
     ld   a,[de]
     ld   [hl],a
     ld   a,[wD801_Player_ActionId]
-    cp   a,PLAYERACTION_UNK30
+    cp   a,PLAYERACTION_RIDING_ELEVATOR
     ld   a,PLAYERACTION_IDLE
     jp   z,call_02_54f9_SwitchPlayerAction
     ret  
@@ -1979,7 +1979,7 @@ call_02_67c2_ObjectAction_Elevator_Update:
 .jr_00_6847:
     ld   bc,$0001
 .jr_00_684A:
-    ld   a,PLAYERACTION_UNK30
+    ld   a,PLAYERACTION_RIDING_ELEVATOR
     ld   hl,wD801_Player_ActionId
     cp   [hl]
     jp   nz,call_02_54f9_SwitchPlayerAction
@@ -2632,7 +2632,7 @@ call_02_6d52_ObjectAction_RockHard_Unk6:
     ret  nz
     ld   a,$01
     ld   [wDC65_ProgressFlags_WWGex],a
-    ld   hl,wDB6A
+    ld   hl,wDB6A_WarpFlags
     set  4,[hl]
     jp   call_00_2b7a_DeactivateObject
 
@@ -2743,7 +2743,7 @@ call_02_6e09_ObjectAction_BrainOfOz_Unk8:
     ret  nz
     ld   a,$01
     ld   [wDC66_ProgressFlags_LizardOfOz],a
-    ld   hl,wDB6A
+    ld   hl,wDB6A_WarpFlags
     set  4,[hl]
     jp   call_00_2b7a_DeactivateObject
 .data_6e3c:
@@ -2958,7 +2958,7 @@ call_02_6faa_ObjectAction_Rez_Unk11:
     ret  nz
     ld   a,$01
     ld   [wDC67_ProgressFlags_ChannelZ],a
-    ld   hl,wDB6A
+    ld   hl,wDB6A_WarpFlags
     set  4,[hl]
     jp   call_00_2b7a_DeactivateObject
 

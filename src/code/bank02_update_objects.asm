@@ -7,7 +7,7 @@ call_02_708f_InitObjectsAndSpawnPlayer:
 ; and spawns required relative objects.
 ; Loops through call_00_360c_SpawnObjectOnceImmediate until the player object (wDAB8_ObjectCounter == 1) is spawned.
     xor  A, A                                          ;; 02:708f $af
-    ld   [wDB6A], A                                    ;; 02:7090 $ea $6a $db
+    ld   [wDB6A_WarpFlags], A                                    ;; 02:7090 $ea $6a $db
     ld   A, [wDC78_PlayerActionIdRelated]                                    ;; 02:7093 $fa $78 $dc
     cp   A, $ff                                        ;; 02:7096 $fe $ff
     jr   Z, .jr_02_70d1                                ;; 02:7098 $28 $37

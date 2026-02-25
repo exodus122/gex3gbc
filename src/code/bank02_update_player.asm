@@ -28,11 +28,11 @@ call_02_4dce_SetTriggerByLevel:
     set  6, [HL]                                       ;; 02:4dd1 $cb $f6
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:4dd3 $fa $6c $db
     cp   A, $07                                        ;; 02:4dd6 $fe $07
-    ld   A, PLAYERACTION_UNK36                                        ;; 02:4dd8 $3e $24
+    ld   A, PLAYERACTION_SNOWBOARDING_STAND_OR_WALK                                        ;; 02:4dd8 $3e $24
     jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:4dda $ca $f9 $54
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:4ddd $fa $6c $db
     cp   A, $08                                        ;; 02:4de0 $fe $08
-    ld   A, PLAYERACTION_UNK48                                        ;; 02:4de2 $3e $30
+    ld   A, PLAYERACTION_KANGAROO_LAND_FROM_HOP                                        ;; 02:4de2 $3e $30
     jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:4de4 $ca $f9 $54
     ld   C, PLAYERACTION_IDLE                                        ;; 02:4de7 $0e $01
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:4de9 $fa $81 $dc
@@ -99,7 +99,7 @@ call_02_4E0C_UpdateActionSequence:
     ld   [wDC7F_Player_IsAttacking],a
     ld   hl,wDC80_Player_UnkStates
     set  6,[hl]
-    ld   a,PLAYERACTION_UNK36
+    ld   a,PLAYERACTION_SNOWBOARDING_STAND_OR_WALK
     jp   call_02_54f9_SwitchPlayerAction
 .jr_00_4E50:
     ld   a,[wDCA2_PlayerUnk1]
@@ -212,11 +212,11 @@ call_02_4f11_ChooseNextActionBasedOnLevel:
     ret  NZ                                            ;; 02:4f1a $c0
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:4f1b $fa $6c $db
     cp   A, $07                                        ;; 02:4f1e $fe $07
-    ld   A, PLAYERACTION_UNK40                                        ;; 02:4f20 $3e $28
+    ld   A, PLAYERACTION_SNOWBOARDING_FALL                                        ;; 02:4f20 $3e $28
     jr   Z, .jr_02_4f2f                                ;; 02:4f22 $28 $0b
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:4f24 $fa $6c $db
     cp   A, $08                                        ;; 02:4f27 $fe $08
-    ld   A, PLAYERACTION_UNK53                                        ;; 02:4f29 $3e $35
+    ld   A, PLAYERACTION_KANGAROO_FALL                                        ;; 02:4f29 $3e $35
     jr   Z, .jr_02_4f2f                                ;; 02:4f2b $28 $02
     ld   A, PLAYERACTION_FALL                                        ;; 02:4f2d $3e $11
 .jr_02_4f2f:
@@ -843,11 +843,11 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
 .jr_02_52de:
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:52de $fa $6c $db
     cp   A, $07                                        ;; 02:52e1 $fe $07
-    ld   A, PLAYERACTION_UNK40                                        ;; 02:52e3 $3e $28
+    ld   A, PLAYERACTION_SNOWBOARDING_FALL                                        ;; 02:52e3 $3e $28
     jr   Z, .jr_02_52f2                                ;; 02:52e5 $28 $0b
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:52e7 $fa $6c $db
     cp   A, $08                                        ;; 02:52ea $fe $08
-    ld   A, PLAYERACTION_UNK53                                        ;; 02:52ec $3e $35
+    ld   A, PLAYERACTION_KANGAROO_FALL                                        ;; 02:52ec $3e $35
     jr   Z, .jr_02_52f2                                ;; 02:52ee $28 $02
     ld   A, PLAYERACTION_FALL                                        ;; 02:52f0 $3e $11
 .jr_02_52f2:
@@ -861,15 +861,15 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     ld   [HL], $00                                     ;; 02:5300 $36 $00
     ld   A, [wD801_Player_ActionId]                                    ;; 02:5302 $fa $01 $d8
     cp   A, $1a                                        ;; 02:5305 $fe $1a
-    ld   A, PLAYERACTION_DIE                                        ;; 02:5307 $3e $0a
+    ld   A, PLAYERACTION_DEATH                                        ;; 02:5307 $3e $0a
     jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:5309 $ca $f9 $54
     ld   A, [wD801_Player_ActionId]                                    ;; 02:530c $fa $01 $d8
     cp   A, $2e                                        ;; 02:530f $fe $2e
-    ld   A, PLAYERACTION_DIE_2                                        ;; 02:5311 $3e $2a
+    ld   A, PLAYERACTION_SNOWBOARDING_DIE                                        ;; 02:5311 $3e $2a
     jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:5313 $ca $f9 $54
     ld   A, [wD801_Player_ActionId]                                    ;; 02:5316 $fa $01 $d8
     cp   A, $3b                                        ;; 02:5319 $fe $3b
-    ld   A, PLAYERACTION_DIE_3                                        ;; 02:531b $3e $37
+    ld   A, PLAYERACTION_KANGAROO_DEATH                                        ;; 02:531b $3e $37
     jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:531d $ca $f9 $54
     ld   A, C                                          ;; 02:5320 $79
     cp   A, $08                                        ;; 02:5321 $fe $08
@@ -882,13 +882,13 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     jp   C, call_02_4dce_SetTriggerByLevel                                 ;; 02:532c $da $ce $4d
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:532f $fa $6c $db
     cp   A, $07                                        ;; 02:5332 $fe $07
-    ld   A, PLAYERACTION_UNK36                                        ;; 02:5334 $3e $24
+    ld   A, PLAYERACTION_SNOWBOARDING_STAND_OR_WALK                                        ;; 02:5334 $3e $24
     jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:5336 $ca $f9 $54
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:5339 $fa $6c $db
     cp   A, $08                                        ;; 02:533c $fe $08
-    ld   A, PLAYERACTION_UNK48                                        ;; 02:533e $3e $30
+    ld   A, PLAYERACTION_KANGAROO_LAND_FROM_HOP                                        ;; 02:533e $3e $30
     jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:5340 $ca $f9 $54
-    ld   A, PLAYERACTION_FALLING_LAND                                        ;; 02:5343 $3e $12
+    ld   A, PLAYERACTION_LAND_FROM_FALL                                        ;; 02:5343 $3e $12
     jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:5345 $c3 $f9 $54
 .jp_02_5348:
     ld   A, [wDC8C_PlayerYVelocity]                                    ;; 02:5348 $fa $8c $dc
@@ -970,7 +970,7 @@ call_02_5374_LevelSpecificEventTrigger:
     ld   A, $20                                        ;; 02:53b5 $3e $20
 .jr_02_53b7:
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:53b7 $ea $8c $dc
-    ld   A, PLAYERACTION_UNK29                                        ;; 02:53ba $3e $1d
+    ld   A, PLAYERACTION_BLOWN_UPWARDS                                        ;; 02:53ba $3e $1d
     jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:53bc $c3 $f9 $54
 .data_02_53bf:
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 02:53bf ????????
@@ -1074,7 +1074,7 @@ call_02_5431_HandleActionTriggersAndEvents:
     jr   NZ, .jr_02_54a7                               ;; 02:547a $20 $2b
     ld   A, $04                                        ;; 02:547c $3e $04
     ld   [wDC9D], A                                    ;; 02:547e $ea $9d $dc
-    ld   A, PLAYERACTION_UNK32                                        ;; 02:5481 $3e $20
+    ld   A, PLAYERACTION_WATER_TREADING                                        ;; 02:5481 $3e $20
     call call_02_54f9_SwitchPlayerAction                                  ;; 02:5483 $cd $f9 $54
     jr   .jr_02_54a7                                   ;; 02:5486 $18 $1f
 .jr_02_5488:
@@ -1090,7 +1090,7 @@ call_02_5431_HandleActionTriggersAndEvents:
     jr   NZ, .jr_02_54a7                               ;; 02:549b $20 $0a
     ld   A, $04                                        ;; 02:549d $3e $04
     ld   [wDC9D], A                                    ;; 02:549f $ea $9d $dc
-    ld   A, PLAYERACTION_UNK32                                        ;; 02:54a2 $3e $20
+    ld   A, PLAYERACTION_WATER_TREADING                                        ;; 02:54a2 $3e $20
     call call_02_54f9_SwitchPlayerAction                                  ;; 02:54a4 $cd $f9 $54
 .jr_02_54a7:
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:54a7 $fa $81 $dc
@@ -1105,7 +1105,7 @@ call_02_5431_HandleActionTriggersAndEvents:
     ld   [wDCA1_PlayerUnk6], A                                    ;; 02:54c3 $ea $a1 $dc
     ld   [wDC86], A                                    ;; 02:54c6 $ea $86 $dc
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:54c9 $ea $8c $dc
-    ld   A, PLAYERACTION_UNK34                                        ;; 02:54cc $3e $22
+    ld   A, PLAYERACTION_CLIMBING                                        ;; 02:54cc $3e $22
     jr   call_02_54f9_SwitchPlayerAction                                  ;; 02:54ce $18 $29
 .jr_02_54d0:
     ld   HL, wD801_Player_ActionId                                     ;; 02:54d0 $21 $01 $d8
@@ -1255,6 +1255,7 @@ data_02_55c5:
     db   $00, $00, $7c, $57, $00, $00, $7c, $57        ;; 02:569d ????????
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 02:56a5 ????????
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 02:56ad ????????
+    
     db   $fe, $01, $ff, $50, $03, $10, $03, $90        ;; 02:56b5 .w..w.w.
     db   $04, $80, $04, $a0, $04, $20, $03, $60        ;; 02:56bd ?.w.?.w.
     db   $03, $01, $10, $41, $10, $51, $10, $11        ;; 02:56c5 ?.w.?.?.

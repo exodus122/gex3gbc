@@ -2,10 +2,10 @@ call_03_46e0_UpdateBgCollision_MainDispatcher:
 ; Saves current bank in wDAD6_ReturnBank
 ; Calls a banked function (call_02_5541_GetActionPropertyByte) to get collision status
 ; Depending on result bits, jumps to specialized collision handlers 
-; (call_03_4a3f_CollisionHandler_ByAction, call_03_4ae4_CollisionMask_LookupAndDispatch, or mode-specific handler table).
+; (call_03_4a3f_BgCollisionHandler_ByAction, call_03_4ae4_CollisionMask_LookupAndDispatch, or mode-specific handler table).
     farcall call_02_5541_GetActionPropertyByte
     bit  5, A                                          ;; 03:46eb $cb $6f
-    jp   NZ, call_03_4a3f_CollisionHandler_ByAction            ;; 03:46ed $c2 $3f $4a
+    jp   NZ, call_03_4a3f_BgCollisionHandler_ByAction            ;; 03:46ed $c2 $3f $4a
     bit  7, A                                          ;; 03:46f0 $cb $7f
     jp   NZ, call_03_4ae4_CollisionMask_LookupAndDispatch      ;; 03:46f2 $c2 $e4 $4a
     ld   HL, wDC1F                                     ;; 03:46f5 $21 $1f $dc
@@ -19,10 +19,10 @@ call_03_46e0_UpdateBgCollision_MainDispatcher:
     ld   L, A                                          ;; 03:4702 $6f
     jp   HL                                            ;; 03:4703 $e9
 .data_03_4704:
-    dw   call_03_4708_CollisionHandler_Sidescroller                                 ;; 03:4704 pP
-    dw   call_03_48ad_CollisionHandler_TopDown                                      ;; 03:4706 ..
+    dw   call_03_4708_BgCollisionHandler_Sidescroller                                 ;; 03:4704 pP
+    dw   call_03_48ad_BgCollisionHandler_TopDown                                      ;; 03:4706 ..
 
-call_03_4708_CollisionHandler_Sidescroller:
+call_03_4708_BgCollisionHandler_Sidescroller:
 ; Handles sidescrolling collision detection for the player.
 ; Clears and updates collision flags in wDABE_UnkBGCollisionFlags2/wDABD_UnkBGCollisionFlags.
 ; Calculates collision offsets relative to player X/Y position.
@@ -31,7 +31,7 @@ call_03_4708_CollisionHandler_Sidescroller:
 ; Proposed name: CollisionHandler_Sidescroller
 
 ; Performs detailed collision checks in side-scrolling levels: clears and stores collision flags (wDABE_UnkBGCollisionFlags2, wDABD_UnkBGCollisionFlags), 
-; clamps vertical velocity, probes the tilemap (call_03_4b37_AccumulateMovementBias/call_03_4b4c_TileCollisionCheck), sets flags for wall/floor hits, 
+; clamps vertical velocity, probes the tilemap (call_03_4b37_Sidescroller_AccumulateMovementBias/call_03_4b4c_TileCollisionCheck), sets flags for wall/floor hits, 
 ; adjusts horizontal/vertical movement masks, and updates collision state variables (wDC84–wDC8D).
     ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 03:4708 $21 $be $da
     ld   A, [HL]                                       ;; 03:470b $7e
@@ -56,7 +56,7 @@ call_03_4708_CollisionHandler_Sidescroller:
     sra  A                                             ;; 03:472f $cb $2f
     sra  A                                             ;; 03:4731 $cb $2f
     ld   [wDC8B], A                                    ;; 03:4733 $ea $8b $dc
-    call call_03_4b37_AccumulateMovementBias                                  ;; 03:4736 $cd $37 $4b
+    call call_03_4b37_Sidescroller_AccumulateMovementBias                                  ;; 03:4736 $cd $37 $4b
     jp   Z, .jp_03_47f6                                ;; 03:4739 $ca $f6 $47
     ld   E, A                                          ;; 03:473c $5f
     bit  7, E                                          ;; 03:473d $cb $7b
@@ -136,7 +136,7 @@ call_03_4708_CollisionHandler_Sidescroller:
     ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 03:47b0 $21 $be $da
     bit  7, [HL]                                       ;; 03:47b3 $cb $7e
     jr   NZ, .jp_03_47f6                               ;; 03:47b5 $20 $3f
-    call call_03_4b37_AccumulateMovementBias                                  ;; 03:47b7 $cd $37 $4b
+    call call_03_4b37_Sidescroller_AccumulateMovementBias                                  ;; 03:47b7 $cd $37 $4b
     jr   Z, .jp_03_47f6                                ;; 03:47ba $28 $3a
     bit  7, A                                          ;; 03:47bc $cb $7f
     jr   NZ, .jr_03_47d5                               ;; 03:47be $20 $15
@@ -199,7 +199,7 @@ call_03_4708_CollisionHandler_Sidescroller:
     ld   A, $04                                        ;; 03:480f $3e $04
     jr   Z, .jr_03_486e                                ;; 03:4811 $28 $5b
     ld   B, $00                                        ;; 03:4813 $06 $00
-    call call_03_4b37_AccumulateMovementBias                                  ;; 03:4815 $cd $37 $4b
+    call call_03_4b37_Sidescroller_AccumulateMovementBias                                  ;; 03:4815 $cd $37 $4b
     ld   C, A                                          ;; 03:4818 $4f
     ld   A, [wD810_PlayerYPosition]                                    ;; 03:4819 $fa $10 $d8
     add  A, $10                                        ;; 03:481c $c6 $10
@@ -267,7 +267,7 @@ call_03_4708_CollisionHandler_Sidescroller:
     ld   [wDC8D], A                                    ;; 03:4872 $ea $8d $dc
     ret                                                ;; 03:4875 $c9
 .jr_03_4876:
-    call call_03_4b37_AccumulateMovementBias                                  ;; 03:4876 $cd $37 $4b
+    call call_03_4b37_Sidescroller_AccumulateMovementBias                                  ;; 03:4876 $cd $37 $4b
     ld   C, A                                          ;; 03:4879 $4f
     ld   A, [wDC8C_PlayerYVelocity]                                    ;; 03:487a $fa $8c $dc
     swap A                                             ;; 03:487d $cb $37
@@ -298,7 +298,7 @@ call_03_4708_CollisionHandler_Sidescroller:
     ret                                                ;; 03:48a4 $c9
     db   $80, $40, $20, $10, $08, $04, $02, $01        ;; 03:48a5 ........
 
-call_03_48ad_CollisionHandler_TopDown:
+call_03_48ad_BgCollisionHandler_TopDown:
 ; Handles top-down movement collisions.
 ; Always sets collision-active bit (set 7,[wDABE_UnkBGCollisionFlags2]).
 ; Uses wDC86 and wDC89 to determine direction/attempted movement.
@@ -415,7 +415,6 @@ call_03_48ad_CollisionHandler_TopDown:
     ld   a,$03
     ld   [wDC89],a
     jp   .jp_03_49ED_AdvanceAlongPath
-
 .jp_03_496B_CheckMove_UpLeft:
 ; TryMoveUpLeft
 ; Checks diagonal up-left movement (C=FF,B=FF etc.).
@@ -447,7 +446,6 @@ call_03_48ad_CollisionHandler_TopDown:
     ld   a,$01
     ld   [wDC89],a
     jr   .jp_03_49ED_AdvanceAlongPath
-
 .jp_03_499F_CheckMove_DownLeft:
 ; TryMoveDownLeft
 ; Checks diagonal down-left (C=FF,B=1 then C=2,B=2).
@@ -549,7 +547,7 @@ call_03_48ad_CollisionHandler_TopDown:
     db   $fe, $02, $ff, $00, $fe, $00, $ff, $ff        ;; 03:4a35 ????????
     db   $fe, $fe                                      ;; 03:4a3d ??
 
-call_03_4a3f_CollisionHandler_ByAction:
+call_03_4a3f_BgCollisionHandler_ByAction:
 ; Special action-dependent collision check.
 ; Clears/sets collision flags.
 ; Looks at the player’s current action ID (wD801_Player_ActionId) to pick a rule set.
@@ -676,7 +674,7 @@ call_03_4ae4_CollisionMask_LookupAndDispatch:
     db   $60, $ff, $ff, $a0, $ff, $01, $50, $01        ;; 03:4b2b ????????
     db   $ff, $90, $01, $01                            ;; 03:4b33 ????
 
-call_03_4b37_AccumulateMovementBias:
+call_03_4b37_Sidescroller_AccumulateMovementBias:
 ; AdjustedDirectionAccumulator
 ; Reads wDC86 (step count/direction bias).
 ; If player-facing bit5 is set, complements and increments A to reverse direction.
@@ -736,6 +734,7 @@ call_03_4b4c_TileCollisionCheck:
     db   $80, $40, $20, $10, $08, $04, $02, $01        ;; 03:4b7a ????????
 
 call_03_4b82_TileCollisionCheck_Raw:
+; seems unused
 ; ProbeTileCollision_NoYOffset
 ; Similar to call_03_4b4c but skips the $0F Y-offset bias—used for a slightly different probe position.
     ld   a,[wD810_PlayerYPosition]

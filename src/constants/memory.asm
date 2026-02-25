@@ -280,7 +280,16 @@ wDB67_HDMATempScratch:
 wDB69:
     ds 1                                               ;; db69
 
-wDB6A:
+wDB6A_WarpFlags:
+; Bitfield
+; bit 7 (80) = 
+; bit 6 (40) = 
+; bit 5 (20) = 
+; bit 4 (10) = entering tv, defeated minibosses, collected bonus tv remotes
+; bit 3 (08) = 
+; bit 2 (04) = soft reset code used (A + B + Select + Start)
+; bit 1 (02) = died
+; bit 0 (01) = 
     ds 1                                               ;; db6a
 
 wDB6B_InterruptFlag:
@@ -627,7 +636,7 @@ wDC4C_UnkGraphicsFlags:
 wDC4D_UnkGraphicsCounter:
     ds 1                                               ;; dc4d
 
-wDC4E_PlayerLivesRemaining:
+wDC4E_LivesRemaining:
     ds 1                                               ;; dc4e
 wDC4F_PawCoinExtraHealth:
     ds 1                                               ;; dc4f

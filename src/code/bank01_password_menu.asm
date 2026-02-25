@@ -10,7 +10,7 @@ call_01_4f7e_SeedTileLookupTable:
 
 call_01_4f8c_BuildPasswordBitfieldAndChecksum:
 ; Description:
-; Clears wDB72_PasswordEncodedBuffer–wDB7D, seeds wDB73_PasswordLivesRemaining–wDB75_PasswordPawCoinExtraHealth from wDC4E_PlayerLivesRemaining/AF/4F, then iterates through DC5C/DC5D data, 
+; Clears wDB72_PasswordEncodedBuffer–wDB7D, seeds wDB73_PasswordLivesRemaining–wDB75_PasswordPawCoinExtraHealth from wDC4E_LivesRemaining/AF/4F, then iterates through DC5C/DC5D data, 
 ; checking bit masks (.data_01_5013 and .data_01_501f) to build bitfields in wDB76_PasswordEncodedBuffer+. 
 ; Sums values for a checksum in wDB72_PasswordEncodedBuffer and sets a completion flag wDB91_PasswordCompletionFlag.
     ld   HL, wDB72_PasswordEncodedBuffer                                     ;; 01:4f8c $21 $72 $db
@@ -22,7 +22,7 @@ call_01_4f8c_BuildPasswordBitfieldAndChecksum:
     jr   NZ, .jr_01_4f92                               ;; 01:4f94 $20 $fc
     xor  A, A                                          ;; 01:4f96 $af
     ld   [wDB72_PasswordEncodedBuffer], A                                    ;; 01:4f97 $ea $72 $db
-    ld   A, [wDC4E_PlayerLivesRemaining]                                    ;; 01:4f9a $fa $4e $dc
+    ld   A, [wDC4E_LivesRemaining]                                    ;; 01:4f9a $fa $4e $dc
     ld   [wDB73_PasswordLivesRemaining], A                                    ;; 01:4f9d $ea $73 $db
     ld   A, [wDCAF_PawCoinCounter]                                    ;; 01:4fa0 $fa $af $dc
     ld   [wDB74_PasswordPawCoinCounter], A                                    ;; 01:4fa3 $ea $74 $db
@@ -194,10 +194,10 @@ call_01_505a_ValidatePassword:
     cp   A, [HL]                                       ;; 01:50a9 $be
     jr   NZ, .jr_01_50b2                               ;; 01:50aa $20 $06
     call call_01_50b5_SetProgressFlagsFromPasswordMasks                                  ;; 01:50ac $cd $b5 $50
-    ld   A, $20                                        ;; 01:50af $3e $20
+    ld   A, PASSWORD_VALID                                        ;; 01:50af $3e $20
     ret                                                ;; 01:50b1 $c9
 .jr_01_50b2:
-    ld   A, $00                                        ;; 01:50b2 $3e $00
+    ld   A, PASSWORD_INVALID                                        ;; 01:50b2 $3e $00
     ret                                                ;; 01:50b4 $c9
 
 call_01_50b5_SetProgressFlagsFromPasswordMasks:
@@ -206,7 +206,7 @@ call_01_50b5_SetProgressFlagsFromPasswordMasks:
 ; .data_01_511a_PasswordColumnMaskTable and .data_01_5126_BitMaskLut_80to01. 
 ; It iterates through each mask byte, rotates bits, checks wDB76_PasswordEncodedBuffer bitfields, and sets password bits 
 ; in a temporary register (C). Once a row is processed, it stores the result into wDC5C_ProgressFlags, repeating 
-; for 12 entries. Finally, it updates wDC4E_PlayerLivesRemaining/AF/4F with values from wDB73_PasswordLivesRemaining–wDB75_PasswordPawCoinExtraHealth.
+; for 12 entries. Finally, it updates wDC4E_LivesRemaining/AF/4F with values from wDB73_PasswordLivesRemaining–wDB75_PasswordPawCoinExtraHealth.
     xor  A, A                                          ;; 01:50b5 $af
     ld   [wDB90_PasswordCounter], A                                    ;; 01:50b6 $ea $90 $db
     ld   DE, $00                                       ;; 01:50b9 $11 $00 $00
@@ -259,7 +259,7 @@ call_01_50b5_SetProgressFlagsFromPasswordMasks:
     cp   A, $0c                                        ;; 01:5103 $fe $0c
     jr   C, .jr_01_50bc                                ;; 01:5105 $38 $b5
     ld   A, [wDB73_PasswordLivesRemaining]                                    ;; 01:5107 $fa $73 $db
-    ld   [wDC4E_PlayerLivesRemaining], A                                    ;; 01:510a $ea $4e $dc
+    ld   [wDC4E_LivesRemaining], A                                    ;; 01:510a $ea $4e $dc
     ld   A, [wDB74_PasswordPawCoinCounter]                                    ;; 01:510d $fa $74 $db
     ld   [wDCAF_PawCoinCounter], A                                    ;; 01:5110 $ea $af $dc
     ld   A, [wDB75_PasswordPawCoinExtraHealth]                                    ;; 01:5113 $fa $75 $db

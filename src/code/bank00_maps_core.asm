@@ -802,7 +802,7 @@ call_00_150f_CheckAndSetLevelTrigger:
 ; Level Event Trigger Checker
 ; Reads wDC8A as an event flag. If not already triggered (bit7 clear), it marks it triggered, 
 ; looks up a table (.data_00_153f) indexed by current level and offset E, and loads a value into wDC69_PlayerSpawnIdInLevel. 
-; It also sets bit2 of wDB6A. Handles special values $ff (no action) and $fe (conditional on wDCB1_LevelTriggerBuffer).
+; It also sets bit2 of wDB6A_WarpFlags. Handles special values $ff (no action) and $fe (conditional on wDCB1_LevelTriggerBuffer).
     ld   HL, wDC8A                                     ;; 00:150f $21 $8a $dc
     ld   E, [HL]                                       ;; 00:1512 $5e
     bit  7, E                                          ;; 00:1513 $cb $7b
@@ -828,7 +828,7 @@ call_00_150f_CheckAndSetLevelTrigger:
     ld   A, $10                                        ;; 00:1534 $3e $10
 .jr_00_1536:
     ld   [wDC69_PlayerSpawnIdInLevel], A                                    ;; 00:1536 $ea $69 $dc
-    ld   HL, wDB6A                                     ;; 00:1539 $21 $6a $db
+    ld   HL, wDB6A_WarpFlags                                     ;; 00:1539 $21 $6a $db
     set  2, [HL]                                       ;; 00:153c $cb $d6
     ret                                                ;; 00:153e $c9
 .data_00_153f:
@@ -1375,7 +1375,7 @@ call_00_1a46_LoadBgMapRow:
 call_00_1bbc_CheckForDoorAndEnter:
 ; Using the current level number (wDC1E_CurrentLevelNumber) and position (wD80E/wD810), 
 ; scans a table (.data_00_1c33_DoorLocationsByMap) for proximity to door trigger points. If within a bounding box, 
-; writes trigger data to wDCC1_EnterDoorRelated1/wDCC2_EnterDoorRelated2, sets wDC69_PlayerSpawnIdInLevel, and marks wDB6A flag. 
+; writes trigger data to wDCC1_EnterDoorRelated1/wDCC2_EnterDoorRelated2, sets wDC69_PlayerSpawnIdInLevel, and marks wDB6A_WarpFlags flag. 
 ; Skips special levels $05 and $0B.
 ; Purpose: Used to enter doors after pressing Up on Dpad
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:1bbc $fa $1e $dc
@@ -1452,7 +1452,7 @@ call_00_1bbc_CheckForDoorAndEnter:
 .jr_00_1c27:
     ld   A, [wDCC1_EnterDoorRelated1]                                    ;; 00:1c27 $fa $c1 $dc
     ld   [wDC69_PlayerSpawnIdInLevel], A                                    ;; 00:1c2a $ea $69 $dc
-    ld   HL, wDB6A                                     ;; 00:1c2d $21 $6a $db
+    ld   HL, wDB6A_WarpFlags                                     ;; 00:1c2d $21 $6a $db
     set  2, [HL]                                       ;; 00:1c30 $cb $d6
     ret                                                ;; 00:1c32 $c9
 .data_00_1c33_DoorLocationsByMap:
