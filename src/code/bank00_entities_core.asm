@@ -17,9 +17,9 @@ call_00_2cbf_LoadEntityPalettes:
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:2cdc $cd $6e $07
     jp   call_00_0f08_RestoreBank                                  ;; 00:2cdf $c3 $08 $0f
 
-call_00_2ce2_BuildGexSpriteDrawList:
+call_00_2ce2_Entity_DrawGex:
 ; This is a complex sprite/OAM population routine. It:
-; Sets wDAC2_DMATransferLength=1 and combines the player’s facing direction with a state byte (wDC7A) into wDC53_GexSpriteRelated2.
+; Sets wDAC2_DMATransferLength=1 and combines the player’s facing direction with a state byte (wDC7A_PlayerClimbingOrSwimmingRelated) into wDC53_GexSpriteRelated2.
 ; Switches banks to retrieve sprite graphics metadata based on the current level (wDB6C_CurrentMapId).
 ; Computes the address of Gex’s sprite frame data (using offsets and increments).
 ; Reads sprite tiles, positions, and attributes, adjusting for the player’s position 
@@ -34,7 +34,7 @@ call_00_2ce2_BuildGexSpriteDrawList:
     ld   A, $01                                        ;; 00:2ce2 $3e $01
     ld   [wDAC2_DMATransferLength], A                                    ;; 00:2ce4 $ea $c2 $da
     ld   A, [wD80D_PlayerFacingDirection]                                    ;; 00:2ce7 $fa $0d $d8
-    ld   HL, wDC7A                                     ;; 00:2cea $21 $7a $dc
+    ld   HL, wDC7A_PlayerClimbingOrSwimmingRelated                                     ;; 00:2cea $21 $7a $dc
     or   A, [HL]                                       ;; 00:2ced $b6
     ld   [wDC53_GexSpriteRelated2], A                                    ;; 00:2cee $ea $53 $dc
     ld   A, BANK_7F_ENTITY_PALETTES                                        ;; 00:2cf1 $3e $7f
@@ -827,13 +827,13 @@ data_00_325F:
     db   $01, $08, $08, COLLISION_TYPE_TV_BUTTON, $00, $00, $ff, $ff ; 00:32e0 ......?? ; ENTITY_TV_BUTTON
     db   $01, $00, $00, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:32e8 ......?. ; ENTITY_TV_REMOTE
     db   $01, $00, $00, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:32f0 ???????? ; ENTITY_UNK13
-    db   $01, $00, $00, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:32f8 ?.....?? ; ENTITY_GOAL_COUNTER
-    db   $01, $00, $00, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:3300 ?.....?? ; ENTITY_UNK15
-    db   $01, $00, $00, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:3308 ?.....?? ; ENTITY_UNK16
-    db   $01, $00, $00, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:3310 ?.....?? ; ENTITY_UNK17
-    db   $01, $00, $00, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:3318 ???????? ; ENTITY_UNK18
-    db   $01, $00, $00, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:3320 ???????? ; ENTITY_UNK19
-    db   $01, $00, $00, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:3328 ???????? ; ENTITY_UNK1A
+    db   $01, $00, $00, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:32f8 ?.....?? ; ENTITY_GOAL_COUNTER_1
+    db   $01, $00, $00, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:3300 ?.....?? ; ENTITY_GOAL_COUNTER_2
+    db   $01, $00, $00, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:3308 ?.....?? ; ENTITY_GOAL_COUNTER_3
+    db   $01, $00, $00, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:3310 ?.....?? ; ENTITY_GOAL_COUNTER_4
+    db   $01, $00, $00, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:3318 ???????? ; ENTITY_GOAL_COUNTER_5
+    db   $01, $00, $00, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:3320 ???????? ; ENTITY_GOAL_COUNTER_6
+    db   $01, $00, $00, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:3328 ???????? ; ENTITY_GOAL_COUNTER_7
     db   $01, $00, $00, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:3330 ???????? ; ENTITY_BONUS_STAGE_TIMER
     db   $01, $10, $10, COLLISION_TYPE_FREESTANDING_REMOTE, $02, $00, $ff, $82 ; 00:3338 ......?. ; ENTITY_FREESTANDING_REMOTE
     db   $01, $0c, $10, COLLISION_TYPE_ICE_SCULPTURE, $00, $00, $ff, $ff ; 00:3340 ......?? ; ENTITY_HOLIDAY_TV_ICE_SCULPTURE
@@ -914,7 +914,7 @@ data_00_325F:
     db   $01, $10, $10, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:3598 ???????? ; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE
     db   $01, $08, $08, COLLISION_TYPE_CANNON, $00, $00, $ff, $ff ; 00:35a0 ???????? ; ENTITY_LIZARD_OF_OZ_CANNON
     db   $01, $0a, $0a, COLLISION_TYPE_BRAIN_OF_OZ_PROJECTILE, $00, $00, $ff, $ff ; 00:35a8 ???????? ; ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE
-    db   $01, $10, $10, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:35b0 ???????? ; ENTITY_UNK6B
+    db   $01, $10, $10, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:35b0 ???????? ; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2
     db   $01, $10, $08, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:35b8 ???????? ; ENTITY_UNK6C
     db   $01, $10, $08, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:35c0 ???????? ; ENTITY_UNK6D
     db   $01, $1c, $20, COLLISION_TYPE_REZ, $10, $00, $ff, $8a ; 00:35c8 ???????? ; ENTITY_CHANNEL_Z_REZ
@@ -1240,8 +1240,8 @@ call_00_37a0_SpawnEntityRelative:
 ; Finds a free slot.
 ; Calls a banked routine (call_03_59c6_IsEntityFlaggedHighBit) to fetch spawn data.
 ; Derives offsets using the current entity address.
-; Reads a table (.data_00_38b6) and copies positional deltas.
-; Depending on a flag in wDCE9, adds or subtracts position offsets.
+; Reads a table (.data_00_38b6_EntityChildSpawnData) and copies positional deltas.
+; Depending on a flag in wDCE9_EntitySpawnPosOffsetFlag, adds or subtracts position offsets.
 ; Writes adjusted coordinates and state values into live entity memory.
 ; Calls 2a03_ResetEntityTempSlot and finalizes setup with banked calls.
 ; Usage: Spawns a new entity at a position relative to the parent entity, 
@@ -1250,7 +1250,7 @@ call_00_37a0_SpawnEntityRelative:
     ret  Z                                             ;; 00:37a3 $c8
     push DE                                            ;; 00:37a4 $d5
     farcall call_03_59c6_IsEntityFlaggedHighBit
-    ld   [wDCE9], A                                    ;; 00:37b0 $ea $e9 $dc
+    ld   [wDCE9_EntitySpawnPosOffsetFlag], A                                    ;; 00:37b0 $ea $e9 $dc
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 00:37b3 $fa $00 $da
     rlca                                               ;; 00:37b6 $07
     rlca                                               ;; 00:37b7 $07
@@ -1261,14 +1261,14 @@ call_00_37a0_SpawnEntityRelative:
     ld   DE, wDA01_EntityListIndexesForCurrentEntities                                     ;; 00:37be $11 $01 $da
     add  HL, DE                                        ;; 00:37c1 $19
     ld   A, [HL]                                       ;; 00:37c2 $7e
-    ld   [wDCE8_ParentEntityListIndex], A                                    ;; 00:37c3 $ea $e8 $dc
+    ld   [wDCE8_CurrentEntity_ParentListIndex], A                                    ;; 00:37c3 $ea $e8 $dc
     pop  DE                                            ;; 00:37c6 $d1
     ld   L, C                                          ;; 00:37c7 $69
     ld   H, $00                                        ;; 00:37c8 $26 $00
     add  HL, HL                                        ;; 00:37ca $29
     add  HL, HL                                        ;; 00:37cb $29
     add  HL, HL                                        ;; 00:37cc $29
-    ld   BC, .data_00_38b6                                     ;; 00:37cd $01 $b6 $38
+    ld   BC, .data_00_38b6_EntityChildSpawnData                                     ;; 00:37cd $01 $b6 $38
     add  HL, BC                                        ;; 00:37d0 $09
     ld   A, [HL+]                                      ;; 00:37d1 $2a
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 00:37d2 $fa $00 $da
@@ -1283,7 +1283,7 @@ call_00_37a0_SpawnEntityRelative:
     ld   D, B                                          ;; 00:37e2 $50
     ld   A, [BC]                                       ;; 00:37e3 $0a
     ld   [DE], A                                       ;; 00:37e4 $12
-    ld   A, [wDCE9]                                    ;; 00:37e5 $fa $e9 $dc
+    ld   A, [wDCE9_EntitySpawnPosOffsetFlag]                                    ;; 00:37e5 $fa $e9 $dc
     and  A, A                                          ;; 00:37e8 $a7
     jr   NZ, .jr_00_37f0                               ;; 00:37e9 $20 $05
     ld   A, [DE]                                       ;; 00:37eb $1a
@@ -1292,21 +1292,21 @@ call_00_37a0_SpawnEntityRelative:
 .jr_00_37f0:
     inc  C                                             ;; 00:37f0 $0c
     inc  E                                             ;; 00:37f1 $1c
-    ld   A, [BC]                                       ;; 00:37f2 $0a
-    add  A, [HL]                                       ;; 00:37f3 $86
-    ld   [DE], A                                       ;; 00:37f4 $12
+    ld   A, [BC]                                       ;; 00:37f2 $0a ; load parent entity x position (lo)
+    add  A, [HL]                                       ;; 00:37f3 $86 ; add offset from table below
+    ld   [DE], A                                       ;; 00:37f4 $12 ; set new entity x position (lo)
     inc  BC                                            ;; 00:37f5 $03
     inc  DE                                            ;; 00:37f6 $13
     inc  HL                                            ;; 00:37f7 $23
-    ld   A, [BC]                                       ;; 00:37f8 $0a
-    adc  A, [HL]                                       ;; 00:37f9 $8e
-    ld   [DE], A                                       ;; 00:37fa $12
+    ld   A, [BC]                                       ;; 00:37f8 $0a ; load parent entity x position (hi)
+    adc  A, [HL]                                       ;; 00:37f9 $8e ; add different offset from table below
+    ld   [DE], A                                       ;; 00:37fa $12 ; set new entity x position (hi)
     jr   .jr_00_3808                                   ;; 00:37fb $18 $0b
 .jr_00_37fd:
     inc  C                                             ;; 00:37fd $0c
     inc  E                                             ;; 00:37fe $1c
     ld   A, [BC]                                       ;; 00:37ff $0a
-    sub  A, [HL]                                       ;; 00:3800 $96
+    sub  A, [HL]                                       ;; 00:3800 $96 ; same as above but subtracts instead of adds
     ld   [DE], A                                       ;; 00:3801 $12
     inc  BC                                            ;; 00:3802 $03
     inc  DE                                            ;; 00:3803 $13
@@ -1320,13 +1320,13 @@ call_00_37a0_SpawnEntityRelative:
     inc  HL                                            ;; 00:380a $23
     ld   A, [BC]                                       ;; 00:380b $0a
     add  A, [HL]                                       ;; 00:380c $86
-    ld   [DE], A                                       ;; 00:380d $12
+    ld   [DE], A                                       ;; 00:380d $12 ; same thing as above but for y position lo
     inc  BC                                            ;; 00:380e $03
     inc  DE                                            ;; 00:380f $13
     inc  HL                                            ;; 00:3810 $23
-    ld   A, [BC]                                       ;; 00:3811 $0a
+    ld   A, [BC]                                       ;; 00:3811 $0a ; now hl points to entity id in table below
     adc  A, [HL]                                       ;; 00:3812 $8e
-    ld   [DE], A                                       ;; 00:3813 $12
+    ld   [DE], A                                       ;; 00:3813 $12 ;
     inc  HL                                            ;; 00:3814 $23
     ld   A, E                                          ;; 00:3815 $7b
     xor  A, $11                                        ;; 00:3816 $ee $11
@@ -1377,7 +1377,7 @@ call_00_37a0_SpawnEntityRelative:
     inc  E                                             ;; 00:3848 $1c ; ENTITY_FIELD_UNK1E
     ld   [DE], A                                       ;; 00:3849 $12
     inc  E                                             ;; 00:384a $1c ; ENTITY_FIELD_PARENT
-    ld   A, [wDCE8_ParentEntityListIndex]                                    ;; 00:384b $fa $e8 $dc
+    ld   A, [wDCE8_CurrentEntity_ParentListIndex]                                    ;; 00:384b $fa $e8 $dc
     ld   [DE], A                                       ;; 00:384e $12 
     call call_00_2a03_ResetEntityListIndex                                  ;; 00:384f $cd $03 $2a
     xor  A, A                                          ;; 00:3852 $af
@@ -1450,38 +1450,38 @@ call_00_37a0_SpawnEntityRelative:
     ld   A, [DE]                                       ;; 00:38b3 $1a
     ld   [HL], A                                       ;; 00:38b4 $77
     ret                                                ;; 00:38b5 $c9
-.data_00_38b6:
-    db   $01, $00, $00, $e0, $ff, $04, $00, $00        ;; 00:38b6 ????????
-    db   $01, $00, $00, $e0, $ff, $05, $00, $00        ;; 00:38be ????????
-    db   $01, $00, $00, $e0, $ff, $06, $00, $00        ;; 00:38c6 ????????
-    db   $01, $00, $00, $e0, $ff, $07, $00, $00        ;; 00:38ce ????????
-    db   $01, $00, $00, $e0, $ff, $08, $00, $00        ;; 00:38d6 ????????
-    db   $01, $f3, $ff, $fd, $ff, $1f, $00, $00        ;; 00:38de .????w??
-    db   $01, $0e, $00, $fb, $ff, $27, $00, $00        ;; 00:38e6 ????????
-    db   $01, $00, $00, $00, $00, $14, $00, $00        ;; 00:38ee .????w??
-    db   $01, $00, $00, $00, $00, $15, $00, $00        ;; 00:38f6 .????w??
-    db   $01, $00, $00, $00, $00, $16, $00, $00        ;; 00:38fe .????w??
-    db   $01, $00, $00, $00, $00, $17, $00, $00        ;; 00:3906 .????w??
-    db   $01, $00, $00, $00, $00, $18, $00, $00        ;; 00:390e ????????
-    db   $01, $00, $00, $00, $00, $19, $00, $00        ;; 00:3916 ????????
-    db   $01, $00, $00, $00, $00, $1a, $00, $00        ;; 00:391e ????????
-    db   $01, $07, $00, $07, $00, $32, $00, $00        ;; 00:3926 ????????
-    db   $01, $07, $00, $07, $00, $33, $00, $00        ;; 00:392e ????????
-    db   $01, $0c, $00, $00, $00, $50, $00, $00        ;; 00:3936 ????????
-    db   $00, $00, $00, $00, $00, $0e, $00, $00        ;; 00:393e ????????
-    db   $00, $00, $00, $00, $00, $0f, $00, $00        ;; 00:3946 ????????
-    db   $00, $00, $00, $00, $00, $10, $00, $00        ;; 00:394e ????????
-    db   $00, $00, $00, $08, $00, $60, $00, $00        ;; 00:3956 ????????
-    db   $00, $f0, $ff, $04, $00, $56, $00, $00        ;; 00:395e ????????
-    db   $00, $01, $00, $f0, $ff, $68, $00, $00        ;; 00:3966 ????????
-    db   $00, $00, $00, $00, $00, $6b, $00, $00        ;; 00:396e ????????
-    db   $00, $00, $00, $08, $00, $6a, $00, $00        ;; 00:3976 ????????
-    db   $00, $00, $00, $00, $00, $1b, $00, $00        ;; 00:397e ????????
-    db   $01, $00, $00, $00, $00, $50, $00, $00        ;; 00:3986 ????????
-    db   $01, $04, $00, $f2, $ff, $29, $00, $00        ;; 00:398e ????????
-    db   $00, $ff, $ff, $0b, $00, $65, $00, $00        ;; 00:3996 ????????
-    db   $00, $c0, $ff, $50, $00, $71, $00, $00        ;; 00:399e ????????
-    db   $00, $40, $00, $50, $00, $71, $00, $00        ;; 00:39a6 ????????
+.data_00_38b6_EntityChildSpawnData:
+    db   $01, $00, $00, $e0, $ff, ENTITY_FLY_1, $00, $00        ;; 00:38b6 ????????
+    db   $01, $00, $00, $e0, $ff, ENTITY_FLY_2, $00, $00        ;; 00:38be ????????
+    db   $01, $00, $00, $e0, $ff, ENTITY_FLY_3, $00, $00        ;; 00:38c6 ????????
+    db   $01, $00, $00, $e0, $ff, ENTITY_FLY_4, $00, $00        ;; 00:38ce ????????
+    db   $01, $00, $00, $e0, $ff, ENTITY_FLY_5, $00, $00        ;; 00:38d6 ????????
+    db   $01, $f3, $ff, $fd, $ff, ENTITY_HOLIDAY_TV_EVIL_SANTA_PROJECTILE, $00, $00        ;; 00:38de .????w??
+    db   $01, $0e, $00, $fb, $ff, ENTITY_MYSTERY_TV_SAFARI_SAM_PROJECTILE, $00, $00        ;; 00:38e6 ????????
+    db   $01, $00, $00, $00, $00, ENTITY_GOAL_COUNTER_1, $00, $00        ;; 00:38ee .????w??
+    db   $01, $00, $00, $00, $00, ENTITY_GOAL_COUNTER_2, $00, $00        ;; 00:38f6 .????w??
+    db   $01, $00, $00, $00, $00, ENTITY_GOAL_COUNTER_3, $00, $00        ;; 00:38fe .????w??
+    db   $01, $00, $00, $00, $00, ENTITY_GOAL_COUNTER_4, $00, $00        ;; 00:3906 .????w??
+    db   $01, $00, $00, $00, $00, ENTITY_GOAL_COUNTER_5, $00, $00        ;; 00:390e ????????
+    db   $01, $00, $00, $00, $00, ENTITY_GOAL_COUNTER_6, $00, $00        ;; 00:3916 ????????
+    db   $01, $00, $00, $00, $00, ENTITY_GOAL_COUNTER_7, $00, $00        ;; 00:391e ????????
+    db   $01, $07, $00, $07, $00, ENTITY_TUT_TV_SNAKE_RIGHT_PROJECTILE, $00, $00        ;; 00:3926 ????????
+    db   $01, $07, $00, $07, $00, ENTITY_TUT_TV_SNAKE_LEFT_PROJECTILE, $00, $00        ;; 00:392e ????????
+    db   $01, $0c, $00, $00, $00, ENTITY_ANIME_CHANNEL_SECBOT_PROJECTILE, $00, $00        ;; 00:3936 ????????
+    db   $00, $00, $00, $00, $00, ENTITY_UNK0E, $00, $00        ;; 00:393e ????????
+    db   $00, $00, $00, $00, $00, ENTITY_UNK0F, $00, $00        ;; 00:3946 ????????
+    db   $00, $00, $00, $00, $00, ENTITY_UNK10, $00, $00        ;; 00:394e ????????
+    db   $00, $00, $00, $08, $00, ENTITY_SUPERHERO_SHOW_CONVICT_PROJECTILE, $00, $00        ;; 00:3956 ????????
+    db   $00, $f0, $ff, $04, $00, ENTITY_SUPERHERO_SHOW_BOMB, $00, $00        ;; 00:395e ????????
+    db   $00, $01, $00, $f0, $ff, ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE, $00, $00        ;; 00:3966 ????????
+    db   $00, $00, $00, $00, $00, ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2, $00, $00        ;; 00:396e ????????
+    db   $00, $00, $00, $08, $00, ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE, $00, $00        ;; 00:3976 ????????
+    db   $00, $00, $00, $00, $00, ENTITY_BONUS_STAGE_TIMER, $00, $00        ;; 00:397e ????????
+    db   $01, $00, $00, $00, $00, ENTITY_ANIME_CHANNEL_SECBOT_PROJECTILE, $00, $00        ;; 00:3986 ????????
+    db   $01, $04, $00, $f2, $ff, ENTITY_MYSTERY_TV_GHOST_KNIGHT_PROJECTILE, $00, $00        ;; 00:398e ????????
+    db   $00, $ff, $ff, $0b, $00, ENTITY_MARSUPIAL_MADNESS_BIRD_PROJECTILE, $00, $00        ;; 00:3996 ????????
+    db   $00, $c0, $ff, $50, $00, ENTITY_CHANNEL_Z_REZ_PROJECTILE, $00, $00        ;; 00:399e ????????
+    db   $00, $40, $00, $50, $00, ENTITY_CHANNEL_Z_REZ_PROJECTILE, $00, $00        ;; 00:39a6 ????????
     db   $00, $00, $00, $00, $00, $00, $00, $6b        ;; 00:39ae ????????
     db   $00, $00, $00, $00, $00, $08, $00, $6a        ;; 00:39b6 ????????
     db   $00, $00, $00, $00, $00, $00, $00, $1b        ;; 00:39be ????????

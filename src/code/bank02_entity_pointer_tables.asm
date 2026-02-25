@@ -19,13 +19,13 @@ data_02_4000:
    dw   .data_02_4300 ; ENTITY_TV_BUTTON
    dw   .data_02_4310 ; ENTITY_TV_REMOTE
    dw   .data_02_4324 ; ENTITY_UNK13
-   dw   .data_02_4328 ; ENTITY_GOAL_COUNTER
-   dw   .data_02_432c ; ENTITY_UNK15 ; probably GoalCounter
-   dw   .data_02_4330 ; ENTITY_UNK16 ; probably GoalCounter
-   dw   .data_02_4334 ; ENTITY_UNK17 ; probably GoalCounter
-   dw   .data_02_4338 ; ENTITY_UNK18 ; probably GoalCounter
-   dw   .data_02_433c ; ENTITY_UNK19 ; probably GoalCounter
-   dw   .data_02_4340 ; ENTITY_UNK1A ; probably GoalCounter
+   dw   .data_02_4328 ; ENTITY_GOAL_COUNTER_1
+   dw   .data_02_432c ; ENTITY_GOAL_COUNTER_2
+   dw   .data_02_4330 ; ENTITY_GOAL_COUNTER_3
+   dw   .data_02_4334 ; ENTITY_GOAL_COUNTER_4
+   dw   .data_02_4338 ; ENTITY_GOAL_COUNTER_5
+   dw   .data_02_433c ; ENTITY_GOAL_COUNTER_6
+   dw   .data_02_4340 ; ENTITY_GOAL_COUNTER_7
    dw   .data_02_4344 ; ENTITY_BONUS_STAGE_TIMER
    dw   .data_02_4348 ; ENTITY_FREESTANDING_REMOTE
    dw   .data_02_4354 ; ENTITY_HOLIDAY_TV_ICE_SCULPTURE
@@ -106,7 +106,7 @@ data_02_4000:
    dw   .data_02_4744 ; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE
    dw   .data_02_4748 ; ENTITY_LIZARD_OF_OZ_CANNON
    dw   .data_02_475c ; ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE
-   dw   .data_02_4760 ; ENTITY_UNK6B
+   dw   .data_02_4760 ; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2
    dw   .data_02_4764 ; ENTITY_UNK6C
    dw   .data_02_4768 ; ENTITY_UNK6D
    dw   .data_02_476c ; ENTITY_CHANNEL_Z_REZ
@@ -631,7 +631,7 @@ data_02_4000:
 .data_02_475c:
     dw   call_02_6e44_EntityAction_BrainOfOzProjectile_Update, data_02_7e53
 .data_02_4760:
-    dw   call_02_6f07_EntityAction_Unk_unk, data_02_7e5e
+    dw   call_02_6f07_EntityAction_CannonProjectile2_Update, data_02_7e5e
 .data_02_4764:
     dw   call_02_6f0e_EntityAction_Unk_None, data_02_7e67
 .data_02_4768:

@@ -17,7 +17,7 @@ call_00_21f6_FindAndMarkEntityInList_TVButton:
 ; to decide which flag (1 or 2) to apply.
 ; Exits by restoring the previous bank. 
 ; Usage:
-; Marks specific entities (e.g., collectibles, triggers, or doors) as “active” or “visited” 
+; Marks specific entities (e.g., collectibles, triggers, or doors) as "active" or "visited" 
 ; for the current level. This is typical of collectible or progression flags.
     push BC                                            ;; 00:21f6 $c5
     ld   A, [wDC16_EntityListBank]                                    ;; 00:21f7 $fa $16 $dc
@@ -212,7 +212,7 @@ call_00_22e0_Entity_IncrementTriggerFlag:
 call_00_22ef_Entity_SetTriggerActive:
 ; Gets entity parameter via 230F.
 ; If parameter < $10, sets that entity’s slot to 1.
-; Purpose: Mark the slot as “active” or “initialized.”
+; Purpose: Mark the slot as "active" or "initialized."
     call call_00_230f_Entity_GetParameter
     ld   a,c
     cp   a,$10
@@ -278,7 +278,7 @@ call_00_230f_Entity_GetParameter:
 call_00_233e_Entity_UpdatePatternedMovement:
 ; Updates an entity’s velocity counter, uses it as an index into a 
 ; velocity lookup table (.data_00_23B4_Velocities).
-; Depending on a “motion type” flag (0, 1, or 2), it interprets table entries 
+; Depending on a "motion type" flag (0, 1, or 2), it interprets table entries 
 ; differently (normal, flipped X, flipped Y).
 ; Computes a signed (Δx, Δy) vector, adds it to the entity’s initial position, 
 ; and stores the new position into the entity’s X/Y position fields.
@@ -664,7 +664,7 @@ call_00_259d_Entity_HandleVerticalBoundingBoxTurnAround:
     ldi  a,[hl]
     sbc  d
     jr   c,call_00_25BF_Entity_SetAndCompareFacingDirection
-    ld   c,ENTITY_FACING_VERTICAL_CHANGE
+    ld   c,ENTITY_FACING_VERTICAL_FLIP
     ldi  a,[hl]
     sub  e
     ld   a,[hl]
@@ -886,7 +886,7 @@ call_00_26c9_Entity_CarryPlayerHorizontally:
 ; Complex: Reads entity’s X velocity, some state flags, and bounding values.
 ; Compares against global state vars (wDC7B_CurrentEntityAddrLoAlt, wDC7B_CurrentEntityAddrLoAlt2).
 ; If conditions match, applies an adjustment to the player’s X position relative to the entity (e.g. conveyor belts, pushers).
-; Appears to handle environmental effects that “move the player.”
+; Appears to handle environmental effects that "move the player."
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XVEL
     ld   c,[hl]
     xor  a,$02
@@ -1379,7 +1379,7 @@ call_00_299f_Entity_TurnAround:
 call_00_29ac_Entity_IsFacingPlayer:
 ; Compares entity’s facing direction with the direction relative to the player.
 ; Returns if they match.
-; Used for checks like “is the entity facing the player?”
+; Used for checks like "is the entity facing the player?"
     call call_00_2a68_Entity_ComputeXDistanceFromPlayer
     call call_00_2976_Entity_GetFacingDirection
     ld   hl,wDA12_EntityDirectionRelativeToPlayer
@@ -1433,7 +1433,7 @@ call_00_29ce_Entity_CheckExists:
     
 call_00_29df_Entity_SetFacingUnkFlag:
 ; Computes HL = $D80D + current entity index.
-; Sets bit 7 of [HL] (marking entity as “active,” “visible,” or “flagged”).
+; Sets bit 7 of [HL] (marking entity as "active," "visible," or "flagged").
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_FACING_DIRECTION
     set  7,[hl]
     ret  
@@ -1533,7 +1533,7 @@ call_00_2a15_CheckCameraOverlapBoundingBox:
 call_00_2a5d_Entity_CheckGraphicsFlag2:
 ; Computes HL = D805 + current entity index.
 ; Tests bit 2 of the entity’s flags.
-; Purpose: Checks a particular state flag (likely “grounded,” “active,” or similar).
+; Purpose: Checks a particular state flag (likely "grounded," "active," or similar).
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_GRAPHICS_FLAGS
     bit  2, [HL]                                       ;; 00:2a65 $cb $56
     ret                                                ;; 00:2a67 $c9
@@ -1677,7 +1677,7 @@ call_00_2b10_Entity_FindDuplicateInstance:
 ; Iterates through a block of entity slots in WRAM.
 ; Compares each entry’s ID and list index against the current entity.
 ; If a match is found, returns success (A=1).
-; Basically: “does another instance of this entity already exist?”
+; Basically: "does another instance of this entity already exist?"
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 00:2b10 $fa $00 $da
     rlca                                               ;; 00:2b13 $07
     rlca                                               ;; 00:2b14 $07
@@ -1737,7 +1737,7 @@ call_00_2b3d_ClearAllEntitySlots:
 call_00_2b5d_ClearEntitySlot:
 ; Marks the current entity slot as inactive by writing $FF to wD8xx. Then computes a related index 
 ; from the slot address to access another table (wDA01_EntityListIndexesForCurrentEntities → wD7xx) and clears bit 6 of its status 
-; byte—likely removing an “active” or “visible” flag for that entity.
+; byte—likely removing an "active" or "visible" flag for that entity.
     LOAD_OBJ_FIELD_TO_HL_ALT ENTITY_FIELD_ENTITY_ID
     ld   [HL], $ff                                     ;; 00:2b65 $36 $ff
     ld   A, L                                          ;; 00:2b67 $7d
@@ -1818,7 +1818,7 @@ call_00_2bbe_AttemptToConvertEntityToCollectible:
 ; (EntitySetId, Entity_Set14, palette, facing direction, etc.).
 ; Updates its status to $50, resets return bank, calls an alternate bank function (call_02_72ac_SetEntityAction), 
 ; and copies a palette (call_00_2c20_Entity_CopyPaletteToBuffer).
-; This is the main “spawn/setup entity” function.
+; This is the main "spawn/setup entity" function.
     call call_00_35e8_GetEntityCollisionFlags                                  ;; 00:2bbe $cd $e8 $35
     cp   A, $ff                                        ;; 00:2bc1 $fe $ff
     jr   Z, call_00_2b7a_DeactivateEntity                                 ;; 00:2bc3 $28 $b5

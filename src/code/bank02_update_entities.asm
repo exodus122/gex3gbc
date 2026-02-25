@@ -2,25 +2,25 @@ call_02_708f_InitEntitiesAndSpawnPlayer:
 ; Purpose: Initializes core entity-related state when entering a level or respawning the player.
 ; Details:
 ; Clears many entity/flag variables (wDC84–wDC8F, wDABD_UnkBGCollisionFlags–wDABE_UnkBGCollisionFlags2, etc.).
-; If a pending action ID exists in wDC78_PlayerActionIdRelated, sets it up it using call_02_72ac_SetEntityAction.
-; Resets player-facing direction and flags, calls call_02_7123_ClearEntitySlotsExcludingPlayer to clear entity slots, 
+; If a pending action ID exists, sets it.
+; Resets player-facing direction and flags, clears entity slots, 
 ; and spawns required relative entities.
 ; Loops through call_00_360c_SpawnEntityOnceImmediate until the player entity (wDAB8_EntityCounter == 1) is spawned.
     xor  A, A                                          ;; 02:708f $af
     ld   [wDB6A_WarpFlags], A                                    ;; 02:7090 $ea $6a $db
-    ld   A, [wDC78_PlayerActionIdRelated]                                    ;; 02:7093 $fa $78 $dc
-    cp   A, $ff                                        ;; 02:7096 $fe $ff
+    ld   A, [wDC78_PlayerPendingActionId]                                    ;; 02:7093 $fa $78 $dc
+    cp   A, PLAYERACTION_NONE_PENDING                                        ;; 02:7096 $fe $ff
     jr   Z, .jr_02_70d1                                ;; 02:7098 $28 $37
     xor  A, A                                          ;; 02:709a $af
     ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 02:709b $ea $00 $da
-    ld   A, $00                                        ;; 02:709e $3e $00
+    ld   A, ENTITY_GEX                                        ;; 02:709e $3e $00
     ld   [wD800_Player_Id], A                                    ;; 02:70a0 $ea $00 $d8
-    ld   A, [wDC78_PlayerActionIdRelated]                                    ;; 02:70a3 $fa $78 $dc
+    ld   A, [wDC78_PlayerPendingActionId]                                    ;; 02:70a3 $fa $78 $dc
     call call_02_72ac_SetEntityAction                                  ;; 02:70a6 $cd $ac $72
-    ld   A, $ff                                        ;; 02:70a9 $3e $ff
-    ld   [wDC78_PlayerActionIdRelated], A                                    ;; 02:70ab $ea $78 $dc
+    ld   A, PLAYERACTION_NONE_PENDING                                        ;; 02:70a9 $3e $ff
+    ld   [wDC78_PlayerPendingActionId], A                                    ;; 02:70ab $ea $78 $dc
     ld   A, $00                                        ;; 02:70ae $3e $00
-    ld   [wDC7A], A                                    ;; 02:70b0 $ea $7a $dc
+    ld   [wDC7A_PlayerClimbingOrSwimmingRelated], A                                    ;; 02:70b0 $ea $7a $dc
     ld   A, $00                                        ;; 02:70b3 $3e $00
     ld   [wD80D_PlayerFacingDirection], A                                    ;; 02:70b5 $ea $0d $d8
     xor  A, A                                          ;; 02:70b8 $af
@@ -39,7 +39,7 @@ call_02_708f_InitEntitiesAndSpawnPlayer:
     ld   [wDABE_UnkBGCollisionFlags2], A                                    ;; 02:70d8 $ea $be $da
     ld   [wDABD_UnkBGCollisionFlags], A                                    ;; 02:70db $ea $bd $da
     ld   A, $ff                                        ;; 02:70de $3e $ff
-    ld   [wDC79], A                                    ;; 02:70e0 $ea $79 $dc
+    ld   [wDC79_PlayerUnkFlags2], A                                    ;; 02:70e0 $ea $79 $dc
     xor  A, A                                          ;; 02:70e3 $af
     ld   [wDC7B_CurrentEntityAddrLoAlt], A                                    ;; 02:70e4 $ea $7b $dc
     ld   [wDC7C_PlayerCollisionUnusedFlag], A                                    ;; 02:70e7 $ea $7c $dc
@@ -124,7 +124,7 @@ call_02_7152_UpdateAllEntities:
 ; Invokes entity behavior routines (call_00_0f22_JumpHL) for special entities (wDC7B_CurrentEntityAddrLoAlt, wDC7B_CurrentEntityAddrLoAlt2).
 ; Calls call_02_72fb_UpdateMapWindow to update the scrolling window and environment.
 ; Iterates through all entities (wDA00_CurrentEntityAddrLo) to run their update logic and 
-; finally triggers graphics updates via banked call call_03_5ec1_UpdateAllEntitiesGraphicsAndCollision.
+; finally draws entities and handles collision.
     xor  A, A                                          ;; 02:7152 $af
     ld   [wDC85], A                                    ;; 02:7153 $ea $85 $dc
     ld   [wDC84], A                                    ;; 02:7156 $ea $84 $dc
@@ -249,79 +249,75 @@ call_02_7152_UpdateAllEntities:
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_ENTITY_ID
     ld   A, [HL]                                       ;; 02:7234 $7e
     cp   A, $ff                                        ;; 02:7235 $fe $ff
-    call NZ, call_02_724d_UpdateEntityAnimationTimersAndSpriteId                              ;; 02:7237 $c4 $4d $72
+    call NZ, call_02_724d_Entity_UpdateSpriteFields                              ;; 02:7237 $c4 $4d $72
 .jr_02_723a:
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 02:723a $fa $00 $da
     add  A, $20                                        ;; 02:723d $c6 $20
     jr   NZ, .jr_02_7205                               ;; 02:723f $20 $c4
-    farcall call_03_5ec1_UpdateAllEntitiesGraphicsAndCollision
+    farcall call_03_5ec1_DrawAllEntitiesAndHandleCollision
     ret                                                ;; 02:724c $c9
 
-call_02_724d_UpdateEntityAnimationTimersAndSpriteId:
-; Purpose: Handles countdown timers, state flags, and transitions for an individual entity slot.
-; Details:
-; Decrements a timer; when it reaches zero, reloads counters, updates flags (set 2, set 1), and fetches new data from tables.
-; Can trigger reinitialization via call_02_54f9_SwitchPlayerAction or call_02_72ac_SetEntityAction.
-; Updates related memory locations with new entity state values.
-    LOAD_OBJ_FIELD_TO_HL_ALT ENTITY_FIELD_SPRITE_FLAGS2
-    ld   E, [HL]                                       ;; 02:7255 $5e ; e = flags (04)
-    inc  L                                             ;; 02:7256 $2c
-    res  2, [HL]                                       ;; 02:7257 $cb $96 ; unset bit 2 in unk05
-    ld   B, [HL]                                       ;; 02:7259 $46 ; b = unk05
-    inc  L                                             ;; 02:725a $2c
-    ld   C, [HL]                                       ;; 02:725b $4e ; c = unk06
-    inc  L                                             ;; 02:725c $2c
-    ld   A, [HL]                                       ;; 02:725d $7e ; a = unk07
+call_02_724d_Entity_UpdateSpriteFields:
+; Purpose: Updates sprite flags, animation counters, and sprite id for an individual entity slot.
+    LOAD_OBJ_FIELD_TO_HL_ALT ENTITY_FIELD_SPRITE_FLAGS2               ; HL = ENTITY_FIELD_SPRITE_FLAGS2
+    ld   E, [HL]                                       ;; 02:7255 $5e
+    inc  L                                             ;; 02:7256 $2c ; HL = ENTITY_FIELD_GRAPHICS_FLAGS
+    res  2, [HL]                                       ;; 02:7257 $cb $96
+    ld   B, [HL]                                       ;; 02:7259 $46 ; b = HL
+    inc  L                                             ;; 02:725a $2c ; HL = ENTITY_FIELD_SPRITE_FRAME_COUNTER_MAX
+    ld   C, [HL]                                       ;; 02:725b $4e ; c = HL
+    inc  L                                             ;; 02:725c $2c ; HL = ENTITY_FIELD_SPRITE_FRAME_COUNTER
+    ld   A, [HL]                                       ;; 02:725d $7e ; a = HL
     cp   A, $ff                                        ;; 02:725e $fe $ff
-    ret  Z                                             ;; 02:7260 $c8 ; return if unk07 == ff
-    dec  [HL]                                          ;; 02:7261 $35 ; unk07 -= 1
-    ret  NZ                                            ;; 02:7262 $c0 ; return if unk07 != 0
-    ld   [HL], C                                       ;; 02:7263 $71 ; unk07 = unk06
-    inc  L                                             ;; 02:7264 $2c
-    ld   A, [HL+]                                      ;; 02:7265 $2a ; a = unk08
-    ld   C, A                                          ;; 02:7266 $4f ; c = unk08
-    inc  [HL]                                          ;; 02:7267 $34 ; unk09 += 1
-    sub  A, [HL]                                       ;; 02:7268 $96 ; a -= unk09
-    jr   NZ, .jr_02_7288                               ;; 02:7269 $20 $1d ; jump if a != 0
-    bit  7, E                                          ;; 02:726b $cb $7b ; check if bit 7 of flags is set
-    jr   Z, .jr_02_727c                                ;; 02:726d $28 $0d ; if unset, jump
+    ret  Z                                             ;; 02:7260 $c8 ; return if == ff
+    dec  [HL]                                          ;; 02:7261 $35 ; 
+    ret  NZ                                            ;; 02:7262 $c0 ; return if ENTITY_FIELD_SPRITE_FRAME_COUNTER != 0
+    ld   [HL], C                                       ;; 02:7263 $71 ; 
+    inc  L                                             ;; 02:7264 $2c ; HL = ENTITY_FIELD_SPRITE_COUNTER_MAX
+    ld   A, [HL+]                                      ;; 02:7265 $2a
+    ld   C, A                                          ;; 02:7266 $4f ; HL = ENTITY_FIELD_SPRITE_COUNTER
+    inc  [HL]                                          ;; 02:7267 $34
+    sub  A, [HL]                                       ;; 02:7268 $96
+    jr   NZ, .jr_02_7288                               ;; 02:7269 $20 $1d
+    bit  7, E                                          ;; 02:726b $cb $7b
+    jr   Z, .jr_02_727c                                ;; 02:726d $28 $0d
     res  7, E                                          ;; 02:726f $cb $bb
-    ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 02:7271 $fa $00 $da
+    ld   A, [wDA00_CurrentEntityAddrLo]                ;; 02:7271 $fa $00 $da
     and  A, A                                          ;; 02:7274 $a7
     ld   A, E                                          ;; 02:7275 $7b
-    jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:7276 $ca $f9 $54
-    jp   call_02_72ac_SetEntityAction                                  ;; 02:7279 $c3 $ac $72
+    jp   Z, call_02_54f9_SwitchPlayerAction            ;; 02:7276 $ca $f9 $54
+    jp   call_02_72ac_SetEntityAction                  ;; 02:7279 $c3 $ac $72
 .jr_02_727c:
-    bit  3, B                                          ;; 02:727c $cb $58 ; check if bit 3 of unk05 is set
+    bit  3, B                                          ;; 02:727c $cb $58
     jr   Z, .jr_02_7282                                ;; 02:727e $28 $02
     ld   A, C                                          ;; 02:7280 $79
-    dec  A                                             ;; 02:7281 $3d ; a (copy of unk08) -= 1
+    dec  A                                             ;; 02:7281 $3d
 .jr_02_7282:
-    ld   [HL-], A                                      ;; 02:7282 $32 ; unk09 -= 1
+    ld   [HL-], A                                      ;; 02:7282 $32
     dec  L                                             ;; 02:7283 $2d
     dec  L                                             ;; 02:7284 $2d
-    dec  L                                             ;; 02:7285 $2d
-    set  2, [HL]                                       ;; 02:7286 $cb $d6 ; set bit 2 (04) in unk05
+    dec  L                                             ;; 02:7285 $2d ; HL = ENTITY_FIELD_GRAPHICS_FLAGS
+    set  2, [HL]                                       ;; 02:7286 $cb $d6 
 .jr_02_7288:
     ld   A, [wDA00_CurrentEntityAddrLo]                ;; 02:7288 $fa $00 $da
     or   A, $05                                        ;; 02:728b $f6 $05
     ld   L, A                                          ;; 02:728d $6f
-    set  1, [HL]                                       ;; 02:728e $cb $ce ; set bit 1 (02) in unk05
-    ld   A, L                                          ;; 02:7290 $7d ; a = ?5
-    xor  A, $0c                                        ;; 02:7291 $ee $0c ; a = ?9
-    ld   L, A                                          ;; 02:7293 $6f
-    ld   E, [HL]                                       ;; 02:7294 $5e ; e = unk09
-    ld   D, $00                                        ;; 02:7295 $16 $00 ; de = 0000 + unk09
-    inc  L                                             ;; 02:7297 $2c
-    push HL                                            ;; 02:7298 $e5 ; push d8?a
-    inc  L                                             ;; 02:7299 $2c
-    ld   A, [HL+]                                      ;; 02:729a $2a ; a = unk0b (ENTITY_FIELD_SPRITE_IDS_PTR)
+    set  1, [HL]                                       ;; 02:728e $cb $ce
+    ld   A, L                                          ;; 02:7290 $7d
+    xor  A, $0c                                        ;; 02:7291 $ee $0c
+    ld   L, A                                          ;; 02:7293 $6f ; HL = ENTITY_FIELD_SPRITE_COUNTER
+    ld   E, [HL]                                       ;; 02:7294 $5e
+    ld   D, $00                                        ;; 02:7295 $16 $00
+    inc  L                                             ;; 02:7297 $2c ; HL = ENTITY_FIELD_SPRITE_ID
+    push HL                                            ;; 02:7298 $e5
+    inc  L                                             ;; 02:7299 $2c ; HL = ENTITY_FIELD_SPRITE_IDS_PTR
+    ld   A, [HL+]                                      ;; 02:729a $2a ; HL = ENTITY_FIELD_SPRITE_IDS_PTR 2nd byte
     ld   H, [HL]                                       ;; 02:729b $66
-    ld   L, A                                          ;; 02:729c $6f ; hl = unk0b unk0c (ENTITY_FIELD_SPRITE_IDS_PTR)
-    add  HL, DE                                        ;; 02:729d $19 ; hl = ENTITY_FIELD_SPRITE_IDS_PTR + 0000 + unk09
-    ld   A, [HL]                                       ;; 02:729e $7e ; a = [hl]
-    pop  HL                                            ;; 02:729f $e1 ; pop d8?a
-    ld   [HL], A                                       ;; 02:72a0 $77 ; d8?a = a
+    ld   L, A                                          ;; 02:729c $6f
+    add  HL, DE                                        ;; 02:729d $19
+    ld   A, [HL]                                       ;; 02:729e $7e
+    pop  HL                                            ;; 02:729f $e1 ; HL = ENTITY_FIELD_SPRITE_ID
+    ld   [HL], A                                       ;; 02:72a0 $77
 
 call_02_72a1_CheckIfPlayerActorUpdatedAction:
 ; Mark Entity Slot Active

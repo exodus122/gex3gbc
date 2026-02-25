@@ -525,7 +525,7 @@ call_01_435e_HandleLevelTransitionMenu:
 ;  - If [wDB6D] == 0:
 ;    - If LevelId ≥ 07 but not 09 or 0A → preload menus 15–1A.
 ;    - Else if LevelId < 07 → request song 13, load menu 09.
-;    - Else (exact 09 or 0A) → same as above “song 13/menu 1B”.
+;    - Else (exact 09 or 0A) → same as above "song 13/menu 1B".
 ; At the end, clears wDB6C_CurrentMapId (so the menu system takes over).
 ; Likely Purpose: Manages menu/graphics updates when transitioning between levels.
     ld   HL, wDB6A_WarpFlags                                     ;; 01:435e $21 $6a $db
@@ -578,7 +578,7 @@ call_01_435e_HandleLevelTransitionMenu:
 call_01_43ba_JumpToDynamicHandler:
 ; Behavior:
 ; Reads a pointer from wDB9C_MenuDynamicHandlerPtr; if nonzero, jumps there.
-; Likely Purpose: Generic “execute callback” mechanism for menu or level-specific code.
+; Likely Purpose: Generic "execute callback" mechanism for menu or level-specific code.
     ld   HL, wDB9C_MenuDynamicHandlerPtr                                     ;; 01:43ba $21 $9c $db
     ld   A, [HL+]                                      ;; 01:43bd $2a
     ld   H, [HL]                                       ;; 01:43be $66

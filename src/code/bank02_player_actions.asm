@@ -18,7 +18,6 @@ call_02_47b4_PlayerAction_Spawn:
 
 call_02_47ce_PlayerAction_Idle:
 ; Also checks bit 4 of wD805_Player_MovementFlags. If set:
-; Sets bit 6 of wDC80_Player_UnkStates (marking a new sub-state).
 ; Clears wDC86, wDC8C_PlayerYVelocity, and wDC87.
 ; Sets wDC83_PlayerIdleTimer = F0h (a countdown timer).
 ; Regardless, it checks if wDC81_CurrentInputsAlt == PADF_UP and, if so, calls call_00_1bbc_CheckForDoorAndEnter.
@@ -158,7 +157,7 @@ call_02_48a1_PlayerAction_StandOnTVButton:
     ld   A, SFX_UNK1D                                        ;; 02:48a6 $3e $1d
     call NZ, call_00_0ff5_QueueSoundEffect                              ;; 02:48a8 $c4 $f5 $0f
     ld   C, ENTITY_TV_BUTTON                                        ;; 02:48ab $0e $11
-    jp   call_02_4db1_Player_CheckXDistanceFromEntity                                    ;; 02:48ad $c3 $b1 $4d
+    jp   call_02_4db1_Player_SnapXPosToEntity                                    ;; 02:48ad $c3 $b1 $4d
 
 call_02_48b0_PlayerAction_EnterTV:
     ld   A, [wD805_Player_MovementFlags]                                    ;; 02:48b0 $fa $05 $d8
@@ -177,7 +176,7 @@ call_02_48bc_PlayerAction_Jump:
     ld   A, $2a                                        ;; 02:48c8 $3e $2a
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:48ca $ea $8c $dc
     ld   [wDC8E_InitialYVelocity], A                                    ;; 02:48cd $ea $8e $dc
-    call call_02_4df6_FlagCollisionActive                                  ;; 02:48d0 $cd $f6 $4d
+    call call_02_4df6_Player_SetJumpRelatedState                                  ;; 02:48d0 $cd $f6 $4d
     call call_02_4e01_SetOneTimeFlag                                  ;; 02:48d3 $cd $01 $4e
 .jr_02_48d6:
     ld   A, [wDC8E_InitialYVelocity]                                    ;; 02:48d6 $fa $8e $dc
@@ -187,7 +186,7 @@ call_02_48bc_PlayerAction_Jump:
     and  A, PADF_B                                        ;; 02:48de $e6 $02
     ld   A, PLAYERACTION_DOUBLE_JUMP                                        ;; 02:48e0 $3e $0f
     jp   NZ, call_02_54f9_SwitchPlayerAction                              ;; 02:48e2 $c2 $f9 $54
-    jp   call_02_4dce_SetTriggerByLevel                                    ;; 02:48e5 $c3 $ce $4d
+    jp   call_02_4dce_Player_SwitchActionToIdleOrWalk                                    ;; 02:48e5 $c3 $ce $4d
 
 call_02_48e8_PlayerAction_DoubleJump:
     ld   HL, wD805_Player_MovementFlags                                     ;; 02:48e8 $21 $05 $d8
@@ -199,7 +198,7 @@ call_02_48e8_PlayerAction_DoubleJump:
     ld   A, $3e                                        ;; 02:48f4 $3e $3e
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:48f6 $ea $8c $dc
     ld   [wDC8E_InitialYVelocity], A                                    ;; 02:48f9 $ea $8e $dc
-    call call_02_4df6_FlagCollisionActive                                  ;; 02:48fc $cd $f6 $4d
+    call call_02_4df6_Player_SetJumpRelatedState                                  ;; 02:48fc $cd $f6 $4d
     call call_02_4e01_SetOneTimeFlag                                  ;; 02:48ff $cd $01 $4e
 .jr_02_4902:
     ld   A, [wDC8E_InitialYVelocity]                                    ;; 02:4902 $fa $8e $dc
@@ -208,7 +207,7 @@ call_02_48e8_PlayerAction_DoubleJump:
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:4907 $fa $81 $dc
     and  A, PADF_B                                        ;; 02:490a $e6 $02
     jr   NZ, .jr_02_48ef                               ;; 02:490c $20 $e1
-    jp   call_02_4dce_SetTriggerByLevel                                    ;; 02:490e $c3 $ce $4d
+    jp   call_02_4dce_Player_SwitchActionToIdleOrWalk                                    ;; 02:490e $c3 $ce $4d
 
 call_02_4911_PlayerAction_TailSpin:
     ld   HL, wD805_Player_MovementFlags                                     ;; 02:4911 $21 $05 $d8
@@ -324,7 +323,7 @@ call_02_49b3_PlayerAction_Water_Swimming:
     ld   [wD80D_PlayerFacingDirection],a
     ld   a,[hl]
     and  a,$40
-    ld   [wDC7A],a
+    ld   [wDC7A_PlayerClimbingOrSwimmingRelated],a
     ld   hl,.data_02_4a15
     add  hl,de
     ld   c,[hl]
@@ -391,12 +390,12 @@ call_02_4a52_PlayerAction_BlownUpwards:
 .jr_00_4A61:
     ld   a,[wDC8E_InitialYVelocity]
     and  a
-    jp   z,call_02_4dce_SetTriggerByLevel
+    jp   z,call_02_4dce_Player_SwitchActionToIdleOrWalk
     ret  
 
 call_02_4a69_PlayerAction_RidingElevator:
     ld   c,ENTITY_ANIME_CHANNEL_ELEVATOR
-    jp   call_02_4db1_Player_CheckXDistanceFromEntity
+    jp   call_02_4db1_Player_SnapXPosToEntity
 
 call_02_4a6e_PlayerAction_Water_TailSpin:
     ld   hl,wD805_Player_MovementFlags
@@ -451,14 +450,14 @@ call_02_4aac_PlayerAction_Climbing:
     ld   l,[hl]
     ld   h,00
     add  hl,hl
-    ld   de,call_02_4adb_Player_Unk34_Sub
+    ld   de,call_02_4adb_Player_Climbing_subroutine
     add  hl,de
     ldi  a,[hl]
     ld   h,[hl]
     ld   l,a
     jp   hl
 
-call_02_4adb_Player_Unk34_Sub:
+call_02_4adb_Player_Climbing_subroutine:
     rst  $18
     ld   c,d
     ld   h,[hl]
@@ -478,7 +477,7 @@ call_02_4adb_Player_Unk34_Sub:
     ld   [wD80D_PlayerFacingDirection],a
     ld   a,[hl]
     and  a,$40
-    ld   [wDC7A],a
+    ld   [wDC7A_PlayerClimbingOrSwimmingRelated],a
     ld   hl,.data_02_4b56
     add  hl,de
     ld   c,[hl]
@@ -558,7 +557,7 @@ call_02_4B66: ; unreferenced function?
     ld   a,$00
     ld   [wD80D_PlayerFacingDirection],a
     ld   a,$00
-    ld   [wDC7A],a
+    ld   [wDC7A_PlayerClimbingOrSwimmingRelated],a
     ld   hl,wDB66_HDMATransferFlags
     set  0,[hl]
     ld   a,[wDC9F]
@@ -593,7 +592,7 @@ call_02_4bb7_PlayerAction_Snowboarding_StandOrWalk:
     ld   a,[wDC81_CurrentInputsAlt]
     bit  6,a
     call nz,call_00_1bbc_CheckForDoorAndEnter
-    call call_02_4E0C_UpdateActionSequence
+    call call_02_4E0C_Player_SnowboardingTailSpin
     ld   a,[wDCA5_PlayerUnk4]
     and  a
     jr   z,.jr_02_4C11
@@ -640,7 +639,7 @@ call_02_4c2c_PlayerAction_Snowboarding_Jump:
     ld   a,$2A
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E_InitialYVelocity],a
-    call call_02_4df6_FlagCollisionActive
+    call call_02_4df6_Player_SetJumpRelatedState
     call call_02_4e01_SetOneTimeFlag
 .jr_00_4C46:
     ld   a,[wDC8E_InitialYVelocity]
@@ -650,7 +649,7 @@ call_02_4c2c_PlayerAction_Snowboarding_Jump:
     and  a,PADF_B
     ld   a,PLAYERACTION_SNOWBOARDING_DOUBLE_JUMP
     jp   nz,call_02_54f9_SwitchPlayerAction
-    jp   call_02_4dce_SetTriggerByLevel
+    jp   call_02_4dce_Player_SwitchActionToIdleOrWalk
 
 call_02_4c58_PlayerAction_Snowboarding_DoubleJump:
     ld   hl,wD805_Player_MovementFlags
@@ -661,12 +660,12 @@ call_02_4c58_PlayerAction_Snowboarding_DoubleJump:
     ld   a,$3E
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E_InitialYVelocity],a
-    call call_02_4df6_FlagCollisionActive
+    call call_02_4df6_Player_SetJumpRelatedState
     call call_02_4e01_SetOneTimeFlag
 .jr_00_4C72:
     ld   a,[wDC8E_InitialYVelocity]
     and  a
-    jp   z,call_02_4dce_SetTriggerByLevel
+    jp   z,call_02_4dce_Player_SwitchActionToIdleOrWalk
     ret  
 
 call_02_4c7a_PlayerAction_Snowboarding_TailSpin:
@@ -687,7 +686,7 @@ call_02_4c7a_PlayerAction_Snowboarding_TailSpin:
     ld   [wDC7F_Player_IsAttacking],a
     call call_02_4e01_SetOneTimeFlag
 .jr_00_4CA1:
-    jp   call_02_4E0C_UpdateActionSequence
+    jp   call_02_4E0C_Player_SnowboardingTailSpin
 
 call_02_4ca4_PlayerAction_Snowboarding_Fall:
     ld   hl,wD805_Player_MovementFlags
@@ -728,7 +727,7 @@ call_02_4ce3_PlayerAction_Kangaroo_Idle:
     call call_02_4e01_SetOneTimeFlag
     ld   a,PLAYERACTION_KANGAROO_HOPPING
     call call_02_54f9_SwitchPlayerAction
-    call call_02_4df6_FlagCollisionActive
+    call call_02_4df6_Player_SetJumpRelatedState
     ld   hl,wDABE_UnkBGCollisionFlags2
     bit  7,[hl]
     jr   z,call_02_4d02_PlayerAction_Kangaroo_Hopping
@@ -743,7 +742,7 @@ call_02_4d02_PlayerAction_Kangaroo_Hopping:
     and  a,PADF_B
     ld   a,PLAYERACTION_KANGAROO_START_JUMP
     jp   nz,call_02_54f9_SwitchPlayerAction
-    jp   call_02_4dce_SetTriggerByLevel
+    jp   call_02_4dce_Player_SwitchActionToIdleOrWalk
 
 call_02_4d14_PlayerAction_Kangaroo_StartJump:
     ld   a,SFX_GEX_DOUBLE_JUMP
@@ -751,7 +750,7 @@ call_02_4d14_PlayerAction_Kangaroo_StartJump:
     call call_02_4e01_SetOneTimeFlag
     ld   a,PLAYERACTION_KANGAROO_JUMP
     call call_02_54f9_SwitchPlayerAction
-    call call_02_4df6_FlagCollisionActive
+    call call_02_4df6_Player_SetJumpRelatedState
     ld   hl,wDABE_UnkBGCollisionFlags2
     bit  7,[hl]
     jr   z,call_02_4d33_PlayerAction_Kangaroo_Jump
@@ -766,7 +765,7 @@ call_02_4d33_PlayerAction_Kangaroo_Jump:
     and  a,PADF_B
     ld   a,PLAYERACTION_KANGAROO_START_JUMP
     jp   nz,call_02_54f9_SwitchPlayerAction
-    jp   call_02_4dce_SetTriggerByLevel
+    jp   call_02_4dce_Player_SwitchActionToIdleOrWalk
 
 call_02_4d45_PlayerAction_Kangaroo_TailSpin:
     ld   hl,wD805_Player_MovementFlags

@@ -254,8 +254,8 @@ call_00_0150_Init:
     ld   A, [wDC4F_PawCoinExtraHealth]                                    ;; 00:0378 $fa $4f $dc
     add  A, $04                                        ;; 00:037b $c6 $04
     ld   [wDC50_PlayerHealth], A                                    ;; 00:037d $ea $50 $dc
-    ld   A, $00                                        ;; 00:0380 $3e $00
-    ld   [wDC78_PlayerActionIdRelated], A                                    ;; 00:0382 $ea $78 $dc
+    ld   A, PLAYERACTION_SPAWN                                        ;; 00:0380 $3e $00
+    ld   [wDC78_PlayerPendingActionId], A                                    ;; 00:0382 $ea $78 $dc
     call call_00_0e3b_ClearGameStateVariables                                  ;; 00:0385 $cd $3b $0e
     call call_00_2f85_LoadAndSortCollectibleData                                  ;; 00:0388 $cd $85 $2f
     call call_00_2ff8_InitLevelEntitiesAndConfig                                  ;; 00:038b $cd $f8 $2f
@@ -263,43 +263,43 @@ call_00_0150_Init:
     farcall call_03_6c89_LoadMapData
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:0399 $fa $1e $dc
     cp   A, LEVEL_GEXTREME_SPORTS                                        ;; 00:039c $fe $07
-    jr   NZ, .jr_00_03b6                               ;; 00:039e $20 $16
-    ld   A, [wDC78_PlayerActionIdRelated]                                    ;; 00:03a0 $fa $78 $dc
-    cp   A, $00                                        ;; 00:03a3 $fe $00
-    ld   A, $23                                        ;; 00:03a5 $3e $23
-    jr   Z, .jr_00_03e8                                ;; 00:03a7 $28 $3f
+    jr   NZ, .jr_00_03b6_NotInGextremeSports                               ;; 00:039e $20 $16
+    ld   A, [wDC78_PlayerPendingActionId]                                    ;; 00:03a0 $fa $78 $dc
+    cp   A, PLAYERACTION_SPAWN                                        ;; 00:03a3 $fe $00
+    ld   A, PLAYERACTION_SNOWBOARDING_SPAWN ; entered gextreme sports level     ;; 00:03a5 $3e $23
+    jr   Z, .jr_00_03e8_SetPendingPlayerAction                                ;; 00:03a7 $28 $3f
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:03a9 $fa $6c $db
     cp   A, MAP_GEXTREME_SPORTS1                                        ;; 00:03ac $fe $07
-    ld   A, $24                                        ;; 00:03ae $3e $24
-    jr   Z, .jr_00_03e8                                ;; 00:03b0 $28 $36
-    ld   A, $01                                        ;; 00:03b2 $3e $01
-    jr   .jr_00_03e8                                   ;; 00:03b4 $18 $32
-.jr_00_03b6:
+    ld   A, PLAYERACTION_SNOWBOARDING_STAND_OR_WALK ; left gextreme sports house    ;; 00:03ae $3e $24
+    jr   Z, .jr_00_03e8_SetPendingPlayerAction                                ;; 00:03b0 $28 $36
+    ld   A, PLAYERACTION_IDLE ; entered gextreme sports house                                       ;; 00:03b2 $3e $01
+    jr   .jr_00_03e8_SetPendingPlayerAction                                   ;; 00:03b4 $18 $32
+.jr_00_03b6_NotInGextremeSports:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:03b6 $fa $1e $dc
     cp   A, LEVEL_MARSUPIAL_MADNESS                                        ;; 00:03b9 $fe $08
-    ld   A, $2f                                        ;; 00:03bb $3e $2f
-    jr   Z, .jr_00_03e8                                ;; 00:03bd $28 $29
-    ld   A, [wDC1F]                                    ;; 00:03bf $fa $1f $dc
-    cp   A, $01                                        ;; 00:03c2 $fe $01
-    jr   Z, .jr_00_03d6                                ;; 00:03c4 $28 $10
-    ld   A, [wDC78_PlayerActionIdRelated]                                    ;; 00:03c6 $fa $78 $dc
-    cp   A, $00                                        ;; 00:03c9 $fe $00
-    jr   Z, .jr_00_03e8                                ;; 00:03cb $28 $1b
+    ld   A, PLAYERACTION_KANGAROO_SPAWN ; entered marsupial madness            ;; 00:03bb $3e $2f
+    jr   Z, .jr_00_03e8_SetPendingPlayerAction                                ;; 00:03bd $28 $29
+    ld   A, [wDC1F_CurrentBgCollisionType]                                    ;; 00:03bf $fa $1f $dc
+    cp   A, BG_COLLISION_TYPE_TOPDOWN                                        ;; 00:03c2 $fe $01
+    jr   Z, .jr_00_03d6_InTopDownCollision                                ;; 00:03c4 $28 $10
+    ld   A, [wDC78_PlayerPendingActionId]                                    ;; 00:03c6 $fa $78 $dc
+    cp   A, PLAYERACTION_SPAWN ; entered sidescroller level     ;; 00:03c9 $fe $00
+    jr   Z, .jr_00_03e8_SetPendingPlayerAction                                ;; 00:03cb $28 $1b
     ld   A, [wD801_Player_ActionId]                                    ;; 00:03cd $fa $01 $d8
-    sub  A, $3c                                        ;; 00:03d0 $d6 $3c
+    sub  A, PLAYERACTION_OFFSET_TOPDOWN                                        ;; 00:03d0 $d6 $3c
     jr   C, .jr_00_03eb                                ;; 00:03d2 $38 $17
-    jr   .jr_00_03e8                                   ;; 00:03d4 $18 $12
-.jr_00_03d6:
-    ld   A, [wDC78_PlayerActionIdRelated]                                    ;; 00:03d6 $fa $78 $dc
-    cp   A, $00                                        ;; 00:03d9 $fe $00
-    ld   A, $3c                                        ;; 00:03db $3e $3c
-    jr   Z, .jr_00_03e8                                ;; 00:03dd $28 $09
+    jr   .jr_00_03e8_SetPendingPlayerAction                                   ;; 00:03d4 $18 $12
+.jr_00_03d6_InTopDownCollision:
+    ld   A, [wDC78_PlayerPendingActionId]                                    ;; 00:03d6 $fa $78 $dc
+    cp   A, PLAYERACTION_SPAWN                                        ;; 00:03d9 $fe $00
+    ld   A, PLAYERACTION_TOPDOWN_SPAWN ; entered topdown collision map    ;; 00:03db $3e $3c
+    jr   Z, .jr_00_03e8_SetPendingPlayerAction                                ;; 00:03dd $28 $09
     ld   A, [wD801_Player_ActionId]                                    ;; 00:03df $fa $01 $d8
-    cp   A, $3c                                        ;; 00:03e2 $fe $3c
+    cp   A, PLAYERACTION_TOPDOWN_SPAWN                                        ;; 00:03e2 $fe $3c
     jr   NC, .jr_00_03eb                               ;; 00:03e4 $30 $05
-    add  A, $3c                                        ;; 00:03e6 $c6 $3c
-.jr_00_03e8:
-    ld   [wDC78_PlayerActionIdRelated], A                                    ;; 00:03e8 $ea $78 $dc
+    add  A, PLAYERACTION_OFFSET_TOPDOWN                                        ;; 00:03e6 $c6 $3c
+.jr_00_03e8_SetPendingPlayerAction:
+    ld   [wDC78_PlayerPendingActionId], A                                    ;; 00:03e8 $ea $78 $dc
 .jr_00_03eb:
     xor  A, A                                          ;; 00:03eb $af
     ld   [wDC29_SkipMapWindowUpdateFlag], A                                    ;; 00:03ec $ea $29 $dc
@@ -309,7 +309,7 @@ call_00_0150_Init:
     farcall call_03_647c_InitPlayerPositionAndLevel
     call call_00_1056_LoadFullMap                                  ;; 00:0402 $cd $56 $10
     farcall call_02_708f_InitEntitiesAndSpawnPlayer
-    call call_00_0513                                  ;; 00:0410 $cd $13 $05
+    call call_00_0513_DrawEntitiesWrapper                                  ;; 00:0410 $cd $13 $05
     xor  A, A                                          ;; 00:0413 $af
     ld   [wDB6A_WarpFlags], A                                    ;; 00:0414 $ea $6a $db
     ld   [wDCDB_EvilSantaHitByProjectileFlag], A                                    ;; 00:0417 $ea $db $dc
@@ -322,7 +322,7 @@ call_00_0150_Init:
     call call_00_1056_LoadFullMap                                  ;; 00:0427 $cd $56 $10
     farcall call_02_7142_RestoreEntityTable
     farcall call_03_68d9_AssignAllEntityPalettes
-    call call_00_0513                                  ;; 00:0440 $cd $13 $05
+    call call_00_0513_DrawEntitiesWrapper                                  ;; 00:0440 $cd $13 $05
 .jp_00_0443_MainGameplayLoop:
     call call_00_0b92_WaitForInterrupt                                  ;; 00:0443 $cd $92 $0b
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:0446 $fa $d7 $da
@@ -397,7 +397,7 @@ call_00_04fb:
     call call_00_0e33_SetLCDControlRegister                                  ;; 00:050f $cd $33 $0e
     ret                                                ;; 00:0512 $c9
 
-call_00_0513:
+call_00_0513_DrawEntitiesWrapper:
     ld   A, BANK_7F_ENTITY_PALETTES                                        ;; 00:0513 $3e $7f
     call call_00_0eee_SwitchBank                                  ;; 00:0515 $cd $ee $0e
     ld   HL, wDB6C_CurrentMapId                                     ;; 00:0518 $21 $6c $db
@@ -456,7 +456,7 @@ call_00_0513:
     ld   A, [wDB69]                                    ;; 00:057b $fa $69 $db
     and  A, $2f                                        ;; 00:057e $e6 $2f
     jr   NZ, .jr_00_056e                               ;; 00:0580 $20 $ec
-    farcall call_03_5ec1_UpdateAllEntitiesGraphicsAndCollision
+    farcall call_03_5ec1_DrawAllEntitiesAndHandleCollision
     ld   A, $01                                        ;; 00:058d $3e $01
     ld   [wDD6A_GameBoyColorPaletteFlag], A                                    ;; 00:058f $ea $6a $dd
     jp   call_00_0b92_WaitForInterrupt                                  ;; 00:0592 $c3 $92 $0b
@@ -543,7 +543,7 @@ call_00_0624_SetFly_TimersAndFlags:
 ; initializes timers/flags (wDCAA_FlyTimerOrFlags1, wDCAB_FlyTimerOrFlags2, wDCA8_FlyTimerOrFlags3, 
 ; wDCA9_FlyTimerOrFlags4, wDCAE_FlyTimerOrFlags5).
 ; Special case for state 03: increments a counter, sets a flag in wDB69.
-; Looks like it initializes different “modes” or “phases” (timers controlling durations).
+; Looks like it initializes different "modes" or "phases" (timers controlling durations).
     ld   hl,wDC51_CurrentFlyRelated
     ld   c,[hl]
     ld   [hl],a
@@ -1026,7 +1026,7 @@ call_00_08f8_SetupEntityVRAMTransfer:
     res  1, [HL]                                       ;; 00:092a $cb $8e
     pop  HL                                            ;; 00:092c $e1
     ld   A, L                                          ;; 00:092d $7d
-    ld   [wDB61_ActiveEntitySlot], A                                    ;; 00:092e $ea $61 $db
+    ld   [wDB61_ActiveObjectSlot], A                                    ;; 00:092e $ea $61 $db
     or   A, $0a                                        ;; 00:0931 $f6 $0a
     ld   L, A                                          ;; 00:0933 $6f
     ld   C, [HL]                                       ;; 00:0934 $4e
@@ -1061,7 +1061,7 @@ call_00_08f8_SetupEntityVRAMTransfer:
     ld   A, H                                          ;; 00:0959 $7c
     ld   [wDB64_VRAMTransferSource+1], A                                    ;; 00:095a $ea $65 $db
     farcall call_03_59b6_LookupEntityPropertyFromType
-    ld   [wDB63_ActiveEntityType], A                                    ;; 00:0968 $ea $63 $db
+    ld   [wDB63_ActiveObjectType], A                                    ;; 00:0968 $ea $63 $db
     ld   HL, wDB66_HDMATransferFlags                                     ;; 00:096b $21 $66 $db
 .jr_00_096e:
     set  1, [HL]                                       ;; 00:096e $cb $ce
@@ -1075,18 +1075,17 @@ call_00_08f8_SetupEntityVRAMTransfer:
     db   $80, $01, $80, $3e, $3a, $80, $01, $80        ;; 00:0988 ????????
     db   $3e, $6e, $80, $03, $80, $3c, $66, $00        ;; 00:0990 ????????
     db   $02, $00, $3e, $ff                            ;; 00:0998 ????
-
 .jr_00_099c:
     res  1, [HL]                                       ;; 00:099c $cb $8e
     pop  HL                                            ;; 00:099e $e1
     ld   A, L                                          ;; 00:099f $7d
-    ld   [wDB61_ActiveEntitySlot], A                                    ;; 00:09a0 $ea $61 $db
+    ld   [wDB61_ActiveObjectSlot], A                                    ;; 00:09a0 $ea $61 $db
     or   A, $0a                                        ;; 00:09a3 $f6 $0a
     ld   L, A                                          ;; 00:09a5 $6f
     ld   A, [HL]                                       ;; 00:09a6 $7e
     push AF                                            ;; 00:09a7 $f5
     farcall call_03_59b6_LookupEntityPropertyFromType
-    ld   [wDB63_ActiveEntityType], A                                    ;; 00:09b3 $ea $63 $db
+    ld   [wDB63_ActiveObjectType], A                                    ;; 00:09b3 $ea $63 $db
     ld   L, A                                          ;; 00:09b6 $6f
     ld   H, $00                                        ;; 00:09b7 $26 $00
     add  HL, HL                                        ;; 00:09b9 $29
@@ -1099,7 +1098,6 @@ call_00_08f8_SetupEntityVRAMTransfer:
     ld   D, A                                          ;; 00:09c2 $57
     ld   E, $00                                        ;; 00:09c3 $1e $00
     jp   HL                                            ;; 00:09c5 $e9
-
 .jr_00_09c6:
     srl  d
     rr   e
@@ -1190,7 +1188,7 @@ call_00_08f8_SetupEntityVRAMTransfer:
     set  7, [HL]                                       ;; 00:0a55 $cb $fe
     ret                                                ;; 00:0a57 $c9
 .data_00_0a58_EntityVRAMSourceResolvers:
-; Used to resolve which function to run based on entity type (wDB63_ActiveEntityType).
+; Used to resolve which function to run based on entity type (wDB63_ActiveObjectType).
     dw   .jr_00_0a17, .jr_00_0a17, .jr_00_0a29        ;; 00:0a58 ??
     dw   .jr_00_09c6, .jr_00_0a37, .jr_00_09db        ;; 00:0a5e ??????
     dw   .jr_00_09f0, .jr_00_0a01, .jr_00_0a41        ;; 00:0a64 pP
@@ -1365,7 +1363,7 @@ call_00_0b92_WaitForInterrupt:
 
 call_00_0b9f_Frame_TilemapUpdateHandler:
 ;; Bank switch to 3.
-; Checks wDC20 flags (bit 7 is a “dirty” flag).
+; Checks wDC20 flags (bit 7 is a "dirty" flag).
 ; If set, applies queued tilemap updates:
 ;   - if low 2 bits set → update block (`75e3`)
 ;   - if bits 2–3 set  → update column (`7664`)
@@ -1453,7 +1451,7 @@ jp_00_0bcf_CopyBlock16BytesLoop:
 call_00_0c03_WaitForVRAMCopyCompletion:
 ; Polls wD9FD masked with $7F. If zero, returns. Otherwise, 
 ; repeatedly calls call_00_0b92_WaitForInterrupt and loops.
-; Essentially “wait until VRAM safe period ends.”
+; Essentially "wait until VRAM safe period ends."
     ld   a,[wD9FD]
     and  a,$7F
     cp   a,$00
@@ -1464,7 +1462,7 @@ call_00_0c03_WaitForVRAMCopyCompletion:
 call_00_0c10_QueueVRAMCopyRequest:
 ; Ensures only one copy operation is queued at a time.
 ; Takes accumulator A, ORs $80, compares against wD9FD. If same, return. Otherwise mask to 7 bits and write.
-; Likely a “request VRAM transfer” trigger.
+; Likely a "request VRAM transfer" trigger.
     ld   HL, wD9FD                                     ;; 00:0c10 $21 $fd $d9
     or   A, $80                                        ;; 00:0c13 $f6 $80
     cp   A, [HL]                                       ;; 00:0c15 $be
@@ -1577,13 +1575,13 @@ call_00_0c6a_HandlePendingHDMATransfers:
     ret                                                ;; 00:0caa $c9
 .jr_00_0cab:
     ld   H, HIGH(wD800_EntityMemory)                                        ;; 00:0cab $26 $d8
-    ld   A, [wDB61_ActiveEntitySlot]                                    ;; 00:0cad $fa $61 $db
+    ld   A, [wDB61_ActiveObjectSlot]                                    ;; 00:0cad $fa $61 $db
     or   A, ENTITY_FIELD_SPRITE_BANK                                        ;; 00:0cb0 $f6 $17
     ld   L, A                                          ;; 00:0cb2 $6f
     ld   A, [HL]                                       ;; 00:0cb3 $7e
     call call_00_0f25_AltSwitchBank                                  ;; 00:0cb4 $cd $25 $0f
     ld   H, HIGH(wD800_EntityMemory)                                        ;; 00:0cb7 $26 $d8
-    ld   A, [wDB61_ActiveEntitySlot]                                    ;; 00:0cb9 $fa $61 $db
+    ld   A, [wDB61_ActiveObjectSlot]                                    ;; 00:0cb9 $fa $61 $db
     or   A, ENTITY_FIELD_GRAPHICS_FLAGS                                        ;; 00:0cbc $f6 $05
     ld   L, A                                          ;; 00:0cbe $6f
     bit  5, [HL]                                       ;; 00:0cbf $cb $6e
@@ -1592,7 +1590,7 @@ call_00_0c6a_HandlePendingHDMATransfers:
     ldh  [rHDMA1], A                                   ;; 00:0cc6 $e0 $51
     ld   A, [wDB64_VRAMTransferSource]                                    ;; 00:0cc8 $fa $64 $db
     ldh  [rHDMA2], A                                   ;; 00:0ccb $e0 $52
-    ld   A, [wDB61_ActiveEntitySlot]                                    ;; 00:0ccd $fa $61 $db
+    ld   A, [wDB61_ActiveObjectSlot]                                    ;; 00:0ccd $fa $61 $db
     rlca                                               ;; 00:0cd0 $07
     rlca                                               ;; 00:0cd1 $07
     rlca                                               ;; 00:0cd2 $07
@@ -1601,7 +1599,7 @@ call_00_0c6a_HandlePendingHDMATransfers:
     ldh  [rHDMA3], A                                   ;; 00:0cd7 $e0 $53
     xor  A, A                                          ;; 00:0cd9 $af
     ldh  [rHDMA4], A                                   ;; 00:0cda $e0 $54
-    ld   A, [wDB63_ActiveEntityType]                                    ;; 00:0cdc $fa $63 $db
+    ld   A, [wDB63_ActiveObjectType]                                    ;; 00:0cdc $fa $63 $db
     add  A, A                                          ;; 00:0cdf $87
     dec  A                                             ;; 00:0ce0 $3d
     ldh  [rHDMA5], A                                   ;; 00:0ce1 $e0 $55
@@ -1620,7 +1618,7 @@ call_00_0c6a_HandlePendingHDMATransfers:
     ldh  [rHDMA3], A                                   ;; 00:0cfb $e0 $53
     ld   A, $00                                        ;; 00:0cfd $3e $00
     ldh  [rHDMA4], A                                   ;; 00:0cff $e0 $54
-    ld   A, [wDB63_ActiveEntityType]                                    ;; 00:0d01 $fa $63 $db
+    ld   A, [wDB63_ActiveObjectType]                                    ;; 00:0d01 $fa $63 $db
     add  A, A                                          ;; 00:0d04 $87
     dec  A                                             ;; 00:0d05 $3d
     ldh  [rHDMA5], A                                   ;; 00:0d06 $e0 $55
@@ -1747,7 +1745,7 @@ call_00_0d8b_Palette_UpdateBG:
 call_00_0dc6_HBlankInterrupt_LoadPaletteSlice:
 ; Writes a hardcoded set of 8 bytes (.data_00_0df0) into the CGB background palettes 
 ; registers (rBCPS/rBCPD) — two full palette entries.
-; Then increments a counter at wDB67_HDMATempScratch (used as a “scanline mark” in the frame loop).
+; Then increments a counter at wDB67_HDMATempScratch (used as a "scanline mark" in the frame loop).
 ; Pops registers and reti. Clearly an interrupt handler, specifically updating palettes.
     ld   hl,.data_00_0df0
     ld   a,$84
@@ -2094,7 +2092,7 @@ call_00_0f80_CheckInputStart:
 call_00_0f8b_CheckInputSelect:
 ; Purpose: Tests if the current input state (wDAD7_CurrentInputs) equals $04. 
 ; If so, returns A unchanged; otherwise clears A.
-; Usage: Likely a quick check for a specific button press (e.g., “Right” or a single button).
+; Usage: Likely a quick check for a specific button press (e.g., "Right" or a single button).
 ; Behavior:
 ; A == $04 → returns immediately.
 ; Otherwise sets A=0 and returns.

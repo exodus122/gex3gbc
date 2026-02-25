@@ -1,48 +1,131 @@
 data_03_58d2:
-    db   $03                                           ;; 03:58d2 ?
-data_03_58d3:
-    db   $08, $85, $02, $85, $02, $85, $02, $84        ;; 03:58d3 ?.w.w.w?
-    db   $01, $84, $01, $84, $01, $84, $01, $84        ;; 03:58db ????????
-    db   $01, $82, $06, $82, $06, $82, $06, $82        ;; 03:58e3 ????????
-    db   $06, $82, $06, $04, $01, $04, $01, $04        ;; 03:58eb ????????
-    db   $01, $85, $02, $82, $06, $00, $02, $c4        ;; 03:58f3 ?.w.w??.
-    db   $01, $c4, $01, $c4, $01, $c4, $01, $c4        ;; 03:58fb w.w.w.w?
-    db   $01, $c4, $01, $c4, $01, $d0, $04, $82        ;; 03:5903 ???????.
-    db   $06, $02, $06, $88, $18, $85, $02, $03        ;; 03:590b w.w...w.
-    db   $08, $05, $02, $03, $08, $82, $06, $05        ;; 03:5913 w.w?????
-    db   $02, $81, $04, $03, $08, $04, $01, $02        ;; 03:591b ????????
-    db   $06, $04, $01, $05, $02, $03, $08, $06        ;; 03:5923 ????????
-    db   $03, $06, $03, $02, $06, $07, $04, $03        ;; 03:592b ????????
-    db   $08, $03, $08, $04, $01, $04, $01, $01        ;; 03:5933 ????????
-    db   $04, $04, $01, $04, $01, $07, $04, $8b        ;; 03:593b ????????
-    db   $10, $0e, $0c, $0e, $0c, $01, $04, $05        ;; 03:5943 ????????
-    db   $02, $05, $02, $05, $02, $06, $03, $03        ;; 03:594b ????????
-    db   $08, $03, $08, $04, $01, $03, $08, $03        ;; 03:5953 ????????
-    db   $08, $07, $04, $04, $01, $0d, $08, $09        ;; 03:595b ????????
-    db   $01, $05, $02, $04, $01, $04, $01, $03        ;; 03:5963 ????????
-    db   $08, $0e, $0c, $05, $02, $05, $02, $04        ;; 03:596b ????????
-    db   $01, $07, $04, $05, $02, $04, $01, $03        ;; 03:5973 ????????
-    db   $08, $0f, $12, $05, $02, $03, $08, $0c        ;; 03:597b ????????
-    db   $06, $02, $06, $85, $02, $05, $02, $03        ;; 03:5983 ????????
-    db   $08, $05, $02, $05, $02, $05, $02, $04        ;; 03:598b ????????
-    db   $01, $03, $08, $03, $08, $03, $08, $05        ;; 03:5993 ????????
-    db   $02, $04, $01, $0b, $10, $02, $06, $44        ;; 03:599b ????????
-    db   $01, $03, $08, $05, $02, $45, $02, $05        ;; 03:59a3 ????????
-    db   $02, $05, $02, $91, $1c, $09, $01, $04        ;; 03:59ab ????????
-    db   $01, $05, $02                                 ;; 03:59b3 ???
+   db   $03, $08 ; ENTITY_GEX
+   db   $85, $02 ; ENTITY_BONUS_COIN
+   db   $85, $02 ; ENTITY_FLY_COIN_SPAWN
+   db   $85, $02 ; ENTITY_PAW_COIN
+   db   $84, $01 ; ENTITY_FLY_1
+   db   $84, $01 ; ENTITY_FLY_2
+   db   $84, $01 ; ENTITY_FLY_3
+   db   $84, $01 ; ENTITY_FLY_4
+   db   $84, $01 ; ENTITY_FLY_5
+   db   $82, $06 ; ENTITY_GREEN_FLY_TV
+   db   $82, $06 ; ENTITY_PURPLE_FLY_TV
+   db   $82, $06 ; ENTITY_UNK_FLY_TV_3
+   db   $82, $06 ; ENTITY_BLUE_FLY_TV
+   db   $82, $06 ; ENTITY_UNK_FLY_TV_5
+   db   $04, $01 ; ENTITY_UNK0E
+   db   $04, $01 ; ENTITY_UNK0F
+   db   $04, $01 ; ENTITY_UNK10
+   db   $85, $02 ; ENTITY_TV_BUTTON
+   db   $82, $06 ; ENTITY_TV_REMOTE
+   db   $00, $02 ; ENTITY_UNK13
+   db   $c4, $01 ; ENTITY_GOAL_COUNTER_1
+   db   $c4, $01 ; ENTITY_GOAL_COUNTER_2
+   db   $c4, $01 ; ENTITY_GOAL_COUNTER_3
+   db   $c4, $01 ; ENTITY_GOAL_COUNTER_4
+   db   $c4, $01 ; ENTITY_GOAL_COUNTER_5
+   db   $c4, $01 ; ENTITY_GOAL_COUNTER_6
+   db   $c4, $01 ; ENTITY_GOAL_COUNTER_7
+   db   $d0, $04 ; ENTITY_BONUS_STAGE_TIMER
+   db   $82, $06 ; ENTITY_FREESTANDING_REMOTE
+   db   $02, $06 ; ENTITY_HOLIDAY_TV_ICE_SCULPTURE
+   db   $88, $18 ; ENTITY_HOLIDAY_TV_EVIL_SANTA
+   db   $85, $02 ; ENTITY_HOLIDAY_TV_EVIL_SANTA_PROJECTILE
+   db   $03, $08 ; ENTITY_HOLIDAY_TV_SKATING_ELF
+   db   $05, $02 ; ENTITY_HOLIDAY_TV_PENGUIN
+   db   $03, $08 ; ENTITY_MYSTERY_TV_REZLING
+   db   $82, $06 ; ENTITY_MYSTERY_TV_BLOOD_COOLER
+   db   $05, $02 ; ENTITY_MYSTERY_TV_FISH
+   db   $81, $04 ; ENTITY_MYSTERY_TV_MAGIC_SWORD
+   db   $03, $08 ; ENTITY_MYSTERY_TV_SAFARI_SAM
+   db   $04, $01 ; ENTITY_MYSTERY_TV_SAFARI_SAM_PROJECTILE
+   db   $02, $06 ; ENTITY_MYSTERY_TV_GHOST_KNIGHT
+   db   $04, $01 ; ENTITY_MYSTERY_TV_GHOST_KNIGHT_PROJECTILE
+   db   $05, $02 ; ENTITY_TUT_TV_HAND
+   db   $03, $08 ; ENTITY_TUT_TV_LOST_ARK
+   db   $06, $03 ; ENTITY_TUT_TV_RISING_PLATFORM
+   db   $06, $03 ; ENTITY_TUT_TV_SIDEWAYS_PLATFORM
+   db   $02, $06 ; ENTITY_TUT_TV_BEE
+   db   $07, $04 ; ENTITY_TUT_TV_RAFT
+   db   $03, $08 ; ENTITY_TUT_TV_SNAKE_FACING_RIGHT
+   db   $03, $08 ; ENTITY_TUT_TV_SNAKE_FACING_LEFT
+   db   $04, $01 ; ENTITY_TUT_TV_SNAKE_RIGHT_PROJECTILE
+   db   $04, $01 ; ENTITY_TUT_TV_SNAKE_LEFT_PROJECTILE
+   db   $01, $04 ; ENTITY_TUT_TV_RA_STAFF
+   db   $04, $01 ; ENTITY_TUT_TV_RA_STATUE_HORIZONTAL_PROJECTILE
+   db   $04, $01 ; ENTITY_TUT_TV_RA_STATUE_DIAGONAL_PROJECTILE
+   db   $07, $04 ; ENTITY_TUT_TV_BREAKABLE_BLOCK
+   db   $8b, $10 ; ENTITY_TUT_TV_COFFIN
+   db   $0e, $0c ; ENTITY_WESTERN_STATION_CACTUS
+   db   $0e, $0c ; ENTITY_UNK3A
+   db   $01, $04 ; ENTITY_WESTERN_STATION_ROCK_PLATFORM
+   db   $05, $02 ; ENTITY_WESTERN_STATION_HARD_HAT
+   db   $05, $02 ; ENTITY_WESTERN_STATION_PLAYING_CARD
+   db   $05, $02 ; ENTITY_WESTERN_STATION_BAT
+   db   $06, $03 ; ENTITY_WESTERN_STATION_RISING_PLATFORM
+   db   $03, $08 ; ENTITY_ANIME_CHANNEL_DOOR
+   db   $03, $08 ; ENTITY_ANIME_CHANNEL_DOOR2
+   db   $04, $01 ; ENTITY_ANIME_CHANNEL_FAN_LIFT
+   db   $03, $08 ; ENTITY_ANIME_CHANNEL_MECH_FACING_RIGHT
+   db   $03, $08 ; ENTITY_ANIME_CHANNEL_MECH_FACING_LEFT
+   db   $07, $04 ; ENTITY_ANIME_CHANNEL_DISAPPEARING_FLOOR
+   db   $04, $01 ; ENTITY_ANIME_CHANNEL_ON_SWITCH2
+   db   $0d, $08 ; ENTITY_ANIME_CHANNEL_ALIEN_CULTURE_TUBE
+   db   $09, $01 ; ENTITY_ANIME_CHANNEL_BLUE_BEAM_BARRIER
+   db   $05, $02 ; ENTITY_ANIME_CHANNEL_RISING_PLATFORM
+   db   $04, $01 ; ENTITY_ANIME_CHANNEL_ON_SWITCH
+   db   $04, $01 ; ENTITY_ANIME_CHANNEL_OFF_SWITCH
+   db   $03, $08 ; ENTITY_ANIME_CHANNEL_SAILOR_TOON_GIRL
+   db   $0e, $0c ; ENTITY_ANIME_CHANNEL_BIG_SILVER_ROBOT
+   db   $05, $02 ; ENTITY_ANIME_CHANNEL_SMALL_BLUE_ROBOT
+   db   $05, $02 ; ENTITY_ANIME_CHANNEL_SECBOT
+   db   $04, $01 ; ENTITY_ANIME_CHANNEL_SECBOT_PROJECTILE
+   db   $07, $04 ; ENTITY_ANIME_CHANNEL_ELEVATOR
+   db   $05, $02 ; ENTITY_ANIME_CHANNEL_FIRE_WALL_ENEMY
+   db   $04, $01 ; ENTITY_ANIME_CHANNEL_GRENADE
+   db   $03, $08 ; ENTITY_ANIME_CHANNEL_PLANET_O_BLAST_WEAPON
+   db   $0f, $12 ; ENTITY_SUPERHERO_SHOW_MAD_BOMBER
+   db   $05, $02 ; ENTITY_SUPERHERO_SHOW_BOMB
+   db   $03, $08 ; ENTITY_SUPERHERO_SHOW_WATER_TOWER_TANK
+   db   $0c, $06 ; ENTITY_SUPERHERO_SHOW_WATER_TOWER_STAND
+   db   $02, $06 ; ENTITY_SUPERHERO_SHOW_CONVICT
+   db   $85, $02 ; ENTITY_SUPERHERO_SHOW_SPIDER
+   db   $05, $02 ; ENTITY_SUPERHERO_SHOW_STRAY_CAT
+   db   $03, $08 ; ENTITY_SUPERHERO_SHOW_YELLOW_GOON
+   db   $05, $02 ; ENTITY_SUPERHERO_SHOW_RAT
+   db   $05, $02 ; ENTITY_SUPERHERO_SHOW_CHOMPER_TV
+   db   $05, $02 ; ENTITY_SUPERHERO_SHOW_CRUMBLING_FLOOR
+   db   $04, $01 ; ENTITY_SUPERHERO_SHOW_CONVICT_PROJECTILE
+   db   $03, $08 ; ENTITY_GEXTREME_SPORTS_ELF
+   db   $03, $08 ; ENTITY_GEXTREME_SPORTS_BONUS_TIME_COIN
+   db   $03, $08 ; ENTITY_MARSUPIAL_MADNESS_BELL
+   db   $05, $02 ; ENTITY_MARSUPIAL_MADNESS_BIRD
+   db   $04, $01 ; ENTITY_MARSUPIAL_MADNESS_BIRD_PROJECTILE
+   db   $0b, $10 ; ENTITY_WW_GEX_WRESTLING_ROCK_HARD
+   db   $02, $06 ; ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ
+   db   $44, $01 ; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE
+   db   $03, $08 ; ENTITY_LIZARD_OF_OZ_CANNON
+   db   $05, $02 ; ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE
+   db   $45, $02 ; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2
+   db   $05, $02 ; ENTITY_UNK6C
+   db   $05, $02 ; ENTITY_UNK6D
+   db   $91, $1c ; ENTITY_CHANNEL_Z_REZ
+   db   $09, $01 ; ENTITY_UNK6F
+   db   $04, $01 ; ENTITY_CHANNEL_Z_METEOR
+   db   $05, $02 ; ENTITY_CHANNEL_Z_REZ_PROJECTILE
 
 call_03_59b6_LookupEntityPropertyFromType:
 ; Entity Property Lookup (DB61-based)
 ; Description:
-; Uses the byte at wDB61_ActiveEntitySlot as an index into a two-byte table at data_03_58d3 to return an entity property byte. 
+; Uses the byte at wDB61_ActiveObjectSlot as an index into a two-byte table at data_03_58d3 to return an entity property byte. 
 ; Likely retrieves a behavior or sprite index based on some game state or entity slot.
-    ld   HL, wDB61_ActiveEntitySlot                                     ;; 03:59b6 $21 $61 $db
+    ld   HL, wDB61_ActiveObjectSlot                                     ;; 03:59b6 $21 $61 $db
     ld   L, [HL]                                       ;; 03:59b9 $6e
     ld   h, HIGH(wD800_EntityMemory)                                        ;; 03:59ba $26 $d8
-    ld   L, [HL]                                       ;; 03:59bc $6e
+    ld   L, [HL]                                       ;; 03:59bc $6e ; ENTITY_FIELD_ENTITY_ID
     ld   H, $00                                        ;; 03:59bd $26 $00
     add  HL, HL                                        ;; 03:59bf $29
-    ld   DE, data_03_58d3                             ;; 03:59c0 $11 $d3 $58
+    ld   DE, data_03_58d2+1                             ;; 03:59c0 $11 $d3 $58
     add  HL, DE                                        ;; 03:59c3 $19
     ld   A, [HL]                                       ;; 03:59c4 $7e
     ret                                                ;; 03:59c5 $c9
@@ -51,11 +134,11 @@ call_03_59c6_IsEntityFlaggedHighBit:
 ; Check High-Bit Flag for Current Entity
 ; Description:
 ; Fetches the current entity’s index from wDA00_CurrentEntityAddrLo, looks it up in data_03_58d2, 
-; masks bit 7 ($80), and returns it. Used as a quick “is flagged?” test for the entity (e.g., active/inactive, hidden).
+; masks bit 7 ($80), and returns it. Used as a quick "is flagged?" test for the entity.
     ld   HL, wDA00_CurrentEntityAddrLo                                     ;; 03:59c6 $21 $00 $da
     ld   L, [HL]                                       ;; 03:59c9 $6e
     ld   h, HIGH(wD800_EntityMemory)                                        ;; 03:59ca $26 $d8
-    ld   L, [HL]                                       ;; 03:59cc $6e
+    ld   L, [HL]                                       ;; 03:59cc $6e ; ENTITY_FIELD_ENTITY_ID
     ld   H, $00                                        ;; 03:59cd $26 $00
     add  HL, HL                                        ;; 03:59cf $29
     ld   DE, data_03_58d2                              ;; 03:59d0 $11 $d2 $58
@@ -64,15 +147,14 @@ call_03_59c6_IsEntityFlaggedHighBit:
     and  A, $80                                        ;; 03:59d5 $e6 $80
     ret                                                ;; 03:59d7 $c9
 
-call_03_59d8_IsEntityRenderableFlag:
+call_03_59d8_Entity_IsGoalCounter:
 ; Check Mid-Bit Flag for Current Entity
 ; Description:
-; Very similar to the above but masks bit 6 ($40). Returns whether the entity has that mid-bit set—likely 
-; another state flag such as “should render” or “has sprite.”
+; Very similar to the above but masks bit 6 ($40). Returns whether the entity has that mid-bit set.
     ld   HL, wDA00_CurrentEntityAddrLo                                     ;; 03:59d8 $21 $00 $da
     ld   L, [HL]                                       ;; 03:59db $6e
     ld   h, HIGH(wD800_EntityMemory)                                        ;; 03:59dc $26 $d8
-    ld   L, [HL]                                       ;; 03:59de $6e
+    ld   L, [HL]                                       ;; 03:59de $6e ; ENTITY_FIELD_ENTITY_ID
     ld   H, $00                                        ;; 03:59df $26 $00
     add  HL, HL                                        ;; 03:59e1 $29
     ld   DE, data_03_58d2                              ;; 03:59e2 $11 $d2 $58
@@ -82,164 +164,273 @@ call_03_59d8_IsEntityRenderableFlag:
     ret                                                ;; 03:59e9 $c9
 
 data_03_59ea_SpriteData:
-    db   $7a, $5a, $83, $5a, $7a, $5a, $83, $5a        ;; 03:59ea ????????
-    db   $8c, $5a, $9d, $5a, $8c, $5a, $9d, $5a        ;; 03:59f2 ????????
-    db   $ae, $5a, $c7, $5a, $ae, $5a, $c7, $5a        ;; 03:59fa ..??????
-    db   $e0, $5a, $01, $5b, $e0, $5a, $01, $5b        ;; 03:5a02 ....????
-    db   $22, $5b, $27, $5b, $22, $5b, $27, $5b        ;; 03:5a0a ..??????
-    db   $2c, $5b, $35, $5b, $2c, $5b, $35, $5b        ;; 03:5a12 ....????
-    db   $3e, $5b, $4b, $5b, $3e, $5b, $4b, $5b        ;; 03:5a1a ????????
-    db   $58, $5b, $69, $5b, $58, $5b, $69, $5b        ;; 03:5a22 ????????
-    db   $7a, $5b, $7a, $5b, $7a, $5b, $7a, $5b        ;; 03:5a2a ..??????
-    db   $db, $5b, $db, $5b, $fc, $5b, $fc, $5b        ;; 03:5a32 ????????
-    db   $1d, $5c, $5e, $5c, $1d, $5c, $5e, $5c        ;; 03:5a3a ????????
-    db   $9f, $5c, $e0, $5c, $9f, $5c, $e0, $5c        ;; 03:5a42 ????????
-    db   $21, $5d, $3a, $5d, $21, $5d, $3a, $5d        ;; 03:5a4a ????????
-    db   $53, $5d, $53, $5d, $53, $5d, $53, $5d        ;; 03:5a52 ????????
-    db   $94, $5d, $c5, $5d, $94, $5d, $c5, $5d        ;; 03:5a5a ????????
-    db   $f6, $5d, $f6, $5d, $f6, $5d, $f6, $5d        ;; 03:5a62 ????????
-    db   $3f, $5e, $3f, $5e, $3f, $5e, $3f, $5e        ;; 03:5a6a ????????
-    db   $50, $5e, $50, $5e, $50, $5e, $50, $5e        ;; 03:5a72 ????????
+    dw   .data_03_5a7a
+    dw   .data_03_5a83
+    dw   .data_03_5a7a
+    dw   .data_03_5a83
+    dw   .data_03_5a8c
+    dw   .data_03_5a9d
+    dw   .data_03_5a8c
+    dw   .data_03_5a9d
+    dw   .data_03_5aae
+    dw   .data_03_5ac7
+    dw   .data_03_5aae
+    dw   .data_03_5ac7
+    dw   .data_03_5ae0
+    dw   .data_03_5b01
+    dw   .data_03_5ae0
+    dw   .data_03_5b01
+    dw   .data_03_5b22
+    dw   .data_03_5b27
+    dw   .data_03_5b22
+    dw   .data_03_5b27
+    dw   .data_03_5b2c
+    dw   .data_03_5b35
+    dw   .data_03_5b2c
+    dw   .data_03_5b35
+    dw   .data_03_5b3e
+    dw   .data_03_5b4b
+    dw   .data_03_5b3e
+    dw   .data_03_5b4b
+    dw   .data_03_5b58
+    dw   .data_03_5b69
+    dw   .data_03_5b58
+    dw   .data_03_5b69
+    dw   .data_03_5b7a
+    dw   .data_03_5b7a
+    dw   .data_03_5b7a
+    dw   .data_03_5b7a
+    dw   .data_03_5bdb
+    dw   .data_03_5bdb
+    dw   .data_03_5bfc
+    dw   .data_03_5bfc
+    dw   .data_03_5c1d
+    dw   .data_03_5c5e
+    dw   .data_03_5c1d
+    dw   .data_03_5c5e
+    dw   .data_03_5c9f
+    dw   .data_03_5ce0
+    dw   .data_03_5c9f
+    dw   .data_03_5ce0
+    dw   .data_03_5d21
+    dw   .data_03_5d3a
+    dw   .data_03_5d21
+    dw   .data_03_5d3a
+    dw   .data_03_5d53
+    dw   .data_03_5d53
+    dw   .data_03_5d53
+    dw   .data_03_5d53
+    dw   .data_03_5d94
+    dw   .data_03_5dc5
+    dw   .data_03_5d94
+    dw   .data_03_5dc5
+    dw   .data_03_5df6
+    dw   .data_03_5df6
+    dw   .data_03_5df6
+    dw   .data_03_5df6
+    dw   .data_03_5e3f
+    dw   .data_03_5e3f
+    dw   .data_03_5e3f
+    dw   .data_03_5e3f
+    dw   .data_03_5e50
+    dw   .data_03_5e50
+    dw   .data_03_5e50
+    dw   .data_03_5e50
+.data_03_5a7a:
+    db   $02, $f0, $fc, $00, $00, $00, $fc, $02
+    db   $00
+.data_03_5a83:
+    db   $02, $f0, $fc, $00, $20, $00, $fc, $02
+    db   $20
+.data_03_5a8c:
+    db   $04, $f0, $f8, $00, $00, $f0, $00, $04
+    db   $00, $00, $f8, $02, $00, $00, $00, $06
+    db   $00
+.data_03_5a9d:
+    db   $04, $f0, $00, $00, $20, $f0, $f8, $04
+    db   $20, $00, $00, $02, $20, $00, $f8, $06
+    db   $20
+.data_03_5aae:
+    db   $06, $f0, $f4, $00, $00, $f0, $fc, $04
+    db   $00, $f0, $04, $08, $00, $00, $f4, $02
+    db   $00, $00, $fc, $06, $00, $00, $04, $0a
+    db   $00
+.data_03_5ac7:
+    db   $06, $f0, $04, $00, $20, $f0, $fc, $04
+    db   $20, $f0, $f4, $08, $20, $00, $04, $02
+    db   $20, $00, $fc, $06, $20, $00, $f4, $0a
+    db   $20
+.data_03_5ae0:
+    db   $08, $f0, $f0, $00, $00, $f0, $f8, $04
+    db   $00, $f0, $00, $08, $00, $f0, $08, $0c
+    db   $00, $00, $f0, $02, $00, $00, $f8, $06
+    db   $00, $00, $00, $0a, $00, $00, $08, $0e
+    db   $00
+.data_03_5b01:
+    db   $08, $f0, $08, $00, $20, $f0, $00, $04
+    db   $20, $f0, $f8, $08, $20, $f0, $f0, $0c
+    db   $20, $00, $08, $02, $20, $00, $00, $06
+    db   $20, $00, $f8, $0a, $20, $00, $f0, $0e
+    db   $20
+.data_03_5b22:
+    db   $01, $f8, $fc, $00, $00
+.data_03_5b27:
+    db   $01, $f8, $fc, $00, $20
+.data_03_5b2c:
+    db   $02, $f8, $f8, $00, $00, $f8, $00, $02
+    db   $00
+.data_03_5b35:
+    db   $02, $f8, $00, $00, $20, $f8, $f8, $02
+    db   $20
+.data_03_5b3e:
+    db   $03, $f8, $f4, $00, $00, $f8, $fc, $02
+    db   $00, $f8, $04, $04, $00
+.data_03_5b4b:
+    db   $03, $f8, $04, $00, $20, $f8, $fc, $02
+    db   $20, $f8, $f4, $04, $20
+.data_03_5b58:
+    db   $04, $f8, $f0, $00, $00, $f8, $f8, $02
+    db   $00, $f8, $00, $04, $00, $f8, $08, $06
+    db   $00
+.data_03_5b69:
+    db   $04, $f8, $08, $00, $20, $f8, $00, $02
+    db   $20, $f8, $f8, $04, $20, $f8, $f0, $06
+    db   $20
+.data_03_5b7a:
+    db   $18, $e8, $e0, $00, $08, $e8, $e8, $06
+    db   $08, $e8, $f0, $0c, $08, $e8, $f8, $12
+    db   $08, $e8, $00, $18, $08, $e8, $08, $1e
+    db   $08, $e8, $10, $24, $08, $e8, $18, $2a
+    db   $08, $f8, $e0, $02, $08, $f8, $e8, $08
+    db   $08, $f8, $f0, $0e, $08, $f8, $f8, $14
+    db   $08, $f8, $00, $1a, $08, $f8, $08, $20
+    db   $08, $f8, $10, $26, $08, $f8, $18, $2c
+    db   $08, $08, $e0, $04, $08, $08, $e8, $0a
+    db   $08, $08, $f0, $10, $08, $08, $f8, $16
+    db   $08, $08, $00, $1c, $08, $08, $08, $22
+    db   $08, $08, $10, $28, $08, $08, $18, $2e
+    db   $08
+.data_03_5bdb:
+    db   $08, $c0, $fc, $00, $00, $d0, $fc, $00
+    db   $00, $e0, $fc, $00, $00, $f0, $fc, $00
+    db   $00, $00, $fc, $00, $00, $10, $fc, $00
+    db   $00, $20, $fc, $00, $00, $30, $fc, $00
+    db   $00
+.data_03_5bfc:
+    db   $08, $c0, $fc, $00, $20, $d0, $fc, $00
+    db   $20, $e0, $fc, $00, $20, $f0, $fc, $00
+    db   $20, $00, $fc, $00, $20, $10, $fc, $00
+    db   $20, $20, $fc, $00, $20, $30, $fc, $00
+    db   $20
+.data_03_5c1d:
+    db   $10, $e0, $f0, $00, $00, $e0, $f8, $08
+    db   $00, $e0, $00, $10, $00, $e0, $08, $18
+    db   $00, $f0, $f0, $02, $00, $f0, $f8, $0a
+    db   $00, $f0, $00, $12, $00, $f0, $08, $1a
+    db   $00, $00, $f0, $04, $00, $00, $f8, $0c
+    db   $00, $00, $00, $14, $00, $00, $08, $1c
+    db   $00, $10, $f0, $06, $00, $10, $f8, $0e
+    db   $00, $10, $00, $16, $00, $10, $08, $1e
+    db   $00
+.data_03_5c5e:
+    db   $10, $e0, $08, $00, $20, $e0, $00, $08
+    db   $20, $e0, $f8, $10, $20, $e0, $f0, $18
+    db   $20, $f0, $08, $02, $20, $f0, $00, $0a
+    db   $20, $f0, $f8, $12, $20, $f0, $f0, $1a
+    db   $20, $00, $08, $04, $20, $00, $00, $0c
+    db   $20, $00, $f8, $14, $20, $00, $f0, $1c
+    db   $20, $10, $08, $06, $20, $10, $00, $0e
+    db   $20, $10, $f8, $16, $20, $10, $f0, $1e
+    db   $20
+.data_03_5c9f:
+    db   $10, $e0, $f0, $00, $08, $e0, $f8, $08
+    db   $08, $e0, $00, $10, $08, $e0, $08, $18
+    db   $08, $f0, $f0, $02, $08, $f0, $f8, $0a
+    db   $08, $f0, $00, $12, $08, $f0, $08, $1a
+    db   $08, $00, $f0, $04, $08, $00, $f8, $0c
+    db   $08, $00, $00, $14, $08, $00, $08, $1c
+    db   $08, $10, $f0, $06, $08, $10, $f8, $0e
+    db   $08, $10, $00, $16, $08, $10, $08, $1e
+    db   $08
+.data_03_5ce0:
+    db   $10, $e0, $08, $00, $28, $e0, $00, $08
+    db   $28, $e0, $f8, $10, $28, $e0, $f0, $18
+    db   $28, $f0, $08, $02, $28, $f0, $00, $0a
+    db   $28, $f0, $f8, $12, $28, $f0, $f0, $1a
+    db   $28, $00, $08, $04, $28, $00, $00, $0c
+    db   $28, $00, $f8, $14, $28, $00, $f0, $1c
+    db   $28, $10, $08, $06, $28, $10, $00, $0e
+    db   $28, $10, $f8, $16, $28, $10, $f0, $1e
+    db   $28
+.data_03_5d21:
+    db   $06, $e8, $f8, $00, $00, $e8, $00, $06
+    db   $00, $f8, $f8, $02, $00, $f8, $00, $08
+    db   $00, $08, $f8, $04, $00, $08, $00, $0a
+    db   $00
+.data_03_5d3a:
+    db   $06, $e8, $00, $00, $20, $e8, $f8, $06
+    db   $20, $f8, $00, $02, $20, $f8, $f8, $08
+    db   $20, $08, $00, $04, $20, $08, $f8, $0a
+    db   $20
+.data_03_5d53:
+    db   $10, $e0, $f0, $00, $00, $e0, $f8, $08
+    db   $00, $e0, $00, $08, $20, $e0, $08, $00
+    db   $20, $f0, $f0, $02, $00, $f0, $f8, $0a
+    db   $00, $f0, $00, $0a, $20, $f0, $08, $02
+    db   $20, $00, $f0, $04, $00, $00, $f8, $0c
+    db   $00, $00, $00, $0c, $20, $00, $08, $04
+    db   $20, $10, $f0, $06, $00, $10, $f8, $0e
+    db   $00, $10, $00, $0e, $20, $10, $08, $06
+    db   $20
+.data_03_5d94:
+    db   $0c, $e8, $f0, $00, $08, $e8, $f8, $06
+    db   $08, $e8, $00, $0c, $08, $e8, $08, $12
+    db   $08, $f8, $f0, $02, $08, $f8, $f8, $08
+    db   $08, $f8, $00, $0e, $08, $f8, $08, $14
+    db   $08, $08, $f0, $04, $08, $08, $f8, $0a
+    db   $08, $08, $00, $10, $08, $08, $08, $16
+    db   $08
+.data_03_5dc5:
+    db   $0c, $e8, $08, $00, $28, $e8, $00, $06
+    db   $28, $e8, $f8, $0c, $28, $e8, $f0, $12
+    db   $28, $f8, $08, $02, $28, $f8, $00, $08
+    db   $28, $f8, $f8, $0e, $28, $f8, $f0, $14
+    db   $28, $08, $08, $04, $28, $08, $00, $0a
+    db   $28, $08, $f8, $10, $28, $08, $f0, $16
+    db   $28
+.data_03_5df6:
+    db   $12, $e8, $e8, $00, $08, $e8, $f0, $06
+    db   $08, $e8, $f8, $0c, $08, $e8, $00, $12
+    db   $08, $e8, $08, $18, $08, $e8, $10, $1e
+    db   $08, $f8, $e8, $02, $08, $f8, $f0, $08
+    db   $08, $f8, $f8, $0e, $08, $f8, $00, $14
+    db   $08, $f8, $08, $1a, $08, $f8, $10, $20
+    db   $08, $08, $e8, $04, $08, $08, $f0, $0a
+    db   $08, $08, $f8, $10, $08, $08, $00, $16
+    db   $08, $08, $08, $1c, $08, $08, $10, $22
+    db   $08
+.data_03_5e3f:
+    db   $04, $f8, $f0, $00, $08, $f8, $f8, $02
+    db   $08, $f8, $00, $04, $08, $f8, $08, $06
+    db   $08
+.data_03_5e50:
+    db   $1c, $e0, $e4, $00, $08, $e0, $ec, $08
+    db   $08, $e0, $f4, $10, $08, $e0, $fc, $18
+    db   $08, $e0, $04, $20, $08, $e0, $0c, $28
+    db   $08, $e0, $14, $30, $08, $f0, $e4, $02
+    db   $08, $f0, $ec, $0a, $08, $f0, $f4, $12
+    db   $08, $f0, $fc, $1a, $08, $f0, $04, $22
+    db   $08, $f0, $0c, $2a, $08, $f0, $14, $32
+    db   $08, $00, $e4, $04, $08, $00, $ec, $0c
+    db   $08, $00, $f4, $14, $08, $00, $fc, $1c
+    db   $08, $00, $04, $24, $08, $00, $0c, $2c
+    db   $08, $00, $14, $34, $08, $10, $e4, $06
+    db   $08, $10, $ec, $0e, $08, $10, $f4, $16
+    db   $08, $10, $fc, $1e, $08, $10, $04, $26
+    db   $08, $10, $0c, $2e, $08, $10, $14, $36
+    db   $08
 
-    db   $02, $f0, $fc, $00, $00, $00, $fc, $02        ;; 03:5a7a ????????
-    db   $00, $02, $f0, $fc, $00, $20, $00, $fc        ;; 03:5a82 ????????
-    db   $02, $20, $04, $f0, $f8, $00, $00, $f0        ;; 03:5a8a ????????
-    db   $00, $04, $00, $00, $f8, $02, $00, $00        ;; 03:5a92 ????????
-    db   $00, $06, $00, $04, $f0, $00, $00, $20        ;; 03:5a9a ????????
-    db   $f0, $f8, $04, $20, $00, $00, $02, $20        ;; 03:5aa2 ????????
-    db   $00, $f8, $06, $20, $06, $f0, $f4, $00        ;; 03:5aaa ????...?
-    db   $00, $f0, $fc, $04, $00, $f0, $04, $08        ;; 03:5ab2 ?..??..?
-    db   $00, $00, $f4, $02, $00, $00, $fc, $06        ;; 03:5aba ?..??..?
-    db   $00, $00, $04, $0a, $00, $06, $f0, $04        ;; 03:5ac2 ?..?????
-    db   $00, $20, $f0, $fc, $04, $20, $f0, $f4        ;; 03:5aca ????????
-    db   $08, $20, $00, $04, $02, $20, $00, $fc        ;; 03:5ad2 ????????
-    db   $06, $20, $00, $f4, $0a, $20, $08, $f0        ;; 03:5ada ??????..
-    db   $f0, $00, $00, $f0, $f8, $04, $00, $f0        ;; 03:5ae2 .??..??.
-    db   $00, $08, $00, $f0, $08, $0c, $00, $00        ;; 03:5aea .??..??.
-    db   $f0, $02, $00, $00, $f8, $06, $00, $00        ;; 03:5af2 .??..??.
-    db   $00, $0a, $00, $00, $08, $0e, $00, $08        ;; 03:5afa .??..??.
-    db   $f0, $08, $00, $20, $f0, $00, $04, $20        ;; 03:5b02 ..??..??
-    db   $f0, $f8, $08, $20, $f0, $f0, $0c, $20        ;; 03:5b0a ..??..??
-    db   $00, $08, $02, $20, $00, $00, $06, $20        ;; 03:5b12 ..??..??
-    db   $00, $f8, $0a, $20, $00, $f0, $0e, $20        ;; 03:5b1a ..??..??
-    db   $01, $f8, $fc, $00, $00, $01, $f8, $fc        ;; 03:5b22 ...?????
-    db   $00, $20, $02, $f8, $f8, $00, $00, $f8        ;; 03:5b2a ??...??.
-    db   $00, $02, $00, $02, $f8, $00, $00, $20        ;; 03:5b32 .??...??
-    db   $f8, $f8, $02, $20, $03, $f8, $f4, $00        ;; 03:5b3a ..??????
-    db   $00, $f8, $fc, $02, $00, $f8, $04, $04        ;; 03:5b42 ????????
-    db   $00, $03, $f8, $04, $00, $20, $f8, $fc        ;; 03:5b4a ????????
-    db   $02, $20, $f8, $f4, $04, $20, $04, $f8        ;; 03:5b52 ????????
-    db   $f0, $00, $00, $f8, $f8, $02, $00, $f8        ;; 03:5b5a ????????
-    db   $00, $04, $00, $f8, $08, $06, $00, $04        ;; 03:5b62 ????????
-    db   $f8, $08, $00, $20, $f8, $00, $02, $20        ;; 03:5b6a ????????
-    db   $f8, $f8, $04, $20, $f8, $f0, $06, $20        ;; 03:5b72 ????????
-    db   $18, $e8, $e0, $00, $08, $e8, $e8, $06        ;; 03:5b7a ...??..?
-    db   $08, $e8, $f0, $0c, $08, $e8, $f8, $12        ;; 03:5b82 ?..??..?
-    db   $08, $e8, $00, $18, $08, $e8, $08, $1e        ;; 03:5b8a ?..??..?
-    db   $08, $e8, $10, $24, $08, $e8, $18, $2a        ;; 03:5b92 ?..??..?
-    db   $08, $f8, $e0, $02, $08, $f8, $e8, $08        ;; 03:5b9a ?..??..?
-    db   $08, $f8, $f0, $0e, $08, $f8, $f8, $14        ;; 03:5ba2 ?..??..?
-    db   $08, $f8, $00, $1a, $08, $f8, $08, $20        ;; 03:5baa ?..??..?
-    db   $08, $f8, $10, $26, $08, $f8, $18, $2c        ;; 03:5bb2 ?..??..?
-    db   $08, $08, $e0, $04, $08, $08, $e8, $0a        ;; 03:5bba ?..??..?
-    db   $08, $08, $f0, $10, $08, $08, $f8, $16        ;; 03:5bc2 ?..??..?
-    db   $08, $08, $00, $1c, $08, $08, $08, $22        ;; 03:5bca ?..??..?
-    db   $08, $08, $10, $28, $08, $08, $18, $2e        ;; 03:5bd2 ?..??..?
-    db   $08, $08, $c0, $fc, $00, $00, $d0, $fc        ;; 03:5bda ????????
-    db   $00, $00, $e0, $fc, $00, $00, $f0, $fc        ;; 03:5be2 ????????
-    db   $00, $00, $00, $fc, $00, $00, $10, $fc        ;; 03:5bea ????????
-    db   $00, $00, $20, $fc, $00, $00, $30, $fc        ;; 03:5bf2 ????????
-    db   $00, $00, $08, $c0, $fc, $00, $20, $d0        ;; 03:5bfa ????????
-    db   $fc, $00, $20, $e0, $fc, $00, $20, $f0        ;; 03:5c02 ????????
-    db   $fc, $00, $20, $00, $fc, $00, $20, $10        ;; 03:5c0a ????????
-    db   $fc, $00, $20, $20, $fc, $00, $20, $30        ;; 03:5c12 ????????
-    db   $fc, $00, $20, $10, $e0, $f0, $00, $00        ;; 03:5c1a ????????
-    db   $e0, $f8, $08, $00, $e0, $00, $10, $00        ;; 03:5c22 ????????
-    db   $e0, $08, $18, $00, $f0, $f0, $02, $00        ;; 03:5c2a ????????
-    db   $f0, $f8, $0a, $00, $f0, $00, $12, $00        ;; 03:5c32 ????????
-    db   $f0, $08, $1a, $00, $00, $f0, $04, $00        ;; 03:5c3a ????????
-    db   $00, $f8, $0c, $00, $00, $00, $14, $00        ;; 03:5c42 ????????
-    db   $00, $08, $1c, $00, $10, $f0, $06, $00        ;; 03:5c4a ????????
-    db   $10, $f8, $0e, $00, $10, $00, $16, $00        ;; 03:5c52 ????????
-    db   $10, $08, $1e, $00, $10, $e0, $08, $00        ;; 03:5c5a ????????
-    db   $20, $e0, $00, $08, $20, $e0, $f8, $10        ;; 03:5c62 ????????
-    db   $20, $e0, $f0, $18, $20, $f0, $08, $02        ;; 03:5c6a ????????
-    db   $20, $f0, $00, $0a, $20, $f0, $f8, $12        ;; 03:5c72 ????????
-    db   $20, $f0, $f0, $1a, $20, $00, $08, $04        ;; 03:5c7a ????????
-    db   $20, $00, $00, $0c, $20, $00, $f8, $14        ;; 03:5c82 ????????
-    db   $20, $00, $f0, $1c, $20, $10, $08, $06        ;; 03:5c8a ????????
-    db   $20, $10, $00, $0e, $20, $10, $f8, $16        ;; 03:5c92 ????????
-    db   $20, $10, $f0, $1e, $20, $10, $e0, $f0        ;; 03:5c9a ????????
-    db   $00, $08, $e0, $f8, $08, $08, $e0, $00        ;; 03:5ca2 ????????
-    db   $10, $08, $e0, $08, $18, $08, $f0, $f0        ;; 03:5caa ????????
-    db   $02, $08, $f0, $f8, $0a, $08, $f0, $00        ;; 03:5cb2 ????????
-    db   $12, $08, $f0, $08, $1a, $08, $00, $f0        ;; 03:5cba ????????
-    db   $04, $08, $00, $f8, $0c, $08, $00, $00        ;; 03:5cc2 ????????
-    db   $14, $08, $00, $08, $1c, $08, $10, $f0        ;; 03:5cca ????????
-    db   $06, $08, $10, $f8, $0e, $08, $10, $00        ;; 03:5cd2 ????????
-    db   $16, $08, $10, $08, $1e, $08, $10, $e0        ;; 03:5cda ????????
-    db   $08, $00, $28, $e0, $00, $08, $28, $e0        ;; 03:5ce2 ????????
-    db   $f8, $10, $28, $e0, $f0, $18, $28, $f0        ;; 03:5cea ????????
-    db   $08, $02, $28, $f0, $00, $0a, $28, $f0        ;; 03:5cf2 ????????
-    db   $f8, $12, $28, $f0, $f0, $1a, $28, $00        ;; 03:5cfa ????????
-    db   $08, $04, $28, $00, $00, $0c, $28, $00        ;; 03:5d02 ????????
-    db   $f8, $14, $28, $00, $f0, $1c, $28, $10        ;; 03:5d0a ????????
-    db   $08, $06, $28, $10, $00, $0e, $28, $10        ;; 03:5d12 ????????
-    db   $f8, $16, $28, $10, $f0, $1e, $28, $06        ;; 03:5d1a ????????
-    db   $e8, $f8, $00, $00, $e8, $00, $06, $00        ;; 03:5d22 ????????
-    db   $f8, $f8, $02, $00, $f8, $00, $08, $00        ;; 03:5d2a ????????
-    db   $08, $f8, $04, $00, $08, $00, $0a, $00        ;; 03:5d32 ????????
-    db   $06, $e8, $00, $00, $20, $e8, $f8, $06        ;; 03:5d3a ????????
-    db   $20, $f8, $00, $02, $20, $f8, $f8, $08        ;; 03:5d42 ????????
-    db   $20, $08, $00, $04, $20, $08, $f8, $0a        ;; 03:5d4a ????????
-    db   $20, $10, $e0, $f0, $00, $00, $e0, $f8        ;; 03:5d52 ????????
-    db   $08, $00, $e0, $00, $08, $20, $e0, $08        ;; 03:5d5a ????????
-    db   $00, $20, $f0, $f0, $02, $00, $f0, $f8        ;; 03:5d62 ????????
-    db   $0a, $00, $f0, $00, $0a, $20, $f0, $08        ;; 03:5d6a ????????
-    db   $02, $20, $00, $f0, $04, $00, $00, $f8        ;; 03:5d72 ????????
-    db   $0c, $00, $00, $00, $0c, $20, $00, $08        ;; 03:5d7a ????????
-    db   $04, $20, $10, $f0, $06, $00, $10, $f8        ;; 03:5d82 ????????
-    db   $0e, $00, $10, $00, $0e, $20, $10, $08        ;; 03:5d8a ????????
-    db   $06, $20, $0c, $e8, $f0, $00, $08, $e8        ;; 03:5d92 ????????
-    db   $f8, $06, $08, $e8, $00, $0c, $08, $e8        ;; 03:5d9a ????????
-    db   $08, $12, $08, $f8, $f0, $02, $08, $f8        ;; 03:5da2 ????????
-    db   $f8, $08, $08, $f8, $00, $0e, $08, $f8        ;; 03:5daa ????????
-    db   $08, $14, $08, $08, $f0, $04, $08, $08        ;; 03:5db2 ????????
-    db   $f8, $0a, $08, $08, $00, $10, $08, $08        ;; 03:5dba ????????
-    db   $08, $16, $08, $0c, $e8, $08, $00, $28        ;; 03:5dc2 ????????
-    db   $e8, $00, $06, $28, $e8, $f8, $0c, $28        ;; 03:5dca ????????
-    db   $e8, $f0, $12, $28, $f8, $08, $02, $28        ;; 03:5dd2 ????????
-    db   $f8, $00, $08, $28, $f8, $f8, $0e, $28        ;; 03:5dda ????????
-    db   $f8, $f0, $14, $28, $08, $08, $04, $28        ;; 03:5de2 ????????
-    db   $08, $00, $0a, $28, $08, $f8, $10, $28        ;; 03:5dea ????????
-    db   $08, $f0, $16, $28, $12, $e8, $e8, $00        ;; 03:5df2 ????????
-    db   $08, $e8, $f0, $06, $08, $e8, $f8, $0c        ;; 03:5dfa ????????
-    db   $08, $e8, $00, $12, $08, $e8, $08, $18        ;; 03:5e02 ????????
-    db   $08, $e8, $10, $1e, $08, $f8, $e8, $02        ;; 03:5e0a ????????
-    db   $08, $f8, $f0, $08, $08, $f8, $f8, $0e        ;; 03:5e12 ????????
-    db   $08, $f8, $00, $14, $08, $f8, $08, $1a        ;; 03:5e1a ????????
-    db   $08, $f8, $10, $20, $08, $08, $e8, $04        ;; 03:5e22 ????????
-    db   $08, $08, $f0, $0a, $08, $08, $f8, $10        ;; 03:5e2a ????????
-    db   $08, $08, $00, $16, $08, $08, $08, $1c        ;; 03:5e32 ????????
-    db   $08, $08, $10, $22, $08, $04, $f8, $f0        ;; 03:5e3a ????????
-    db   $00, $08, $f8, $f8, $02, $08, $f8, $00        ;; 03:5e42 ????????
-    db   $04, $08, $f8, $08, $06, $08, $1c, $e0        ;; 03:5e4a ????????
-    db   $e4, $00, $08, $e0, $ec, $08, $08, $e0        ;; 03:5e52 ????????
-    db   $f4, $10, $08, $e0, $fc, $18, $08, $e0        ;; 03:5e5a ????????
-    db   $04, $20, $08, $e0, $0c, $28, $08, $e0        ;; 03:5e62 ????????
-    db   $14, $30, $08, $f0, $e4, $02, $08, $f0        ;; 03:5e6a ????????
-    db   $ec, $0a, $08, $f0, $f4, $12, $08, $f0        ;; 03:5e72 ????????
-    db   $fc, $1a, $08, $f0, $04, $22, $08, $f0        ;; 03:5e7a ????????
-    db   $0c, $2a, $08, $f0, $14, $32, $08, $00        ;; 03:5e82 ????????
-    db   $e4, $04, $08, $00, $ec, $0c, $08, $00        ;; 03:5e8a ????????
-    db   $f4, $14, $08, $00, $fc, $1c, $08, $00        ;; 03:5e92 ????????
-    db   $04, $24, $08, $00, $0c, $2c, $08, $00        ;; 03:5e9a ????????
-    db   $14, $34, $08, $10, $e4, $06, $08, $10        ;; 03:5ea2 ????????
-    db   $ec, $0e, $08, $10, $f4, $16, $08, $10        ;; 03:5eaa ????????
-    db   $fc, $1e, $08, $10, $04, $26, $08, $10        ;; 03:5eb2 ????????
-    db   $0c, $2e, $08, $10, $14, $36, $08             ;; 03:5eba ???????
-
-call_03_5ec1_UpdateAllEntitiesGraphicsAndCollision:
+call_03_5ec1_DrawAllEntitiesAndHandleCollision:
 ; Main Entity Graphics/Collision Updater
 ; Description:
 ; Top-level routine for each frame’s entity processing:
@@ -252,16 +443,16 @@ call_03_5ec1_UpdateAllEntitiesGraphicsAndCollision:
 ; This is the game’s primary per-frame entity graphics pipeline.
     ld   A, $08                                        ;; 03:5ec1 $3e $08
     ld   [wDC6F_EntitySpriteRelated], A                                    ;; 03:5ec3 $ea $6f $dc
-    ld   A, [wDC1F]                                    ;; 03:5ec6 $fa $1f $dc
-    cp   A, $01                                        ;; 03:5ec9 $fe $01
+    ld   A, [wDC1F_CurrentBgCollisionType]                                    ;; 03:5ec6 $fa $1f $dc
+    cp   A, BG_COLLISION_TYPE_TOPDOWN                                        ;; 03:5ec9 $fe $01
     jr   NZ, .jr_03_5ed8                               ;; 03:5ecb $20 $0b
     ld   A, [wDB6C_CurrentMapId]                                    ;; 03:5ecd $fa $6c $db
-    cp   A, $18                                        ;; 03:5ed0 $fe $18
+    cp   A, MAP_MYSTERY_TV8                                        ;; 03:5ed0 $fe $18
     jr   Z, .jr_03_5ed8                                ;; 03:5ed2 $28 $04
-    cp   A, $1a                                        ;; 03:5ed4 $fe $1a
+    cp   A, MAP_MYSTERY_TV10                                        ;; 03:5ed4 $fe $1a
     jr   NZ, .jr_03_5f35                               ;; 03:5ed6 $20 $5d
 .jr_03_5ed8:
-    ld   A, $20                                        ;; 03:5ed8 $3e $20
+    ld   A, LOW(wD820_EntityMemoryAfterPlayer)                                        ;; 03:5ed8 $3e $20
 .jr_03_5eda:
     ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 03:5eda $ea $00 $da
     or   A, ENTITY_FIELD_ENTITY_ID                                        ;; 03:5edd $f6 $00
@@ -270,7 +461,7 @@ call_03_5ec1_UpdateAllEntitiesGraphicsAndCollision:
     ld   A, [HL]                                       ;; 03:5ee2 $7e
     cp   A, $ff                                        ;; 03:5ee3 $fe $ff
     jr   Z, .jr_03_5eed                                ;; 03:5ee5 $28 $06
-    call call_03_59d8_IsEntityRenderableFlag                                  ;; 03:5ee7 $cd $d8 $59
+    call call_03_59d8_Entity_IsGoalCounter                                  ;; 03:5ee7 $cd $d8 $59
     call NZ, call_03_5fc2_SetupEntitySprite                              ;; 03:5eea $c4 $c2 $5f
 .jr_03_5eed:
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:5eed $fa $00 $da
@@ -278,8 +469,8 @@ call_03_5ec1_UpdateAllEntitiesGraphicsAndCollision:
     jr   NZ, .jr_03_5eda                               ;; 03:5ef2 $20 $e6
     ld   A, [wDCA7_DrawGexFlag]                                    ;; 03:5ef4 $fa $a7 $dc
     and  A, A                                          ;; 03:5ef7 $a7
-    call NZ, call_00_2ce2_BuildGexSpriteDrawList                              ;; 03:5ef8 $c4 $e2 $2c
-    ld   A, $20                                        ;; 03:5efb $3e $20
+    call NZ, call_00_2ce2_Entity_DrawGex                              ;; 03:5ef8 $c4 $e2 $2c
+    ld   A, LOW(wD820_EntityMemoryAfterPlayer)                                        ;; 03:5efb $3e $20
 .jr_03_5efd:
     ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 03:5efd $ea $00 $da
     or   A, ENTITY_FIELD_ENTITY_ID                                        ;; 03:5f00 $f6 $00
@@ -288,7 +479,7 @@ call_03_5ec1_UpdateAllEntitiesGraphicsAndCollision:
     ld   A, [HL]                                       ;; 03:5f05 $7e
     cp   A, $ff                                        ;; 03:5f06 $fe $ff
     jr   Z, .jr_03_5f10                                ;; 03:5f08 $28 $06
-    call call_03_59d8_IsEntityRenderableFlag                                  ;; 03:5f0a $cd $d8 $59
+    call call_03_59d8_Entity_IsGoalCounter                                  ;; 03:5f0a $cd $d8 $59
     call Z, call_03_5fc2_SetupEntitySprite                               ;; 03:5f0d $cc $c2 $5f
 .jr_03_5f10:
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:5f10 $fa $00 $da
@@ -297,7 +488,7 @@ call_03_5ec1_UpdateAllEntitiesGraphicsAndCollision:
 .jp_03_5f17:
     call call_03_615d_SetupCollectibleSprites                                  ;; 03:5f17 $cd $5d $61
     call call_03_6148_ClearUnusedSpriteSlots                                  ;; 03:5f1a $cd $48 $61
-    ld   A, $20                                        ;; 03:5f1d $3e $20
+    ld   A, LOW(wD820_EntityMemoryAfterPlayer)                                        ;; 03:5f1d $3e $20
 .jr_03_5f1f:
     ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 03:5f1f $ea $00 $da
     or   A, ENTITY_FIELD_ENTITY_ID                                        ;; 03:5f22 $f6 $00
@@ -399,7 +590,7 @@ call_03_5ec1_UpdateAllEntitiesGraphicsAndCollision:
 .jr_03_5fb2:
     ld   A, [wDCA7_DrawGexFlag]                                    ;; 03:5fb2 $fa $a7 $dc
     and  A, A                                          ;; 03:5fb5 $a7
-    call NZ, call_00_2ce2_BuildGexSpriteDrawList                              ;; 03:5fb6 $c4 $e2 $2c
+    call NZ, call_00_2ce2_Entity_DrawGex                              ;; 03:5fb6 $c4 $e2 $2c
 .jr_03_5fb9:
     pop  HL                                            ;; 03:5fb9 $e1
     pop  BC                                            ;; 03:5fba $c1

@@ -8,7 +8,7 @@ call_03_46e0_UpdateBgCollision_MainDispatcher:
     jp   NZ, call_03_4a3f_BgCollisionHandler_ByAction            ;; 03:46ed $c2 $3f $4a
     bit  7, A                                          ;; 03:46f0 $cb $7f
     jp   NZ, call_03_4ae4_CollisionMask_LookupAndDispatch      ;; 03:46f2 $c2 $e4 $4a
-    ld   HL, wDC1F                                     ;; 03:46f5 $21 $1f $dc
+    ld   HL, wDC1F_CurrentBgCollisionType                                     ;; 03:46f5 $21 $1f $dc
     ld   L, [HL]                                       ;; 03:46f8 $6e
     ld   H, $00                                        ;; 03:46f9 $26 $00
     add  HL, HL                                        ;; 03:46fb $29

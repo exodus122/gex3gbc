@@ -38,7 +38,7 @@ wD200_CollectiblesOrderedByX:
     ds 256                                             ;; d200
 wD300_CollectibleBucketLookupTable:
 ; Groups collectibles into spatial buckets (~11 X units wide).
-; So wD300 = quick lookup of “which collectibles live in this horizontal slice.”
+; So wD300 = quick lookup of "which collectibles live in this horizontal slice."
     ds 256                                             ;; d300
 
 wD400_TileBuffer:
@@ -249,9 +249,9 @@ wDAE1_TextBuffer:
     ds 128                                             ;; dae1
 
 ; HDMA Transfer related ram
-wDB61_ActiveEntitySlot:
+wDB61_ActiveObjectSlot:
     ds 2                                               ;; db61
-wDB63_ActiveEntityType:
+wDB63_ActiveObjectType:
     ds 1                                               ;; db63
 wDB64_VRAMTransferSource:
     ds 2                                               ;; db64
@@ -264,12 +264,12 @@ wDB66_HDMATransferFlags:
 ; Bit 1 set →
 ; Copy tiles for the current interaction entity.
 ; - Uses wDB64/65 as the source pointer.
-; - Source bank depends on the entity’s data (ENTITY_FIELD_GRAPHICS_FLAGS, plus a VBK = 1 path if “extended” graphics).
-; - Length depends on the entity’s type (wDB63_ActiveEntityType).
+; - Source bank depends on the entity’s data (ENTITY_FIELD_GRAPHICS_FLAGS, plus a VBK = 1 path if "extended" graphics).
+; - Length depends on the entity’s type (wDB63_ActiveObjectType).
 ; - This looks like sprite/animation tiles for NPCs or items.
 ; Bit 2 set →
 ; Perform a variable-length streaming transfer.
-; - Uses wDC2B_HDMATransferRelated1–wDC32 as a little “DMA job struct”: source address, destination, length, VRAM bank, and continuation fields.
+; - Uses wDC2B_HDMATransferRelated1–wDC32 as a little "DMA job struct": source address, destination, length, VRAM bank, and continuation fields.
 ; - After copying, it updates the struct so the next frame continues where this left off until finished.
 ; - When finished, clears bit 2.
 ; - Looks like it’s used for big transfers (maybe level backgrounds, cutscene art, or font pages).
@@ -540,7 +540,7 @@ wDC1C_CurrentMapWidthAndHeightInBlocks:
 wDC1E_CurrentLevelNumber: ; all maps in the same level share the same value here
     ds 1                                               ;; dc1e
 
-wDC1F:
+wDC1F_CurrentBgCollisionType:
     ds 1                                               ;; dc1f
 
 wDC20:
@@ -702,13 +702,13 @@ wDC73_FrameCounter3:
     ds 5                                               ;; dc73
     
 ; Misc player variables
-wDC78_PlayerActionIdRelated:
+wDC78_PlayerPendingActionId:
     ds 1                                               ;; dc78
 
-wDC79:
+wDC79_PlayerUnkFlags2:
     ds 1                                               ;; dc79
 
-wDC7A:
+wDC7A_PlayerClimbingOrSwimmingRelated:
     ds 1                                               ;; dc7a
 
 wDC7B_CurrentEntityAddrLoAlt:
@@ -727,6 +727,14 @@ wDC7F_Player_IsAttacking: ; set to 1 when using tail spin
     ds 1                                               ;; dc7f
 
 wDC80_Player_UnkStates:
+; bit 7 (80) = jump related (set in call_02_4df6_Player_SetJumpRelatedState)
+; bit 6 (40) = set in idle/swimming/climbing, and after a tailspin
+; bit 5 (20) = unused?
+; bit 4 (10) = unused?
+; bit 3 (08) = unused?
+; bit 2 (04) = unused?
+; bit 1 (02) = unused?
+; bit 0 (01) = set during tailspin
     ds 1                                               ;; dc80
 
 wDC81_CurrentInputsAlt:
@@ -927,9 +935,9 @@ wDCE2_ElevatorEntityUnkData:
     ds 6                                               ;; dce2
 
 ; Entity spawning related flags
-wDCE8_ParentEntityListIndex: ; used relative entity spawns, such as projectiles and flies
+wDCE8_CurrentEntity_ParentListIndex: ; used relative entity spawns, such as projectiles and flies
     ds 1                                               ;; dce8
-wDCE9:
+wDCE9_EntitySpawnPosOffsetFlag:
     ds 1                                               ;; dce9
 
 ; Palletes and related flags

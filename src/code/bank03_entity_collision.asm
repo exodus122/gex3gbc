@@ -89,12 +89,12 @@ call_03_4c38_UpdateEntityCollision_Dispatch:
 
 call_03_4ccf_CollisionHandler_None:
 ; Does nothing, just returns.
-; Acts as a “null” collision handler.
+; Acts as a "null" collision handler.
     ret                                                ;; 03:4ccf $c9
 
 call_03_4cd0_CollisionHandler_InvulnerableEnemy:
 ; Checks for player-entity interaction.
-; If collision is detected (carry set), jumps to call_00_06f6_DealDamageToPlayer (probably a generic “hit” or interaction response).
+; If collision is detected (carry set), jumps to call_00_06f6_DealDamageToPlayer (probably a generic "hit" or interaction response).
 ; Otherwise returns.
     call call_03_550e_Entity_CheckPlayerInteraction
     jp   c,call_00_06f6_DealDamageToPlayer
@@ -130,7 +130,7 @@ call_03_4cea_CollisionHandler_DamagePlayer:
     jr   Z, .jr_03_4cfe                                ;; 03:4cf3 $28 $09
     cp   A, PLAYERACTION_KANGAROO_TAKE_DAMAGE                                        ;; 03:4cf5 $fe $36
     jr   Z, .jr_03_4cfe                                ;; 03:4cf7 $28 $05
-    cp   A, PLAYERACTION_TAKE_DAMAGE+$3C                                        ;; 03:4cf9 $fe $45
+    cp   A, PLAYERACTION_TOPDOWN_TAKE_DAMAGE                                        ;; 03:4cf9 $fe $45
     call NZ, call_00_06f6_DealDamageToPlayer                              ;; 03:4cfb $c4 $f6 $06
 .jr_03_4cfe:
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
@@ -176,7 +176,7 @@ call_03_4d44_CollisionHandler_DamagePlayerUnused:
     ret  z
     cp   a,PLAYERACTION_KANGAROO_TAKE_DAMAGE
     ret  z
-    cp   a,PLAYERACTION_TAKE_DAMAGE+$3C
+    cp   a,PLAYERACTION_TOPDOWN_TAKE_DAMAGE
     ret  z
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
@@ -353,7 +353,7 @@ call_03_4e4b_CollisionHandler_IceSculpture:
     jp   call_00_2c09_Entity_SpawnGoalCounter                                  ;; 03:4e86 $c3 $09 $2c
 
 call_03_4e89_CollisionHandler_EvilSantaProjectile:
-; Rejects if entity “inactive” (bit 7 of property set) or action ≥ 5.
+; Rejects if entity "inactive" (bit 7 of property set) or action ≥ 5.
 ; If collision and result A==01:
 ; - Negates a property byte (EntityGet1D), does distance check, looks up a value in 
 ;   .data_03_4efa (a table of progression values), writes it to entity state.
@@ -645,7 +645,7 @@ call_03_5069_CollisionHandler_PlayingCard:
     jp   call_00_2c09_Entity_SpawnGoalCounter
 
 call_03_5085_CollisionHandler_HardHat:
-; If the collision type isn’t “01”, the player takes damage.
+; If the collision type isn’t "01", the player takes damage.
 ; If it is type 01:
 ;    HardHat is only vulnerable while it is jumping (action 1)
 ;    Otherwise it switches to the crouch down action (action 2)
@@ -1446,7 +1446,7 @@ call_03_550e_Entity_CheckPlayerInteraction:
     ret                                                ;; 03:55fc $c9
 .jr_03_55fd_ReturnNoInteraction:
 ; Just xor A and ret.
-; Acts as the “failed collision / no interaction” exit for call_03_550e.
+; Acts as the "failed collision / no interaction" exit for call_03_550e.
     xor  A, A                                          ;; 03:55fd $af
     ret                                                ;; 03:55fe $c9
 .data_03_55ff_EntityInteractionFlagsTable:
@@ -1477,13 +1477,13 @@ call_03_550e_Entity_CheckPlayerInteraction:
     db   $01 ; ENTITY_TV_BUTTON
     db   $00 ; ENTITY_TV_REMOTE
     db   $00 ; ENTITY_UNK13
-    db   $00 ; ENTITY_GOAL_COUNTER
-    db   $00 ; ENTITY_UNK15
-    db   $00 ; ENTITY_UNK16
-    db   $00 ; ENTITY_UNK17
-    db   $00 ; ENTITY_UNK18
-    db   $00 ; ENTITY_UNK19
-    db   $00 ; ENTITY_UNK1A
+    db   $00 ; ENTITY_GOAL_COUNTER_1
+    db   $00 ; ENTITY_GOAL_COUNTER_2
+    db   $00 ; ENTITY_GOAL_COUNTER_3
+    db   $00 ; ENTITY_GOAL_COUNTER_4
+    db   $00 ; ENTITY_GOAL_COUNTER_5
+    db   $00 ; ENTITY_GOAL_COUNTER_6
+    db   $00 ; ENTITY_GOAL_COUNTER_7
     db   $00 ; ENTITY_BONUS_STAGE_TIMER
     db   $02 ; ENTITY_FREESTANDING_REMOTE
     db   $02 ; ENTITY_HOLIDAY_TV_ICE_SCULPTURE
@@ -1564,7 +1564,7 @@ call_03_550e_Entity_CheckPlayerInteraction:
     db   $00 ; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE
     db   $02 ; ENTITY_LIZARD_OF_OZ_CANNON
     db   $01 ; ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE
-    db   $00 ; ENTITY_UNK6B
+    db   $00 ; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2
     db   $00 ; ENTITY_UNK6C
     db   $00 ; ENTITY_UNK6D
     db   $03 ; ENTITY_CHANNEL_Z_REZ
@@ -1638,7 +1638,7 @@ call_03_5671_HandleEntityHit:
 
 call_03_56c1_CollisionHandler_Platform:
 ; Early exit if the player’s ActionId is in certain states 
-; (1A, 2E, 3B, 1B = probably cutscenes, knockback, death, or other “don’t collide” states).
+; (1A, 2E, 3B, 1B = probably cutscenes, knockback, death, or other "don’t collide" states).
 ; Otherwise, it takes the player’s Y position + vertical offset (wDC88_CurrentEntity_UnkVerticalOffset, which looks like a 
 ; per-frame Y delta or velocity), then compares against the current entity’s bounding box 
 ; stored at $D8xx (using wDA00_CurrentEntityAddrLo).
@@ -1647,7 +1647,7 @@ call_03_56c1_CollisionHandler_Platform:
 ; If overlap is valid, it calls into call_03_58a9_ComputeCollisionOffset for fine-grained offset adjustment and then either:
 ; Jumps to call_03_580b_RegisterSecondaryCollision (registers the entity as the active collision target),
 ; Or to call_03_57f8_ClearCollisionForEntity (clear/ignore collision).
-; Role: The main “does the player collide with this entity?” function.
+; Role: The main "does the player collide with this entity?" function.
     ld   a,[wD801_Player_ActionId]
     cp   a,PLAYERACTION_DEATH_IN_PIT_ALT
     jp   z,call_03_57f8_ClearCollisionForEntity
@@ -1850,9 +1850,9 @@ call_03_57e6_ResolveCollision_Reset:
     ret                                                ;; 03:57f7 $c9
 
 call_03_57f8_ClearCollisionForEntity:
-; Compares the current entity ID to the two “last touched entity” slots (wDC7B_CurrentEntityAddrLoAlt and wDC7B_CurrentEntityAddrLoAlt2).
+; Compares the current entity ID to the two "last touched entity" slots (wDC7B_CurrentEntityAddrLoAlt and wDC7B_CurrentEntityAddrLoAlt2).
 ; If it matches, clears those slots.
-; Effectively means: “This entity is no longer colliding with the player, remove it from tracking.”
+; Effectively means: "This entity is no longer colliding with the player, remove it from tracking."
 ; Role: Collision cleanup when no intersection occurs.
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:57f8 $fa $00 $da
     ld   HL, wDC7B_CurrentEntityAddrLoAlt                                     ;; 03:57fb $21 $7b $dc
@@ -1867,7 +1867,7 @@ call_03_57f8_ClearCollisionForEntity:
     ret                                                ;; 03:580a $c9
 
 call_03_580b_RegisterSecondaryCollision:
-; Marks the current entity as the “secondary” collision slot (wDC7B_CurrentEntityAddrLoAlt2).
+; Marks the current entity as the "secondary" collision slot (wDC7B_CurrentEntityAddrLoAlt2).
 ; If it was in wDC7B_CurrentEntityAddrLoAlt, clears that first.
 ; Role: Assigns the entity as the active secondary collision candidate.
     ld   a,[wDA00_CurrentEntityAddrLo]
@@ -1880,7 +1880,7 @@ call_03_580b_RegisterSecondaryCollision:
     ret  
 
 call_03_581a_CollisionHandler_TVButton:
-; Skips entirely if the player is in the same “ignore” action IDs.
+; Skips entirely if the player is in the same "ignore" action IDs.
 ; Uses the entity’s width/height at $D8xx+12/+13 to test bounding-box intersection against the player.
 ; Again compares Y offset + vertical delta (wDC88_CurrentEntity_UnkVerticalOffset).
 ; If all checks pass, adjusts by camera scroll (wDC8C_PlayerYVelocity >> 4) and then calls into 57e6 (collision hit) or 57f8 (miss).

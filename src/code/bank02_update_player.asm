@@ -1,4 +1,4 @@
-call_02_4db1_Player_CheckXDistanceFromEntity:
+call_02_4db1_Player_SnapXPosToEntity:
 ; Checks whether an entity exists (call_00_29ce), then compares the entity’s X position to the player’s. 
 ; If the entity is left of the player (carry set), branches to a special handler. If they are perfectly aligned, 
 ; it returns. Otherwise jumps to a general trigger routine.
@@ -20,32 +20,29 @@ call_02_4db1_Player_CheckXDistanceFromEntity:
     ret  Z                                             ;; 02:4dca $c8
     jp   call_02_518a_ApplyLeftwardCollisionAdjustment                                  ;; 02:4dcb $c3 $8a $51
 
-call_02_4dce_SetTriggerByLevel:
-; Sets flag wDC80_Player_UnkStates bit 6, then selects a trigger value based on the current level (wDB6C_CurrentMapId). 
-; Uses inputs (wDC81_CurrentInputsAlt) to decide between trigger IDs, then jumps to call_02_54f9_SwitchPlayerAction.
-; Purpose: Level-specific event/door trigger.
+call_02_4dce_Player_SwitchActionToIdleOrWalk:
+; Sets idle action based on the current map and inputs.
     ld   HL, wDC80_Player_UnkStates                                     ;; 02:4dce $21 $80 $dc
     set  6, [HL]                                       ;; 02:4dd1 $cb $f6
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:4dd3 $fa $6c $db
-    cp   A, $07                                        ;; 02:4dd6 $fe $07
+    cp   A, MAP_GEXTREME_SPORTS1                                        ;; 02:4dd6 $fe $07
     ld   A, PLAYERACTION_SNOWBOARDING_STAND_OR_WALK                                        ;; 02:4dd8 $3e $24
     jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:4dda $ca $f9 $54
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:4ddd $fa $6c $db
-    cp   A, $08                                        ;; 02:4de0 $fe $08
+    cp   A, MAP_MARSUPIAL_MADNESS1                                        ;; 02:4de0 $fe $08
     ld   A, PLAYERACTION_KANGAROO_IDLE                                        ;; 02:4de2 $3e $30
     jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:4de4 $ca $f9 $54
     ld   C, PLAYERACTION_IDLE                                        ;; 02:4de7 $0e $01
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:4de9 $fa $81 $dc
-    and  A, $30                                        ;; 02:4dec $e6 $30
+    and  A, PADF_LEFT | PADF_RIGHT                                        ;; 02:4dec $e6 $30
     jr   Z, .jr_02_4df2                                ;; 02:4dee $28 $02
     ld   C, PLAYERACTION_WALK                                        ;; 02:4df0 $0e $03
 .jr_02_4df2:
     ld   A, C                                          ;; 02:4df2 $79
     jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:4df3 $c3 $f9 $54
 
-call_02_4df6_FlagCollisionActive:
-; Masks the lower nibble of wDC80_Player_UnkStates, forces the high bit, and stores it back.
-; Purpose: Marks that a collision/event state is active.
+call_02_4df6_Player_SetJumpRelatedState:
+; Masks the lower nibble of UnkStates, sets the high bit, and stores it back.
     ld   A, [wDC80_Player_UnkStates]                                    ;; 02:4df6 $fa $80 $dc
     and  A, $0f                                        ;; 02:4df9 $e6 $0f
     or   A, $80                                        ;; 02:4dfb $f6 $80
@@ -62,23 +59,23 @@ call_02_4e01_SetOneTimeFlag:
     ld   [wDC87], A                                    ;; 02:4e08 $ea $87 $dc
     ret                                                ;; 02:4e0b $c9
 
-call_02_4E0C_UpdateActionSequence:
+call_02_4E0C_Player_SnowboardingTailSpin:
 ; Updates counters (wDCA2_PlayerUnk1–wDCA6_PlayerUnk5) for a repeating animation or scripted sequence. 
-; Uses call_02_4E7A_LookupFrameData to fetch frame data from tables at $4EA1/$4EC3. Handles two cases: 
-; when the player’s action ID is $27 (special move) or any other action. Sets flags (wDC7F_Player_IsAttacking, wDC80_Player_UnkStates), 
+; Fetch frame data from tables at $4EA1/$4EC3. Handles two cases: 
+; when the player’s action ID is $27 (special move) or any other action. Sets attacking flag, 
 ; triggers sound/action (call_02_54f9_SwitchPlayerAction) when counters overflow, and sets wDB66_HDMATransferFlags to signal a redraw.
 ; Purpose: Manage complex animation or event sequences based on timers and player state.
     ld   a,[wDCA5_PlayerUnk4]
     ld   [wDCA6_PlayerUnk5],a
     ld   hl,wDC95
     ld   e,[hl]
-    call call_02_4E7A_LookupFrameData
+    call call_02_4E7A_LookupSnowboardingData
     inc  d
     dec  d
     jr   nz,.jr_00_4E24
     ld   hl,wDC93
     ld   e,[hl]
-    call call_02_4E7A_LookupFrameData
+    call call_02_4E7A_LookupSnowboardingData
 .jr_00_4E24:
     ld   hl,wDCA5_PlayerUnk4
     ld   [hl],d
@@ -127,7 +124,7 @@ call_02_4E0C_UpdateActionSequence:
     set  0,[hl]
     ret  
 
-call_02_4E7A_LookupFrameData:
+call_02_4E7A_LookupSnowboardingData:
 ; Scans a table for an entry matching value E, then selects a frame or command 
 ; byte based on facing direction. Stores result in wDCA4_PlayerUnk3.
 ; Purpose: Table-driven frame or pattern lookup for 4E0C.
@@ -199,7 +196,7 @@ call_02_4ee7_MapCollisionFlags:
 
 call_02_4f11_ChooseNextActionBasedOnLevel:
 ; Reads two state flags (wDABD_UnkBGCollisionFlags and wDABE_UnkBGCollisionFlags2) and ORs them together. 
-; If bit 7 is set (likely “player busy/disabled”), it returns immediately. 
+; If bit 7 is set (likely "player busy/disabled"), it returns immediately. 
 ; Otherwise, it checks the current level ID (wDB6C_CurrentMapId) to pick an action ID:
 ; If level is 07h → $28.
 ; If level is 08h → $35.
@@ -225,10 +222,10 @@ call_02_4f11_ChooseNextActionBasedOnLevel:
 call_02_4f32_PlayerUpdateMain:
 ; The main per-frame player update.
 ; Actions:
-; - Processes inputs, clearing or setting bits in wDC80_Player_UnkStates/wDC81_CurrentInputsAlt.
+; - Processes inputs, clearing or setting bits in UnkStates/CurrentInputsAlt.
 ; - Manages timers (wDC7E_PlayerDamageCooldownTimer, wDCA9_FlyTimerOrFlags4–wDCAB_FlyTimerOrFlags2) using call_02_4ffb_DecTimerEveryCycle.
 ; - Calls palette setup (call_03_6567_SetupEntityPalettes), BG collision update, entity caching, and entity loading.
-; - Jumps to the player action function (wD802_Player_ActionFunc).
+; - Jumps to the player action function.
 ; - Clears bits and finalizes state before call_02_724d.
 ; Purpose: Central routine for player state, input, collisions, and rendering per frame.
     ld   A, [wDAD7_CurrentInputs]                                    ;; 02:4f32 $fa $d7 $da
@@ -303,7 +300,7 @@ call_02_4f32_PlayerUpdateMain:
     call call_02_5267_PlatformSlopeAndTriggerHandler                                  ;; 02:4fc0 $cd $67 $52
     farcall call_03_4bb6_CacheNearbyTileValues
     call call_02_5431_HandleActionTriggersAndEvents                                  ;; 02:4fce $cd $31 $54
-    ld   HL, wDC79                                     ;; 02:4fd1 $21 $79 $dc
+    ld   HL, wDC79_PlayerUnkFlags2                                     ;; 02:4fd1 $21 $79 $dc
     ld   A, [HL]                                       ;; 02:4fd4 $7e
     ld   [HL], $ff                                     ;; 02:4fd5 $36 $ff
     cp   A, $ff                                        ;; 02:4fd7 $fe $ff
@@ -323,7 +320,7 @@ call_02_4f32_PlayerUpdateMain:
     call call_02_5047_CachePlayerTileCoords                                  ;; 02:4ff0 $cd $47 $50
     ld   HL, wD805_Player_MovementFlags                                     ;; 02:4ff3 $21 $05 $d8
     res  4, [HL]                                       ;; 02:4ff6 $cb $a6
-    jp   call_02_724d_UpdateEntityAnimationTimersAndSpriteId                                  ;; 02:4ff8 $c3 $4d $72
+    jp   call_02_724d_Entity_UpdateSpriteFields                                  ;; 02:4ff8 $c3 $4d $72
 
 call_02_4ffb_DecTimerEveryCycle:
 ; Decrements a timer in [HL] every wDCA8_FlyTimerOrFlags3 frames. Resets wDCA8_FlyTimerOrFlags3 to 3C when it wraps.
@@ -439,8 +436,8 @@ call_02_5081_Player_UpdateFacingAndMovementVector:
     call call_02_5541_GetPlayerStatesFromAction                                  ;; 02:508f $cd $41 $55
     and  A, $a0                                        ;; 02:5092 $e6 $a0
     jr   NZ, .jr_02_509d                               ;; 02:5094 $20 $07
-    ld   A, [wDC1F]                                    ;; 02:5096 $fa $1f $dc
-    cp   A, $00                                        ;; 02:5099 $fe $00
+    ld   A, [wDC1F_CurrentBgCollisionType]                                    ;; 02:5096 $fa $1f $dc
+    cp   A, BG_COLLISION_TYPE_SIDESCROLLER                                        ;; 02:5099 $fe $00
     jr   Z, .jr_02_50c4                                ;; 02:509b $28 $27
 .jr_02_509d:
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:509d $fa $81 $dc
@@ -509,8 +506,8 @@ call_02_5100_Player_HorizontalMovementHandler:
     call call_02_5541_GetPlayerStatesFromAction                                  ;; 02:5100 $cd $41 $55
     and  A, $a0                                        ;; 02:5103 $e6 $a0
     jr   NZ, .jr_02_510e                               ;; 02:5105 $20 $07
-    ld   A, [wDC1F]                                    ;; 02:5107 $fa $1f $dc
-    cp   A, $00                                        ;; 02:510a $fe $00
+    ld   A, [wDC1F_CurrentBgCollisionType]                                    ;; 02:5107 $fa $1f $dc
+    cp   A, BG_COLLISION_TYPE_SIDESCROLLER                                        ;; 02:510a $fe $00
     jr   Z, .jr_02_5159                                ;; 02:510c $28 $4b
 .jr_02_510e:
     ld   A, [wDC86]                                    ;; 02:510e $fa $86 $dc
@@ -782,8 +779,8 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     call call_02_5541_GetPlayerStatesFromAction                                  ;; 02:5267 $cd $41 $55
     and  A, $a0                                        ;; 02:526a $e6 $a0
     ret  NZ                                            ;; 02:526c $c0
-    ld   A, [wDC1F]                                    ;; 02:526d $fa $1f $dc
-    cp   A, $01                                        ;; 02:5270 $fe $01
+    ld   A, [wDC1F_CurrentBgCollisionType]                                    ;; 02:526d $fa $1f $dc
+    cp   A, BG_COLLISION_TYPE_TOPDOWN                                        ;; 02:5270 $fe $01
     jp   Z, .jp_02_5348                                ;; 02:5272 $ca $48 $53
     ld   A, [wDC8C_PlayerYVelocity]                                    ;; 02:5275 $fa $8c $dc
     bit  7, A                                          ;; 02:5278 $cb $7f
@@ -879,7 +876,7 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     ret                                                ;; 02:5329 $c9
 .jr_02_532a:
     cp   A, $10                                        ;; 02:532a $fe $10
-    jp   C, call_02_4dce_SetTriggerByLevel                                 ;; 02:532c $da $ce $4d
+    jp   C, call_02_4dce_Player_SwitchActionToIdleOrWalk                                 ;; 02:532c $da $ce $4d
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:532f $fa $6c $db
     cp   A, $07                                        ;; 02:5332 $fe $07
     ld   A, PLAYERACTION_SNOWBOARDING_STAND_OR_WALK                                        ;; 02:5334 $3e $24
@@ -1145,15 +1142,15 @@ call_02_54f9_SwitchPlayerAction:
 ; Adjusts action index if in special level/bank.
 ; Avoids redundant switches if already in that action.
 ; Validates against flags in data_02_554d_PlayerStatesPerAction.
-; Writes new action ID to wDC79 and resets auxiliary timers (wDC7F_Player_IsAttacking, wDC7A).
+; Writes new action ID to wDC79_PlayerUnkFlags2 and sets other bytes.
     ld   L, A                                          ;; 02:54f9 $6f
-    cp   A, $3c                                        ;; 02:54fa $fe $3c
+    cp   A, PLAYERACTION_OFFSET_TOPDOWN                                        ;; 02:54fa $fe $3c
     jr   NC, .jr_02_5509                               ;; 02:54fc $30 $0b
-    ld   A, [wDC1F]                                    ;; 02:54fe $fa $1f $dc
-    cp   A, $01                                        ;; 02:5501 $fe $01
+    ld   A, [wDC1F_CurrentBgCollisionType]                                    ;; 02:54fe $fa $1f $dc
+    cp   A, BG_COLLISION_TYPE_TOPDOWN                                        ;; 02:5501 $fe $01
     jr   NZ, .jr_02_5509                               ;; 02:5503 $20 $04
     ld   A, L                                          ;; 02:5505 $7d
-    add  A, $3c                                        ;; 02:5506 $c6 $3c
+    add  A, PLAYERACTION_OFFSET_TOPDOWN                                        ;; 02:5506 $c6 $3c
     ld   L, A                                          ;; 02:5508 $6f
 .jr_02_5509:
     ld   A, L                                          ;; 02:5509 $7d
@@ -1166,7 +1163,7 @@ call_02_54f9_SwitchPlayerAction:
     add  HL, DE                                        ;; 02:5515 $19
     bit  0, [HL]                                       ;; 02:5516 $cb $46
     jr   NZ, .jr_02_552e                               ;; 02:5518 $20 $14
-    ld   HL, wDC79                                     ;; 02:551a $21 $79 $dc
+    ld   HL, wDC79_PlayerUnkFlags2                                     ;; 02:551a $21 $79 $dc
     bit  7, [HL]                                       ;; 02:551d $cb $7e
     jr   Z, .jr_02_5524                                ;; 02:551f $28 $03
     ld   HL, wD801_Player_ActionId                                     ;; 02:5521 $21 $01 $d8
@@ -1178,27 +1175,21 @@ call_02_54f9_SwitchPlayerAction:
     bit  1, [HL]                                       ;; 02:552b $cb $4e
     ret  NZ                                            ;; 02:552d $c0
 .jr_02_552e:
-    ld   [wDC79], A                                    ;; 02:552e $ea $79 $dc
+    ld   [wDC79_PlayerUnkFlags2], A                                    ;; 02:552e $ea $79 $dc
     xor  A, A                                          ;; 02:5531 $af
     ld   [wDC7F_Player_IsAttacking], A                                    ;; 02:5532 $ea $7f $dc
     ld   A, $00                                        ;; 02:5535 $3e $00
-    ld   [wDC7A], A                                    ;; 02:5537 $ea $7a $dc
+    ld   [wDC7A_PlayerClimbingOrSwimmingRelated], A                                    ;; 02:5537 $ea $7a $dc
     ret                                                ;; 02:553a $c9
 
 call_02_553b_PlayerIsInWater:
-; Purpose: Checks if a specific input bit ($20) is pressed.
-; Behavior:
-; Calls call_02_5541_GetPlayerStatesFromAction to fetch current input/action data.
-; Returns Z/NZ depending on whether the special bit is set.
+; Check if the player's current action is a water action
     call call_02_5541_GetPlayerStatesFromAction                                  ;; 02:553b $cd $41 $55
     and  A, PLAYER_IN_WATER                                        ;; 02:553e $e6 $20
     ret                                                ;; 02:5540 $c9
 
 call_02_5541_GetPlayerStatesFromAction:
-; Purpose: Helper to fetch the property byte for the current action.
-; Behavior:
-; Uses the current action ID (wD801) as an index into data_02_554d_PlayerStatesPerAction.
-; Returns the byte containing action flags (e.g., input mask, movement rules).
+; Gets states for the player's current action
     ld   HL, wD801_Player_ActionId                                     ;; 02:5541 $21 $01 $d8
     ld   L, [HL]                                       ;; 02:5544 $6e
     ld   H, $00                                        ;; 02:5545 $26 $00

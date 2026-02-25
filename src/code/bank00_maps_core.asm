@@ -1683,15 +1683,15 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
     push DE                                            ;; 00:1ee0 $d5
     xor  A, A                                          ;; 00:1ee1 $af
     ld   [wDCA7_DrawGexFlag], A                                    ;; 00:1ee2 $ea $a7 $dc
-    ld   A, $00                                        ;; 00:1ee5 $3e $00
-    ld   [wDC78_PlayerActionIdRelated], A                                    ;; 00:1ee7 $ea $78 $dc
+    ld   A, PLAYERACTION_SPAWN                                        ;; 00:1ee5 $3e $00
+    ld   [wDC78_PlayerPendingActionId], A                                    ;; 00:1ee7 $ea $78 $dc
     call call_00_04fb                                  ;; 00:1eea $cd $fb $04
     farcall call_03_6c89_LoadMapData
     farcall call_03_6203_LoadLevelBoundariesFromId
     call call_00_10de_UpdatePlayerMapWindow                                  ;; 00:1f03 $cd $de $10
     call call_00_1056_LoadFullMap                                  ;; 00:1f06 $cd $56 $10
     farcall call_02_708f_InitEntitiesAndSpawnPlayer
-    call call_00_0513                                  ;; 00:1f14 $cd $13 $05
+    call call_00_0513_DrawEntitiesWrapper                                  ;; 00:1f14 $cd $13 $05
     pop  HL                                            ;; 00:1f17 $e1
     ld   E, [HL]                                       ;; 00:1f18 $5e
     inc  HL                                            ;; 00:1f19 $23
