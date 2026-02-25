@@ -1,4 +1,4 @@
-; This contains the sprite frame data for object animations
+; This contains the sprite frame data for entity animations
 
 data_02_739b:
     db   $00, $81, $1a, $08, $0b

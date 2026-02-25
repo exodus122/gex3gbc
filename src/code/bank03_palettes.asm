@@ -1,17 +1,17 @@
-call_03_6567_SetupObjectPalettes:
-; Purpose: Chooses which object palette set to load based on state flags.
+call_03_6567_SetupEntityPalettes:
+; Purpose: Chooses which entity palette set to load based on state flags.
 ; Behavior:
 ; If wDCAB_FlyTimerOrFlags2 non-zero, uses default palette table .data_03_658c.
 ; Otherwise, checks wDC51_CurrentFlyRelated, indexes .data_03_6594, and resolves an HL pointer to palette data.
-; Copies 8 bytes into wDD2A_ObjectPalettes.
-; Usage: Called when loading or switching level themes/objects.
+; Copies 8 bytes into wDD2A_EntityPalettes.
+; Usage: Called when loading or switching level themes/entities.
     ld   HL, .data_03_658c                             ;; 03:6567 $21 $8c $65
     ld   A, [wDCAB_FlyTimerOrFlags2]                                    ;; 03:656a $fa $ab $dc
     and  A, A                                          ;; 03:656d $a7
     jr   NZ, .jr_03_6583                               ;; 03:656e $20 $13
     ld   A, [wDC51_CurrentFlyRelated]                                    ;; 03:6570 $fa $51 $dc
     and  A, A                                          ;; 03:6573 $a7
-    jp   Z, call_00_2cbf_LoadObjectPalettes                               ;; 03:6574 $ca $bf $2c
+    jp   Z, call_00_2cbf_LoadEntityPalettes                               ;; 03:6574 $ca $bf $2c
     dec  A                                             ;; 03:6577 $3d
     ld   L, A                                          ;; 03:6578 $6f
     ld   H, $00                                        ;; 03:6579 $26 $00
@@ -22,7 +22,7 @@ call_03_6567_SetupObjectPalettes:
     ld   H, [HL]                                       ;; 03:6581 $66
     ld   L, A                                          ;; 03:6582 $6f
 .jr_03_6583:
-    ld   DE, wDD2A_ObjectPalettes                                     ;; 03:6583 $11 $2a $dd
+    ld   DE, wDD2A_EntityPalettes                                     ;; 03:6583 $11 $2a $dd
     ld   BC, $08                                       ;; 03:6586 $01 $08 $00
     jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 03:6589 $c3 $6e $07
 .data_03_658c:
@@ -39,8 +39,8 @@ call_03_6567_SetupObjectPalettes:
 call_03_65c6_LoadMenuOrLevelPalettes:
 ; Purpose: Loads either level palettes or menu palettes depending on C.
 ; Behavior:
-; If C is zero, loads map and object palettes via call_00_05af_LoadMapPalettes 
-; and call_00_2cbf_LoadObjectPalettes.
+; If C is zero, loads map and entity palettes via call_00_05af_LoadMapPalettes 
+; and call_00_2cbf_LoadEntityPalettes.
 ; If bit 7 of C is set, returns immediately.
 ; Else, uses C as index into .data_03_65f1_MenuPalettes to copy 0x40 bytes to wDCEA_BgPalettes, 
 ; then loads a default set from .data_03_6803_palette.
@@ -48,7 +48,7 @@ call_03_65c6_LoadMenuOrLevelPalettes:
     dec  C                                             ;; 03:65c7 $0d
     jr   NZ, .jr_03_65d1                               ;; 03:65c8 $20 $07
     call call_00_05af_LoadMapPalettes                                  ;; 03:65ca $cd $af $05
-    call call_00_2cbf_LoadObjectPalettes                                  ;; 03:65cd $cd $bf $2c
+    call call_00_2cbf_LoadEntityPalettes                                  ;; 03:65cd $cd $bf $2c
     ret                                                ;; 03:65d0 $c9
 .jr_03_65d1:
     bit  7, C                                          ;; 03:65d1 $cb $79
@@ -94,7 +94,7 @@ call_03_65c6_LoadMenuOrLevelPalettes:
 
 call_03_6833:
     push bc
-    call call_00_2930_Object_SetId
+    call call_00_2930_Entity_SetId
     ld   l,c
     ld   h,$00
     add  hl,hl
@@ -105,24 +105,24 @@ call_03_6833:
     ldi  a,[hl]
     push hl
     ld   c,a
-    call call_00_2944_Object_SetWidth
+    call call_00_2944_Entity_SetWidth
     pop  hl
     ldi  a,[hl]
     push hl
     ld   c,a
-    call call_00_294e_Object_SetHeight
+    call call_00_294e_Entity_SetHeight
     pop  hl
     ldi  a,[hl]
     push hl
     ld   c,a
-    call call_00_288c_Object_SetCollisionType
+    call call_00_288c_Entity_SetCollisionType
     pop  hl
     ldi  a,[hl]
     dec  a
     ld   c,a
-    call call_00_28aa_Object_Set16
-    ld   c,OBJECT_FACING_RIGHT
-    call call_00_2958_Object_SetFacingDirection
+    call call_00_28aa_Entity_Set16
+    ld   c,ENTITY_FACING_RIGHT
+    call call_00_2958_Entity_SetFacingDirection
     pop  bc
     ld   l,c
     ld   h,$00
@@ -131,37 +131,37 @@ call_03_6833:
     add  hl,hl
     ld   de,data_03_68f9
     add  hl,de
-    call call_00_2c20_Object_CopyPaletteToBuffer
+    call call_00_2c20_Entity_CopyPaletteToBuffer
     xor  a
-    farcall call_02_72ac_SetObjectAction
+    farcall call_02_72ac_SetEntityAction
     ret  
 
-call_03_687c_AssignObjectPalette:
-; Purpose: Assigns a palette to a single game object based on its type and state.
+call_03_687c_AssignEntityPalette:
+; Purpose: Assigns a palette to a single game entity based on its type and state.
 ; Behavior:
-; Derives a palette index from the current object address (wDA00_CurrentObjectAddrLo).
-; Stores the palette ID in wDAAE_ObjectPaletteIds.
-; Calculates an address into wDD2A_ObjectPalettes, then copies 8 palette bytes from data_03_68f9.
-; Usage: Ensures each on-screen object uses the correct colors.
-    LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_GRAPHICS_FLAGS                                     ;; 03:6883 $6f
+; Derives a palette index from the current entity address (wDA00_CurrentEntityAddrLo).
+; Stores the palette ID in wDAAE_EntityPaletteIds.
+; Calculates an address into wDD2A_EntityPalettes, then copies 8 palette bytes from data_03_68f9.
+; Usage: Ensures each on-screen entity uses the correct colors.
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_GRAPHICS_FLAGS                                     ;; 03:6883 $6f
     ld   C, $00                                        ;; 03:6884 $0e $00
     bit  7, [HL]                                       ;; 03:6886 $cb $7e
     jr   NZ, .jr_03_6893                               ;; 03:6888 $20 $09
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:688a $fa $00 $da
+    ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:688a $fa $00 $da
     rlca                                               ;; 03:688d $07
     rlca                                               ;; 03:688e $07
     rlca                                               ;; 03:688f $07
     and  A, $07                                        ;; 03:6890 $e6 $07
     ld   C, A                                          ;; 03:6892 $4f
 .jr_03_6893:
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:6893 $fa $00 $da
+    ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:6893 $fa $00 $da
     rlca                                               ;; 03:6896 $07
     rlca                                               ;; 03:6897 $07
     rlca                                               ;; 03:6898 $07
     and  A, $07                                        ;; 03:6899 $e6 $07
     ld   L, A                                          ;; 03:689b $6f
     ld   H, $00                                        ;; 03:689c $26 $00
-    ld   DE, wDAAE_ObjectPaletteIds                                     ;; 03:689e $11 $ae $da
+    ld   DE, wDAAE_EntityPaletteIds                                     ;; 03:689e $11 $ae $da
     add  HL, DE                                        ;; 03:68a1 $19
     ld   [HL], C                                       ;; 03:68a2 $71
     ld   L, C                                          ;; 03:68a3 $69
@@ -169,11 +169,11 @@ call_03_687c_AssignObjectPalette:
     add  HL, HL                                        ;; 03:68a6 $29
     add  HL, HL                                        ;; 03:68a7 $29
     add  HL, HL                                        ;; 03:68a8 $29
-    ld   DE, wDD2A_ObjectPalettes                                     ;; 03:68a9 $11 $2a $dd
+    ld   DE, wDD2A_EntityPalettes                                     ;; 03:68a9 $11 $2a $dd
     add  HL, DE                                        ;; 03:68ac $19
     ld   E, L                                          ;; 03:68ad $5d
     ld   D, H                                          ;; 03:68ae $54
-    LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_OBJECT_ID
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_ENTITY_ID
     ld   L, [HL]                                       ;; 03:68b7 $6e
     ld   H, $00                                        ;; 03:68b8 $26 $00
     add  HL, HL                                        ;; 03:68ba $29
@@ -206,18 +206,18 @@ call_03_687c_AssignObjectPalette:
     ld   [DE], A                                       ;; 03:68d7 $12
     ret                                                ;; 03:68d8 $c9
 
-call_03_68d9_AssignAllObjectPalettes:
-; Purpose: Loops through all active objects and assigns palettes to each.
+call_03_68d9_AssignAllEntityPalettes:
+; Purpose: Loops through all active entities and assigns palettes to each.
 ; Behavior:
-; Starts at address $40 in object memory.
-; For each object not marked FF (inactive), sets bit 1 of its flags, then calls AssignObjectPalette.
-; Increments by $20 for each object until wraparound.
+; Starts at address $40 in entity memory.
+; For each entity not marked FF (inactive), sets bit 1 of its flags, then calls AssignEntityPalette.
+; Increments by $20 for each entity until wraparound.
     ld   A, $40                                        ;; 03:68d9 $3e $40
 .jr_03_68db:
-    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 03:68db $ea $00 $da
-    or   A, OBJECT_FIELD_OBJECT_ID                                        ;; 03:68de $f6 $00
+    ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 03:68db $ea $00 $da
+    or   A, ENTITY_FIELD_ENTITY_ID                                        ;; 03:68de $f6 $00
     ld   L, A                                          ;; 03:68e0 $6f
-    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:68e1 $26 $d8
+    ld   h, HIGH(wD800_EntityMemory)                                        ;; 03:68e1 $26 $d8
     ld   A, [HL]                                       ;; 03:68e3 $7e
     cp   A, $ff                                        ;; 03:68e4 $fe $ff
     jr   Z, .jr_03_68f1                                ;; 03:68e6 $28 $09
@@ -225,9 +225,9 @@ call_03_68d9_AssignAllObjectPalettes:
     xor  A, $05                                        ;; 03:68e9 $ee $05
     ld   L, A                                          ;; 03:68eb $6f
     set  1, [HL]                                       ;; 03:68ec $cb $ce
-    call call_03_687c_AssignObjectPalette                                  ;; 03:68ee $cd $7c $68
+    call call_03_687c_AssignEntityPalette                                  ;; 03:68ee $cd $7c $68
 .jr_03_68f1:
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:68f1 $fa $00 $da
+    ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:68f1 $fa $00 $da
     add  A, $20                                        ;; 03:68f4 $c6 $20
     jr   NZ, .jr_03_68db                               ;; 03:68f6 $20 $e3
     ret                                                ;; 03:68f8 $c9

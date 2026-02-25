@@ -31,14 +31,14 @@ data_03_58d3:
     db   $02, $05, $02, $91, $1c, $09, $01, $04        ;; 03:59ab ????????
     db   $01, $05, $02                                 ;; 03:59b3 ???
 
-call_03_59b6_LookupObjectPropertyFromType:
-; Object Property Lookup (DB61-based)
+call_03_59b6_LookupEntityPropertyFromType:
+; Entity Property Lookup (DB61-based)
 ; Description:
-; Uses the byte at wDB61_ActiveObjectSlot as an index into a two-byte table at data_03_58d3 to return an object property byte. 
-; Likely retrieves a behavior or sprite index based on some game state or object slot.
-    ld   HL, wDB61_ActiveObjectSlot                                     ;; 03:59b6 $21 $61 $db
+; Uses the byte at wDB61_ActiveEntitySlot as an index into a two-byte table at data_03_58d3 to return an entity property byte. 
+; Likely retrieves a behavior or sprite index based on some game state or entity slot.
+    ld   HL, wDB61_ActiveEntitySlot                                     ;; 03:59b6 $21 $61 $db
     ld   L, [HL]                                       ;; 03:59b9 $6e
-    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:59ba $26 $d8
+    ld   h, HIGH(wD800_EntityMemory)                                        ;; 03:59ba $26 $d8
     ld   L, [HL]                                       ;; 03:59bc $6e
     ld   H, $00                                        ;; 03:59bd $26 $00
     add  HL, HL                                        ;; 03:59bf $29
@@ -47,14 +47,14 @@ call_03_59b6_LookupObjectPropertyFromType:
     ld   A, [HL]                                       ;; 03:59c4 $7e
     ret                                                ;; 03:59c5 $c9
 
-call_03_59c6_IsObjectFlaggedHighBit:
-; Check High-Bit Flag for Current Object
+call_03_59c6_IsEntityFlaggedHighBit:
+; Check High-Bit Flag for Current Entity
 ; Description:
-; Fetches the current object’s index from wDA00_CurrentObjectAddrLo, looks it up in data_03_58d2, 
-; masks bit 7 ($80), and returns it. Used as a quick “is flagged?” test for the object (e.g., active/inactive, hidden).
-    ld   HL, wDA00_CurrentObjectAddrLo                                     ;; 03:59c6 $21 $00 $da
+; Fetches the current entity’s index from wDA00_CurrentEntityAddrLo, looks it up in data_03_58d2, 
+; masks bit 7 ($80), and returns it. Used as a quick “is flagged?” test for the entity (e.g., active/inactive, hidden).
+    ld   HL, wDA00_CurrentEntityAddrLo                                     ;; 03:59c6 $21 $00 $da
     ld   L, [HL]                                       ;; 03:59c9 $6e
-    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:59ca $26 $d8
+    ld   h, HIGH(wD800_EntityMemory)                                        ;; 03:59ca $26 $d8
     ld   L, [HL]                                       ;; 03:59cc $6e
     ld   H, $00                                        ;; 03:59cd $26 $00
     add  HL, HL                                        ;; 03:59cf $29
@@ -64,14 +64,14 @@ call_03_59c6_IsObjectFlaggedHighBit:
     and  A, $80                                        ;; 03:59d5 $e6 $80
     ret                                                ;; 03:59d7 $c9
 
-call_03_59d8_IsObjectRenderableFlag:
-; Check Mid-Bit Flag for Current Object
+call_03_59d8_IsEntityRenderableFlag:
+; Check Mid-Bit Flag for Current Entity
 ; Description:
-; Very similar to the above but masks bit 6 ($40). Returns whether the object has that mid-bit set—likely 
+; Very similar to the above but masks bit 6 ($40). Returns whether the entity has that mid-bit set—likely 
 ; another state flag such as “should render” or “has sprite.”
-    ld   HL, wDA00_CurrentObjectAddrLo                                     ;; 03:59d8 $21 $00 $da
+    ld   HL, wDA00_CurrentEntityAddrLo                                     ;; 03:59d8 $21 $00 $da
     ld   L, [HL]                                       ;; 03:59db $6e
-    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:59dc $26 $d8
+    ld   h, HIGH(wD800_EntityMemory)                                        ;; 03:59dc $26 $d8
     ld   L, [HL]                                       ;; 03:59de $6e
     ld   H, $00                                        ;; 03:59df $26 $00
     add  HL, HL                                        ;; 03:59e1 $29
@@ -239,19 +239,19 @@ data_03_59ea_SpriteData:
     db   $fc, $1e, $08, $10, $04, $26, $08, $10        ;; 03:5eb2 ????????
     db   $0c, $2e, $08, $10, $14, $36, $08             ;; 03:5eba ???????
 
-call_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
-; Main Object Graphics/Collision Updater
+call_03_5ec1_UpdateAllEntitiesGraphicsAndCollision:
+; Main Entity Graphics/Collision Updater
 ; Description:
-; Top-level routine for each frame’s object processing:
-; Iterates through all object slots ($20 spacing).
+; Top-level routine for each frame’s entity processing:
+; Iterates through all entity slots ($20 spacing).
 ; Skips unused entries ($FF).
-; Calls IsObjectRenderableFlag and, if set, runs ObjectSpriteSetup.
+; Calls IsEntityRenderableFlag and, if set, runs EntitySpriteSetup.
 ; Builds Gex’s own sprite draw list when required.
-; Clears unused sprite slots, sets up collectibles, and updates collision for all objects.
-; Sorts or reorders objects (wDC44_UnkGraphicsBuffer sorting loop) for sprite priority.
-; This is the game’s primary per-frame object graphics pipeline.
+; Clears unused sprite slots, sets up collectibles, and updates collision for all entities.
+; Sorts or reorders entities (wDC44_UnkGraphicsBuffer sorting loop) for sprite priority.
+; This is the game’s primary per-frame entity graphics pipeline.
     ld   A, $08                                        ;; 03:5ec1 $3e $08
-    ld   [wDC6F_ObjectSpriteRelated], A                                    ;; 03:5ec3 $ea $6f $dc
+    ld   [wDC6F_EntitySpriteRelated], A                                    ;; 03:5ec3 $ea $6f $dc
     ld   A, [wDC1F]                                    ;; 03:5ec6 $fa $1f $dc
     cp   A, $01                                        ;; 03:5ec9 $fe $01
     jr   NZ, .jr_03_5ed8                               ;; 03:5ecb $20 $0b
@@ -263,17 +263,17 @@ call_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
 .jr_03_5ed8:
     ld   A, $20                                        ;; 03:5ed8 $3e $20
 .jr_03_5eda:
-    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 03:5eda $ea $00 $da
-    or   A, OBJECT_FIELD_OBJECT_ID                                        ;; 03:5edd $f6 $00
+    ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 03:5eda $ea $00 $da
+    or   A, ENTITY_FIELD_ENTITY_ID                                        ;; 03:5edd $f6 $00
     ld   L, A                                          ;; 03:5edf $6f
-    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:5ee0 $26 $d8
+    ld   h, HIGH(wD800_EntityMemory)                                        ;; 03:5ee0 $26 $d8
     ld   A, [HL]                                       ;; 03:5ee2 $7e
     cp   A, $ff                                        ;; 03:5ee3 $fe $ff
     jr   Z, .jr_03_5eed                                ;; 03:5ee5 $28 $06
-    call call_03_59d8_IsObjectRenderableFlag                                  ;; 03:5ee7 $cd $d8 $59
-    call NZ, call_03_5fc2_SetupObjectSprite                              ;; 03:5eea $c4 $c2 $5f
+    call call_03_59d8_IsEntityRenderableFlag                                  ;; 03:5ee7 $cd $d8 $59
+    call NZ, call_03_5fc2_SetupEntitySprite                              ;; 03:5eea $c4 $c2 $5f
 .jr_03_5eed:
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5eed $fa $00 $da
+    ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:5eed $fa $00 $da
     add  A, $20                                        ;; 03:5ef0 $c6 $20
     jr   NZ, .jr_03_5eda                               ;; 03:5ef2 $20 $e6
     ld   A, [wDCA7_DrawGexFlag]                                    ;; 03:5ef4 $fa $a7 $dc
@@ -281,17 +281,17 @@ call_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     call NZ, call_00_2ce2_BuildGexSpriteDrawList                              ;; 03:5ef8 $c4 $e2 $2c
     ld   A, $20                                        ;; 03:5efb $3e $20
 .jr_03_5efd:
-    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 03:5efd $ea $00 $da
-    or   A, OBJECT_FIELD_OBJECT_ID                                        ;; 03:5f00 $f6 $00
+    ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 03:5efd $ea $00 $da
+    or   A, ENTITY_FIELD_ENTITY_ID                                        ;; 03:5f00 $f6 $00
     ld   L, A                                          ;; 03:5f02 $6f
-    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:5f03 $26 $d8
+    ld   h, HIGH(wD800_EntityMemory)                                        ;; 03:5f03 $26 $d8
     ld   A, [HL]                                       ;; 03:5f05 $7e
     cp   A, $ff                                        ;; 03:5f06 $fe $ff
     jr   Z, .jr_03_5f10                                ;; 03:5f08 $28 $06
-    call call_03_59d8_IsObjectRenderableFlag                                  ;; 03:5f0a $cd $d8 $59
-    call Z, call_03_5fc2_SetupObjectSprite                               ;; 03:5f0d $cc $c2 $5f
+    call call_03_59d8_IsEntityRenderableFlag                                  ;; 03:5f0a $cd $d8 $59
+    call Z, call_03_5fc2_SetupEntitySprite                               ;; 03:5f0d $cc $c2 $5f
 .jr_03_5f10:
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5f10 $fa $00 $da
+    ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:5f10 $fa $00 $da
     add  A, $20                                        ;; 03:5f13 $c6 $20
     jr   NZ, .jr_03_5efd                               ;; 03:5f15 $20 $e6
 .jp_03_5f17:
@@ -299,20 +299,20 @@ call_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     call call_03_6148_ClearUnusedSpriteSlots                                  ;; 03:5f1a $cd $48 $61
     ld   A, $20                                        ;; 03:5f1d $3e $20
 .jr_03_5f1f:
-    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 03:5f1f $ea $00 $da
-    or   A, OBJECT_FIELD_OBJECT_ID                                        ;; 03:5f22 $f6 $00
+    ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 03:5f1f $ea $00 $da
+    or   A, ENTITY_FIELD_ENTITY_ID                                        ;; 03:5f22 $f6 $00
     ld   L, A                                          ;; 03:5f24 $6f
-    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:5f25 $26 $d8
+    ld   h, HIGH(wD800_EntityMemory)                                        ;; 03:5f25 $26 $d8
     ld   A, [HL]                                       ;; 03:5f27 $7e
     cp   A, $ff                                        ;; 03:5f28 $fe $ff
-    call NZ, call_03_4c38_UpdateObjectCollision_Dispatch                              ;; 03:5f2a $c4 $38 $4c
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5f2d $fa $00 $da
+    call NZ, call_03_4c38_UpdateEntityCollision_Dispatch                              ;; 03:5f2a $c4 $38 $4c
+    ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:5f2d $fa $00 $da
     add  A, $20                                        ;; 03:5f30 $c6 $20
     jr   NZ, .jr_03_5f1f                               ;; 03:5f32 $20 $eb
     ret                                                ;; 03:5f34 $c9
 .jr_03_5f35:
     ld   HL, wDC44_UnkGraphicsBuffer                                     ;; 03:5f35 $21 $44 $dc
-    ld   D, HIGH(wD800_ObjectMemory)                                        ;; 03:5f38 $16 $d8
+    ld   D, HIGH(wD800_EntityMemory)                                        ;; 03:5f38 $16 $d8
     ld   B, $00                                        ;; 03:5f3a $06 $00
     ld   A, $00                                        ;; 03:5f3c $3e $00
 .jr_03_5f3e:
@@ -340,7 +340,7 @@ call_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     xor  A, A                                          ;; 03:5f5d $af
     ld   [wDC4C_UnkGraphicsFlags], A                                    ;; 03:5f5e $ea $4c $dc
     ld   HL, wDC44_UnkGraphicsBuffer                                     ;; 03:5f61 $21 $44 $dc
-    ld   D, HIGH(wD800_ObjectMemory)                                        ;; 03:5f64 $16 $d8
+    ld   D, HIGH(wD800_EntityMemory)                                        ;; 03:5f64 $16 $d8
     push BC                                            ;; 03:5f66 $c5
 .jr_03_5f67:
     push HL                                            ;; 03:5f67 $e5
@@ -386,15 +386,15 @@ call_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     push BC                                            ;; 03:5f9c $c5
     push HL                                            ;; 03:5f9d $e5
     ld   A, [HL]                                       ;; 03:5f9e $7e
-    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 03:5f9f $ea $00 $da
+    ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 03:5f9f $ea $00 $da
     and  A, A                                          ;; 03:5fa2 $a7
     jr   Z, .jr_03_5fb2                                ;; 03:5fa3 $28 $0d
-    or   A, OBJECT_FIELD_OBJECT_ID                                        ;; 03:5fa5 $f6 $00
+    or   A, ENTITY_FIELD_ENTITY_ID                                        ;; 03:5fa5 $f6 $00
     ld   L, A                                          ;; 03:5fa7 $6f
-    ld   h, HIGH(wD800_ObjectMemory)                                        ;; 03:5fa8 $26 $d8
+    ld   h, HIGH(wD800_EntityMemory)                                        ;; 03:5fa8 $26 $d8
     ld   A, [HL]                                       ;; 03:5faa $7e
     cp   A, $ff                                        ;; 03:5fab $fe $ff
-    call NZ, call_03_5fc2_SetupObjectSprite                              ;; 03:5fad $c4 $c2 $5f
+    call NZ, call_03_5fc2_SetupEntitySprite                              ;; 03:5fad $c4 $c2 $5f
     jr   .jr_03_5fb9                                   ;; 03:5fb0 $18 $07
 .jr_03_5fb2:
     ld   A, [wDCA7_DrawGexFlag]                                    ;; 03:5fb2 $fa $a7 $dc
@@ -408,31 +408,31 @@ call_03_5ec1_UpdateAllObjectsGraphicsAndCollision:
     jr   NZ, .jr_03_5f9c                               ;; 03:5fbd $20 $dd
     jp   .jp_03_5f17                                   ;; 03:5fbf $c3 $17 $5f
 
-call_03_5fc2_SetupObjectSprite:
-; Build Sprite Data for an Object
+call_03_5fc2_SetupEntitySprite:
+; Build Sprite Data for an Entity
 ; Description:
-; Given the current object:
-; Determines its palette (wDAAE_ObjectPaletteIds).
+; Given the current entity:
+; Determines its palette (wDAAE_EntityPaletteIds).
 ; Computes screen-relative X/Y distances vs. the camera (wDBF9, wDBFB).
 ; Checks if it’s within the visible window; deactivates it if far outside.
 ; Handles bounding-box collision tests.
-; Prepares OAM (sprite) entries: calculates tile indices, attributes, flips, and writes to the sprite buffer (wDC6F_ObjectSpriteRelated pointer).
+; Prepares OAM (sprite) entries: calculates tile indices, attributes, flips, and writes to the sprite buffer (wDC6F_EntitySpriteRelated pointer).
 ; Has a branch for special particle effects (call_03_60e6_SetupParticleSprite).
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:5fc2 $fa $00 $da
+    ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:5fc2 $fa $00 $da
     rlca                                               ;; 03:5fc5 $07
     rlca                                               ;; 03:5fc6 $07
     rlca                                               ;; 03:5fc7 $07
     and  A, $07                                        ;; 03:5fc8 $e6 $07
     ld   L, A                                          ;; 03:5fca $6f
     ld   H, $00                                        ;; 03:5fcb $26 $00
-    ld   DE, wDAAE_ObjectPaletteIds                                     ;; 03:5fcd $11 $ae $da
+    ld   DE, wDAAE_EntityPaletteIds                                     ;; 03:5fcd $11 $ae $da
     add  HL, DE                                        ;; 03:5fd0 $19
     ld   E, [HL]                                       ;; 03:5fd1 $5e
-    LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_FACING_DIRECTION                                        ;; 03:5fd9 $6f
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_FACING_DIRECTION                                        ;; 03:5fd9 $6f
     ld   A, [HL]                                       ;; 03:5fda $7e
     or   A, E                                          ;; 03:5fdb $b3
     ld   [wDAB6_SpriteFlags], A                                    ;; 03:5fdc $ea $b6 $da
-    LOAD_OBJ_FIELD_TO_DE OBJECT_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_XPOS
     ld   HL, wDBF9_XPositionInMap                                     ;; 03:5fe7 $21 $f9 $db
     ld   A, [DE]                                       ;; 03:5fea $1a
     sub  A, [HL]                                       ;; 03:5feb $96
@@ -478,7 +478,7 @@ call_03_5fc2_SetupObjectSprite:
     cp   A, $f0                                        ;; 03:6022 $fe $f0
     jr   NC, .jr_03_603e                               ;; 03:6024 $30 $18
 .jr_03_6026:
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:6026 $fa $00 $da
+    ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:6026 $fa $00 $da
     swap A                                             ;; 03:6029 $cb $37
     and  A, $0e                                        ;; 03:602b $e6 $0e
     ld   L, A                                          ;; 03:602d $6f
@@ -489,10 +489,10 @@ call_03_5fc2_SetupObjectSprite:
     ld   [HL+], A                                      ;; 03:6035 $22
     ld   [HL], A                                       ;; 03:6036 $77
     call call_00_2a15_CheckCameraOverlapBoundingBox                                  ;; 03:6037 $cd $15 $2a
-    call C, call_00_2b5d_ClearObjectSlot                               ;; 03:603a $dc $5d $2b
+    call C, call_00_2b5d_ClearEntitySlot                               ;; 03:603a $dc $5d $2b
     ret                                                ;; 03:603d $c9
 .jr_03_603e:
-    LOAD_OBJ_FIELD_TO_HL_ALT OBJECT_FIELD_COOLDOWN_TIMER
+    LOAD_OBJ_FIELD_TO_HL_ALT ENTITY_FIELD_COOLDOWN_TIMER
     ld   A, [HL]                                       ;; 03:6046 $7e
     and  A, A                                          ;; 03:6047 $a7
     jr   Z, .jr_03_6050                                ;; 03:6048 $28 $06
@@ -501,7 +501,7 @@ call_03_5fc2_SetupObjectSprite:
     ret  NZ                                            ;; 03:604f $c0
 .jr_03_6050:
     push BC                                            ;; 03:6050 $c5
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:6051 $fa $00 $da
+    ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:6051 $fa $00 $da
     swap A                                             ;; 03:6054 $cb $37
     and  A, $0e                                        ;; 03:6056 $e6 $0e
     ld   L, A                                          ;; 03:6058 $6f
@@ -528,12 +528,12 @@ call_03_5fc2_SetupObjectSprite:
     bit  5, A                                          ;; 03:6077 $cb $6f
     ld   A, $40                                        ;; 03:6079 $3e $40
     jr   NZ, .jr_03_6083                               ;; 03:607b $20 $06
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 03:607d $fa $00 $da
+    ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:607d $fa $00 $da
     rrca                                               ;; 03:6080 $0f
     and  A, $70                                        ;; 03:6081 $e6 $70
 .jr_03_6083:
-    ld   [wDC70_ObjectSpriteRelated2], A                                    ;; 03:6083 $ea $70 $dc
-    LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_FACING_DIRECTION
+    ld   [wDC70_EntitySpriteRelated2], A                                    ;; 03:6083 $ea $70 $dc
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_FACING_DIRECTION
     ld   A, [HL]                                       ;; 03:608e $7e
     swap A                                             ;; 03:608f $cb $37
     rrca                                               ;; 03:6091 $0f
@@ -562,7 +562,7 @@ call_03_5fc2_SetupObjectSprite:
 .jr_03_60b4:
     ld   DE, data_03_59ea_SpriteData                              ;; 03:60b4 $11 $ea $59
     call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 03:60b7 $cd $77 $07
-    ld   A, [wDC6F_ObjectSpriteRelated]                                    ;; 03:60ba $fa $6f $dc
+    ld   A, [wDC6F_EntitySpriteRelated]                                    ;; 03:60ba $fa $6f $dc
     ld   E, A                                          ;; 03:60bd $5f
     ld   D, $d9                                        ;; 03:60be $16 $d9
     ld   A, [HL+]                                      ;; 03:60c0 $2a
@@ -579,7 +579,7 @@ call_03_5fc2_SetupObjectSprite:
     add  A, C                                          ;; 03:60cc $81
     ld   [DE], A                                       ;; 03:60cd $12
     inc  E                                             ;; 03:60ce $1c
-    ld   A, [wDC70_ObjectSpriteRelated2]                                    ;; 03:60cf $fa $70 $dc
+    ld   A, [wDC70_EntitySpriteRelated2]                                    ;; 03:60cf $fa $70 $dc
     add  A, [HL]                                       ;; 03:60d2 $86
     ld   [DE], A                                       ;; 03:60d3 $12
     inc  HL                                            ;; 03:60d4 $23
@@ -594,13 +594,13 @@ call_03_5fc2_SetupObjectSprite:
     dec  A                                             ;; 03:60de $3d
     jr   NZ, .jr_03_60c1                               ;; 03:60df $20 $e0
     ld   A, E                                          ;; 03:60e1 $7b
-    ld   [wDC6F_ObjectSpriteRelated], A                                    ;; 03:60e2 $ea $6f $dc
+    ld   [wDC6F_EntitySpriteRelated], A                                    ;; 03:60e2 $ea $6f $dc
     ret                                                ;; 03:60e5 $c9
 
 call_03_60e6_SetupParticleSprite:
 ; Particle Sprite Setup Subroutine
 ; Description:
-; Handles special case when the object’s data marks it as a particle effect:
+; Handles special case when the entity’s data marks it as a particle effect:
 ; Gets particle buffer pointer (ParticleSlot_GetBufferPtr).
 ; Converts a velocity/magnitude value into a frame index using .data_03_6140.
 ; Updates wDAB6_SpriteFlags flags and writes three small sprite entries for the particle effect.
@@ -626,7 +626,7 @@ call_03_60e6_SetupParticleSprite:
     ld   A, [wDAB6_SpriteFlags]                                    ;; 03:6105 $fa $b6 $da
     or   A, $08                                        ;; 03:6108 $f6 $08
     ld   [wDAB6_SpriteFlags], A                                    ;; 03:610a $ea $b6 $da
-    ld   A, [wDC6F_ObjectSpriteRelated]                                    ;; 03:610d $fa $6f $dc
+    ld   A, [wDC6F_EntitySpriteRelated]                                    ;; 03:610d $fa $6f $dc
     ld   E, A                                          ;; 03:6110 $5f
     ld   D, $d9                                        ;; 03:6111 $16 $d9
     ld   A, $03                                        ;; 03:6113 $3e $03
@@ -662,18 +662,18 @@ call_03_60e6_SetupParticleSprite:
     dec  A                                             ;; 03:6138 $3d
     jr   NZ, .jr_03_6115                               ;; 03:6139 $20 $da
     ld   A, E                                          ;; 03:613b $7b
-    ld   [wDC6F_ObjectSpriteRelated], A                                    ;; 03:613c $ea $6f $dc
+    ld   [wDC6F_EntitySpriteRelated], A                                    ;; 03:613c $ea $6f $dc
     ret                                                ;; 03:613f $c9
 .data_03_6140:
     db   $34, $36, $38, $3a, $3a, $3a, $3a, $3a        ;; 03:6140 ........
 
 call_03_6148_ClearUnusedSpriteSlots:
-; Purpose: Iterates through sprite attribute table memory, starting at wDC6F_ObjectSpriteRelated/$D900, 
+; Purpose: Iterates through sprite attribute table memory, starting at wDC6F_EntitySpriteRelated/$D900, 
 ; and fills unused slots with zero until a boundary ($9F) is reached. This clears out 
 ; leftover OAM/sprite data to prevent rendering glitches.
 ; Summary: Clears inactive sprite slots in VRAM.
     ld   A, $9f                                        ;; 03:6148 $3e $9f
-    ld   HL, wDC6F_ObjectSpriteRelated                                     ;; 03:614a $21 $6f $dc
+    ld   HL, wDC6F_EntitySpriteRelated                                     ;; 03:614a $21 $6f $dc
     ld   L, [HL]                                       ;; 03:614d $6e
     cp   A, L                                          ;; 03:614e $bd
     ret  C                                             ;; 03:614f $d8
@@ -778,9 +778,9 @@ call_03_61db_LoadCollectibleSprite:
 ; Purpose:
 ; Inserts a collectible’s sprite data (two 8×8 tiles forming the collectible graphic) into OAM memory.
 ; Adjusts X/Y coordinates slightly (−8 offset) for correct placement.
-; Updates wDC6F_ObjectSpriteRelated pointer to the next available sprite slot.
+; Updates wDC6F_EntitySpriteRelated pointer to the next available sprite slot.
 ; Summary: Writes a collectible sprite’s graphics and position into the sprite buffer.
-    ld   A, [wDC6F_ObjectSpriteRelated]                                    ;; 03:61db $fa $6f $dc
+    ld   A, [wDC6F_EntitySpriteRelated]                                    ;; 03:61db $fa $6f $dc
     cp   A, $9c                                        ;; 03:61de $fe $9c
     ret  NC                                            ;; 03:61e0 $d0
     ld   L, A                                          ;; 03:61e1 $6f
@@ -805,6 +805,6 @@ call_03_61db_LoadCollectibleSprite:
     ld   A, $08                                        ;; 03:61fb $3e $08
     ld   [HL+], A                                      ;; 03:61fd $22
     ld   A, L                                          ;; 03:61fe $7d
-    ld   [wDC6F_ObjectSpriteRelated], A                                    ;; 03:61ff $ea $6f $dc
+    ld   [wDC6F_EntitySpriteRelated], A                                    ;; 03:61ff $ea $6f $dc
     ret                                                ;; 03:6202 $c9
     

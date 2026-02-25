@@ -7,7 +7,7 @@ DEF MBC1SRamBankingMode EQU $6001
 ; ROM Banks
 DEF BANK_00_HOME_CODE         EQU $00
 DEF BANK_01_MENU_CODE         EQU $01
-DEF BANK_02_OBJECT_CODE       EQU $02
+DEF BANK_02_ENTITY_CODE       EQU $02
 DEF BANK_03_COLLISION_AND_GRAPHICS_CODE EQU $03
 DEF BANK_04_AUDIO_CODE_1      EQU $04
 DEF BANK_05_AUDIO_CODE_2      EQU $05
@@ -15,7 +15,7 @@ DEF Bank06                    EQU $06
 DEF Bank07                    EQU $07
 DEF Bank08                    EQU $08
 DEF Bank09                    EQU $09
-DEF BANK_0A_OBJECT_SPRITES    EQU $0a
+DEF BANK_0A_ENTITY_SPRITES    EQU $0a
 DEF Bank0b                    EQU $0b
 DEF Bank0c                    EQU $0c
 DEF Bank0d                    EQU $0d
@@ -29,7 +29,7 @@ DEF Bank1e                    EQU $1e
 DEF BANK_1F_SECONDARY_TILESETS EQU $1f
 DEF Bank20                    EQU $20 ; unused
 DEF Bank21_BgPalettesAndCollectibleLists EQU $21 ; bg palette data, and collectible lists for each map
-DEF Bank22_ObjectSpawnLists   EQU $22 ; object spawn lists for each map
+DEF Bank22_EntitySpawnLists   EQU $22 ; entity spawn lists for each map
 DEF Bank23_CollisionBlocksets EQU $23
 DEF Bank24_BlocksetData       EQU $24
 DEF Bank25_BlocksetData       EQU $25
@@ -71,7 +71,7 @@ DEF Bank4d_Tileset            EQU $4d ; GexCave, AnimeChannel, GextremeSports
 DEF Bank4e_Tileset            EQU $4e ; GexCave
 DEF Bank4f_Tileset            EQU $4f ; WesternStation, WWGexWrestling, ChannelZ
 
-DEF BANK_7F_OBJECT_PALETTES   EQU $7f ; object sprite and palette data
+DEF BANK_7F_ENTITY_PALETTES   EQU $7f ; entity sprite and palette data
 
 ; Inputs (defined in hardware.inc)
 ; DEF PADF_DOWN   EQU $80
@@ -160,182 +160,182 @@ DEF MAP_CHANNEL_Z3                 EQU $3A
 DEF MAP_CHANNEL_Z4                 EQU $3B
 DEF MAP_CHANNEL_Z5                 EQU $3C
 
-; Objects
-DEF OBJECT_GEX                                         EQU $00
-DEF OBJECT_BONUS_COIN                                  EQU $01
-DEF OBJECT_FLY_COIN_SPAWN                              EQU $02
-DEF OBJECT_PAW_COIN                                    EQU $03
-DEF OBJECT_FLY_1                                       EQU $04
-DEF OBJECT_FLY_2                                       EQU $05
-DEF OBJECT_FLY_3                                       EQU $06
-DEF OBJECT_FLY_4                                       EQU $07
-DEF OBJECT_FLY_5                                       EQU $08
-DEF OBJECT_GREEN_FLY_TV                                EQU $09
-DEF OBJECT_PURPLE_FLY_TV                               EQU $0A
-DEF OBJECT_UNK_FLY_TV_3                                EQU $0B
-DEF OBJECT_BLUE_FLY_TV                                 EQU $0C
-DEF OBJECT_UNK_FLY_TV_5                                EQU $0D
-DEF OBJECT_UNK0E                                       EQU $0E
-DEF OBJECT_UNK0F                                       EQU $0F
-DEF OBJECT_UNK10                                       EQU $10
-DEF OBJECT_TV_BUTTON                                   EQU $11
-DEF OBJECT_TV_REMOTE                                   EQU $12
-DEF OBJECT_UNK13                                       EQU $13
-DEF OBJECT_GOAL_COUNTER                                EQU $14
-DEF OBJECT_UNK15                                       EQU $15
-DEF OBJECT_UNK16                                       EQU $16
-DEF OBJECT_UNK17                                       EQU $17
-DEF OBJECT_UNK18                                       EQU $18
-DEF OBJECT_UNK19                                       EQU $19
-DEF OBJECT_UNK1A                                       EQU $1A
-DEF OBJECT_BONUS_STAGE_TIMER                           EQU $1B
-DEF OBJECT_FREESTANDING_REMOTE                         EQU $1C
-DEF OBJECT_HOLIDAY_TV_ICE_SCULPTURE                    EQU $1D
-DEF OBJECT_HOLIDAY_TV_EVIL_SANTA                       EQU $1E
-DEF OBJECT_HOLIDAY_TV_EVIL_SANTA_PROJECTILE            EQU $1F
-DEF OBJECT_HOLIDAY_TV_SKATING_ELF                      EQU $20
-DEF OBJECT_HOLIDAY_TV_PENGUIN                          EQU $21
-DEF OBJECT_MYSTERY_TV_REZLING                          EQU $22
-DEF OBJECT_MYSTERY_TV_BLOOD_COOLER                     EQU $23
-DEF OBJECT_MYSTERY_TV_FISH                             EQU $24
-DEF OBJECT_MYSTERY_TV_MAGIC_SWORD                      EQU $25
-DEF OBJECT_MYSTERY_TV_SAFARI_SAM                       EQU $26
-DEF OBJECT_MYSTERY_TV_SAFARI_SAM_PROJECTILE            EQU $27
-DEF OBJECT_MYSTERY_TV_GHOST_KNIGHT                     EQU $28
-DEF OBJECT_MYSTERY_TV_GHOST_KNIGHT_PROJECTILE          EQU $29
-DEF OBJECT_TUT_TV_HAND                                 EQU $2A
-DEF OBJECT_TUT_TV_LOST_ARK                             EQU $2B
-DEF OBJECT_TUT_TV_RISING_PLATFORM                      EQU $2C
-DEF OBJECT_TUT_TV_SIDEWAYS_PLATFORM                    EQU $2D
-DEF OBJECT_TUT_TV_BEE                                  EQU $2E
-DEF OBJECT_TUT_TV_RAFT                                 EQU $2F
-DEF OBJECT_TUT_TV_SNAKE_FACING_RIGHT                   EQU $30
-DEF OBJECT_TUT_TV_SNAKE_FACING_LEFT                    EQU $31
-DEF OBJECT_TUT_TV_SNAKE_RIGHT_PROJECTILE               EQU $32
-DEF OBJECT_TUT_TV_SNAKE_LEFT_PROJECTILE                EQU $33
-DEF OBJECT_TUT_TV_RA_STAFF                             EQU $34
-DEF OBJECT_TUT_TV_RA_STATUE_HORIZONTAL_PROJECTILE      EQU $35
-DEF OBJECT_TUT_TV_RA_STATUE_DIAGONAL_PROJECTILE        EQU $36
-DEF OBJECT_TUT_TV_BREAKABLE_BLOCK                      EQU $37
-DEF OBJECT_TUT_TV_COFFIN                               EQU $38
-DEF OBJECT_WESTERN_STATION_CACTUS                      EQU $39
-DEF OBJECT_UNK3A                                       EQU $3A
-DEF OBJECT_WESTERN_STATION_ROCK_PLATFORM               EQU $3B
-DEF OBJECT_WESTERN_STATION_HARD_HAT                    EQU $3C
-DEF OBJECT_WESTERN_STATION_PLAYING_CARD                EQU $3D
-DEF OBJECT_WESTERN_STATION_BAT                         EQU $3E
-DEF OBJECT_WESTERN_STATION_RISING_PLATFORM             EQU $3F
-DEF OBJECT_ANIME_CHANNEL_DOOR                          EQU $40
-DEF OBJECT_ANIME_CHANNEL_DOOR2                         EQU $41
-DEF OBJECT_ANIME_CHANNEL_FAN_LIFT                      EQU $42
-DEF OBJECT_ANIME_CHANNEL_MECH_FACING_RIGHT             EQU $43
-DEF OBJECT_ANIME_CHANNEL_MECH_FACING_LEFT              EQU $44
-DEF OBJECT_ANIME_CHANNEL_DISAPPEARING_FLOOR            EQU $45
-DEF OBJECT_ANIME_CHANNEL_ON_SWITCH2                    EQU $46
-DEF OBJECT_ANIME_CHANNEL_ALIEN_CULTURE_TUBE            EQU $47
-DEF OBJECT_ANIME_CHANNEL_BLUE_BEAM_BARRIER             EQU $48
-DEF OBJECT_ANIME_CHANNEL_RISING_PLATFORM               EQU $49
-DEF OBJECT_ANIME_CHANNEL_ON_SWITCH                     EQU $4A
-DEF OBJECT_ANIME_CHANNEL_OFF_SWITCH                    EQU $4B
-DEF OBJECT_ANIME_CHANNEL_SAILOR_TOON_GIRL              EQU $4C
-DEF OBJECT_ANIME_CHANNEL_BIG_SILVER_ROBOT              EQU $4D
-DEF OBJECT_ANIME_CHANNEL_SMALL_BLUE_ROBOT              EQU $4E
-DEF OBJECT_ANIME_CHANNEL_SECBOT                        EQU $4F
-DEF OBJECT_ANIME_CHANNEL_SECBOT_PROJECTILE             EQU $50
-DEF OBJECT_ANIME_CHANNEL_ELEVATOR                      EQU $51
-DEF OBJECT_ANIME_CHANNEL_FIRE_WALL_ENEMY               EQU $52
-DEF OBJECT_ANIME_CHANNEL_GRENADE                       EQU $53
-DEF OBJECT_ANIME_CHANNEL_PLANET_O_BLAST_WEAPON         EQU $54
-DEF OBJECT_SUPERHERO_SHOW_MAD_BOMBER                   EQU $55
-DEF OBJECT_SUPERHERO_SHOW_BOMB                         EQU $56
-DEF OBJECT_SUPERHERO_SHOW_WATER_TOWER_TANK             EQU $57
-DEF OBJECT_SUPERHERO_SHOW_WATER_TOWER_STAND            EQU $58
-DEF OBJECT_SUPERHERO_SHOW_CONVICT                      EQU $59
-DEF OBJECT_SUPERHERO_SHOW_SPIDER                       EQU $5A
-DEF OBJECT_SUPERHERO_SHOW_STRAY_CAT                    EQU $5B
-DEF OBJECT_SUPERHERO_SHOW_YELLOW_GOON                  EQU $5C
-DEF OBJECT_SUPERHERO_SHOW_RAT                          EQU $5D
-DEF OBJECT_SUPERHERO_SHOW_CHOMPER_TV                   EQU $5E
-DEF OBJECT_SUPERHERO_SHOW_CRUMBLING_FLOOR              EQU $5F
-DEF OBJECT_SUPERHERO_SHOW_CONVICT_PROJECTILE           EQU $60
-DEF OBJECT_GEXTREME_SPORTS_ELF                         EQU $61
-DEF OBJECT_GEXTREME_SPORTS_BONUS_TIME_COIN             EQU $62
-DEF OBJECT_MARSUPIAL_MADNESS_BELL                      EQU $63
-DEF OBJECT_MARSUPIAL_MADNESS_BIRD                      EQU $64
-DEF OBJECT_MARSUPIAL_MADNESS_BIRD_PROJECTILE           EQU $65
-DEF OBJECT_WW_GEX_WRESTLING_ROCK_HARD                  EQU $66
-DEF OBJECT_LIZARD_OF_OZ_BRAIN_OF_OZ                    EQU $67
-DEF OBJECT_LIZARD_OF_OZ_CANNON_PROJECTILE              EQU $68
-DEF OBJECT_LIZARD_OF_OZ_CANNON                         EQU $69
-DEF OBJECT_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE         EQU $6A
-DEF OBJECT_UNK6B                                       EQU $6B
-DEF OBJECT_UNK6C                                       EQU $6C
-DEF OBJECT_UNK6D                                       EQU $6D
-DEF OBJECT_CHANNEL_Z_REZ                               EQU $6E
-DEF OBJECT_UNK6F                                       EQU $6F
-DEF OBJECT_CHANNEL_Z_METEOR                            EQU $70
-DEF OBJECT_CHANNEL_Z_REZ_PROJECTILE                    EQU $71
-DEF OBJECT_LIST_TERMINATOR                             EQU $FF
+; Entities
+DEF ENTITY_GEX                                         EQU $00
+DEF ENTITY_BONUS_COIN                                  EQU $01
+DEF ENTITY_FLY_COIN_SPAWN                              EQU $02
+DEF ENTITY_PAW_COIN                                    EQU $03
+DEF ENTITY_FLY_1                                       EQU $04
+DEF ENTITY_FLY_2                                       EQU $05
+DEF ENTITY_FLY_3                                       EQU $06
+DEF ENTITY_FLY_4                                       EQU $07
+DEF ENTITY_FLY_5                                       EQU $08
+DEF ENTITY_GREEN_FLY_TV                                EQU $09
+DEF ENTITY_PURPLE_FLY_TV                               EQU $0A
+DEF ENTITY_UNK_FLY_TV_3                                EQU $0B
+DEF ENTITY_BLUE_FLY_TV                                 EQU $0C
+DEF ENTITY_UNK_FLY_TV_5                                EQU $0D
+DEF ENTITY_UNK0E                                       EQU $0E
+DEF ENTITY_UNK0F                                       EQU $0F
+DEF ENTITY_UNK10                                       EQU $10
+DEF ENTITY_TV_BUTTON                                   EQU $11
+DEF ENTITY_TV_REMOTE                                   EQU $12
+DEF ENTITY_UNK13                                       EQU $13
+DEF ENTITY_GOAL_COUNTER                                EQU $14
+DEF ENTITY_UNK15                                       EQU $15
+DEF ENTITY_UNK16                                       EQU $16
+DEF ENTITY_UNK17                                       EQU $17
+DEF ENTITY_UNK18                                       EQU $18
+DEF ENTITY_UNK19                                       EQU $19
+DEF ENTITY_UNK1A                                       EQU $1A
+DEF ENTITY_BONUS_STAGE_TIMER                           EQU $1B
+DEF ENTITY_FREESTANDING_REMOTE                         EQU $1C
+DEF ENTITY_HOLIDAY_TV_ICE_SCULPTURE                    EQU $1D
+DEF ENTITY_HOLIDAY_TV_EVIL_SANTA                       EQU $1E
+DEF ENTITY_HOLIDAY_TV_EVIL_SANTA_PROJECTILE            EQU $1F
+DEF ENTITY_HOLIDAY_TV_SKATING_ELF                      EQU $20
+DEF ENTITY_HOLIDAY_TV_PENGUIN                          EQU $21
+DEF ENTITY_MYSTERY_TV_REZLING                          EQU $22
+DEF ENTITY_MYSTERY_TV_BLOOD_COOLER                     EQU $23
+DEF ENTITY_MYSTERY_TV_FISH                             EQU $24
+DEF ENTITY_MYSTERY_TV_MAGIC_SWORD                      EQU $25
+DEF ENTITY_MYSTERY_TV_SAFARI_SAM                       EQU $26
+DEF ENTITY_MYSTERY_TV_SAFARI_SAM_PROJECTILE            EQU $27
+DEF ENTITY_MYSTERY_TV_GHOST_KNIGHT                     EQU $28
+DEF ENTITY_MYSTERY_TV_GHOST_KNIGHT_PROJECTILE          EQU $29
+DEF ENTITY_TUT_TV_HAND                                 EQU $2A
+DEF ENTITY_TUT_TV_LOST_ARK                             EQU $2B
+DEF ENTITY_TUT_TV_RISING_PLATFORM                      EQU $2C
+DEF ENTITY_TUT_TV_SIDEWAYS_PLATFORM                    EQU $2D
+DEF ENTITY_TUT_TV_BEE                                  EQU $2E
+DEF ENTITY_TUT_TV_RAFT                                 EQU $2F
+DEF ENTITY_TUT_TV_SNAKE_FACING_RIGHT                   EQU $30
+DEF ENTITY_TUT_TV_SNAKE_FACING_LEFT                    EQU $31
+DEF ENTITY_TUT_TV_SNAKE_RIGHT_PROJECTILE               EQU $32
+DEF ENTITY_TUT_TV_SNAKE_LEFT_PROJECTILE                EQU $33
+DEF ENTITY_TUT_TV_RA_STAFF                             EQU $34
+DEF ENTITY_TUT_TV_RA_STATUE_HORIZONTAL_PROJECTILE      EQU $35
+DEF ENTITY_TUT_TV_RA_STATUE_DIAGONAL_PROJECTILE        EQU $36
+DEF ENTITY_TUT_TV_BREAKABLE_BLOCK                      EQU $37
+DEF ENTITY_TUT_TV_COFFIN                               EQU $38
+DEF ENTITY_WESTERN_STATION_CACTUS                      EQU $39
+DEF ENTITY_UNK3A                                       EQU $3A
+DEF ENTITY_WESTERN_STATION_ROCK_PLATFORM               EQU $3B
+DEF ENTITY_WESTERN_STATION_HARD_HAT                    EQU $3C
+DEF ENTITY_WESTERN_STATION_PLAYING_CARD                EQU $3D
+DEF ENTITY_WESTERN_STATION_BAT                         EQU $3E
+DEF ENTITY_WESTERN_STATION_RISING_PLATFORM             EQU $3F
+DEF ENTITY_ANIME_CHANNEL_DOOR                          EQU $40
+DEF ENTITY_ANIME_CHANNEL_DOOR2                         EQU $41
+DEF ENTITY_ANIME_CHANNEL_FAN_LIFT                      EQU $42
+DEF ENTITY_ANIME_CHANNEL_MECH_FACING_RIGHT             EQU $43
+DEF ENTITY_ANIME_CHANNEL_MECH_FACING_LEFT              EQU $44
+DEF ENTITY_ANIME_CHANNEL_DISAPPEARING_FLOOR            EQU $45
+DEF ENTITY_ANIME_CHANNEL_ON_SWITCH2                    EQU $46
+DEF ENTITY_ANIME_CHANNEL_ALIEN_CULTURE_TUBE            EQU $47
+DEF ENTITY_ANIME_CHANNEL_BLUE_BEAM_BARRIER             EQU $48
+DEF ENTITY_ANIME_CHANNEL_RISING_PLATFORM               EQU $49
+DEF ENTITY_ANIME_CHANNEL_ON_SWITCH                     EQU $4A
+DEF ENTITY_ANIME_CHANNEL_OFF_SWITCH                    EQU $4B
+DEF ENTITY_ANIME_CHANNEL_SAILOR_TOON_GIRL              EQU $4C
+DEF ENTITY_ANIME_CHANNEL_BIG_SILVER_ROBOT              EQU $4D
+DEF ENTITY_ANIME_CHANNEL_SMALL_BLUE_ROBOT              EQU $4E
+DEF ENTITY_ANIME_CHANNEL_SECBOT                        EQU $4F
+DEF ENTITY_ANIME_CHANNEL_SECBOT_PROJECTILE             EQU $50
+DEF ENTITY_ANIME_CHANNEL_ELEVATOR                      EQU $51
+DEF ENTITY_ANIME_CHANNEL_FIRE_WALL_ENEMY               EQU $52
+DEF ENTITY_ANIME_CHANNEL_GRENADE                       EQU $53
+DEF ENTITY_ANIME_CHANNEL_PLANET_O_BLAST_WEAPON         EQU $54
+DEF ENTITY_SUPERHERO_SHOW_MAD_BOMBER                   EQU $55
+DEF ENTITY_SUPERHERO_SHOW_BOMB                         EQU $56
+DEF ENTITY_SUPERHERO_SHOW_WATER_TOWER_TANK             EQU $57
+DEF ENTITY_SUPERHERO_SHOW_WATER_TOWER_STAND            EQU $58
+DEF ENTITY_SUPERHERO_SHOW_CONVICT                      EQU $59
+DEF ENTITY_SUPERHERO_SHOW_SPIDER                       EQU $5A
+DEF ENTITY_SUPERHERO_SHOW_STRAY_CAT                    EQU $5B
+DEF ENTITY_SUPERHERO_SHOW_YELLOW_GOON                  EQU $5C
+DEF ENTITY_SUPERHERO_SHOW_RAT                          EQU $5D
+DEF ENTITY_SUPERHERO_SHOW_CHOMPER_TV                   EQU $5E
+DEF ENTITY_SUPERHERO_SHOW_CRUMBLING_FLOOR              EQU $5F
+DEF ENTITY_SUPERHERO_SHOW_CONVICT_PROJECTILE           EQU $60
+DEF ENTITY_GEXTREME_SPORTS_ELF                         EQU $61
+DEF ENTITY_GEXTREME_SPORTS_BONUS_TIME_COIN             EQU $62
+DEF ENTITY_MARSUPIAL_MADNESS_BELL                      EQU $63
+DEF ENTITY_MARSUPIAL_MADNESS_BIRD                      EQU $64
+DEF ENTITY_MARSUPIAL_MADNESS_BIRD_PROJECTILE           EQU $65
+DEF ENTITY_WW_GEX_WRESTLING_ROCK_HARD                  EQU $66
+DEF ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ                    EQU $67
+DEF ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE              EQU $68
+DEF ENTITY_LIZARD_OF_OZ_CANNON                         EQU $69
+DEF ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE         EQU $6A
+DEF ENTITY_UNK6B                                       EQU $6B
+DEF ENTITY_UNK6C                                       EQU $6C
+DEF ENTITY_UNK6D                                       EQU $6D
+DEF ENTITY_CHANNEL_Z_REZ                               EQU $6E
+DEF ENTITY_UNK6F                                       EQU $6F
+DEF ENTITY_CHANNEL_Z_METEOR                            EQU $70
+DEF ENTITY_CHANNEL_Z_REZ_PROJECTILE                    EQU $71
+DEF ENTITY_LIST_TERMINATOR                             EQU $FF
 
-; Object Instance Struct
-DEF OBJECT_FIELD_OBJECT_ID                  EQU $00
-DEF OBJECT_FIELD_ACTION_ID                  EQU $01
-DEF OBJECT_FIELD_ACTION_FUNC                EQU $02
-DEF OBJECT_FIELD_SPRITE_FLAGS2              EQU $04
-DEF OBJECT_FIELD_GRAPHICS_FLAGS             EQU $05
-DEF OBJECT_FIELD_SPRITE_FRAME_COUNTER_MAX   EQU $06 ; how many frames to use this sprite
-DEF OBJECT_FIELD_SPRITE_FRAME_COUNTER       EQU $07 ; counter for the above
-DEF OBJECT_FIELD_SPRITE_COUNTER_MAX         EQU $08 ; total sprite frames for current action
-DEF OBJECT_FIELD_SPRITE_COUNTER             EQU $09 ; counter for above
-DEF OBJECT_FIELD_SPRITE_ID                  EQU $0A ; current sprite id
-DEF OBJECT_FIELD_SPRITE_IDS_PTR             EQU $0B ; ptr to sprite data (in object_animation_data.asm)
-DEF OBJECT_FIELD_FACING_DIRECTION           EQU $0D
-DEF OBJECT_FIELD_XPOS                       EQU $0E
-DEF OBJECT_FIELD_YPOS                       EQU $10
-DEF OBJECT_FIELD_WIDTH                      EQU $12 ; set to [1] into data_00_3258
-DEF OBJECT_FIELD_HEIGHT                     EQU $13 ; set to [2] into data_00_3258
-DEF OBJECT_FIELD_COLLISION_TYPE             EQU $14 ; set to [3] into data_00_3258
-DEF OBJECT_FIELD_COOLDOWN_TIMER             EQU $15 ; defaults to 0, but might get set to $3c (same value as gex's cooldown timer)
-DEF OBJECT_FIELD_DAMAGE_STATE               EQU $16 ; stores current health or other damage states
-DEF OBJECT_FIELD_SPRITE_BANK                EQU $17
-DEF OBJECT_FIELD_UNK18                      EQU $18 ; seems unused
-DEF OBJECT_FIELD_MISC_FLAGS                 EQU $19 ; only used by moving platforms, skating elf health, and sec bot?
-                                                    ; initially set to data_00_3258[object_id*8][5]
-DEF OBJECT_FIELD_MISC_TIMER                 EQU $1A ; timer which can be used for various purposes
-DEF OBJECT_FIELD_XVEL                       EQU $1B
-DEF OBJECT_FIELD_XVEL_RELATED               EQU $1C ; used with XVEL to calculate X delta
-DEF OBJECT_FIELD_YVEL                       EQU $1D
-DEF OBJECT_FIELD_UNK1E                      EQU $1E ; seems unused, likely would have been used for Y velocity delta
-DEF OBJECT_FIELD_PARENT                     EQU $1F ; stores object list index of this object's parent (used for projectiles, flies)
+; Entity Instance Struct
+DEF ENTITY_FIELD_ENTITY_ID                  EQU $00
+DEF ENTITY_FIELD_ACTION_ID                  EQU $01
+DEF ENTITY_FIELD_ACTION_FUNC                EQU $02
+DEF ENTITY_FIELD_SPRITE_FLAGS2              EQU $04
+DEF ENTITY_FIELD_GRAPHICS_FLAGS             EQU $05
+DEF ENTITY_FIELD_SPRITE_FRAME_COUNTER_MAX   EQU $06 ; how many frames to use this sprite
+DEF ENTITY_FIELD_SPRITE_FRAME_COUNTER       EQU $07 ; counter for the above
+DEF ENTITY_FIELD_SPRITE_COUNTER_MAX         EQU $08 ; total sprite frames for current action
+DEF ENTITY_FIELD_SPRITE_COUNTER             EQU $09 ; counter for above
+DEF ENTITY_FIELD_SPRITE_ID                  EQU $0A ; current sprite id
+DEF ENTITY_FIELD_SPRITE_IDS_PTR             EQU $0B ; ptr to sprite data (in entity_animation_data.asm)
+DEF ENTITY_FIELD_FACING_DIRECTION           EQU $0D
+DEF ENTITY_FIELD_XPOS                       EQU $0E
+DEF ENTITY_FIELD_YPOS                       EQU $10
+DEF ENTITY_FIELD_WIDTH                      EQU $12 ; set to [1] into data_00_3258
+DEF ENTITY_FIELD_HEIGHT                     EQU $13 ; set to [2] into data_00_3258
+DEF ENTITY_FIELD_COLLISION_TYPE             EQU $14 ; set to [3] into data_00_3258
+DEF ENTITY_FIELD_COOLDOWN_TIMER             EQU $15 ; defaults to 0, but might get set to $3c (same value as gex's cooldown timer)
+DEF ENTITY_FIELD_DAMAGE_STATE               EQU $16 ; stores current health or other damage states
+DEF ENTITY_FIELD_SPRITE_BANK                EQU $17
+DEF ENTITY_FIELD_UNK18                      EQU $18 ; seems unused
+DEF ENTITY_FIELD_MISC_FLAGS                 EQU $19 ; only used by moving platforms, skating elf health, and sec bot?
+                                                    ; initially set to data_00_3258[entity_id*8][5]
+DEF ENTITY_FIELD_MISC_TIMER                 EQU $1A ; timer which can be used for various purposes
+DEF ENTITY_FIELD_XVEL                       EQU $1B
+DEF ENTITY_FIELD_XVEL_RELATED               EQU $1C ; used with XVEL to calculate X delta
+DEF ENTITY_FIELD_YVEL                       EQU $1D
+DEF ENTITY_FIELD_UNK1E                      EQU $1E ; seems unused, likely would have been used for Y velocity delta
+DEF ENTITY_FIELD_PARENT                     EQU $1F ; stores entity list index of this entity's parent (used for projectiles, flies)
 
-; Object Spawn Struct
-DEF OBJECT_SPAWN_ID_OFFSET                  EQU $00
-DEF OBJECT_SPAWN_XPOS_OFFSET                EQU $01
-DEF OBJECT_SPAWN_YPOS_OFFSET                EQU $03
-DEF OBJECT_SPAWN_BOUNDINGBOX_XMAX_OFFSET    EQU $05
-DEF OBJECT_SPAWN_BOUNDINGBOX_XMIN_OFFSET    EQU $07
-DEF OBJECT_SPAWN_BOUNDINGBOX_YMIN_OFFSET    EQU $09
-DEF OBJECT_SPAWN_BOUNDINGBOX_YMAX_OFFSET    EQU $0B
-DEF OBJECT_SPAWN_PARAMETER_OFFSET           EQU $0D ; usually id used for collectibles, but sometimes contains a timer value
-DEF OBJECT_SPAWN_MAP_OFFSET                 EQU $0F
+; Entity Spawn Struct
+DEF ENTITY_SPAWN_ID_OFFSET                  EQU $00
+DEF ENTITY_SPAWN_XPOS_OFFSET                EQU $01
+DEF ENTITY_SPAWN_YPOS_OFFSET                EQU $03
+DEF ENTITY_SPAWN_BOUNDINGBOX_XMAX_OFFSET    EQU $05
+DEF ENTITY_SPAWN_BOUNDINGBOX_XMIN_OFFSET    EQU $07
+DEF ENTITY_SPAWN_BOUNDINGBOX_YMIN_OFFSET    EQU $09
+DEF ENTITY_SPAWN_BOUNDINGBOX_YMAX_OFFSET    EQU $0B
+DEF ENTITY_SPAWN_PARAMETER_OFFSET           EQU $0D ; usually id used for collectibles, but sometimes contains a timer value
+DEF ENTITY_SPAWN_MAP_OFFSET                 EQU $0F
 
-; Object Facing Direction values
-DEF OBJECT_FACING_RIGHT                 EQU $00
-DEF OBJECT_FACING_LEFT                  EQU $20
-DEF OBJECT_FACING_VERTICAL_CHANGE       EQU $40
-DEF OBJECT_FACING_UNK_FLAG              EQU $80
+; Entity Facing Direction values
+DEF ENTITY_FACING_RIGHT                 EQU $00
+DEF ENTITY_FACING_LEFT                  EQU $20
+DEF ENTITY_FACING_VERTICAL_CHANGE       EQU $40
+DEF ENTITY_FACING_UNK_FLAG              EQU $80
 
-; Object position relative to Gex
-DEF OBJECT_LEFT_OF_GEX       EQU $00
-DEF OBJECT_RIGHT_OF_GEX      EQU $20
+; Entity position relative to Gex
+DEF ENTITY_LEFT_OF_GEX       EQU $00
+DEF ENTITY_RIGHT_OF_GEX      EQU $20
 
-; Object flags, used in wD700_ObjectFlags
-DEF OBJECT_FLAG_80_ACTIVE    EQU $80
+; Entity flags, used in wD700_EntityFlags
+DEF ENTITY_FLAG_80_ACTIVE    EQU $80
 
-; Player vs Object interactions
-DEF PLAYER_TOUCHED_OBJECT    EQU $00
-DEF PLAYER_ATTACKED_OBJECT   EQU $01
-DEF PLAYER_STOMPED_OBJECT    EQU $02
+; Player vs Entity interactions
+DEF PLAYER_TOUCHED_ENTITY    EQU $00
+DEF PLAYER_ATTACKED_ENTITY   EQU $01
+DEF PLAYER_STOMPED_ENTITY    EQU $02
 
 ; Frame timer values
 DEF TIMER_AMOUNT_0_FRAMES                  EQU $00
@@ -460,9 +460,9 @@ DEF SONG_NONE                              EQU $FF
 ; Collision Types
 DEF COLLISION_TYPE_NONE                      EQU $00
 DEF COLLISION_TYPE_PLATFORM                  EQU $01
-DEF COLLISION_TYPE_INVULNERABLE_ENEMY        EQU $02 ; player can be damaged by this object, but cannot damage it
-DEF COLLISION_TYPE_PROJECTILE                EQU $03 ; the object is destroyed after damaging player 
-DEF COLLISION_TYPE_GENERIC_ENEMY             EQU $04 ; the object remains after damaging player. player can damage this enemy.
+DEF COLLISION_TYPE_INVULNERABLE_ENEMY        EQU $02 ; player can be damaged by this entity, but cannot damage it
+DEF COLLISION_TYPE_PROJECTILE                EQU $03 ; the entity is destroyed after damaging player 
+DEF COLLISION_TYPE_GENERIC_ENEMY             EQU $04 ; the entity remains after damaging player. player can damage this enemy.
 DEF COLLISION_TYPE_GENERIC_ENEMY_UNUSED      EQU $05 ; seems unused
 DEF COLLISION_TYPE_DAMAGE_PLAYER_UNUSED      EQU $06 ; seems unused
 DEF COLLISION_TYPE_BONUS_COIN                EQU $07
@@ -587,6 +587,6 @@ DEF PLAYER_IN_WATER          EQU $20
 DEF PLAYER_UNK40             EQU $40 ; unused?
 DEF PLAYER_CLIMBING          EQU $80
 
-; Object Action Ids
-DEF OBJECTACTION_PENGUIN_WALK_OR_RUN             EQU $00
-DEF OBJECTACTION_PENGUIN_JUMP                    EQU $01
+; Entity Action Ids
+DEF ENTITYACTION_PENGUIN_WALK_OR_RUN             EQU $00
+DEF ENTITYACTION_PENGUIN_JUMP                    EQU $01

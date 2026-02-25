@@ -34,7 +34,7 @@ $(BUILDDIR)/rom.o $(BUILDDIR)/rom.mk: src/main.asm $(patsubst src/gfx/%.png,src/
 		-o $(BUILDDIR)/rom.o $<
 
 # Special gfx processing flags
-src/.gfx/object_sprites/%.bin: rgbgfx += --columns
+src/.gfx/entity_sprites/%.bin: rgbgfx += --columns
 src/.gfx/misc_sprites/%.bin: rgbgfx += --columns
 src/.gfx/text/%.bin: rgbgfx += --columns
 src/.gfx/collision_tileset/%.bin: rgbgfx += -d 1

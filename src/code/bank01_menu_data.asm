@@ -105,7 +105,7 @@ data_01_512e:
 data_01_53c6_MenuTypeData:
     dw   data_01_559a                                  ;; 01:53c6 pP
     db   $00, $02, $20, $54, $00, $10, $d3, $04        ;; 01:53c8 ........
-    dw   call_01_43c3_LoadMenuObjectPalette                                  ;; 01:53d0 pP
+    dw   call_01_43c3_LoadMenuEntityPalette                                  ;; 01:53d0 pP
     db   $00, $00, $00, $00                            ;; 01:53d2 ????
     dw   data_01_55c3                                  ;; 01:53d6 pP
     db   $01, $12, $08, $20, $18, $18, $d3, $07        ;; 01:53d8 ........

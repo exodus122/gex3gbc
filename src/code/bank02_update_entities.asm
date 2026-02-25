@@ -1,22 +1,22 @@
-call_02_708f_InitObjectsAndSpawnPlayer:
-; Purpose: Initializes core object-related state when entering a level or respawning the player.
+call_02_708f_InitEntitiesAndSpawnPlayer:
+; Purpose: Initializes core entity-related state when entering a level or respawning the player.
 ; Details:
-; Clears many object/flag variables (wDC84–wDC8F, wDABD_UnkBGCollisionFlags–wDABE_UnkBGCollisionFlags2, etc.).
-; If a pending action ID exists in wDC78_PlayerActionIdRelated, sets it up it using call_02_72ac_SetObjectAction.
-; Resets player-facing direction and flags, calls call_02_7123_ClearObjectSlotsExcludingPlayer to clear object slots, 
-; and spawns required relative objects.
-; Loops through call_00_360c_SpawnObjectOnceImmediate until the player object (wDAB8_ObjectCounter == 1) is spawned.
+; Clears many entity/flag variables (wDC84–wDC8F, wDABD_UnkBGCollisionFlags–wDABE_UnkBGCollisionFlags2, etc.).
+; If a pending action ID exists in wDC78_PlayerActionIdRelated, sets it up it using call_02_72ac_SetEntityAction.
+; Resets player-facing direction and flags, calls call_02_7123_ClearEntitySlotsExcludingPlayer to clear entity slots, 
+; and spawns required relative entities.
+; Loops through call_00_360c_SpawnEntityOnceImmediate until the player entity (wDAB8_EntityCounter == 1) is spawned.
     xor  A, A                                          ;; 02:708f $af
     ld   [wDB6A_WarpFlags], A                                    ;; 02:7090 $ea $6a $db
     ld   A, [wDC78_PlayerActionIdRelated]                                    ;; 02:7093 $fa $78 $dc
     cp   A, $ff                                        ;; 02:7096 $fe $ff
     jr   Z, .jr_02_70d1                                ;; 02:7098 $28 $37
     xor  A, A                                          ;; 02:709a $af
-    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 02:709b $ea $00 $da
+    ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 02:709b $ea $00 $da
     ld   A, $00                                        ;; 02:709e $3e $00
     ld   [wD800_Player_Id], A                                    ;; 02:70a0 $ea $00 $d8
     ld   A, [wDC78_PlayerActionIdRelated]                                    ;; 02:70a3 $fa $78 $dc
-    call call_02_72ac_SetObjectAction                                  ;; 02:70a6 $cd $ac $72
+    call call_02_72ac_SetEntityAction                                  ;; 02:70a6 $cd $ac $72
     ld   A, $ff                                        ;; 02:70a9 $3e $ff
     ld   [wDC78_PlayerActionIdRelated], A                                    ;; 02:70ab $ea $78 $dc
     ld   A, $00                                        ;; 02:70ae $3e $00
@@ -30,7 +30,7 @@ call_02_708f_InitObjectsAndSpawnPlayer:
     ld   [wDC8D], A                                    ;; 02:70c2 $ea $8d $dc
     ld   [wDC8E_InitialYVelocity], A                                    ;; 02:70c5 $ea $8e $dc
     ld   [wDC8F], A                                    ;; 02:70c8 $ea $8f $dc
-    ld   [wDC88_CurrentObject_UnkVerticalOffset], A                                    ;; 02:70cb $ea $88 $dc
+    ld   [wDC88_CurrentEntity_UnkVerticalOffset], A                                    ;; 02:70cb $ea $88 $dc
     ld   [wDC80_Player_UnkStates], A                                    ;; 02:70ce $ea $80 $dc
 .jr_02_70d1:
     xor  A, A                                          ;; 02:70d1 $af
@@ -41,37 +41,37 @@ call_02_708f_InitObjectsAndSpawnPlayer:
     ld   A, $ff                                        ;; 02:70de $3e $ff
     ld   [wDC79], A                                    ;; 02:70e0 $ea $79 $dc
     xor  A, A                                          ;; 02:70e3 $af
-    ld   [wDC7B_CurrentObjectAddrLoAlt], A                                    ;; 02:70e4 $ea $7b $dc
+    ld   [wDC7B_CurrentEntityAddrLoAlt], A                                    ;; 02:70e4 $ea $7b $dc
     ld   [wDC7C_PlayerCollisionUnusedFlag], A                                    ;; 02:70e7 $ea $7c $dc
-    ld   [wDC7B_CurrentObjectAddrLoAlt2], A                                    ;; 02:70ea $ea $7d $dc
-    call call_02_7123_ClearObjectSlotsExcludingPlayer                                  ;; 02:70ed $cd $23 $71
+    ld   [wDC7B_CurrentEntityAddrLoAlt2], A                                    ;; 02:70ea $ea $7d $dc
+    call call_02_7123_ClearEntitySlotsExcludingPlayer                                  ;; 02:70ed $cd $23 $71
     ld   A, [wDB6D]                                    ;; 02:70f0 $fa $6d $db
     and  A, A                                          ;; 02:70f3 $a7
     jr   Z, .jr_02_7115                                ;; 02:70f4 $28 $1f
     xor  A, A                                          ;; 02:70f6 $af
-    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 02:70f7 $ea $00 $da
+    ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 02:70f7 $ea $00 $da
     ld   C, $19                                        ;; 02:70fa $0e $19
-    call call_00_3792_PrepareRelativeObjectSpawn                                  ;; 02:70fc $cd $92 $37
-    ld   C, OBJECT_BONUS_STAGE_TIMER                                        ;; 02:70ff $0e $1b
-    call call_00_29ce_Object_CheckExists                                  ;; 02:7101 $cd $ce $29
+    call call_00_3792_PrepareRelativeEntitySpawn                                  ;; 02:70fc $cd $92 $37
+    ld   C, ENTITY_BONUS_STAGE_TIMER                                        ;; 02:70ff $0e $1b
+    call call_00_29ce_Entity_CheckExists                                  ;; 02:7101 $cd $ce $29
     jr   NZ, .jr_02_7115                               ;; 02:7104 $20 $0f
     ld   A, L                                          ;; 02:7106 $7d
-    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 02:7107 $ea $00 $da
-    farcall call_02_5bb3_ObjectAction_UpdateBonusStageTimer
+    ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 02:7107 $ea $00 $da
+    farcall call_02_5bb3_EntityAction_UpdateBonusStageTimer
 .jr_02_7115:
-    call call_00_3252_ResetObjectCounter                                  ;; 02:7115 $cd $52 $32
+    call call_00_3252_ResetEntityCounter                                  ;; 02:7115 $cd $52 $32
 .jr_02_7118:
-    call call_00_360c_SpawnObjectOnceImmediate                                  ;; 02:7118 $cd $0c $36
-    ld   A, [wDAB8_ObjectCounter]                                    ;; 02:711b $fa $b8 $da
+    call call_00_360c_SpawnEntityOnceImmediate                                  ;; 02:7118 $cd $0c $36
+    ld   A, [wDAB8_EntityCounter]                                    ;; 02:711b $fa $b8 $da
     cp   A, $01                                        ;; 02:711e $fe $01
     jr   NZ, .jr_02_7118                               ;; 02:7120 $20 $f6
     ret                                                ;; 02:7122 $c9
 
-call_02_7123_ClearObjectSlotsExcludingPlayer:
-; Purpose: Clears seven 32-byte object slots by filling them with $FF.
+call_02_7123_ClearEntitySlotsExcludingPlayer:
+; Purpose: Clears seven 32-byte entity slots by filling them with $FF.
 ; Details:
-; Starts at wD820_ObjectMemoryAfterPlayer, increments by $20 each time, repeats 7 times.
-    ld   HL, wD820_ObjectMemoryAfterPlayer                                     ;; 02:7123 $21 $20 $d8
+; Starts at wD820_EntityMemoryAfterPlayer, increments by $20 each time, repeats 7 times.
+    ld   HL, wD820_EntityMemoryAfterPlayer                                     ;; 02:7123 $21 $20 $d8
     ld   DE, $20                                       ;; 02:7126 $11 $20 $00
     ld   B, $07                                        ;; 02:7129 $06 $07
 .jr_02_712b:
@@ -81,14 +81,14 @@ call_02_7123_ClearObjectSlotsExcludingPlayer:
     jr   NZ, .jr_02_712b                               ;; 02:712f $20 $fa
     ret                                                ;; 02:7131 $c9
 
-call_02_7132_BackupObjectTable:
-; Purpose: Copies all current object table entries from working memory (wD800) to a backup buffer 
-; (wDA09_LoadedObjectIdsBackupBuffer).
+call_02_7132_BackupEntityTable:
+; Purpose: Copies all current entity table entries from working memory (wD800) to a backup buffer 
+; (wDA09_LoadedEntityIdsBackupBuffer).
 ; Details:
-; Iterates through object slots in steps of $20, copying each byte until wrap-around.
+; Iterates through entity slots in steps of $20, copying each byte until wrap-around.
 ; This is used when pausing
     ld   HL, wD800_Player_Id                                     ;; 02:7132 $21 $00 $d8
-    ld   DE, wDA09_LoadedObjectIdsBackupBuffer                                     ;; 02:7135 $11 $09 $da
+    ld   DE, wDA09_LoadedEntityIdsBackupBuffer                                     ;; 02:7135 $11 $09 $da
 .jr_02_7138:
     ld   A, [HL]                                       ;; 02:7138 $7e
     ld   [DE], A                                       ;; 02:7139 $12
@@ -99,13 +99,13 @@ call_02_7132_BackupObjectTable:
     jr   NZ, .jr_02_7138                               ;; 02:713f $20 $f7
     ret                                                ;; 02:7141 $c9
 
-call_02_7142_RestoreObjectTable:
-; Purpose: Restores object table entries from the backup buffer back to working memory.
+call_02_7142_RestoreEntityTable:
+; Purpose: Restores entity table entries from the backup buffer back to working memory.
 ; Details:
-; Reverse of BackupObjectTable, writing from wDA09_LoadedObjectIdsBackupBuffer back to wD800.
+; Reverse of BackupEntityTable, writing from wDA09_LoadedEntityIdsBackupBuffer back to wD800.
 ; This is used when unpausing
     ld   HL, wD800_Player_Id                                     ;; 02:7142 $21 $00 $d8
-    ld   DE, wDA09_LoadedObjectIdsBackupBuffer                                     ;; 02:7145 $11 $09 $da
+    ld   DE, wDA09_LoadedEntityIdsBackupBuffer                                     ;; 02:7145 $11 $09 $da
 .jr_02_7148:
     ld   A, [DE]                                       ;; 02:7148 $1a
     ld   [HL], A                                       ;; 02:7149 $77
@@ -116,15 +116,15 @@ call_02_7142_RestoreObjectTable:
     jr   NZ, .jr_02_7148                               ;; 02:714f $20 $f7
     ret                                                ;; 02:7151 $c9
 
-call_02_7152_UpdateAllObjects:
-; Purpose: Master routine for per-frame object updates and player-related checks.
+call_02_7152_UpdateAllEntities:
+; Purpose: Master routine for per-frame entity updates and player-related checks.
 ; Details:
 ; Resets temporary flags and checks conditions in wDCA7_DrawGexFlag.
 ; Handles special cases for player actions/IDs, adjusts player Y-position (wD810/wD811).
-; Invokes object behavior routines (call_00_0f22_JumpHL) for special objects (wDC7B_CurrentObjectAddrLoAlt, wDC7B_CurrentObjectAddrLoAlt2).
+; Invokes entity behavior routines (call_00_0f22_JumpHL) for special entities (wDC7B_CurrentEntityAddrLoAlt, wDC7B_CurrentEntityAddrLoAlt2).
 ; Calls call_02_72fb_UpdateMapWindow to update the scrolling window and environment.
-; Iterates through all objects (wDA00_CurrentObjectAddrLo) to run their update logic and 
-; finally triggers graphics updates via banked call call_03_5ec1_UpdateAllObjectsGraphicsAndCollision.
+; Iterates through all entities (wDA00_CurrentEntityAddrLo) to run their update logic and 
+; finally triggers graphics updates via banked call call_03_5ec1_UpdateAllEntitiesGraphicsAndCollision.
     xor  A, A                                          ;; 02:7152 $af
     ld   [wDC85], A                                    ;; 02:7153 $ea $85 $dc
     ld   [wDC84], A                                    ;; 02:7156 $ea $84 $dc
@@ -170,22 +170,22 @@ call_02_7152_UpdateAllObjects:
     ld   HL, wDC84                                     ;; 02:71a5 $21 $84 $dc
     ld   [HL], C                                       ;; 02:71a8 $71
 .jr_02_71a9:
-    ld   A, [wDC7B_CurrentObjectAddrLoAlt]                                    ;; 02:71a9 $fa $7b $dc
+    ld   A, [wDC7B_CurrentEntityAddrLoAlt]                                    ;; 02:71a9 $fa $7b $dc
     and  A, A                                          ;; 02:71ac $a7
     jr   Z, .jr_02_71e4                                ;; 02:71ad $28 $35
-    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 02:71af $ea $00 $da
+    ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 02:71af $ea $00 $da
     or   A, $02                                        ;; 02:71b2 $f6 $02
     ld   L, A                                          ;; 02:71b4 $6f
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:71b5 $26 $d8
+    ld   H, HIGH(wD800_EntityMemory)                                        ;; 02:71b5 $26 $d8
     ld   A, [HL+]                                      ;; 02:71b7 $2a
     ld   H, [HL]                                       ;; 02:71b8 $66
     ld   L, A                                          ;; 02:71b9 $6f
     call call_00_0f22_JumpHL                                  ;; 02:71ba $cd $22 $0f
-    ld   A, [wDC7B_CurrentObjectAddrLoAlt]                                    ;; 02:71bd $fa $7b $dc
+    ld   A, [wDC7B_CurrentEntityAddrLoAlt]                                    ;; 02:71bd $fa $7b $dc
     and  A, A                                          ;; 02:71c0 $a7
     jr   Z, .jr_02_71e4                                ;; 02:71c1 $28 $21
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:71c3 $26 $d8
-    ld   A, [wDC7B_CurrentObjectAddrLoAlt]                                    ;; 02:71c5 $fa $7b $dc
+    ld   H, HIGH(wD800_EntityMemory)                                        ;; 02:71c3 $26 $d8
+    ld   A, [wDC7B_CurrentEntityAddrLoAlt]                                    ;; 02:71c5 $fa $7b $dc
     and  A, $e0                                        ;; 02:71c8 $e6 $e0
     or   A, $10                                        ;; 02:71ca $f6 $10
     ld   L, A                                          ;; 02:71cc $6f
@@ -205,65 +205,65 @@ call_02_7152_UpdateAllObjects:
     sbc  A, $00                                        ;; 02:71df $de $00
     ld   [wD810_PlayerYPosition+1], A                                    ;; 02:71e1 $ea $11 $d8
 .jr_02_71e4:
-    ld   A, [wDC7B_CurrentObjectAddrLoAlt2]                                    ;; 02:71e4 $fa $7d $dc
+    ld   A, [wDC7B_CurrentEntityAddrLoAlt2]                                    ;; 02:71e4 $fa $7d $dc
     and  A, A                                          ;; 02:71e7 $a7
     jr   Z, .jr_02_71f8                                ;; 02:71e8 $28 $0e
-    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 02:71ea $ea $00 $da
+    ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 02:71ea $ea $00 $da
     or   A, $02                                        ;; 02:71ed $f6 $02
     ld   L, A                                          ;; 02:71ef $6f
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:71f0 $26 $d8
+    ld   H, HIGH(wD800_EntityMemory)                                        ;; 02:71f0 $26 $d8
     ld   A, [HL+]                                      ;; 02:71f2 $2a
     ld   H, [HL]                                       ;; 02:71f3 $66
     ld   L, A                                          ;; 02:71f4 $6f
     call call_00_0f22_JumpHL                                  ;; 02:71f5 $cd $22 $0f
 .jr_02_71f8:
     ld   A, $00                                        ;; 02:71f8 $3e $00
-    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 02:71fa $ea $00 $da
+    ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 02:71fa $ea $00 $da
     call call_02_4f32_PlayerUpdateMain                                  ;; 02:71fd $cd $32 $4f
 .jp_02_7200:
     call call_02_72fb_UpdateMapWindow                                  ;; 02:7200 $cd $fb $72
     ld   A, $20                                        ;; 02:7203 $3e $20
 .jr_02_7205:
-    ld   [wDA00_CurrentObjectAddrLo], A                                    ;; 02:7205 $ea $00 $da
+    ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 02:7205 $ea $00 $da
     or   A, $00                                        ;; 02:7208 $f6 $00
     ld   L, A                                          ;; 02:720a $6f
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:720b $26 $d8
+    ld   H, HIGH(wD800_EntityMemory)                                        ;; 02:720b $26 $d8
     ld   A, [HL]                                       ;; 02:720d $7e
     cp   A, $ff                                        ;; 02:720e $fe $ff
     jr   Z, .jr_02_723a                                ;; 02:7210 $28 $28
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:7212 $fa $00 $da
-    ld   HL, wDC7B_CurrentObjectAddrLoAlt                                     ;; 02:7215 $21 $7b $dc
+    ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 02:7212 $fa $00 $da
+    ld   HL, wDC7B_CurrentEntityAddrLoAlt                                     ;; 02:7215 $21 $7b $dc
     cp   A, [HL]                                       ;; 02:7218 $be
     jr   Z, .jr_02_722c                                ;; 02:7219 $28 $11
-    ld   HL, wDC7B_CurrentObjectAddrLoAlt2                                     ;; 02:721b $21 $7d $dc
+    ld   HL, wDC7B_CurrentEntityAddrLoAlt2                                     ;; 02:721b $21 $7d $dc
     cp   A, [HL]                                       ;; 02:721e $be
     jr   Z, .jr_02_722c                                ;; 02:721f $28 $0b
     or   A, $02                                        ;; 02:7221 $f6 $02
     ld   L, A                                          ;; 02:7223 $6f
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:7224 $26 $d8
+    ld   H, HIGH(wD800_EntityMemory)                                        ;; 02:7224 $26 $d8
     ld   A, [HL+]                                      ;; 02:7226 $2a
     ld   H, [HL]                                       ;; 02:7227 $66
     ld   L, A                                          ;; 02:7228 $6f
     call call_00_0f22_JumpHL                                  ;; 02:7229 $cd $22 $0f
 .jr_02_722c:
-    LOAD_OBJ_FIELD_TO_HL OBJECT_FIELD_OBJECT_ID
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_ENTITY_ID
     ld   A, [HL]                                       ;; 02:7234 $7e
     cp   A, $ff                                        ;; 02:7235 $fe $ff
-    call NZ, call_02_724d_UpdateObjectAnimationTimersAndSpriteId                              ;; 02:7237 $c4 $4d $72
+    call NZ, call_02_724d_UpdateEntityAnimationTimersAndSpriteId                              ;; 02:7237 $c4 $4d $72
 .jr_02_723a:
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:723a $fa $00 $da
+    ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 02:723a $fa $00 $da
     add  A, $20                                        ;; 02:723d $c6 $20
     jr   NZ, .jr_02_7205                               ;; 02:723f $20 $c4
-    farcall call_03_5ec1_UpdateAllObjectsGraphicsAndCollision
+    farcall call_03_5ec1_UpdateAllEntitiesGraphicsAndCollision
     ret                                                ;; 02:724c $c9
 
-call_02_724d_UpdateObjectAnimationTimersAndSpriteId:
-; Purpose: Handles countdown timers, state flags, and transitions for an individual object slot.
+call_02_724d_UpdateEntityAnimationTimersAndSpriteId:
+; Purpose: Handles countdown timers, state flags, and transitions for an individual entity slot.
 ; Details:
 ; Decrements a timer; when it reaches zero, reloads counters, updates flags (set 2, set 1), and fetches new data from tables.
-; Can trigger reinitialization via call_02_54f9_SwitchPlayerAction or call_02_72ac_SetObjectAction.
-; Updates related memory locations with new object state values.
-    LOAD_OBJ_FIELD_TO_HL_ALT OBJECT_FIELD_SPRITE_FLAGS2
+; Can trigger reinitialization via call_02_54f9_SwitchPlayerAction or call_02_72ac_SetEntityAction.
+; Updates related memory locations with new entity state values.
+    LOAD_OBJ_FIELD_TO_HL_ALT ENTITY_FIELD_SPRITE_FLAGS2
     ld   E, [HL]                                       ;; 02:7255 $5e ; e = flags (04)
     inc  L                                             ;; 02:7256 $2c
     res  2, [HL]                                       ;; 02:7257 $cb $96 ; unset bit 2 in unk05
@@ -286,11 +286,11 @@ call_02_724d_UpdateObjectAnimationTimersAndSpriteId:
     bit  7, E                                          ;; 02:726b $cb $7b ; check if bit 7 of flags is set
     jr   Z, .jr_02_727c                                ;; 02:726d $28 $0d ; if unset, jump
     res  7, E                                          ;; 02:726f $cb $bb
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:7271 $fa $00 $da
+    ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 02:7271 $fa $00 $da
     and  A, A                                          ;; 02:7274 $a7
     ld   A, E                                          ;; 02:7275 $7b
     jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:7276 $ca $f9 $54
-    jp   call_02_72ac_SetObjectAction                                  ;; 02:7279 $c3 $ac $72
+    jp   call_02_72ac_SetEntityAction                                  ;; 02:7279 $c3 $ac $72
 .jr_02_727c:
     bit  3, B                                          ;; 02:727c $cb $58 ; check if bit 3 of unk05 is set
     jr   Z, .jr_02_7282                                ;; 02:727e $28 $02
@@ -303,7 +303,7 @@ call_02_724d_UpdateObjectAnimationTimersAndSpriteId:
     dec  L                                             ;; 02:7285 $2d
     set  2, [HL]                                       ;; 02:7286 $cb $d6 ; set bit 2 (04) in unk05
 .jr_02_7288:
-    ld   A, [wDA00_CurrentObjectAddrLo]                ;; 02:7288 $fa $00 $da
+    ld   A, [wDA00_CurrentEntityAddrLo]                ;; 02:7288 $fa $00 $da
     or   A, $05                                        ;; 02:728b $f6 $05
     ld   L, A                                          ;; 02:728d $6f
     set  1, [HL]                                       ;; 02:728e $cb $ce ; set bit 1 (02) in unk05
@@ -315,39 +315,39 @@ call_02_724d_UpdateObjectAnimationTimersAndSpriteId:
     inc  L                                             ;; 02:7297 $2c
     push HL                                            ;; 02:7298 $e5 ; push d8?a
     inc  L                                             ;; 02:7299 $2c
-    ld   A, [HL+]                                      ;; 02:729a $2a ; a = unk0b (OBJECT_FIELD_SPRITE_IDS_PTR)
+    ld   A, [HL+]                                      ;; 02:729a $2a ; a = unk0b (ENTITY_FIELD_SPRITE_IDS_PTR)
     ld   H, [HL]                                       ;; 02:729b $66
-    ld   L, A                                          ;; 02:729c $6f ; hl = unk0b unk0c (OBJECT_FIELD_SPRITE_IDS_PTR)
-    add  HL, DE                                        ;; 02:729d $19 ; hl = OBJECT_FIELD_SPRITE_IDS_PTR + 0000 + unk09
+    ld   L, A                                          ;; 02:729c $6f ; hl = unk0b unk0c (ENTITY_FIELD_SPRITE_IDS_PTR)
+    add  HL, DE                                        ;; 02:729d $19 ; hl = ENTITY_FIELD_SPRITE_IDS_PTR + 0000 + unk09
     ld   A, [HL]                                       ;; 02:729e $7e ; a = [hl]
     pop  HL                                            ;; 02:729f $e1 ; pop d8?a
     ld   [HL], A                                       ;; 02:72a0 $77 ; d8?a = a
 
 call_02_72a1_CheckIfPlayerActorUpdatedAction:
-; Mark Object Slot Active
+; Mark Entity Slot Active
 ; Description:
-; Checks if wDA00_CurrentObjectAddrLo is zero (no active object). If so, sets bit0 of 
+; Checks if wDA00_CurrentEntityAddrLo is zero (no active entity). If so, sets bit0 of 
 ; wDB66_HDMATransferFlags, likely to indicate that the player actor has changed it's action.
-    ld   A, [wDA00_CurrentObjectAddrLo]                                    ;; 02:72a1 $fa $00 $da
+    ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 02:72a1 $fa $00 $da
     and  A, A                                          ;; 02:72a4 $a7
     ret  NZ                                            ;; 02:72a5 $c0
     ld   HL, wDB66_HDMATransferFlags                                     ;; 02:72a6 $21 $66 $db
     set  0, [HL]                                       ;; 02:72a9 $cb $c6
     ret                                                ;; 02:72ab $c9
 
-call_02_72ac_SetObjectAction:
-; Purpose: Loads an object's initialization data from a data table 
+call_02_72ac_SetEntityAction:
+; Purpose: Loads an entity's initialization data from a data table 
 ; (data_02_4000) into its slot in working memory.
 ; Details:
-; Uses the object ID (masked with $7F) as an index into the object data table.
-; Copies attributes like behavior pointers and timers into the object's memory slot.
-; Sets auxiliary values and flags (wDB66_HDMATransferFlags bit 0) to indicate a new object was loaded.
+; Uses the entity ID (masked with $7F) as an index into the entity data table.
+; Copies attributes like behavior pointers and timers into the entity's memory slot.
+; Sets auxiliary values and flags (wDB66_HDMATransferFlags bit 0) to indicate a new entity was loaded.
     and  A, $7f                                        ;; 02:72ac $e6 $7f
-    ld   HL, wDA00_CurrentObjectAddrLo                   ;; 02:72ae $21 $00 $da
+    ld   HL, wDA00_CurrentEntityAddrLo                   ;; 02:72ae $21 $00 $da
     ld   L, [HL]                                       ;; 02:72b1 $6e
     inc  L                                             ;; 02:72b2 $2c
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:72b3 $26 $d8
-    ld   [HL-], A                                      ;; 02:72b5 $32 ; writes new action id to object instance
+    ld   H, HIGH(wD800_EntityMemory)                                        ;; 02:72b3 $26 $d8
+    ld   [HL-], A                                      ;; 02:72b5 $32 ; writes new action id to entity instance
     ld   L, [HL]                                       ;; 02:72b6 $6e
     ld   H, $00                                        ;; 02:72b7 $26 $00
     add  HL, HL                                        ;; 02:72b9 $29
@@ -356,14 +356,14 @@ call_02_72ac_SetObjectAction:
     ld   E, [HL]                                       ;; 02:72be $5e
     inc  HL                                            ;; 02:72bf $23
     ld   D, [HL]                                       ;; 02:72c0 $56
-    ld   L, A                                          ;; 02:72c1 $6f ; at this point, DE = ptr to the object's action table
+    ld   L, A                                          ;; 02:72c1 $6f ; at this point, DE = ptr to the entity's action table
     ld   H, $00                                        ;; 02:72c2 $26 $00
     add  HL, HL                                        ;; 02:72c4 $29
     add  HL, HL                                        ;; 02:72c5 $29
     add  HL, DE                                        ;; 02:72c6 $19
     ld   C, L                                          ;; 02:72c7 $4d
-    ld   B, H                                          ;; 02:72c8 $44 ; HL and BC are ptrs to an object action table entry
-    LOAD_OBJ_FIELD_TO_HL_ALT OBJECT_FIELD_ACTION_FUNC
+    ld   B, H                                          ;; 02:72c8 $44 ; HL and BC are ptrs to an entity action table entry
+    LOAD_OBJ_FIELD_TO_HL_ALT ENTITY_FIELD_ACTION_FUNC
     ld   A, [BC]                                       ;; 02:72d1 $0a
     ld   [HL+], A                                      ;; 02:72d2 $22
     inc  BC                                            ;; 02:72d3 $03

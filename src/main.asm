@@ -6,21 +6,20 @@ INCLUDE "code/macros/macros.asm"
 SECTION "bank00", ROM0[$0000]
 INCLUDE "code/bank00_home.asm"
 INCLUDE "code/bank00_maps_core.asm"
-INCLUDE "code/bank00_object_utils.asm"
-INCLUDE "code/bank00_objects_core.asm"
+INCLUDE "code/bank00_entity_utils.asm"
+INCLUDE "code/bank00_entities_core.asm"
 
 SECTION "bank01", ROMX[$4000], BANK[$01]
 INCLUDE "code/bank01_menus.asm"
-INCLUDE "code/bank01_password_menu.asm"
 INCLUDE "code/bank01_menu_data.asm"
 
 SECTION "bank02", ROMX[$4000], BANK[$02]
-INCLUDE "code/bank02_object_pointer_tables.asm"
+INCLUDE "code/bank02_entity_pointer_tables.asm"
 INCLUDE "code/bank02_player_actions.asm"
 INCLUDE "code/bank02_update_player.asm"
-INCLUDE "code/bank02_object_actions.asm"
-INCLUDE "code/bank02_update_objects.asm"
-INCLUDE "code/bank02_object_animation_data.asm"
+INCLUDE "code/bank02_entity_actions.asm"
+INCLUDE "code/bank02_update_entities.asm"
+INCLUDE "code/bank02_entity_animation_data.asm"
 
 SECTION "bank03", ROMX[$4000], BANK[$03]
 data_03_4000_bg_collision_tileset_flags:
@@ -33,8 +32,8 @@ image_003_4400:
 image_003_4580:
     INCBIN ".gfx/misc_sprites/image_003_4580.bin"
 INCLUDE "code/bank03_bg_collision.asm"
-INCLUDE "code/bank03_object_collision.asm"
-INCLUDE "code/bank03_object_graphics.asm"
+INCLUDE "code/bank03_entity_collision.asm"
+INCLUDE "code/bank03_entity_graphics.asm"
 INCLUDE "code/bank03_map_boundaries_and_spawns.asm"
 INCLUDE "code/bank03_palettes.asm"
 INCLUDE "code/bank03_map_metadata.asm"
@@ -86,7 +85,7 @@ image_006_67c6_palette_ids:
 
 SECTION "bank07", ROMX[$4000], BANK[$07]
 image_007_4000:
-    INCBIN ".gfx/object_sprites/image_007_4000.bin"
+    INCBIN ".gfx/entity_sprites/image_007_4000.bin"
 image_007_5b00:
     INCBIN ".gfx/menu_tilesets/image_007_5b00.bin"
 image_007_5b00_bgmap_tile_ids:
@@ -94,41 +93,41 @@ image_007_5b00_bgmap_tile_ids:
 
 SECTION "bank08", ROMX[$4000], BANK[$08]
 image_08_4000:
-    INCBIN ".gfx/object_sprites/image_008_4000.bin"
+    INCBIN ".gfx/entity_sprites/image_008_4000.bin"
 
 SECTION "bank09", ROMX[$4000], BANK[$09]
 image_09_4000:
-    INCBIN ".gfx/object_sprites/image_009_4000.bin"
+    INCBIN ".gfx/entity_sprites/image_009_4000.bin"
 
 SECTION "bank0a", ROMX[$4000], BANK[$0A]
 image_0a_4000:
-    INCBIN ".gfx/object_sprites/image_00a_4000.bin"
+    INCBIN ".gfx/entity_sprites/image_00a_4000.bin"
 image_0a_6000:
-    INCBIN ".gfx/object_sprites/image_00a_6000.bin"
+    INCBIN ".gfx/entity_sprites/image_00a_6000.bin"
 
 SECTION "bank0b", ROMX[$4000], BANK[$0B]
 image_0b_4000:
-    INCBIN ".gfx/object_sprites/image_00b_4000.bin"
+    INCBIN ".gfx/entity_sprites/image_00b_4000.bin"
 
 SECTION "bank0c", ROMX[$4000], BANK[$0C]
 image_0c_4000:
-    INCBIN ".gfx/object_sprites/image_00c_4000.bin"
+    INCBIN ".gfx/entity_sprites/image_00c_4000.bin"
 
 SECTION "bank0d", ROMX[$4000], BANK[$0D]
 image_0d_4000:
-    INCBIN ".gfx/object_sprites/image_00d_4000.bin"
+    INCBIN ".gfx/entity_sprites/image_00d_4000.bin"
 
 SECTION "bank0e", ROMX[$4000], BANK[$0E]
 image_0e_4000:
-    INCBIN ".gfx/object_sprites/image_00e_4000.bin"
+    INCBIN ".gfx/entity_sprites/image_00e_4000.bin"
 
 SECTION "bank0f", ROMX[$4000], BANK[$0F]
 image_0f_4000:
-    INCBIN ".gfx/object_sprites/image_00f_4000.bin"
+    INCBIN ".gfx/entity_sprites/image_00f_4000.bin"
 
 SECTION "bank10", ROMX[$4000], BANK[$10]
 image_10_4000:
-    INCBIN ".gfx/object_sprites/image_010_4000.bin"
+    INCBIN ".gfx/entity_sprites/image_010_4000.bin"
 
 SECTION "bank11", ROMX[$4000], BANK[$11]
 image_11_4000:
@@ -155,11 +154,11 @@ bank_01c_text:
 
 SECTION "bank1d", ROMX[$4000], BANK[$1D]
 image_1d_4000:
-    INCBIN ".gfx/object_sprites/image_01d_4000.bin"
+    INCBIN ".gfx/entity_sprites/image_01d_4000.bin"
 
 SECTION "bank1e", ROMX[$4000], BANK[$1E]
 image_1e_4000:
-    INCBIN ".gfx/object_sprites/image_01e_4000.bin"
+    INCBIN ".gfx/entity_sprites/image_01e_4000.bin"
 
 SECTION "bank1f", ROMX[$4000], BANK[$1F]
 image_01f_00:
@@ -352,30 +351,30 @@ ChannelZ_collectible_list:
     INCBIN "data/maps/ChannelZ/ChannelZ_collectible_list.bin"
 
 SECTION "bank22", ROMX[$4000], BANK[$22]
-GexCave_object_list:
-    INCLUDE "data/maps/GexCave/GexCave_object_list.asm"
-HolidayTV_object_list:
-    INCLUDE "data/maps/HolidayTV/HolidayTV_object_list.asm"
-MysteryTV_object_list:
-    INCLUDE "data/maps/MysteryTV/MysteryTV_object_list.asm"
-TutTV_object_list:
-    INCLUDE "data/maps/TutTV/TutTV_object_list.asm"
-WesternStation_object_list:
-    INCLUDE "data/maps/WesternStation/WesternStation_object_list.asm"
-AnimeChannel_object_list:
-    INCLUDE "data/maps/AnimeChannel/AnimeChannel_object_list.asm"
-SuperheroShow_object_list:
-    INCLUDE "data/maps/SuperheroShow/SuperheroShow_object_list.asm"
-GextremeSports_object_list:
-    INCLUDE "data/maps/GextremeSports/GextremeSports_object_list.asm"
-MarsupialMadness_object_list:
-    INCLUDE "data/maps/MarsupialMadness/MarsupialMadness_object_list.asm"
-WWGexWrestling_object_list:
-    INCLUDE "data/maps/WWGexWrestling/WWGexWrestling_object_list.asm"
-LizardOfOz_object_list:
-    INCLUDE "data/maps/LizardOfOz/LizardOfOz_object_list.asm"
-ChannelZ_object_list:
-    INCLUDE "data/maps/ChannelZ/ChannelZ_object_list.asm"
+GexCave_entity_list:
+    INCLUDE "data/maps/GexCave/GexCave_entity_list.asm"
+HolidayTV_entity_list:
+    INCLUDE "data/maps/HolidayTV/HolidayTV_entity_list.asm"
+MysteryTV_entity_list:
+    INCLUDE "data/maps/MysteryTV/MysteryTV_entity_list.asm"
+TutTV_entity_list:
+    INCLUDE "data/maps/TutTV/TutTV_entity_list.asm"
+WesternStation_entity_list:
+    INCLUDE "data/maps/WesternStation/WesternStation_entity_list.asm"
+AnimeChannel_entity_list:
+    INCLUDE "data/maps/AnimeChannel/AnimeChannel_entity_list.asm"
+SuperheroShow_entity_list:
+    INCLUDE "data/maps/SuperheroShow/SuperheroShow_entity_list.asm"
+GextremeSports_entity_list:
+    INCLUDE "data/maps/GextremeSports/GextremeSports_entity_list.asm"
+MarsupialMadness_entity_list:
+    INCLUDE "data/maps/MarsupialMadness/MarsupialMadness_entity_list.asm"
+WWGexWrestling_entity_list:
+    INCLUDE "data/maps/WWGexWrestling/WWGexWrestling_entity_list.asm"
+LizardOfOz_entity_list:
+    INCLUDE "data/maps/LizardOfOz/LizardOfOz_entity_list.asm"
+ChannelZ_entity_list:
+    INCLUDE "data/maps/ChannelZ/ChannelZ_entity_list.asm"
 
 SECTION "bank23", ROMX[$4000], BANK[$23]
 GexCave_1_collision_blockset:

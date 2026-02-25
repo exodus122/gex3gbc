@@ -157,8 +157,8 @@ call_02_48a1_PlayerAction_StandOnTVButton:
     bit  4, [HL]                                       ;; 02:48a4 $cb $66
     ld   A, SFX_UNK1D                                        ;; 02:48a6 $3e $1d
     call NZ, call_00_0ff5_QueueSoundEffect                              ;; 02:48a8 $c4 $f5 $0f
-    ld   C, OBJECT_TV_BUTTON                                        ;; 02:48ab $0e $11
-    jp   call_02_4db1_Player_CheckXDistanceFromObject                                    ;; 02:48ad $c3 $b1 $4d
+    ld   C, ENTITY_TV_BUTTON                                        ;; 02:48ab $0e $11
+    jp   call_02_4db1_Player_CheckXDistanceFromEntity                                    ;; 02:48ad $c3 $b1 $4d
 
 call_02_48b0_PlayerAction_EnterTV:
     ld   A, [wD805_Player_MovementFlags]                                    ;; 02:48b0 $fa $05 $d8
@@ -284,7 +284,7 @@ call_02_4989_PlayerAction_Unk19:
     ld   a,SFX_UNK0B
     call call_00_0ff5_QueueSoundEffect
     ld   a,$14
-    call call_02_72ac_SetObjectAction
+    call call_02_72ac_SetEntityAction
 
 call_02_49a8_PlayerAction_EnterIdle:
     ld   a,[wDC8E_InitialYVelocity]
@@ -395,8 +395,8 @@ call_02_4a52_PlayerAction_BlownUpwards:
     ret  
 
 call_02_4a69_PlayerAction_RidingElevator:
-    ld   c,OBJECT_ANIME_CHANNEL_ELEVATOR
-    jp   call_02_4db1_Player_CheckXDistanceFromObject
+    ld   c,ENTITY_ANIME_CHANNEL_ELEVATOR
+    jp   call_02_4db1_Player_CheckXDistanceFromEntity
 
 call_02_4a6e_PlayerAction_Water_TailSpin:
     ld   hl,wD805_Player_MovementFlags

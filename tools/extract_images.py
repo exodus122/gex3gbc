@@ -79,7 +79,7 @@ def extract_bank_1f():
                 chunk_counter = chunk_counter + 1
         i = i + 1
 
-def extract_object_sprites():
+def extract_entity_sprites():
     banks = ["007", "007", "008", "009", "00a", "00a", "00b", "00c", "00d", "00e", "00f", "010", "01d", "01e"]
     banks2 = ["07", "07", "08", "09", "0a", "0a", "0b", "0c", "0d", "0e", "0f", "10", "1d", "1e"]
     addrs = [0x4000, 0x5B00, 0x4000, 0x4000, 0x4000, 0x6000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000]
@@ -107,7 +107,7 @@ def extract_object_sprites():
             os.system('rgbgfx --reverse '+str(width)+' -o banks/bank_'+bank+'/image_'+bank+'_'+addr_str+'.bin banks/bank_'+bank+'/image_'+bank+'_'+addr_str+'.png')
 
         out2 = open('./banks/bank_'+bank+'/text.txt', "a")
-        out2.write('data_'+bank2+'_'+addr_str+':\n    INCBIN \"./.gfx/object_sprites/image_'+bank+'_'+addr_str+'.bin\"\n')
+        out2.write('data_'+bank2+'_'+addr_str+':\n    INCBIN \"./.gfx/entity_sprites/image_'+bank+'_'+addr_str+'.bin\"\n')
         out2.close()
 
 def extract_bank_06():
@@ -258,7 +258,7 @@ def extract_gex_sprites():
     
 
 #extract_banks()
-#extract_object_sprites()
+#extract_entity_sprites()
 #extract_bank_1f()
 #extract_bank_06()
 #extract_bank_11()

@@ -93,8 +93,8 @@ call_03_6c89_LoadMapData:
     dw   GexCave_1_collision_blockset
     db   BANK(GexCave_1_palette)
     dw   GexCave_1_palette
-    db   BANK(GexCave_object_list)
-    dw   GexCave_object_list
+    db   BANK(GexCave_entity_list)
+    dw   GexCave_entity_list
     db   BANK(GexCave_collectible_list)
     dw   GexCave_collectible_list
     db   $1e, $11, $00, $00
@@ -113,8 +113,8 @@ call_03_6c89_LoadMapData:
     dw   GexCave_2_collision_blockset
     db   BANK(GexCave_2_palette)
     dw   GexCave_2_palette
-    db   BANK(GexCave_object_list)
-    dw   GexCave_object_list
+    db   BANK(GexCave_entity_list)
+    dw   GexCave_entity_list
     db   BANK(GexCave_collectible_list)
     dw   GexCave_collectible_list
     db   $1e, $11, $00, $00
@@ -133,8 +133,8 @@ call_03_6c89_LoadMapData:
     dw   GexCave_3_collision_blockset
     db   BANK(GexCave_3_palette)
     dw   GexCave_3_palette
-    db   BANK(GexCave_object_list)
-    dw   GexCave_object_list
+    db   BANK(GexCave_entity_list)
+    dw   GexCave_entity_list
     db   BANK(GexCave_collectible_list)
     dw   GexCave_collectible_list
     db   $1e, $11, $00, $00
@@ -153,8 +153,8 @@ call_03_6c89_LoadMapData:
     dw   GexCave_4_collision_blockset
     db   BANK(GexCave_4_palette)
     dw   GexCave_4_palette
-    db   BANK(GexCave_object_list)
-    dw   GexCave_object_list
+    db   BANK(GexCave_entity_list)
+    dw   GexCave_entity_list
     db   BANK(GexCave_collectible_list)
     dw   GexCave_collectible_list
     db   $1e, $11, $00, $00
@@ -173,8 +173,8 @@ call_03_6c89_LoadMapData:
     dw   HolidayTV_1_collision_blockset
     db   BANK(HolidayTV_1_palette)
     dw   HolidayTV_1_palette
-    db   BANK(HolidayTV_object_list)
-    dw   HolidayTV_object_list
+    db   BANK(HolidayTV_entity_list)
+    dw   HolidayTV_entity_list
     db   BANK(HolidayTV_collectible_list)
     dw   HolidayTV_collectible_list
     db   $a0, $50, $01, $00
@@ -193,8 +193,8 @@ call_03_6c89_LoadMapData:
     dw   HolidayTV_2_collision_blockset
     db   BANK(HolidayTV_2_palette)
     dw   HolidayTV_2_palette
-    db   BANK(HolidayTV_object_list)
-    dw   HolidayTV_object_list
+    db   BANK(HolidayTV_entity_list)
+    dw   HolidayTV_entity_list
     db   BANK(HolidayTV_collectible_list)
     dw   HolidayTV_collectible_list
     db   $14, $16, $01, $00
@@ -213,8 +213,8 @@ call_03_6c89_LoadMapData:
     dw   HolidayTV_2_collision_blockset
     db   BANK(HolidayTV_3_palette_4180)
     dw   HolidayTV_3_palette_4180
-    db   BANK(HolidayTV_object_list)
-    dw   HolidayTV_object_list
+    db   BANK(HolidayTV_entity_list)
+    dw   HolidayTV_entity_list
     db   BANK(HolidayTV_collectible_list)
     dw   HolidayTV_collectible_list
     db   $14, $16, $01, $00
@@ -233,8 +233,8 @@ call_03_6c89_LoadMapData:
     dw   HolidayTV_4_collision_blockset
     db   BANK(HolidayTV_4_palette)
     dw   HolidayTV_4_palette
-    db   BANK(HolidayTV_object_list)
-    dw   HolidayTV_object_list
+    db   BANK(HolidayTV_entity_list)
+    dw   HolidayTV_entity_list
     db   BANK(HolidayTV_collectible_list)
     dw   HolidayTV_collectible_list
     db   $14, $9, $01, $00
@@ -253,8 +253,8 @@ call_03_6c89_LoadMapData:
     dw   MysteryTV_1_collision_blockset
     db   BANK(MysteryTV_1_palette)
     dw   MysteryTV_1_palette
-    db   BANK(MysteryTV_object_list)
-    dw   MysteryTV_object_list
+    db   BANK(MysteryTV_entity_list)
+    dw   MysteryTV_entity_list
     db   BANK(MysteryTV_collectible_list)
     dw   MysteryTV_collectible_list
     db   $2d, $2d, $02, $00
@@ -273,8 +273,8 @@ call_03_6c89_LoadMapData:
     dw   MysteryTV_2_collision_blockset
     db   BANK(MysteryTV_2_palette)
     dw   MysteryTV_2_palette
-    db   BANK(MysteryTV_object_list)
-    dw   MysteryTV_object_list
+    db   BANK(MysteryTV_entity_list)
+    dw   MysteryTV_entity_list
     db   BANK(MysteryTV_collectible_list)
     dw   MysteryTV_collectible_list
     db   $28, $32, $02, $01
@@ -293,8 +293,8 @@ call_03_6c89_LoadMapData:
     dw   MysteryTV_3_collision_blockset
     db   BANK(MysteryTV_3_palette)
     dw   MysteryTV_3_palette
-    db   BANK(MysteryTV_object_list)
-    dw   MysteryTV_object_list
+    db   BANK(MysteryTV_entity_list)
+    dw   MysteryTV_entity_list
     db   BANK(MysteryTV_collectible_list)
     dw   MysteryTV_collectible_list
     db   $2d, $1e, $02, $00
@@ -313,8 +313,8 @@ call_03_6c89_LoadMapData:
     dw   MysteryTV_4_collision_blockset
     db   BANK(MysteryTV_4_palette)
     dw   MysteryTV_4_palette
-    db   BANK(MysteryTV_object_list)
-    dw   MysteryTV_object_list
+    db   BANK(MysteryTV_entity_list)
+    dw   MysteryTV_entity_list
     db   BANK(MysteryTV_collectible_list)
     dw   MysteryTV_collectible_list
     db   $14, $2a, $02, $00
@@ -333,8 +333,8 @@ call_03_6c89_LoadMapData:
     dw   MysteryTV_4_collision_blockset
     db   BANK(MysteryTV_5_palette_4300)
     dw   MysteryTV_5_palette_4300
-    db   BANK(MysteryTV_object_list)
-    dw   MysteryTV_object_list
+    db   BANK(MysteryTV_entity_list)
+    dw   MysteryTV_entity_list
     db   BANK(MysteryTV_collectible_list)
     dw   MysteryTV_collectible_list
     db   $14, $2a, $02, $00
@@ -353,8 +353,8 @@ call_03_6c89_LoadMapData:
     dw   MysteryTV_4_collision_blockset
     db   BANK(MysteryTV_6_palette_4340)
     dw   MysteryTV_6_palette_4340
-    db   BANK(MysteryTV_object_list)
-    dw   MysteryTV_object_list
+    db   BANK(MysteryTV_entity_list)
+    dw   MysteryTV_entity_list
     db   BANK(MysteryTV_collectible_list)
     dw   MysteryTV_collectible_list
     db   $14, $2a, $02, $00
@@ -373,8 +373,8 @@ call_03_6c89_LoadMapData:
     dw   MysteryTV_7_collision_blockset
     db   BANK(MysteryTV_7_palette)
     dw   MysteryTV_7_palette
-    db   BANK(MysteryTV_object_list)
-    dw   MysteryTV_object_list
+    db   BANK(MysteryTV_entity_list)
+    dw   MysteryTV_entity_list
     db   BANK(MysteryTV_collectible_list)
     dw   MysteryTV_collectible_list
     db   $0a, $08, $02, $01
@@ -393,8 +393,8 @@ call_03_6c89_LoadMapData:
     dw   MysteryTV_8_collision_blockset
     db   BANK(MysteryTV_8_palette)
     dw   MysteryTV_8_palette
-    db   BANK(MysteryTV_object_list)
-    dw   MysteryTV_object_list
+    db   BANK(MysteryTV_entity_list)
+    dw   MysteryTV_entity_list
     db   BANK(MysteryTV_collectible_list)
     dw   MysteryTV_collectible_list
     db   $0a, $09, $02, $01
@@ -413,8 +413,8 @@ call_03_6c89_LoadMapData:
     dw   MysteryTV_4_collision_blockset
     db   BANK(MysteryTV_4_palette)
     dw   MysteryTV_4_palette
-    db   BANK(MysteryTV_object_list)
-    dw   MysteryTV_object_list
+    db   BANK(MysteryTV_entity_list)
+    dw   MysteryTV_entity_list
     db   BANK(MysteryTV_collectible_list)
     dw   MysteryTV_collectible_list
     db   $14, $2a, $02, $00
@@ -433,8 +433,8 @@ call_03_6c89_LoadMapData:
     dw   MysteryTV_2_collision_blockset
     db   BANK(MysteryTV_2_palette)
     dw   MysteryTV_2_palette
-    db   BANK(MysteryTV_object_list)
-    dw   MysteryTV_object_list
+    db   BANK(MysteryTV_entity_list)
+    dw   MysteryTV_entity_list
     db   BANK(MysteryTV_collectible_list)
     dw   MysteryTV_collectible_list
     db   $28, $32, $02, $01
@@ -453,8 +453,8 @@ call_03_6c89_LoadMapData:
     dw   TutTV_1_collision_blockset
     db   BANK(TutTV_1_palette)
     dw   TutTV_1_palette
-    db   BANK(TutTV_object_list)
-    dw   TutTV_object_list
+    db   BANK(TutTV_entity_list)
+    dw   TutTV_entity_list
     db   BANK(TutTV_collectible_list)
     dw   TutTV_collectible_list
     db   $27, $13, $03, $00
@@ -473,8 +473,8 @@ call_03_6c89_LoadMapData:
     dw   TutTV_2_collision_blockset
     db   BANK(TutTV_2_palette)
     dw   TutTV_2_palette
-    db   BANK(TutTV_object_list)
-    dw   TutTV_object_list
+    db   BANK(TutTV_entity_list)
+    dw   TutTV_entity_list
     db   BANK(TutTV_collectible_list)
     dw   TutTV_collectible_list
     db   $34, $33, $03, $00
@@ -493,8 +493,8 @@ call_03_6c89_LoadMapData:
     dw   TutTV_3_collision_blockset
     db   BANK(TutTV_3_palette)
     dw   TutTV_3_palette
-    db   BANK(TutTV_object_list)
-    dw   TutTV_object_list
+    db   BANK(TutTV_entity_list)
+    dw   TutTV_entity_list
     db   BANK(TutTV_collectible_list)
     dw   TutTV_collectible_list
     db   $64, $17, $03, $00
@@ -513,8 +513,8 @@ call_03_6c89_LoadMapData:
     dw   TutTV_4_collision_blockset
     db   BANK(TutTV_4_palette)
     dw   TutTV_4_palette
-    db   BANK(TutTV_object_list)
-    dw   TutTV_object_list
+    db   BANK(TutTV_entity_list)
+    dw   TutTV_entity_list
     db   BANK(TutTV_collectible_list)
     dw   TutTV_collectible_list
     db   $4a, $13, $03, $00
@@ -533,8 +533,8 @@ call_03_6c89_LoadMapData:
     dw   TutTV_5_collision_blockset
     db   BANK(TutTV_5_palette)
     dw   TutTV_5_palette
-    db   BANK(TutTV_object_list)
-    dw   TutTV_object_list
+    db   BANK(TutTV_entity_list)
+    dw   TutTV_entity_list
     db   BANK(TutTV_collectible_list)
     dw   TutTV_collectible_list
     db   $0a, $09, $03, $00
@@ -553,8 +553,8 @@ call_03_6c89_LoadMapData:
     dw   TutTV_6_collision_blockset
     db   BANK(TutTV_6_palette)
     dw   TutTV_6_palette
-    db   BANK(TutTV_object_list)
-    dw   TutTV_object_list
+    db   BANK(TutTV_entity_list)
+    dw   TutTV_entity_list
     db   BANK(TutTV_collectible_list)
     dw   TutTV_collectible_list
     db   $14, $09, $03, $00
@@ -573,8 +573,8 @@ call_03_6c89_LoadMapData:
     dw   TutTV_7_collision_blockset
     db   BANK(TutTV_7_palette)
     dw   TutTV_7_palette
-    db   BANK(TutTV_object_list)
-    dw   TutTV_object_list
+    db   BANK(TutTV_entity_list)
+    dw   TutTV_entity_list
     db   BANK(TutTV_collectible_list)
     dw   TutTV_collectible_list
     db   $32, $19, $03, $00  
@@ -593,8 +593,8 @@ call_03_6c89_LoadMapData:
     dw   WesternStation_1_collision_blockset
     db   BANK(WesternStation_1_palette)
     dw   WesternStation_1_palette
-    db   BANK(WesternStation_object_list)
-    dw   WesternStation_object_list
+    db   BANK(WesternStation_entity_list)
+    dw   WesternStation_entity_list
     db   BANK(WesternStation_collectible_list)
     dw   WesternStation_collectible_list
     db   $28, $16, $04, $00
@@ -613,8 +613,8 @@ call_03_6c89_LoadMapData:
     dw   WesternStation_2_collision_blockset
     db   BANK(WesternStation_2_palette)
     dw   WesternStation_2_palette
-    db   BANK(WesternStation_object_list)
-    dw   WesternStation_object_list
+    db   BANK(WesternStation_entity_list)
+    dw   WesternStation_entity_list
     db   BANK(WesternStation_collectible_list)
     dw   WesternStation_collectible_list
     db   $26, $16, $04, $00
@@ -633,8 +633,8 @@ call_03_6c89_LoadMapData:
     dw   WesternStation_3_collision_blockset
     db   BANK(WesternStation_3_palette)
     dw   WesternStation_3_palette
-    db   BANK(WesternStation_object_list)
-    dw   WesternStation_object_list
+    db   BANK(WesternStation_entity_list)
+    dw   WesternStation_entity_list
     db   BANK(WesternStation_collectible_list)
     dw   WesternStation_collectible_list
     db   $14, $0b, $04, $00
@@ -653,8 +653,8 @@ call_03_6c89_LoadMapData:
     dw   WesternStation_4_collision_blockset
     db   BANK(WesternStation_4_palette)
     dw   WesternStation_4_palette
-    db   BANK(WesternStation_object_list)
-    dw   WesternStation_object_list
+    db   BANK(WesternStation_entity_list)
+    dw   WesternStation_entity_list
     db   BANK(WesternStation_collectible_list)
     dw   WesternStation_collectible_list
     db   $0a, $12, $04, $00
@@ -673,8 +673,8 @@ call_03_6c89_LoadMapData:
     dw   WesternStation_5_collision_blockset
     db   BANK(WesternStation_5_palette)
     dw   WesternStation_5_palette
-    db   BANK(WesternStation_object_list)
-    dw   WesternStation_object_list
+    db   BANK(WesternStation_entity_list)
+    dw   WesternStation_entity_list
     db   BANK(WesternStation_collectible_list)
     dw   WesternStation_collectible_list
     db   $50, $12, $04, $00
@@ -693,8 +693,8 @@ call_03_6c89_LoadMapData:
     dw   WesternStation_6_collision_blockset
     db   BANK(WesternStation_6_palette)
     dw   WesternStation_6_palette
-    db   BANK(WesternStation_object_list)
-    dw   WesternStation_object_list
+    db   BANK(WesternStation_entity_list)
+    dw   WesternStation_entity_list
     db   BANK(WesternStation_collectible_list)
     dw   WesternStation_collectible_list
     db   $7d, $33, $04, $00
@@ -713,8 +713,8 @@ call_03_6c89_LoadMapData:
     dw   WesternStation_4_collision_blockset
     db   BANK(WesternStation_4_palette)
     dw   WesternStation_4_palette
-    db   BANK(WesternStation_object_list)
-    dw   WesternStation_object_list
+    db   BANK(WesternStation_entity_list)
+    dw   WesternStation_entity_list
     db   BANK(WesternStation_collectible_list)
     dw   WesternStation_collectible_list
     db   $0a, $12, $04, $00
@@ -733,8 +733,8 @@ call_03_6c89_LoadMapData:
     dw   WesternStation_4_collision_blockset
     db   BANK(WesternStation_4_palette)
     dw   WesternStation_4_palette
-    db   BANK(WesternStation_object_list)
-    dw   WesternStation_object_list
+    db   BANK(WesternStation_entity_list)
+    dw   WesternStation_entity_list
     db   BANK(WesternStation_collectible_list)
     dw   WesternStation_collectible_list
     db   $0a, $12, $04, $00
@@ -753,8 +753,8 @@ call_03_6c89_LoadMapData:
     dw   WesternStation_4_collision_blockset
     db   BANK(WesternStation_4_palette)
     dw   WesternStation_4_palette
-    db   BANK(WesternStation_object_list)
-    dw   WesternStation_object_list
+    db   BANK(WesternStation_entity_list)
+    dw   WesternStation_entity_list
     db   BANK(WesternStation_collectible_list)
     dw   WesternStation_collectible_list
     db   $0a, $12, $04, $00
@@ -773,8 +773,8 @@ call_03_6c89_LoadMapData:
     dw   AnimeChannel_1_collision_blockset
     db   BANK(AnimeChannel_1_palette)
     dw   AnimeChannel_1_palette
-    db   BANK(AnimeChannel_object_list)
-    dw   AnimeChannel_object_list
+    db   BANK(AnimeChannel_entity_list)
+    dw   AnimeChannel_entity_list
     db   BANK(AnimeChannel_collectible_list)
     dw   AnimeChannel_collectible_list
     db   $3e, $1e, $05, $00   
@@ -793,8 +793,8 @@ call_03_6c89_LoadMapData:
     dw   AnimeChannel_2_collision_blockset
     db   BANK(AnimeChannel_2_palette)
     dw   AnimeChannel_2_palette
-    db   BANK(AnimeChannel_object_list)
-    dw   AnimeChannel_object_list
+    db   BANK(AnimeChannel_entity_list)
+    dw   AnimeChannel_entity_list
     db   BANK(AnimeChannel_collectible_list)
     dw   AnimeChannel_collectible_list
     db   $30, $1e, $05, $00
@@ -813,8 +813,8 @@ call_03_6c89_LoadMapData:
     dw   AnimeChannel_3_collision_blockset
     db   BANK(AnimeChannel_3_palette)
     dw   AnimeChannel_3_palette
-    db   BANK(AnimeChannel_object_list)
-    dw   AnimeChannel_object_list
+    db   BANK(AnimeChannel_entity_list)
+    dw   AnimeChannel_entity_list
     db   BANK(AnimeChannel_collectible_list)
     dw   AnimeChannel_collectible_list
     db   $38, $13, $05, $00
@@ -833,8 +833,8 @@ call_03_6c89_LoadMapData:
     dw   AnimeChannel_4_collision_blockset
     db   BANK(AnimeChannel_4_palette)
     dw   AnimeChannel_4_palette
-    db   BANK(AnimeChannel_object_list)
-    dw   AnimeChannel_object_list
+    db   BANK(AnimeChannel_entity_list)
+    dw   AnimeChannel_entity_list
     db   BANK(AnimeChannel_collectible_list)
     dw   AnimeChannel_collectible_list
     db   $5e, $2a, $05, $00
@@ -853,8 +853,8 @@ call_03_6c89_LoadMapData:
     dw   AnimeChannel_5_collision_blockset
     db   BANK(AnimeChannel_5_palette)
     dw   AnimeChannel_5_palette
-    db   BANK(AnimeChannel_object_list)
-    dw   AnimeChannel_object_list
+    db   BANK(AnimeChannel_entity_list)
+    dw   AnimeChannel_entity_list
     db   BANK(AnimeChannel_collectible_list)
     dw   AnimeChannel_collectible_list
     db   $f5, $16, $05, $00
@@ -873,8 +873,8 @@ call_03_6c89_LoadMapData:
     dw   AnimeChannel_6_collision_blockset
     db   BANK(AnimeChannel_6_palette)
     dw   AnimeChannel_6_palette
-    db   BANK(AnimeChannel_object_list)
-    dw   AnimeChannel_object_list
+    db   BANK(AnimeChannel_entity_list)
+    dw   AnimeChannel_entity_list
     db   BANK(AnimeChannel_collectible_list)
     dw   AnimeChannel_collectible_list
     db   $1e, $33, $05, $00
@@ -893,8 +893,8 @@ call_03_6c89_LoadMapData:
     dw   AnimeChannel_6_collision_blockset
     db   BANK(AnimeChannel_6_palette)
     dw   AnimeChannel_6_palette
-    db   BANK(AnimeChannel_object_list)
-    dw   AnimeChannel_object_list
+    db   BANK(AnimeChannel_entity_list)
+    dw   AnimeChannel_entity_list
     db   BANK(AnimeChannel_collectible_list)
     dw   AnimeChannel_collectible_list
     db   $1e, $33, $05, $00
@@ -913,8 +913,8 @@ call_03_6c89_LoadMapData:
     dw   AnimeChannel_6_collision_blockset
     db   BANK(AnimeChannel_6_palette)
     dw   AnimeChannel_6_palette
-    db   BANK(AnimeChannel_object_list)
-    dw   AnimeChannel_object_list
+    db   BANK(AnimeChannel_entity_list)
+    dw   AnimeChannel_entity_list
     db   BANK(AnimeChannel_collectible_list)
     dw   AnimeChannel_collectible_list
     db   $1e, $33, $05, $00
@@ -933,8 +933,8 @@ call_03_6c89_LoadMapData:
     dw   AnimeChannel_5_collision_blockset
     db   BANK(AnimeChannel_5_palette)
     dw   AnimeChannel_5_palette
-    db   BANK(AnimeChannel_object_list)
-    dw   AnimeChannel_object_list
+    db   BANK(AnimeChannel_entity_list)
+    dw   AnimeChannel_entity_list
     db   BANK(AnimeChannel_collectible_list)
     dw   AnimeChannel_collectible_list
     db   $f5, $16, $05, $00
@@ -953,8 +953,8 @@ call_03_6c89_LoadMapData:
     dw   SuperheroShow_1_collision_blockset
     db   BANK(SuperheroShow_1_palette)
     dw   SuperheroShow_1_palette
-    db   BANK(SuperheroShow_object_list)
-    dw   SuperheroShow_object_list
+    db   BANK(SuperheroShow_entity_list)
+    dw   SuperheroShow_entity_list
     db   BANK(SuperheroShow_collectible_list)
     dw   SuperheroShow_collectible_list
     db   $bf, $1e, $06, $00
@@ -973,8 +973,8 @@ call_03_6c89_LoadMapData:
     dw   SuperheroShow_2_collision_blockset
     db   BANK(SuperheroShow_2_palette)
     dw   SuperheroShow_2_palette
-    db   BANK(SuperheroShow_object_list)
-    dw   SuperheroShow_object_list
+    db   BANK(SuperheroShow_entity_list)
+    dw   SuperheroShow_entity_list
     db   BANK(SuperheroShow_collectible_list)
     dw   SuperheroShow_collectible_list
     db   $c2, $44, $06, $00
@@ -993,8 +993,8 @@ call_03_6c89_LoadMapData:
     dw   SuperheroShow_3_collision_blockset
     db   BANK(SuperheroShow_3_palette)
     dw   SuperheroShow_3_palette
-    db   BANK(SuperheroShow_object_list)
-    dw   SuperheroShow_object_list
+    db   BANK(SuperheroShow_entity_list)
+    dw   SuperheroShow_entity_list
     db   BANK(SuperheroShow_collectible_list)
     dw   SuperheroShow_collectible_list
     db   $43, $1e, $06, $00
@@ -1013,8 +1013,8 @@ call_03_6c89_LoadMapData:
     dw   SuperheroShow_4_collision_blockset
     db   BANK(SuperheroShow_4_palette)
     dw   SuperheroShow_4_palette
-    db   BANK(SuperheroShow_object_list)
-    dw   SuperheroShow_object_list
+    db   BANK(SuperheroShow_entity_list)
+    dw   SuperheroShow_entity_list
     db   BANK(SuperheroShow_collectible_list)
     dw   SuperheroShow_collectible_list
     db   $60, $1e, $06, $00
@@ -1033,8 +1033,8 @@ call_03_6c89_LoadMapData:
     dw   SuperheroShow_5_collision_blockset
     db   BANK(SuperheroShow_5_palette)
     dw   SuperheroShow_5_palette
-    db   BANK(SuperheroShow_object_list)
-    dw   SuperheroShow_object_list
+    db   BANK(SuperheroShow_entity_list)
+    dw   SuperheroShow_entity_list
     db   BANK(SuperheroShow_collectible_list)
     dw   SuperheroShow_collectible_list
     db   $30, $22, $06, $00
@@ -1053,8 +1053,8 @@ call_03_6c89_LoadMapData:
     dw   SuperheroShow_6_collision_blockset
     db   BANK(SuperheroShow_6_palette)
     dw   SuperheroShow_6_palette
-    db   BANK(SuperheroShow_object_list)
-    dw   SuperheroShow_object_list
+    db   BANK(SuperheroShow_entity_list)
+    dw   SuperheroShow_entity_list
     db   BANK(SuperheroShow_collectible_list)
     dw   SuperheroShow_collectible_list
     db   $0a, $08, $06, $00
@@ -1073,8 +1073,8 @@ call_03_6c89_LoadMapData:
     dw   GextremeSports_1_collision_blockset
     db   BANK(GextremeSports_1_palette)
     dw   GextremeSports_1_palette
-    db   BANK(GextremeSports_object_list)
-    dw   GextremeSports_object_list
+    db   BANK(GextremeSports_entity_list)
+    dw   GextremeSports_entity_list
     db   BANK(GextremeSports_collectible_list)
     dw   GextremeSports_collectible_list
     db   $30, $30, $07, $00
@@ -1093,8 +1093,8 @@ call_03_6c89_LoadMapData:
     dw   HolidayTV_2_collision_blockset
     db   BANK(HolidayTV_3_palette_4180)
     dw   HolidayTV_3_palette_4180
-    db   BANK(GextremeSports_object_list)
-    dw   GextremeSports_object_list
+    db   BANK(GextremeSports_entity_list)
+    dw   GextremeSports_entity_list
     db   BANK(GextremeSports_collectible_list)
     dw   GextremeSports_collectible_list
     db   $14, $16, $07, $00
@@ -1113,8 +1113,8 @@ call_03_6c89_LoadMapData:
     dw   HolidayTV_2_collision_blockset
     db   BANK(HolidayTV_3_palette_4180)
     dw   HolidayTV_3_palette_4180
-    db   BANK(GextremeSports_object_list)
-    dw   GextremeSports_object_list
+    db   BANK(GextremeSports_entity_list)
+    dw   GextremeSports_entity_list
     db   BANK(GextremeSports_collectible_list)
     dw   GextremeSports_collectible_list
     db   $14, $16, $07, $00
@@ -1133,8 +1133,8 @@ call_03_6c89_LoadMapData:
     dw   HolidayTV_2_collision_blockset
     db   BANK(HolidayTV_3_palette_4180)
     dw   HolidayTV_3_palette_4180
-    db   BANK(GextremeSports_object_list)
-    dw   GextremeSports_object_list
+    db   BANK(GextremeSports_entity_list)
+    dw   GextremeSports_entity_list
     db   BANK(GextremeSports_collectible_list)
     dw   GextremeSports_collectible_list
     db   $14, $16, $07, $00
@@ -1153,8 +1153,8 @@ call_03_6c89_LoadMapData:
     dw   MarsupialMadness_1_collision_blockset
     db   BANK(MarsupialMadness_1_palette)
     dw   MarsupialMadness_1_palette
-    db   BANK(MarsupialMadness_object_list)
-    dw   MarsupialMadness_object_list
+    db   BANK(MarsupialMadness_entity_list)
+    dw   MarsupialMadness_entity_list
     db   BANK(MarsupialMadness_collectible_list)
     dw   MarsupialMadness_collectible_list
     db   $20, $42, $08, $00
@@ -1173,8 +1173,8 @@ call_03_6c89_LoadMapData:
     dw   WWGexWrestling_1_collision_blockset
     db   BANK(WWGexWrestling_1_palette)
     dw   WWGexWrestling_1_palette
-    db   BANK(WWGexWrestling_object_list)
-    dw   WWGexWrestling_object_list
+    db   BANK(WWGexWrestling_entity_list)
+    dw   WWGexWrestling_entity_list
     db   BANK(WWGexWrestling_collectible_list)
     dw   WWGexWrestling_collectible_list
     db   $18, $12, $09, $01
@@ -1193,8 +1193,8 @@ call_03_6c89_LoadMapData:
     dw   LizardOfOz_1_collision_blockset
     db   BANK(LizardOfOz_1_palette)
     dw   LizardOfOz_1_palette
-    db   BANK(LizardOfOz_object_list)
-    dw   LizardOfOz_object_list
+    db   BANK(LizardOfOz_entity_list)
+    dw   LizardOfOz_entity_list
     db   BANK(LizardOfOz_collectible_list)
     dw   LizardOfOz_collectible_list
     db   $0f, $08, $0a, $00
@@ -1213,8 +1213,8 @@ call_03_6c89_LoadMapData:
     dw   ChannelZ_1_collision_blockset
     db   BANK(ChannelZ_1_palette)
     dw   ChannelZ_1_palette
-    db   BANK(ChannelZ_object_list)
-    dw   ChannelZ_object_list
+    db   BANK(ChannelZ_entity_list)
+    dw   ChannelZ_entity_list
     db   BANK(ChannelZ_collectible_list)
     dw   ChannelZ_collectible_list
     db   $28, $38, $0b, $00
@@ -1233,8 +1233,8 @@ call_03_6c89_LoadMapData:
     dw   ChannelZ_2_collision_blockset
     db   BANK(ChannelZ_2_palette)
     dw   ChannelZ_2_palette
-    db   BANK(ChannelZ_object_list)
-    dw   ChannelZ_object_list
+    db   BANK(ChannelZ_entity_list)
+    dw   ChannelZ_entity_list
     db   BANK(ChannelZ_collectible_list)
     dw   ChannelZ_collectible_list
     db   $1f, $11, $0b, $00
@@ -1253,8 +1253,8 @@ call_03_6c89_LoadMapData:
     dw   ChannelZ_3_collision_blockset
     db   BANK(ChannelZ_3_palette)
     dw   ChannelZ_3_palette
-    db   BANK(ChannelZ_object_list)
-    dw   ChannelZ_object_list
+    db   BANK(ChannelZ_entity_list)
+    dw   ChannelZ_entity_list
     db   BANK(ChannelZ_collectible_list)
     dw   ChannelZ_collectible_list
     db   $28, $20, $0b, $00
@@ -1273,8 +1273,8 @@ call_03_6c89_LoadMapData:
     dw   ChannelZ_4_collision_blockset
     db   BANK(ChannelZ_4_palette)
     dw   ChannelZ_4_palette
-    db   BANK(ChannelZ_object_list)
-    dw   ChannelZ_object_list
+    db   BANK(ChannelZ_entity_list)
+    dw   ChannelZ_entity_list
     db   BANK(ChannelZ_collectible_list)
     dw   ChannelZ_collectible_list
     db   $28, $20, $0b, $00
@@ -1293,8 +1293,8 @@ call_03_6c89_LoadMapData:
     dw   ChannelZ_5_collision_blockset
     db   BANK(ChannelZ_5_palette)
     dw   ChannelZ_5_palette
-    db   BANK(ChannelZ_object_list)
-    dw   ChannelZ_object_list
+    db   BANK(ChannelZ_entity_list)
+    dw   ChannelZ_entity_list
     db   BANK(ChannelZ_collectible_list)
     dw   ChannelZ_collectible_list
     db   $0f, $08, $0b, $00

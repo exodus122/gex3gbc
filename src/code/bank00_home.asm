@@ -236,7 +236,7 @@ call_00_0150_Init:
     farcall call_01_432b_SetLevelMenuAndPalette
     call call_00_0e3b_ClearGameStateVariables                                  ;; 00:0344 $cd $3b $0e
     call call_00_2f85_LoadAndSortCollectibleData                                  ;; 00:0347 $cd $85 $2f
-    call call_00_2ff8_InitLevelObjectsAndConfig                                  ;; 00:034a $cd $f8 $2f
+    call call_00_2ff8_InitLevelEntitiesAndConfig                                  ;; 00:034a $cd $f8 $2f
     call call_00_0595_PlaySongBasedOnLevel                                  ;; 00:034d $cd $95 $05
     call call_00_1ea0_LoadAndRunMissionPreviewCutscene                                  ;; 00:0350 $cd $a0 $1e
     xor  A, A                                          ;; 00:0353 $af
@@ -258,7 +258,7 @@ call_00_0150_Init:
     ld   [wDC78_PlayerActionIdRelated], A                                    ;; 00:0382 $ea $78 $dc
     call call_00_0e3b_ClearGameStateVariables                                  ;; 00:0385 $cd $3b $0e
     call call_00_2f85_LoadAndSortCollectibleData                                  ;; 00:0388 $cd $85 $2f
-    call call_00_2ff8_InitLevelObjectsAndConfig                                  ;; 00:038b $cd $f8 $2f
+    call call_00_2ff8_InitLevelEntitiesAndConfig                                  ;; 00:038b $cd $f8 $2f
 .jp_00_038e_LoadMap:
     farcall call_03_6c89_LoadMapData
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:0399 $fa $1e $dc
@@ -308,7 +308,7 @@ call_00_0150_Init:
     call call_00_04fb                                  ;; 00:03f4 $cd $fb $04
     farcall call_03_647c_InitPlayerPositionAndLevel
     call call_00_1056_LoadFullMap                                  ;; 00:0402 $cd $56 $10
-    farcall call_02_708f_InitObjectsAndSpawnPlayer
+    farcall call_02_708f_InitEntitiesAndSpawnPlayer
     call call_00_0513                                  ;; 00:0410 $cd $13 $05
     xor  A, A                                          ;; 00:0413 $af
     ld   [wDB6A_WarpFlags], A                                    ;; 00:0414 $ea $6a $db
@@ -320,8 +320,8 @@ call_00_0150_Init:
     call call_00_0595_PlaySongBasedOnLevel                                  ;; 00:0421 $cd $95 $05
     call call_00_04fb                                  ;; 00:0424 $cd $fb $04
     call call_00_1056_LoadFullMap                                  ;; 00:0427 $cd $56 $10
-    farcall call_02_7142_RestoreObjectTable
-    farcall call_03_68d9_AssignAllObjectPalettes
+    farcall call_02_7142_RestoreEntityTable
+    farcall call_03_68d9_AssignAllEntityPalettes
     call call_00_0513                                  ;; 00:0440 $cd $13 $05
 .jp_00_0443_MainGameplayLoop:
     call call_00_0b92_WaitForInterrupt                                  ;; 00:0443 $cd $92 $0b
@@ -332,7 +332,7 @@ call_00_0150_Init:
     bit  2, [HL]                                       ;; 00:0451 $cb $56
     jr   Z, .jr_00_045e_SkipLoadMap                                ;; 00:0453 $28 $09
     call call_00_1633_HandleLevelWarpOrExit                                  ;; 00:0455 $cd $33 $16
-    call call_00_2b3d_ClearAllObjectSlots                                  ;; 00:0458 $cd $3d $2b
+    call call_00_2b3d_ClearAllEntitySlots                                  ;; 00:0458 $cd $3d $2b
     jp   .jp_00_038e_LoadMap                                   ;; 00:045b $c3 $8e $03
 .jr_00_045e_SkipLoadMap:
     ld   HL, wDB6A_WarpFlags                                     ;; 00:045e $21 $6a $db
@@ -358,7 +358,7 @@ call_00_0150_Init:
     call call_00_0fa2_PlaySong                                  ;; 00:049d $cd $a2 $0f
     ld   A, SFX_EMPTY                                        ;; 00:04a0 $3e $00
     call call_00_0fd7_TriggerSoundEffect                                  ;; 00:04a2 $cd $d7 $0f
-    farcall call_02_7132_BackupObjectTable
+    farcall call_02_7132_BackupEntityTable
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:04b0 $fa $1e $dc
     and  A, A                                          ;; 00:04b3 $a7
     ld   A, MENU_PAUSE_IN_GEX_CAVE                                        ;; 00:04b4 $3e $0b
@@ -377,12 +377,12 @@ call_00_0150_Init:
 .jr_00_04d8_SkipPauseCheck:
     call call_00_05fd_CheckForEatFly                                  ;; 00:04d8 $cd $fd $05
     call call_00_05c7                                  ;; 00:04db $cd $c7 $05
-    farcall call_02_7152_UpdateAllObjects
+    farcall call_02_7152_UpdateAllEntities
     call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:04e9 $cd $c8 $11
     call call_00_0fc8_ProcessQueuedSoundEffect                                  ;; 00:04ec $cd $c8 $0f
     call call_00_150f_CheckAndSetLevelTrigger                                  ;; 00:04ef $cd $0f $15
-    call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:04f2 $cd $fa $35
-    call call_00_08f8_SetupObjectVRAMTransfer                                  ;; 00:04f5 $cd $f8 $08
+    call call_00_35fa_WaitForLineThenSpawnEntity                                  ;; 00:04f2 $cd $fa $35
+    call call_00_08f8_SetupEntityVRAMTransfer                                  ;; 00:04f5 $cd $f8 $08
     jp   .jp_00_0443_MainGameplayLoop                                   ;; 00:04f8 $c3 $43 $04
 
 call_00_04fb:
@@ -398,7 +398,7 @@ call_00_04fb:
     ret                                                ;; 00:0512 $c9
 
 call_00_0513:
-    ld   A, BANK_7F_OBJECT_PALETTES                                        ;; 00:0513 $3e $7f
+    ld   A, BANK_7F_ENTITY_PALETTES                                        ;; 00:0513 $3e $7f
     call call_00_0eee_SwitchBank                                  ;; 00:0515 $cd $ee $0e
     ld   HL, wDB6C_CurrentMapId                                     ;; 00:0518 $21 $6c $db
     ld   E, [HL]                                       ;; 00:051b $5e
@@ -449,14 +449,14 @@ call_00_0513:
     ld   [HL], $17                                     ;; 00:056c $36 $17
 .jr_00_056e:
     call call_00_0b92_WaitForInterrupt                                  ;; 00:056e $cd $92 $0b
-    call call_00_08f8_SetupObjectVRAMTransfer                                  ;; 00:0571 $cd $f8 $08
+    call call_00_08f8_SetupEntityVRAMTransfer                                  ;; 00:0571 $cd $f8 $08
     ld   A, [wDB66_HDMATransferFlags]                                    ;; 00:0574 $fa $66 $db
     and  A, $ff                                        ;; 00:0577 $e6 $ff
     jr   NZ, .jr_00_056e                               ;; 00:0579 $20 $f3
     ld   A, [wDB69]                                    ;; 00:057b $fa $69 $db
     and  A, $2f                                        ;; 00:057e $e6 $2f
     jr   NZ, .jr_00_056e                               ;; 00:0580 $20 $ec
-    farcall call_03_5ec1_UpdateAllObjectsGraphicsAndCollision
+    farcall call_03_5ec1_UpdateAllEntitiesGraphicsAndCollision
     ld   A, $01                                        ;; 00:058d $3e $01
     ld   [wDD6A_GameBoyColorPaletteFlag], A                                    ;; 00:058f $ea $6a $dd
     jp   call_00_0b92_WaitForInterrupt                                  ;; 00:0592 $c3 $92 $0b
@@ -510,8 +510,8 @@ call_00_05c7:
     set  5, [HL]                                       ;; 00:05ee $cb $ee
     ret                                                ;; 00:05f0 $c9
 .jr_00_05f1:
-    ld   C, OBJECT_FREESTANDING_REMOTE                                        ;; 00:05f1 $0e $1c
-    call call_00_29ce_Object_CheckExists                                  ;; 00:05f3 $cd $ce $29
+    ld   C, ENTITY_FREESTANDING_REMOTE                                        ;; 00:05f1 $0e $1c
+    call call_00_29ce_Entity_CheckExists                                  ;; 00:05f3 $cd $ce $29
     ret  Z                                             ;; 00:05f6 $c8
     ld   HL, wDB6A_WarpFlags                                     ;; 00:05f7 $21 $6a $db
     set  4, [HL]                                       ;; 00:05fa $cb $e6
@@ -922,7 +922,7 @@ call_00_088a_HDMA_BackgroundAnimator:
     ld   A, [wDBE3]                                    ;; 00:088a $fa $e3 $db
     and  A, A                                          ;; 00:088d $a7
     ret  Z                                             ;; 00:088e $c8
-    ld   A, BANK_0A_OBJECT_SPRITES                                        ;; 00:088f $3e $0a
+    ld   A, BANK_0A_ENTITY_SPRITES                                        ;; 00:088f $3e $0a
     call call_00_0eee_SwitchBank                                  ;; 00:0891 $cd $ee $0e
     ld   HL, wDC72_FrameCounter2                                     ;; 00:0894 $21 $72 $dc
     inc  [HL]                                          ;; 00:0897 $34
@@ -987,21 +987,21 @@ call_00_088a_HDMA_BackgroundAnimator:
     dw   wDBE7                                         ;; 00:08f1 pP
     db   $08, $20, $4d, $40, $8f                       ;; 00:08f3 .....
 
-call_00_08f8_SetupObjectVRAMTransfer:
-; Prepares an object’s graphics for VRAM upload.
-; Resolves the active object’s type and data pointer, stores the source address in wDB64/65, 
+call_00_08f8_SetupEntityVRAMTransfer:
+; Prepares an entity’s graphics for VRAM upload.
+; Resolves the active entity’s type and data pointer, stores the source address in wDB64/65, 
 ; and sets the appropriate wDB66_HDMATransferFlags so that HandlePendingHDMATransfers will 
 ; stream the tiles into VRAM on the next frame.
     ld   HL, wDB66_HDMATransferFlags                                     ;; 00:08f8 $21 $66 $db
     bit  7, [HL]                                       ;; 00:08fb $cb $7e
-    jr   NZ, call_00_08f8_SetupObjectVRAMTransfer                              ;; 00:08fd $20 $f9
+    jr   NZ, call_00_08f8_SetupEntityVRAMTransfer                              ;; 00:08fd $20 $f9
     bit  2, [HL]                                       ;; 00:08ff $cb $56
     jp   NZ, .jp_00_0a52                               ;; 00:0901 $c2 $52 $0a
     bit  0, [HL]                                       ;; 00:0904 $cb $46
     jp   NZ, .jp_00_0a52                               ;; 00:0906 $c2 $52 $0a
     bit  1, [HL]                                       ;; 00:0909 $cb $4e
     ret  NZ                                            ;; 00:090b $c0
-    ld   HL, wD840_ObjectMemoryAfterPlayer                                     ;; 00:090c $21 $40 $d8
+    ld   HL, wD840_EntityMemoryAfterPlayer                                     ;; 00:090c $21 $40 $d8
 .jr_00_090f:
     push HL                                            ;; 00:090f $e5
     ld   A, [HL]                                       ;; 00:0910 $7e
@@ -1026,7 +1026,7 @@ call_00_08f8_SetupObjectVRAMTransfer:
     res  1, [HL]                                       ;; 00:092a $cb $8e
     pop  HL                                            ;; 00:092c $e1
     ld   A, L                                          ;; 00:092d $7d
-    ld   [wDB61_ActiveObjectSlot], A                                    ;; 00:092e $ea $61 $db
+    ld   [wDB61_ActiveEntitySlot], A                                    ;; 00:092e $ea $61 $db
     or   A, $0a                                        ;; 00:0931 $f6 $0a
     ld   L, A                                          ;; 00:0933 $6f
     ld   C, [HL]                                       ;; 00:0934 $4e
@@ -1060,8 +1060,8 @@ call_00_08f8_SetupObjectVRAMTransfer:
     ld   [wDB64_VRAMTransferSource], A                                    ;; 00:0956 $ea $64 $db
     ld   A, H                                          ;; 00:0959 $7c
     ld   [wDB64_VRAMTransferSource+1], A                                    ;; 00:095a $ea $65 $db
-    farcall call_03_59b6_LookupObjectPropertyFromType
-    ld   [wDB63_ActiveObjectType], A                                    ;; 00:0968 $ea $63 $db
+    farcall call_03_59b6_LookupEntityPropertyFromType
+    ld   [wDB63_ActiveEntityType], A                                    ;; 00:0968 $ea $63 $db
     ld   HL, wDB66_HDMATransferFlags                                     ;; 00:096b $21 $66 $db
 .jr_00_096e:
     set  1, [HL]                                       ;; 00:096e $cb $ce
@@ -1080,17 +1080,17 @@ call_00_08f8_SetupObjectVRAMTransfer:
     res  1, [HL]                                       ;; 00:099c $cb $8e
     pop  HL                                            ;; 00:099e $e1
     ld   A, L                                          ;; 00:099f $7d
-    ld   [wDB61_ActiveObjectSlot], A                                    ;; 00:09a0 $ea $61 $db
+    ld   [wDB61_ActiveEntitySlot], A                                    ;; 00:09a0 $ea $61 $db
     or   A, $0a                                        ;; 00:09a3 $f6 $0a
     ld   L, A                                          ;; 00:09a5 $6f
     ld   A, [HL]                                       ;; 00:09a6 $7e
     push AF                                            ;; 00:09a7 $f5
-    farcall call_03_59b6_LookupObjectPropertyFromType
-    ld   [wDB63_ActiveObjectType], A                                    ;; 00:09b3 $ea $63 $db
+    farcall call_03_59b6_LookupEntityPropertyFromType
+    ld   [wDB63_ActiveEntityType], A                                    ;; 00:09b3 $ea $63 $db
     ld   L, A                                          ;; 00:09b6 $6f
     ld   H, $00                                        ;; 00:09b7 $26 $00
     add  HL, HL                                        ;; 00:09b9 $29
-    ld   DE, .data_00_0a58_ObjectVRAMSourceResolvers                                      ;; 00:09ba $11 $58 $0a
+    ld   DE, .data_00_0a58_EntityVRAMSourceResolvers                                      ;; 00:09ba $11 $58 $0a
     add  HL, DE                                        ;; 00:09bd $19
     ld   A, [HL+]                                      ;; 00:09be $2a
     ld   H, [HL]                                       ;; 00:09bf $66
@@ -1189,8 +1189,8 @@ call_00_08f8_SetupObjectVRAMTransfer:
     ld   HL, wDB66_HDMATransferFlags                                     ;; 00:0a52 $21 $66 $db
     set  7, [HL]                                       ;; 00:0a55 $cb $fe
     ret                                                ;; 00:0a57 $c9
-.data_00_0a58_ObjectVRAMSourceResolvers:
-; Used to resolve which function to run based on object type (wDB63_ActiveObjectType).
+.data_00_0a58_EntityVRAMSourceResolvers:
+; Used to resolve which function to run based on entity type (wDB63_ActiveEntityType).
     dw   .jr_00_0a17, .jr_00_0a17, .jr_00_0a29        ;; 00:0a58 ??
     dw   .jr_00_09c6, .jr_00_0a37, .jr_00_09db        ;; 00:0a5e ??????
     dw   .jr_00_09f0, .jr_00_0a01, .jr_00_0a41        ;; 00:0a64 pP
@@ -1576,15 +1576,15 @@ call_00_0c6a_HandlePendingHDMATransfers:
     res  7, [HL]                                       ;; 00:0ca8 $cb $be
     ret                                                ;; 00:0caa $c9
 .jr_00_0cab:
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:0cab $26 $d8
-    ld   A, [wDB61_ActiveObjectSlot]                                    ;; 00:0cad $fa $61 $db
-    or   A, OBJECT_FIELD_SPRITE_BANK                                        ;; 00:0cb0 $f6 $17
+    ld   H, HIGH(wD800_EntityMemory)                                        ;; 00:0cab $26 $d8
+    ld   A, [wDB61_ActiveEntitySlot]                                    ;; 00:0cad $fa $61 $db
+    or   A, ENTITY_FIELD_SPRITE_BANK                                        ;; 00:0cb0 $f6 $17
     ld   L, A                                          ;; 00:0cb2 $6f
     ld   A, [HL]                                       ;; 00:0cb3 $7e
     call call_00_0f25_AltSwitchBank                                  ;; 00:0cb4 $cd $25 $0f
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 00:0cb7 $26 $d8
-    ld   A, [wDB61_ActiveObjectSlot]                                    ;; 00:0cb9 $fa $61 $db
-    or   A, OBJECT_FIELD_GRAPHICS_FLAGS                                        ;; 00:0cbc $f6 $05
+    ld   H, HIGH(wD800_EntityMemory)                                        ;; 00:0cb7 $26 $d8
+    ld   A, [wDB61_ActiveEntitySlot]                                    ;; 00:0cb9 $fa $61 $db
+    or   A, ENTITY_FIELD_GRAPHICS_FLAGS                                        ;; 00:0cbc $f6 $05
     ld   L, A                                          ;; 00:0cbe $6f
     bit  5, [HL]                                       ;; 00:0cbf $cb $6e
     jr   NZ, .jr_00_0ceb                               ;; 00:0cc1 $20 $28
@@ -1592,7 +1592,7 @@ call_00_0c6a_HandlePendingHDMATransfers:
     ldh  [rHDMA1], A                                   ;; 00:0cc6 $e0 $51
     ld   A, [wDB64_VRAMTransferSource]                                    ;; 00:0cc8 $fa $64 $db
     ldh  [rHDMA2], A                                   ;; 00:0ccb $e0 $52
-    ld   A, [wDB61_ActiveObjectSlot]                                    ;; 00:0ccd $fa $61 $db
+    ld   A, [wDB61_ActiveEntitySlot]                                    ;; 00:0ccd $fa $61 $db
     rlca                                               ;; 00:0cd0 $07
     rlca                                               ;; 00:0cd1 $07
     rlca                                               ;; 00:0cd2 $07
@@ -1601,7 +1601,7 @@ call_00_0c6a_HandlePendingHDMATransfers:
     ldh  [rHDMA3], A                                   ;; 00:0cd7 $e0 $53
     xor  A, A                                          ;; 00:0cd9 $af
     ldh  [rHDMA4], A                                   ;; 00:0cda $e0 $54
-    ld   A, [wDB63_ActiveObjectType]                                    ;; 00:0cdc $fa $63 $db
+    ld   A, [wDB63_ActiveEntityType]                                    ;; 00:0cdc $fa $63 $db
     add  A, A                                          ;; 00:0cdf $87
     dec  A                                             ;; 00:0ce0 $3d
     ldh  [rHDMA5], A                                   ;; 00:0ce1 $e0 $55
@@ -1620,7 +1620,7 @@ call_00_0c6a_HandlePendingHDMATransfers:
     ldh  [rHDMA3], A                                   ;; 00:0cfb $e0 $53
     ld   A, $00                                        ;; 00:0cfd $3e $00
     ldh  [rHDMA4], A                                   ;; 00:0cff $e0 $54
-    ld   A, [wDB63_ActiveObjectType]                                    ;; 00:0d01 $fa $63 $db
+    ld   A, [wDB63_ActiveEntityType]                                    ;; 00:0d01 $fa $63 $db
     add  A, A                                          ;; 00:0d04 $87
     dec  A                                             ;; 00:0d05 $3d
     ldh  [rHDMA5], A                                   ;; 00:0d06 $e0 $55
@@ -1846,8 +1846,8 @@ call_00_0e33_SetLCDControlRegister:
     jp   call_00_0b92_WaitForInterrupt                                  ;; 00:0e38 $c3 $92 $0b
 
 call_00_0e3b_ClearGameStateVariables:
-; Purpose: Clears/reset various RAM variables related to the game state and objects.
-; Then: Calls a function in bank 02 to clear object slots.
+; Purpose: Clears/reset various RAM variables related to the game state and entities.
+; Then: Calls a function in bank 02 to clear entity slots.
 ; Then: Waits for interrupt.
 ; Use Case: Prepares the game for a fresh state, probably at start of a level or menu.
     xor  A, A                                          ;; 00:0e3b $af
@@ -1859,13 +1859,13 @@ call_00_0e3b_ClearGameStateVariables:
     ld   [wDC72_FrameCounter2], A                                    ;; 00:0e4b $ea $72 $dc
     ld   [wDBE3], A                                    ;; 00:0e4e $ea $e3 $db
     ld   [wDD6B], A                                    ;; 00:0e51 $ea $6b $dd
-    farcall call_02_7123_ClearObjectSlotsExcludingPlayer
+    farcall call_02_7123_ClearEntitySlotsExcludingPlayer
     jp   call_00_0b92_WaitForInterrupt                                  ;; 00:0e5f $c3 $92 $0b
 
 call_00_0e62_ResetFlagsAndVRAMState:
 ; Purpose: Resets some RAM variables (wDD6A_GameBoyColorPaletteFlag, wDAD9_ScrollX, wDADA_ScrollY) and clears a chunk of RAM (wD900 to wD99F).
 ; Then: Waits for interrupts at key points.
-; Use Case: VRAM/object state reset before loading new assets or scenes.
+; Use Case: VRAM/entity state reset before loading new assets or scenes.
     xor  A, A                                          ;; 00:0e62 $af
     ld   [wDD6A_GameBoyColorPaletteFlag], A                                    ;; 00:0e63 $ea $6a $dd
     call call_00_0b92_WaitForInterrupt                                  ;; 00:0e66 $cd $92 $0b

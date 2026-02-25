@@ -5,121 +5,121 @@ import struct
 import os
 import math
 
-object_names = [
-    "OBJECT_GEX",
-    "OBJECT_BONUS_COIN",
-    "OBJECT_FLY_COIN_SPAWN",
-    "OBJECT_PAW_COIN",
-    "OBJECT_FLY_1",
-    "OBJECT_FLY_2",
-    "OBJECT_FLY_3",
-    "OBJECT_FLY_4",
-    "OBJECT_FLY_5",
-    "OBJECT_GREEN_FLY_TV",
-    "OBJECT_PURPLE_FLY_TV",
-    "OBJECT_UNK_FLY_TV_3",
-    "OBJECT_BLUE_FLY_TV",
-    "OBJECT_UNK_FLY_TV_5",
-    "OBJECT_UNK0E",
-    "OBJECT_UNK0F",
-    "OBJECT_UNK10",
-    "OBJECT_TV_BUTTON",
-    "OBJECT_TV_REMOTE",
-    "OBJECT_UNK13",
-    "OBJECT_GOAL_COUNTER",
-    "OBJECT_UNK15",
-    "OBJECT_UNK16",
-    "OBJECT_UNK17",
-    "OBJECT_UNK18",
-    "OBJECT_UNK19",
-    "OBJECT_UNK1A",
-    "OBJECT_BONUS_STAGE_TIMER",
-    "OBJECT_FREESTANDING_REMOTE",
-    "OBJECT_HOLIDAY_TV_ICE_SCULPTURE",
-    "OBJECT_HOLIDAY_TV_EVIL_SANTA",
-    "OBJECT_HOLIDAY_TV_EVIL_SANTA_PROJECTILE",
-    "OBJECT_HOLIDAY_TV_SKATING_ELF",
-    "OBJECT_HOLIDAY_TV_PENGUIN",
-    "OBJECT_MYSTERY_TV_REZLING",
-    "OBJECT_MYSTERY_TV_BLOOD_COOLER",
-    "OBJECT_MYSTERY_TV_FISH",
-    "OBJECT_MYSTERY_TV_MAGIC_SWORD",
-    "OBJECT_MYSTERY_TV_SAFARI_SAM",
-    "OBJECT_MYSTERY_TV_SAFARI_SAM_PROJECTILE",
-    "OBJECT_MYSTERY_TV_GHOST_KNIGHT",
-    "OBJECT_MYSTERY_TV_GHOST_KNIGHT_PROJECTILE",
-    "OBJECT_TUT_TV_HAND",
-    "OBJECT_TUT_TV_LOST_ARK",
-    "OBJECT_TUT_TV_RISING_PLATFORM",
-    "OBJECT_TUT_TV_SIDEWAYS_PLATFORM",
-    "OBJECT_TUT_TV_BEE",
-    "OBJECT_TUT_TV_RAFT",
-    "OBJECT_TUT_TV_SNAKE_FACING_RIGHT",
-    "OBJECT_TUT_TV_SNAKE_FACING_LEFT",
-    "OBJECT_TUT_TV_SNAKE_RIGHT_PROJECTILE",
-    "OBJECT_TUT_TV_SNAKE_LEFT_PROJECTILE",
-    "OBJECT_TUT_TV_RA_STAFF",
-    "OBJECT_TUT_TV_RA_STATUE_HORIZONTAL_PROJECTILE",
-    "OBJECT_TUT_TV_RA_STATUE_DIAGONAL_PROJECTILE",
-    "OBJECT_TUT_TV_BREAKABLE_BLOCK",
-    "OBJECT_TUT_TV_COFFIN",
-    "OBJECT_WESTERN_STATION_CACTUS",
-    "OBJECT_UNK3A",
-    "OBJECT_WESTERN_STATION_ROCK_PLATFORM",
-    "OBJECT_WESTERN_STATION_HARD_HAT",
-    "OBJECT_WESTERN_STATION_PLAYING_CARD",
-    "OBJECT_WESTERN_STATION_BAT",
-    "OBJECT_WESTERN_STATION_RISING_PLATFORM",
-    "OBJECT_ANIME_CHANNEL_DOOR",
-    "OBJECT_ANIME_CHANNEL_DOOR2",
-    "OBJECT_ANIME_CHANNEL_FAN_LIFT",
-    "OBJECT_ANIME_CHANNEL_MECH_FACING_RIGHT",
-    "OBJECT_ANIME_CHANNEL_MECH_FACING_LEFT",
-    "OBJECT_ANIME_CHANNEL_DISAPPEARING_FLOOR",
-    "OBJECT_ANIME_CHANNEL_ON_SWITCH2",
-    "OBJECT_ANIME_CHANNEL_ALIEN_CULTURE_TUBE",
-    "OBJECT_ANIME_CHANNEL_BLUE_BEAM_BARRIER",
-    "OBJECT_ANIME_CHANNEL_RISING_PLATFORM",
-    "OBJECT_ANIME_CHANNEL_ON_SWITCH",
-    "OBJECT_ANIME_CHANNEL_OFF_SWITCH",
-    "OBJECT_ANIME_CHANNEL_SAILOR_TOON_GIRL",
-    "OBJECT_ANIME_CHANNEL_BIG_SILVER_ROBOT",
-    "OBJECT_ANIME_CHANNEL_SMALL_BLUE_ROBOT",
-    "OBJECT_ANIME_CHANNEL_SECBOT",
-    "OBJECT_ANIME_CHANNEL_SECBOT_PROJECTILE",
-    "OBJECT_ANIME_CHANNEL_ELEVATOR",
-    "OBJECT_ANIME_CHANNEL_FIRE_WALL_ENEMY",
-    "OBJECT_ANIME_CHANNEL_GRENADE",
-    "OBJECT_ANIME_CHANNEL_PLANET_O_BLAST_WEAPON",
-    "OBJECT_SUPERHERO_SHOW_MAD_BOMBER",
-    "OBJECT_SUPERHERO_SHOW_BOMB",
-    "OBJECT_SUPERHERO_SHOW_WATER_TOWER_TANK",
-    "OBJECT_SUPERHERO_SHOW_WATER_TOWER_STAND",
-    "OBJECT_SUPERHERO_SHOW_CONVICT",
-    "OBJECT_SUPERHERO_SHOW_SPIDER",
-    "OBJECT_SUPERHERO_SHOW_STRAY_CAT",
-    "OBJECT_SUPERHERO_SHOW_YELLOW_GOON",
-    "OBJECT_SUPERHERO_SHOW_RAT",
-    "OBJECT_SUPERHERO_SHOW_CHOMPER_TV",
-    "OBJECT_SUPERHERO_SHOW_CRUMBLING_FLOOR",
-    "OBJECT_SUPERHERO_SHOW_CONVICT_PROJECTILE",
-    "OBJECT_GEXTREME_SPORTS_ELF",
-    "OBJECT_GEXTREME_SPORTS_BONUS_TIME_COIN",
-    "OBJECT_MARSUPIAL_MADNESS_BELL",
-    "OBJECT_MARSUPIAL_MADNESS_BIRD",
-    "OBJECT_MARSUPIAL_MADNESS_BIRD_PROJECTILE",
-    "OBJECT_WW_GEX_WRESTLING_ROCK_HARD",
-    "OBJECT_LIZARD_OF_OZ_BRAIN_OF_OZ",
-    "OBJECT_LIZARD_OF_OZ_CANNON_PROJECTILE",
-    "OBJECT_LIZARD_OF_OZ_CANNON",
-    "OBJECT_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE",
-    "OBJECT_UNK6B",
-    "OBJECT_UNK6C",
-    "OBJECT_UNK6D",
-    "OBJECT_CHANNEL_Z_REZ",
-    "OBJECT_UNK6F",
-    "OBJECT_CHANNEL_Z_METEOR",
-    "OBJECT_CHANNEL_Z_REZ_PROJECTILE"
+entity_names = [
+    "ENTITY_GEX",
+    "ENTITY_BONUS_COIN",
+    "ENTITY_FLY_COIN_SPAWN",
+    "ENTITY_PAW_COIN",
+    "ENTITY_FLY_1",
+    "ENTITY_FLY_2",
+    "ENTITY_FLY_3",
+    "ENTITY_FLY_4",
+    "ENTITY_FLY_5",
+    "ENTITY_GREEN_FLY_TV",
+    "ENTITY_PURPLE_FLY_TV",
+    "ENTITY_UNK_FLY_TV_3",
+    "ENTITY_BLUE_FLY_TV",
+    "ENTITY_UNK_FLY_TV_5",
+    "ENTITY_UNK0E",
+    "ENTITY_UNK0F",
+    "ENTITY_UNK10",
+    "ENTITY_TV_BUTTON",
+    "ENTITY_TV_REMOTE",
+    "ENTITY_UNK13",
+    "ENTITY_GOAL_COUNTER",
+    "ENTITY_UNK15",
+    "ENTITY_UNK16",
+    "ENTITY_UNK17",
+    "ENTITY_UNK18",
+    "ENTITY_UNK19",
+    "ENTITY_UNK1A",
+    "ENTITY_BONUS_STAGE_TIMER",
+    "ENTITY_FREESTANDING_REMOTE",
+    "ENTITY_HOLIDAY_TV_ICE_SCULPTURE",
+    "ENTITY_HOLIDAY_TV_EVIL_SANTA",
+    "ENTITY_HOLIDAY_TV_EVIL_SANTA_PROJECTILE",
+    "ENTITY_HOLIDAY_TV_SKATING_ELF",
+    "ENTITY_HOLIDAY_TV_PENGUIN",
+    "ENTITY_MYSTERY_TV_REZLING",
+    "ENTITY_MYSTERY_TV_BLOOD_COOLER",
+    "ENTITY_MYSTERY_TV_FISH",
+    "ENTITY_MYSTERY_TV_MAGIC_SWORD",
+    "ENTITY_MYSTERY_TV_SAFARI_SAM",
+    "ENTITY_MYSTERY_TV_SAFARI_SAM_PROJECTILE",
+    "ENTITY_MYSTERY_TV_GHOST_KNIGHT",
+    "ENTITY_MYSTERY_TV_GHOST_KNIGHT_PROJECTILE",
+    "ENTITY_TUT_TV_HAND",
+    "ENTITY_TUT_TV_LOST_ARK",
+    "ENTITY_TUT_TV_RISING_PLATFORM",
+    "ENTITY_TUT_TV_SIDEWAYS_PLATFORM",
+    "ENTITY_TUT_TV_BEE",
+    "ENTITY_TUT_TV_RAFT",
+    "ENTITY_TUT_TV_SNAKE_FACING_RIGHT",
+    "ENTITY_TUT_TV_SNAKE_FACING_LEFT",
+    "ENTITY_TUT_TV_SNAKE_RIGHT_PROJECTILE",
+    "ENTITY_TUT_TV_SNAKE_LEFT_PROJECTILE",
+    "ENTITY_TUT_TV_RA_STAFF",
+    "ENTITY_TUT_TV_RA_STATUE_HORIZONTAL_PROJECTILE",
+    "ENTITY_TUT_TV_RA_STATUE_DIAGONAL_PROJECTILE",
+    "ENTITY_TUT_TV_BREAKABLE_BLOCK",
+    "ENTITY_TUT_TV_COFFIN",
+    "ENTITY_WESTERN_STATION_CACTUS",
+    "ENTITY_UNK3A",
+    "ENTITY_WESTERN_STATION_ROCK_PLATFORM",
+    "ENTITY_WESTERN_STATION_HARD_HAT",
+    "ENTITY_WESTERN_STATION_PLAYING_CARD",
+    "ENTITY_WESTERN_STATION_BAT",
+    "ENTITY_WESTERN_STATION_RISING_PLATFORM",
+    "ENTITY_ANIME_CHANNEL_DOOR",
+    "ENTITY_ANIME_CHANNEL_DOOR2",
+    "ENTITY_ANIME_CHANNEL_FAN_LIFT",
+    "ENTITY_ANIME_CHANNEL_MECH_FACING_RIGHT",
+    "ENTITY_ANIME_CHANNEL_MECH_FACING_LEFT",
+    "ENTITY_ANIME_CHANNEL_DISAPPEARING_FLOOR",
+    "ENTITY_ANIME_CHANNEL_ON_SWITCH2",
+    "ENTITY_ANIME_CHANNEL_ALIEN_CULTURE_TUBE",
+    "ENTITY_ANIME_CHANNEL_BLUE_BEAM_BARRIER",
+    "ENTITY_ANIME_CHANNEL_RISING_PLATFORM",
+    "ENTITY_ANIME_CHANNEL_ON_SWITCH",
+    "ENTITY_ANIME_CHANNEL_OFF_SWITCH",
+    "ENTITY_ANIME_CHANNEL_SAILOR_TOON_GIRL",
+    "ENTITY_ANIME_CHANNEL_BIG_SILVER_ROBOT",
+    "ENTITY_ANIME_CHANNEL_SMALL_BLUE_ROBOT",
+    "ENTITY_ANIME_CHANNEL_SECBOT",
+    "ENTITY_ANIME_CHANNEL_SECBOT_PROJECTILE",
+    "ENTITY_ANIME_CHANNEL_ELEVATOR",
+    "ENTITY_ANIME_CHANNEL_FIRE_WALL_ENEMY",
+    "ENTITY_ANIME_CHANNEL_GRENADE",
+    "ENTITY_ANIME_CHANNEL_PLANET_O_BLAST_WEAPON",
+    "ENTITY_SUPERHERO_SHOW_MAD_BOMBER",
+    "ENTITY_SUPERHERO_SHOW_BOMB",
+    "ENTITY_SUPERHERO_SHOW_WATER_TOWER_TANK",
+    "ENTITY_SUPERHERO_SHOW_WATER_TOWER_STAND",
+    "ENTITY_SUPERHERO_SHOW_CONVICT",
+    "ENTITY_SUPERHERO_SHOW_SPIDER",
+    "ENTITY_SUPERHERO_SHOW_STRAY_CAT",
+    "ENTITY_SUPERHERO_SHOW_YELLOW_GOON",
+    "ENTITY_SUPERHERO_SHOW_RAT",
+    "ENTITY_SUPERHERO_SHOW_CHOMPER_TV",
+    "ENTITY_SUPERHERO_SHOW_CRUMBLING_FLOOR",
+    "ENTITY_SUPERHERO_SHOW_CONVICT_PROJECTILE",
+    "ENTITY_GEXTREME_SPORTS_ELF",
+    "ENTITY_GEXTREME_SPORTS_BONUS_TIME_COIN",
+    "ENTITY_MARSUPIAL_MADNESS_BELL",
+    "ENTITY_MARSUPIAL_MADNESS_BIRD",
+    "ENTITY_MARSUPIAL_MADNESS_BIRD_PROJECTILE",
+    "ENTITY_WW_GEX_WRESTLING_ROCK_HARD",
+    "ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ",
+    "ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE",
+    "ENTITY_LIZARD_OF_OZ_CANNON",
+    "ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE",
+    "ENTITY_UNK6B",
+    "ENTITY_UNK6C",
+    "ENTITY_UNK6D",
+    "ENTITY_CHANNEL_Z_REZ",
+    "ENTITY_UNK6F",
+    "ENTITY_CHANNEL_Z_METEOR",
+    "ENTITY_CHANNEL_Z_REZ_PROJECTILE"
 ]
 
 def get_next_offset(arr, entry):
@@ -152,10 +152,10 @@ def x_flip_tile(tile_data):
     Flips a single Game Boy tile (16 bytes) horizontally.
 
     Args:
-        tile_data: A bytes object of exactly 16 bytes.
+        tile_data: A bytes entity of exactly 16 bytes.
 
     Returns:
-        A new bytes object with the tile data flipped horizontally.
+        A new bytes entity with the tile data flipped horizontally.
     """
     if len(tile_data) != 16:
         raise ValueError("Tile data must be exactly 16 bytes.")
@@ -171,10 +171,10 @@ def y_flip_tile(tile_data):
     Flips a single Game Boy tile (16 bytes) vertically.
 
     Args:
-        tile_data: A bytes object of exactly 16 bytes.
+        tile_data: A bytes entity of exactly 16 bytes.
 
     Returns:
-        A new bytes object with the tile data flipped vertically.
+        A new bytes entity with the tile data flipped vertically.
     """
     if len(tile_data) != 16:
         raise ValueError("Tile data must be exactly 16 bytes.")
@@ -197,9 +197,9 @@ def remove_trailing_zeros(my_bytes):
     pattern = b'\x00' * 16
     pattern_len = len(pattern)
 
-    # Loop while the bytes object ends with the pattern
+    # Loop while the bytes entity ends with the pattern
     while my_bytes.endswith(pattern):
-        # Reassign the variable to a new slice of the bytes object,
+        # Reassign the variable to a new slice of the bytes entity,
         # cutting off the pattern from the end
         my_bytes = my_bytes[:-pattern_len]
 
@@ -220,8 +220,8 @@ COLLISION_BLOCKSET_BANK = 10
 COLLISION_BLOCKSET_BANK_OFFSET = 11
 BG_PALETTE_BANK = 12
 BG_PALETTE_BANK_OFFSET = 13
-OBJECT_LIST_BANK = 14
-OBJECT_LIST_BANK_OFFSET = 15
+ENTITY_LIST_BANK = 14
+ENTITY_LIST_BANK_OFFSET = 15
 COLLECTIBLE_LIST_BANK = 16
 COLLECTIBLE_LIST_BANK_OFFSET = 17
 MAP_WIDTH = 18 # width of map (in blocks. each block is 4 tiles)
@@ -247,7 +247,7 @@ blockset_offsets = [] # list of banks and offsets in the blockset banks
 map_offsets = []
 tileset_offsets = []
 collectible_list_offsets = []
-object_list_offsets = []
+entity_list_offsets = []
 collision_blockset_offsets = []
 
 for level_counter in range(0, len(level_data_pointers)):
@@ -261,8 +261,8 @@ for level_counter in range(0, len(level_data_pointers)):
         tileset_offsets.append([level_data[TILESET_BANK], level_data[TILESET_BANK_OFFSET]])
     if [level_data[COLLECTIBLE_LIST_BANK], level_data[COLLECTIBLE_LIST_BANK_OFFSET]] not in collectible_list_offsets:
         collectible_list_offsets.append([level_data[COLLECTIBLE_LIST_BANK], level_data[COLLECTIBLE_LIST_BANK_OFFSET]])
-    if [level_data[OBJECT_LIST_BANK], level_data[OBJECT_LIST_BANK_OFFSET]] not in object_list_offsets:
-        object_list_offsets.append([level_data[OBJECT_LIST_BANK], level_data[OBJECT_LIST_BANK_OFFSET]])
+    if [level_data[ENTITY_LIST_BANK], level_data[ENTITY_LIST_BANK_OFFSET]] not in entity_list_offsets:
+        entity_list_offsets.append([level_data[ENTITY_LIST_BANK], level_data[ENTITY_LIST_BANK_OFFSET]])
     if [level_data[COLLISION_BLOCKSET_BANK], level_data[COLLISION_BLOCKSET_BANK_OFFSET]] not in collision_blockset_offsets:
         collision_blockset_offsets.append([level_data[COLLISION_BLOCKSET_BANK], level_data[COLLISION_BLOCKSET_BANK_OFFSET]])
 
@@ -286,9 +286,9 @@ sorted_collectible_list_offsets = sorted(collectible_list_offsets, key=lambda x:
 #for b in collectible_list_offsets:
 #    print(f"{b[0]:0{2}x}"+": "+f"{b[1]:0{4}x}")
 
-#print("\nObject List Offsets:")
-sorted_object_list_offsets = sorted(object_list_offsets, key=lambda x: (x[0], x[1]))
-#for b in object_list_offsets:
+#print("\nEntity List Offsets:")
+sorted_entity_list_offsets = sorted(entity_list_offsets, key=lambda x: (x[0], x[1]))
+#for b in entity_list_offsets:
 #    print(f"{b[0]:0{2}x}"+": "+f"{b[1]:0{4}x}")
 
 #print("\nPlayer Spawn Offsets:")
@@ -298,10 +298,10 @@ sorted_collision_blockset_offsets = sorted(collision_blockset_offsets, key=lambd
 
 split_map_data = True
 generate_regular_maps = False
-draw_objects_and_collectibles = False
+draw_entities_and_collectibles = False
 generate_collision_maps = False
 
-if draw_objects_and_collectibles:
+if draw_entities_and_collectibles:
     # set up collectible sprite
     collectible_sprite_path = "../banks/bank_00a.bin"
     collectible_sprite = open(collectible_sprite_path, "rb").read()[0xBA0:0xBE0]
@@ -434,29 +434,29 @@ if split_map_data:
         out.write(collectible_list_data)
         out.close()
 
-        # object list
-        object_list_file = "../banks/bank_0"+f"{level_data[OBJECT_LIST_BANK]:x}"+".bin"
-        end_addr = get_next_offset(sorted_object_list_offsets, [level_data[OBJECT_LIST_BANK], level_data[OBJECT_LIST_BANK_OFFSET]])
-        object_list_data = open(object_list_file, "rb").read()[level_data[OBJECT_LIST_BANK_OFFSET]-0x4000:end_addr-0x4000]
-        object_list_data = remove_trailing_zeros(object_list_data)
-        out = open('extracted_map_data/'+level_name+'/'+level_name+'_object_list.bin', "wb")
-        out.write(object_list_data)
+        # entity list
+        entity_list_file = "../banks/bank_0"+f"{level_data[ENTITY_LIST_BANK]:x}"+".bin"
+        end_addr = get_next_offset(sorted_entity_list_offsets, [level_data[ENTITY_LIST_BANK], level_data[ENTITY_LIST_BANK_OFFSET]])
+        entity_list_data = open(entity_list_file, "rb").read()[level_data[ENTITY_LIST_BANK_OFFSET]-0x4000:end_addr-0x4000]
+        entity_list_data = remove_trailing_zeros(entity_list_data)
+        out = open('extracted_map_data/'+level_name+'/'+level_name+'_entity_list.bin', "wb")
+        out.write(entity_list_data)
         out.close()
         
-        os.system('mkdir -p extracted_map_data/object_lists')
-        # create the object list asm file
-        out = open('extracted_map_data/object_lists/'+level_name+'_object_list.asm', "w")
+        os.system('mkdir -p extracted_map_data/entity_lists')
+        # create the entity list asm file
+        out = open('extracted_map_data/entity_lists/'+level_name+'_entity_list.asm', "w")
         
-        for i in range(0, len(object_list_data)-1, 0x10):
+        for i in range(0, len(entity_list_data)-1, 0x10):
             try:
-                objectId, xPosition, yPosition, xMax, xMin, yMin, yMax, flags, map = struct.unpack('<BHHHHHHHB',object_list_data[i:i+0x10])
-                object_name = object_names[objectId]
-                object_string = "    db   {}\n    dw   ${:04x}, ${:04x}\n    dw   ${:04x}, ${:04x}, ${:04x}, ${:04x}\n    dw   ${:04x}\n    db   ${:02x}\n\n".format(object_name, xPosition, yPosition, xMax, xMin, yMin, yMax, flags, map)
-                out.write(object_string)
+                entityId, xPosition, yPosition, xMax, xMin, yMin, yMax, flags, map = struct.unpack('<BHHHHHHHB',entity_list_data[i:i+0x10])
+                entity_name = entity_names[entityId]
+                entity_string = "    db   {}\n    dw   ${:04x}, ${:04x}\n    dw   ${:04x}, ${:04x}, ${:04x}, ${:04x}\n    dw   ${:04x}\n    db   ${:02x}\n\n".format(entity_name, xPosition, yPosition, xMax, xMin, yMin, yMax, flags, map)
+                out.write(entity_string)
             except:
                 break
         
-        out.write("    db   OBJECT_LIST_TERMINATOR\n")
+        out.write("    db   ENTITY_LIST_TERMINATOR\n")
         out.close()
 
 
@@ -498,8 +498,8 @@ if split_map_data:
         out2.write('    dw   '+level_name+'_'+channel_map_number+'_collision_blockset\n')
         out2.write('    db   BANK('+level_name+'_'+channel_map_number+'_palette)\n')
         out2.write('    dw   '+level_name+'_'+channel_map_number+'_palette\n')
-        out2.write('    db   BANK('+level_name+'_object_list)\n')
-        out2.write('    dw   '+level_name+'_object_list\n')
+        out2.write('    db   BANK('+level_name+'_entity_list)\n')
+        out2.write('    dw   '+level_name+'_entity_list\n')
         out2.write('    db   BANK('+level_name+'_collectible_list)\n')
         out2.write('    dw   '+level_name+'_collectible_list\n')
         out2.write('    db   $'+f"{width:02x}"+', $'+f"{height:02x}"+', $'+f"{level_id:02x}"+', $'+f"{unknown:02x}"+'\n')
@@ -598,12 +598,12 @@ if generate_regular_maps:
 
         os.system('mkdir -p map_images')
         os.system('mkdir -p map_images/'+level_name)
-        os.system('mkdir -p map_images_with_objects')
-        os.system('mkdir -p map_images_with_objects/'+level_name)
+        os.system('mkdir -p map_images_with_entities')
+        os.system('mkdir -p map_images_with_entities/'+level_name)
 
         map_image_path = "./map_images/"
-        if draw_objects_and_collectibles:
-            map_image_path = "./map_images_with_objects/"
+        if draw_entities_and_collectibles:
+            map_image_path = "./map_images_with_entities/"
 
         map_file = "../banks/bank_0"+f"{level_data[MAP_BANK]:x}"+".bin"
         map_data = open(map_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
@@ -622,19 +622,19 @@ if generate_regular_maps:
                 
                 count = count+1
 
-        if draw_objects_and_collectibles:
+        if draw_entities_and_collectibles:
 
-            object_list_file = "../banks/bank_0"+f"{level_data[OBJECT_LIST_BANK]:x}"+".bin"
-            end_addr = get_next_offset(sorted_object_list_offsets, [level_data[OBJECT_LIST_BANK], level_data[OBJECT_LIST_BANK_OFFSET]])
-            object_list_data = open(object_list_file, "rb").read()[level_data[OBJECT_LIST_BANK_OFFSET]-0x4000:end_addr-0x4000]
-            object_list_data = remove_trailing_zeros(object_list_data)
-            for i in range(0, len(object_list_data)-1, 0x10):
+            entity_list_file = "../banks/bank_0"+f"{level_data[ENTITY_LIST_BANK]:x}"+".bin"
+            end_addr = get_next_offset(sorted_entity_list_offsets, [level_data[ENTITY_LIST_BANK], level_data[ENTITY_LIST_BANK_OFFSET]])
+            entity_list_data = open(entity_list_file, "rb").read()[level_data[ENTITY_LIST_BANK_OFFSET]-0x4000:end_addr-0x4000]
+            entity_list_data = remove_trailing_zeros(entity_list_data)
+            for i in range(0, len(entity_list_data)-1, 0x10):
                 try:
-                    objectId, x, y, unk05, unk06, unk07, unk08, un09, unk0a, unk0b, unk0c, unk0d, unk0e, map_ = struct.unpack('<BHHBBBBBBBBBBB',object_list_data[i:i+0x10])
+                    entityId, x, y, unk05, unk06, unk07, unk08, un09, unk0a, unk0b, unk0c, unk0d, unk0e, map_ = struct.unpack('<BHHBBBBBBBBBBB',entity_list_data[i:i+0x10])
 
                     if map_ == level_counter:
                         draw.rectangle(((x-8,y-8), (x+8,y+8)), "white","white")
-                        draw.text((x-5, y-5), f"{objectId:0{2}X}", "black")
+                        draw.text((x-5, y-5), f"{entityId:0{2}X}", "black")
                         #img.paste(collectible_sprite, (x, y), collectible_sprite)
                 except:
                     continue

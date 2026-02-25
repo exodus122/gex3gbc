@@ -1,9 +1,9 @@
-call_02_4db1_Player_CheckXDistanceFromObject:
-; Checks whether an object exists (call_00_29ce), then compares the object’s X position to the player’s. 
-; If the object is left of the player (carry set), branches to a special handler. If they are perfectly aligned, 
+call_02_4db1_Player_CheckXDistanceFromEntity:
+; Checks whether an entity exists (call_00_29ce), then compares the entity’s X position to the player’s. 
+; If the entity is left of the player (carry set), branches to a special handler. If they are perfectly aligned, 
 ; it returns. Otherwise jumps to a general trigger routine.
 ; Purpose: Detects horizontal proximity for events.
-    call call_00_29ce_Object_CheckExists                                  ;; 02:4db1 $cd $ce $29
+    call call_00_29ce_Entity_CheckExists                                  ;; 02:4db1 $cd $ce $29
     ret  NZ                                            ;; 02:4db4 $c0
     ld   A, L                                          ;; 02:4db5 $7d
     or   A, $0e                                        ;; 02:4db6 $f6 $0e
@@ -227,7 +227,7 @@ call_02_4f32_PlayerUpdateMain:
 ; Actions:
 ; - Processes inputs, clearing or setting bits in wDC80_Player_UnkStates/wDC81_CurrentInputsAlt.
 ; - Manages timers (wDC7E_PlayerDamageCooldownTimer, wDCA9_FlyTimerOrFlags4–wDCAB_FlyTimerOrFlags2) using call_02_4ffb_DecTimerEveryCycle.
-; - Calls palette setup (call_03_6567_SetupObjectPalettes), BG collision update, object caching, and object loading.
+; - Calls palette setup (call_03_6567_SetupEntityPalettes), BG collision update, entity caching, and entity loading.
 ; - Jumps to the player action function (wD802_Player_ActionFunc).
 ; - Clears bits and finalizes state before call_02_724d.
 ; Purpose: Central routine for player state, input, collisions, and rendering per frame.
@@ -297,7 +297,7 @@ call_02_4f32_PlayerUpdateMain:
     call call_02_4ffb_DecTimerEveryCycle                                  ;; 02:4f9e $cd $fb $4f
     ld   HL, wDCAB_FlyTimerOrFlags2                                     ;; 02:4fa1 $21 $ab $dc
     call call_02_4ffb_DecTimerEveryCycle                                  ;; 02:4fa4 $cd $fb $4f
-    farcall call_03_6567_SetupObjectPalettes
+    farcall call_03_6567_SetupEntityPalettes
     call call_02_5081_Player_UpdateFacingAndMovementVector                                  ;; 02:4fb2 $cd $81 $50
     farcall call_03_46e0_UpdateBgCollision_MainDispatcher
     call call_02_5267_PlatformSlopeAndTriggerHandler                                  ;; 02:4fc0 $cd $67 $52
@@ -307,7 +307,7 @@ call_02_4f32_PlayerUpdateMain:
     ld   A, [HL]                                       ;; 02:4fd4 $7e
     ld   [HL], $ff                                     ;; 02:4fd5 $36 $ff
     cp   A, $ff                                        ;; 02:4fd7 $fe $ff
-    call NZ, call_02_72ac_SetObjectAction                              ;; 02:4fd9 $c4 $ac $72
+    call NZ, call_02_72ac_SetEntityAction                              ;; 02:4fd9 $c4 $ac $72
     ld   HL, wD802_Player_ActionFunc                                     ;; 02:4fdc $21 $02 $d8
     ld   A, [HL+]                                      ;; 02:4fdf $2a
     ld   H, [HL]                                       ;; 02:4fe0 $66
@@ -323,7 +323,7 @@ call_02_4f32_PlayerUpdateMain:
     call call_02_5047_CachePlayerTileCoords                                  ;; 02:4ff0 $cd $47 $50
     ld   HL, wD805_Player_MovementFlags                                     ;; 02:4ff3 $21 $05 $d8
     res  4, [HL]                                       ;; 02:4ff6 $cb $a6
-    jp   call_02_724d_UpdateObjectAnimationTimersAndSpriteId                                  ;; 02:4ff8 $c3 $4d $72
+    jp   call_02_724d_UpdateEntityAnimationTimersAndSpriteId                                  ;; 02:4ff8 $c3 $4d $72
 
 call_02_4ffb_DecTimerEveryCycle:
 ; Decrements a timer in [HL] every wDCA8_FlyTimerOrFlags3 frames. Resets wDCA8_FlyTimerOrFlags3 to 3C when it wraps.
@@ -584,14 +584,14 @@ call_02_5100_Player_HorizontalMovementHandler:
 call_02_518a_ApplyLeftwardCollisionAdjustment:
 ; Purpose: Adjusts the player's X-position when moving left against solid tiles or obstacles.
 ; Details:
-; Checks flags (wDC7C_PlayerCollisionUnusedFlag, wDC7B_CurrentObjectAddrLoAlt2) for collision state.
+; Checks flags (wDC7C_PlayerCollisionUnusedFlag, wDC7B_CurrentEntityAddrLoAlt2) for collision state.
 ; Computes the delta between player position and reference points.
 ; Writes corrected position back to wD80E_PlayerXPosition or clamps based on collision checks.
 ; Works together with call_02_5195_ResolveLeftwardTilePushback to fine-tune adjustments.
     ld   A, [wDC7C_PlayerCollisionUnusedFlag]                                    ;; 02:518a $fa $7c $dc
     and  A, A                                          ;; 02:518d $a7
     jr   NZ, call_02_51cb_CheckLeftCollisionAndStoreOffset                                ;; 02:518e $20 $3b
-    ld   A, [wDC7B_CurrentObjectAddrLoAlt2]                                    ;; 02:5190 $fa $7d $dc
+    ld   A, [wDC7B_CurrentEntityAddrLoAlt2]                                    ;; 02:5190 $fa $7d $dc
     and  A, A                                          ;; 02:5193 $a7
     ret  NZ                                            ;; 02:5194 $c0
 
@@ -644,13 +644,13 @@ call_02_5195_ResolveLeftwardTilePushback:
 call_02_51cb_CheckLeftCollisionAndStoreOffset:
 ; Purpose: Handles left-side collision testing.
 ; Behavior:
-; Offsets into the player object table, checks a collision flag (bit 7).
+; Offsets into the player entity table, checks a collision flag (bit 7).
 ; Compares the player’s X position to stored tile edge positions.
 ; If overlap exists, calls ResolveLeftwardTilePushback.
-; Stores the corrected offset between player and solid edge back into the object table.
-    or   A, OBJECT_FIELD_COLLISION_TYPE                                        ;; 02:51cb $f6 $14
+; Stores the corrected offset between player and solid edge back into the entity table.
+    or   A, ENTITY_FIELD_COLLISION_TYPE                                        ;; 02:51cb $f6 $14
     ld   L, A                                          ;; 02:51cd $6f
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:51ce $26 $d8
+    ld   H, HIGH(wD800_EntityMemory)                                        ;; 02:51ce $26 $d8
     bit  7, [HL]                                       ;; 02:51d0 $cb $7e
     ret  NZ                                            ;; 02:51d2 $c0
     dec  L                                             ;; 02:51d3 $2d
@@ -687,7 +687,7 @@ call_02_51f9_ApplyRightwardCollisionAdjustment:
     ld   A, [wDC7C_PlayerCollisionUnusedFlag]                                    ;; 02:51f9 $fa $7c $dc
     and  A, A                                          ;; 02:51fc $a7
     jr   NZ, call_02_5238_CheckRightCollisionAndStoreOffset                                ;; 02:51fd $20 $39
-    ld   A, [wDC7B_CurrentObjectAddrLoAlt2]                                    ;; 02:51ff $fa $7d $dc
+    ld   A, [wDC7B_CurrentEntityAddrLoAlt2]                                    ;; 02:51ff $fa $7d $dc
     and  A, A                                          ;; 02:5202 $a7
     ret  NZ                                            ;; 02:5203 $c0
 
@@ -741,9 +741,9 @@ call_02_5238_CheckRightCollisionAndStoreOffset:
 ; Performs the same operations but for movement to the right.
 ; Calls ResolveRightwardTilePushback when needed.
 ; Updates the tile offset table after adjustment.
-    or   A, OBJECT_FIELD_COLLISION_TYPE                                        ;; 02:5238 $f6 $14
+    or   A, ENTITY_FIELD_COLLISION_TYPE                                        ;; 02:5238 $f6 $14
     ld   L, A                                          ;; 02:523a $6f
-    ld   H, HIGH(wD800_ObjectMemory)                                        ;; 02:523b $26 $d8
+    ld   H, HIGH(wD800_EntityMemory)                                        ;; 02:523b $26 $d8
     bit  7, [HL]                                       ;; 02:523d $cb $7e
     ret  NZ                                            ;; 02:523f $c0
     dec  L                                             ;; 02:5240 $2d
@@ -908,7 +908,7 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     jr   Z, .jr_02_5366                                ;; 02:5362 $28 $02
     or   A, $f0                                        ;; 02:5364 $f6 $f0
 .jr_02_5366:
-    ld   HL, wDC88_CurrentObject_UnkVerticalOffset                                     ;; 02:5366 $21 $88 $dc
+    ld   HL, wDC88_CurrentEntity_UnkVerticalOffset                                     ;; 02:5366 $21 $88 $dc
     add  A, [HL]                                       ;; 02:5369 $86
     bit  7, A                                          ;; 02:536a $cb $7f
     jr   NZ, .jr_02_5372                               ;; 02:536c $20 $04

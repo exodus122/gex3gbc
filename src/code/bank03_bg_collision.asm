@@ -37,7 +37,7 @@ call_03_4708_BgCollisionHandler_Sidescroller:
     ld   A, [HL]                                       ;; 03:470b $7e
     ld   [HL], $00                                     ;; 03:470c $36 $00
     ld   [wDABD_UnkBGCollisionFlags], A                                    ;; 03:470e $ea $bd $da
-    ld   A, [wDC7B_CurrentObjectAddrLoAlt]                                    ;; 03:4711 $fa $7b $dc
+    ld   A, [wDC7B_CurrentEntityAddrLoAlt]                                    ;; 03:4711 $fa $7b $dc
     and  A, A                                          ;; 03:4714 $a7
     jr   Z, .jr_03_471c                                ;; 03:4715 $28 $05
     ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 03:4717 $21 $be $da

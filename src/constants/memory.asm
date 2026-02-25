@@ -46,14 +46,14 @@ wD400_TileBuffer:
 wD578_TileBuffer2:
     ds 392                                               ;; d578
 
-wD700_ObjectFlags:
-; Each byte stores the current flags for each object in the object list for the level
+wD700_EntityFlags:
+; Each byte stores the current flags for each entity in the entity list for the level
     ds 256
 
-; From D800 to D900 is the loaded objects space
+; From D800 to D900 is the loaded entities space
 ; There are 8 instances of 0x20 bytes each. 
-; Object Instance Struct is defined in constants.inc
-wD800_ObjectMemory:
+; Entity Instance Struct is defined in constants.inc
+wD800_EntityMemory:
 wD800_Player_Id:
     ds 1                                               ;; d800
 wD801_Player_ActionId:
@@ -73,16 +73,16 @@ wD80E_PlayerXPosition:
 wD810_PlayerYPosition:
     ds 2                                               ;; d810
     ds 14                                              ;; d811
-wD820_ObjectMemoryAfterPlayer:
+wD820_EntityMemoryAfterPlayer:
     ds 32                                              ;; d820
-wD840_ObjectMemoryAfterPlayer: ; why does some code use this and not wDB20? maybe wD820 is reserved for a particular object
+wD840_EntityMemoryAfterPlayer: ; why does some code use this and not wDB20? maybe wD820 is reserved for a particular entity
     ds 32                                              ;; d840
     ds 32 
     ds 32 
     ds 32 
     ds 32 
     ds 32 
-; End of Loaded Objects space
+; End of Loaded Entities space
 
 wD900:
     ds 1                                               ;; d900
@@ -103,26 +103,26 @@ wD9FE:
 wD9FF:
     ds 1                                               ;; d9ff
 
-; DA00 through DA13 stores temporary information about the currently updating object, or used by that object
-wDA00_CurrentObjectAddrLo:
-; if the object instance starts at $D8E0, this value is E0, for example
+; DA00 through DA13 stores temporary information about the currently updating entity, or used by that entity
+wDA00_CurrentEntityAddrLo:
+; if the entity instance starts at $D8E0, this value is E0, for example
     ds 1                                               ;; da00
-wDA01_ObjectListIndexesForCurrentObjects:
-; stores the entry number in the object list, of all the currently loaded objects
+wDA01_EntityListIndexesForCurrentEntities:
+; stores the entry number in the entity list, of all the currently loaded entities
 ; the values stored here have 1 added to them though. so index 0 would have value 1 here
     ds 8                                               ;; da01
-wDA09_LoadedObjectIdsBackupBuffer:
+wDA09_LoadedEntityIdsBackupBuffer:
     ds 8                                               ;; da09
-wDA11_ObjectXDistFromPlayer:
-; The distance between the player and the current object
+wDA11_EntityXDistFromPlayer:
+; The distance between the player and the current entity
     ds 1                                               ;; da11
-wDA12_ObjectDirectionRelativeToPlayer:
-; The direction of the current object relative to the player
-; 0x00 (OBJECT_LEFT_OF_GEX) = object is to the left of the player
-; 0x20 (OBJECT_RIGHT_OF_GEX) = object is to the right of the player
+wDA12_EntityDirectionRelativeToPlayer:
+; The direction of the current entity relative to the player
+; 0x00 (ENTITY_LEFT_OF_GEX) = entity is to the left of the player
+; 0x20 (ENTITY_RIGHT_OF_GEX) = entity is to the right of the player
     ds 1                                               ;; da12
-wDA13_ObjectXVelocityDelta:
-; How much the X Velocity of the current object has changed/(will change?) by
+wDA13_EntityXVelocityDelta:
+; How much the X Velocity of the current entity has changed/(will change?) by
     ds 1                                               ;; da13
 
 ; Camera position
@@ -135,27 +135,27 @@ wDA18_CameraPos_Top:
 wDA1A_CameraPos_Bottom:
     ds 2                                               ;; da1a
 
-; DA1C through DA9B is memory storing constants for each loaded object (8 instances of size 0x10)
-; 12 bytes are copied from the object spawn data, but in a different order
-; 0x0 wDA1C_ObjectBoundingBoxXMax
-; 0x2 wDA1E_ObjectBoundingBoxXMin
-; 0x4 wDA20_ObjectBoundingBoxYMin
-; 0x6 wDA22_ObjectBoundingBoxYMax
-; 0x8 wDA24_ObjectInitialXPos
-; 0xA wDA26_ObjectInitialYPos
+; DA1C through DA9B is memory storing constants for each loaded entity (8 instances of size 0x10)
+; 12 bytes are copied from the entity spawn data, but in a different order
+; 0x0 wDA1C_EntityBoundingBoxXMax
+; 0x2 wDA1E_EntityBoundingBoxXMin
+; 0x4 wDA20_EntityBoundingBoxYMin
+; 0x6 wDA22_EntityBoundingBoxYMax
+; 0x8 wDA24_EntityInitialXPos
+; 0xA wDA26_EntityInitialYPos
 ; 0xC DA28 - unused
 ; 0xE DA2A - unused
-wDA1C_ObjectBoundingBoxXMax:
+wDA1C_EntityBoundingBoxXMax:
     ds 2                                               ;; da1c
-wDA1E_ObjectBoundingBoxXMin:
+wDA1E_EntityBoundingBoxXMin:
     ds 2                                               ;; da1e
-wDA20_ObjectBoundingBoxYMin:
+wDA20_EntityBoundingBoxYMin:
     ds 2                                               ;; da20
-wDA22_ObjectBoundingBoxYMax:
+wDA22_EntityBoundingBoxYMax:
     ds 2                                               ;; da22
-wDA24_ObjectInitialXPos:
+wDA24_EntityInitialXPos:
     ds 2                                               ;; da24
-wDA26_ObjectInitialYPos:
+wDA26_EntityInitialYPos:
     ds 2
     ds 4
 
@@ -166,7 +166,7 @@ wDA26_ObjectInitialYPos:
     ds 16
     ds 16
     ds 16
-; end extra object memory
+; end extra entity memory
 
 wDA9C:
     ds 16                                              ;; da9c
@@ -176,23 +176,23 @@ wDAAC_CameraXHi: ; Camera X position related
 wDAAD_CameraYHi: ; Camera Y position related
     ds 1                                               ;; daad
 
-wDAAE_ObjectPaletteIds:
+wDAAE_EntityPaletteIds:
     ds 8                                               ;; daae
 wDAB6_SpriteFlags:
     ds 1                                               ;; dab6
 wDAB7_ParticleVelocity:
     ds 1                                               ;; dab7
-wDAB8_ObjectCounter:
-; this starts at 1 and goes up by 1 for each object in the object list for this level
+wDAB8_EntityCounter:
+; this starts at 1 and goes up by 1 for each entity in the entity list for this level
     ds 1                                               ;; dab8
-wDAB9_NextAvailableObjectSlot:
-; starts at 7 if no objects are currently loaded, then goes to 6 if one is, and so on
+wDAB9_NextAvailableEntitySlot:
+; starts at 7 if no entities are currently loaded, then goes to 6 if one is, and so on
     ds 1                                               ;; dab9
-wDABA_ObjectCounterRelated:
+wDABA_EntityCounterRelated:
     ds 1                                               ;; daba
-wDABB_CurrentObjectId:
+wDABB_CurrentEntityId:
     ds 1                                               ;; dabb
-wDABC_CurrentObjectFlags:
+wDABC_CurrentEntityFlags:
 ; from table at $D700(-$D7FF?)
 ; default value is $80 on initialization
     ds 1                                               ;; dabc
@@ -249,9 +249,9 @@ wDAE1_TextBuffer:
     ds 128                                             ;; dae1
 
 ; HDMA Transfer related ram
-wDB61_ActiveObjectSlot:
+wDB61_ActiveEntitySlot:
     ds 2                                               ;; db61
-wDB63_ActiveObjectType:
+wDB63_ActiveEntityType:
     ds 1                                               ;; db63
 wDB64_VRAMTransferSource:
     ds 2                                               ;; db64
@@ -262,10 +262,10 @@ wDB66_HDMATransferFlags:
 ; - Transfer length = wDAC2_DMATransferLength.
 ; - Always writes to VRAM bank 0.
 ; Bit 1 set →
-; Copy tiles for the current interaction object.
+; Copy tiles for the current interaction entity.
 ; - Uses wDB64/65 as the source pointer.
-; - Source bank depends on the object’s data (OBJECT_FIELD_GRAPHICS_FLAGS, plus a VBK = 1 path if “extended” graphics).
-; - Length depends on the object’s type (wDB63_ActiveObjectType).
+; - Source bank depends on the entity’s data (ENTITY_FIELD_GRAPHICS_FLAGS, plus a VBK = 1 path if “extended” graphics).
+; - Length depends on the entity’s type (wDB63_ActiveEntityType).
 ; - This looks like sprite/animation tiles for NPCs or items.
 ; Bit 2 set →
 ; Perform a variable-length streaming transfer.
@@ -527,9 +527,9 @@ wDC13_BgPaletteBank:
    ds 1                                               ;; dc13
 wDC14_BgPaletteBankOffset:
     ds 2                                               ;; dc14
-wDC16_ObjectListBank:
+wDC16_EntityListBank:
     ds 1                                               ;; dc16
-wDC17_ObjectListBankOffset:
+wDC17_EntityListBankOffset:
     ds 2                                               ;; dc17
 wDC19_CollectibleListBank:
     ds 1                                               ;; dc19
@@ -655,7 +655,7 @@ wDC54_CachedTileXCoord:
 wDC56_CachedTileYCoord:
     ds 2                                               ;; dc56
 
-wDC58_CurrentObjectInteractionFlags:
+wDC58_CurrentEntityInteractionFlags:
     ds 1                                               ;; dc58
 
 wDC59_NumRemotesOnMissionSelectMenu:
@@ -689,9 +689,9 @@ wDC6C_CheckpointStoredY:
 ; unused?
     ds 1                                               ;; dc6e
 
-wDC6F_ObjectSpriteRelated:
+wDC6F_EntitySpriteRelated:
     ds 1                                               ;; dc6f
-wDC70_ObjectSpriteRelated2:
+wDC70_EntitySpriteRelated2:
     ds 1                                               ;; dc70
 
 wDC71_FrameCounter:
@@ -711,13 +711,13 @@ wDC79:
 wDC7A:
     ds 1                                               ;; dc7a
 
-wDC7B_CurrentObjectAddrLoAlt:
+wDC7B_CurrentEntityAddrLoAlt:
     ds 1                                               ;; dc7b
 
 wDC7C_PlayerCollisionUnusedFlag:
     ds 1                                               ;; dc7c
 
-wDC7B_CurrentObjectAddrLoAlt2:
+wDC7B_CurrentEntityAddrLoAlt2:
     ds 1                                               ;; dc7d
 
 wDC7E_PlayerDamageCooldownTimer:
@@ -735,7 +735,7 @@ wDC81_CurrentInputsAlt:
 wDC83_PlayerIdleTimer:
     ds 1                                               ;; dc83
 
-; Object collision related
+; Entity collision related
 wDC84:
     ds 1                                               ;; dc84
 wDC85:
@@ -746,7 +746,7 @@ wDC86:
 wDC87:
     ds 1                                               ;; dc87
 
-wDC88_CurrentObject_UnkVerticalOffset:
+wDC88_CurrentEntity_UnkVerticalOffset:
     ds 1                                               ;; dc88
 
 wDC89:
@@ -860,7 +860,7 @@ wDCC1_EnterDoorRelated1:
 wDCC2_EnterDoorRelated2:
     ds 1                                               ;; dcc2
 
-; Object counters and flags
+; Entity counters and flags
 wDCC3_IceSculptureCounter:
     ds 1                                               ;; dcc3
 wDCC4_EvilSantaHealth:
@@ -893,7 +893,7 @@ wDCD1_BrainOfOzFlag:
     ds 1                                               ;; dcd1
 wDCD2_FreestandingRemoteHitFlags:
 ; gets set when a collision occurs with a freestanding remote
-; the remote object checks for this flag and sets progressflags
+; the remote entity checks for this flag and sets progressflags
     ds 1                                               ;; dcd2
 wDCD3_GhostKnightDamageCounter1:
     ds 1                                               ;; dcd3
@@ -913,7 +913,7 @@ wDCDA_BrainOfOzAndRezCounter:
     ds 1                                               ;; dcda
 wDCDB_EvilSantaHitByProjectileFlag:
     ds 1                                               ;; dcdb
-wDCDC_HandObjectUnkFlag:
+wDCDC_HandEntityUnkFlag:
     ds 2                                               ;; dcdc
 
 ; Mission Preview Cutscene flags
@@ -922,12 +922,12 @@ wDCDE_MissionPreviewCutsceneRelated:
 wDCE0_MissionPreviewCutsceneMovementFlags:
     ds 2                                               ;; dce0
 
-; Elevator object data
-wDCE2_ElevatorObjectUnkData:
+; Elevator entity data
+wDCE2_ElevatorEntityUnkData:
     ds 6                                               ;; dce2
 
-; Object spawning related flags
-wDCE8_ParentObjectListIndex: ; used relative object spawns, such as projectiles and flies
+; Entity spawning related flags
+wDCE8_ParentEntityListIndex: ; used relative entity spawns, such as projectiles and flies
     ds 1                                               ;; dce8
 wDCE9:
     ds 1                                               ;; dce9
@@ -937,9 +937,9 @@ wDCEA_BgPalettes:
     ds 32                                              ;; dcea
 wDD0A_BgPalettes:
     ds 32                                              ;; dd0a
-wDD2A_ObjectPalettes:
+wDD2A_EntityPalettes:
     ds 32                                              ;; dd2a
-wDD4A_ObjectPalettes:
+wDD4A_EntityPalettes:
     ds 32                                              ;; dd4a
 wDD6A_GameBoyColorPaletteFlag: ; determines if colored palettes will be used
     ds 1                                               ;; dd6a

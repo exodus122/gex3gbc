@@ -1626,8 +1626,8 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
 
 ; Enters a loop that:
 ; Waits for inputs and updates the map
-; Calls call_00_217f_ProcessCutsceneMovement (movement handler below) and updates objects (call_02_7152_UpdateAllObjects).
-; Spawns any queued objects (call_00_35fa_WaitForLineThenSpawnObject).
+; Calls call_00_217f_ProcessCutsceneMovement (movement handler below) and updates entities (call_02_7152_UpdateAllEntities).
+; Spawns any queued entities (call_00_35fa_WaitForLineThenSpawnEntity).
 ; Decrements timing counters until the script says to advance or exit.
 
 ; After finishing, restores the previous level ID and player positions, 
@@ -1690,7 +1690,7 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
     farcall call_03_6203_LoadLevelBoundariesFromId
     call call_00_10de_UpdatePlayerMapWindow                                  ;; 00:1f03 $cd $de $10
     call call_00_1056_LoadFullMap                                  ;; 00:1f06 $cd $56 $10
-    farcall call_02_708f_InitObjectsAndSpawnPlayer
+    farcall call_02_708f_InitEntitiesAndSpawnPlayer
     call call_00_0513                                  ;; 00:1f14 $cd $13 $05
     pop  HL                                            ;; 00:1f17 $e1
     ld   E, [HL]                                       ;; 00:1f18 $5e
@@ -1724,10 +1724,10 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
 .jr_00_1f42:
     call call_00_0b92_WaitForInterrupt                                  ;; 00:1f42 $cd $92 $0b
     call call_00_217f_ProcessCutsceneMovement                                  ;; 00:1f45 $cd $7f $21
-    farcall call_02_7152_UpdateAllObjects
+    farcall call_02_7152_UpdateAllEntities
     call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:1f53 $cd $c8 $11
-    call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:1f56 $cd $fa $35
-    call call_00_08f8_SetupObjectVRAMTransfer                                  ;; 00:1f59 $cd $f8 $08
+    call call_00_35fa_WaitForLineThenSpawnEntity                                  ;; 00:1f56 $cd $fa $35
+    call call_00_08f8_SetupEntityVRAMTransfer                                  ;; 00:1f59 $cd $f8 $08
     ld   HL, wDCDE_MissionPreviewCutsceneRelated                                     ;; 00:1f5c $21 $de $dc
     ld   A, [HL]                                       ;; 00:1f5f $7e
     sub  A, $01                                        ;; 00:1f60 $d6 $01
@@ -1754,10 +1754,10 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
 .jr_00_1f7a:
     push AF                                            ;; 00:1f7a $f5
     call call_00_0b92_WaitForInterrupt                                  ;; 00:1f7b $cd $92 $0b
-    farcall call_02_7152_UpdateAllObjects
+    farcall call_02_7152_UpdateAllEntities
     call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:1f89 $cd $c8 $11
-    call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:1f8c $cd $fa $35
-    call call_00_08f8_SetupObjectVRAMTransfer                                  ;; 00:1f8f $cd $f8 $08
+    call call_00_35fa_WaitForLineThenSpawnEntity                                  ;; 00:1f8c $cd $fa $35
+    call call_00_08f8_SetupEntityVRAMTransfer                                  ;; 00:1f8f $cd $f8 $08
     ld   A, [wDAD7_CurrentInputs]                                    ;; 00:1f92 $fa $d7 $da
     and  A, A                                          ;; 00:1f95 $a7
     jr   Z, .jr_00_1f9b                                ;; 00:1f96 $28 $03
