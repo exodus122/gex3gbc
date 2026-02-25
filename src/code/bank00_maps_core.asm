@@ -1626,7 +1626,7 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
 
 ; Enters a loop that:
 ; Waits for inputs and updates the map
-; Calls call_00_217f_ProcessCutsceneMovement (movement handler below) and updates objects (call_02_7152_UpdateObjects).
+; Calls call_00_217f_ProcessCutsceneMovement (movement handler below) and updates objects (call_02_7152_UpdateAllObjects).
 ; Spawns any queued objects (call_00_35fa_WaitForLineThenSpawnObject).
 ; Decrements timing counters until the script says to advance or exit.
 
@@ -1724,7 +1724,7 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
 .jr_00_1f42:
     call call_00_0b92_WaitForInterrupt                                  ;; 00:1f42 $cd $92 $0b
     call call_00_217f_ProcessCutsceneMovement                                  ;; 00:1f45 $cd $7f $21
-    farcall call_02_7152_UpdateObjects
+    farcall call_02_7152_UpdateAllObjects
     call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:1f53 $cd $c8 $11
     call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:1f56 $cd $fa $35
     call call_00_08f8_SetupObjectVRAMTransfer                                  ;; 00:1f59 $cd $f8 $08
@@ -1754,7 +1754,7 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
 .jr_00_1f7a:
     push AF                                            ;; 00:1f7a $f5
     call call_00_0b92_WaitForInterrupt                                  ;; 00:1f7b $cd $92 $0b
-    farcall call_02_7152_UpdateObjects
+    farcall call_02_7152_UpdateAllObjects
     call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:1f89 $cd $c8 $11
     call call_00_35fa_WaitForLineThenSpawnObject                                  ;; 00:1f8c $cd $fa $35
     call call_00_08f8_SetupObjectVRAMTransfer                                  ;; 00:1f8f $cd $f8 $08

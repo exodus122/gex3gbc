@@ -1,9 +1,9 @@
 call_03_46e0_UpdateBgCollision_MainDispatcher:
 ; Saves current bank in wDAD6_ReturnBank
-; Calls a banked function (call_02_5541_GetActionPropertyByte) to get collision status
+; Calls a banked function (call_02_5541_GetPlayerStatesFromAction) to get collision status
 ; Depending on result bits, jumps to specialized collision handlers 
 ; (call_03_4a3f_BgCollisionHandler_ByAction, call_03_4ae4_CollisionMask_LookupAndDispatch, or mode-specific handler table).
-    farcall call_02_5541_GetActionPropertyByte
+    farcall call_02_5541_GetPlayerStatesFromAction
     bit  5, A                                          ;; 03:46eb $cb $6f
     jp   NZ, call_03_4a3f_BgCollisionHandler_ByAction            ;; 03:46ed $c2 $3f $4a
     bit  7, A                                          ;; 03:46f0 $cb $7f

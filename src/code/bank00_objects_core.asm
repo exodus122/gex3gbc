@@ -353,12 +353,12 @@ call_00_2ce2_BuildGexSpriteDrawList:
 call_00_2f00_CallBank2_Helper_AndCheckBit8:
 ; Switch to Bank 2 and Run Entry
 ; Behavior: Saves registers, stores current bank (wDAD6_ReturnBank), switches to bank $02, 
-; and calls call_02_5541_GetActionPropertyByte using the alternate-bank call routine. Restores registers, masks result with $08, and returns.
+; and calls call_02_5541_GetPlayerStatesFromAction using the alternate-bank call routine. Restores registers, masks result with $08, and returns.
 ; Purpose: Executes a helper routine from bank 2 and checks a specific status bit.
     push HL                                            ;; 00:2f00 $e5
     push DE                                            ;; 00:2f01 $d5
     push BC                                            ;; 00:2f02 $c5
-    farcall call_02_5541_GetActionPropertyByte
+    farcall call_02_5541_GetPlayerStatesFromAction
     pop  BC                                            ;; 00:2f0e $c1
     pop  DE                                            ;; 00:2f0f $d1
     pop  HL                                            ;; 00:2f10 $e1
@@ -851,10 +851,10 @@ data_00_325F:
     db   $01, $0a, $0a, COLLISION_TYPE_GENERIC_ENEMY, $00, $00, $ff, $ff ; 00:33a0 ???????? ; OBJECT_MYSTERY_TV_GHOST_KNIGHT_PROJECTILE
     db   $01, $0c, $0c, COLLISION_TYPE_HAND, $00, $00, $ff, $ff ; 00:33a8 ???????? ; OBJECT_TUT_TV_HAND
     db   $01, $10, $08, COLLISION_TYPE_LOST_ARK, $02, $00, $ff, $01 ; 00:33b0 ???????? ; OBJECT_TUT_TV_LOST_ARK
-    db   $01, $0c, $08, COLLISION_TYPE_PLATFORM_WITH_FLAG, $00, $00, $ff, $ff ; 00:33b8 ???????? ; OBJECT_TUT_TV_RISING_PLATFORM
-    db   $01, $0c, $08, COLLISION_TYPE_PLATFORM_WITH_FLAG, $00, $00, $ff, $ff ; 00:33c0 ???????? ; OBJECT_TUT_TV_SIDEWAYS_PLATFORM
+    db   $01, $0c, $08, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:33b8 ???????? ; OBJECT_TUT_TV_RISING_PLATFORM
+    db   $01, $0c, $08, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:33c0 ???????? ; OBJECT_TUT_TV_SIDEWAYS_PLATFORM
     db   $01, $0c, $0c, COLLISION_TYPE_GENERIC_ENEMY, $02, $00, $ff, $c4 ; 00:33c8 ???????? ; OBJECT_TUT_TV_BEE
-    db   $01, $10, $08, COLLISION_TYPE_PLATFORM_WITH_FLAG, $00, $00, $ff, $ff ; 00:33d0 ???????? ; OBJECT_TUT_TV_RAFT
+    db   $01, $10, $08, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:33d0 ???????? ; OBJECT_TUT_TV_RAFT
     db   $01, $08, $08, COLLISION_TYPE_GENERIC_ENEMY, $02, $00, $ff, $c3 ; 00:33d8 ???????? ; OBJECT_TUT_TV_SNAKE_FACING_RIGHT
     db   $01, $08, $08, COLLISION_TYPE_GENERIC_ENEMY, $02, $00, $ff, $c3 ; 00:33e0 ???????? ; OBJECT_TUT_TV_SNAKE_FACING_LEFT
     db   $01, $06, $08, COLLISION_TYPE_PROJECTILE, $00, $00, $ff, $ff ; 00:33e8 ???????? ; OBJECT_TUT_TV_SNAKE_RIGHT_PROJECTILE
@@ -862,25 +862,25 @@ data_00_325F:
     db   $01, $08, $10, COLLISION_TYPE_RA_STAFF, $02, $00, $ff, $81 ; 00:33f8 ???????? ; OBJECT_TUT_TV_RA_STAFF
     db   $01, $0a, $0a, COLLISION_TYPE_RA_STATUE_PROJECTILE, $00, $00, $ff, $ff ; 00:3400 ???????? ; OBJECT_TUT_TV_RA_STATUE_HORIZONTAL_PROJECTILE
     db   $01, $0a, $0a, COLLISION_TYPE_RA_STATUE_PROJECTILE, $00, $00, $ff, $ff ; 00:3408 ???????? ; OBJECT_TUT_TV_RA_STATUE_DIAGONAL_PROJECTILE
-    db   $01, $12, $08, COLLISION_TYPE_PLATFORM_WITH_FLAG, $00, $00, $ff, $ff ; 00:3410 ???????? ; OBJECT_TUT_TV_BREAKABLE_BLOCK
+    db   $01, $12, $08, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:3410 ???????? ; OBJECT_TUT_TV_BREAKABLE_BLOCK
     db   $01, $10, $20, COLLISION_TYPE_COFFIN, $00, $00, $ff, $ff ; 00:3418 ???????? ; OBJECT_TUT_TV_COFFIN
     db   $01, $10, $18, COLLISION_TYPE_CACTUS, $03, $00, $ff, $46 ; 00:3420 ???????? ; OBJECT_WESTERN_STATION_CACTUS
     db   $01, $10, $18, COLLISION_TYPE_GENERIC_ENEMY, $00, $00, $ff, $ff ; 00:3428 ???????? ; OBJECT_UNK3A
-    db   $01, $0a, $10, COLLISION_TYPE_PLATFORM_WITH_FLAG, $00, $00, $ff, $ff ; 00:3430 ???????? ; OBJECT_WESTERN_STATION_ROCK_PLATFORM
+    db   $01, $0a, $10, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:3430 ???????? ; OBJECT_WESTERN_STATION_ROCK_PLATFORM
     db   $01, $0a, $0a, COLLISION_TYPE_HARD_HAT, $02, $00, $ff, $c4 ; 00:3438 ???????? ; OBJECT_WESTERN_STATION_HARD_HAT
     db   $01, $0a, $0a, COLLISION_TYPE_PLAYING_CARD, $02, $00, $ff, $81 ; 00:3440 ???????? ; OBJECT_WESTERN_STATION_PLAYING_CARD
     db   $01, $0a, $0a, COLLISION_TYPE_GENERIC_ENEMY, $02, $00, $ff, $84 ; 00:3448 ???????? ; OBJECT_WESTERN_STATION_BAT
-    db   $01, $0c, $08, COLLISION_TYPE_PLATFORM_WITH_FLAG, $00, $00, $ff, $ff ; 00:3450 ???????? ; OBJECT_WESTERN_STATION_RISING_PLATFORM
+    db   $01, $0c, $08, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:3450 ???????? ; OBJECT_WESTERN_STATION_RISING_PLATFORM
     db   $01, $08, $08, COLLISION_TYPE_DOOR, $00, $00, $ff, $ff ; 00:3458 ???????? ; OBJECT_ANIME_CHANNEL_DOOR
     db   $01, $08, $08, COLLISION_TYPE_DOOR_2, $00, $00, $ff, $ff ; 00:3460 ???????? ; OBJECT_ANIME_CHANNEL_DOOR2
     db   $01, $00, $00, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:3468 ???????? ; OBJECT_ANIME_CHANNEL_FAN_LIFT
     db   $01, $10, $10, COLLISION_TYPE_MECH, $04, $00, $ff, $81 ; 00:3470 ???????? ; OBJECT_ANIME_CHANNEL_MECH_FACING_RIGHT
     db   $01, $10, $10, COLLISION_TYPE_MECH, $04, $00, $ff, $81 ; 00:3478 ???????? ; OBJECT_ANIME_CHANNEL_MECH_FACING_LEFT
-    db   $01, $12, $08, COLLISION_TYPE_PLATFORM_WITH_FLAG, $00, $00, $ff, $ff ; 00:3480 ???????? ; OBJECT_ANIME_CHANNEL_DISAPPEARING_FLOOR
+    db   $01, $12, $08, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:3480 ???????? ; OBJECT_ANIME_CHANNEL_DISAPPEARING_FLOOR
     db   $01, $08, $08, COLLISION_TYPE_ON_SWITCH_2, $00, $00, $ff, $ff ; 00:3488 ???????? ; OBJECT_ANIME_CHANNEL_ON_SWITCH2
     db   $01, $10, $20, COLLISION_TYPE_ALIEN_CULTURE_TUBE, $02, $00, $ff, $01 ; 00:3490 ???????? ; OBJECT_ANIME_CHANNEL_ALIEN_CULTURE_TUBE
-    db   $01, $08, $40, COLLISION_TYPE_PLATFORM_WITH_FLAG, $00, $00, $ff, $ff ; 00:3498 ???????? ; OBJECT_ANIME_CHANNEL_BLUE_BEAM_BARRIER
-    db   $01, $08, $08, COLLISION_TYPE_PLATFORM_WITH_FLAG, $00, $00, $ff, $ff ; 00:34a0 ???????? ; OBJECT_ANIME_CHANNEL_RISING_PLATFORM
+    db   $01, $08, $40, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:3498 ???????? ; OBJECT_ANIME_CHANNEL_BLUE_BEAM_BARRIER
+    db   $01, $08, $08, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:34a0 ???????? ; OBJECT_ANIME_CHANNEL_RISING_PLATFORM
     db   $01, $08, $08, COLLISION_TYPE_ON_SWITCH, $00, $00, $ff, $ff ; 00:34a8 ???????? ; OBJECT_ANIME_CHANNEL_ON_SWITCH
     db   $01, $08, $08, COLLISION_TYPE_OFF_SWITCH, $00, $00, $ff, $ff ; 00:34b0 ???????? ; OBJECT_ANIME_CHANNEL_OFF_SWITCH
     db   $01, $10, $10, COLLISION_TYPE_SAILOR_TOON_GIRL, $04, $00, $ff, $42 ; 00:34b8 ???????? ; OBJECT_ANIME_CHANNEL_SAILOR_TOON_GIRL
@@ -888,13 +888,13 @@ data_00_325F:
     db   $01, $0a, $0a, COLLISION_TYPE_GENERIC_ENEMY, $02, $00, $ff, $c2 ; 00:34c8 ???????? ; OBJECT_ANIME_CHANNEL_SMALL_BLUE_ROBOT
     db   $01, $0a, $0a, COLLISION_TYPE_SECBOT, $03, $00, $ff, $c4 ; 00:34d0 ???????? ; OBJECT_ANIME_CHANNEL_SECBOT
     db   $01, $0a, $0a, COLLISION_TYPE_PROJECTILE, $00, $00, $ff, $ff ; 00:34d8 ???????? ; OBJECT_ANIME_CHANNEL_SECBOT_PROJECTILE
-    db   $01, $12, $08, COLLISION_TYPE_PLATFORM_WITH_FLAG, $00, $00, $ff, $ff ; 00:34e0 ???????? ; OBJECT_ANIME_CHANNEL_ELEVATOR
+    db   $01, $12, $08, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:34e0 ???????? ; OBJECT_ANIME_CHANNEL_ELEVATOR
     db   $01, $0c, $0c, COLLISION_TYPE_GENERIC_ENEMY, $00, $00, $ff, $ff ; 00:34e8 ???????? ; OBJECT_ANIME_CHANNEL_FIRE_WALL_ENEMY
     db   $01, $0a, $0a, COLLISION_TYPE_GENERIC_ENEMY, $00, $00, $ff, $ff ; 00:34f0 ???????? ; OBJECT_ANIME_CHANNEL_GRENADE
     db   $01, $14, $14, COLLISION_TYPE_PLANET_O_BLAST, $04, $00, $ff, $c1 ; 00:34f8 ???????? ; OBJECT_ANIME_CHANNEL_PLANET_O_BLAST_WEAPON
     db   $01, $10, $18, COLLISION_TYPE_NONE, $06, $00, $ff, $05 ; 00:3500 ???????? ; OBJECT_SUPERHERO_SHOW_MAD_BOMBER
     db   $01, $0a, $0a, COLLISION_TYPE_BOMB, $00, $00, $ff, $ff ; 00:3508 ???????? ; OBJECT_SUPERHERO_SHOW_BOMB
-    db   $01, $10, $10, COLLISION_TYPE_PLATFORM_WITH_FLAG, $00, $00, $ff, $ff ; 00:3510 ???????? ; OBJECT_SUPERHERO_SHOW_WATER_TOWER_TANK
+    db   $01, $10, $10, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:3510 ???????? ; OBJECT_SUPERHERO_SHOW_WATER_TOWER_TANK
     db   $01, $14, $18, COLLISION_TYPE_WATER_TOWER_STAND, $02, $00, $ff, $01 ; 00:3518 ???????? ; OBJECT_SUPERHERO_SHOW_WATER_TOWER_STAND
     db   $01, $0c, $10, COLLISION_TYPE_CONVICT, $02, $00, $ff, $c3 ; 00:3520 ???????? ; OBJECT_SUPERHERO_SHOW_CONVICT
     db   $01, $0a, $0a, COLLISION_TYPE_GENERIC_ENEMY, $03, $00, $ff, $c3 ; 00:3528 ???????? ; OBJECT_SUPERHERO_SHOW_SPIDER
@@ -902,7 +902,7 @@ data_00_325F:
     db   $01, $0c, $10, COLLISION_TYPE_YELLOW_GOON, $04, $00, $ff, $c3 ; 00:3538 ???????? ; OBJECT_SUPERHERO_SHOW_YELLOW_GOON
     db   $01, $0c, $0c, COLLISION_TYPE_GENERIC_ENEMY, $04, $00, $ff, $c2 ; 00:3540 ???????? ; OBJECT_SUPERHERO_SHOW_RAT
     db   $01, $0a, $0a, COLLISION_TYPE_CHOMPER_TV, $03, $00, $ff, $c3 ; 00:3548 ???????? ; OBJECT_SUPERHERO_SHOW_CHOMPER_TV
-    db   $01, $10, $08, COLLISION_TYPE_PLATFORM_WITH_FLAG, $00, $00, $ff, $ff ; 00:3550 ???????? ; OBJECT_SUPERHERO_SHOW_CRUMBLING_FLOOR
+    db   $01, $10, $08, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:3550 ???????? ; OBJECT_SUPERHERO_SHOW_CRUMBLING_FLOOR
     db   $01, $0a, $0a, COLLISION_TYPE_GENERIC_ENEMY, $00, $00, $ff, $ff ; 00:3558 ???????? ; OBJECT_SUPERHERO_SHOW_CONVICT_PROJECTILE
     db   $01, $0c, $10, COLLISION_TYPE_GEXTREME_SPORTS_ELF, $00, $00, $ff, $80 ; 00:3560 ???????? ; OBJECT_GEXTREME_SPORTS_ELF
     db   $01, $10, $10, COLLISION_TYPE_BONUS_TIME_COIN, $02, $00, $ff, $81 ; 00:3568 ???????? ; OBJECT_GEXTREME_SPORTS_BONUS_TIME_COIN
@@ -915,8 +915,8 @@ data_00_325F:
     db   $01, $08, $08, COLLISION_TYPE_CANNON, $00, $00, $ff, $ff ; 00:35a0 ???????? ; OBJECT_LIZARD_OF_OZ_CANNON
     db   $01, $0a, $0a, COLLISION_TYPE_BRAIN_OF_OZ_PROJECTILE, $00, $00, $ff, $ff ; 00:35a8 ???????? ; OBJECT_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE
     db   $01, $10, $10, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:35b0 ???????? ; OBJECT_UNK6B
-    db   $01, $10, $08, COLLISION_TYPE_PLATFORM_WITH_FLAG, $00, $00, $ff, $ff ; 00:35b8 ???????? ; OBJECT_UNK6C
-    db   $01, $10, $08, COLLISION_TYPE_PLATFORM_WITH_FLAG, $00, $00, $ff, $ff ; 00:35c0 ???????? ; OBJECT_UNK6D
+    db   $01, $10, $08, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:35b8 ???????? ; OBJECT_UNK6C
+    db   $01, $10, $08, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:35c0 ???????? ; OBJECT_UNK6D
     db   $01, $1c, $20, COLLISION_TYPE_REZ, $10, $00, $ff, $8a ; 00:35c8 ???????? ; OBJECT_CHANNEL_Z_REZ
     db   $01, $0a, $40, COLLISION_TYPE_GENERIC_ENEMY, $00, $00, $ff, $ff ; 00:35d0 ???????? ; OBJECT_UNK6F
     db   $01, $0c, $0c, COLLISION_TYPE_METEOR, $02, $00, $ff, $82 ; 00:35d8 ???????? ; OBJECT_CHANNEL_Z_METEOR

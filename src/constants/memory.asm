@@ -281,11 +281,10 @@ wDB69:
     ds 1                                               ;; db69
 
 wDB6A_WarpFlags:
-; Bitfield
 ; bit 7 (80) = 
 ; bit 6 (40) = 
-; bit 5 (20) = 
-; bit 4 (10) = entering tv, defeated minibosses, collected bonus tv remotes
+; bit 5 (20) = collected a remote that warps you?
+; bit 4 (10) = loading new area (entering tv, defeated minibosses, collected bonus tv remotes)
 ; bit 3 (08) = 
 ; bit 2 (04) = soft reset code used (A + B + Select + Start)
 ; bit 1 (02) = died

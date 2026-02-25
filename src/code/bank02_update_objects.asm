@@ -116,7 +116,7 @@ call_02_7142_RestoreObjectTable:
     jr   NZ, .jr_02_7148                               ;; 02:714f $20 $f7
     ret                                                ;; 02:7151 $c9
 
-call_02_7152_UpdateObjects:
+call_02_7152_UpdateAllObjects:
 ; Purpose: Master routine for per-frame object updates and player-related checks.
 ; Details:
 ; Resets temporary flags and checks conditions in wDCA7_DrawGexFlag.
@@ -133,7 +133,7 @@ call_02_7152_UpdateObjects:
     ld   A, [wDCA7_DrawGexFlag]                                    ;; 02:715f $fa $a7 $dc
     and  A, A                                          ;; 02:7162 $a7
     jp   Z, .jp_02_7200                                ;; 02:7163 $ca $00 $72
-    call call_02_5541_GetActionPropertyByte                                  ;; 02:7166 $cd $41 $55
+    call call_02_5541_GetPlayerStatesFromAction                                  ;; 02:7166 $cd $41 $55
     and  A, $08                                        ;; 02:7169 $e6 $08
     jr   NZ, .jr_02_717f                               ;; 02:716b $20 $12
     ld   A, [wDC93]                                    ;; 02:716d $fa $93 $dc

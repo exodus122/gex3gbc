@@ -184,7 +184,7 @@ call_00_0150_Init:
     farcall call_01_4000_MenuHandler_LoadAndProcess
     ld   A, MENU_DAVID_A_PALMER                                        ;; 00:02a5 $3e $0f
     farcall call_01_4000_MenuHandler_LoadAndProcess
-.jp_00_02b2:
+.jp_00_02b2_LoadMainMenu:
     ld   A, SONG_UNK01                                        ;; 00:02b2 $3e $01
     call call_00_0fa2_PlaySong                                  ;; 00:02b4 $cd $a2 $0f
     ld   A, MENU_TITLE_SCREEN                                        ;; 00:02b7 $3e $00
@@ -192,7 +192,7 @@ call_00_0150_Init:
     cp   A, $20                                        ;; 00:02c4 $fe $20
     jr   Z, .jr_00_02ed                                ;; 00:02c6 $28 $25
     cp   A, $10                                        ;; 00:02c8 $fe $10
-    jr   NZ, .jp_00_02b2                               ;; 00:02ca $20 $e6
+    jr   NZ, .jp_00_02b2_LoadMainMenu                               ;; 00:02ca $20 $e6
 .jp_00_02cc_LoadMainMenuAfterGameOver:
     ld   A, $04                                        ;; 00:02cc $3e $04
     ld   [wDC4E_LivesRemaining], A                                    ;; 00:02ce $ea $4e $dc
@@ -223,7 +223,7 @@ call_00_0150_Init:
     call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:030c $cd $6a $0a
     ld   A, $e7                                        ;; 00:030f $3e $e7
     call call_00_0e33_SetLCDControlRegister                                  ;; 00:0311 $cd $33 $0e
-.jp_00_0314:
+.jp_00_0314_LoadNewMap:
     ld   A, [wDB6A_WarpFlags]                                    ;; 00:0314 $fa $6a $db
     and  A, $10                                        ;; 00:0317 $e6 $10
     jr   Z, .jr_00_0326                                ;; 00:0319 $28 $0b
@@ -316,7 +316,7 @@ call_00_0150_Init:
     ld   A, $ff                                        ;; 00:041a $3e $ff
     ld   [wDC8A], A                                    ;; 00:041c $ea $8a $dc
     jr   .jp_00_0443_MainGameplayLoop                                   ;; 00:041f $18 $22
-.jp_00_0421:
+.jp_00_0421_Unpaused:
     call call_00_0595_PlaySongBasedOnLevel                                  ;; 00:0421 $cd $95 $05
     call call_00_04fb                                  ;; 00:0424 $cd $fb $04
     call call_00_1056_LoadFullMap                                  ;; 00:0427 $cd $56 $10
@@ -337,7 +337,7 @@ call_00_0150_Init:
 .jr_00_045e_SkipLoadMap:
     ld   HL, wDB6A_WarpFlags                                     ;; 00:045e $21 $6a $db
     bit  4, [HL]                                       ;; 00:0461 $cb $66
-    jp   NZ, .jp_00_0314                               ;; 00:0463 $c2 $14 $03
+    jp   NZ, .jp_00_0314_LoadNewMap                               ;; 00:0463 $c2 $14 $03
     ld   HL, wDB6A_WarpFlags                                     ;; 00:0466 $21 $6a $db
     bit  1, [HL]                                       ;; 00:0469 $cb $4e
     jr   Z, .jr_00_0487                                ;; 00:046b $28 $1a
@@ -347,13 +347,13 @@ call_00_0150_Init:
     farcall call_01_42fd_LoadMenu_GameOver
     cp   A, $40                                        ;; 00:047f $fe $40
     jp   Z, .jp_00_02cc_LoadMainMenuAfterGameOver                                ;; 00:0481 $ca $cc $02
-    jp   .jp_00_02b2                                   ;; 00:0484 $c3 $b2 $02
+    jp   .jp_00_02b2_LoadMainMenu                                   ;; 00:0484 $c3 $b2 $02
 .jr_00_0487:
-    farcall call_02_5541_GetActionPropertyByte
+    farcall call_02_5541_GetPlayerStatesFromAction
     and  A, $08                                        ;; 00:0492 $e6 $08
-    jr   NZ, .jr_00_04d8                               ;; 00:0494 $20 $42
+    jr   NZ, .jr_00_04d8_SkipPauseCheck                               ;; 00:0494 $20 $42
     call call_00_0f80_CheckInputStart                                  ;; 00:0496 $cd $80 $0f
-    jr   Z, .jr_00_04d8                                ;; 00:0499 $28 $3d
+    jr   Z, .jr_00_04d8_SkipPauseCheck                                ;; 00:0499 $28 $3d
     ld   A, SONG_EMPTY                                        ;; 00:049b $3e $00
     call call_00_0fa2_PlaySong                                  ;; 00:049d $cd $a2 $0f
     ld   A, SFX_EMPTY                                        ;; 00:04a0 $3e $00
@@ -362,22 +362,22 @@ call_00_0150_Init:
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:04b0 $fa $1e $dc
     and  A, A                                          ;; 00:04b3 $a7
     ld   A, MENU_PAUSE_IN_GEX_CAVE                                        ;; 00:04b4 $3e $0b
-    jr   Z, .jr_00_04ba                                ;; 00:04b6 $28 $02
+    jr   Z, .jr_00_04ba_PausedInGexCave                                ;; 00:04b6 $28 $02
     ld   A, MENU_PAUSE_IN_LEVEL                                        ;; 00:04b8 $3e $0d
-.jr_00_04ba:
+.jr_00_04ba_PausedInGexCave:
     farcall call_01_4000_MenuHandler_LoadAndProcess
     cp   A, $60                                        ;; 00:04c5 $fe $60
-    jp   NZ, .jp_00_0421                               ;; 00:04c7 $c2 $21 $04
+    jp   NZ, .jp_00_0421_Unpaused                               ;; 00:04c7 $c2 $21 $04
     ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:04ca $fa $1e $dc
     and  A, A                                          ;; 00:04cd $a7
-    jp   Z, .jp_00_02b2                                ;; 00:04ce $ca $b2 $02
+    jp   Z, .jp_00_02b2_LoadMainMenu                                ;; 00:04ce $ca $b2 $02
     xor  A, A                                          ;; 00:04d1 $af
     ld   [wDB6C_CurrentMapId], A                                    ;; 00:04d2 $ea $6c $db
-    jp   .jp_00_0314                                   ;; 00:04d5 $c3 $14 $03
-.jr_00_04d8:
+    jp   .jp_00_0314_LoadNewMap                                   ;; 00:04d5 $c3 $14 $03
+.jr_00_04d8_SkipPauseCheck:
     call call_00_05fd_CheckForEatFly                                  ;; 00:04d8 $cd $fd $05
     call call_00_05c7                                  ;; 00:04db $cd $c7 $05
-    farcall call_02_7152_UpdateObjects
+    farcall call_02_7152_UpdateAllObjects
     call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:04e9 $cd $c8 $11
     call call_00_0fc8_ProcessQueuedSoundEffect                                  ;; 00:04ec $cd $c8 $0f
     call call_00_150f_CheckAndSetLevelTrigger                                  ;; 00:04ef $cd $0f $15
@@ -1483,7 +1483,7 @@ call_00_0c1b_LCDInterrupt_Setup:
     or   A, $80                                        ;; 00:0c1c $f6 $80
     ld   [wD9FD], A                                    ;; 00:0c1e $ea $fd $d9
     ld   H, $00                                        ;; 00:0c21 $26 $00
-    ld   DE, call_00_0c44_LCDInterrupt_Table                                      ;; 00:0c23 $11 $44 $0c
+    ld   DE, .data_00_0c44_LCDInterrupt_Table                                      ;; 00:0c23 $11 $44 $0c
     add  HL, DE                                        ;; 00:0c26 $19
     ld   A, [HL+]                                      ;; 00:0c27 $2a
     ldh  [rSTAT], A                                    ;; 00:0c28 $e0 $41
@@ -1506,19 +1506,21 @@ call_00_0c1b_LCDInterrupt_Setup:
     ld   A, H                                          ;; 00:0c3f $7c
     ld   [wD9FF], A                                    ;; 00:0c40 $ea $ff $d9
     ret                                                ;; 00:0c43 $c9
-
-call_00_0c44_LCDInterrupt_Table:
+.data_00_0c44_LCDInterrupt_Table:
 ; Table of interrupt handlers and parameters.
 ; Contains a dispatcher that increments wDB67_HDMATempScratch and calls routines like 0d8b, 0dc6.
 ; Purpose: This is a vector table and handler dispatcher for the STAT/LYC interrupts.
 ; Different entries configure palette changes, etc.
-    db   $08, $00, $01, $53, $0c, $08, $00, $15
-    db   $55, $0c, $08, $00, $01, $f8, $0d, $d9
-
-call_00_0c54:
+    db   $08, $00, $01
+    dw   .call_00_0c53
+    db   $08, $00, $15
+    dw   .call_00_0c55
+    db   $08, $00, $01
+    dw   call_00_0df8 
+.call_00_0c53:
+    reti
     ret
-
-call_00_0c55:
+.call_00_0c55:
     push af
     push hl
     ld   a,[wDB67_HDMATempScratch]
@@ -1774,7 +1776,10 @@ call_00_0dc6_HBlankInterrupt_LoadPaletteSlice:
     pop  af
     reti 
 .data_00_0df0:
-    db   $ff, $7f, $80, $03, $ff, $03, $ff, $7f, $d9                  ;; 00:0df3 ?????.
+    db   $ff, $7f, $80, $03, $ff, $03, $ff, $7f                  ;; 00:0df3 ?????.
+
+call_00_0df8:
+   reti
 
 call_00_0df9_ProcessVRAMTransferQueue:
 ; First calls call_00_0c6a_HandlePendingHDMATransfers (HDMA/VRAM copy handler).

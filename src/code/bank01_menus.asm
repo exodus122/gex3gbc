@@ -130,7 +130,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     and  A, $01                                        ;; 01:4088 $e6 $01
     jp   Z, .jp_01_41cb                                ;; 01:408a $ca $cb $41
     ld   HL, wDAD7_CurrentInputs                                     ;; 01:408d $21 $d7 $da
-    bit  2, [HL]                                       ;; 01:4090 $cb $56
+    bit  2, [HL] ; PADF_SELECT                                      ;; 01:4090 $cb $56
     jr   Z, .jr_01_40ad                                ;; 01:4092 $28 $19
     ld   A, SFX_MENU_SCROLL                                        ;; 01:4094 $3e $01
     call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4096 $cd $d7 $0f
@@ -2144,7 +2144,7 @@ call_01_4d2c_ProcessTileStreamingLoop:
     and  A, $01                                        ;; 01:4d3c $e6 $01
     ld   A, [wDAD7_CurrentInputs]                                    ;; 01:4d3e $fa $d7 $da
     jr   Z, .jr_01_4d45                                ;; 01:4d41 $28 $02
-    and  A, $fe                                        ;; 01:4d43 $e6 $fe
+    and  A, PADF_B | PADF_SELECT | PADF_START | PADF_RIGHT | PADF_LEFT | PADF_UP | PADF_DOWN   ;; 01:4d43 $e6 $fe
 .jr_01_4d45:
     and  A, A                                          ;; 01:4d45 $a7
     jr   NZ, call_01_4d2c_ProcessTileStreamingLoop                              ;; 01:4d46 $20 $e4

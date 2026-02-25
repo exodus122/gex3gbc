@@ -432,11 +432,11 @@ call_02_5081_Player_UpdateFacingAndMovementVector:
     ld   HL, wD801_Player_ActionId                                     ;; 02:5081 $21 $01 $d8
     ld   L, [HL]                                       ;; 02:5084 $6e
     ld   H, $00                                        ;; 02:5085 $26 $00
-    ld   DE, data_02_554d                              ;; 02:5087 $11 $4d $55
+    ld   DE, data_02_554d_PlayerStatesPerAction                              ;; 02:5087 $11 $4d $55
     add  HL, DE                                        ;; 02:508a $19
     bit  2, [HL]                                       ;; 02:508b $cb $56
     jr   NZ, .jr_02_50db                               ;; 02:508d $20 $4c
-    call call_02_5541_GetActionPropertyByte                                  ;; 02:508f $cd $41 $55
+    call call_02_5541_GetPlayerStatesFromAction                                  ;; 02:508f $cd $41 $55
     and  A, $a0                                        ;; 02:5092 $e6 $a0
     jr   NZ, .jr_02_509d                               ;; 02:5094 $20 $07
     ld   A, [wDC1F]                                    ;; 02:5096 $fa $1f $dc
@@ -500,13 +500,13 @@ call_02_5081_Player_UpdateFacingAndMovementVector:
 call_02_5100_Player_HorizontalMovementHandler:
 ; Purpose: Main dispatcher for handling horizontal player movement.
 ; Details:
-; Calls call_02_5541_GetActionPropertyByte to poll input state.
+; Calls call_02_5541_GetPlayerStatesFromAction to poll input state.
 ; Checks movement bits ($10, $20, $40, $80) and calls appropriate handlers 
 ; (call_02_51f9_ApplyRightwardCollisionAdjustment for right, call_02_518a_ApplyLeftwardCollisionAdjustment for left, etc.).
 ; Handles inversion if facing left (cpl/inc pattern), triggers collision tests (call_02_53e7_ApplyVerticalMovementAndClamp), 
 ; and adjusts movement depending on player action IDs.
 ; Falls back to a routine when no direct input (.jr_02_5159 path) to apply momentum or snapping
-    call call_02_5541_GetActionPropertyByte                                  ;; 02:5100 $cd $41 $55
+    call call_02_5541_GetPlayerStatesFromAction                                  ;; 02:5100 $cd $41 $55
     and  A, $a0                                        ;; 02:5103 $e6 $a0
     jr   NZ, .jr_02_510e                               ;; 02:5105 $20 $07
     ld   A, [wDC1F]                                    ;; 02:5107 $fa $1f $dc
@@ -526,7 +526,7 @@ call_02_5100_Player_HorizontalMovementHandler:
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:5123 $fa $81 $dc
     and  A, PADF_LEFT                                        ;; 02:5126 $e6 $20
     call NZ, call_02_518a_ApplyLeftwardCollisionAdjustment                              ;; 02:5128 $c4 $8a $51
-    call call_02_553b_PollForSpecialInput                                  ;; 02:512b $cd $3b $55
+    call call_02_553b_PlayerIsInWater                                  ;; 02:512b $cd $3b $55
     jr   Z, .jr_02_513a                                ;; 02:512e $28 $0a
     ld   A, [wD801_Player_ActionId]                                    ;; 02:5130 $fa $01 $d8
     cp   A, PLAYERACTION_WATER_SWIMMING                                        ;; 02:5133 $fe $19
@@ -779,7 +779,7 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
 ; Reads slope/collision data (wDC8C_PlayerYVelocity, wDC8F, etc.) and adjusts horizontal velocity.
 ; Checks level ID and player action IDs to trigger special cases (calls call_02_54f9_SwitchPlayerAction).
 ; Handles different terrain behaviors (e.g., slippery slopes or triggers unique to levels 7 & 8).
-    call call_02_5541_GetActionPropertyByte                                  ;; 02:5267 $cd $41 $55
+    call call_02_5541_GetPlayerStatesFromAction                                  ;; 02:5267 $cd $41 $55
     and  A, $a0                                        ;; 02:526a $e6 $a0
     ret  NZ                                            ;; 02:526c $c0
     ld   A, [wDC1F]                                    ;; 02:526d $fa $1f $dc
@@ -925,7 +925,7 @@ call_02_5374_LevelSpecificEventTrigger:
 ; Uses level number and index (wDC1E_CurrentLevelNumber) to find event tables (.data_02_53bf).
 ; Compares collected values (wDCB1_LevelTriggerBuffer) to thresholds and modifies wDC8C_PlayerYVelocity (horizontal momentum or trigger accumulator).
 ; Likely handles special pickups or doors that open based on conditions.
-    call call_02_5541_GetActionPropertyByte                                  ;; 02:5374 $cd $41 $55
+    call call_02_5541_GetPlayerStatesFromAction                                  ;; 02:5374 $cd $41 $55
     and  A, $08                                        ;; 02:5377 $e6 $08
     ret  NZ                                            ;; 02:5379 $c0
     ld   A, [wDC93]                                    ;; 02:537a $fa $93 $dc
@@ -1033,14 +1033,14 @@ call_02_53e7_ApplyVerticalMovementAndClamp:
 call_02_5431_HandleActionTriggersAndEvents:
 ; Purpose: Central dispatcher for action-specific triggers, tile events, and scripted transitions.
 ; Behavior:
-; Looks up the current action’s properties (data_02_554d) to check event bits.
+; Looks up the current action’s properties (data_02_554d_PlayerStatesPerAction) to check event bits.
 ; Compares nearby tile IDs (wDC92, wDC93) for special cases (e.g., doors, hazards).
-; Calls LevelSpecificEventTrigger (5374) and call_02_553b_PollForSpecialInput (input polling).
+; Calls LevelSpecificEventTrigger (5374) and call_02_553b_PlayerIsInWater (input polling).
 ; May queue new action states via call_02_54f9_SwitchPlayerAction or reset collision variables if certain tile types are detected.
     ld   HL, wD801_Player_ActionId                                     ;; 02:5431 $21 $01 $d8
     ld   L, [HL]                                       ;; 02:5434 $6e
     ld   H, $00                                        ;; 02:5435 $26 $00
-    ld   DE, data_02_554d                              ;; 02:5437 $11 $4d $55
+    ld   DE, data_02_554d_PlayerStatesPerAction                              ;; 02:5437 $11 $4d $55
     add  HL, DE                                        ;; 02:543a $19
     bit  3, [HL]                                       ;; 02:543b $cb $5e
     jr   NZ, .jr_02_545b                               ;; 02:543d $20 $1c
@@ -1058,7 +1058,7 @@ call_02_5431_HandleActionTriggersAndEvents:
     jp   Z, jp_00_06e8                                 ;; 02:5458 $ca $e8 $06
 .jr_02_545b:
     call call_02_5374_LevelSpecificEventTrigger                                  ;; 02:545b $cd $74 $53
-    call call_02_553b_PollForSpecialInput                                  ;; 02:545e $cd $3b $55
+    call call_02_553b_PlayerIsInWater                                  ;; 02:545e $cd $3b $55
     jr   Z, .jr_02_5488                                ;; 02:5461 $28 $25
     ld   A, [wD801_Player_ActionId]                                    ;; 02:5463 $fa $01 $d8
     cp   A, PLAYERACTION_WATER_SWIMMING                                        ;; 02:5466 $fe $19
@@ -1144,7 +1144,7 @@ call_02_54f9_SwitchPlayerAction:
 ; Behavior:
 ; Adjusts action index if in special level/bank.
 ; Avoids redundant switches if already in that action.
-; Validates against flags in data_02_554d.
+; Validates against flags in data_02_554d_PlayerStatesPerAction.
 ; Writes new action ID to wDC79 and resets auxiliary timers (wDC7F_Player_IsAttacking, wDC7A).
     ld   L, A                                          ;; 02:54f9 $6f
     cp   A, $3c                                        ;; 02:54fa $fe $3c
@@ -1162,7 +1162,7 @@ call_02_54f9_SwitchPlayerAction:
     ret  Z                                             ;; 02:550e $c8
     ld   L, A                                          ;; 02:550f $6f
     ld   H, $00                                        ;; 02:5510 $26 $00
-    ld   DE, data_02_554d                              ;; 02:5512 $11 $4d $55
+    ld   DE, data_02_554d_PlayerStatesPerAction                              ;; 02:5512 $11 $4d $55
     add  HL, DE                                        ;; 02:5515 $19
     bit  0, [HL]                                       ;; 02:5516 $cb $46
     jr   NZ, .jr_02_552e                               ;; 02:5518 $20 $14
@@ -1173,7 +1173,7 @@ call_02_54f9_SwitchPlayerAction:
 .jr_02_5524:
     ld   L, [HL]                                       ;; 02:5524 $6e
     ld   H, $00                                        ;; 02:5525 $26 $00
-    ld   DE, data_02_554d                              ;; 02:5527 $11 $4d $55
+    ld   DE, data_02_554d_PlayerStatesPerAction                              ;; 02:5527 $11 $4d $55
     add  HL, DE                                        ;; 02:552a $19
     bit  1, [HL]                                       ;; 02:552b $cb $4e
     ret  NZ                                            ;; 02:552d $c0
@@ -1185,122 +1185,341 @@ call_02_54f9_SwitchPlayerAction:
     ld   [wDC7A], A                                    ;; 02:5537 $ea $7a $dc
     ret                                                ;; 02:553a $c9
 
-call_02_553b_PollForSpecialInput:
+call_02_553b_PlayerIsInWater:
 ; Purpose: Checks if a specific input bit ($20) is pressed.
 ; Behavior:
-; Calls call_02_5541_GetActionPropertyByte to fetch current input/action data.
+; Calls call_02_5541_GetPlayerStatesFromAction to fetch current input/action data.
 ; Returns Z/NZ depending on whether the special bit is set.
-    call call_02_5541_GetActionPropertyByte                                  ;; 02:553b $cd $41 $55
-    and  A, $20                                        ;; 02:553e $e6 $20
+    call call_02_5541_GetPlayerStatesFromAction                                  ;; 02:553b $cd $41 $55
+    and  A, PLAYER_IN_WATER                                        ;; 02:553e $e6 $20
     ret                                                ;; 02:5540 $c9
 
-call_02_5541_GetActionPropertyByte:
+call_02_5541_GetPlayerStatesFromAction:
 ; Purpose: Helper to fetch the property byte for the current action.
 ; Behavior:
-; Uses the current action ID (wD801) as an index into data_02_554d.
+; Uses the current action ID (wD801) as an index into data_02_554d_PlayerStatesPerAction.
 ; Returns the byte containing action flags (e.g., input mask, movement rules).
     ld   HL, wD801_Player_ActionId                                     ;; 02:5541 $21 $01 $d8
     ld   L, [HL]                                       ;; 02:5544 $6e
     ld   H, $00                                        ;; 02:5545 $26 $00
-    ld   DE, data_02_554d                              ;; 02:5547 $11 $4d $55
+    ld   DE, data_02_554d_PlayerStatesPerAction                              ;; 02:5547 $11 $4d $55
     add  HL, DE                                        ;; 02:554a $19
     ld   A, [HL]                                       ;; 02:554b $7e
     ret                                                ;; 02:554c $c9
 
-data_02_554d:
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 02:554d ........
-    db   $00, $04, $0f, $0f, $07, $07, $00, $00        ;; 02:5555 ?.......
-    db   $00, $00, $04, $00, $00, $04, $04, $04        ;; 02:555d ...?????
-    db   $04, $20, $0f, $0f, $00, $00, $04, $20        ;; 02:5565 ???.????
-    db   $20, $24, $80, $00, $00, $00, $00, $00        ;; 02:556d ????????
-    db   $00, $04, $0f, $0f, $07, $07, $0f, $00        ;; 02:5575 ????????
-    db   $00, $00, $00, $00, $00, $00, $04, $0f        ;; 02:557d ????????
-    db   $0f, $07, $07, $0f, $00, $00, $00, $00        ;; 02:5585 ????????
-    db   $00, $00, $00, $00, $00, $04, $0f, $0f        ;; 02:558d ????????
-    db   $07, $07, $00, $00, $00, $00, $04, $00        ;; 02:5595 ????????
-    db   $00, $04, $04, $04, $04, $20, $0f, $0f        ;; 02:559d ????????
-    db   $00, $00, $04, $20, $20, $24, $80, $00        ;; 02:55a5 ????????
-    db   $00, $00, $00, $00, $00, $04, $0f, $0f        ;; 02:55ad ????????
-    db   $07, $07, $0f, $00, $00, $00, $00, $00        ;; 02:55b5 ????????
-    db   $00, $00, $04, $0f, $0f, $07, $07, $0f        ;; 02:55bd ????????
+data_02_554d_PlayerStatesPerAction:
+    db   PLAYER_DEFAULT ; PLAYERACTION_SPAWN
+    db   PLAYER_DEFAULT ; PLAYERACTION_IDLE
+    db   PLAYER_DEFAULT ; PLAYERACTION_IDLE_ANIMATION
+    db   PLAYER_DEFAULT ; PLAYERACTION_WALK
+    db   PLAYER_DEFAULT ; PLAYERACTION_START_CROUCH
+    db   PLAYER_DEFAULT ; PLAYERACTION_CROUCH_LOOK_DOWN
+    db   PLAYER_DEFAULT ; PLAYERACTION_NONE_0
+    db   PLAYER_DEFAULT ; PLAYERACTION_UNK7
+    db   PLAYER_DEFAULT ; PLAYERACTION_EAT_FLY
+    db   PLAYER_UNK04 ; PLAYERACTION_TAKE_DAMAGE
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 | PLAYER_DEAD ; PLAYERACTION_DEATH
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 | PLAYER_DEAD ; PLAYERACTION_DEATH_SET_UP_WARP
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 ; PLAYERACTION_STAND_ON_TV_BUTTON
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 ; PLAYERACTION_ENTER_TV
+    db   PLAYER_DEFAULT ; PLAYERACTION_JUMP
+    db   PLAYER_DEFAULT ; PLAYERACTION_DOUBLE_JUMP
+    db   PLAYER_DEFAULT ; PLAYERACTION_TAIL_SPIN
+    db   PLAYER_DEFAULT ; PLAYERACTION_FALL
+    db   PLAYER_UNK04 ; PLAYERACTION_LAND_FROM_FALL
+    db   PLAYER_DEFAULT ; PLAYERACTION_UNK19
+    db   PLAYER_DEFAULT ; PLAYERACTION_ENTER_IDLE
+    db   PLAYER_UNK04 ; PLAYERACTION_NONE_1
+    db   PLAYER_UNK04 ; PLAYERACTION_NONE_2
+    db   PLAYER_UNK04 ; PLAYERACTION_NONE_3
+    db   PLAYER_UNK04 ; PLAYERACTION_NONE_4
+    db   PLAYER_IN_WATER ; PLAYERACTION_WATER_SWIMMING
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 | PLAYER_DEAD ; PLAYERACTION_DEATH_IN_PIT_ALT
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 | PLAYER_DEAD ; PLAYERACTION_DEATH_IN_PIT
+    db   PLAYER_DEFAULT ; PLAYERACTION_NONE_5
+    db   PLAYER_DEFAULT ; PLAYERACTION_BLOWN_UPWARDS
+    db   PLAYER_UNK04 ; PLAYERACTION_RIDING_ELEVATOR
+    db   PLAYER_IN_WATER ; PLAYERACTION_WATER_TAIL_SPIN
+    db   PLAYER_IN_WATER ; PLAYERACTION_WATER_TREADING
+    db   PLAYER_UNK04 | PLAYER_IN_WATER ; PLAYERACTION_WATER_DIVING
+    db   PLAYER_CLIMBING ; PLAYERACTION_CLIMBING
+    db   PLAYER_DEFAULT ; PLAYERACTION_SNOWBOARDING_SPAWN
+    db   PLAYER_DEFAULT ; PLAYERACTION_SNOWBOARDING_STAND_OR_WALK
+    db   PLAYER_DEFAULT ; PLAYERACTION_SNOWBOARDING_JUMP
+    db   PLAYER_DEFAULT ; PLAYERACTION_SNOWBOARDING_DOUBLE_JUMP
+    db   PLAYER_DEFAULT ; PLAYERACTION_SNOWBOARDING_TAIL_SPIN
+    db   PLAYER_DEFAULT ; PLAYERACTION_SNOWBOARDING_FALL
+    db   PLAYER_UNK04 ; PLAYERACTION_SNOWBOARDING_TAKE_DAMAGE
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 | PLAYER_DEAD ; PLAYERACTION_SNOWBOARDING_DIE
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 | PLAYER_DEAD ; PLAYERACTION_SNOWBOARDING_DIE_WARP
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 ; PLAYERACTION_SNOWBOARDING_STAND_ON_TV_BUTTON
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 ; PLAYERACTION_SNOWBOARDING_ENTER_TV
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 | PLAYER_DEAD ; PLAYERACTION_SNOWBOARDING_DEATH_IN_PIT_ALT
+    db   PLAYER_DEFAULT ; PLAYERACTION_KANGAROO_SPAWN
+    db   PLAYER_DEFAULT ; PLAYERACTION_KANGAROO_IDLE
+    db   PLAYER_DEFAULT ; PLAYERACTION_KANGAROO_HOPPING
+    db   PLAYER_DEFAULT ; PLAYERACTION_KANGAROO_START_JUMP
+    db   PLAYER_DEFAULT ; PLAYERACTION_KANGAROO_JUMP
+    db   PLAYER_DEFAULT ; PLAYERACTION_KANGAROO_TAIL_SPIN
+    db   PLAYER_DEFAULT ; PLAYERACTION_KANGAROO_FALL
+    db   PLAYER_UNK04 ; PLAYERACTION_KANGAROO_TAKE_DAMAGE
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 | PLAYER_DEAD ; PLAYERACTION_KANGAROO_DEATH
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 | PLAYER_DEAD ; PLAYERACTION_KANGAROO_DEATH_SET_UP_WARP
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 ; PLAYERACTION_KANGAROO_STAND_ON_TV_BUTTON
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 ; PLAYERACTION_KANGAROO_ENTER_TV
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 | PLAYER_DEAD ; PLAYERACTION_KANGAROO_DEATH_IN_PIT_ALT
+    db   PLAYER_DEFAULT ; PLAYERACTION_SPAWN
+    db   PLAYER_DEFAULT ; PLAYERACTION_IDLE
+    db   PLAYER_DEFAULT ; PLAYERACTION_IDLE_ANIMATION
+    db   PLAYER_DEFAULT ; PLAYERACTION_WALK
+    db   PLAYER_DEFAULT ; PLAYERACTION_START_CROUCH
+    db   PLAYER_DEFAULT ; PLAYERACTION_CROUCH_LOOK_DOWN
+    db   PLAYER_DEFAULT ; PLAYERACTION_NONE_0
+    db   PLAYER_DEFAULT ; PLAYERACTION_UNK7
+    db   PLAYER_DEFAULT ; PLAYERACTION_EAT_FLY
+    db   PLAYER_UNK04 ; PLAYERACTION_TAKE_DAMAGE
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 | PLAYER_DEAD ; PLAYERACTION_DEATH
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 | PLAYER_DEAD ; PLAYERACTION_DEATH_SET_UP_WARP
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 ; PLAYERACTION_STAND_ON_TV_BUTTON
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 ; PLAYERACTION_ENTER_TV
+    db   PLAYER_DEFAULT ; PLAYERACTION_JUMP
+    db   PLAYER_DEFAULT ; PLAYERACTION_DOUBLE_JUMP
+    db   PLAYER_DEFAULT ; PLAYERACTION_TAIL_SPIN
+    db   PLAYER_DEFAULT ; PLAYERACTION_FALL
+    db   PLAYER_UNK04 ; PLAYERACTION_LAND_FROM_FALL
+    db   PLAYER_DEFAULT ; PLAYERACTION_UNK19
+    db   PLAYER_DEFAULT ; PLAYERACTION_ENTER_IDLE
+    db   PLAYER_UNK04 ; PLAYERACTION_NONE_1
+    db   PLAYER_UNK04 ; PLAYERACTION_NONE_2
+    db   PLAYER_UNK04 ; PLAYERACTION_NONE_3
+    db   PLAYER_UNK04 ; PLAYERACTION_NONE_4
+    db   PLAYER_IN_WATER ; PLAYERACTION_WATER_SWIMMING
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 | PLAYER_DEAD ; PLAYERACTION_DEATH_IN_PIT_ALT
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 | PLAYER_DEAD ; PLAYERACTION_DEATH_IN_PIT
+    db   PLAYER_DEFAULT ; PLAYERACTION_NONE_5
+    db   PLAYER_DEFAULT ; PLAYERACTION_BLOWN_UPWARDS
+    db   PLAYER_UNK04 ; PLAYERACTION_RIDING_ELEVATOR
+    db   PLAYER_IN_WATER ; PLAYERACTION_WATER_TAIL_SPIN
+    db   PLAYER_IN_WATER ; PLAYERACTION_WATER_TREADING
+    db   PLAYER_UNK04 | PLAYER_IN_WATER ; PLAYERACTION_WATER_DIVING
+    db   PLAYER_CLIMBING ; PLAYERACTION_CLIMBING
+    db   PLAYER_DEFAULT ; PLAYERACTION_SNOWBOARDING_SPAWN
+    db   PLAYER_DEFAULT ; PLAYERACTION_SNOWBOARDING_STAND_OR_WALK
+    db   PLAYER_DEFAULT ; PLAYERACTION_SNOWBOARDING_JUMP
+    db   PLAYER_DEFAULT ; PLAYERACTION_SNOWBOARDING_DOUBLE_JUMP
+    db   PLAYER_DEFAULT ; PLAYERACTION_SNOWBOARDING_TAIL_SPIN
+    db   PLAYER_DEFAULT ; PLAYERACTION_SNOWBOARDING_FALL
+    db   PLAYER_UNK04 ; PLAYERACTION_SNOWBOARDING_TAKE_DAMAGE
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 | PLAYER_DEAD ; PLAYERACTION_SNOWBOARDING_DIE
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 | PLAYER_DEAD ; PLAYERACTION_SNOWBOARDING_DIE_WARP
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 ; PLAYERACTION_SNOWBOARDING_STAND_ON_TV_BUTTON
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 ; PLAYERACTION_SNOWBOARDING_ENTER_TV
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 | PLAYER_DEAD ; PLAYERACTION_SNOWBOARDING_DEATH_IN_PIT_ALT
+    db   PLAYER_DEFAULT ; PLAYERACTION_KANGAROO_SPAWN
+    db   PLAYER_DEFAULT ; PLAYERACTION_KANGAROO_IDLE
+    db   PLAYER_DEFAULT ; PLAYERACTION_KANGAROO_HOPPING
+    db   PLAYER_DEFAULT ; PLAYERACTION_KANGAROO_START_JUMP
+    db   PLAYER_DEFAULT ; PLAYERACTION_KANGAROO_JUMP
+    db   PLAYER_DEFAULT ; PLAYERACTION_KANGAROO_TAIL_SPIN
+    db   PLAYER_DEFAULT ; PLAYERACTION_KANGAROO_FALL
+    db   PLAYER_UNK04 ; PLAYERACTION_KANGAROO_TAKE_DAMAGE
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 | PLAYER_DEAD ; PLAYERACTION_KANGAROO_DEATH
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 | PLAYER_DEAD ; PLAYERACTION_KANGAROO_DEATH_SET_UP_WARP
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 ; PLAYERACTION_KANGAROO_STAND_ON_TV_BUTTON
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 ; PLAYERACTION_KANGAROO_ENTER_TV
+    db   PLAYER_UNK01 | PLAYER_UNK02 | PLAYER_UNK04 | PLAYER_DEAD ; PLAYERACTION_KANGAROO_DEATH_IN_PIT_ALT
 
 data_02_55c5:
-    db   $b5, $56, $b8, $56, $b8, $56, $eb, $56        ;; 02:55c5 ........
-    db   $12, $57, $15, $57, $00, $00, $00, $00        ;; 02:55cd ........
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 02:55d5 ??......
-    db   $00, $00, $00, $00, $44, $57, $44, $57        ;; 02:55dd ........
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 02:55e5 ......??
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 02:55ed ????????
-    db   $00, $00, $57, $57, $00, $00, $00, $00        ;; 02:55f5 ??????..
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 02:55fd ????????
-    db   $6a, $57, $00, $00, $00, $00, $8f, $57        ;; 02:5605 ????????
-    db   $92, $57, $b7, $57, $b7, $57, $00, $00        ;; 02:560d ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 02:5615 ????????
-    db   $00, $00, $00, $00, $00, $00, $79, $57        ;; 02:561d ????????
-    db   $00, $00, $7c, $57, $00, $00, $7c, $57        ;; 02:5625 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 02:562d ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 02:5635 ????????
-    db   $ca, $57, $cd, $57, $cd, $57, $f2, $57        ;; 02:563d ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 02:5645 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 02:564d ????????
-    db   $00, $00, $00, $00, $1b, $58, $1b, $58        ;; 02:5655 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 02:565d ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 02:5665 ????????
-    db   $00, $00, $57, $57, $00, $00, $00, $00        ;; 02:566d ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 02:5675 ????????
-    db   $6a, $57, $00, $00, $00, $00, $8f, $57        ;; 02:567d ????????
-    db   $92, $57, $b7, $57, $b7, $57, $00, $00        ;; 02:5685 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 02:568d ????????
-    db   $00, $00, $00, $00, $00, $00, $79, $57        ;; 02:5695 ????????
-    db   $00, $00, $7c, $57, $00, $00, $7c, $57        ;; 02:569d ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 02:56a5 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 02:56ad ????????
-    
-    db   $fe, $01, $ff, $50, $03, $10, $03, $90        ;; 02:56b5 .w..w.w.
-    db   $04, $80, $04, $a0, $04, $20, $03, $60        ;; 02:56bd ?.w.?.w.
-    db   $03, $01, $10, $41, $10, $51, $10, $11        ;; 02:56c5 ?.w.?.?.
-    db   $10, $91, $10, $81, $10, $a1, $10, $21        ;; 02:56cd w.?.?.?.
-    db   $10, $61, $10, $02, $0e, $42, $0e, $52        ;; 02:56d5 w.?.w.?.
-    db   $0e, $12, $0e, $92, $0e, $82, $0e, $a2        ;; 02:56dd ?.w.?.?.
-    db   $0e, $22, $0e, $62, $0e, $ff, $01, $10        ;; 02:56e5 ?.w.?..w
-    db   $41, $10, $51, $10, $11, $10, $91, $10        ;; 02:56ed .?.?.w.w
-    db   $81, $10, $a1, $10, $21, $10, $61, $10        ;; 02:56f5 .?.?.w.?
-    db   $12, $0e, $22, $0e, $52, $0e, $62, $0e        ;; 02:56fd .w.w.?.?
-    db   $80, $07, $90, $07, $a0, $07, $40, $01        ;; 02:5705 .?.w.w.w
-    db   $03, $01, $00, $01, $ff, $00, $01, $ff        ;; 02:570d .?.w..w.
-    db   $82, $0e, $92, $0e, $a2, $0e, $12, $0e        ;; 02:5715 .?.?.?.?
-    db   $22, $0e, $42, $0e, $52, $0e, $62, $0e        ;; 02:571d .?.?.?.?
-    db   $01, $10, $41, $10, $51, $10, $11, $10        ;; 02:5725 .?.?.?.?
-    db   $91, $10, $81, $10, $a1, $10, $21, $10        ;; 02:572d .?.?.w.?
-    db   $61, $10, $40, $06, $50, $06, $60, $06        ;; 02:5735 .?.?.?.?
-    db   $10, $03, $20, $03, $00, $06, $ff, $01        ;; 02:573d .w.?.w..
-    db   $10, $41, $10, $51, $10, $11, $10, $91        ;; 02:5745 w.?.?.w.
-    db   $10, $81, $10, $a1, $10, $21, $10, $61        ;; 02:574d ?.?.?.w.
-    db   $10, $ff, $01, $1f, $41, $1f, $51, $1f        ;; 02:5755 ?.??????
-    db   $11, $1f, $91, $1f, $81, $1f, $a1, $1f        ;; 02:575d ????????
-    db   $21, $1f, $61, $1f, $ff, $02, $0f, $42        ;; 02:5765 ????????
-    db   $0f, $52, $0f, $12, $0f, $22, $0f, $62        ;; 02:576d ????????
-    db   $0f, $80, $21, $ff, $fe, $30, $ff, $01        ;; 02:5775 ????????
-    db   $34, $41, $34, $51, $34, $11, $34, $91        ;; 02:577d ????????
-    db   $34, $81, $34, $a1, $34, $21, $34, $61        ;; 02:5785 ????????
-    db   $34, $ff, $fe, $24, $ff, $01, $27, $41        ;; 02:578d ????????
-    db   $27, $51, $27, $11, $27, $91, $27, $81        ;; 02:5795 ????????
-    db   $27, $a1, $27, $21, $27, $61, $27, $02        ;; 02:579d ????????
-    db   $25, $42, $25, $52, $25, $12, $25, $92        ;; 02:57a5 ????????
-    db   $25, $82, $25, $a2, $25, $22, $25, $62        ;; 02:57ad ????????
-    db   $25, $ff, $01, $27, $41, $27, $51, $27        ;; 02:57b5 ????????
-    db   $11, $27, $91, $27, $81, $27, $a1, $27        ;; 02:57bd ????????
-    db   $21, $27, $61, $27, $ff, $fe, $3d, $ff        ;; 02:57c5 ????????
-    db   $40, $3f, $50, $3f, $10, $3f, $90, $3f        ;; 02:57cd ????????
-    db   $80, $3f, $a0, $3f, $20, $3f, $60, $3f        ;; 02:57d5 ????????
-    db   $01, $4c, $02, $4a, $42, $4a, $52, $4a        ;; 02:57dd ????????
-    db   $12, $4a, $92, $4a, $82, $4a, $a2, $4a        ;; 02:57e5 ????????
-    db   $22, $4a, $62, $4a, $ff, $01, $4c, $41        ;; 02:57ed ????????
-    db   $4c, $51, $4c, $11, $4c, $91, $4c, $81        ;; 02:57f5 ????????
-    db   $4c, $a1, $4c, $21, $4c, $61, $4c, $02        ;; 02:57fd ????????
-    db   $4a, $42, $4a, $52, $4a, $12, $4a, $92        ;; 02:5805 ????????
-    db   $4a, $82, $4a, $a2, $4a, $22, $4a, $62        ;; 02:580d ????????
-    db   $4a, $03, $3d, $00, $3d, $ff, $01, $4c        ;; 02:5815 ????????
-    db   $41, $4c, $51, $4c, $11, $4c, $91, $4c        ;; 02:581d ????????
-    db   $81, $4c, $a1, $4c, $21, $4c, $61, $4c        ;; 02:5825 ????????
-    db   $ff                                           ;; 02:582d ?
+    dw   .data_02_56b5 ; PLAYERACTION_SPAWN
+    dw   .data_02_56b8 ; PLAYERACTION_IDLE
+    dw   .data_02_56b8 ; PLAYERACTION_IDLE_ANIMATION
+    dw   .data_02_56eb ; PLAYERACTION_WALK
+    dw   .data_02_5712 ; PLAYERACTION_START_CROUCH
+    dw   .data_02_5715 ; PLAYERACTION_CROUCH_LOOK_DOWN
+    dw   $0000 ; PLAYERACTION_NONE_0
+    dw   $0000 ; PLAYERACTION_UNK7
+    dw   $0000 ; PLAYERACTION_EAT_FLY
+    dw   $0000 ; PLAYERACTION_TAKE_DAMAGE
+    dw   $0000 ; PLAYERACTION_DEATH
+    dw   $0000 ; PLAYERACTION_DEATH_SET_UP_WARP
+    dw   $0000 ; PLAYERACTION_STAND_ON_TV_BUTTON
+    dw   $0000 ; PLAYERACTION_ENTER_TV
+    dw   .data_02_5744 ; PLAYERACTION_JUMP
+    dw   .data_02_5744 ; PLAYERACTION_DOUBLE_JUMP
+    dw   $0000 ; PLAYERACTION_TAIL_SPIN
+    dw   $0000 ; PLAYERACTION_FALL
+    dw   $0000 ; PLAYERACTION_LAND_FROM_FALL
+    dw   $0000 ; PLAYERACTION_UNK19
+    dw   $0000 ; PLAYERACTION_ENTER_IDLE
+    dw   $0000 ; PLAYERACTION_NONE_1
+    dw   $0000 ; PLAYERACTION_NONE_2
+    dw   $0000 ; PLAYERACTION_NONE_3
+    dw   $0000 ; PLAYERACTION_NONE_4
+    dw   .data_02_5757 ; PLAYERACTION_WATER_SWIMMING
+    dw   $0000 ; PLAYERACTION_DEATH_IN_PIT_ALT
+    dw   $0000 ; PLAYERACTION_DEATH_IN_PIT
+    dw   $0000 ; PLAYERACTION_NONE_5
+    dw   $0000 ; PLAYERACTION_BLOWN_UPWARDS
+    dw   $0000 ; PLAYERACTION_RIDING_ELEVATOR
+    dw   $0000 ; PLAYERACTION_WATER_TAIL_SPIN
+    dw   .data_02_576a ; PLAYERACTION_WATER_TREADING
+    dw   $0000 ; PLAYERACTION_WATER_DIVING
+    dw   $0000 ; PLAYERACTION_CLIMBING
+    dw   .data_02_578f ; PLAYERACTION_SNOWBOARDING_SPAWN
+    dw   .data_02_5792 ; PLAYERACTION_SNOWBOARDING_STAND_OR_WALK
+    dw   .data_02_57b7 ; PLAYERACTION_SNOWBOARDING_JUMP
+    dw   .data_02_57b7 ; PLAYERACTION_SNOWBOARDING_DOUBLE_JUMP
+    dw   $0000 ; PLAYERACTION_SNOWBOARDING_TAIL_SPIN
+    dw   $0000 ; PLAYERACTION_SNOWBOARDING_FALL
+    dw   $0000 ; PLAYERACTION_SNOWBOARDING_TAKE_DAMAGE
+    dw   $0000 ; PLAYERACTION_SNOWBOARDING_DIE
+    dw   $0000 ; PLAYERACTION_SNOWBOARDING_DIE_WARP
+    dw   $0000 ; PLAYERACTION_SNOWBOARDING_STAND_ON_TV_BUTTON
+    dw   $0000 ; PLAYERACTION_SNOWBOARDING_ENTER_TV
+    dw   $0000 ; PLAYERACTION_SNOWBOARDING_DEATH_IN_PIT_ALT
+    dw   .data_02_5779 ; PLAYERACTION_KANGAROO_SPAWN
+    dw   $0000 ; PLAYERACTION_KANGAROO_IDLE
+    dw   .data_02_577c ; PLAYERACTION_KANGAROO_HOPPING
+    dw   $0000 ; PLAYERACTION_KANGAROO_START_JUMP
+    dw   .data_02_577c ; PLAYERACTION_KANGAROO_JUMP
+    dw   $0000 ; PLAYERACTION_KANGAROO_TAIL_SPIN
+    dw   $0000 ; PLAYERACTION_KANGAROO_FALL
+    dw   $0000 ; PLAYERACTION_KANGAROO_TAKE_DAMAGE
+    dw   $0000 ; PLAYERACTION_KANGAROO_DEATH
+    dw   $0000 ; PLAYERACTION_KANGAROO_DEATH_SET_UP_WARP
+    dw   $0000 ; PLAYERACTION_KANGAROO_STAND_ON_TV_BUTTON
+    dw   $0000 ; PLAYERACTION_KANGAROO_ENTER_TV
+    dw   $0000 ; PLAYERACTION_KANGAROO_DEATH_IN_PIT_ALT
+    dw   .data_02_57ca ; PLAYERACTION_SPAWN
+    dw   .data_02_57cd ; PLAYERACTION_IDLE
+    dw   .data_02_57cd ; PLAYERACTION_IDLE_ANIMATION
+    dw   .data_02_57f2 ; PLAYERACTION_WALK
+    dw   $0000 ; PLAYERACTION_START_CROUCH
+    dw   $0000 ; PLAYERACTION_CROUCH_LOOK_DOWN
+    dw   $0000 ; PLAYERACTION_NONE_0
+    dw   $0000 ; PLAYERACTION_UNK7
+    dw   $0000 ; PLAYERACTION_EAT_FLY
+    dw   $0000 ; PLAYERACTION_TAKE_DAMAGE
+    dw   $0000 ; PLAYERACTION_DEATH
+    dw   $0000 ; PLAYERACTION_DEATH_SET_UP_WARP
+    dw   $0000 ; PLAYERACTION_STAND_ON_TV_BUTTON
+    dw   $0000 ; PLAYERACTION_ENTER_TV
+    dw   .data_02_581b ; PLAYERACTION_JUMP
+    dw   .data_02_581b ; PLAYERACTION_DOUBLE_JUMP
+    dw   $0000 ; PLAYERACTION_TAIL_SPIN
+    dw   $0000 ; PLAYERACTION_FALL
+    dw   $0000 ; PLAYERACTION_LAND_FROM_FALL
+    dw   $0000 ; PLAYERACTION_UNK19
+    dw   $0000 ; PLAYERACTION_ENTER_IDLE
+    dw   $0000 ; PLAYERACTION_NONE_1
+    dw   $0000 ; PLAYERACTION_NONE_2
+    dw   $0000 ; PLAYERACTION_NONE_3
+    dw   $0000 ; PLAYERACTION_NONE_4
+    dw   .data_02_5757 ; PLAYERACTION_WATER_SWIMMING
+    dw   $0000 ; PLAYERACTION_DEATH_IN_PIT_ALT
+    dw   $0000 ; PLAYERACTION_DEATH_IN_PIT
+    dw   $0000 ; PLAYERACTION_NONE_5
+    dw   $0000 ; PLAYERACTION_BLOWN_UPWARDS
+    dw   $0000 ; PLAYERACTION_RIDING_ELEVATOR
+    dw   $0000 ; PLAYERACTION_WATER_TAIL_SPIN
+    dw   .data_02_576a ; PLAYERACTION_WATER_TREADING
+    dw   $0000 ; PLAYERACTION_WATER_DIVING
+    dw   $0000 ; PLAYERACTION_CLIMBING
+    dw   .data_02_578f ; PLAYERACTION_SNOWBOARDING_SPAWN
+    dw   .data_02_5792 ; PLAYERACTION_SNOWBOARDING_STAND_OR_WALK
+    dw   .data_02_57b7 ; PLAYERACTION_SNOWBOARDING_JUMP
+    dw   .data_02_57b7 ; PLAYERACTION_SNOWBOARDING_DOUBLE_JUMP
+    dw   $0000 ; PLAYERACTION_SNOWBOARDING_TAIL_SPIN
+    dw   $0000 ; PLAYERACTION_SNOWBOARDING_FALL
+    dw   $0000 ; PLAYERACTION_SNOWBOARDING_TAKE_DAMAGE
+    dw   $0000 ; PLAYERACTION_SNOWBOARDING_DIE
+    dw   $0000 ; PLAYERACTION_SNOWBOARDING_DIE_WARP
+    dw   $0000 ; PLAYERACTION_SNOWBOARDING_STAND_ON_TV_BUTTON
+    dw   $0000 ; PLAYERACTION_SNOWBOARDING_ENTER_TV
+    dw   $0000 ; PLAYERACTION_SNOWBOARDING_DEATH_IN_PIT_ALT
+    dw   .data_02_5779 ; PLAYERACTION_KANGAROO_SPAWN
+    dw   $0000 ; PLAYERACTION_KANGAROO_IDLE
+    dw   .data_02_577c ; PLAYERACTION_KANGAROO_HOPPING
+    dw   $0000 ; PLAYERACTION_KANGAROO_START_JUMP
+    dw   .data_02_577c ; PLAYERACTION_KANGAROO_JUMP
+    dw   $0000 ; PLAYERACTION_KANGAROO_TAIL_SPIN
+    dw   $0000 ; PLAYERACTION_KANGAROO_FALL
+    dw   $0000 ; PLAYERACTION_KANGAROO_TAKE_DAMAGE
+    dw   $0000 ; PLAYERACTION_KANGAROO_DEATH
+    dw   $0000 ; PLAYERACTION_KANGAROO_DEATH_SET_UP_WARP
+    dw   $0000 ; PLAYERACTION_KANGAROO_STAND_ON_TV_BUTTON
+    dw   $0000 ; PLAYERACTION_KANGAROO_ENTER_TV
+    dw   $0000 ; PLAYERACTION_KANGAROO_DEATH_IN_PIT_ALT
+.data_02_56b5:
+    db   $fe, $01, $ff
+.data_02_56b8:
+    db   $50, $03, $10, $03, $90, $04, $80, $04
+    db   $a0, $04, $20, $03, $60, $03, $01, $10
+    db   $41, $10, $51, $10, $11, $10, $91, $10
+    db   $81, $10, $a1, $10, $21, $10, $61, $10
+    db   $02, $0e, $42, $0e, $52, $0e, $12, $0e
+    db   $92, $0e, $82, $0e, $a2, $0e, $22, $0e
+    db   $62, $0e, $ff
+.data_02_56eb:
+    db   $01, $10, $41, $10, $51, $10, $11, $10
+    db   $91, $10, $81, $10, $a1, $10, $21, $10
+    db   $61, $10, $12, $0e, $22, $0e, $52, $0e
+    db   $62, $0e, $80, $07, $90, $07, $a0, $07
+    db   $40, $01, $03, $01, $00, $01, $ff
+.data_02_5712:
+    db   $00, $01, $ff
+.data_02_5715:
+    db   $82, $0e, $92, $0e, $a2, $0e, $12, $0e
+    db   $22, $0e, $42, $0e, $52, $0e, $62, $0e
+    db   $01, $10, $41, $10, $51, $10, $11, $10
+    db   $91, $10, $81, $10, $a1, $10, $21, $10
+    db   $61, $10, $40, $06, $50, $06, $60, $06
+    db   $10, $03, $20, $03, $00, $06, $ff
+.data_02_5744:
+    db   $01, $10, $41, $10, $51, $10, $11, $10
+    db   $91, $10, $81, $10, $a1, $10, $21, $10
+    db   $61, $10, $ff
+.data_02_5757:
+    db   $01, $1f, $41, $1f, $51, $1f, $11, $1f
+    db   $91, $1f, $81, $1f, $a1, $1f, $21, $1f
+    db   $61, $1f, $ff
+.data_02_576a:
+    db   $02, $0f, $42, $0f, $52, $0f, $12, $0f
+    db   $22, $0f, $62, $0f, $80, $21, $ff
+.data_02_5779:
+    db   $fe, $30, $ff
+.data_02_577c:
+    db   $01, $34, $41, $34, $51, $34, $11, $34
+    db   $91, $34, $81, $34, $a1, $34, $21, $34
+    db   $61, $34, $ff
+.data_02_578f:
+    db   $fe, $24, $ff
+.data_02_5792:
+    db   $01, $27, $41, $27, $51, $27, $11, $27
+    db   $91, $27, $81, $27, $a1, $27, $21, $27
+    db   $61, $27, $02, $25, $42, $25, $52, $25
+    db   $12, $25, $92, $25, $82, $25, $a2, $25
+    db   $22, $25, $62, $25, $ff
+.data_02_57b7:
+    db   $01, $27, $41, $27, $51, $27, $11, $27
+    db   $91, $27, $81, $27, $a1, $27, $21, $27
+    db   $61, $27, $ff
+.data_02_57ca:
+    db   $fe, $3d, $ff
+.data_02_57cd:
+    db   $40, $3f, $50, $3f, $10, $3f, $90, $3f
+    db   $80, $3f, $a0, $3f, $20, $3f, $60, $3f
+    db   $01, $4c, $02, $4a, $42, $4a, $52, $4a
+    db   $12, $4a, $92, $4a, $82, $4a, $a2, $4a
+    db   $22, $4a, $62, $4a, $ff
+.data_02_57f2:
+    db   $01, $4c, $41, $4c, $51, $4c, $11, $4c
+    db   $91, $4c, $81, $4c, $a1, $4c, $21, $4c
+    db   $61, $4c, $02, $4a, $42, $4a, $52, $4a
+    db   $12, $4a, $92, $4a, $82, $4a, $a2, $4a
+    db   $22, $4a, $62, $4a, $03, $3d, $00, $3d
+    db   $ff
+.data_02_581b:
+    db   $01, $4c, $41, $4c, $51, $4c, $11, $4c
+    db   $91, $4c, $81, $4c, $a1, $4c, $21, $4c
+    db   $61, $4c, $ff
