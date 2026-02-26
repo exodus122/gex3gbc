@@ -174,14 +174,14 @@ call_03_753e_AnimatedBackground_HDMA:
     ret                                                ;; 03:757d $c9
 
 call_03_757e_LoadHUDSprites_HDMA:
-; If bit 2 of wDB69 is set and a value exists in wDB6D, converts values in wDB6E 
+; If bit 2 of wDB69 is set and a value exists in wDB6D_InBonusLevel, converts values in wDB6E 
 ; to tile indices and issues several HDMA transfers from image_003_4580 to VRAM 
 ; positions ($8400+). Loads a 4×2 block of HUD sprite tiles.
     ld   HL, wDB69                                     ;; 03:757e $21 $69 $db
     bit  2, [HL]                                       ;; 03:7581 $cb $56
     ret  Z                                             ;; 03:7583 $c8
     res  2, [HL]                                       ;; 03:7584 $cb $96
-    ld   A, [wDB6D]                                    ;; 03:7586 $fa $6d $db
+    ld   A, [wDB6D_InBonusLevel]                                    ;; 03:7586 $fa $6d $db
     and  A, A                                          ;; 03:7589 $a7
     ret  Z                                             ;; 03:758a $c8
     ld   A, [wDB6E]                                    ;; 03:758b $fa $6e $db

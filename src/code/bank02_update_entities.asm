@@ -45,7 +45,7 @@ call_02_708f_InitEntitiesAndSpawnPlayer:
     ld   [wDC7C_PlayerCollisionUnusedFlag], A                                    ;; 02:70e7 $ea $7c $dc
     ld   [wDC7B_CurrentEntityAddrLoAlt2], A                                    ;; 02:70ea $ea $7d $dc
     call call_02_7123_ClearEntitySlotsExcludingPlayer                                  ;; 02:70ed $cd $23 $71
-    ld   A, [wDB6D]                                    ;; 02:70f0 $fa $6d $db
+    ld   A, [wDB6D_InBonusLevel]                                    ;; 02:70f0 $fa $6d $db
     and  A, A                                          ;; 02:70f3 $a7
     jr   Z, .jr_02_7115                                ;; 02:70f4 $28 $1f
     xor  A, A                                          ;; 02:70f6 $af

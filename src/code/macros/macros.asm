@@ -6,6 +6,12 @@ MACRO farcall
 	call call_00_0edd_FarCall
 ENDM
 
+; Store an address and the associated bank.
+macro farpointer
+    db   BANK(\1)
+    dw   \1
+endm
+
 ; Load the address of a field in the current entity into certain registers
 MACRO LOAD_OBJ_FIELD_TO_HL
     ld   h, HIGH(wD800_EntityMemory)

@@ -210,7 +210,7 @@ call_00_0150_Init:
 .jr_00_02ed:
     xor  A, A                                          ;; 00:02ed $af
     ld   [wDB6C_CurrentMapId], A                                    ;; 00:02ee $ea $6c $db
-    ld   [wDC5B_TVButtonLevelMissionRelated], A                                    ;; 00:02f1 $ea $5b $dc
+    ld   [wDC5B_LevelIdFromTVButton], A                                    ;; 00:02f1 $ea $5b $dc
     ld   [wDC69_PlayerSpawnIdInLevel], A                                    ;; 00:02f4 $ea $69 $dc
     ld   [wDB6A_WarpFlags], A                                    ;; 00:02f7 $ea $6a $db
     call call_00_0e3b_ClearGameStateVariables                                  ;; 00:02fa $cd $3b $0e
@@ -227,9 +227,9 @@ call_00_0150_Init:
     ld   A, [wDB6A_WarpFlags]                                    ;; 00:0314 $fa $6a $db
     and  A, $10                                        ;; 00:0317 $e6 $10
     jr   Z, .jr_00_0326                                ;; 00:0319 $28 $0b
-    farcall call_01_435e_HandleLevelTransitionMenu
+    farcall call_01_435e_DetermineNextMapId
 .jr_00_0326:
-    farcall call_03_6c89_LoadMapData
+    farcall call_03_6c89_LoadMapDataPtrs
     ld   A, [wDC4F_PawCoinExtraHealth]                                    ;; 00:0331 $fa $4f $dc
     add  A, $04                                        ;; 00:0334 $c6 $04
     ld   [wDC50_PlayerHealth], A                                    ;; 00:0336 $ea $50 $dc
@@ -242,9 +242,9 @@ call_00_0150_Init:
     xor  A, A                                          ;; 00:0353 $af
     ld   [wDC69_PlayerSpawnIdInLevel], A                                    ;; 00:0354 $ea $69 $dc
 .jp_00_0357_RespawnAfterDeath:
-    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:0357 $fa $1e $dc
+    ld   A, [wDC1E_CurrentLevelID]                                    ;; 00:0357 $fa $1e $dc
     ld   [wDB6C_CurrentMapId], A                                    ;; 00:035a $ea $6c $db
-    farcall call_03_6c89_LoadMapData
+    farcall call_03_6c89_LoadMapDataPtrs
     xor  A, A                                          ;; 00:0368 $af
     ld   [wDC51_CurrentFlyRelated], A                                    ;; 00:0369 $ea $51 $dc
     ld   [wDCA9_FlyTimerOrFlags4], A                                    ;; 00:036c $ea $a9 $dc
@@ -260,8 +260,8 @@ call_00_0150_Init:
     call call_00_2f85_LoadAndSortCollectibleData                                  ;; 00:0388 $cd $85 $2f
     call call_00_2ff8_InitLevelEntitiesAndConfig                                  ;; 00:038b $cd $f8 $2f
 .jp_00_038e_LoadMap:
-    farcall call_03_6c89_LoadMapData
-    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:0399 $fa $1e $dc
+    farcall call_03_6c89_LoadMapDataPtrs
+    ld   A, [wDC1E_CurrentLevelID]                                    ;; 00:0399 $fa $1e $dc
     cp   A, LEVEL_GEXTREME_SPORTS                                        ;; 00:039c $fe $07
     jr   NZ, .jr_00_03b6_NotInGextremeSports                               ;; 00:039e $20 $16
     ld   A, [wDC78_PlayerPendingActionId]                                    ;; 00:03a0 $fa $78 $dc
@@ -275,7 +275,7 @@ call_00_0150_Init:
     ld   A, PLAYERACTION_IDLE ; entered gextreme sports house                                       ;; 00:03b2 $3e $01
     jr   .jr_00_03e8_SetPendingPlayerAction                                   ;; 00:03b4 $18 $32
 .jr_00_03b6_NotInGextremeSports:
-    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:03b6 $fa $1e $dc
+    ld   A, [wDC1E_CurrentLevelID]                                    ;; 00:03b6 $fa $1e $dc
     cp   A, LEVEL_MARSUPIAL_MADNESS                                        ;; 00:03b9 $fe $08
     ld   A, PLAYERACTION_KANGAROO_SPAWN ; entered marsupial madness            ;; 00:03bb $3e $2f
     jr   Z, .jr_00_03e8_SetPendingPlayerAction                                ;; 00:03bd $28 $29
@@ -359,7 +359,7 @@ call_00_0150_Init:
     ld   A, SFX_EMPTY                                        ;; 00:04a0 $3e $00
     call call_00_0fd7_TriggerSoundEffect                                  ;; 00:04a2 $cd $d7 $0f
     farcall call_02_7132_BackupEntityTable
-    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:04b0 $fa $1e $dc
+    ld   A, [wDC1E_CurrentLevelID]                                    ;; 00:04b0 $fa $1e $dc
     and  A, A                                          ;; 00:04b3 $a7
     ld   A, MENU_PAUSE_IN_GEX_CAVE                                        ;; 00:04b4 $3e $0b
     jr   Z, .jr_00_04ba_PausedInGexCave                                ;; 00:04b6 $28 $02
@@ -368,7 +368,7 @@ call_00_0150_Init:
     farcall call_01_4000_MenuHandler_LoadAndProcess
     cp   A, $60                                        ;; 00:04c5 $fe $60
     jp   NZ, .jp_00_0421_Unpaused                               ;; 00:04c7 $c2 $21 $04
-    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:04ca $fa $1e $dc
+    ld   A, [wDC1E_CurrentLevelID]                                    ;; 00:04ca $fa $1e $dc
     and  A, A                                          ;; 00:04cd $a7
     jp   Z, .jp_00_02b2_LoadMainMenu                                ;; 00:04ce $ca $b2 $02
     xor  A, A                                          ;; 00:04d1 $af
@@ -462,7 +462,7 @@ call_00_0513_DrawEntitiesWrapper:
     jp   call_00_0b92_WaitForInterrupt                                  ;; 00:0592 $c3 $92 $0b
 
 call_00_0595_PlaySongBasedOnLevel:
-    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:0595 $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelID                                     ;; 00:0595 $21 $1e $dc
     ld   L, [HL]                                       ;; 00:0598 $6e
     ld   H, $00                                        ;; 00:0599 $26 $00
     ld   DE, .data_00_05a3                                      ;; 00:059b $11 $a3 $05
@@ -487,7 +487,7 @@ call_00_05af_LoadMapPalettes:
     jp   call_00_0f08_RestoreBank                                  ;; 00:05c4 $c3 $08 $0f
 
 call_00_05c7:
-    ld   A, [wDB6D]                                    ;; 00:05c7 $fa $6d $db
+    ld   A, [wDB6D_InBonusLevel]                                    ;; 00:05c7 $fa $6d $db
     and  A, A                                          ;; 00:05ca $a7
     ret  Z                                             ;; 00:05cb $c8
     ld   HL, wDCD2_FreestandingRemoteHitFlags                                     ;; 00:05cc $21 $d2 $dc
@@ -606,11 +606,11 @@ jp_00_0693:
     bit  7, [HL]                                       ;; 00:0696 $cb $7e
     jr   NZ, .jr_00_06ba                               ;; 00:0698 $20 $20
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:069a $fa $6c $db
-    cp   A, $07                                        ;; 00:069d $fe $07
+    cp   A, MAP_GEXTREME_SPORTS1                                        ;; 00:069d $fe $07
     ld   A, PLAYERACTION_SNOWBOARDING_DEATH_IN_PIT_ALT                                        ;; 00:069f $3e $2e
     jr   Z, .jr_00_06ae                                ;; 00:06a1 $28 $0b
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:06a3 $fa $6c $db
-    cp   A, $08                                        ;; 00:06a6 $fe $08
+    cp   A, MAP_MARSUPIAL_MADNESS1                                        ;; 00:06a6 $fe $08
     ld   A, PLAYERACTION_KANGAROO_DEATH_IN_PIT_ALT                                        ;; 00:06a8 $3e $3b
     jr   Z, .jr_00_06ae                                ;; 00:06aa $28 $02
     ld   A, PLAYERACTION_DEATH_IN_PIT_ALT                                        ;; 00:06ac $3e $1a
@@ -619,11 +619,11 @@ jp_00_0693:
     ret                                                ;; 00:06b9 $c9
 .jr_00_06ba:
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:06ba $fa $6c $db
-    cp   A, $07                                        ;; 00:06bd $fe $07
+    cp   A, MAP_GEXTREME_SPORTS1                                        ;; 00:06bd $fe $07
     ld   A, PLAYERACTION_SNOWBOARDING_DIE                                        ;; 00:06bf $3e $2a
     jr   Z, .jr_00_06ce                                ;; 00:06c1 $28 $0b
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:06c3 $fa $6c $db
-    cp   A, $08                                        ;; 00:06c6 $fe $08
+    cp   A, MAP_MARSUPIAL_MADNESS1                                        ;; 00:06c6 $fe $08
     ld   A, PLAYERACTION_KANGAROO_DEATH                                        ;; 00:06c8 $3e $37
     jr   Z, .jr_00_06ce                                ;; 00:06ca $28 $02
     ld   A, PLAYERACTION_DEATH                                        ;; 00:06cc $3e $0a
@@ -690,7 +690,7 @@ call_00_0723_IncrementCollectibleCount:
     ret  NZ                                            ;; 00:0738 $c0
     ld   A, SFX_REMOTE                                        ;; 00:0739 $3e $1e
     call call_00_0ff5_QueueSoundEffect                                  ;; 00:073b $cd $f5 $0f
-    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:073e $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelID                                     ;; 00:073e $21 $1e $dc
     ld   L, [HL]                                       ;; 00:0741 $6e
     ld   H, $00                                        ;; 00:0742 $26 $00
     ld   DE, wDC5C_ProgressFlags                                     ;; 00:0744 $11 $5c $dc
@@ -734,7 +734,7 @@ call_00_076e_CopyBCBytesFromHLToDE:
     jr   NZ, call_00_076e_CopyBCBytesFromHLToDE                              ;; 00:0774 $20 $f8
     ret                                                ;; 00:0776 $c9
 
-call_00_0777_LoadPointerIndexAFromTableDE:
+call_00_0777_LoadPointerIndexAFromTableDEIntoHL:
     ld   L, A                                          ;; 00:0777 $6f
     ld   H, $00                                        ;; 00:0778 $26 $00
     add  HL, HL                                        ;; 00:077a $29
@@ -816,7 +816,7 @@ jp_00_0781:
     jr   NZ, .jr_00_07ed                               ;; 00:07fb $20 $f0
     jp   call_00_0f08_RestoreBank                                  ;; 00:07fd $c3 $08 $0f
 
-call_00_0800:
+call_00_0800_LoadLevelSelectMenu_SecondaryTileset:
     push HL                                            ;; 00:0800 $e5
     push DE                                            ;; 00:0801 $d5
     push BC                                            ;; 00:0802 $c5
@@ -824,8 +824,8 @@ call_00_0800:
     ld   A, BANK_1F_SECONDARY_TILESETS                                        ;; 00:0804 $3e $1f
     call call_00_0eee_SwitchBank                                  ;; 00:0806 $cd $ee $0e
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:0809 $fa $6c $db
-    ld   DE, $b01                                      ;; 00:080c $11 $01 $0b
-    call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 00:080f $cd $77 $07
+    ld   DE, data_00_0b01_SecondaryTilesetPtrs                                      ;; 00:080c $11 $01 $0b
+    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 00:080f $cd $77 $07
     ld   DE, $300                                      ;; 00:0812 $11 $00 $03
     add  HL, DE                                        ;; 00:0815 $19
     ld   E, L                                          ;; 00:0816 $5d
@@ -1255,9 +1255,10 @@ call_00_0a6a_LoadMapConfigAndWaitVBlank:
     dw   $c000, _VRAM, $1000, $0001                    ;; 00:0af1 ........
     dw   $c000, _VRAM, $1000, $0101                    ;; 00:0af9 .???????
 
-    dw   $4000, $4000, $4350, $46a0                    ;; 00:0b01 .???????
-    dw   $49f0, $4d40, $5090, $53e0                    ;; 00:0b09 .???????
-    dw   $53e0, $5730, $5a80, $5dd0                    ;; 00:0b11 .???????
+data_00_0b01_SecondaryTilesetPtrs:
+    dw   image_01f_00, image_01f_00, image_01f_01, image_01f_02                    ;; 00:0b01 .???????
+    dw   image_01f_03, image_01f_04, image_01f_05, image_01f_06                    ;; 00:0b09 .???????
+    dw   image_01f_06, image_01f_07, image_01f_08, image_01f_09                    ;; 00:0b11 .???????
 
 data_00_0b19:
     db   $00, $01, $02, $05, $09, $0d, $12, $83                    ;; 00:0b19 .???????

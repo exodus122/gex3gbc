@@ -91,11 +91,11 @@ DEF LEVEL_TUT_TV                     EQU $03
 DEF LEVEL_WESTERN_STATION            EQU $04
 DEF LEVEL_ANIME_CHANNEL              EQU $05
 DEF LEVEL_SUPERHERO_SHOW             EQU $06
-DEF LEVEL_GEXTREME_SPORTS            EQU $07
+DEF LEVEL_GEXTREME_SPORTS            EQU $07 ; if you touch a tv button with this level id, you go to credits
 DEF LEVEL_MARSUPIAL_MADNESS          EQU $08
 DEF LEVEL_WW_GEX_WRESTLING           EQU $09
 DEF LEVEL_LIZARD_OF_OZ               EQU $0A
-DEF LEVEL_CHANNEL_Z                  EQU $0B
+DEF LEVEL_CHANNEL_Z                  EQU $0B ; if you touch a tv button with this level id, you go to credits
 
 ; Maps
 DEF MAP_GEX_CAVE1                  EQU $00
@@ -268,7 +268,7 @@ DEF ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ                    EQU $67
 DEF ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE              EQU $68
 DEF ENTITY_LIZARD_OF_OZ_CANNON                         EQU $69
 DEF ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE         EQU $6A
-DEF ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2                                       EQU $6B
+DEF ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2            EQU $6B
 DEF ENTITY_UNK6C                                       EQU $6C
 DEF ENTITY_UNK6D                                       EQU $6D
 DEF ENTITY_CHANNEL_Z_REZ                               EQU $6E
@@ -403,8 +403,8 @@ DEF MENU_MISSION_SELECT_1_REMOTE          EQU $05
 DEF MENU_UNK06                            EQU $06 ; unused?
 DEF MENU_MISSION_SELECT_3_REMOTES         EQU $07
 DEF MENU_TOTALS                           EQU $08
-DEF MENU_UNK09                            EQU $09 ; used but unknown
-DEF MENU_UNK0A                            EQU $0A ; used but unknown
+DEF MENU_CONGRATULATIONS_GOT_REMOTE       EQU $09
+DEF MENU_TIME_UP                          EQU $0A
 DEF MENU_PAUSE_IN_GEX_CAVE                EQU $0B
 DEF MENU_QUIT_GAME                        EQU $0C
 DEF MENU_PAUSE_IN_LEVEL                   EQU $0D
@@ -421,7 +421,7 @@ DEF MENU_END_CREDITS_3                    EQU $17
 DEF MENU_END_CREDITS_4                    EQU $18
 DEF MENU_END_CREDITS_5                    EQU $19
 DEF MENU_END_CREDITS_6                    EQU $1A
-DEF MENU_UNK1B                            EQU $1B ; used but unknown
+DEF MENU_WELL_DONE                        EQU $1B
 
 ; Password validity
 DEF PASSWORD_INVALID                      EQU $00
@@ -469,26 +469,26 @@ DEF SONG_HOLIDAY_TV                        EQU $02
 DEF SONG_WESTERN_STATION                   EQU $03
 DEF SONG_GEX_CAVE                          EQU $04
 DEF SONG_TUT_TV                            EQU $05
-DEF SONG_UNK06                             EQU $06
-DEF SONG_UNK07                             EQU $07
-DEF SONG_UNK08                             EQU $08
-DEF SONG_UNK09                             EQU $09
-DEF SONG_UNK0A                             EQU $0A
-DEF SONG_UNK0B                             EQU $0B
-DEF SONG_UNK0C                             EQU $0C
-DEF SONG_UNK0D                             EQU $0D
-DEF SONG_UNK0E                             EQU $0E
-DEF SONG_UNK0F                             EQU $0F
-DEF SONG_UNK10                             EQU $10
+DEF SONG_UNK06                             EQU $06 ; unused?
+DEF SONG_UNK07                             EQU $07 ; unused?
+DEF SONG_UNK08                             EQU $08 ; unused?
+DEF SONG_UNK09                             EQU $09 ; unused?
+DEF SONG_UNK0A                             EQU $0A ; unused?
+DEF SONG_UNK0B                             EQU $0B ; unused?
+DEF SONG_UNK0C                             EQU $0C ; unused?
+DEF SONG_UNK0D                             EQU $0D ; unused?
+DEF SONG_UNK0E                             EQU $0E ; unused?
+DEF SONG_UNK0F                             EQU $0F ; unused?
+DEF SONG_UNK10                             EQU $10 ; unused?
 DEF SONG_BOSS                              EQU $11
 DEF SONG_MYSTERY_TV                        EQU $12
-DEF SONG_UNK13                             EQU $13
+DEF SONG_MISSION_SUCCESS                   EQU $13 ; used when you get a remote or complete a bonus level
 DEF SONG_ANIME_CHANNEL                     EQU $14
-DEF SONG_UNK15                             EQU $15
+DEF SONG_GAME_OVER_OR_TIME_UP              EQU $15
 DEF SONG_BONUS_CHANNEL                     EQU $16
 DEF SONG_SUPERHERO_SHOW                    EQU $17
 DEF SONG_CHANNEL_Z                         EQU $18
-DEF SONG_UNK19                             EQU $19
+DEF SONG_CREDITS                           EQU $19
 DEF SONG_NONE                              EQU $FF
 
 ; Entity Collision Types

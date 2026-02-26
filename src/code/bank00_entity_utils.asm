@@ -13,7 +13,7 @@ call_00_21f6_FindAndMarkEntityInList_TVButton:
 ; whose parameter matches C.
 ; When found, it updates a D7xx structure at index B:
 ; Sets a nibble/flag ([DE] = ([DE] & $F0) | value).
-; Uses a small table (db $00,$01,$02,$04 at .data_00_225c) and level mask (wDC1E_CurrentLevelNumber) 
+; Uses a small table (db $00,$01,$02,$04 at .data_00_225c) and level mask (wDC1E_CurrentLevelID) 
 ; to decide which flag (1 or 2) to apply.
 ; Exits by restoring the previous bank. 
 ; Usage:
@@ -65,7 +65,7 @@ call_00_21f6_FindAndMarkEntityInList_TVButton:
     add  HL, BC                                        ;; 00:2239 $09
     ld   A, [HL]                                       ;; 00:223a $7e
     push AF                                            ;; 00:223b $f5
-    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:223c $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelID                                     ;; 00:223c $21 $1e $dc
     ld   L, [HL]                                       ;; 00:223f $6e
     ld   H, $00                                        ;; 00:2240 $26 $00
     ld   BC, wDC5C_ProgressFlags                                     ;; 00:2242 $01 $5c $dc
@@ -74,7 +74,7 @@ call_00_21f6_FindAndMarkEntityInList_TVButton:
     ld   C, $01                                        ;; 00:2247 $0e $01
     and  A, [HL]                                       ;; 00:2249 $a6
     jr   Z, .jr_00_2254                                ;; 00:224a $28 $08
-    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:224c $fa $1e $dc
+    ld   A, [wDC1E_CurrentLevelID]                                    ;; 00:224c $fa $1e $dc
     and  A, A                                          ;; 00:224f $a7
     jr   Z, .jr_00_2254                                ;; 00:2250 $28 $02
     ld   C, $02                                        ;; 00:2252 $0e $02
@@ -187,7 +187,7 @@ call_00_22d4_Entity_CheckTriggerFlag:
 ; Uses that param to look up a byte in the table at wDCB1_LevelTriggerBuffer.
 ; Returns with A = value at that slot (flags zero/non-zero).
 ; Purpose: Check if a flag/slot for this entity is set.
-    call call_00_230f_Entity_GetParameter
+    call call_00_230f_Entity_GetParameterIntoC
     ld   b,$00
     ld   hl,wDCB1_LevelTriggerBuffer
     add  hl,bc
@@ -199,7 +199,7 @@ call_00_22e0_Entity_IncrementTriggerFlag:
 ; Gets entity parameter via 230F.
 ; If parameter < $10, increments that entity’s slot in wDCB1_LevelTriggerBuffer.
 ; Purpose: Increment a small counter for this entity (capped at 16 slots).
-    call call_00_230f_Entity_GetParameter
+    call call_00_230f_Entity_GetParameterIntoC
     ld   a,c
     cp   a,$10
     ret  nc
@@ -213,7 +213,7 @@ call_00_22ef_Entity_SetTriggerActive:
 ; Gets entity parameter via 230F.
 ; If parameter < $10, sets that entity’s slot to 1.
 ; Purpose: Mark the slot as "active" or "initialized."
-    call call_00_230f_Entity_GetParameter
+    call call_00_230f_Entity_GetParameterIntoC
     ld   a,c
     cp   a,$10
     ret  nc
@@ -227,7 +227,7 @@ call_00_22ff_Entity_SetTriggerInactive:
 ; Gets entity parameter via 230F.
 ; If parameter < $10, clears that slot to 0.
 ; Purpose: Mark the slot as inactive/cleared.
-    call call_00_230f_Entity_GetParameter
+    call call_00_230f_Entity_GetParameterIntoC
     ld   a,c
     cp   a,$10
     ret  nc
@@ -237,7 +237,7 @@ call_00_22ff_Entity_SetTriggerInactive:
     ld   [hl],$00
     ret  
 
-call_00_230f_Entity_GetParameter:
+call_00_230f_Entity_GetParameterIntoC:
 ; Switches to the entity list bank (wDC16_EntityListBank).
 ; Uses wDC17_EntityListBankOffset and the current entity’s ID (wDA00_CurrentEntityAddrLo) to compute 
 ; an index (C) into the entity list.
@@ -1581,7 +1581,7 @@ call_00_2a98_RaStatueEntity_PlayerInteraction:
 ; triggers a banked function (call_02_72ac_SetEntityAction)
 ; Purpose: Detects when the player collides with or interacts with a special entity and dispatches a handler.
     push de
-    call call_00_230f_Entity_GetParameter
+    call call_00_230f_Entity_GetParameterIntoC
     ld   l,c
     ld   h,$00
     add  hl,hl

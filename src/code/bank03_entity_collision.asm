@@ -145,11 +145,11 @@ call_03_4cea_CollisionHandler_DamagePlayer:
 .jr_03_4d15:
     ld   [wDC98], A                                    ;; 03:4d15 $ea $98 $dc
     ld   A, [wDB6C_CurrentMapId]                                    ;; 03:4d18 $fa $6c $db
-    cp   A, $07                                        ;; 03:4d1b $fe $07
+    cp   A, MAP_GEXTREME_SPORTS1                                        ;; 03:4d1b $fe $07
     ld   A, PLAYERACTION_SNOWBOARDING_TAKE_DAMAGE                                        ;; 03:4d1d $3e $29
     jr   Z, .jr_03_4d2c                                ;; 03:4d1f $28 $0b
     ld   A, [wDB6C_CurrentMapId]                                    ;; 03:4d21 $fa $6c $db
-    cp   A, $08                                        ;; 03:4d24 $fe $08
+    cp   A, MAP_MARSUPIAL_MADNESS1                                        ;; 03:4d24 $fe $08
     ld   A, PLAYERACTION_KANGAROO_TAKE_DAMAGE                                        ;; 03:4d26 $3e $36
     jr   Z, .jr_03_4d2c                                ;; 03:4d28 $28 $02
     ld   A, PLAYERACTION_TAKE_DAMAGE                                        ;; 03:4d2a $3e $09
@@ -212,7 +212,7 @@ call_03_4d9b_CollisionHandler_BonusCoin:
 ; If collision: sets per-level progress bit (bit4 of level data), plays sound 02, then handles entity hit.
     call call_03_550e_Entity_CheckPlayerInteraction                                  ;; 03:4d9b $cd $0e $55
     ret  NC                                            ;; 03:4d9e $d0
-    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 03:4d9f $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelID                                     ;; 03:4d9f $21 $1e $dc
     ld   L, [HL]                                       ;; 03:4da2 $6e
     ld   H, $00                                        ;; 03:4da3 $26 $00
     ld   DE, wDC5C_ProgressFlags                                     ;; 03:4da5 $11 $5c $dc
@@ -240,12 +240,12 @@ call_03_4dc2_CollisionHandler_PawCoin:
 ; This is basically a collectible counter with milestones.
     call call_03_550e_Entity_CheckPlayerInteraction                                  ;; 03:4dc2 $cd $0e $55
     ret  NC                                            ;; 03:4dc5 $d0
-    call call_00_230f_Entity_GetParameter                                  ;; 03:4dc6 $cd $0f $23
+    call call_00_230f_Entity_GetParameterIntoC                                  ;; 03:4dc6 $cd $0f $23
     ld   B, $00                                        ;; 03:4dc9 $06 $00
     ld   HL, .data_03_4e00                             ;; 03:4dcb $21 $00 $4e
     add  HL, BC                                        ;; 03:4dce $09
     ld   C, [HL]                                       ;; 03:4dcf $4e
-    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 03:4dd0 $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelID                                     ;; 03:4dd0 $21 $1e $dc
     ld   L, [HL]                                       ;; 03:4dd3 $6e
     ld   H, $00                                        ;; 03:4dd4 $26 $00
     ld   DE, wDC5C_ProgressFlags                                     ;; 03:4dd6 $11 $5c $dc
@@ -448,7 +448,7 @@ call_03_4f23_CollisionHandler_HolidayTV_Elf:
     jp   NZ, call_03_4cea_CollisionHandler_DamagePlayer                               ;; 03:4f29 $c2 $ea $4c
     ld   A, $04                                        ;; 03:4f2c $3e $04
     farcall call_02_72ac_SetEntityAction
-    call call_00_230f_Entity_GetParameter                                  ;; 03:4f39 $cd $0f $23
+    call call_00_230f_Entity_GetParameterIntoC                                  ;; 03:4f39 $cd $0f $23
     ld   B, $00                                        ;; 03:4f3c $06 $00
     ld   HL, wDCD5_ElfHealth1                                     ;; 03:4f3e $21 $d5 $dc
     add  HL, BC                                        ;; 03:4f41 $09
@@ -745,7 +745,7 @@ call_03_5116_CollisionHandler_Door:
     ret  c
     cp   a,PLAYERACTION_WALK
     ret  nc
-    call call_00_230f_Entity_GetParameter
+    call call_00_230f_Entity_GetParameterIntoC
     inc  c
     jr   z,.jr_00_5143
     call call_00_22d4_Entity_CheckTriggerFlag
@@ -776,7 +776,7 @@ call_03_5156_CollisionHandler_Door2:
     ret  c
     cp   a,PLAYERACTION_WALK
     ret  nc
-    call call_00_230f_Entity_GetParameter
+    call call_00_230f_Entity_GetParameterIntoC
     inc  c
     jr   z,.jr_00_5183
     call call_00_22d4_Entity_CheckTriggerFlag
@@ -883,9 +883,9 @@ call_03_5231_CollisionHandler_Mech:
     ret  nz
     call call_00_22e0_Entity_IncrementTriggerFlag
     ld   a,[wDB6C_CurrentMapId]
-    cp   a,$29
+    cp   a,MAP_ANIME_CHANNEL2
     jr   z,.jr_00_5258
-    cp   a,$2A
+    cp   a,MAP_ANIME_CHANNEL3
     ret  nz
 .jr_00_5258:
     ld   hl,wDCCB_MechCounter
@@ -1030,7 +1030,7 @@ call_03_532f_CollisionHandler_GextremeSports_Elf:
     jp   nz,call_03_4cea_CollisionHandler_DamagePlayer
     ld   a,$04
     farcall call_02_72ac_SetEntityAction
-    call call_00_230f_Entity_GetParameter
+    call call_00_230f_Entity_GetParameterIntoC
     ld   b,$00
     ld   hl,wDCD5_ElfHealth1
     add  hl,bc
@@ -1067,7 +1067,7 @@ call_03_537a_CollisionHandler_BonusTimeCoin:
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
     ret  nz
-    call call_00_230f_Entity_GetParameter
+    call call_00_230f_Entity_GetParameterIntoC
     ld   a,[wDB6E]
     add  c
     ld   [wDB6E],a

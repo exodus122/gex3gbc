@@ -208,11 +208,11 @@ call_02_4f11_ChooseNextActionBasedOnLevel:
     bit  7, A                                          ;; 02:4f18 $cb $7f
     ret  NZ                                            ;; 02:4f1a $c0
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:4f1b $fa $6c $db
-    cp   A, $07                                        ;; 02:4f1e $fe $07
+    cp   A, MAP_GEXTREME_SPORTS1                                        ;; 02:4f1e $fe $07
     ld   A, PLAYERACTION_SNOWBOARDING_FALL                                        ;; 02:4f20 $3e $28
     jr   Z, .jr_02_4f2f                                ;; 02:4f22 $28 $0b
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:4f24 $fa $6c $db
-    cp   A, $08                                        ;; 02:4f27 $fe $08
+    cp   A, MAP_MARSUPIAL_MADNESS1                                        ;; 02:4f27 $fe $08
     ld   A, PLAYERACTION_KANGAROO_FALL                                        ;; 02:4f29 $3e $35
     jr   Z, .jr_02_4f2f                                ;; 02:4f2b $28 $02
     ld   A, PLAYERACTION_FALL                                        ;; 02:4f2d $3e $11
@@ -839,11 +839,11 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     jp   C, .jp_02_5283                                ;; 02:52db $da $83 $52
 .jr_02_52de:
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:52de $fa $6c $db
-    cp   A, $07                                        ;; 02:52e1 $fe $07
+    cp   A, MAP_GEXTREME_SPORTS1                                        ;; 02:52e1 $fe $07
     ld   A, PLAYERACTION_SNOWBOARDING_FALL                                        ;; 02:52e3 $3e $28
     jr   Z, .jr_02_52f2                                ;; 02:52e5 $28 $0b
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:52e7 $fa $6c $db
-    cp   A, $08                                        ;; 02:52ea $fe $08
+    cp   A, MAP_MARSUPIAL_MADNESS1                                        ;; 02:52ea $fe $08
     ld   A, PLAYERACTION_KANGAROO_FALL                                        ;; 02:52ec $3e $35
     jr   Z, .jr_02_52f2                                ;; 02:52ee $28 $02
     ld   A, PLAYERACTION_FALL                                        ;; 02:52f0 $3e $11
@@ -878,11 +878,11 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     cp   A, $10                                        ;; 02:532a $fe $10
     jp   C, call_02_4dce_Player_SwitchActionToIdleOrWalk                                 ;; 02:532c $da $ce $4d
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:532f $fa $6c $db
-    cp   A, $07                                        ;; 02:5332 $fe $07
+    cp   A, MAP_GEXTREME_SPORTS1                                        ;; 02:5332 $fe $07
     ld   A, PLAYERACTION_SNOWBOARDING_STAND_OR_WALK                                        ;; 02:5334 $3e $24
     jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:5336 $ca $f9 $54
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:5339 $fa $6c $db
-    cp   A, $08                                        ;; 02:533c $fe $08
+    cp   A, MAP_MARSUPIAL_MADNESS1                                        ;; 02:533c $fe $08
     ld   A, PLAYERACTION_KANGAROO_IDLE                                        ;; 02:533e $3e $30
     jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:5340 $ca $f9 $54
     ld   A, PLAYERACTION_LAND_FROM_FALL                                        ;; 02:5343 $3e $12
@@ -919,7 +919,7 @@ call_02_5374_LevelSpecificEventTrigger:
 ; Purpose: Triggers scripted events or hazards tied to specific X positions or collectibles.
 ; Details:
 ; Filters on input state (and A,$08).
-; Uses level number and index (wDC1E_CurrentLevelNumber) to find event tables (.data_02_53bf).
+; Uses level number and index (wDC1E_CurrentLevelID) to find event tables (.data_02_53bf).
 ; Compares collected values (wDCB1_LevelTriggerBuffer) to thresholds and modifies wDC8C_PlayerYVelocity (horizontal momentum or trigger accumulator).
 ; Likely handles special pickups or doors that open based on conditions.
     call call_02_5541_GetPlayerStatesFromAction                                  ;; 02:5374 $cd $41 $55
@@ -932,7 +932,7 @@ call_02_5374_LevelSpecificEventTrigger:
     ret  NC                                            ;; 02:5382 $d0
     sub  A, $3e                                        ;; 02:5383 $d6 $3e
     ld   C, A                                          ;; 02:5385 $4f
-    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 02:5386 $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelID                                     ;; 02:5386 $21 $1e $dc
     ld   L, [HL]                                       ;; 02:5389 $6e
     ld   H, $00                                        ;; 02:538a $26 $00
     add  HL, HL                                        ;; 02:538c $29

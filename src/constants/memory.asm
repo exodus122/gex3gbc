@@ -299,7 +299,7 @@ wDB6C_CurrentMapId: ; can freeze and enter level to get to another level
 ; also used for totals menu pages
     ds 1                                               ;; db6c
 
-wDB6D:
+wDB6D_InBonusLevel: ; 1 = in gextreme sports or marsupial madness
     ds 1                                               ;; db6d
 
 wDB6E:
@@ -452,9 +452,9 @@ wDBE6:
     ds 1                                               ;; dbe6
 wDBE7:
     ds 1                                               ;; dbe7
-wDBE8:
+wDBE8_ManuMapIDRelated:
     ds 1                                               ;; dbe8
-wDBE9:
+wDBE9_MenuTypeRelated:
     ds 1                                               ;; dbe9
 wDBEA_MenuType:
     ds 1                                               ;; dbea
@@ -537,7 +537,7 @@ wDC1A_CollectibleListBankOffset:
     ds 2                                               ;; dc1a
 wDC1C_CurrentMapWidthAndHeightInBlocks:
     ds 2                                               ;; dc1c
-wDC1E_CurrentLevelNumber: ; all maps in the same level share the same value here
+wDC1E_CurrentLevelID: ; all maps in the same level share the same value here
     ds 1                                               ;; dc1e
 
 wDC1F_CurrentBgCollisionType:
@@ -662,7 +662,7 @@ wDC59_NumRemotesOnMissionSelectMenu:
     ds 1                                               ;; dc59
 wDC5A_MissionNumberSelected:
     ds 1                                               ;; dc5a
-wDC5B_TVButtonLevelMissionRelated:
+wDC5B_LevelIdFromTVButton:
     ds 1                                               ;; dc5b
 
 wDC5C_ProgressFlags:

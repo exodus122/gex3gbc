@@ -42,7 +42,7 @@ call_02_585f_EntityAction_MovePlatformHorizontally:
     and  a,$7F
     xor  a,$40
     ld   [hl],a
-    call call_00_230f_Entity_GetParameter
+    call call_00_230f_Entity_GetParameterIntoC
     jp   call_00_290d_Entity_SetMiscTimer
 .jr_00_588C:
     ld   c,$01
@@ -87,7 +87,7 @@ call_02_58bd_EntityAction_MovePlatformVertically:
     and  a,$7F
     xor  a,$40
     ld   [hl],a
-    call call_00_230f_Entity_GetParameter
+    call call_00_230f_Entity_GetParameterIntoC
     jp   call_00_290d_Entity_SetMiscTimer
 .jr_00_58EA:
     ld   c,$01
@@ -174,7 +174,7 @@ call_02_59aa_EntityAction_FlyTV_Reset:
     call call_02_59D2_FlyTV_unk
     call call_00_2b10_Entity_FindDuplicateInstance
     ret  nz
-    call call_00_230f_Entity_GetParameter
+    call call_00_230f_Entity_GetParameterIntoC
     ld   a,c
     and  a
     ret  z
@@ -238,26 +238,26 @@ call_02_5a1c_EntityAction_TVButton_unk2:
     ld   A, $02                                        ;; 02:5a2c $3e $02
     call call_02_72ac_SetEntityAction                                  ;; 02:5a2e $cd $ac $72
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:5a31 $fa $6c $db
-    cp   A, $07                                        ;; 02:5a34 $fe $07
+    cp   A, MAP_GEXTREME_SPORTS1                                        ;; 02:5a34 $fe $07
     ld   A, PLAYERACTION_SNOWBOARDING_STAND_ON_TV_BUTTON                                        ;; 02:5a36 $3e $2c
     jr   Z, .jr_02_5a45                                ;; 02:5a38 $28 $0b
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:5a3a $fa $6c $db
-    cp   A, $08                                        ;; 02:5a3d $fe $08
+    cp   A, MAP_MARSUPIAL_MADNESS1                                        ;; 02:5a3d $fe $08
     ld   A, PLAYERACTION_KANGAROO_STAND_ON_TV_BUTTON                                        ;; 02:5a3f $3e $39
     jr   Z, .jr_02_5a45                                ;; 02:5a41 $28 $02
     ld   A, PLAYERACTION_STAND_ON_TV_BUTTON                                        ;; 02:5a43 $3e $0c
 .jr_02_5a45:
     call call_02_54f9_SwitchPlayerAction                                  ;; 02:5a45 $cd $f9 $54
-    call call_00_230f_Entity_GetParameter                                  ;; 02:5a48 $cd $0f $23
-    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 02:5a4b $fa $1e $dc
+    call call_00_230f_Entity_GetParameterIntoC                                  ;; 02:5a48 $cd $0f $23
+    ld   A, [wDC1E_CurrentLevelID]                                    ;; 02:5a4b $fa $1e $dc
     and  A, A                                          ;; 02:5a4e $a7
-    jr   Z, .jr_02_5a6a                                ;; 02:5a4f $28 $19
+    jr   Z, .jr_02_5a6a_InGexCave                                ;; 02:5a4f $28 $19
     push BC                                            ;; 02:5a51 $c5
     ld   B, $00                                        ;; 02:5a52 $06 $00
     ld   HL, .data_02_5a71                             ;; 02:5a54 $21 $71 $5a
     add  HL, BC                                        ;; 02:5a57 $09
     ld   C, [HL]                                       ;; 02:5a58 $4e
-    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 02:5a59 $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelID                                     ;; 02:5a59 $21 $1e $dc
     ld   L, [HL]                                       ;; 02:5a5c $6e
     ld   H, $00                                        ;; 02:5a5d $26 $00
     ld   DE, wDC5C_ProgressFlags                                     ;; 02:5a5f $11 $5c $dc
@@ -267,8 +267,8 @@ call_02_5a1c_EntityAction_TVButton_unk2:
     ld   [HL], A                                       ;; 02:5a65 $77
     pop  BC                                            ;; 02:5a66 $c1
     jp   call_00_2260_FindAndFlagEntity_TVRemote                                    ;; 02:5a67 $c3 $60 $22
-.jr_02_5a6a:
-    ld   HL, wDC5B_TVButtonLevelMissionRelated                                     ;; 02:5a6a $21 $5b $dc
+.jr_02_5a6a_InGexCave:
+    ld   HL, wDC5B_LevelIdFromTVButton                                     ;; 02:5a6a $21 $5b $dc
     ld   [HL], C                                       ;; 02:5a6d $71
     jp   call_00_2260_FindAndFlagEntity_TVRemote                                    ;; 02:5a6e $c3 $60 $22
 .data_02_5a71:
@@ -281,10 +281,10 @@ call_02_5a75_EntityAction_TVButton_unk3:
     db   $00, $00, $00, $00, $73, $4e, $e0, $03        ;; 02:5a7b ........
 
 call_02_5a83_EntityAction_TVButton_unk4:
-    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 02:5a83 $fa $1e $dc
+    ld   A, [wDC1E_CurrentLevelID]                                    ;; 02:5a83 $fa $1e $dc
     and  A, A                                          ;; 02:5a86 $a7
     ret  NZ                                            ;; 02:5a87 $c0
-    call call_00_230f_Entity_GetParameter                                  ;; 02:5a88 $cd $0f $23
+    call call_00_230f_Entity_GetParameterIntoC                                  ;; 02:5a88 $cd $0f $23
     ld   B, $00                                        ;; 02:5a8b $06 $00
     ld   HL, data_00_0b19                                      ;; 02:5a8d $21 $19 $0b
     add  HL, BC                                        ;; 02:5a90 $09
@@ -340,10 +340,10 @@ call_02_5aee_EntityAction_TVRemote_unk3:    ;; 02:5aeb $c3 $b1 $22
     jp   call_00_22b1_Entity_UpdateFlagsAndSetAction
 
 call_02_5af8_EntityAction_TVRemote_unk4:
-    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 02:5af8 $fa $1e $dc
+    ld   A, [wDC1E_CurrentLevelID]                                    ;; 02:5af8 $fa $1e $dc
     and  A, A                                          ;; 02:5afb $a7
     ret  NZ                                            ;; 02:5afc $c0
-    call call_00_230f_Entity_GetParameter                                  ;; 02:5afd $cd $0f $23
+    call call_00_230f_Entity_GetParameterIntoC                                  ;; 02:5afd $cd $0f $23
     ld   B, $00                                        ;; 02:5b00 $06 $00
     ld   HL, data_00_0b19                                      ;; 02:5b02 $21 $19 $0b
     add  HL, BC                                        ;; 02:5b05 $09
@@ -372,7 +372,7 @@ call_02_5af8_EntityAction_TVRemote_unk4:
     ld   A, $03                                        ;; 02:5b3b $3e $03
     call call_02_72ac_SetEntityAction                                  ;; 02:5b3d $cd $ac $72
 .jr_02_5b40:
-    call call_00_230f_Entity_GetParameter                                  ;; 02:5b40 $cd $0f $23
+    call call_00_230f_Entity_GetParameterIntoC                                  ;; 02:5b40 $cd $0f $23
     ld   B, $00                                        ;; 02:5b43 $06 $00
     ld   HL, .data_02_5b7e                             ;; 02:5b45 $21 $7e $5b
     add  HL, BC                                        ;; 02:5b48 $09
@@ -440,7 +440,7 @@ call_02_5bb3_EntityAction_UpdateBonusStageTimer:
     ret  
 
 call_02_5bd4_EntityAction_FreestandingRemote_unk0:
-    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 02:5bd4 $fa $1e $dc
+    ld   A, [wDC1E_CurrentLevelID]                                    ;; 02:5bd4 $fa $1e $dc
     and  A, A                                          ;; 02:5bd7 $a7
     jr   Z, .jr_02_5be4                                ;; 02:5bd8 $28 $0a
     ld   A, [wDCD2_FreestandingRemoteHitFlags]                                    ;; 02:5bda $fa $d2 $dc
@@ -474,7 +474,7 @@ call_02_5bfa_EntityAction_FreestandingRemote_unk2:
     call call_00_2c67_Particle_InitBurst                                  ;; 02:5c10 $cd $67 $2c
     ld   C, TIMER_AMOUNT_60_FRAMES                                        ;; 02:5c13 $0e $3c
     call call_00_290d_Entity_SetMiscTimer                                  ;; 02:5c15 $cd $0d $29
-    call call_00_230f_Entity_GetParameter                                  ;; 02:5c18 $cd $0f $23
+    call call_00_230f_Entity_GetParameterIntoC                                  ;; 02:5c18 $cd $0f $23
     ld   B, $00                                        ;; 02:5c1b $06 $00
     ld   HL, wDC5C_ProgressFlags                                     ;; 02:5c1d $21 $5c $dc
     add  HL, BC                                        ;; 02:5c20 $09
@@ -484,7 +484,7 @@ call_02_5bfa_EntityAction_FreestandingRemote_unk2:
     ret  NZ                                            ;; 02:5c26 $c0
     call call_00_2922_Entity_MiscTimerCountdown                                  ;; 02:5c27 $cd $22 $29
     ret  NZ                                            ;; 02:5c2a $c0
-    call call_00_230f_Entity_GetParameter                                  ;; 02:5c2b $cd $0f $23
+    call call_00_230f_Entity_GetParameterIntoC                                  ;; 02:5c2b $cd $0f $23
     inc  C                                             ;; 02:5c2e $0c
     dec  C                                             ;; 02:5c2f $0d
     jp   Z, call_00_2b7a_DeactivateEntity                                 ;; 02:5c30 $ca $7a $2b
@@ -755,7 +755,7 @@ call_02_5e34_EntityAction_SkatingElf_Damaged:
     call Z, call_00_2588_Entity_ApproachXVelocity                               ;; 02:5e51 $cc $88 $25
     call call_00_251c_Entity_HandleHorizontalBoundingBoxTurnAround                                  ;; 02:5e54 $cd $1c $25
     ret  Z                                             ;; 02:5e57 $c8
-    call call_00_230f_Entity_GetParameter                                  ;; 02:5e58 $cd $0f $23
+    call call_00_230f_Entity_GetParameterIntoC                                  ;; 02:5e58 $cd $0f $23
     ld   B, $00                                        ;; 02:5e5b $06 $00
     ld   HL, wDCD5_ElfHealth1                                     ;; 02:5e5d $21 $d5 $dc
     add  HL, BC                                        ;; 02:5e60 $09
@@ -1434,7 +1434,7 @@ call_02_642e_EntityAction_Rock_Unk0:
     ld   hl,wDA00_CurrentEntityAddrLo
     cp   [hl]
     ret  nz
-    call call_00_230f_Entity_GetParameter
+    call call_00_230f_Entity_GetParameterIntoC
     jp   call_00_290d_Entity_SetMiscTimer
 .jr_00_6450:
     call call_00_2922_Entity_MiscTimerCountdown
@@ -1623,7 +1623,7 @@ call_02_659d_EntityAction_AnimeDisappearingFloor_Unk0:
 
 call_02_65b3_EntityAction_Onswitch2_Unk1:
     ld   a,[wDB6C_CurrentMapId]
-    cp   a,$2B
+    cp   a,MAP_ANIME_CHANNEL4
     ret  nz
     call call_00_22d4_Entity_CheckTriggerFlag
     cp   a,$01
@@ -2036,7 +2036,7 @@ call_02_68b2_EntityAction_Grenade_Unk0:
     ld   b,$00
     call call_00_24df_Entity_AdjustXPosition
     call call_00_27e4_Entity_ResetToInitialYPos
-    call call_00_230f_Entity_GetParameter
+    call call_00_230f_Entity_GetParameterIntoC
     ld   b,$FF
     call call_00_250d_Entity_AdjustYPosition
     ld   c,TIMER_AMOUNT_GRENADE
@@ -2319,7 +2319,7 @@ call_02_6add_EntityAction_ConvictProjectile_Update:
 call_02_6b03_EntityAction_Spider_Unk0:
     call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
     jr   z,.jr_00_6B0E
-    call call_00_230f_Entity_GetParameter
+    call call_00_230f_Entity_GetParameterIntoC
     call call_00_290d_Entity_SetMiscTimer
 .jr_00_6B0E:
     ld   bc,$0002
@@ -2334,7 +2334,7 @@ call_02_6b03_EntityAction_Spider_Unk0:
 call_02_6b20_EntityAction_Spider_Unk1:
     ld   bc,$FFFF
     call call_00_250d_Entity_AdjustYPosition
-    call call_00_230f_Entity_GetParameter
+    call call_00_230f_Entity_GetParameterIntoC
     call call_00_2917_Entity_CheckIfMiscTimerIsZero
     inc  a
     ld   [hl],a
@@ -2403,7 +2403,7 @@ call_02_6ba3_EntityAction_ChomperTV_Unk0:
     jr   z,.jr_00_6BB3
     ld   c,$04
     call call_00_28c8_Entity_SetXVelocity
-    call call_00_230f_Entity_GetParameter
+    call call_00_230f_Entity_GetParameterIntoC
     call call_00_290d_Entity_SetMiscTimer
 .jr_00_6BB3:
     call call_00_251c_Entity_HandleHorizontalBoundingBoxTurnAround
@@ -2432,7 +2432,7 @@ call_02_6bc8_EntityAction_ChomperTV_Unk2:
     call call_00_251c_Entity_HandleHorizontalBoundingBoxTurnAround
 
 call_02_6be4_EntityAction_ChomperTV_Unk1:
-    call call_00_230f_Entity_GetParameter
+    call call_00_230f_Entity_GetParameterIntoC
     call call_00_2917_Entity_CheckIfMiscTimerIsZero
     cp   c
     ld   a,$00
@@ -2518,7 +2518,7 @@ call_02_6c73_EntityAction_GextremeSportsElf_Unk4:
     call z,call_00_2588_Entity_ApproachXVelocity
     call call_00_251c_Entity_HandleHorizontalBoundingBoxTurnAround
     ret  z
-    call call_00_230f_Entity_GetParameter
+    call call_00_230f_Entity_GetParameterIntoC
     ld   b,$00
     ld   hl,wDCD5_ElfHealth1
     add  hl,bc
@@ -2539,7 +2539,7 @@ call_02_6c73_EntityAction_GextremeSportsElf_Unk4:
 call_02_6cbb_EntityAction_Bird_Update:
     call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
     jr   z,.jr_00_6CC6
-    call call_00_230f_Entity_GetParameter
+    call call_00_230f_Entity_GetParameterIntoC
     call call_00_2958_Entity_SetFacingDirection
 .jr_00_6CC6:
     call call_00_27f3_Entity_GetInitialYPos

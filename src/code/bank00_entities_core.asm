@@ -567,7 +567,7 @@ call_00_2ff8_InitLevelEntitiesAndConfig:
     ld   [wDCD1_BrainOfOzFlag], A                                    ;; 00:3049 $ea $d1 $dc
     ld   [wDCD2_FreestandingRemoteHitFlags], A                                    ;; 00:304c $ea $d2 $dc
     ld   [wDCDA_BrainOfOzAndRezCounter], A                                    ;; 00:304f $ea $da $dc
-    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:3052 $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelID                                     ;; 00:3052 $21 $1e $dc
     ld   L, [HL]                                       ;; 00:3055 $6e
     ld   H, $00                                        ;; 00:3056 $26 $00
     add  HL, HL                                        ;; 00:3058 $29
@@ -589,17 +589,17 @@ call_00_2ff8_InitLevelEntitiesAndConfig:
     ld   [wDCD7_ElfHealth3], A                                    ;; 00:307d $ea $d7 $dc
     ld   [wDCD8_ElfHealth4], A                                    ;; 00:3080 $ea $d8 $dc
     ld   [wDCD9_ElfHealth5], A                                    ;; 00:3083 $ea $d9 $dc
-    ld   HL, wDB6D                                     ;; 00:3086 $21 $6d $db
+    ld   HL, wDB6D_InBonusLevel                                     ;; 00:3086 $21 $6d $db
     ld   [HL], $00                                     ;; 00:3089 $36 $00
-    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:308b $fa $1e $dc
-    cp   A, $07                                        ;; 00:308e $fe $07
-    jr   Z, .jr_00_3096                                ;; 00:3090 $28 $04
-    cp   A, $08                                        ;; 00:3092 $fe $08
+    ld   A, [wDC1E_CurrentLevelID]                                    ;; 00:308b $fa $1e $dc
+    cp   A, LEVEL_GEXTREME_SPORTS                                        ;; 00:308e $fe $07
+    jr   Z, .jr_00_3096_InBonusLevel                                ;; 00:3090 $28 $04
+    cp   A, LEVEL_MARSUPIAL_MADNESS                                        ;; 00:3092 $fe $08
     jr   NZ, .jr_00_30ab                               ;; 00:3094 $20 $15
-.jr_00_3096:
+.jr_00_3096_InBonusLevel:
     ld   [HL], $01                                     ;; 00:3096 $36 $01
-    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:3098 $fa $1e $dc
-    cp   A, $07                                        ;; 00:309b $fe $07
+    ld   A, [wDC1E_CurrentLevelID]                                    ;; 00:3098 $fa $1e $dc
+    cp   A, LEVEL_GEXTREME_SPORTS                                        ;; 00:309b $fe $07
     ld   A, $3c                                        ;; 00:309d $3e $3c
     jr   Z, .jr_00_30a3                                ;; 00:309f $28 $02
     ld   A, $69                                        ;; 00:30a1 $3e $69
@@ -647,7 +647,7 @@ call_00_3180_MarkInitialLevelEntities:
 ; for each bit set, calls FindAndMarkEntityInList. For level 0, performs a banked 
 ; call comparison loop using call_01_4ab9_CountSetBitsInFlags and thresholds in .data_00_31cd.
 ; Purpose: Ensures certain entities are flagged or activated when the level begins.
-    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:3180 $fa $1e $dc
+    ld   A, [wDC1E_CurrentLevelID]                                    ;; 00:3180 $fa $1e $dc
     and  A, A                                          ;; 00:3183 $a7
     jr   Z, .jr_00_31a0                                ;; 00:3184 $28 $1a
     ld   L, A                                          ;; 00:3186 $6f
@@ -696,7 +696,7 @@ call_00_31d9_CheckAndClearBonusCoinEntityFlags:
 ; Behavior: Uses level number + wDC5C_ProgressFlags as a flag table, checks bit-4; if set, 
 ; searches entity list for type 01 and clears a RAM byte (wD7??) to zero.
 ; Purpose: Disables or resets a specific entity type when a special flag is set.
-    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:31d9 $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelID                                     ;; 00:31d9 $21 $1e $dc
     ld   L, [HL]                                       ;; 00:31dc $6e
     ld   H, $00                                        ;; 00:31dd $26 $00
     ld   DE, wDC5C_ProgressFlags                                     ;; 00:31df $11 $5c $dc
@@ -735,7 +735,7 @@ call_00_320d_CheckAndClearPawCoinEntityFlags:
 ; Purpose: Applies level-specific masking to entity type 3 spawns.
     ld   A, [wDC16_EntityListBank]                                    ;; 00:320d $fa $16 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:3210 $cd $ee $0e
-    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:3213 $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelID                                     ;; 00:3213 $21 $1e $dc
     ld   L, [HL]                                       ;; 00:3216 $6e
     ld   H, $00                                        ;; 00:3217 $26 $00
     ld   DE, wDC5C_ProgressFlags                                     ;; 00:3219 $11 $5c $dc

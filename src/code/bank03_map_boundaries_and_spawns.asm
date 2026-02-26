@@ -174,15 +174,15 @@ call_03_647c_InitPlayerPositionAndLevel:
     call call_03_6203_LoadLevelBoundariesFromId                                  ;; 03:64c6 $cd $03 $62
     jp   call_00_10de_UpdatePlayerMapWindow                                  ;; 03:64c9 $c3 $de $10
 .jr_03_64cc:
-    ld   HL, wDC5B_TVButtonLevelMissionRelated                                     ;; 03:64cc $21 $5b $dc
+    ld   HL, wDC5B_LevelIdFromTVButton                                     ;; 03:64cc $21 $5b $dc
     ld   L, [HL]                                       ;; 03:64cf $6e
     ld   H, $00                                        ;; 03:64d0 $26 $00
     ld   DE, .data_03_652b                             ;; 03:64d2 $11 $2b $65
     add  HL, DE                                        ;; 03:64d5 $19
     ld   A, [HL]                                       ;; 03:64d6 $7e
     ld   [wDB6C_CurrentMapId], A                                    ;; 03:64d7 $ea $6c $db
-    call call_03_6c89_LoadMapData                                  ;; 03:64da $cd $89 $6c
-    ld   HL, wDC5B_TVButtonLevelMissionRelated                                     ;; 03:64dd $21 $5b $dc
+    call call_03_6c89_LoadMapDataPtrs                                  ;; 03:64da $cd $89 $6c
+    ld   HL, wDC5B_LevelIdFromTVButton                                     ;; 03:64dd $21 $5b $dc
     ld   L, [HL]                                       ;; 03:64e0 $6e
     ld   H, $00                                        ;; 03:64e1 $26 $00
     add  HL, HL                                        ;; 03:64e3 $29
@@ -218,4 +218,3 @@ call_03_647c_InitPlayerPositionAndLevel:
     db   $d8, $0a, $20, $01, $98, $02, $b8, $02        ;; 03:654f ????????
     db   $a8, $01, $f8, $03, $c0, $00, $80, $00        ;; 03:6557 ????????
     db   $78, $00, $60, $00, $c8, $00, $20, $03        ;; 03:655f ????????
-

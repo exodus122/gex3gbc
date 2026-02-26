@@ -1,8 +1,8 @@
 call_01_4000_MenuHandler_LoadAndProcess:
 ; Purpose:
-; Initializes menu variables (wDBE9, wDBEA_MenuType, etc.) and copies menu-type–specific data into wDB92.
+; Initializes menu variables (wDBE9_MenuTypeRelated, wDBEA_MenuType, etc.) and copies menu-type–specific data into wDB92.
 ; Saves/restores the current level ID when transitioning to the menu.
-; Loads map/VRAM data for menu backgrounds (call_03_6c89_LoadMapData).
+; Loads map/VRAM data for menu backgrounds (call_03_6c89_LoadMapDataPtrs).
 ; Handles multiple input modes:
 ; Navigation (up/down/left/right) through menu entries.
 ; Page wrapping, clamping, and cursor movement (wDBED_PasswordColumnSelected, wDBEE_PasswordRowSelected, etc.).
@@ -13,7 +13,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
 ;
 ; 1. Initialization Phase
 ; - Reset flags & menu state:
-;   - Clears wDBE9 (menu state flags).
+;   - Clears wDBE9_MenuTypeRelated (menu state flags).
 ;   - Sets wDBEA_MenuType to the incoming menu ID.
 ;   - Saves the current level ID (wDB6C_CurrentMapId) so it can be restored after the menu closes.
 ;   - Copies a block of menu-specific data (pointer table or palette data) into wDB92—this acts as the active menu configuration.
@@ -69,7 +69,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
 ; 4. Handle confirm or cancel to branch or exit.
 ; 5. Update VRAM/OAM for smooth visuals.
 ; 6. On exit, restore level and resume gameplay.
-    ld   HL, wDBE9                                     ;; 01:4000 $21 $e9 $db
+    ld   HL, wDBE9_MenuTypeRelated                                     ;; 01:4000 $21 $e9 $db
     ld   [HL], $00                                     ;; 01:4003 $36 $00
 .jp_01_4005:
     ld   [wDBEA_MenuType], A                                    ;; 01:4005 $ea $ea $db
@@ -85,18 +85,18 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   BC, $0c                                       ;; 01:4016 $01 $0c $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4019 $cd $6e $07
     ld   A, [wDB6C_CurrentMapId]                                    ;; 01:401c $fa $6c $db
-    ld   [wDBE8], A                                    ;; 01:401f $ea $e8 $db
-    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 01:4022 $fa $1e $dc
+    ld   [wDBE8_ManuMapIDRelated], A                                    ;; 01:401f $ea $e8 $db
+    ld   A, [wDC1E_CurrentLevelID]                                    ;; 01:4022 $fa $1e $dc
     ld   [wDB6C_CurrentMapId], A                                    ;; 01:4025 $ea $6c $db
-    cp   A, $07                                        ;; 01:4028 $fe $07
+    cp   A, LEVEL_GEXTREME_SPORTS                                        ;; 01:4028 $fe $07
     jr   C, .jr_01_4037                                ;; 01:402a $38 $0b
     ld   A, [wDBEA_MenuType]                                    ;; 01:402c $fa $ea $db
-    cp   A, $08                                        ;; 01:402f $fe $08
+    cp   A, MENU_TOTALS                                        ;; 01:402f $fe $08
     jr   NZ, .jr_01_4037                               ;; 01:4031 $20 $04
     xor  A, A                                          ;; 01:4033 $af
     ld   [wDB6C_CurrentMapId], A                                    ;; 01:4034 $ea $6c $db
 .jr_01_4037:
-    farcall call_03_6c89_LoadMapData
+    farcall call_03_6c89_LoadMapDataPtrs
     xor  A, A                                          ;; 01:4042 $af
     ld   [wDBEB_MenuColumnSelected], A                                    ;; 01:4043 $ea $eb $db
     ld   [wDBEC_MenuRowSelected], A                                    ;; 01:4046 $ea $ec $db
@@ -134,9 +134,9 @@ call_01_4000_MenuHandler_LoadAndProcess:
     jr   Z, .jr_01_40ad                                ;; 01:4092 $28 $19
     ld   A, SFX_MENU_SCROLL                                        ;; 01:4094 $3e $01
     call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4096 $cd $d7 $0f
-    ld   A, [wDBE8]                                    ;; 01:4099 $fa $e8 $db
+    ld   A, [wDBE8_ManuMapIDRelated]                                    ;; 01:4099 $fa $e8 $db
     ld   [wDB6C_CurrentMapId], A                                    ;; 01:409c $ea $6c $db
-    farcall call_03_6c89_LoadMapData
+    farcall call_03_6c89_LoadMapDataPtrs
     jp   .jp_01_4285                                   ;; 01:40aa $c3 $85 $42
 .jr_01_40ad:
     ld   A, [wDB95_MenuTypeData_Unk3]                                    ;; 01:40ad $fa $95 $db
@@ -347,7 +347,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     jr   Z, .jr_01_4223                                ;; 01:421f $28 $02
     ld   [HL], $06                                     ;; 01:4221 $36 $06
 .jr_01_4223:
-    farcall call_03_6c89_LoadMapData
+    farcall call_03_6c89_LoadMapDataPtrs
     ld   HL, data_01_5692                              ;; 01:422e $21 $92 $56
     call call_01_4454_SetMenuPointer                                  ;; 01:4231 $cd $54 $44
     ld   A, SFX_MENU_SCROLL                                        ;; 01:4234 $3e $01
@@ -359,9 +359,9 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   A, SFX_MENU_SCROLL                                        ;; 01:4242 $3e $01
     call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4244 $cd $d7 $0f
     call call_00_0f5e_WaitUntilNoInputPressed                                  ;; 01:4247 $cd $5e $0f
-    ld   A, [wDBE8]                                    ;; 01:424a $fa $e8 $db
+    ld   A, [wDBE8_ManuMapIDRelated]                                    ;; 01:424a $fa $e8 $db
     ld   [wDB6C_CurrentMapId], A                                    ;; 01:424d $ea $6c $db
-    farcall call_03_6c89_LoadMapData
+    farcall call_03_6c89_LoadMapDataPtrs
     ld   A, [wDB95_MenuTypeData_Unk3]                                    ;; 01:425b $fa $95 $db
     and  A, A                                          ;; 01:425e $a7
     jr   Z, .jp_01_4285                                ;; 01:425f $28 $24
@@ -387,13 +387,13 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ret  Z                                             ;; 01:4284 $c8
 .jp_01_4285:
     call call_00_0f5e_WaitUntilNoInputPressed                                  ;; 01:4285 $cd $5e $0f
-    ld   A, [wDBE9]                                    ;; 01:4288 $fa $e9 $db
+    ld   A, [wDBE9_MenuTypeRelated]                                    ;; 01:4288 $fa $e9 $db
     and  A, A                                          ;; 01:428b $a7
     jp   NZ, call_01_4000_MenuHandler_LoadAndProcess                              ;; 01:428c $c2 $00 $40
     ret                                                ;; 01:428f $c9
 .jr_01_4290:
     ld   A, [wDBEA_MenuType]                                    ;; 01:4290 $fa $ea $db
-    ld   [wDBE9], A                                    ;; 01:4293 $ea $e9 $db
+    ld   [wDBE9_MenuTypeRelated], A                                    ;; 01:4293 $ea $e9 $db
     call call_01_4f8c_BuildPasswordBitfieldAndChecksum                                  ;; 01:4296 $cd $8c $4f
     call call_01_5027_BuildPasswordBufferFromBitfield                                  ;; 01:4299 $cd $27 $50
     ld   A, MENU_SEE_PASSWORD                                        ;; 01:429c $3e $02
@@ -403,16 +403,16 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   A, MENU_ENTER_PASSWORD                                        ;; 01:42a4 $3e $01
     jp   call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:42a6 $c3 $00 $40
 .jr_01_42a9:
-    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 01:42a9 $fa $1e $dc
+    ld   A, [wDC1E_CurrentLevelID]                                    ;; 01:42a9 $fa $1e $dc
     and  A, A                                          ;; 01:42ac $a7
-    ld   A, $0c                                        ;; 01:42ad $3e $0c
+    ld   A, MENU_QUIT_GAME                                        ;; 01:42ad $3e $0c
     jp   Z, .jp_01_4005                                ;; 01:42af $ca $05 $40
-    ld   A, $0e                                        ;; 01:42b2 $3e $0e
+    ld   A, MENU_GO_TO_MAP                                        ;; 01:42b2 $3e $0e
     jp   .jp_01_4005                                   ;; 01:42b4 $c3 $05 $40
 .jr_01_42b7:
     ld   A, [wDBEA_MenuType]                                    ;; 01:42b7 $fa $ea $db
-    ld   [wDBE9], A                                    ;; 01:42ba $ea $e9 $db
-    ld   A, $08                                        ;; 01:42bd $3e $08
+    ld   [wDBE9_MenuTypeRelated], A                                    ;; 01:42ba $ea $e9 $db
+    ld   A, MENU_TOTALS                                        ;; 01:42bd $3e $08
     jp   .jp_01_4005                                   ;; 01:42bf $c3 $05 $40
 .jp_01_42c2:
     ld   BC, $12c                                      ;; 01:42c2 $01 $2c $01
@@ -456,17 +456,17 @@ call_01_42fd_LoadMenu_GameOver:
 ; Behavior:
 ; Requests song bank 15 and starts playback, then immediately jumps to LoadMenu with ID $03.
 ; Likely Purpose: Entry point to show a specific menu screen (e.g., pause/options).
-    ld   A, SONG_UNK15                                        ;; 01:42fd $3e $15
+    ld   A, SONG_GAME_OVER_OR_TIME_UP                                        ;; 01:42fd $3e $15
     call call_00_0fa2_PlaySong                                  ;; 01:42ff $cd $a2 $0f
     ld   A, MENU_GAME_OVER                                        ;; 01:4302 $3e $03
     jp   call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4304 $c3 $00 $40
 
-call_01_4307_PreloadMenus_15to1A:
+call_01_4307_LoadCreditsMenus:
 ; Behavior:
 ; Requests song bank 19 and plays it, then sequentially loads menus $15–$1A.
 ; Likely Purpose: Preloads multiple menu assets into VRAM (like caching 
 ; graphics for level select or transitions).
-    ld   A, SONG_UNK19                                        ;; 01:4307 $3e $19
+    ld   A, SONG_CREDITS                                        ;; 01:4307 $3e $19
     call call_00_0fa2_PlaySong                                  ;; 01:4309 $cd $a2 $0f
     ld   A, MENU_END_CREDITS_1                                        ;; 01:430c $3e $15
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:430e $cd $00 $40
@@ -495,7 +495,7 @@ call_01_432b_SetLevelMenuAndPalette:
     ld   A, SONG_GEX_CAVE                                        ;; 01:4330 $3e $04
     call call_00_0fa2_PlaySong                                  ;; 01:4332 $cd $a2 $0f
     ld   A, [wDB6C_CurrentMapId]                                    ;; 01:4335 $fa $6c $db
-    cp   A, $07                                        ;; 01:4338 $fe $07
+    cp   A, MAP_GEXTREME_SPORTS1                                        ;; 01:4338 $fe $07
     jr   C, .jr_01_434d                                ;; 01:433a $38 $11
     ld   A, $01                                        ;; 01:433c $3e $01
     ld   [wDC59_NumRemotesOnMissionSelectMenu], A                                    ;; 01:433e $ea $59 $dc
@@ -513,16 +513,16 @@ call_01_432b_SetLevelMenuAndPalette:
     ld   [wDC5A_MissionNumberSelected], A                                    ;; 01:435a $ea $5a $dc
     ret                                                ;; 01:435d $c9
 
-call_01_435e_HandleLevelTransitionMenu:
+call_01_435e_DetermineNextMapId:
 ; Behavior:
 ; Clears a flag bit in wDB6A_WarpFlags.
-; Copies CurrentLevelNumber to CurrentLevelId.
-; If that ID is 0, restores it from wDC5B_TVButtonLevelMissionRelated and returns.
+; Copies CurrentLevelNumber to CurrentMapId.
+; If that ID is 0, restores it from LevelIdFromTVButton and returns.
 ; Otherwise, branching logic:
-;  - If [wDB6D] != 0:
+;  - If InBonusLevel != 0:
 ;    - If bit 5 of wDB6A_WarpFlags is set: clear it, request song 15, load menu 0A.
 ;  - Else: request song 13, load menu 1B.
-;  - If [wDB6D] == 0:
+;  - If InBonusLevel == 0:
 ;    - If LevelId ≥ 07 but not 09 or 0A → preload menus 15–1A.
 ;    - Else if LevelId < 07 → request song 13, load menu 09.
 ;    - Else (exact 09 or 0A) → same as above "song 13/menu 1B".
@@ -530,48 +530,48 @@ call_01_435e_HandleLevelTransitionMenu:
 ; Likely Purpose: Manages menu/graphics updates when transitioning between levels.
     ld   HL, wDB6A_WarpFlags                                     ;; 01:435e $21 $6a $db
     res  4, [HL]                                       ;; 01:4361 $cb $a6
-    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 01:4363 $fa $1e $dc
+    ld   A, [wDC1E_CurrentLevelID]                                    ;; 01:4363 $fa $1e $dc
     ld   [wDB6C_CurrentMapId], A                                    ;; 01:4366 $ea $6c $db
     and  A, A                                          ;; 01:4369 $a7
-    jr   Z, .jr_01_43b3                                ;; 01:436a $28 $47
-    ld   A, [wDB6D]                                    ;; 01:436c $fa $6d $db
+    jr   Z, .jr_01_43b3_InGexCave1                                ;; 01:436a $28 $47
+    ld   A, [wDB6D_InBonusLevel]                                    ;; 01:436c $fa $6d $db
     and  A, A                                          ;; 01:436f $a7
-    jr   Z, .jr_01_4390                                ;; 01:4370 $28 $1e
+    jr   Z, .jr_01_4390_NotInBonusLevel                                ;; 01:4370 $28 $1e
     bit  5, [HL]                                       ;; 01:4372 $cb $6e
     jr   Z, .jr_01_4384                                ;; 01:4374 $28 $0e
     res  5, [HL]                                       ;; 01:4376 $cb $ae
-    ld   A, SONG_UNK15                                        ;; 01:4378 $3e $15
+    ld   A, SONG_GAME_OVER_OR_TIME_UP                                        ;; 01:4378 $3e $15
     call call_00_0fa2_PlaySong                                  ;; 01:437a $cd $a2 $0f
-    ld   A, MENU_UNK0A                                        ;; 01:437d $3e $0a
+    ld   A, MENU_TIME_UP                                        ;; 01:437d $3e $0a
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:437f $cd $00 $40
     jr   .jr_01_43ae                                   ;; 01:4382 $18 $2a
 .jr_01_4384:
-    ld   A, SONG_UNK13                                        ;; 01:4384 $3e $13
+    ld   A, SONG_MISSION_SUCCESS                                        ;; 01:4384 $3e $13
     call call_00_0fa2_PlaySong                                  ;; 01:4386 $cd $a2 $0f
-    ld   A, MENU_UNK1B                                        ;; 01:4389 $3e $1b
+    ld   A, MENU_WELL_DONE                                        ;; 01:4389 $3e $1b
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:438b $cd $00 $40
     jr   .jr_01_43ae                                   ;; 01:438e $18 $1e
-.jr_01_4390:
+.jr_01_4390_NotInBonusLevel:
     ld   A, [wDB6C_CurrentMapId]                                    ;; 01:4390 $fa $6c $db
-    cp   A, $07                                        ;; 01:4393 $fe $07
-    jr   C, .jr_01_43a4                                ;; 01:4395 $38 $0d
-    cp   A, $09                                        ;; 01:4397 $fe $09
+    cp   A, MAP_GEXTREME_SPORTS1                                        ;; 01:4393 $fe $07
+    jr   C, .jr_01_43a4_MapLessThan7 ; jump if map < gextremesports1                                ;; 01:4395 $38 $0d
+    cp   A, MAP_WW_GEX_WRESTLING1                                        ;; 01:4397 $fe $09
     jr   Z, .jr_01_4384                                ;; 01:4399 $28 $e9
-    cp   A, $0a                                        ;; 01:439b $fe $0a
+    cp   A, MAP_LIZARD_OF_OZ1                                        ;; 01:439b $fe $0a
     jr   Z, .jr_01_4384                                ;; 01:439d $28 $e5
-    call call_01_4307_PreloadMenus_15to1A                                  ;; 01:439f $cd $07 $43
+    call call_01_4307_LoadCreditsMenus                                  ;; 01:439f $cd $07 $43
     jr   .jr_01_43ae                                   ;; 01:43a2 $18 $0a
-.jr_01_43a4:
-    ld   A, SONG_UNK13                                        ;; 01:43a4 $3e $13
+.jr_01_43a4_MapLessThan7:
+    ld   A, SONG_MISSION_SUCCESS                                        ;; 01:43a4 $3e $13
     call call_00_0fa2_PlaySong                                  ;; 01:43a6 $cd $a2 $0f
-    ld   A, MENU_UNK09                                        ;; 01:43a9 $3e $09
+    ld   A, MENU_CONGRATULATIONS_GOT_REMOTE                                        ;; 01:43a9 $3e $09
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:43ab $cd $00 $40
 .jr_01_43ae:
     xor  A, A                                          ;; 01:43ae $af
     ld   [wDB6C_CurrentMapId], A                                    ;; 01:43af $ea $6c $db
     ret                                                ;; 01:43b2 $c9
-.jr_01_43b3:
-    ld   A, [wDC5B_TVButtonLevelMissionRelated]                                    ;; 01:43b3 $fa $5b $dc
+.jr_01_43b3_InGexCave1:
+    ld   A, [wDC5B_LevelIdFromTVButton]                                    ;; 01:43b3 $fa $5b $dc
     ld   [wDB6C_CurrentMapId], A                                    ;; 01:43b6 $ea $6c $db
     ret                                                ;; 01:43b9 $c9
 
@@ -638,7 +638,7 @@ call_01_43f0_MenuEngine_MainLoop:
     cp   A, $ff                                        ;; 01:441f $fe $ff
     jr   Z, .jr_01_442b                                ;; 01:4421 $28 $08
     ld   DE, data_01_5596                              ;; 01:4423 $11 $96 $55
-    call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 01:4426 $cd $77 $07
+    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 01:4426 $cd $77 $07
     jr   .jr_01_440c                                   ;; 01:4429 $18 $e1
 .jr_01_442b:
     call call_01_4f51_UploadSecondaryTileLayer                                  ;; 01:442b $cd $51 $4f
@@ -733,7 +733,7 @@ call_01_446b_ExecuteMenuCommand:
     sub  A, $e0                                        ;; 01:44c0 $d6 $e0
     jr   C, .jr_01_44cd                                ;; 01:44c2 $38 $09
     ld   DE, .data_01_456b_MenuCommandJumpTable                             ;; 01:44c4 $11 $6b $45
-    call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 01:44c7 $cd $77 $07
+    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 01:44c7 $cd $77 $07
     call call_00_0f22_JumpHL                                  ;; 01:44ca $cd $22 $0f
 .jr_01_44cd:
     ld   A, [wDBAA_MenuCommandBuffer2_Unk6]                                    ;; 01:44cd $fa $aa $db
@@ -786,7 +786,7 @@ call_01_446b_ExecuteMenuCommand:
     ld   A, [wDBA3_MenuCommandBuffer_Unk5]                                    ;; 01:4520 $fa $a3 $db
     cp   A, $ff                                        ;; 01:4523 $fe $ff
     jr   NZ, .jr_01_452e                               ;; 01:4525 $20 $07
-    call call_00_0800                                  ;; 01:4527 $cd $00 $08
+    call call_00_0800_LoadLevelSelectMenu_SecondaryTileset                                  ;; 01:4527 $cd $00 $08
     pop  BC                                            ;; 01:452a $c1
     pop  HL                                            ;; 01:452b $e1
     jr   .jr_01_4546                                   ;; 01:452c $18 $18
@@ -869,7 +869,7 @@ call_01_458d_MenuHandler_LoadAssetsAndJump:
 ; Likely Purpose: Load specific menu graphics and branch to a menu update routine.
     ld   a,[wDBA7_MenuCommandBuffer2_Unk3]
     ld   de,data_01_6f39
-    call call_00_0777_LoadPointerIndexAFromTableDE
+    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL
     jp   call_01_4d03_StreamTilemapBlockToBg
 
 call_01_4599_MenuHandler_LoadAssetsAndJump:
@@ -877,7 +877,7 @@ call_01_4599_MenuHandler_LoadAssetsAndJump:
 ; same as above
     ld   A, [wDBA7_MenuCommandBuffer2_Unk3]                                    ;; 01:4599 $fa $a7 $db
     ld   DE, data_01_6f39                              ;; 01:459c $11 $39 $6f
-    call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 01:459f $cd $77 $07
+    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 01:459f $cd $77 $07
     jp   call_01_4d03_StreamTilemapBlockToBg                                    ;; 01:45a2 $c3 $03 $4d
 
 call_01_45a5_MenuHandler_LoadBgPalettesAndSecondaryTilesets:
@@ -890,8 +890,8 @@ call_01_45a5_MenuHandler_LoadBgPalettesAndSecondaryTilesets:
     ld   BC, $80                                       ;; 01:45ab $01 $80 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:45ae $cd $6e $07
     ld   A, [wDB6C_CurrentMapId]                                    ;; 01:45b1 $fa $6c $db
-    ld   DE, $b01                                      ;; 01:45b4 $11 $01 $0b
-    call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 01:45b7 $cd $77 $07
+    ld   DE, data_00_0b01_SecondaryTilesetPtrs                                      ;; 01:45b4 $11 $01 $0b
+    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 01:45b7 $cd $77 $07
     ld   DE, $330                                      ;; 01:45ba $11 $30 $03
     add  HL, DE                                        ;; 01:45bd $19
     ld   DE, wDD0A_BgPalettes                                     ;; 01:45be $11 $0a $dd
@@ -899,8 +899,8 @@ call_01_45a5_MenuHandler_LoadBgPalettesAndSecondaryTilesets:
     ld   A, BANK_1F_SECONDARY_TILESETS                                        ;; 01:45c4 $3e $1f
     call call_00_075f_SwitchBankAndCopyBCBytesFromHLToDE                                  ;; 01:45c6 $cd $5f $07
     ld   A, [wDB6C_CurrentMapId]                                    ;; 01:45c9 $fa $6c $db
-    ld   DE, $b01                                      ;; 01:45cc $11 $01 $0b
-    call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 01:45cf $cd $77 $07
+    ld   DE, data_00_0b01_SecondaryTilesetPtrs                                      ;; 01:45cc $11 $01 $0b
+    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 01:45cf $cd $77 $07
     ld   A, [wDBA6_MenuCommandBuffer2_Unk2]                                    ;; 01:45d2 $fa $a6 $db
     ld   [wDBA2_MenuCommandBuffer_Unk4], A                                    ;; 01:45d5 $ea $a2 $db
     ld   A, $08                                        ;; 01:45d8 $3e $08
@@ -1042,7 +1042,7 @@ call_01_4722_MenuStateHandlerTable:
 ; Contains inline small handlers (.4744, .4748, .474c, etc.) that return values or constants.
     ld   A, [wDBA7_MenuCommandBuffer2_Unk3]                                    ;; 01:4722 $fa $a7 $db
     ld   DE, .data_01_472c                             ;; 01:4725 $11 $2c $47
-    call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 01:4728 $cd $77 $07
+    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 01:4728 $cd $77 $07
     jp   HL                                            ;; 01:472b $e9
 .data_01_472c:
     dw   call_01_4acf_CountCollectedBitsForLevel                                  ;; 01:472c pP
@@ -1064,7 +1064,7 @@ call_01_4722_MenuStateHandlerTable:
     ld   A, [wDCAF_PawCoinCounter]                                    ;; 01:4748 $fa $af $dc
     ret                                                ;; 01:474b $c9
 .jp_01_474c:
-    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 01:474c $fa $1e $dc
+    ld   A, [wDC1E_CurrentLevelID]                                    ;; 01:474c $fa $1e $dc
     and  A, A                                          ;; 01:474f $a7
     ld   A, $01                                        ;; 01:4750 $3e $01
     ret  Z                                             ;; 01:4752 $c8
@@ -1092,7 +1092,7 @@ call_01_4760_MenuState_SubmenuHandler:
 .jr_01_476f:
     ld   A, [wDBA7_MenuCommandBuffer2_Unk3]                                    ;; 01:476f $fa $a7 $db
     ld   DE, data_01_5b61                              ;; 01:4772 $11 $61 $5b
-    call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 01:4775 $cd $77 $07
+    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 01:4775 $cd $77 $07
     jp   call_01_4c45_ParseAndLoadTextIntoBuffer                                  ;; 01:4778 $c3 $45 $4c
 
 call_01_477b_MenuState_NoOp:
@@ -1144,7 +1144,7 @@ call_01_47b1_LoadMenuConfigData:
 ; copies 8 bytes into wDBB1_MenuCommandBuffer4_Unk0, then jumps to jp_00_0781 (likely continues processing).
     ld   A, [wDBA7_MenuCommandBuffer2_Unk3]                                    ;; 01:47b1 $fa $a7 $db
     ld   DE, .data_01_47c6                             ;; 01:47b4 $11 $c6 $47
-    call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 01:47b7 $cd $77 $07
+    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 01:47b7 $cd $77 $07
     ld   DE, wDBB1_MenuCommandBuffer4_Unk0                                     ;; 01:47ba $11 $b1 $db
     ld   BC, $08                                       ;; 01:47bd $01 $08 $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:47c0 $cd $6e $07
@@ -1668,7 +1668,7 @@ call_01_4acf_CountCollectedBitsForLevel:
 ; Description:
 ; For the current level number, reads a byte from wDC5C_ProgressFlags + level, 
 ; counts how many of its low 4 bits are set.
-    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 01:4acf $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelID                                     ;; 01:4acf $21 $1e $dc
     ld   L, [HL]                                       ;; 01:4ad2 $6e
     ld   H, $00                                        ;; 01:4ad3 $26 $00
     ld   DE, wDC5C_ProgressFlags                                     ;; 01:4ad5 $11 $5c $dc
@@ -1707,7 +1707,7 @@ call_01_4ae7_CountLevelsWithFlag4:
 call_01_4af9_IsLevelFlag4Set:
 ; Description:
 ; Checks if the current level’s flag byte at wDC5C_ProgressFlags + level has bit 4 set, returning 1 if so.
-    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 01:4af9 $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelID                                     ;; 01:4af9 $21 $1e $dc
     ld   L, [HL]                                       ;; 01:4afc $6e
     ld   H, $00                                        ;; 01:4afd $26 $00
     ld   DE, wDC5C_ProgressFlags                                     ;; 01:4aff $11 $5c $dc
@@ -1721,7 +1721,7 @@ call_01_4af9_IsLevelFlag4Set:
 call_01_4b0a_CountLowBitsForLevel:
 ; Description:
 ; Counts how many of the lowest three bits are set in the current level’s flag byte.
-    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 01:4b0a $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelID                                     ;; 01:4b0a $21 $1e $dc
     ld   L, [HL]                                       ;; 01:4b0d $6e
     ld   H, $00                                        ;; 01:4b0e $26 $00
     ld   DE, wDC5C_ProgressFlags                                     ;; 01:4b10 $11 $5c $dc
@@ -1791,8 +1791,8 @@ call_01_4b43_LookupLevelBasePointer:
     dw   $57ba                                         ;; 01:4b5b wW
     dw   $5a5f                                         ;; 01:4b5d wW
     dw   $5d89                                         ;; 01:4b5f wW
-    db   $06, $60, $4e, $61, $a4, $62, $a5, $64        ;; 01:4b61 ????????
-    db   $3e, $66                                      ;; 01:4b69 ??
+    dw   $6006, $614e, $62a4, $64a5        ;; 01:4b61 ????????
+    dw   $663e                                      ;; 01:4b69 ??
 
 call_01_4b6b_StreamTileDataToBuffer:
 ; Description:
@@ -1813,7 +1813,7 @@ call_01_4b6b_StreamTileDataToBuffer:
     jp   .jp_01_4b81                                   ;; 01:4b7e $c3 $81 $4b
 .jp_01_4b81:
     ld   DE, data_01_5b61                              ;; 01:4b81 $11 $61 $5b
-    call call_00_0777_LoadPointerIndexAFromTableDE                                  ;; 01:4b84 $cd $77 $07
+    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 01:4b84 $cd $77 $07
     ld   A, [HL+]                                      ;; 01:4b87 $2a
     cp   A, $ff                                        ;; 01:4b88 $fe $ff
     ret  Z                                             ;; 01:4b8a $c8

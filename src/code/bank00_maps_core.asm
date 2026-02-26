@@ -869,7 +869,7 @@ call_00_1633_HandleLevelWarpOrExit:
 ; Calculates a destination level and coordinates based on current level number (wDC1E) and 
 ; player Y-position. It fetches a pointer from .data_00_16a2_PlayerSpawnPositions, determines the new level ID, 
 ; screen positions (wDC6A_CheckpointStoredX/B), and offset vector (wDC6C_CheckpointStoredY), ensuring transitions are within bounds.
-    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:1633 $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelID                                     ;; 00:1633 $21 $1e $dc
     ld   L, [HL]                                       ;; 00:1636 $6e
     ld   H, $00                                        ;; 00:1637 $26 $00
     add  HL, HL                                        ;; 00:1639 $29
@@ -1373,15 +1373,15 @@ call_00_1a46_LoadBgMapRow:
     jp   call_00_0f08_RestoreBank                                  ;; 00:1bb9 $c3 $08 $0f
 
 call_00_1bbc_CheckForDoorAndEnter:
-; Using the current level number (wDC1E_CurrentLevelNumber) and position (wD80E/wD810), 
+; Using the current level number (wDC1E_CurrentLevelID) and position (wD80E/wD810), 
 ; scans a table (.data_00_1c33_DoorLocationsByMap) for proximity to door trigger points. If within a bounding box, 
 ; writes trigger data to wDCC1_EnterDoorRelated1/wDCC2_EnterDoorRelated2, sets wDC69_PlayerSpawnIdInLevel, and marks wDB6A_WarpFlags flag. 
 ; Skips special levels $05 and $0B.
 ; Purpose: Used to enter doors after pressing Up on Dpad
-    ld   A, [wDC1E_CurrentLevelNumber]                                    ;; 00:1bbc $fa $1e $dc
-    cp   A, $05                                        ;; 00:1bbf $fe $05
+    ld   A, [wDC1E_CurrentLevelID]                                    ;; 00:1bbc $fa $1e $dc
+    cp   A, LEVEL_ANIME_CHANNEL                                        ;; 00:1bbf $fe $05
     ret  Z                                             ;; 00:1bc1 $c8
-    cp   A, $0b                                        ;; 00:1bc2 $fe $0b
+    cp   A, LEVEL_CHANNEL_Z                                        ;; 00:1bc2 $fe $0b
     ret  Z                                             ;; 00:1bc4 $c8
     and  A, A                                          ;; 00:1bc5 $a7
     jr   Z, .jr_00_1bce                                ;; 00:1bc6 $28 $06
@@ -1617,11 +1617,11 @@ call_00_1bbc_CheckForDoorAndEnter:
     db   $38, $01, $80, $01, $ff                       ;; 00:1e9b ?????
 
 call_00_1ea0_LoadAndRunMissionPreviewCutscene:
-; Uses the current level number (wDC1E_CurrentLevelNumber) and sub-index (wDC5A_MissionNumberSelected) 
+; Uses the current level number (wDC1E_CurrentLevelID) and sub-index (wDC5A_MissionNumberSelected) 
 ; to select an entry from .data_00_1fc0.
 ; Retrieves a pointer from .data_00_1ff0 to a level setup script (data_2014, 202a, 2040, …).
 ; Temporarily stores the current level ID, loads a new one from the script, and swaps 
-; banks to copy in the proper level/map data (call_03_6c89_LoadMapData, call_03_6203_LoadLevelBoundariesFromId, etc.).
+; banks to copy in the proper level/map data (call_03_6c89_LoadMapDataPtrs, call_03_6203_LoadLevelBoundariesFromId, etc.).
 ; Sets the player’s starting X/Y positions and various working variables.
 
 ; Enters a loop that:
@@ -1634,7 +1634,7 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
 ; then copies level data again for the new state.
 ; Usage: Core routine for loading and running scripted level transitions—used for mission preview cutscenes, 
 ; changing areas while preserving player state.
-    ld   HL, wDC1E_CurrentLevelNumber                                     ;; 00:1ea0 $21 $1e $dc
+    ld   HL, wDC1E_CurrentLevelID                                     ;; 00:1ea0 $21 $1e $dc
     ld   L, [HL]                                       ;; 00:1ea3 $6e
     ld   H, $00                                        ;; 00:1ea4 $26 $00
     add  HL, HL                                        ;; 00:1ea6 $29
@@ -1686,7 +1686,7 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
     ld   A, PLAYERACTION_SPAWN                                        ;; 00:1ee5 $3e $00
     ld   [wDC78_PlayerPendingActionId], A                                    ;; 00:1ee7 $ea $78 $dc
     call call_00_04fb                                  ;; 00:1eea $cd $fb $04
-    farcall call_03_6c89_LoadMapData
+    farcall call_03_6c89_LoadMapDataPtrs
     farcall call_03_6203_LoadLevelBoundariesFromId
     call call_00_10de_UpdatePlayerMapWindow                                  ;; 00:1f03 $cd $de $10
     call call_00_1056_LoadFullMap                                  ;; 00:1f06 $cd $56 $10
@@ -1782,7 +1782,7 @@ call_00_1ea0_LoadAndRunMissionPreviewCutscene:
     ld   [HL], C                                       ;; 00:1faf $71
     pop  AF                                            ;; 00:1fb0 $f1
     ld   [wDB6C_CurrentMapId], A                                    ;; 00:1fb1 $ea $6c $db
-    farcall call_03_6c89_LoadMapData
+    farcall call_03_6c89_LoadMapDataPtrs
     ret                                                ;; 00:1fbf $c9
 .data_00_1fc0:
     db   $ff, $ff, $ff, $ff, $00, $01, $02, $ff        ;; 00:1fc0 ...?www?
