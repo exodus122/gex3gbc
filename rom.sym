@@ -3220,7 +3220,7 @@
 00:dc84 wDC84
 00:dc85 wDC85
 00:dc86 wDC86_PlayerXVelocity
-00:dc87 wDC87_PlayerXMaxSpeed
+00:dc87 wDC87_PlayerXMaxVelocity
 00:dc88 wDC88_CurrentEntity_UnkVerticalOffset
 00:dc89 wDC89
 00:dc8a wDC8A
