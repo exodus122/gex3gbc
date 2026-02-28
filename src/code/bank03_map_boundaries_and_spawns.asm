@@ -130,14 +130,14 @@ call_03_6203_LoadLevelBoundariesFromId:
 call_03_647c_InitPlayerPositionAndLevel:
 ; Purpose: Initializes the player’s spawn coordinates and current level on scene entry or respawn.
 ; Behavior:
-; Resets checkpoint flags (wDCAC/wDCAD).
+; Resets flags (wDCAC_Player_CrouchLookDownRelated/wDCAD).
 ; If checkpoint bit set in wDB6A_WarpFlags, restores stored X/Y from wDC6A_CheckpointStoredX–wDC6D.
 ; Else, if level ID non-zero, fetches default spawn coords from .data_03_6537.
 ; If level ID is zero, pulls next-level ID from .data_03_652b, copies level data (call_03_6c89), 
 ; then fetches new spawn coords.
 ; Calls call_03_6203 to set window boundaries and jumps to call_00_10de_UpdatePlayerMapWindow.
     xor  A, A                                          ;; 03:647c $af
-    ld   [wDCAC], A                                    ;; 03:647d $ea $ac $dc
+    ld   [wDCAC_Player_CrouchLookDownRelated], A                                    ;; 03:647d $ea $ac $dc
     ld   [wDCAD], A                                    ;; 03:6480 $ea $ad $dc
     ld   HL, wDB6A_WarpFlags                                     ;; 03:6483 $21 $6a $db
     bit  2, [HL]                                       ;; 03:6486 $cb $56

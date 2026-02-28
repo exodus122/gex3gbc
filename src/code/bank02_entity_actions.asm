@@ -113,7 +113,7 @@ call_02_58bd_EntityAction_MovePlatformVertically:
     jp   call_00_290d_Entity_SetMiscTimer
 
 call_02_5918_EntityAction_Fly_Update:
-    ld   a,[wDC71_FrameCounter]
+    ld   a,[wDC71_FrameCounter_Entities]
     rrca 
     and  a,$0F
     ld   l,a
@@ -549,7 +549,7 @@ call_02_5ca5_EntityAction_EvilSanta_Damaged:
     call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
     ld   a,SFX_SMALL_BANG
     call nz,call_00_0ff5_QueueSoundEffect
-    ld   a,[wDC71_FrameCounter]
+    ld   a,[wDC71_FrameCounter_Entities]
     and  a,$0F
     cp   a,$0C
     ld   hl,.data_02_5cc8_EvilSantaDamagedPalette2
@@ -699,7 +699,7 @@ call_02_5dde_EntityAction_SkatingElf_Skate:
     call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck                                  ;; 02:5dde $cd $f5 $29
     ld   C, $20                                        ;; 02:5de1 $0e $20
     call NZ, call_00_28c8_Entity_SetXVelocity                              ;; 02:5de3 $c4 $c8 $28
-    ld   A, [wDC71_FrameCounter]                                    ;; 02:5de6 $fa $71 $dc
+    ld   A, [wDC71_FrameCounter_Entities]                                    ;; 02:5de6 $fa $71 $dc
     and  A, $07                                        ;; 02:5de9 $e6 $07
     ld   C, $10                                        ;; 02:5deb $0e $10
     call Z, call_00_2588_Entity_ApproachXVelocity                               ;; 02:5ded $cc $88 $25
@@ -749,7 +749,7 @@ call_02_5e34_EntityAction_SkatingElf_Damaged:
 .jr_02_5e45:
     call call_00_298a_Entity_GetMiscFlags                                  ;; 02:5e45 $cd $8a $29
     jr   Z, .jr_02_5e6d                                ;; 02:5e48 $28 $23
-    ld   A, [wDC71_FrameCounter]                                    ;; 02:5e4a $fa $71 $dc
+    ld   A, [wDC71_FrameCounter_Entities]                                    ;; 02:5e4a $fa $71 $dc
     and  A, $07                                        ;; 02:5e4d $e6 $07
     ld   C, $10                                        ;; 02:5e4f $0e $10
     call Z, call_00_2588_Entity_ApproachXVelocity                               ;; 02:5e51 $cc $88 $25
@@ -1166,7 +1166,7 @@ call_02_6214_EntityAction_Raft_ResetAndWait:
     ld   c,TIMER_AMOUNT_RAFT
     call call_00_290d_Entity_SetMiscTimer
 .jr_00_6239:
-    ld   a,[wDC71_FrameCounter]
+    ld   a,[wDC71_FrameCounter_Entities]
     and  a,$03
     ret  nz
     ld   bc,$FFFF
@@ -1185,7 +1185,7 @@ call_02_624e_EntityAction_Raft_MoveRightAndCarryPlayer:
 ; If raft goes fully off-screen: switch to reset state (action 0).
 ; If raft snaps against the right edge: switch to state 2.
 ; Otherwise, keeps moving right.
-    ld   a,[wDC71_FrameCounter]
+    ld   a,[wDC71_FrameCounter_Entities]
     and  a,$01
     ld   c,$00
     jp   z,call_00_28c8_Entity_SetXVelocity
@@ -1236,7 +1236,7 @@ call_02_6293_EntityAction_Raft_DriftDown:
     ld   c,TIMER_AMOUNT_RAFT
     call call_00_290d_Entity_SetMiscTimer
 .jr_00_62A7:
-    ld   a,[wDC71_FrameCounter]
+    ld   a,[wDC71_FrameCounter_Entities]
     and  a,$03
     ret  nz
     ld   bc,$0001
@@ -1592,7 +1592,7 @@ call_02_6569_EntityAction_FanLift_Unk0:
 call_02_6577_EntityAction_FanLift_Unk2:
     call call_00_2917_Entity_CheckIfMiscTimerIsZero
     inc  [hl]
-    ld   hl,wDC71_FrameCounter
+    ld   hl,wDC71_FrameCounter_Entities
     and  [hl]
     and  a,$1F
     jr   z,.jr_00_6589
@@ -1658,7 +1658,7 @@ call_02_65d7_EntityAction_AnimeRisingPlatform_Update:
     ld   bc,$FFFF
     jp   call_00_250d_Entity_AdjustYPosition
 .jr_00_65F8:
-    ld   a,[wDC71_FrameCounter]
+    ld   a,[wDC71_FrameCounter_Entities]
     and  a,$03
     ret  nz
     call call_00_2917_Entity_CheckIfMiscTimerIsZero
@@ -2030,7 +2030,7 @@ call_02_68b2_EntityAction_Grenade_Unk0:
     ld   hl,.data_02_68e5
     call call_00_2c20_Entity_CopyPaletteToBuffer
     call call_00_2826_Entity_ResetToInitialXPos
-    ld   a,[wDC71_FrameCounter]
+    ld   a,[wDC71_FrameCounter_Entities]
     and  a,$0F
     ld   c,a
     ld   b,$00
@@ -2065,7 +2065,7 @@ call_02_68ed_EntityAction_Grenade_Unk1:
     call call_00_28dc_Entity_SetYVelocity
     call call_00_28e6_Entity_CheckIfXVelocityIsZero
     ret  nz
-    ld   a,[wDC71_FrameCounter]
+    ld   a,[wDC71_FrameCounter_Entities]
     swap a
     and  a,$03
     ld   l,a
@@ -2189,7 +2189,7 @@ call_02_69af_EntityAction_Bomb_Unk1:
     db   $10, $f0, $08, $f8, $10, $f0, $04, $fc
     
 call_02_6a04_EntityAction_Bomb_Unk2:
-    ld   a,[wDC71_FrameCounter]
+    ld   a,[wDC71_FrameCounter_Entities]
     and  a,$03
     ret  nz
     call call_00_2922_Entity_MiscTimerCountdown
@@ -2418,7 +2418,7 @@ call_02_6ba3_EntityAction_ChomperTV_Unk0:
 
 call_02_6bc8_EntityAction_ChomperTV_Unk2:
     call call_00_2917_Entity_CheckIfMiscTimerIsZero
-    ld   a,[wDC71_FrameCounter]
+    ld   a,[wDC71_FrameCounter_Entities]
     and  [hl]
     and  a,$3F
     jr   nz,.jr_00_6BDC
@@ -2462,7 +2462,7 @@ call_02_6c1d_EntityAction_GextremeSportsElf_Unk0:
     call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
     ld   c,$20
     call nz,call_00_28c8_Entity_SetXVelocity
-    ld   a,[wDC71_FrameCounter]
+    ld   a,[wDC71_FrameCounter_Entities]
     and  a,$07
     ld   c,$10
     call z,call_00_2588_Entity_ApproachXVelocity
@@ -2512,7 +2512,7 @@ call_02_6c73_EntityAction_GextremeSportsElf_Unk4:
 .jr_00_6C84:
     call call_00_298a_Entity_GetMiscFlags
     jr   z,.jr_00_6CAC
-    ld   a,[wDC71_FrameCounter]
+    ld   a,[wDC71_FrameCounter_Entities]
     and  a,$07
     ld   c,$10
     call z,call_00_2588_Entity_ApproachXVelocity
@@ -2915,7 +2915,7 @@ call_02_6f64_EntityAction_Rez_Unk8:
 .jr_00_6F74:
     call call_00_2917_Entity_CheckIfMiscTimerIsZero
     jr   z,.jr_00_6F93
-    ld   a,[wDC71_FrameCounter]
+    ld   a,[wDC71_FrameCounter_Entities]
     and  a,$3F
     ret  nz
     call call_00_2922_Entity_MiscTimerCountdown

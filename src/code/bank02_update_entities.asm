@@ -24,8 +24,8 @@ call_02_708f_InitEntitiesAndSpawnPlayer:
     ld   A, $00                                        ;; 02:70b3 $3e $00
     ld   [wD80D_PlayerFacingDirection], A                                    ;; 02:70b5 $ea $0d $d8
     xor  A, A                                          ;; 02:70b8 $af
-    ld   [wDC86], A                                    ;; 02:70b9 $ea $86 $dc
-    ld   [wDC87], A                                    ;; 02:70bc $ea $87 $dc
+    ld   [wDC86_PlayerXVelocity], A                                    ;; 02:70b9 $ea $86 $dc
+    ld   [wDC87_PlayerXMaxVelocity], A                                    ;; 02:70bc $ea $87 $dc
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:70bf $ea $8c $dc
     ld   [wDC8D], A                                    ;; 02:70c2 $ea $8d $dc
     ld   [wDC8E_InitialYVelocity], A                                    ;; 02:70c5 $ea $8e $dc

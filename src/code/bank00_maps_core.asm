@@ -7,7 +7,7 @@ call_00_1056_LoadFullMap:
     call call_00_0e62_ResetFlagsAndVRAMState                                  ;; 00:1059 $cd $62 $0e
     call call_00_10c7_InitRowOffsetTableForMap                                  ;; 00:105c $cd $c7 $10
     ld   C, $00                                        ;; 00:105f $0e $00
-    farcall call_03_65c6_LoadMenuOrLevelPalettes
+    farcall call_03_65c6_LoadBgPalettes
     ld   C, $03                                        ;; 00:106c $0e $03
     call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:106e $cd $6a $0a
     ld   C, $04                                        ;; 00:1071 $0e $04
@@ -151,7 +151,7 @@ call_00_10de_UpdatePlayerMapWindow:
     rr   E                                             ;; 00:1150 $cb $1b
     ld   A, E                                          ;; 00:1152 $7b
     ld   [wDAAC_CameraXHi], A                                    ;; 00:1153 $ea $ac $da
-    ld   HL, wDCAC                                     ;; 00:1156 $21 $ac $dc
+    ld   HL, wDCAC_Player_CrouchLookDownRelated                                     ;; 00:1156 $21 $ac $dc
     ld   A, [wD810_PlayerYPosition]                                    ;; 00:1159 $fa $10 $d8
     add  A, [HL]                                       ;; 00:115c $86
     ld   C, A                                          ;; 00:115d $4f

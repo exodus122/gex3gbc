@@ -376,7 +376,7 @@ call_00_0150_Init:
     jp   .jp_00_0314_LoadNewMap                                   ;; 00:04d5 $c3 $14 $03
 .jr_00_04d8_SkipPauseCheck:
     call call_00_05fd_CheckForEatFly                                  ;; 00:04d8 $cd $fd $05
-    call call_00_05c7                                  ;; 00:04db $cd $c7 $05
+    call call_00_05c7_WarpAfterCompletingBonusStage                                  ;; 00:04db $cd $c7 $05
     farcall call_02_7152_UpdateAllEntities
     call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:04e9 $cd $c8 $11
     call call_00_0fc8_ProcessQueuedSoundEffect                                  ;; 00:04ec $cd $c8 $0f
@@ -486,7 +486,7 @@ call_00_05af_LoadMapPalettes:
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:05c1 $cd $6e $07
     jp   call_00_0f08_RestoreBank                                  ;; 00:05c4 $c3 $08 $0f
 
-call_00_05c7:
+call_00_05c7_WarpAfterCompletingBonusStage:
     ld   A, [wDB6D_InBonusStage]                                    ;; 00:05c7 $fa $6d $db
     and  A, A                                          ;; 00:05ca $a7
     ret  Z                                             ;; 00:05cb $c8
@@ -924,7 +924,7 @@ call_00_088a_AnimateMenuSprites:
     ret  Z                                             ;; 00:088e $c8
     ld   A, BANK_0A_ENTITY_SPRITES                                        ;; 00:088f $3e $0a
     call call_00_0eee_SwitchBank                                  ;; 00:0891 $cd $ee $0e
-    ld   HL, wDC72_FrameCounter2                                     ;; 00:0894 $21 $72 $dc
+    ld   HL, wDC72_FrameCounter_Sprites                                     ;; 00:0894 $21 $72 $dc
     inc  [HL]                                          ;; 00:0897 $34
     ld   A, [HL]                                       ;; 00:0898 $7e
     sub  A, $0a                                        ;; 00:0899 $d6 $0a
@@ -940,7 +940,7 @@ call_00_088a_AnimateMenuSprites:
     ld   A, [DE]                                       ;; 00:08a6 $1a
     inc  DE                                            ;; 00:08a7 $13
     ld   H, A                                          ;; 00:08a8 $67
-    ld   A, [wDC72_FrameCounter2]                                    ;; 00:08a9 $fa $72 $dc
+    ld   A, [wDC72_FrameCounter_Sprites]                                    ;; 00:08a9 $fa $72 $dc
     and  A, A                                          ;; 00:08ac $a7
     jr   NZ, .jr_00_08b5                               ;; 00:08ad $20 $06
     inc  [HL]                                          ;; 00:08af $34
@@ -1310,7 +1310,7 @@ call_00_0b25_MainGameLoop_UpdateAndRenderFrame:
     ldh  [rWX], A                                      ;; 00:0b58 $e0 $4b
     ld   A, [wDADC_WindowY]                                    ;; 00:0b5a $fa $dc $da
     ldh  [rWY], A                                      ;; 00:0b5d $e0 $4a
-    ld   HL, wDC71_FrameCounter                                     ;; 00:0b5f $21 $71 $dc
+    ld   HL, wDC71_FrameCounter_Entities                                     ;; 00:0b5f $21 $71 $dc
     inc  [HL]                                          ;; 00:0b62 $34
     ld   A, [wDE60_AudioBankCurrent]                                    ;; 00:0b63 $fa $60 $de
     add  A, BANK_04_AUDIO_CODE_1                                        ;; 00:0b66 $c6 $04
@@ -1855,7 +1855,7 @@ call_00_0e3b_ClearGameStateVariables:
     ld   [wDB66_HDMATransferFlags], A                                    ;; 00:0e42 $ea $66 $db
     ld   [wDB69_HUDGraphicsUpdateFlags], A                                    ;; 00:0e45 $ea $69 $db
     ld   [wDBEF_UnkCounter], A                                    ;; 00:0e48 $ea $ef $db
-    ld   [wDC72_FrameCounter2], A                                    ;; 00:0e4b $ea $72 $dc
+    ld   [wDC72_FrameCounter_Sprites], A                                    ;; 00:0e4b $ea $72 $dc
     ld   [wDBE3_Menu_AnimateFlag], A                                    ;; 00:0e4e $ea $e3 $db
     ld   [wDD6B], A                                    ;; 00:0e51 $ea $6b $dd
     farcall call_02_7123_ClearEntitySlotsExcludingPlayer

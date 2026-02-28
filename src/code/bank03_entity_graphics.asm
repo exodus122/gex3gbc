@@ -687,7 +687,7 @@ call_03_5fc2_SetupEntitySprite:
     ld   A, [HL]                                       ;; 03:6046 $7e
     and  A, A                                          ;; 03:6047 $a7
     jr   Z, .jr_03_6050                                ;; 03:6048 $28 $06
-    ld   A, [wDC71_FrameCounter]                                    ;; 03:604a $fa $71 $dc
+    ld   A, [wDC71_FrameCounter_Entities]                                    ;; 03:604a $fa $71 $dc
     and  A, $07                                        ;; 03:604d $e6 $07
     ret  NZ                                            ;; 03:604f $c0
 .jr_03_6050:

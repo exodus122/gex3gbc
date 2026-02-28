@@ -1,24 +1,24 @@
 call_02_47b4_PlayerAction_Spawn:
 ; Checks bit 4 of wD805_Player_MovementFlags (a flag for spawning in a level). 
 ; If the bit is not set, it returns. If set, it:
-; Clears state variables (wDCA2_PlayerUnk1, wDCA3_PlayerUnk2, wDC87).
-; Sets wDCA4_PlayerUnk3 = 05h (some delay or counter).
+; Clears state variables (wDCA2_Player_SnowboardingRelated, wDCA3_Player_SnowboardingRelated2, wDC87_PlayerXMaxVelocity).
+; Sets wDCA4_Player_SnowboardingRelated3 = 05h (some delay or counter).
 ; Plays sound effect $0E via call_00_0ff5_QueueSoundEffect
     ld   HL, wD805_Player_MovementFlags                                     ;; 02:47b4 $21 $05 $d8
     bit  4, [HL]                                       ;; 02:47b7 $cb $66
     ret  Z                                             ;; 02:47b9 $c8
     xor  A, A                                          ;; 02:47ba $af
-    ld   [wDCA2_PlayerUnk1], A                                    ;; 02:47bb $ea $a2 $dc
-    ld   [wDCA3_PlayerUnk2], A                                    ;; 02:47be $ea $a3 $dc
-    ld   [wDC87], A                                    ;; 02:47c1 $ea $87 $dc
+    ld   [wDCA2_Player_SnowboardingRelated], A                                    ;; 02:47bb $ea $a2 $dc
+    ld   [wDCA3_Player_SnowboardingRelated2], A                                    ;; 02:47be $ea $a3 $dc
+    ld   [wDC87_PlayerXMaxVelocity], A                                    ;; 02:47c1 $ea $87 $dc
     ld   A, $05                                        ;; 02:47c4 $3e $05
-    ld   [wDCA4_PlayerUnk3], A                                    ;; 02:47c6 $ea $a4 $dc
+    ld   [wDCA4_Player_SnowboardingRelated3], A                                    ;; 02:47c6 $ea $a4 $dc
     ld   A, SFX_GEX_SPAWN                                        ;; 02:47c9 $3e $0e
     jp   call_00_0ff5_QueueSoundEffect                                  ;; 02:47cb $c3 $f5 $0f
 
 call_02_47ce_PlayerAction_Idle:
 ; Also checks bit 4 of wD805_Player_MovementFlags. If set:
-; Clears wDC86, wDC8C_PlayerYVelocity, and wDC87.
+; Clears wDC86_PlayerXVelocity, wDC8C_PlayerYVelocity, and wDC87_PlayerXMaxVelocity.
 ; Sets wDC83_PlayerIdleTimer = F0h (a countdown timer).
 ; Regardless, it checks if wDC81_CurrentInputsAlt == PADF_UP and, if so, calls call_00_1bbc_CheckForDoorAndEnter.
 ; It then calls call_02_4f11 to potentially switch actions.
@@ -29,9 +29,9 @@ call_02_47ce_PlayerAction_Idle:
     ld   HL, wDC80_Player_UnkStates                                     ;; 02:47d5 $21 $80 $dc
     set  6, [HL]                                       ;; 02:47d8 $cb $f6
     xor  A, A                                          ;; 02:47da $af
-    ld   [wDC86], A                                    ;; 02:47db $ea $86 $dc
+    ld   [wDC86_PlayerXVelocity], A                                    ;; 02:47db $ea $86 $dc
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:47de $ea $8c $dc
-    ld   [wDC87], A                                    ;; 02:47e1 $ea $87 $dc
+    ld   [wDC87_PlayerXMaxVelocity], A                                    ;; 02:47e1 $ea $87 $dc
     ld   A, TIMER_AMOUNT_240_FRAMES                                        ;; 02:47e4 $3e $f0
     ld   [wDC83_PlayerIdleTimer], A                                    ;; 02:47e6 $ea $83 $dc
 .jr_02_47e9:
@@ -55,34 +55,34 @@ call_02_47fe_PlayerAction_IdleAnimation:
     ret                                                ;; 02:4809 $c9
 
 call_02_480a_PlayerAction_Walk:
-; Checks bit 4 of wD805_Player_MovementFlags. If set, sets wDC87 = 02h (possibly a movement or animation flag). 
+; Checks bit 4 of wD805_Player_MovementFlags. If set, sets wDC87_PlayerXMaxVelocity = 02h (possibly a movement or animation flag). 
 ; Then calls call_02_4f11.
     ld   HL, wD805_Player_MovementFlags                                     ;; 02:480a $21 $05 $d8
     bit  4, [HL]                                       ;; 02:480d $cb $66
     jr   Z, .jr_02_4816                                ;; 02:480f $28 $05
     ld   A, $02                                        ;; 02:4811 $3e $02
-    ld   [wDC87], A                                    ;; 02:4813 $ea $87 $dc
+    ld   [wDC87_PlayerXMaxVelocity], A                                    ;; 02:4813 $ea $87 $dc
 .jr_02_4816:
     call call_02_4f11_ChooseNextActionBasedOnLevel                                  ;; 02:4816 $cd $11 $4f
     ret                                                ;; 02:4819 $c9
 
 call_02_481a_PlayerAction_StartCrouch:
-; Simply clears wDC87 (writes 0) and returns. 
+; Simply clears wDC87_PlayerXMaxVelocity (writes 0) and returns. 
 ; Used to reset a temporary player state or movement flag.
     xor  A, A                                          ;; 02:481a $af
-    ld   [wDC87], A                                    ;; 02:481b $ea $87 $dc
+    ld   [wDC87_PlayerXMaxVelocity], A                                    ;; 02:481b $ea $87 $dc
     ret                                                ;; 02:481e $c9
 
 call_02_481f_PlayerAction_CrouchLookDown:
-; Increments wDCAC by 2 but clamps the value to a maximum of $41. 
+; Increments wDCAC_Player_CrouchLookDownRelated by 2 but clamps the value to a maximum of $41. 
 ; Used for a position, animation frame, or velocity value that should not exceed a limit.
-    ld   A, [wDCAC]                                    ;; 02:481f $fa $ac $dc
+    ld   A, [wDCAC_Player_CrouchLookDownRelated]                                    ;; 02:481f $fa $ac $dc
     add  A, $02                                        ;; 02:4822 $c6 $02
     cp   A, $41                                        ;; 02:4824 $fe $41
     jr   C, .jr_02_482a                                ;; 02:4826 $38 $02
     ld   A, $41                                        ;; 02:4828 $3e $41
 .jr_02_482a:
-    ld   [wDCAC], A                                    ;; 02:482a $ea $ac $dc
+    ld   [wDCAC_Player_CrouchLookDownRelated], A                                    ;; 02:482a $ea $ac $dc
     ret                                                ;; 02:482d $c9
 
 call_02_482e_PlayerAction_Unk7:
@@ -94,7 +94,7 @@ call_02_482e_PlayerAction_Unk7:
     jr   NC, .jr_02_483a                               ;; 02:4837 $30 $01
     xor  A, A                                          ;; 02:4839 $af
 .jr_02_483a:
-    ld   [wDC87], A                                    ;; 02:483a $ea $87 $dc
+    ld   [wDC87_PlayerXMaxVelocity], A                                    ;; 02:483a $ea $87 $dc
     ret                                                ;; 02:483d $c9
 
 call_02_483e_PlayerAction_EatFly:
@@ -130,7 +130,7 @@ call_02_4873_PlayerAction_Death:
     bit  4, [HL]                                       ;; 02:4876 $cb $66
     jr   Z, .jr_02_4883                                ;; 02:4878 $28 $09
     xor  A, A                                          ;; 02:487a $af
-    ld   [wDC87], A                                    ;; 02:487b $ea $87 $dc
+    ld   [wDC87_PlayerXMaxVelocity], A                                    ;; 02:487b $ea $87 $dc
     ld   A, SFX_UNK0D                                        ;; 02:487e $3e $0d
     call call_00_0ff5_QueueSoundEffect                                  ;; 02:4880 $cd $f5 $0f
 .jr_02_4883:
@@ -140,7 +140,7 @@ call_02_4873_PlayerAction_Death:
 
 call_02_4889_PlayerAction_DeathSetUpWarp:
     xor  A, A                                          ;; 02:4889 $af
-    ld   [wDC87], A                                    ;; 02:488a $ea $87 $dc
+    ld   [wDC87_PlayerXMaxVelocity], A                                    ;; 02:488a $ea $87 $dc
     ld   A, TIMER_AMOUNT_60_FRAMES                                        ;; 02:488d $3e $3c
     ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 02:488f $ea $7e $dc
     ld   A, [wD805_Player_MovementFlags]                                    ;; 02:4892 $fa $05 $d8
@@ -268,7 +268,7 @@ call_02_497a_PlayerAction_FallingLand:
     ld   A, SFX_UNK08                                        ;; 02:497f $3e $08
     call NZ, call_00_0ff5_QueueSoundEffect                              ;; 02:4981 $c4 $f5 $0f
     xor  A, A                                          ;; 02:4984 $af
-    ld   [wDC87], A                                    ;; 02:4985 $ea $87 $dc
+    ld   [wDC87_PlayerXMaxVelocity], A                                    ;; 02:4985 $ea $87 $dc
     ret                                                ;; 02:4988 $c9
 
 call_02_4989_PlayerAction_Unk19:
@@ -302,14 +302,14 @@ call_02_49b3_PlayerAction_Water_Swimming:
     ld   hl,wDC80_Player_UnkStates
     set  6,[hl]
     xor  a
-    ld   [wDC9B],a
+    ld   [wDC9B_Player_SwimmingRelated3],a
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8D],a
     ld   a,01
-    ld   [wDC87],a
+    ld   [wDC87_PlayerXMaxVelocity],a
 .jr_00_49CE:
     call call_02_4ee7_MapCollisionFlags
-    ld   hl,wDC9D
+    ld   hl,wDC9D_Player_SwimmingRelated
     cp   a,$FF
     jr   z,.jr_00_49D9
     ld   [hl],a
@@ -327,19 +327,19 @@ call_02_49b3_PlayerAction_Water_Swimming:
     ld   hl,.data_02_4a15
     add  hl,de
     ld   c,[hl]
-    ld   hl,wDC9C
+    ld   hl,wDC9C_Player_SwimmingRelated2
     dec  [hl]
     bit  7,[hl]
     jr   z,.jr_00_4A05
     ld   [hl],$05
-    ld   hl,wDC9B
+    ld   hl,wDC9B_Player_SwimmingRelated3
     inc  [hl]
     ld   a,[hl]
     sub  a,$07
     jr   nz,.jr_00_4A05
     ld   [hl],a
 .jr_00_4A05:
-    ld   a,[wDC9B]
+    ld   a,[wDC9B_Player_SwimmingRelated3]
     add  c
     ld   hl,wD80A_Player_SpriteId
     cp   [hl]
@@ -355,7 +355,7 @@ call_02_49b3_PlayerAction_Water_Swimming:
 
 call_02_4a25_PlayerAction_DeathInPitAlt:
     xor  a
-    ld   [wDC87],a
+    ld   [wDC87_PlayerXMaxVelocity],a
     ld   a,TIMER_AMOUNT_60_FRAMES
     ld   [wDC7E_PlayerDamageCooldownTimer],a
     ld   a,[wDC93]
@@ -365,7 +365,7 @@ call_02_4a25_PlayerAction_DeathInPitAlt:
 
 call_02_4a37_PlayerAction_DeathInPit:
     xor  A, A                                          ;; 02:4a37 $af
-    ld   [wDC87], A                                    ;; 02:4a38 $ea $87 $dc
+    ld   [wDC87_PlayerXMaxVelocity], A                                    ;; 02:4a38 $ea $87 $dc
     ld   A, TIMER_AMOUNT_60_FRAMES                                        ;; 02:4a3b $3e $3c
     ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 02:4a3d $ea $7e $dc
     ld   A, $01                                        ;; 02:4a40 $3e $01
@@ -407,7 +407,7 @@ call_02_4a6e_PlayerAction_Water_TailSpin:
     set  0,[hl]
     ld   a,$01
     ld   [wDC7F_Player_IsAttacking],a
-    ld   [wDC87],a
+    ld   [wDC87_PlayerXMaxVelocity],a
 .jr_00_4A87:
     ld   a,[wD805_Player_MovementFlags]
     and  a,$04
@@ -421,14 +421,14 @@ call_02_4a6e_PlayerAction_Water_TailSpin:
 
 call_02_4a9b_PlayerAction_Water_Treading:
     ld   a,$01
-    ld   [wDC87],a
+    ld   [wDC87_PlayerXMaxVelocity],a
     ret  
 
 call_02_4aa1_PlayerAction_Water_Diving:
     ld   a,$01
-    ld   [wDC87],a
+    ld   [wDC87_PlayerXMaxVelocity],a
     ld   a,$04
-    ld   [wDC9D],a
+    ld   [wDC9D_Player_SwimmingRelated],a
     ret  
 
 call_02_4aac_PlayerAction_Climbing:
@@ -438,15 +438,15 @@ call_02_4aac_PlayerAction_Climbing:
     ld   hl,wDC80_Player_UnkStates
     set  6,[hl]
     xor  a
-    ld   [wDC9F],a
+    ld   [wDC9F_Player_ClimbingRelated],a
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8D],a
     ld   a,$01
-    ld   [wDC87],a
+    ld   [wDC87_PlayerXMaxVelocity],a
     ld   a,$00
-    ld   [wDC9E],a
+    ld   [wDC9E_Player_ClimbingRelated2],a
 .jr_00_4ACC:
-    ld   hl,wDC9E
+    ld   hl,wDC9E_Player_ClimbingRelated2
     ld   l,[hl]
     ld   h,00
     add  hl,hl
@@ -463,7 +463,7 @@ call_02_4adb_Player_Climbing_subroutine:
     ld   h,[hl]
     ld   c,e
     call call_02_4ee7_MapCollisionFlags
-    ld   hl,wDCA1_PlayerUnk6
+    ld   hl,wDCA1_Player_ClimbingRelated4
     cp   a,$FF
     jr   z,.jr_00_4AEA
     ld   [hl],a
@@ -481,19 +481,19 @@ call_02_4adb_Player_Climbing_subroutine:
     ld   hl,.data_02_4b56
     add  hl,de
     ld   c,[hl]
-    ld   hl,wDCA0_PlayerUnk7
+    ld   hl,wDCA0_Player_ClimbingRelated3
     dec  [hl]
     bit  7,[hl]
     jr   z,.jr_00_4B16
     ld   [hl],$05
-    ld   hl,wDC9F
+    ld   hl,wDC9F_Player_ClimbingRelated
     inc  [hl]
     ld   a,[hl]
     sub  a,$0A
     jr   nz,.jr_00_4B16
     ld   [hl],a
 .jr_00_4B16:
-    ld   a,[wDC9F]
+    ld   a,[wDC9F_Player_ClimbingRelated]
     add  c
     ld   hl,wD80A_Player_SpriteId
     cp   [hl]
@@ -517,9 +517,9 @@ call_02_4adb_Player_Climbing_subroutine:
     set  0,[hl]
     call call_02_4e01_SetOneTimeFlag
     ld   a,$01
-    ld   [wDC9E],a
+    ld   [wDC9E_Player_ClimbingRelated2],a
     xor  a
-    ld   [wDC9F],a
+    ld   [wDC9F_Player_ClimbingRelated],a
     ld   a,$01
     ld   [wDC7F_Player_IsAttacking],a
     ret  
@@ -532,21 +532,21 @@ call_02_4adb_Player_Climbing_subroutine:
 
 call_02_4B66: ; unreferenced function?
     call call_02_4ee7_MapCollisionFlags
-    ld   hl,wDCA1_PlayerUnk6
+    ld   hl,wDCA1_Player_ClimbingRelated4
     cp   a,$FF
     jr   z,.jr_00_4B71
     ld   [hl],a
 .jr_00_4B71:
-    ld   hl,wDCA0_PlayerUnk7
+    ld   hl,wDCA0_Player_ClimbingRelated3
     dec  [hl]
     bit  7,[hl]
     jr   z,.jr_00_4B7F
     ld   [hl],$02
-    ld   hl,wDC9F
+    ld   hl,wDC9F_Player_ClimbingRelated
     inc  [hl]
 .jr_00_4B7F:
-    ld   a,[wDC9F]
-    ld   hl,wDCA1_PlayerUnk6
+    ld   a,[wDC9F_Player_ClimbingRelated]
+    ld   hl,wDCA1_Player_ClimbingRelated4
     add  [hl]
     and  a,$07
     add  a,$E5
@@ -560,13 +560,13 @@ call_02_4B66: ; unreferenced function?
     ld   [wDC7A_PlayerClimbingOrSwimmingRelated],a
     ld   hl,wDB66_HDMATransferFlags
     set  0,[hl]
-    ld   a,[wDC9F]
+    ld   a,[wDC9F_Player_ClimbingRelated]
     cp   a,$08
     ret  c
     ld   a,$00
-    ld   [wDC9E],a
+    ld   [wDC9E_Player_ClimbingRelated2],a
     xor  a
-    ld   [wDC9F],a
+    ld   [wDC9F_Player_ClimbingRelated],a
     ld   [wDC7F_Player_IsAttacking],a
     ld   hl,wDC80_Player_UnkStates
     set  6,[hl]
@@ -577,15 +577,15 @@ call_02_4bb7_PlayerAction_Snowboarding_StandOrWalk:
     bit  4,[hl]
     jr   z,.jr_00_4BDC
     ld   a,$03
-    ld   [wDC87],a
+    ld   [wDC87_PlayerXMaxVelocity],a
     xor  a
-    ld   [wDCA2_PlayerUnk1],a
-    ld   [wDCA3_PlayerUnk2],a
+    ld   [wDCA2_Player_SnowboardingRelated],a
+    ld   [wDCA3_Player_SnowboardingRelated2],a
     ld   a,$05
-    ld   [wDCA4_PlayerUnk3],a
+    ld   [wDCA4_Player_SnowboardingRelated3],a
     ld   a,$01
-    ld   [wDCA5_PlayerUnk4],a
-    ld   [wDCA6_PlayerUnk5],a
+    ld   [wDCA5_Player_SnowboardingRelated4],a
+    ld   [wDCA6_Player_SnowboardingRelated5],a
     ld   hl,wDC80_Player_UnkStates
     set  6,[hl]
 .jr_00_4BDC:
@@ -593,14 +593,14 @@ call_02_4bb7_PlayerAction_Snowboarding_StandOrWalk:
     bit  6,a
     call nz,call_00_1bbc_CheckForDoorAndEnter
     call call_02_4E0C_Player_SnowboardingTailSpin
-    ld   a,[wDCA5_PlayerUnk4]
+    ld   a,[wDCA5_Player_SnowboardingRelated4]
     and  a
     jr   z,.jr_02_4C11
-    ld   a,[wDCA6_PlayerUnk5]
+    ld   a,[wDCA6_Player_SnowboardingRelated5]
     and  a
     jr   z,.jr_02_4C10
     ld   c,a
-    ld   a,[wDCA5_PlayerUnk4]
+    ld   a,[wDCA5_Player_SnowboardingRelated4]
     cp   a,$01
     ret  nz
     ld   hl,.jr_02_4C16
@@ -620,7 +620,7 @@ call_02_4bb7_PlayerAction_Snowboarding_StandOrWalk:
 .jr_02_4C10:
     ret  
 .jr_02_4C11:
-    ld   a,[wDCA6_PlayerUnk5]
+    ld   a,[wDCA6_Player_SnowboardingRelated5]
     and  a
     ret  z
 .jr_02_4C16:
@@ -673,11 +673,11 @@ call_02_4c7a_PlayerAction_Snowboarding_TailSpin:
     bit  4,[hl]
     jr   z,.jr_00_4CA1
     xor  a
-    ld   [wDCA2_PlayerUnk1],a
+    ld   [wDCA2_Player_SnowboardingRelated],a
     ld   a,$03
-    ld   [wDCA3_PlayerUnk2],a
+    ld   [wDCA3_Player_SnowboardingRelated2],a
     ld   a,$0B
-    ld   [wDCA4_PlayerUnk3],a
+    ld   [wDCA4_Player_SnowboardingRelated3],a
     ld   a,SFX_GEX_TAIL_SPIN
     call call_00_0ff5_QueueSoundEffect
     ld   hl,wDC80_Player_UnkStates

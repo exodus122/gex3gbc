@@ -86,10 +86,8 @@ wD840_EntityMemoryAfterPlayer: ; why does some code use this and not wDB20? mayb
 
 wD900:
     ds 1                                               ;; d900
-
 wD901:
     ds 3                                               ;; d901
-
 wD904:
     ds 156                                             ;; d904
 
@@ -704,20 +702,18 @@ wDC6F_EntitySpriteRelated:
 wDC70_EntitySpriteRelated2:
     ds 1                                               ;; dc70
 
-wDC71_FrameCounter:
+wDC71_FrameCounter_Entities:
     ds 1                                               ;; dc71
-wDC72_FrameCounter2:
+wDC72_FrameCounter_Sprites:
     ds 1                                               ;; dc72
-wDC73_FrameCounter3:
+wDC73_FrameCounter_FlyCoins:
     ds 5                                               ;; dc73
     
 ; Misc player variables
 wDC78_PlayerPendingActionId:
     ds 1                                               ;; dc78
-
 wDC79_PlayerUnkFlags2:
     ds 1                                               ;; dc79
-
 wDC7A_PlayerClimbingOrSwimmingRelated:
     ds 1                                               ;; dc7a
 
@@ -732,10 +728,8 @@ wDC7B_CurrentEntityAddrLoAlt2:
 
 wDC7E_PlayerDamageCooldownTimer:
     ds 1                                               ;; dc7e
-
 wDC7F_Player_IsAttacking: ; set to 1 when using tail spin
     ds 1                                               ;; dc7f
-
 wDC80_Player_UnkStates:
 ; bit 7 (80) = jump related (set in call_02_4df6_Player_SetJumpRelatedState)
 ; bit 6 (40) = set in idle/swimming/climbing, and after a tailspin
@@ -758,10 +752,10 @@ wDC84:
     ds 1                                               ;; dc84
 wDC85:
     ds 1                                               ;; dc85
-wDC86:
-    ds 1                                               ;; dc86
 
-wDC87:
+wDC86_PlayerXVelocity:
+    ds 1                                               ;; dc86
+wDC87_PlayerXMaxVelocity: ; if freeze this, gex can run faster
     ds 1                                               ;; dc87
 
 wDC88_CurrentEntity_UnkVerticalOffset:
@@ -794,54 +788,46 @@ wDC90:
 wDC91:
     ds 1                                               ;; dc91
 
+; Nearby collision tiles
 wDC92:
     ds 1                                               ;; dc92
-
 wDC93:
     ds 1                                               ;; dc93
-
 wDC94:
     ds 1                                               ;; dc94
-
 wDC95:
     ds 2                                               ;; dc95
-
 wDC97:
     ds 1                                               ;; dc97
 
 wDC98:
     ds 3                                               ;; dc98
 
-wDC9B:
+wDC9B_Player_SwimmingRelated3:
     ds 1                                               ;; dc9b
-
-wDC9C:
+wDC9C_Player_SwimmingRelated2:
     ds 1                                               ;; dc9c
-
-wDC9D:
+wDC9D_Player_SwimmingRelated:
     ds 1                                               ;; dc9d
 
-wDC9E:
+wDC9E_Player_ClimbingRelated2:
     ds 1                                               ;; dc9e
-
-wDC9F:
+wDC9F_Player_ClimbingRelated:
     ds 1                                               ;; dc9f
-
-wDCA0_PlayerUnk7:
+wDCA0_Player_ClimbingRelated3:
     ds 1                                               ;; dca0
-
-wDCA1_PlayerUnk6:
+wDCA1_Player_ClimbingRelated4:
     ds 1                                               ;; dca1
 
-wDCA2_PlayerUnk1:
+wDCA2_Player_SnowboardingRelated:
     ds 1                                               ;; dca2
-wDCA3_PlayerUnk2:
+wDCA3_Player_SnowboardingRelated2:
     ds 1                                               ;; dca3
-wDCA4_PlayerUnk3:
+wDCA4_Player_SnowboardingRelated3:
     ds 1                                               ;; dca4
-wDCA5_PlayerUnk4:
+wDCA5_Player_SnowboardingRelated4:
     ds 1                                               ;; dca5
-wDCA6_PlayerUnk5:
+wDCA6_Player_SnowboardingRelated5:
     ds 1                                               ;; dca6
 
 wDCA7_DrawGexFlag:
@@ -856,7 +842,7 @@ wDCAA_FlyTimerOrFlags1:
 wDCAB_FlyTimerOrFlags2:
     ds 1                                               ;; dcab
 
-wDCAC:
+wDCAC_Player_CrouchLookDownRelated:
     ds 1                                               ;; dcac
 wDCAD:
     ds 1                                               ;; dcad

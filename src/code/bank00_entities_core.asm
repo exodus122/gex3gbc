@@ -112,7 +112,7 @@ call_00_2ce2_Entity_DrawGex:
     ld   A, [wDC7E_PlayerDamageCooldownTimer]                                    ;; 00:2d79 $fa $7e $dc
     and  A, A                                          ;; 00:2d7c $a7
     jr   Z, .jr_00_2d87                                ;; 00:2d7d $28 $08
-    ld   A, [wDC71_FrameCounter]                                    ;; 00:2d7f $fa $71 $dc
+    ld   A, [wDC71_FrameCounter_Entities]                                    ;; 00:2d7f $fa $71 $dc
     and  A, $07                                        ;; 00:2d82 $e6 $07
     jp   NZ, .jp_00_2ece                               ;; 00:2d84 $c2 $ce $2e
 .jr_00_2d87:
@@ -166,7 +166,7 @@ call_00_2ce2_Entity_DrawGex:
     ld   A, [wDC7E_PlayerDamageCooldownTimer]                                    ;; 00:2dd4 $fa $7e $dc
     and  A, A                                          ;; 00:2dd7 $a7
     jr   Z, .jr_00_2de2                                ;; 00:2dd8 $28 $08
-    ld   A, [wDC71_FrameCounter]                                    ;; 00:2dda $fa $71 $dc
+    ld   A, [wDC71_FrameCounter_Entities]                                    ;; 00:2dda $fa $71 $dc
     and  A, $07                                        ;; 00:2ddd $e6 $07
     jp   NZ, .jp_00_2ece                               ;; 00:2ddf $c2 $ce $2e
 .jr_00_2de2:
@@ -225,7 +225,7 @@ call_00_2ce2_Entity_DrawGex:
     ld   A, [wDC7E_PlayerDamageCooldownTimer]                                    ;; 00:2e38 $fa $7e $dc
     and  A, A                                          ;; 00:2e3b $a7
     jr   Z, .jr_00_2e46                                ;; 00:2e3c $28 $08
-    ld   A, [wDC71_FrameCounter]                                    ;; 00:2e3e $fa $71 $dc
+    ld   A, [wDC71_FrameCounter_Entities]                                    ;; 00:2e3e $fa $71 $dc
     and  A, $07                                        ;; 00:2e41 $e6 $07
     jp   NZ, .jp_00_2ece                               ;; 00:2e43 $c2 $ce $2e
 .jr_00_2e46:
@@ -282,7 +282,7 @@ call_00_2ce2_Entity_DrawGex:
     ld   A, [wDC7E_PlayerDamageCooldownTimer]                                    ;; 00:2e97 $fa $7e $dc
     and  A, A                                          ;; 00:2e9a $a7
     jr   Z, .jr_00_2ea4                                ;; 00:2e9b $28 $07
-    ld   A, [wDC71_FrameCounter]                                    ;; 00:2e9d $fa $71 $dc
+    ld   A, [wDC71_FrameCounter_Entities]                                    ;; 00:2e9d $fa $71 $dc
     and  A, $07                                        ;; 00:2ea0 $e6 $07
     jr   NZ, .jp_00_2ece                               ;; 00:2ea2 $20 $2a
 .jr_00_2ea4:
@@ -321,7 +321,7 @@ call_00_2ce2_Entity_DrawGex:
     ld   A, [wDC51_CurrentFlyRelated]                                    ;; 00:2ece $fa $51 $dc
     and  A, A                                          ;; 00:2ed1 $a7
     jr   Z, .jr_00_2ef9                                ;; 00:2ed2 $28 $25
-    ld   A, [wDC71_FrameCounter]                                    ;; 00:2ed4 $fa $71 $dc
+    ld   A, [wDC71_FrameCounter_Entities]                                    ;; 00:2ed4 $fa $71 $dc
     rrca                                               ;; 00:2ed7 $0f
     and  A, $0f                                        ;; 00:2ed8 $e6 $0f
     add  A, A                                          ;; 00:2eda $87

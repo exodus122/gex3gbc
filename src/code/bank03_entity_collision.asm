@@ -1972,7 +1972,7 @@ call_03_581a_CollisionHandler_TVButton:
 call_03_58a9_ComputeCollisionOffset:
 ; Loads the entity’s parameter at $D8xx+1B.
 ; Flips it if the entity’s direction byte ($D8xx+19) has bit 7 set (sign extension trick).
-; Combines this with wDC84–wDC86 (looks like camera or scroll deltas).
+; Combines this with wDC84–wDC86_PlayerXVelocity (looks like camera or scroll deltas).
 ; Then checks wD80D_PlayerFacingDirection, and if bit 5 is set, flips the result.
 ; Role: This is a collision offset calculator: adjusts collision testing 
 ; depending on entity properties (size/offset) and player facing direction.
@@ -1991,7 +1991,7 @@ call_03_58a9_ComputeCollisionOffset:
     ld   a,[wDC85]
     add  d
     ld   d,a
-    ld   a,[wDC86]
+    ld   a,[wDC86_PlayerXVelocity]
     ld   e,a
     ld   hl,wD80D_PlayerFacingDirection
     bit  5,[hl]

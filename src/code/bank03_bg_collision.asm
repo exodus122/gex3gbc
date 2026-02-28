@@ -127,7 +127,7 @@ call_03_4708_BgCollisionHandler_Sidescroller:
     inc  A                                             ;; 03:47a0 $3c
 .jr_03_47a1:
     xor  A, A                                          ;; 03:47a1 $af
-    ld   [wDC86], A                                    ;; 03:47a2 $ea $86 $dc
+    ld   [wDC86_PlayerXVelocity], A                                    ;; 03:47a2 $ea $86 $dc
     ld   [wDC85], A                                    ;; 03:47a5 $ea $85 $dc
     ld   [wDC84], A                                    ;; 03:47a8 $ea $84 $dc
     ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 03:47ab $21 $be $da
@@ -301,16 +301,16 @@ call_03_4708_BgCollisionHandler_Sidescroller:
 call_03_48ad_BgCollisionHandler_TopDown:
 ; Handles top-down movement collisions.
 ; Always sets collision-active bit (set 7,[wDABE_UnkBGCollisionFlags2]).
-; Uses wDC86 and wDC89 to determine direction/attempted movement.
+; Uses wDC86_PlayerXVelocity and wDC89 to determine direction/attempted movement.
 ; Dispatches to one of several routines for checking walls/diagonals (.jp_03_48E1_ResetDirectionState, .jp_03_496B_CheckMove_UpLeft, etc.).
-; Updates collision status (wDC81_CurrentInputsAlt, wDC86, wDC89) depending on blocked directions.
+; Updates collision status (wDC81_CurrentInputsAlt, wDC86_PlayerXVelocity, wDC89) depending on blocked directions.
     ld   hl,wDABE_UnkBGCollisionFlags2
     ld   a,[hl]
     ld   [hl],00
     ld   [wDABD_UnkBGCollisionFlags],a
     ld   hl,wDABE_UnkBGCollisionFlags2
     set  7,[hl]
-    ld   a,[wDC86]
+    ld   a,[wDC86_PlayerXVelocity]
     and  a
     ret  z
     ld   hl,wDC89
@@ -329,10 +329,10 @@ call_03_48ad_BgCollisionHandler_TopDown:
     dw   .jp_03_49ED_AdvanceAlongPath, .jp_03_496B_CheckMove_UpLeft
 .jp_03_48E1_ResetDirectionState:
 ; ResetDirection
-; Clears wDC86 (direction attempt counter) and returns.
+; Clears wDC86_PlayerXVelocity (direction attempt counter) and returns.
 ; Purpose: Resets movement attempt state.
     xor  a
-    ld   [wDC86],a
+    ld   [wDC86_PlayerXVelocity],a
     ret  
 .jp_03_48E6_CheckMove_Up:
 ; TryMoveUp
@@ -343,7 +343,7 @@ call_03_48ad_BgCollisionHandler_TopDown:
     ld   b,$FF
     call call_03_4b4c_TileCollisionCheck
     jr   nz,.jp_03_4900_Fallback_UpBlocked
-    ld   a,[wDC86]
+    ld   a,[wDC86_PlayerXVelocity]
     cp   a,$02
     ret  c
     ld   c,$02
@@ -377,7 +377,7 @@ call_03_48ad_BgCollisionHandler_TopDown:
     ld   b,$01
     call call_03_4b4c_TileCollisionCheck
     jr   nz,.jp_03_4935_Fallback_DownBlocked
-    ld   a,[wDC86]
+    ld   a,[wDC86_PlayerXVelocity]
     cp   a,$02
     ret  c
     ld   c,$02
@@ -423,7 +423,7 @@ call_03_48ad_BgCollisionHandler_TopDown:
     ld   b,$FF
     call call_03_4b4c_TileCollisionCheck
     jr   nz,.jp_03_4985_Fallback_UpLeftBlocked
-    ld   a,[wDC86]
+    ld   a,[wDC86_PlayerXVelocity]
     cp   a,$02
     ret  c
     ld   c,$02
@@ -453,7 +453,7 @@ call_03_48ad_BgCollisionHandler_TopDown:
     ld   b,$01
     call call_03_4b4c_TileCollisionCheck
     jr   nz,.jp_03_49B8_Fallback_DownLeftBlocked
-    ld   a,[wDC86]
+    ld   a,[wDC86_PlayerXVelocity]
     cp   a,$02
     ret  c
     ld   c,$02
@@ -496,7 +496,7 @@ call_03_48ad_BgCollisionHandler_TopDown:
 ; Performs multi-step tile probing for diagonal/complex movement.
 ; Uses wDC89 as index into .data_03_4a1b for offset pairs.
 ; Iteratively calls call_03_4b4c_TileCollisionCheck with varying offsets, counting successes 
-; in E and decrementing D (wDC86) until blocked or out of attempts.
+; in E and decrementing D (wDC86_PlayerXVelocity) until blocked or out of attempts.
 ; Purpose: Fine-grained collision stepping along a chosen path.
     ld   hl,wDC89
     ld   l,[hl]
@@ -506,13 +506,13 @@ call_03_48ad_BgCollisionHandler_TopDown:
     ld   de,.data_03_4a1b
     add  hl,de
     ld   e,$00
-    ld   a,[wDC86]
+    ld   a,[wDC86_PlayerXVelocity]
     ld   d,a
 .jp_03_49FF_PathStepLoop_CheckTiles:
 ; PathStepLoop
 ; Reads pairs of X/Y offsets from .data_03_4a1b, pushes them through call_03_4b4c_TileCollisionCheck repeatedly.
 ; Increments E on success, decrements D (remaining steps). Loops until blocked or out of attempts.
-; At .jp_03_4A10_CommitStepCount, writes the total successful steps (E) back to wDC86.
+; At .jp_03_4A10_CommitStepCount, writes the total successful steps (E) back to wDC86_PlayerXVelocity.
     ldi  a,[hl]
     ld   c,a
     ldi  a,[hl]
@@ -528,16 +528,16 @@ call_03_48ad_BgCollisionHandler_TopDown:
     jr   nz,.jp_03_49FF_PathStepLoop_CheckTiles
 .jp_03_4A10_CommitStepCount:
 ; CommitStepCount
-; Ends the path-stepping loop, commits the successful step count (E) to wDC86, then returns.
+; Ends the path-stepping loop, commits the successful step count (E) to wDC86_PlayerXVelocity, then returns.
     ld   a,e
-    ld   [wDC86],a
+    ld   [wDC86_PlayerXVelocity],a
     ret  
 .jp_03_4A15_ForceSingleStep:
 ; ForceStep
-; Sets wDC86 to 1 and returns—used when blocked to ensure 
+; Sets wDC86_PlayerXVelocity to 1 and returns—used when blocked to ensure 
 ; at least one movement attempt is registered.
     ld   a,$01
-    ld   [wDC86],a
+    ld   [wDC86_PlayerXVelocity],a
     ret  
 .data_03_4a1b:
     db   $00, $00        ;; 03:4a15 ????????
@@ -676,10 +676,10 @@ call_03_4ae4_CollisionMask_LookupAndDispatch:
 
 call_03_4b37_Sidescroller_AccumulateMovementBias:
 ; AdjustedDirectionAccumulator
-; Reads wDC86 (step count/direction bias).
+; Reads wDC86_PlayerXVelocity (step count/direction bias).
 ; If player-facing bit5 is set, complements and increments A to reverse direction.
 ; Adds A to two accumulators (wDC84 and wDC85) to update directional totals.
-    ld   A, [wDC86]                                    ;; 03:4b37 $fa $86 $dc
+    ld   A, [wDC86_PlayerXVelocity]                                    ;; 03:4b37 $fa $86 $dc
     ld   HL, wD80D_PlayerFacingDirection                                     ;; 03:4b3a $21 $0d $d8
     bit  5, [HL]                                       ;; 03:4b3d $cb $6e
     jr   Z, .jr_03_4b43                                ;; 03:4b3f $28 $02

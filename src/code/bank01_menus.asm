@@ -647,7 +647,7 @@ call_01_43f0_MenuEngine_MainLoop:
     bit  7, [HL]                                       ;; 01:4434 $cb $7e
     jr   NZ, .jr_01_4444                               ;; 01:4436 $20 $0c
     ld   C, [HL]                                       ;; 01:4438 $4e
-    farcall call_03_65c6_LoadMenuOrLevelPalettes
+    farcall call_03_65c6_LoadBgPalettes
 .jr_01_4444:
     call call_01_43ba_JumpToDynamicHandler                                  ;; 01:4444 $cd $ba $43
     ld   A, $d3                                        ;; 01:4447 $3e $d3

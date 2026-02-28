@@ -50,23 +50,23 @@ call_02_4df6_Player_SetJumpRelatedState:
     ret                                                ;; 02:4e00 $c9
 
 call_02_4e01_SetOneTimeFlag:
-; If wDC87 is zero, sets it to 1. Used to ensure an action happens only once per frame or state.
+; If wDC87_PlayerXMaxVelocity is zero, sets it to 1. Used to ensure an action happens only once per frame or state.
 ; Purpose: Single-use event guard.
-    ld   A, [wDC87]                                    ;; 02:4e01 $fa $87 $dc
+    ld   A, [wDC87_PlayerXMaxVelocity]                                    ;; 02:4e01 $fa $87 $dc
     and  A, A                                          ;; 02:4e04 $a7
     ret  NZ                                            ;; 02:4e05 $c0
     ld   A, $01                                        ;; 02:4e06 $3e $01
-    ld   [wDC87], A                                    ;; 02:4e08 $ea $87 $dc
+    ld   [wDC87_PlayerXMaxVelocity], A                                    ;; 02:4e08 $ea $87 $dc
     ret                                                ;; 02:4e0b $c9
 
 call_02_4E0C_Player_SnowboardingTailSpin:
-; Updates counters (wDCA2_PlayerUnk1–wDCA6_PlayerUnk5) for a repeating animation or scripted sequence. 
+; Updates counters (wDCA2_Player_SnowboardingRelated–wDCA6_Player_SnowboardingRelated5) for a repeating animation or scripted sequence. 
 ; Fetch frame data from tables at $4EA1/$4EC3. Handles two cases: 
 ; when the player’s action ID is $27 (special move) or any other action. Sets attacking flag, 
 ; triggers sound/action (call_02_54f9_SwitchPlayerAction) when counters overflow, and sets wDB66_HDMATransferFlags to signal a redraw.
 ; Purpose: Manage complex animation or event sequences based on timers and player state.
-    ld   a,[wDCA5_PlayerUnk4]
-    ld   [wDCA6_PlayerUnk5],a
+    ld   a,[wDCA5_Player_SnowboardingRelated4]
+    ld   [wDCA6_Player_SnowboardingRelated5],a
     ld   hl,wDC95
     ld   e,[hl]
     call call_02_4E7A_LookupSnowboardingData
@@ -77,17 +77,17 @@ call_02_4E0C_Player_SnowboardingTailSpin:
     ld   e,[hl]
     call call_02_4E7A_LookupSnowboardingData
 .jr_00_4E24:
-    ld   hl,wDCA5_PlayerUnk4
+    ld   hl,wDCA5_Player_SnowboardingRelated4
     ld   [hl],d
     ld   a,[wD801_Player_ActionId]
     cp   a,PLAYERACTION_SNOWBOARDING_TAIL_SPIN
     jr   nz,.jr_00_4E57
-    ld   hl,wDCA3_PlayerUnk2
+    ld   hl,wDCA3_Player_SnowboardingRelated2
     dec  [hl]
     bit  7,[hl]
     jr   z,.jr_00_4E50
     ld   [hl],$03
-    ld   hl,wDCA2_PlayerUnk1
+    ld   hl,wDCA2_Player_SnowboardingRelated
     inc  [hl]
     ld   a,[hl]
     cp   a,$08
@@ -99,22 +99,22 @@ call_02_4E0C_Player_SnowboardingTailSpin:
     ld   a,PLAYERACTION_SNOWBOARDING_STAND_OR_WALK
     jp   call_02_54f9_SwitchPlayerAction
 .jr_00_4E50:
-    ld   a,[wDCA2_PlayerUnk1]
+    ld   a,[wDCA2_Player_SnowboardingRelated]
     and  a,$07
     jr   .jr_00_4E6A
 .jr_00_4E57:
-    ld   hl,wDCA3_PlayerUnk2
+    ld   hl,wDCA3_Player_SnowboardingRelated2
     dec  [hl]
     bit  7,[hl]
     jr   z,.jr_00_4E65
     ld   [hl],$09
-    ld   hl,wDCA2_PlayerUnk1
+    ld   hl,wDCA2_Player_SnowboardingRelated
     inc  [hl]
 .jr_00_4E65:
-    ld   a,[wDCA2_PlayerUnk1]
+    ld   a,[wDCA2_Player_SnowboardingRelated]
     and  a,$01
 .jr_00_4E6A:
-    ld   hl,wDCA4_PlayerUnk3
+    ld   hl,wDCA4_Player_SnowboardingRelated3
     add  [hl]
     ld   hl,wD80A_Player_SpriteId
     cp   [hl]
@@ -126,7 +126,7 @@ call_02_4E0C_Player_SnowboardingTailSpin:
 
 call_02_4E7A_LookupSnowboardingData:
 ; Scans a table for an entry matching value E, then selects a frame or command 
-; byte based on facing direction. Stores result in wDCA4_PlayerUnk3.
+; byte based on facing direction. Stores result in wDCA4_Player_SnowboardingRelated3.
 ; Purpose: Table-driven frame or pattern lookup for 4E0C.
     ld   d,$00
     ld   hl,.data_02_4EC3
@@ -152,7 +152,7 @@ call_02_4E7A_LookupSnowboardingData:
     jr   z,.jr_00_4E9F
     ld   a,b
 .jr_00_4E9F:
-    ld   [wDCA4_PlayerUnk3],a
+    ld   [wDCA4_Player_SnowboardingRelated3],a
     ret  
 .data_02_4EA3:
     db   $01        ;; 02:4e9c ????????
@@ -224,7 +224,7 @@ call_02_4f32_PlayerUpdateMain:
 ; Actions:
 ; - Processes inputs, clearing or setting bits in UnkStates/CurrentInputsAlt.
 ; - Manages timers (wDC7E_PlayerDamageCooldownTimer, wDCA9_FlyTimerOrFlags4–wDCAB_FlyTimerOrFlags2) using call_02_4ffb_DecTimerEveryCycle.
-; - Calls palette setup (call_03_6567_SetupEntityPalettes), BG collision update, entity caching, and entity loading.
+; - Calls palette setup (call_03_6567_LoadFlyPalettes), BG collision update, entity caching, and entity loading.
 ; - Jumps to the player action function.
 ; - Clears bits and finalizes state before call_02_724d.
 ; Purpose: Central routine for player state, input, collisions, and rendering per frame.
@@ -294,7 +294,7 @@ call_02_4f32_PlayerUpdateMain:
     call call_02_4ffb_DecTimerEveryCycle                                  ;; 02:4f9e $cd $fb $4f
     ld   HL, wDCAB_FlyTimerOrFlags2                                     ;; 02:4fa1 $21 $ab $dc
     call call_02_4ffb_DecTimerEveryCycle                                  ;; 02:4fa4 $cd $fb $4f
-    farcall call_03_6567_SetupEntityPalettes
+    farcall call_03_6567_LoadFlyPalettes
     call call_02_5081_Player_UpdateFacingAndMovementVector                                  ;; 02:4fb2 $cd $81 $50
     farcall call_03_46e0_UpdateBgCollision_MainDispatcher
     call call_02_5267_PlatformSlopeAndTriggerHandler                                  ;; 02:4fc0 $cd $67 $52
@@ -310,7 +310,7 @@ call_02_4f32_PlayerUpdateMain:
     ld   H, [HL]                                       ;; 02:4fe0 $66
     ld   L, A                                          ;; 02:4fe1 $6f
     call call_00_0f22_JumpHL                                  ;; 02:4fe2 $cd $22 $0f
-    ld   HL, wDCAC                                     ;; 02:4fe5 $21 $ac $dc
+    ld   HL, wDCAC_Player_CrouchLookDownRelated                                     ;; 02:4fe5 $21 $ac $dc
     ld   A, [HL]                                       ;; 02:4fe8 $7e
     and  A, A                                          ;; 02:4fe9 $a7
     jr   Z, .jr_02_4fed                                ;; 02:4fea $28 $01
@@ -424,7 +424,7 @@ call_02_5081_Player_UpdateFacingAndMovementVector:
 ; Uses the player’s current action ID and collision flags to:
 ; - Choose a new facing direction (wD80D_PlayerFacingDirection).
 ; - Look up a movement vector from .data_02_50f0.
-; - Smoothly adjust acceleration (wDC86) with hysteresis against wDC87.
+; - Smoothly adjust acceleration (wDC86_PlayerXVelocity) with hysteresis against wDC87_PlayerXMaxVelocity.
 ; Purpose: Update facing direction and movement acceleration vectors.
     ld   HL, wD801_Player_ActionId                                     ;; 02:5081 $21 $01 $d8
     ld   L, [HL]                                       ;; 02:5084 $6e
@@ -477,18 +477,18 @@ call_02_5081_Player_UpdateFacingAndMovementVector:
     jr   Z, .jr_02_50e0                                ;; 02:50d9 $28 $05
 .jr_02_50db:
     xor  A, A                                          ;; 02:50db $af
-    ld   [wDC86], A                                    ;; 02:50dc $ea $86 $dc
+    ld   [wDC86_PlayerXVelocity], A                                    ;; 02:50dc $ea $86 $dc
     ret                                                ;; 02:50df $c9
 .jr_02_50e0:
-    ld   A, [wDC86]                                    ;; 02:50e0 $fa $86 $dc
-    ld   HL, wDC87                                     ;; 02:50e3 $21 $87 $dc
+    ld   A, [wDC86_PlayerXVelocity]                                    ;; 02:50e0 $fa $86 $dc
+    ld   HL, wDC87_PlayerXMaxVelocity                                     ;; 02:50e3 $21 $87 $dc
     cp   A, [HL]                                       ;; 02:50e6 $be
     jr   C, .jr_02_50eb                                ;; 02:50e7 $38 $02
     ld   A, [HL]                                       ;; 02:50e9 $7e
     dec  A                                             ;; 02:50ea $3d
 .jr_02_50eb:
     inc  A                                             ;; 02:50eb $3c
-    ld   [wDC86], A                                    ;; 02:50ec $ea $86 $dc
+    ld   [wDC86_PlayerXVelocity], A                                    ;; 02:50ec $ea $86 $dc
     ret                                                ;; 02:50ef $c9
 .data_02_50f0:
     db   $00, $03, $07, $03, $01, $02, $08, $02        ;; 02:50f0 ????????
@@ -510,15 +510,15 @@ call_02_5100_Player_HorizontalMovementHandler:
     cp   A, BG_COLLISION_TYPE_SIDESCROLLER                                        ;; 02:510a $fe $00
     jr   Z, .jr_02_5159                                ;; 02:510c $28 $4b
 .jr_02_510e:
-    ld   A, [wDC86]                                    ;; 02:510e $fa $86 $dc
+    ld   A, [wDC86_PlayerXVelocity]                                    ;; 02:510e $fa $86 $dc
     and  A, A                                          ;; 02:5111 $a7
     ret  Z                                             ;; 02:5112 $c8
-    ld   HL, wDC86                                     ;; 02:5113 $21 $86 $dc
+    ld   HL, wDC86_PlayerXVelocity                                     ;; 02:5113 $21 $86 $dc
     ld   C, [HL]                                       ;; 02:5116 $4e
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:5117 $fa $81 $dc
     and  A, PADF_RIGHT                                        ;; 02:511a $e6 $10
     call NZ, call_02_51f9_ApplyRightwardCollisionAdjustment                              ;; 02:511c $c4 $f9 $51
-    ld   HL, wDC86                                     ;; 02:511f $21 $86 $dc
+    ld   HL, wDC86_PlayerXVelocity                                     ;; 02:511f $21 $86 $dc
     ld   C, [HL]                                       ;; 02:5122 $4e
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:5123 $fa $81 $dc
     and  A, PADF_LEFT                                        ;; 02:5126 $e6 $20
@@ -531,13 +531,13 @@ call_02_5100_Player_HorizontalMovementHandler:
     cp   A, $1f                                        ;; 02:5137 $fe $1f
     ret  NZ                                            ;; 02:5139 $c0
 .jr_02_513a:
-    ld   HL, wDC86                                     ;; 02:513a $21 $86 $dc
+    ld   HL, wDC86_PlayerXVelocity                                     ;; 02:513a $21 $86 $dc
     ld   C, [HL]                                       ;; 02:513d $4e
     ld   B, $00                                        ;; 02:513e $06 $00
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:5140 $fa $81 $dc
     and  A, PADF_DOWN                                        ;; 02:5143 $e6 $80
     call NZ, call_02_53e7_ApplyVerticalMovementAndClamp                              ;; 02:5145 $c4 $e7 $53
-    ld   A, [wDC86]                                    ;; 02:5148 $fa $86 $dc
+    ld   A, [wDC86_PlayerXVelocity]                                    ;; 02:5148 $fa $86 $dc
     cpl                                                ;; 02:514b $2f
     inc  A                                             ;; 02:514c $3c
     ld   C, A                                          ;; 02:514d $4f
@@ -547,7 +547,7 @@ call_02_5100_Player_HorizontalMovementHandler:
     call NZ, call_02_53e7_ApplyVerticalMovementAndClamp                              ;; 02:5155 $c4 $e7 $53
     ret                                                ;; 02:5158 $c9
 .jr_02_5159:
-    ld   A, [wDC86]                                    ;; 02:5159 $fa $86 $dc
+    ld   A, [wDC86_PlayerXVelocity]                                    ;; 02:5159 $fa $86 $dc
     ld   HL, wD80D_PlayerFacingDirection                                     ;; 02:515c $21 $0d $d8
     bit  5, [HL]                                       ;; 02:515f $cb $6e
     jr   Z, .jr_02_5165                                ;; 02:5161 $28 $02
@@ -1070,7 +1070,7 @@ call_02_5431_HandleActionTriggersAndEvents:
     cp   A, $36                                        ;; 02:5478 $fe $36
     jr   NZ, .jr_02_54a7                               ;; 02:547a $20 $2b
     ld   A, $04                                        ;; 02:547c $3e $04
-    ld   [wDC9D], A                                    ;; 02:547e $ea $9d $dc
+    ld   [wDC9D_Player_SwimmingRelated], A                                    ;; 02:547e $ea $9d $dc
     ld   A, PLAYERACTION_WATER_TREADING                                        ;; 02:5481 $3e $20
     call call_02_54f9_SwitchPlayerAction                                  ;; 02:5483 $cd $f9 $54
     jr   .jr_02_54a7                                   ;; 02:5486 $18 $1f
@@ -1086,7 +1086,7 @@ call_02_5431_HandleActionTriggersAndEvents:
     cp   A, $36                                        ;; 02:5499 $fe $36
     jr   NZ, .jr_02_54a7                               ;; 02:549b $20 $0a
     ld   A, $04                                        ;; 02:549d $3e $04
-    ld   [wDC9D], A                                    ;; 02:549f $ea $9d $dc
+    ld   [wDC9D_Player_SwimmingRelated], A                                    ;; 02:549f $ea $9d $dc
     ld   A, PLAYERACTION_WATER_TREADING                                        ;; 02:54a2 $3e $20
     call call_02_54f9_SwitchPlayerAction                                  ;; 02:54a4 $cd $f9 $54
 .jr_02_54a7:
@@ -1099,8 +1099,8 @@ call_02_5431_HandleActionTriggersAndEvents:
     farcall call_03_4c2e_IsTileType3D
     jr   NZ, .jr_02_54d0                               ;; 02:54c0 $20 $0e
     xor  A, A                                          ;; 02:54c2 $af
-    ld   [wDCA1_PlayerUnk6], A                                    ;; 02:54c3 $ea $a1 $dc
-    ld   [wDC86], A                                    ;; 02:54c6 $ea $86 $dc
+    ld   [wDCA1_Player_ClimbingRelated4], A                                    ;; 02:54c3 $ea $a1 $dc
+    ld   [wDC86_PlayerXVelocity], A                                    ;; 02:54c6 $ea $86 $dc
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:54c9 $ea $8c $dc
     ld   A, PLAYERACTION_CLIMBING                                        ;; 02:54cc $3e $22
     jr   call_02_54f9_SwitchPlayerAction                                  ;; 02:54ce $18 $29

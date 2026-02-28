@@ -1,4 +1,4 @@
-call_03_6567_SetupEntityPalettes:
+call_03_6567_LoadFlyPalettes:
 ; Purpose: Chooses which entity palette set to load based on state flags.
 ; Behavior:
 ; If wDCAB_FlyTimerOrFlags2 non-zero, uses default palette table .data_03_658c.
@@ -6,12 +6,12 @@ call_03_6567_SetupEntityPalettes:
 ; Copies 8 bytes into wDD2A_EntityPalettes.
 ; Usage: Called when loading or switching level themes/entities.
     ld   HL, .data_03_658c                             ;; 03:6567 $21 $8c $65
-    ld   A, [wDCAB_FlyTimerOrFlags2]                                    ;; 03:656a $fa $ab $dc
+    ld   A, [wDCAB_FlyTimerOrFlags2]                   ;; 03:656a $fa $ab $dc
     and  A, A                                          ;; 03:656d $a7
     jr   NZ, .jr_03_6583                               ;; 03:656e $20 $13
-    ld   A, [wDC51_CurrentFlyRelated]                                    ;; 03:6570 $fa $51 $dc
+    ld   A, [wDC51_CurrentFlyRelated]                  ;; 03:6570 $fa $51 $dc
     and  A, A                                          ;; 03:6573 $a7
-    jp   Z, call_00_2cbf_LoadEntityPalettes                               ;; 03:6574 $ca $bf $2c
+    jp   Z, call_00_2cbf_LoadEntityPalettes            ;; 03:6574 $ca $bf $2c
     dec  A                                             ;; 03:6577 $3d
     ld   L, A                                          ;; 03:6578 $6f
     ld   H, $00                                        ;; 03:6579 $26 $00
@@ -22,21 +22,26 @@ call_03_6567_SetupEntityPalettes:
     ld   H, [HL]                                       ;; 03:6581 $66
     ld   L, A                                          ;; 03:6582 $6f
 .jr_03_6583:
-    ld   DE, wDD2A_EntityPalettes                                     ;; 03:6583 $11 $2a $dd
+    ld   DE, wDD2A_EntityPalettes                      ;; 03:6583 $11 $2a $dd
     ld   BC, $08                                       ;; 03:6586 $01 $08 $00
-    jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 03:6589 $c3 $6e $07
+    jp   call_00_076e_CopyBCBytesFromHLToDE            ;; 03:6589 $c3 $6e $07
 .data_03_658c:
-    db   $00, $00, $00, $00, $00, $42, $e0, $7f        ;; 03:658c ????????
+    db   $00, $00, $00, $00, $00, $42, $e0, $7f
 .data_03_6594:
-    db   $ae, $65, $be, $65, $9e, $65, $a6, $65        ;; 03:6594 ????????
-    db   $b6, $65, $00, $00, $00, $00, $00, $02        ;; 03:659c ????????
-    db   $e0, $03, $00, $00, $00, $00, $10, $40        ;; 03:65a4 ????????
-    db   $1f, $7c, $00, $00, $00, $00, $00, $00        ;; 03:65ac ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $42        ;; 03:65b4 ????????
-    db   $e0, $7f, $00, $00, $00, $00, $00, $00        ;; 03:65bc ????????
-    db   $00, $00                                      ;; 03:65c4 ??
+    dw   .data_03_65ae, .data_03_65be, .data_03_659e
+    dw   .data_03_65a6, .data_03_65b6
+.data_03_659e:
+    db   $00, $00, $00, $00, $00, $02, $e0, $03
+.data_03_65a6:
+    db   $00, $00, $00, $00, $10, $40, $1f, $7c
+.data_03_65ae:
+    db   $00, $00, $00, $00, $00, $00, $00, $00
+.data_03_65b6:
+    db   $00, $00, $00, $00, $00, $42, $e0, $7f
+.data_03_65be:
+    db   $00, $00, $00, $00, $00, $00, $00, $00
 
-call_03_65c6_LoadMenuOrLevelPalettes:
+call_03_65c6_LoadBgPalettes:
 ; Purpose: Loads either level palettes or menu palettes depending on C.
 ; Behavior:
 ; If C is zero, loads map and entity palettes via call_00_05af_LoadMapPalettes 
@@ -47,8 +52,8 @@ call_03_65c6_LoadMenuOrLevelPalettes:
     inc  C                                             ;; 03:65c6 $0c
     dec  C                                             ;; 03:65c7 $0d
     jr   NZ, .jr_03_65d1                               ;; 03:65c8 $20 $07
-    call call_00_05af_LoadMapPalettes                                  ;; 03:65ca $cd $af $05
-    call call_00_2cbf_LoadEntityPalettes                                  ;; 03:65cd $cd $bf $2c
+    call call_00_05af_LoadMapPalettes                  ;; 03:65ca $cd $af $05
+    call call_00_2cbf_LoadEntityPalettes               ;; 03:65cd $cd $bf $2c
     ret                                                ;; 03:65d0 $c9
 .jr_03_65d1:
     bit  7, C                                          ;; 03:65d1 $cb $79
@@ -56,17 +61,17 @@ call_03_65c6_LoadMenuOrLevelPalettes:
     ld   L, C                                          ;; 03:65d4 $69
     ld   H, $00                                        ;; 03:65d5 $26 $00
     add  HL, HL                                        ;; 03:65d7 $29
-    ld   DE, .data_03_65f1_MenuPalettes                             ;; 03:65d8 $11 $f1 $65
+    ld   DE, .data_03_65f1_MenuPalettes                ;; 03:65d8 $11 $f1 $65
     add  HL, DE                                        ;; 03:65db $19
     ld   A, [HL+]                                      ;; 03:65dc $2a
     ld   H, [HL]                                       ;; 03:65dd $66
     ld   L, A                                          ;; 03:65de $6f
-    ld   DE, wDCEA_BgPalettes                                     ;; 03:65df $11 $ea $dc
+    ld   DE, wDCEA_BgPalettes                          ;; 03:65df $11 $ea $dc
     ld   BC, $40                                       ;; 03:65e2 $01 $40 $00
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 03:65e5 $cd $6e $07
-    ld   HL, .data_03_6803_palette                             ;; 03:65e8 $21 $03 $68
+    call call_00_076e_CopyBCBytesFromHLToDE            ;; 03:65e5 $cd $6e $07
+    ld   HL, .data_03_6803_palette                     ;; 03:65e8 $21 $03 $68
     ld   BC, $40                                       ;; 03:65eb $01 $40 $00
-    jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 03:65ee $c3 $6e $07
+    jp   call_00_076e_CopyBCBytesFromHLToDE            ;; 03:65ee $c3 $6e $07
 .data_03_65f1_MenuPalettes:
     dw   $0000
     dw   .data_03_6603_palette, .data_03_6643_palette
@@ -74,23 +79,23 @@ call_03_65c6_LoadMenuOrLevelPalettes:
     dw   .data_03_6703_palette, .data_03_6743_palette
     dw   .data_03_6783_palette, .data_03_67c3_palette
 .data_03_6603_palette: ; pause menus
-    INCBIN "gfx/menu_palettes/pause_menu_palette.bin"
+    INCBIN "gfx/menus/palettes/pause_menu_palette.bin"
 .data_03_6643_palette: ; david a palmer productions
-    INCBIN "gfx/menu_palettes/david_a_palmer_palette.bin"
+    INCBIN "gfx/menus/palettes/david_a_palmer_palette.bin"
 .data_03_6683_palette:
-    INCBIN "gfx/menu_palettes/unk_menu_palette_6683.bin"
+    INCBIN "gfx/menus/palettes/unk_menu_palette_6683.bin"
 .data_03_66c3_palette: ; title screen
-    INCBIN "gfx/menu_palettes/title_screen_palette.bin"
+    INCBIN "gfx/menus/palettes/title_screen_palette.bin"
 .data_03_6703_palette: ; eidos interactive
-    INCBIN "gfx/menu_palettes/eidos_interactive_palette.bin"
+    INCBIN "gfx/menus/palettes/eidos_interactive_palette.bin"
 .data_03_6743_palette: ; crystal dynamics (might be swapped with above)
-    INCBIN "gfx/menu_palettes/crystal_dynamics_palette.bin"
+    INCBIN "gfx/menus/palettes/crystal_dynamics_palette.bin"
 .data_03_6783_palette: ; password screens
-    INCBIN "gfx/menu_palettes/password_menu_palette.bin"
+    INCBIN "gfx/menus/palettes/password_menu_palette.bin"
 .data_03_67c3_palette:
-    INCBIN "gfx/menu_palettes/unk_menu_palette_67c3.bin"
+    INCBIN "gfx/menus/palettes/unk_menu_palette_67c3.bin"
 .data_03_6803_palette:
-    INCBIN "gfx/menu_palettes/unk_menu_palette_6803.bin" 
+    INCBIN "gfx/menus/palettes/unk_menu_palette_6803.bin" 
 
 call_03_6833:
     push bc
@@ -129,7 +134,7 @@ call_03_6833:
     add  hl,hl
     add  hl,hl
     add  hl,hl
-    ld   de,data_03_68f9
+    ld   de,data_03_68f9_EntityPalettes
     add  hl,de
     call call_00_2c20_Entity_CopyPaletteToBuffer
     xor  a
@@ -141,27 +146,27 @@ call_03_687c_AssignEntityPalette:
 ; Behavior:
 ; Derives a palette index from the current entity address (wDA00_CurrentEntityAddrLo).
 ; Stores the palette ID in wDAAE_EntityPaletteIds.
-; Calculates an address into wDD2A_EntityPalettes, then copies 8 palette bytes from data_03_68f9.
+; Calculates an address into wDD2A_EntityPalettes, then copies 8 palette bytes from data_03_68f9_EntityPalettes.
 ; Usage: Ensures each on-screen entity uses the correct colors.
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_GRAPHICS_FLAGS                                     ;; 03:6883 $6f
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_GRAPHICS_FLAGS   ;; 03:6883 $6f
     ld   C, $00                                        ;; 03:6884 $0e $00
     bit  7, [HL]                                       ;; 03:6886 $cb $7e
     jr   NZ, .jr_03_6893                               ;; 03:6888 $20 $09
-    ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:688a $fa $00 $da
+    ld   A, [wDA00_CurrentEntityAddrLo]                ;; 03:688a $fa $00 $da
     rlca                                               ;; 03:688d $07
     rlca                                               ;; 03:688e $07
     rlca                                               ;; 03:688f $07
     and  A, $07                                        ;; 03:6890 $e6 $07
     ld   C, A                                          ;; 03:6892 $4f
 .jr_03_6893:
-    ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:6893 $fa $00 $da
+    ld   A, [wDA00_CurrentEntityAddrLo]                ;; 03:6893 $fa $00 $da
     rlca                                               ;; 03:6896 $07
     rlca                                               ;; 03:6897 $07
     rlca                                               ;; 03:6898 $07
     and  A, $07                                        ;; 03:6899 $e6 $07
     ld   L, A                                          ;; 03:689b $6f
     ld   H, $00                                        ;; 03:689c $26 $00
-    ld   DE, wDAAE_EntityPaletteIds                                     ;; 03:689e $11 $ae $da
+    ld   DE, wDAAE_EntityPaletteIds                    ;; 03:689e $11 $ae $da
     add  HL, DE                                        ;; 03:68a1 $19
     ld   [HL], C                                       ;; 03:68a2 $71
     ld   L, C                                          ;; 03:68a3 $69
@@ -169,7 +174,7 @@ call_03_687c_AssignEntityPalette:
     add  HL, HL                                        ;; 03:68a6 $29
     add  HL, HL                                        ;; 03:68a7 $29
     add  HL, HL                                        ;; 03:68a8 $29
-    ld   DE, wDD2A_EntityPalettes                                     ;; 03:68a9 $11 $2a $dd
+    ld   DE, wDD2A_EntityPalettes                      ;; 03:68a9 $11 $2a $dd
     add  HL, DE                                        ;; 03:68ac $19
     ld   E, L                                          ;; 03:68ad $5d
     ld   D, H                                          ;; 03:68ae $54
@@ -179,7 +184,7 @@ call_03_687c_AssignEntityPalette:
     add  HL, HL                                        ;; 03:68ba $29
     add  HL, HL                                        ;; 03:68bb $29
     add  HL, HL                                        ;; 03:68bc $29
-    ld   BC, data_03_68f9                             ;; 03:68bd $01 $f9 $68
+    ld   BC, data_03_68f9_EntityPalettes               ;; 03:68bd $01 $f9 $68
     add  HL, BC                                        ;; 03:68c0 $09
     ld   A, [HL+]                                      ;; 03:68c1 $2a
     ld   [DE], A                                       ;; 03:68c2 $12
@@ -214,10 +219,10 @@ call_03_68d9_AssignAllEntityPalettes:
 ; Increments by $20 for each entity until wraparound.
     ld   A, $40                                        ;; 03:68d9 $3e $40
 .jr_03_68db:
-    ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 03:68db $ea $00 $da
-    or   A, ENTITY_FIELD_ENTITY_ID                                        ;; 03:68de $f6 $00
+    ld   [wDA00_CurrentEntityAddrLo], A                ;; 03:68db $ea $00 $da
+    or   A, ENTITY_FIELD_ENTITY_ID                     ;; 03:68de $f6 $00
     ld   L, A                                          ;; 03:68e0 $6f
-    ld   h, HIGH(wD800_EntityMemory)                                        ;; 03:68e1 $26 $d8
+    ld   h, HIGH(wD800_EntityMemory)                   ;; 03:68e1 $26 $d8
     ld   A, [HL]                                       ;; 03:68e3 $7e
     cp   A, $ff                                        ;; 03:68e4 $fe $ff
     jr   Z, .jr_03_68f1                                ;; 03:68e6 $28 $09
@@ -225,125 +230,125 @@ call_03_68d9_AssignAllEntityPalettes:
     xor  A, $05                                        ;; 03:68e9 $ee $05
     ld   L, A                                          ;; 03:68eb $6f
     set  1, [HL]                                       ;; 03:68ec $cb $ce
-    call call_03_687c_AssignEntityPalette                                  ;; 03:68ee $cd $7c $68
+    call call_03_687c_AssignEntityPalette              ;; 03:68ee $cd $7c $68
 .jr_03_68f1:
-    ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:68f1 $fa $00 $da
+    ld   A, [wDA00_CurrentEntityAddrLo]                ;; 03:68f1 $fa $00 $da
     add  A, $20                                        ;; 03:68f4 $c6 $20
     jr   NZ, .jr_03_68db                               ;; 03:68f6 $20 $e3
     ret                                                ;; 03:68f8 $c9
 
-data_03_68f9:
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 03:68f9 ????????
-    db   $00, $00, $00, $00, $1f, $00, $ff, $03        ;; 03:6901 ........
-    db   $00, $00, $00, $00, $60, $02, $9c, $03        ;; 03:6909 ........
-    db   $00, $00, $00, $00, $ff, $03, $e0, $03        ;; 03:6911 ........
-    db   $00, $00, $00, $00, $10, $42, $e0, $03        ;; 03:6919 ????????
-    db   $00, $00, $00, $00, $10, $42, $13, $7c        ;; 03:6921 ????????
-    db   $00, $00, $00, $00, $10, $42, $52, $7e        ;; 03:6929 ????????
-    db   $00, $00, $00, $00, $10, $42, $e0, $7f        ;; 03:6931 ????????
-    db   $00, $00, $00, $00, $10, $42, $1f, $00        ;; 03:6939 ????????
-    db   $00, $00, $00, $00, $10, $42, $e0, $03        ;; 03:6941 ????????
-    db   $00, $00, $00, $00, $10, $42, $13, $7c        ;; 03:6949 ????????
-    db   $00, $00, $00, $00, $10, $42, $52, $7e        ;; 03:6951 ????????
-    db   $00, $00, $00, $00, $10, $42, $e0, $7f        ;; 03:6959 ????????
-    db   $00, $00, $00, $00, $10, $42, $1f, $00        ;; 03:6961 ????????
-    db   $00, $00, $00, $00, $10, $42, $52, $7e        ;; 03:6969 ????????
-    db   $00, $00, $00, $00, $10, $42, $6b, $0a        ;; 03:6971 ????????
-    db   $00, $00, $00, $00, $10, $42, $1f, $00        ;; 03:6979 ????????
-    db   $00, $00, $00, $00, $73, $4e, $1f, $00        ;; 03:6981 ........
-    db   $00, $00, $00, $00, $73, $4e, $1f, $00        ;; 03:6989 ........
-    db   $00, $00, $00, $34, $ff, $03, $80, $02        ;; 03:6991 ????????
-    db   $00, $00, $ff, $03, $1f, $02, $ec, $00        ;; 03:6999 ........
-    db   $00, $00, $ff, $03, $1f, $02, $ec, $00        ;; 03:69a1 ........
-    db   $00, $00, $ff, $03, $1f, $02, $ec, $00        ;; 03:69a9 ........
-    db   $00, $00, $ff, $03, $1f, $02, $ec, $00        ;; 03:69b1 ........
-    db   $00, $00, $ff, $03, $1f, $02, $ec, $00        ;; 03:69b9 ????????
-    db   $00, $00, $ff, $03, $1f, $02, $ec, $00        ;; 03:69c1 ????????
-    db   $00, $00, $ff, $03, $1f, $02, $ec, $00        ;; 03:69c9 ????????
-    db   $00, $00, $2d, $19, $7b, $09, $9f, $47        ;; 03:69d1 ????????
-    db   $00, $00, $00, $01, $e0, $03, $ff, $7f        ;; 03:69d9 ........
-    db   $00, $00, $b3, $7f, $85, $7e, $a4, $7c        ;; 03:69e1 ........
-    db   $00, $00, $00, $00, $1f, $00, $ff, $7f        ;; 03:69e9 ........
-    db   $00, $00, $4a, $29, $b5, $56, $ff, $7f        ;; 03:69f1 ........
-    db   $00, $00, $7d, $42, $20, $03, $00, $00        ;; 03:69f9 ........
-    db   $00, $00, $00, $00, $ff, $7f, $1f, $02        ;; 03:6a01 ........
-    db   $00, $00, $00, $00, $10, $42, $ec, $7f        ;; 03:6a09 ????????
-    db   $00, $00, $00, $00, $ff, $7f, $1f, $00        ;; 03:6a11 ????????
-    db   $00, $00, $00, $00, $ff, $7f, $80, $02        ;; 03:6a19 ????????
-    db   $00, $00, $00, $00, $ff, $7f, $ff, $03        ;; 03:6a21 ????????
-    db   $00, $00, $00, $00, $00, $03, $ff, $7f        ;; 03:6a29 ????????
-    db   $00, $00, $00, $00, $68, $77, $ff, $7f        ;; 03:6a31 ????????
-    db   $00, $00, $00, $00, $ff, $7f, $10, $42        ;; 03:6a39 ????????
-    db   $00, $00, $00, $00, $28, $7e, $f1, $7e        ;; 03:6a41 ????????
-    db   $00, $00, $00, $00, $10, $42, $ff, $7f        ;; 03:6a49 ????????
-    db   $00, $00, $00, $00, $00, $7c, $ff, $03        ;; 03:6a51 ????????
-    db   $00, $00, $8e, $00, $00, $7c, $ff, $03        ;; 03:6a59 ????????
-    db   $00, $00, $8e, $00, $00, $7c, $ff, $03        ;; 03:6a61 ????????
-    db   $00, $00, $00, $00, $ff, $03, $ce, $01        ;; 03:6a69 ????????
-    db   $00, $00, $00, $00, $10, $01, $57, $02        ;; 03:6a71 ????????
-    db   $00, $00, $00, $00, $c0, $02, $ff, $03        ;; 03:6a79 ????????
-    db   $00, $00, $00, $00, $c0, $02, $ff, $03        ;; 03:6a81 ????????
-    db   $00, $00, $ff, $03, $10, $02, $00, $00        ;; 03:6a89 ????????
-    db   $00, $00, $ff, $03, $10, $02, $00, $00        ;; 03:6a91 ????????
-    db   $00, $00, $8c, $01, $94, $02, $ff, $03        ;; 03:6a99 ????????
-    db   $00, $00, $1f, $00, $1f, $02, $ff, $03        ;; 03:6aa1 ????????
-    db   $00, $00, $1f, $00, $1f, $02, $ff, $03        ;; 03:6aa9 ????????
-    db   $00, $00, $00, $00, $36, $02, $3c, $4f        ;; 03:6ab1 ????????
-    db   $00, $00, $00, $7c, $d7, $01, $ff, $03        ;; 03:6ab9 ????????
-    db   $00, $00, $00, $00, $20, $03, $ff, $7f        ;; 03:6ac1 ????????
-    db   $00, $00, $00, $00, $20, $03, $ff, $7f        ;; 03:6ac9 ????????
-    db   $00, $00, $00, $00, $4a, $29, $52, $4a        ;; 03:6ad1 ????????
-    db   $00, $00, $ff, $03, $00, $00, $52, $4a        ;; 03:6ad9 ????????
-    db   $00, $00, $00, $00, $7e, $00, $bf, $6b        ;; 03:6ae1 ????????
-    db   $00, $00, $1f, $00, $08, $21, $18, $63        ;; 03:6ae9 ????????
-    db   $00, $00, $8e, $00, $00, $7c, $ff, $03        ;; 03:6af1 ????????
-    db   $00, $00, $00, $00, $10, $42, $ff, $7f        ;; 03:6af9 ????????
-    db   $00, $00, $00, $00, $10, $42, $ff, $7f        ;; 03:6b01 ????????
-    db   $00, $00, $00, $00, $ef, $54, $15, $72        ;; 03:6b09 ????????
-    db   $00, $00, $1f, $00, $ce, $39, $00, $00        ;; 03:6b11 ????????
-    db   $00, $00, $1f, $00, $ce, $39, $00, $00        ;; 03:6b19 ????????
-    db   $00, $00, $fc, $16, $94, $52, $00, $00        ;; 03:6b21 ????????
-    db   $00, $00, $00, $00, $10, $01, $57, $02        ;; 03:6b29 ????????
-    db   $00, $00, $00, $02, $2b, $2f, $fa, $47        ;; 03:6b31 ????????
-    db   $00, $00, $00, $7c, $e0, $7f, $ff, $7f        ;; 03:6b39 ????????
-    db   $00, $00, $00, $00, $ff, $02, $ff, $03        ;; 03:6b41 ????????
-    db   $00, $00, $00, $00, $1f, $00, $7f, $4e        ;; 03:6b49 ????????
-    db   $00, $00, $00, $00, $1f, $00, $7f, $4e        ;; 03:6b51 ????????
-    db   $00, $00, $00, $00, $bc, $45, $ff, $7f        ;; 03:6b59 ????????
-    db   $00, $00, $00, $00, $73, $4e, $ff, $7f        ;; 03:6b61 ????????
-    db   $00, $00, $00, $00, $69, $66, $c9, $7f        ;; 03:6b69 ????????
-    db   $00, $00, $00, $00, $6b, $3e, $3c, $00        ;; 03:6b71 ????????
-    db   $00, $00, $00, $7c, $e0, $7f, $ff, $7f        ;; 03:6b79 ????????
-    db   $00, $00, $fc, $16, $94, $52, $00, $00        ;; 03:6b81 ????????
-    db   $00, $00, $00, $00, $dc, $08, $1f, $0e        ;; 03:6b89 ????????
-    db   $00, $00, $00, $00, $ff, $03, $ff, $7f        ;; 03:6b91 ????????
-    db   $00, $00, $ff, $7f, $e0, $03, $1f, $00        ;; 03:6b99 ????????
-    db   $00, $00, $00, $00, $53, $68, $bf, $57        ;; 03:6ba1 ????????
-    db   $00, $00, $00, $00, $df, $00, $7f, $53        ;; 03:6ba9 ????????
-    db   $00, $00, $00, $00, $11, $09, $76, $09        ;; 03:6bb1 ????????
-    db   $00, $00, $00, $00, $11, $09, $76, $09        ;; 03:6bb9 ????????
-    db   $00, $00, $00, $00, $10, $42, $ff, $7f        ;; 03:6bc1 ????????
-    db   $00, $00, $00, $00, $35, $65, $bf, $7a        ;; 03:6bc9 ????????
-    db   $00, $00, $00, $00, $f7, $5e, $ff, $7f        ;; 03:6bd1 ????????
-    db   $00, $00, $00, $00, $1f, $03, $ff, $03        ;; 03:6bd9 ????????
-    db   $00, $00, $00, $00, $f4, $21, $bb, $42        ;; 03:6be1 ????????
-    db   $00, $00, $00, $00, $a9, $1e, $95, $47        ;; 03:6be9 ????????
-    db   $00, $00, $08, $21, $10, $42, $5a, $6b        ;; 03:6bf1 ????????
-    db   $00, $00, $00, $00, $df, $00, $ff, $7f        ;; 03:6bf9 ????????
-    db   $00, $00, $7d, $42, $20, $03, $00, $00        ;; 03:6c01 ????????
-    db   $00, $00, $00, $00, $96, $01, $5e, $03        ;; 03:6c09 ????????
-    db   $00, $00, $dd, $13, $19, $02, $00, $00        ;; 03:6c11 ????????
-    db   $00, $00, $00, $00, $10, $42, $9c, $73        ;; 03:6c19 ????????
-    db   $00, $00, $00, $00, $10, $42, $9c, $73        ;; 03:6c21 ????????
-    db   $00, $00, $00, $00, $58, $2a, $3e, $87        ;; 03:6c29 ????????
-    db   $00, $00, $00, $00, $f8, $71, $7d, $7f        ;; 03:6c31 ????????
-    db   $00, $00, $00, $00, $08, $21, $10, $06        ;; 03:6c39 ????????
-    db   $00, $00, $00, $00, $b7, $01, $1f, $1b        ;; 03:6c41 ????????
-    db   $00, $00, $00, $00, $dc, $08, $1f, $0e        ;; 03:6c49 ????????
-    db   $00, $00, $00, $00, $dc, $00, $1f, $43        ;; 03:6c51 ????????
-    db   $00, $00, $00, $02, $2b, $2f, $fa, $47        ;; 03:6c59 ????????
-    db   $00, $00, $d0, $04, $d6, $09, $fc, $16        ;; 03:6c61 ????????
-    db   $00, $00, $00, $00, $10, $42, $18, $63        ;; 03:6c69 ????????
-    db   $00, $00, $00, $7c, $e0, $7f, $ff, $7f        ;; 03:6c71 ????????
-    db   $00, $00, $00, $00, $dc, $08, $1f, $0e        ;; 03:6c79 ????????
-    db   $00, $00, $00, $00, $dc, $08, $1f, $0e        ;; 03:6c81 ????????
+data_03_68f9_EntityPalettes:
+    db   $00, $00, $00, $00, $00, $00, $00, $00 ;; 03:68f9 ???????? ; ENTITY_GEX
+    db   $00, $00, $00, $00, $1f, $00, $ff, $03 ;; 03:6901 ........ ; ENTITY_BONUS_COIN
+    db   $00, $00, $00, $00, $60, $02, $9c, $03 ;; 03:6909 ........ ; ENTITY_FLY_COIN_SPAWN
+    db   $00, $00, $00, $00, $ff, $03, $e0, $03 ;; 03:6911 ........ ; ENTITY_PAW_COIN
+    db   $00, $00, $00, $00, $10, $42, $e0, $03 ;; 03:6919 ???????? ; ENTITY_FLY_1
+    db   $00, $00, $00, $00, $10, $42, $13, $7c ;; 03:6921 ???????? ; ENTITY_FLY_2
+    db   $00, $00, $00, $00, $10, $42, $52, $7e ;; 03:6929 ???????? ; ENTITY_FLY_3
+    db   $00, $00, $00, $00, $10, $42, $e0, $7f ;; 03:6931 ???????? ; ENTITY_FLY_4
+    db   $00, $00, $00, $00, $10, $42, $1f, $00 ;; 03:6939 ???????? ; ENTITY_FLY_5
+    db   $00, $00, $00, $00, $10, $42, $e0, $03 ;; 03:6941 ???????? ; ENTITY_GREEN_FLY_TV
+    db   $00, $00, $00, $00, $10, $42, $13, $7c ;; 03:6949 ???????? ; ENTITY_PURPLE_FLY_TV
+    db   $00, $00, $00, $00, $10, $42, $52, $7e ;; 03:6951 ???????? ; ENTITY_UNK_FLY_TV_3
+    db   $00, $00, $00, $00, $10, $42, $e0, $7f ;; 03:6959 ???????? ; ENTITY_BLUE_FLY_TV
+    db   $00, $00, $00, $00, $10, $42, $1f, $00 ;; 03:6961 ???????? ; ENTITY_UNK_FLY_TV_5
+    db   $00, $00, $00, $00, $10, $42, $52, $7e ;; 03:6969 ???????? ; ENTITY_UNK0E
+    db   $00, $00, $00, $00, $10, $42, $6b, $0a ;; 03:6971 ???????? ; ENTITY_UNK0F
+    db   $00, $00, $00, $00, $10, $42, $1f, $00 ;; 03:6979 ???????? ; ENTITY_UNK10
+    db   $00, $00, $00, $00, $73, $4e, $1f, $00 ;; 03:6981 ........ ; ENTITY_TV_BUTTON
+    db   $00, $00, $00, $00, $73, $4e, $1f, $00 ;; 03:6989 ........ ; ENTITY_TV_REMOTE
+    db   $00, $00, $00, $34, $ff, $03, $80, $02 ;; 03:6991 ???????? ; ENTITY_UNK13
+    db   $00, $00, $ff, $03, $1f, $02, $ec, $00 ;; 03:6999 ........ ; ENTITY_GOAL_COUNTER_1
+    db   $00, $00, $ff, $03, $1f, $02, $ec, $00 ;; 03:69a1 ........ ; ENTITY_GOAL_COUNTER_2
+    db   $00, $00, $ff, $03, $1f, $02, $ec, $00 ;; 03:69a9 ........ ; ENTITY_GOAL_COUNTER_3
+    db   $00, $00, $ff, $03, $1f, $02, $ec, $00 ;; 03:69b1 ........ ; ENTITY_GOAL_COUNTER_4
+    db   $00, $00, $ff, $03, $1f, $02, $ec, $00 ;; 03:69b9 ???????? ; ENTITY_GOAL_COUNTER_5
+    db   $00, $00, $ff, $03, $1f, $02, $ec, $00 ;; 03:69c1 ???????? ; ENTITY_GOAL_COUNTER_6
+    db   $00, $00, $ff, $03, $1f, $02, $ec, $00 ;; 03:69c9 ???????? ; ENTITY_GOAL_COUNTER_7
+    db   $00, $00, $2d, $19, $7b, $09, $9f, $47 ;; 03:69d1 ???????? ; ENTITY_BONUS_STAGE_TIMER
+    db   $00, $00, $00, $01, $e0, $03, $ff, $7f ;; 03:69d9 ........ ; ENTITY_FREESTANDING_REMOTE
+    db   $00, $00, $b3, $7f, $85, $7e, $a4, $7c ;; 03:69e1 ........ ; ENTITY_HOLIDAY_TV_ICE_SCULPTURE
+    db   $00, $00, $00, $00, $1f, $00, $ff, $7f ;; 03:69e9 ........ ; ENTITY_HOLIDAY_TV_EVIL_SANTA
+    db   $00, $00, $4a, $29, $b5, $56, $ff, $7f ;; 03:69f1 ........ ; ENTITY_HOLIDAY_TV_EVIL_SANTA_PROJECTILE
+    db   $00, $00, $7d, $42, $20, $03, $00, $00 ;; 03:69f9 ........ ; ENTITY_HOLIDAY_TV_SKATING_ELF
+    db   $00, $00, $00, $00, $ff, $7f, $1f, $02 ;; 03:6a01 ........ ; ENTITY_HOLIDAY_TV_PENGUIN
+    db   $00, $00, $00, $00, $10, $42, $ec, $7f ;; 03:6a09 ???????? ; ENTITY_MYSTERY_TV_REZLING
+    db   $00, $00, $00, $00, $ff, $7f, $1f, $00 ;; 03:6a11 ???????? ; ENTITY_MYSTERY_TV_BLOOD_COOLER
+    db   $00, $00, $00, $00, $ff, $7f, $80, $02 ;; 03:6a19 ???????? ; ENTITY_MYSTERY_TV_FISH
+    db   $00, $00, $00, $00, $ff, $7f, $ff, $03 ;; 03:6a21 ???????? ; ENTITY_MYSTERY_TV_MAGIC_SWORD
+    db   $00, $00, $00, $00, $00, $03, $ff, $7f ;; 03:6a29 ???????? ; ENTITY_MYSTERY_TV_SAFARI_SAM
+    db   $00, $00, $00, $00, $68, $77, $ff, $7f ;; 03:6a31 ???????? ; ENTITY_MYSTERY_TV_SAFARI_SAM_PROJECTILE
+    db   $00, $00, $00, $00, $ff, $7f, $10, $42 ;; 03:6a39 ???????? ; ENTITY_MYSTERY_TV_GHOST_KNIGHT
+    db   $00, $00, $00, $00, $28, $7e, $f1, $7e ;; 03:6a41 ???????? ; ENTITY_MYSTERY_TV_GHOST_KNIGHT_PROJECTILE
+    db   $00, $00, $00, $00, $10, $42, $ff, $7f ;; 03:6a49 ???????? ; ENTITY_TUT_TV_HAND
+    db   $00, $00, $00, $00, $00, $7c, $ff, $03 ;; 03:6a51 ???????? ; ENTITY_TUT_TV_LOST_ARK
+    db   $00, $00, $8e, $00, $00, $7c, $ff, $03 ;; 03:6a59 ???????? ; ENTITY_TUT_TV_RISING_PLATFORM
+    db   $00, $00, $8e, $00, $00, $7c, $ff, $03 ;; 03:6a61 ???????? ; ENTITY_TUT_TV_SIDEWAYS_PLATFORM
+    db   $00, $00, $00, $00, $ff, $03, $ce, $01 ;; 03:6a69 ???????? ; ENTITY_TUT_TV_BEE
+    db   $00, $00, $00, $00, $10, $01, $57, $02 ;; 03:6a71 ???????? ; ENTITY_TUT_TV_RAFT
+    db   $00, $00, $00, $00, $c0, $02, $ff, $03 ;; 03:6a79 ???????? ; ENTITY_TUT_TV_SNAKE_FACING_RIGHT
+    db   $00, $00, $00, $00, $c0, $02, $ff, $03 ;; 03:6a81 ???????? ; ENTITY_TUT_TV_SNAKE_FACING_LEFT
+    db   $00, $00, $ff, $03, $10, $02, $00, $00 ;; 03:6a89 ???????? ; ENTITY_TUT_TV_SNAKE_RIGHT_PROJECTILE
+    db   $00, $00, $ff, $03, $10, $02, $00, $00 ;; 03:6a91 ???????? ; ENTITY_TUT_TV_SNAKE_LEFT_PROJECTILE
+    db   $00, $00, $8c, $01, $94, $02, $ff, $03 ;; 03:6a99 ???????? ; ENTITY_TUT_TV_RA_STAFF
+    db   $00, $00, $1f, $00, $1f, $02, $ff, $03 ;; 03:6aa1 ???????? ; ENTITY_TUT_TV_RA_STATUE_HORIZONTAL_PROJECTILE
+    db   $00, $00, $1f, $00, $1f, $02, $ff, $03 ;; 03:6aa9 ???????? ; ENTITY_TUT_TV_RA_STATUE_DIAGONAL_PROJECTILE
+    db   $00, $00, $00, $00, $36, $02, $3c, $4f ;; 03:6ab1 ???????? ; ENTITY_TUT_TV_BREAKABLE_BLOCK
+    db   $00, $00, $00, $7c, $d7, $01, $ff, $03 ;; 03:6ab9 ???????? ; ENTITY_TUT_TV_COFFIN
+    db   $00, $00, $00, $00, $20, $03, $ff, $7f ;; 03:6ac1 ???????? ; ENTITY_WESTERN_STATION_CACTUS
+    db   $00, $00, $00, $00, $20, $03, $ff, $7f ;; 03:6ac9 ???????? ; ENTITY_UNK3A
+    db   $00, $00, $00, $00, $4a, $29, $52, $4a ;; 03:6ad1 ???????? ; ENTITY_WESTERN_STATION_ROCK_PLATFORM
+    db   $00, $00, $ff, $03, $00, $00, $52, $4a ;; 03:6ad9 ???????? ; ENTITY_WESTERN_STATION_HARD_HAT
+    db   $00, $00, $00, $00, $7e, $00, $bf, $6b ;; 03:6ae1 ???????? ; ENTITY_WESTERN_STATION_PLAYING_CARD
+    db   $00, $00, $1f, $00, $08, $21, $18, $63 ;; 03:6ae9 ???????? ; ENTITY_WESTERN_STATION_BAT
+    db   $00, $00, $8e, $00, $00, $7c, $ff, $03 ;; 03:6af1 ???????? ; ENTITY_WESTERN_STATION_RISING_PLATFORM
+    db   $00, $00, $00, $00, $10, $42, $ff, $7f ;; 03:6af9 ???????? ; ENTITY_ANIME_CHANNEL_DOOR
+    db   $00, $00, $00, $00, $10, $42, $ff, $7f ;; 03:6b01 ???????? ; ENTITY_ANIME_CHANNEL_DOOR2
+    db   $00, $00, $00, $00, $ef, $54, $15, $72 ;; 03:6b09 ???????? ; ENTITY_ANIME_CHANNEL_FAN_LIFT
+    db   $00, $00, $1f, $00, $ce, $39, $00, $00 ;; 03:6b11 ???????? ; ENTITY_ANIME_CHANNEL_MECH_FACING_RIGHT
+    db   $00, $00, $1f, $00, $ce, $39, $00, $00 ;; 03:6b19 ???????? ; ENTITY_ANIME_CHANNEL_MECH_FACING_LEFT
+    db   $00, $00, $fc, $16, $94, $52, $00, $00 ;; 03:6b21 ???????? ; ENTITY_ANIME_CHANNEL_DISAPPEARING_FLOOR
+    db   $00, $00, $00, $00, $10, $01, $57, $02 ;; 03:6b29 ???????? ; ENTITY_ANIME_CHANNEL_ON_SWITCH2
+    db   $00, $00, $00, $02, $2b, $2f, $fa, $47 ;; 03:6b31 ???????? ; ENTITY_ANIME_CHANNEL_ALIEN_CULTURE_TUBE
+    db   $00, $00, $00, $7c, $e0, $7f, $ff, $7f ;; 03:6b39 ???????? ; ENTITY_ANIME_CHANNEL_BLUE_BEAM_BARRIER
+    db   $00, $00, $00, $00, $ff, $02, $ff, $03 ;; 03:6b41 ???????? ; ENTITY_ANIME_CHANNEL_RISING_PLATFORM
+    db   $00, $00, $00, $00, $1f, $00, $7f, $4e ;; 03:6b49 ???????? ; ENTITY_ANIME_CHANNEL_ON_SWITCH
+    db   $00, $00, $00, $00, $1f, $00, $7f, $4e ;; 03:6b51 ???????? ; ENTITY_ANIME_CHANNEL_OFF_SWITCH
+    db   $00, $00, $00, $00, $bc, $45, $ff, $7f ;; 03:6b59 ???????? ; ENTITY_ANIME_CHANNEL_SAILOR_TOON_GIRL
+    db   $00, $00, $00, $00, $73, $4e, $ff, $7f ;; 03:6b61 ???????? ; ENTITY_ANIME_CHANNEL_BIG_SILVER_ROBOT
+    db   $00, $00, $00, $00, $69, $66, $c9, $7f ;; 03:6b69 ???????? ; ENTITY_ANIME_CHANNEL_SMALL_BLUE_ROBOT
+    db   $00, $00, $00, $00, $6b, $3e, $3c, $00 ;; 03:6b71 ???????? ; ENTITY_ANIME_CHANNEL_SECBOT
+    db   $00, $00, $00, $7c, $e0, $7f, $ff, $7f ;; 03:6b79 ???????? ; ENTITY_ANIME_CHANNEL_SECBOT_PROJECTILE
+    db   $00, $00, $fc, $16, $94, $52, $00, $00 ;; 03:6b81 ???????? ; ENTITY_ANIME_CHANNEL_ELEVATOR
+    db   $00, $00, $00, $00, $dc, $08, $1f, $0e ;; 03:6b89 ???????? ; ENTITY_ANIME_CHANNEL_FIRE_WALL_ENEMY
+    db   $00, $00, $00, $00, $ff, $03, $ff, $7f ;; 03:6b91 ???????? ; ENTITY_ANIME_CHANNEL_GRENADE
+    db   $00, $00, $ff, $7f, $e0, $03, $1f, $00 ;; 03:6b99 ???????? ; ENTITY_ANIME_CHANNEL_PLANET_O_BLAST_WEAPON
+    db   $00, $00, $00, $00, $53, $68, $bf, $57 ;; 03:6ba1 ???????? ; ENTITY_SUPERHERO_SHOW_MAD_BOMBER
+    db   $00, $00, $00, $00, $df, $00, $7f, $53 ;; 03:6ba9 ???????? ; ENTITY_SUPERHERO_SHOW_BOMB
+    db   $00, $00, $00, $00, $11, $09, $76, $09 ;; 03:6bb1 ???????? ; ENTITY_SUPERHERO_SHOW_WATER_TOWER_TANK
+    db   $00, $00, $00, $00, $11, $09, $76, $09 ;; 03:6bb9 ???????? ; ENTITY_SUPERHERO_SHOW_WATER_TOWER_STAND
+    db   $00, $00, $00, $00, $10, $42, $ff, $7f ;; 03:6bc1 ???????? ; ENTITY_SUPERHERO_SHOW_CONVICT
+    db   $00, $00, $00, $00, $35, $65, $bf, $7a ;; 03:6bc9 ???????? ; ENTITY_SUPERHERO_SHOW_SPIDER
+    db   $00, $00, $00, $00, $f7, $5e, $ff, $7f ;; 03:6bd1 ???????? ; ENTITY_SUPERHERO_SHOW_STRAY_CAT
+    db   $00, $00, $00, $00, $1f, $03, $ff, $03 ;; 03:6bd9 ???????? ; ENTITY_SUPERHERO_SHOW_YELLOW_GOON
+    db   $00, $00, $00, $00, $f4, $21, $bb, $42 ;; 03:6be1 ???????? ; ENTITY_SUPERHERO_SHOW_RAT
+    db   $00, $00, $00, $00, $a9, $1e, $95, $47 ;; 03:6be9 ???????? ; ENTITY_SUPERHERO_SHOW_CHOMPER_TV
+    db   $00, $00, $08, $21, $10, $42, $5a, $6b ;; 03:6bf1 ???????? ; ENTITY_SUPERHERO_SHOW_CRUMBLING_FLOOR
+    db   $00, $00, $00, $00, $df, $00, $ff, $7f ;; 03:6bf9 ???????? ; ENTITY_SUPERHERO_SHOW_CONVICT_PROJECTILE
+    db   $00, $00, $7d, $42, $20, $03, $00, $00 ;; 03:6c01 ???????? ; ENTITY_GEXTREME_SPORTS_ELF
+    db   $00, $00, $00, $00, $96, $01, $5e, $03 ;; 03:6c09 ???????? ; ENTITY_GEXTREME_SPORTS_BONUS_TIME_COIN
+    db   $00, $00, $dd, $13, $19, $02, $00, $00 ;; 03:6c11 ???????? ; ENTITY_MARSUPIAL_MADNESS_BELL
+    db   $00, $00, $00, $00, $10, $42, $9c, $73 ;; 03:6c19 ???????? ; ENTITY_MARSUPIAL_MADNESS_BIRD
+    db   $00, $00, $00, $00, $10, $42, $9c, $73 ;; 03:6c21 ???????? ; ENTITY_MARSUPIAL_MADNESS_BIRD_PROJECTILE
+    db   $00, $00, $00, $00, $58, $2a, $3e, $87 ;; 03:6c29 ???????? ; ENTITY_WW_GEX_WRESTLING_ROCK_HARD
+    db   $00, $00, $00, $00, $f8, $71, $7d, $7f ;; 03:6c31 ???????? ; ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ
+    db   $00, $00, $00, $00, $08, $21, $10, $06 ;; 03:6c39 ???????? ; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE
+    db   $00, $00, $00, $00, $b7, $01, $1f, $1b ;; 03:6c41 ???????? ; ENTITY_LIZARD_OF_OZ_CANNON
+    db   $00, $00, $00, $00, $dc, $08, $1f, $0e ;; 03:6c49 ???????? ; ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE
+    db   $00, $00, $00, $00, $dc, $00, $1f, $43 ;; 03:6c51 ???????? ; ENTITY_UNK6B
+    db   $00, $00, $00, $02, $2b, $2f, $fa, $47 ;; 03:6c59 ???????? ; ENTITY_UNK6C
+    db   $00, $00, $d0, $04, $d6, $09, $fc, $16 ;; 03:6c61 ???????? ; ENTITY_UNK6D
+    db   $00, $00, $00, $00, $10, $42, $18, $63 ;; 03:6c69 ???????? ; ENTITY_CHANNEL_Z_REZ
+    db   $00, $00, $00, $7c, $e0, $7f, $ff, $7f ;; 03:6c71 ???????? ; ENTITY_UNK6F
+    db   $00, $00, $00, $00, $dc, $08, $1f, $0e ;; 03:6c79 ???????? ; ENTITY_CHANNEL_Z_METEOR
+    db   $00, $00, $00, $00, $dc, $08, $1f, $0e ;; 03:6c81 ???????? ; ENTITY_CHANNEL_Z_REZ_PROJECTILE
