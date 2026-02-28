@@ -589,14 +589,14 @@ call_00_2ff8_InitLevelEntitiesAndConfig:
     ld   [wDCD7_ElfHealth3], A                                    ;; 00:307d $ea $d7 $dc
     ld   [wDCD8_ElfHealth4], A                                    ;; 00:3080 $ea $d8 $dc
     ld   [wDCD9_ElfHealth5], A                                    ;; 00:3083 $ea $d9 $dc
-    ld   HL, wDB6D_InBonusLevel                                     ;; 00:3086 $21 $6d $db
+    ld   HL, wDB6D_InBonusStage                                     ;; 00:3086 $21 $6d $db
     ld   [HL], $00                                     ;; 00:3089 $36 $00
     ld   A, [wDC1E_CurrentLevelID]                                    ;; 00:308b $fa $1e $dc
     cp   A, LEVEL_GEXTREME_SPORTS                                        ;; 00:308e $fe $07
-    jr   Z, .jr_00_3096_InBonusLevel                                ;; 00:3090 $28 $04
+    jr   Z, .jr_00_3096_InBonusStage                                ;; 00:3090 $28 $04
     cp   A, LEVEL_MARSUPIAL_MADNESS                                        ;; 00:3092 $fe $08
     jr   NZ, .jr_00_30ab                               ;; 00:3094 $20 $15
-.jr_00_3096_InBonusLevel:
+.jr_00_3096_InBonusStage:
     ld   [HL], $01                                     ;; 00:3096 $36 $01
     ld   A, [wDC1E_CurrentLevelID]                                    ;; 00:3098 $fa $1e $dc
     cp   A, LEVEL_GEXTREME_SPORTS                                        ;; 00:309b $fe $07
@@ -604,9 +604,9 @@ call_00_2ff8_InitLevelEntitiesAndConfig:
     jr   Z, .jr_00_30a3                                ;; 00:309f $28 $02
     ld   A, $69                                        ;; 00:30a1 $3e $69
 .jr_00_30a3:
-    ld   [wDB6E], A                                    ;; 00:30a3 $ea $6e $db
+    ld   [wDB6E_BonusStageTimerHi], A                                    ;; 00:30a3 $ea $6e $db
     ld   A, $3c                                        ;; 00:30a6 $3e $3c
-    ld   [wDB6F], A                                    ;; 00:30a8 $ea $6f $db
+    ld   [wDB6F_BonusStageTimerLo], A                                    ;; 00:30a8 $ea $6f $db
 .jr_00_30ab:
     call call_00_3180_MarkInitialLevelEntities                                  ;; 00:30ab $cd $80 $31
     call call_00_31d9_CheckAndClearBonusCoinEntityFlags                                  ;; 00:30ae $cd $d9 $31
@@ -659,7 +659,7 @@ call_00_3180_MarkInitialLevelEntities:
 .jr_00_3190:
     push BC                                            ;; 00:3190 $c5
     bit  0, B                                          ;; 00:3191 $cb $40
-    call NZ, call_00_21f6_FindAndMarkEntityInList_TVButton                              ;; 00:3193 $c4 $f6 $21
+    call NZ, call_00_21f6_Entity_SetTVButtonFlags                              ;; 00:3193 $c4 $f6 $21
     pop  BC                                            ;; 00:3196 $c1
     rr   B                                             ;; 00:3197 $cb $18
     inc  C                                             ;; 00:3199 $0c
@@ -677,7 +677,7 @@ call_00_3180_MarkInitialLevelEntities:
     ld   HL, .data_00_31cd                                     ;; 00:31b1 $21 $cd $31
     add  HL, BC                                        ;; 00:31b4 $09
     cp   A, [HL]                                       ;; 00:31b5 $be
-    call NC, call_00_21f6_FindAndMarkEntityInList_TVButton                              ;; 00:31b6 $d4 $f6 $21
+    call NC, call_00_21f6_Entity_SetTVButtonFlags                              ;; 00:31b6 $d4 $f6 $21
     pop  BC                                            ;; 00:31b9 $c1
     inc  C                                             ;; 00:31ba $0c
     ld   A, C                                          ;; 00:31bb $79
@@ -839,7 +839,7 @@ data_00_325F:
     db   $01, $0c, $10, COLLISION_TYPE_ICE_SCULPTURE, $00, $00, $ff, $ff ; 00:3340 ......?? ; ENTITY_HOLIDAY_TV_ICE_SCULPTURE
     db   $01, $0c, $10, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:3348 ......?? ; ENTITY_HOLIDAY_TV_EVIL_SANTA
     db   $01, $0c, $08, COLLISION_TYPE_EVIL_SANTA_PROJECTILE, $00, $00, $ff, $ff ; 00:3350 ?.....?? ; ENTITY_HOLIDAY_TV_EVIL_SANTA_PROJECTILE
-    db   $01, $0c, $10, COLLISION_TYPE_HOLIDAY_TV_ELF, $00, $00, $ff, $c0 ; 00:3358 ......?. ; ENTITY_HOLIDAY_TV_SKATING_ELF
+    db   $01, $0c, $10, COLLISION_TYPE_ELF, $00, $00, $ff, $c0 ; 00:3358 ......?. ; ENTITY_HOLIDAY_TV_SKATING_ELF
     db   $01, $0a, $0a, COLLISION_TYPE_GENERIC_ENEMY, $02, $00, $ff, $c3 ; 00:3360 ......?. ; ENTITY_HOLIDAY_TV_PENGUIN
     db   $01, $10, $10, COLLISION_TYPE_GENERIC_ENEMY, $02, $00, $ff, $c3 ; 00:3368 ???????? ; ENTITY_MYSTERY_TV_REZLING
     db   $01, $0c, $10, COLLISION_TYPE_BLOOD_COOLER, $02, $00, $ff, $01 ; 00:3370 ???????? ; ENTITY_MYSTERY_TV_BLOOD_COOLER
@@ -864,8 +864,8 @@ data_00_325F:
     db   $01, $0a, $0a, COLLISION_TYPE_RA_STATUE_PROJECTILE, $00, $00, $ff, $ff ; 00:3408 ???????? ; ENTITY_TUT_TV_RA_STATUE_DIAGONAL_PROJECTILE
     db   $01, $12, $08, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:3410 ???????? ; ENTITY_TUT_TV_BREAKABLE_BLOCK
     db   $01, $10, $20, COLLISION_TYPE_COFFIN, $00, $00, $ff, $ff ; 00:3418 ???????? ; ENTITY_TUT_TV_COFFIN
-    db   $01, $10, $18, COLLISION_TYPE_CACTUS, $03, $00, $ff, $46 ; 00:3420 ???????? ; ENTITY_WESTERN_STATION_CACTUS
-    db   $01, $10, $18, COLLISION_TYPE_GENERIC_ENEMY, $00, $00, $ff, $ff ; 00:3428 ???????? ; ENTITY_UNK3A
+    db   $01, $10, $18, COLLISION_TYPE_CACTUS, $03, $00, $ff, $46 ; 00:3420 ???????? ; ENTITY_WESTERN_STATION_ENEMY_CACTUS
+    db   $01, $10, $18, COLLISION_TYPE_GENERIC_ENEMY, $00, $00, $ff, $ff ; 00:3428 ???????? ; ENTITY_WESTERN_STATION_CACTUS
     db   $01, $0a, $10, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:3430 ???????? ; ENTITY_WESTERN_STATION_ROCK_PLATFORM
     db   $01, $0a, $0a, COLLISION_TYPE_HARD_HAT, $02, $00, $ff, $c4 ; 00:3438 ???????? ; ENTITY_WESTERN_STATION_HARD_HAT
     db   $01, $0a, $0a, COLLISION_TYPE_PLAYING_CARD, $02, $00, $ff, $81 ; 00:3440 ???????? ; ENTITY_WESTERN_STATION_PLAYING_CARD
@@ -915,10 +915,10 @@ data_00_325F:
     db   $01, $08, $08, COLLISION_TYPE_CANNON, $00, $00, $ff, $ff ; 00:35a0 ???????? ; ENTITY_LIZARD_OF_OZ_CANNON
     db   $01, $0a, $0a, COLLISION_TYPE_BRAIN_OF_OZ_PROJECTILE, $00, $00, $ff, $ff ; 00:35a8 ???????? ; ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE
     db   $01, $10, $10, COLLISION_TYPE_NONE, $00, $00, $ff, $ff ; 00:35b0 ???????? ; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2
-    db   $01, $10, $08, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:35b8 ???????? ; ENTITY_UNK6C
-    db   $01, $10, $08, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:35c0 ???????? ; ENTITY_UNK6D
+    db   $01, $10, $08, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:35b8 ???????? ; ENTITY_CHANNEL_Z_GREEN_BLOCK
+    db   $01, $10, $08, COLLISION_TYPE_PLATFORM | COLLISION_TYPE_UNK_PLATFORM_FLAG, $00, $00, $ff, $ff ; 00:35c0 ???????? ; ENTITY_CHANNEL_Z_ORANGE_BLOCK
     db   $01, $1c, $20, COLLISION_TYPE_REZ, $10, $00, $ff, $8a ; 00:35c8 ???????? ; ENTITY_CHANNEL_Z_REZ
-    db   $01, $0a, $40, COLLISION_TYPE_GENERIC_ENEMY, $00, $00, $ff, $ff ; 00:35d0 ???????? ; ENTITY_UNK6F
+    db   $01, $0a, $40, COLLISION_TYPE_GENERIC_ENEMY, $00, $00, $ff, $ff ; 00:35d0 ???????? ; ENTITY_CHANNEL_Z_BLUE_BEAM_BARRIER
     db   $01, $0c, $0c, COLLISION_TYPE_METEOR, $02, $00, $ff, $82 ; 00:35d8 ???????? ; ENTITY_CHANNEL_Z_METEOR
     db   $01, $0a, $0a, COLLISION_TYPE_GENERIC_ENEMY, $02, $00, $ff, $81 ; 00:35e0 ???????? ; ENTITY_CHANNEL_Z_REZ_PROJECTILE
 

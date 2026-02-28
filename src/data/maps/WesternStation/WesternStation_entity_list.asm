@@ -58,7 +58,7 @@
     dw   $0000
     db   $21
 
-    db   ENTITY_WESTERN_STATION_CACTUS
+    db   ENTITY_WESTERN_STATION_ENEMY_CACTUS
     dw   $00f0, $0148
     dw   $0240, $0030, $0158, $0138
     dw   $0000

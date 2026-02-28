@@ -37,7 +37,7 @@ INCLUDE "code/bank03_entity_graphics.asm"
 INCLUDE "code/bank03_map_boundaries_and_spawns.asm"
 INCLUDE "code/bank03_palettes.asm"
 INCLUDE "code/bank03_map_data_pointers.asm"
-INCLUDE "code/bank03_hud_graphics.asm"
+INCLUDE "code/bank03_graphics.asm"
 
 SECTION "bank04", ROMX[$4000], BANK[$04]
 INCLUDE "code/audio/bank04_audio1.asm"

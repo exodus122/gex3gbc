@@ -85,17 +85,17 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   BC, $0c                                       ;; 01:4016 $01 $0c $00
     call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4019 $cd $6e $07
     ld   A, [wDB6C_CurrentMapId]                                    ;; 01:401c $fa $6c $db
-    ld   [wDBE8_ManuMapIDRelated], A                                    ;; 01:401f $ea $e8 $db
+    ld   [wDBE8_Menu_StoredMapId], A                                    ;; 01:401f $ea $e8 $db
     ld   A, [wDC1E_CurrentLevelID]                                    ;; 01:4022 $fa $1e $dc
     ld   [wDB6C_CurrentMapId], A                                    ;; 01:4025 $ea $6c $db
     cp   A, LEVEL_GEXTREME_SPORTS                                        ;; 01:4028 $fe $07
-    jr   C, .jr_01_4037                                ;; 01:402a $38 $0b
+    jr   C, .jr_01_4037_SkipZeroingMapID                                ;; 01:402a $38 $0b
     ld   A, [wDBEA_MenuType]                                    ;; 01:402c $fa $ea $db
     cp   A, MENU_TOTALS                                        ;; 01:402f $fe $08
-    jr   NZ, .jr_01_4037                               ;; 01:4031 $20 $04
+    jr   NZ, .jr_01_4037_SkipZeroingMapID                               ;; 01:4031 $20 $04
     xor  A, A                                          ;; 01:4033 $af
-    ld   [wDB6C_CurrentMapId], A                                    ;; 01:4034 $ea $6c $db
-.jr_01_4037:
+    ld   [wDB6C_CurrentMapId], A  ; if on totals screen, set mapid to 0  ;; 01:4034 $ea $6c $db
+.jr_01_4037_SkipZeroingMapID:
     farcall call_03_6c89_LoadMapDataPtrs
     xor  A, A                                          ;; 01:4042 $af
     ld   [wDBEB_MenuColumnSelected], A                                    ;; 01:4043 $ea $eb $db
@@ -134,7 +134,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     jr   Z, .jr_01_40ad                                ;; 01:4092 $28 $19
     ld   A, SFX_MENU_SCROLL                                        ;; 01:4094 $3e $01
     call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4096 $cd $d7 $0f
-    ld   A, [wDBE8_ManuMapIDRelated]                                    ;; 01:4099 $fa $e8 $db
+    ld   A, [wDBE8_Menu_StoredMapId]                                    ;; 01:4099 $fa $e8 $db
     ld   [wDB6C_CurrentMapId], A                                    ;; 01:409c $ea $6c $db
     farcall call_03_6c89_LoadMapDataPtrs
     jp   .jp_01_4285                                   ;; 01:40aa $c3 $85 $42
@@ -359,7 +359,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   A, SFX_MENU_SCROLL                                        ;; 01:4242 $3e $01
     call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4244 $cd $d7 $0f
     call call_00_0f5e_WaitUntilNoInputPressed                                  ;; 01:4247 $cd $5e $0f
-    ld   A, [wDBE8_ManuMapIDRelated]                                    ;; 01:424a $fa $e8 $db
+    ld   A, [wDBE8_Menu_StoredMapId]                                    ;; 01:424a $fa $e8 $db
     ld   [wDB6C_CurrentMapId], A                                    ;; 01:424d $ea $6c $db
     farcall call_03_6c89_LoadMapDataPtrs
     ld   A, [wDB95_MenuTypeData_Unk3]                                    ;; 01:425b $fa $95 $db
@@ -519,10 +519,10 @@ call_01_435e_DetermineNextMapId:
 ; Copies CurrentLevelNumber to CurrentMapId.
 ; If that ID is 0, restores it from LevelIdFromTVButton and returns.
 ; Otherwise, branching logic:
-;  - If InBonusLevel != 0:
+;  - If InBonusStage != 0:
 ;    - If bit 5 of wDB6A_WarpFlags is set: clear it, request song 15, load menu 0A.
 ;  - Else: request song 13, load menu 1B.
-;  - If InBonusLevel == 0:
+;  - If InBonusStage == 0:
 ;    - If LevelId ≥ 07 but not 09 or 0A → preload menus 15–1A.
 ;    - Else if LevelId < 07 → request song 13, load menu 09.
 ;    - Else (exact 09 or 0A) → same as above "song 13/menu 1B".
@@ -534,9 +534,9 @@ call_01_435e_DetermineNextMapId:
     ld   [wDB6C_CurrentMapId], A                                    ;; 01:4366 $ea $6c $db
     and  A, A                                          ;; 01:4369 $a7
     jr   Z, .jr_01_43b3_InGexCave1                                ;; 01:436a $28 $47
-    ld   A, [wDB6D_InBonusLevel]                                    ;; 01:436c $fa $6d $db
+    ld   A, [wDB6D_InBonusStage]                                    ;; 01:436c $fa $6d $db
     and  A, A                                          ;; 01:436f $a7
-    jr   Z, .jr_01_4390_NotInBonusLevel                                ;; 01:4370 $28 $1e
+    jr   Z, .jr_01_4390_NotInBonusStage                                ;; 01:4370 $28 $1e
     bit  5, [HL]                                       ;; 01:4372 $cb $6e
     jr   Z, .jr_01_4384                                ;; 01:4374 $28 $0e
     res  5, [HL]                                       ;; 01:4376 $cb $ae
@@ -551,7 +551,7 @@ call_01_435e_DetermineNextMapId:
     ld   A, MENU_WELL_DONE                                        ;; 01:4389 $3e $1b
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:438b $cd $00 $40
     jr   .jr_01_43ae                                   ;; 01:438e $18 $1e
-.jr_01_4390_NotInBonusLevel:
+.jr_01_4390_NotInBonusStage:
     ld   A, [wDB6C_CurrentMapId]                                    ;; 01:4390 $fa $6c $db
     cp   A, MAP_GEXTREME_SPORTS1                                        ;; 01:4393 $fe $07
     jr   C, .jr_01_43a4_MapLessThan7 ; jump if map < gextremesports1                                ;; 01:4395 $38 $0d
@@ -587,17 +587,17 @@ call_01_43ba_JumpToDynamicHandler:
     ret  Z                                             ;; 01:43c1 $c8
     jp   HL                                            ;; 01:43c2 $e9
 
-call_01_43c3_LoadMenuEntityPalette:
+call_01_43c3_Menu_LoadTitleScreenObjectPalettes:
 ; Behavior:
-; Copies one of two 16-byte palette sets into wDD4A_EntityPalettes depending on wDBEC_MenuRowSelected.
-; Likely Purpose: Sets entity sprite palettes based on context (e.g., regular vs. alternate theme).
+; Copies one of two 16-byte palette sets into wDD4A_ObjectPalettes depending on wDBEC_MenuRowSelected.
+; Likely Purpose: Sets object sprite palettes based on context (e.g., regular vs. alternate theme).
     ld   HL, .data_01_43d8                             ;; 01:43c3 $21 $d8 $43
     ld   A, [wDBEC_MenuRowSelected]                                    ;; 01:43c6 $fa $ec $db
     and  A, A                                          ;; 01:43c9 $a7
     jr   Z, .jr_01_43cf                                ;; 01:43ca $28 $03
     ld   HL, .data_01_43e0                             ;; 01:43cc $21 $e0 $43
 .jr_01_43cf:
-    ld   DE, wDD4A_EntityPalettes                                     ;; 01:43cf $11 $4a $dd
+    ld   DE, wDD4A_ObjectPalettes                                     ;; 01:43cf $11 $4a $dd
     ld   BC, $10                                       ;; 01:43d2 $01 $10 $00
     jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:43d5 $c3 $6e $07
 .data_01_43d8:
@@ -622,7 +622,7 @@ call_01_43f0_MenuEngine_MainLoop:
     ld   [wDBC7], A                                    ;; 01:43fc $ea $c7 $db
     xor  A, A                                          ;; 01:43ff $af
     ld   [wDBDE], A                                    ;; 01:4400 $ea $de $db
-    ld   [wDBE3], A                                    ;; 01:4403 $ea $e3 $db
+    ld   [wDBE3_Menu_AnimateFlag], A                                    ;; 01:4403 $ea $e3 $db
     ld   A, $0a                                        ;; 01:4406 $3e $0a
     call call_00_0c10_QueueVRAMCopyRequest                                  ;; 01:4408 $cd $10 $0c
     pop  HL                                            ;; 01:440b $e1
@@ -852,7 +852,7 @@ call_01_446b_ExecuteMenuCommand:
     dw   call_01_4675_MenuState_LoadAndDrawB                                  ;; 01:4573 pP
     dw   call_01_467b_MenuState_UpdateLevelCursor                                  ;; 01:4575 pP
     dw   call_01_46d4_MenuState_InitSelectionScreen                                  ;; 01:4577 pP
-    dw   call_01_46f9_ResetTemporaryFlags                                  ;; 01:4579 pP
+    dw   call_01_46f9_MenuState_ResetTemporaryFlags                                  ;; 01:4579 pP
     dw   call_01_470c_MenuState_DispatchAndDraw                                  ;; 01:457b pP
     dw   call_01_4760_MenuState_SubmenuHandler                                  ;; 01:457d pP
     dw   call_01_477b_MenuState_NoOp                                      ;; 01:457f ??
@@ -1013,8 +1013,8 @@ call_01_46d4_MenuState_InitSelectionScreen:
     ld   [wDBC7], A                                    ;; 01:46f3 $ea $c7 $db
     jp   call_01_4bb8_UpdateInterpolationStep                                  ;; 01:46f6 $c3 $b8 $4b
 
-call_01_46f9_ResetTemporaryFlags:
-; Description: Clears a block of wDBE3–wDBE7 flags and sets wDBE3=1. 
+call_01_46f9_MenuState_ResetTemporaryFlags:
+; Description: Clears a block of wDBE3_Menu_AnimateFlag–wDBE7 flags and sets wDBE3_Menu_AnimateFlag=1. 
 ; Likely resets some state variables (e.g., reset counters or flags).
     xor  A, A                                          ;; 01:46f9 $af
     ld   [wDBE4], A                                    ;; 01:46fa $ea $e4 $db
@@ -1022,7 +1022,7 @@ call_01_46f9_ResetTemporaryFlags:
     ld   [wDBE6], A                                    ;; 01:4700 $ea $e6 $db
     ld   [wDBE7], A                                    ;; 01:4703 $ea $e7 $db
     ld   A, $01                                        ;; 01:4706 $3e $01
-    ld   [wDBE3], A                                    ;; 01:4708 $ea $e3 $db
+    ld   [wDBE3_Menu_AnimateFlag], A                                    ;; 01:4708 $ea $e3 $db
     ret                                                ;; 01:470b $c9
 
 call_01_470c_MenuState_DispatchAndDraw:
@@ -1101,7 +1101,7 @@ call_01_477b_MenuState_NoOp:
 
 call_01_477c_DrawMenuNumberSprite:
 ; Description: Uses wDBA7_MenuCommandBuffer2_Unk3 to compute sprite data offsets into wC980_NumberSprites, 
-;then uses wDB7E_PasswordValues to pick a number graphic, combines with data_01_66f9, and jumps to jp_00_0bcf_CopyBlock16BytesLoop (sprite draw). Likely draws a numeric value (e.g., score).
+;then uses wDB7E_PasswordValues to pick a number graphic, combines with data_01_66f9, and jumps to call_00_0bcf_MemCopy16Loop (sprite draw). Likely draws a numeric value (e.g., score).
     ld   HL, wDBA7_MenuCommandBuffer2_Unk3                                     ;; 01:477c $21 $a7 $db
     ld   L, [HL]                                       ;; 01:477f $6e
     ld   H, $00                                        ;; 01:4780 $26 $00
@@ -1131,7 +1131,7 @@ call_01_477c_DrawMenuNumberSprite:
     ld   BC, data_01_66f9                              ;; 01:47a1 $01 $f9 $66
     add  HL, BC                                        ;; 01:47a4 $09
     ld   B, $04                                        ;; 01:47a5 $06 $04
-    jp   jp_00_0bcf_CopyBlock16BytesLoop                                    ;; 01:47a7 $c3 $cf $0b
+    jp   call_00_0bcf_MemCopy16Loop                                    ;; 01:47a7 $c3 $cf $0b
 
 call_01_47aa_StoreCurrentMenuIndex:
 ; Description: Copies wDBA7_MenuCommandBuffer2_Unk3 to wDBDD. Probably stores the current selection.

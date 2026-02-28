@@ -46,7 +46,7 @@ call_00_1056_LoadFullMap:
     call call_00_0b92_WaitForInterrupt                                  ;; 00:10b4 $cd $92 $0b
     farcall call_02_72fb_UpdateMapWindow
     xor  A, A                                          ;; 00:10c2 $af
-    ld   [wDC20], A                                    ;; 00:10c3 $ea $20 $dc
+    ld   [wDC20_BgMapLoadingFlags], A                                    ;; 00:10c3 $ea $20 $dc
     ret                                                ;; 00:10c6 $c9
 
 call_00_10c7_InitRowOffsetTableForMap:
@@ -227,20 +227,20 @@ call_00_10de_UpdatePlayerMapWindow:
     ret                                                ;; 00:11c7 $c9
 
 call_00_11c8_LoadBgMapDirtyRegions:
-; Role: Checks scroll flags in wDC20 to see whether vertical or horizontal 
+; Role: Checks scroll flags in wDC20_BgMapLoadingFlags to see whether vertical or horizontal 
 ; background map sections need updating. Calls the appropriate vertical (11E5) 
 ; or horizontal (1351) loader and sets a busy flag.
 ; Why: Handles incremental background updates only where scrolling occurred.
-    ld   HL, wDC20                                     ;; 00:11c8 $21 $20 $dc
+    ld   HL, wDC20_BgMapLoadingFlags                                     ;; 00:11c8 $21 $20 $dc
     bit  7, [HL]                                       ;; 00:11cb $cb $7e
     jr   NZ, call_00_11c8_LoadBgMapDirtyRegions                              ;; 00:11cd $20 $f9
-    ld   A, [wDC20]                                    ;; 00:11cf $fa $20 $dc
+    ld   A, [wDC20_BgMapLoadingFlags]                                    ;; 00:11cf $fa $20 $dc
     and  A, $03                                        ;; 00:11d2 $e6 $03
     call NZ, call_00_11e5_LoadVerticalBgStrip                              ;; 00:11d4 $c4 $e5 $11
-    ld   A, [wDC20]                                    ;; 00:11d7 $fa $20 $dc
+    ld   A, [wDC20_BgMapLoadingFlags]                                    ;; 00:11d7 $fa $20 $dc
     and  A, $0c                                        ;; 00:11da $e6 $0c
     call NZ, call_00_1351_LoadHorizontalBgStrip                              ;; 00:11dc $c4 $51 $13
-    ld   HL, wDC20                                     ;; 00:11df $21 $20 $dc
+    ld   HL, wDC20_BgMapLoadingFlags                                     ;; 00:11df $21 $20 $dc
     set  7, [HL]                                       ;; 00:11e2 $cb $fe
     ret                                                ;; 00:11e4 $c9
 
@@ -255,7 +255,7 @@ call_00_11e5_LoadVerticalBgStrip:
     ld   A, [HL+]                                      ;; 00:11ea $2a
     ld   B, A                                          ;; 00:11eb $47
     ld   HL, $88                                       ;; 00:11ec $21 $88 $00
-    ld   A, [wDC20]                                    ;; 00:11ef $fa $20 $dc
+    ld   A, [wDC20_BgMapLoadingFlags]                                    ;; 00:11ef $fa $20 $dc
     and  A, $02                                        ;; 00:11f2 $e6 $02
     jr   NZ, .jr_00_11f9                               ;; 00:11f4 $20 $03
     ld   HL, rIE                                       ;; 00:11f6 $21 $ff $ff
@@ -505,7 +505,7 @@ call_00_1351_LoadHorizontalBgStrip:
     ld   A, [HL+]                                      ;; 00:1356 $2a
     ld   D, A                                          ;; 00:1357 $57
     ld   HL, $a0                                       ;; 00:1358 $21 $a0 $00
-    ld   A, [wDC20]                                    ;; 00:135b $fa $20 $dc
+    ld   A, [wDC20_BgMapLoadingFlags]                                    ;; 00:135b $fa $20 $dc
     and  A, $08                                        ;; 00:135e $e6 $08
     jr   NZ, .jr_00_1365                               ;; 00:1360 $20 $03
     ld   HL, rIE                                       ;; 00:1362 $21 $ff $ff

@@ -1,4 +1,4 @@
-call_00_21ef_PlayRemoteSpawnSFX:
+call_00_21ef_Entity_PlayRemoteSFX:
 ; Pushes BC (preserve), loads A=1E, calls QueueSoundEffectWithPriority, restores BC.
 ; Just plays the remote spawned/obtained sound effect
     push BC                                            ;; 00:21ef $c5
@@ -6,7 +6,7 @@ call_00_21ef_PlayRemoteSpawnSFX:
     call call_00_0ff5_QueueSoundEffect                                  ;; 00:21f2 $cd $f5 $0f
     pop  BC                                            ;; 00:21f5 $c1
 
-call_00_21f6_FindAndMarkEntityInList_TVButton:
+call_00_21f6_Entity_SetTVButtonFlags:
 ; Switches to the bank containing the entity list (wDC16_EntityListBank).
 ; Reads the start of the entity list (wDC17_EntityListBankOffset).
 ; Iterates through 16-byte entity records, searching for entities of type $11 (ENTITY_TV_BUTTON)
@@ -87,7 +87,7 @@ call_00_21f6_FindAndMarkEntityInList_TVButton:
 .data_00_225c:
     db   $00, $01, $02, $04                            ;; 00:225c ?...
 
-call_00_2260_FindAndFlagEntity_TVRemote:
+call_00_2260_Entity_SetTVRemoteFlags:
 ; Switches to the entity list bank and scans through entity entries starting 
 ; from wDC17_EntityListBankOffset.
 ; For each entry, checks if the type byte is $12 (ENTITY_TV_REMOTE). If found, jumps 13 bytes 

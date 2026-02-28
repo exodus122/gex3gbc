@@ -45,7 +45,7 @@ call_02_708f_InitEntitiesAndSpawnPlayer:
     ld   [wDC7C_PlayerCollisionUnusedFlag], A                                    ;; 02:70e7 $ea $7c $dc
     ld   [wDC7B_CurrentEntityAddrLoAlt2], A                                    ;; 02:70ea $ea $7d $dc
     call call_02_7123_ClearEntitySlotsExcludingPlayer                                  ;; 02:70ed $cd $23 $71
-    ld   A, [wDB6D_InBonusLevel]                                    ;; 02:70f0 $fa $6d $db
+    ld   A, [wDB6D_InBonusStage]                                    ;; 02:70f0 $fa $6d $db
     and  A, A                                          ;; 02:70f3 $a7
     jr   Z, .jr_02_7115                                ;; 02:70f4 $28 $1f
     xor  A, A                                          ;; 02:70f6 $af
@@ -415,7 +415,7 @@ call_02_7305_CheckVerticalMapScroll:
 ; Details:
 ; Stores the fine Y-position (wDADA_ScrollY).
 ; Shifts and subtracts to compute movement delta.
-; Sets flags in wDC20 for upward or downward scroll events.
+; Sets flags in wDC20_BgMapLoadingFlags for upward or downward scroll events.
     ld   HL, wDBFB_YPositionInMap                                     ;; 02:7305 $21 $fb $db
     ld   A, [HL+]                                      ;; 02:7308 $2a
     ld   D, [HL]                                       ;; 02:7309 $56
@@ -440,13 +440,13 @@ call_02_7305_CheckVerticalMapScroll:
     jr   C, .jr_02_732f                                ;; 02:7323 $38 $0a
     or   A, E                                          ;; 02:7325 $b3
     ret  Z                                             ;; 02:7326 $c8
-    ld   HL, wDC20                                     ;; 02:7327 $21 $20 $dc
+    ld   HL, wDC20_BgMapLoadingFlags                                     ;; 02:7327 $21 $20 $dc
     ld   A, [HL]                                       ;; 02:732a $7e
     or   A, $01                                        ;; 02:732b $f6 $01
     ld   [HL], A                                       ;; 02:732d $77
     ret                                                ;; 02:732e $c9
 .jr_02_732f:
-    ld   HL, wDC20                                     ;; 02:732f $21 $20 $dc
+    ld   HL, wDC20_BgMapLoadingFlags                                     ;; 02:732f $21 $20 $dc
     ld   A, [HL]                                       ;; 02:7332 $7e
     or   A, $02                                        ;; 02:7333 $f6 $02
     ld   [HL], A                                       ;; 02:7335 $77
@@ -456,7 +456,7 @@ call_02_7337_CheckHorizontalMapScroll:
 ; Purpose: Analogous to CheckVerticalMapScroll, but for the X-axis.
 ; Details:
 ; Uses wDBF9_XPositionInMap and related values.
-; Updates horizontal scroll flags in wDC20.
+; Updates horizontal scroll flags in wDC20_BgMapLoadingFlags.
     ld   HL, wDBF9_XPositionInMap                                     ;; 02:7337 $21 $f9 $db
     ld   A, [HL+]                                      ;; 02:733a $2a
     ld   D, [HL]                                       ;; 02:733b $56
@@ -498,7 +498,7 @@ call_02_7337_CheckHorizontalMapScroll:
     or   A, C                                          ;; 02:7370 $b1
     jr   Z, .jr_02_7393                                ;; 02:7371 $28 $20
 .jr_02_7373:
-    ld   HL, wDC20                                     ;; 02:7373 $21 $20 $dc
+    ld   HL, wDC20_BgMapLoadingFlags                                     ;; 02:7373 $21 $20 $dc
     ld   A, [HL]                                       ;; 02:7376 $7e
     or   A, $04                                        ;; 02:7377 $f6 $04
     ld   [HL], A                                       ;; 02:7379 $77
@@ -519,7 +519,7 @@ call_02_7337_CheckHorizontalMapScroll:
     or   A, C                                          ;; 02:7390 $b1
     jr   Z, .jr_02_7373                                ;; 02:7391 $28 $e0
 .jr_02_7393:
-    ld   HL, wDC20                                     ;; 02:7393 $21 $20 $dc
+    ld   HL, wDC20_BgMapLoadingFlags                                     ;; 02:7393 $21 $20 $dc
     ld   A, [HL]                                       ;; 02:7396 $7e
     or   A, $08                                        ;; 02:7397 $f6 $08
     ld   [HL], A                                       ;; 02:7399 $77

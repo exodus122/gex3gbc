@@ -266,11 +266,11 @@ call_02_5a1c_EntityAction_TVButton_unk2:
     or   A, C                                          ;; 02:5a64 $b1
     ld   [HL], A                                       ;; 02:5a65 $77
     pop  BC                                            ;; 02:5a66 $c1
-    jp   call_00_2260_FindAndFlagEntity_TVRemote                                    ;; 02:5a67 $c3 $60 $22
+    jp   call_00_2260_Entity_SetTVRemoteFlags                                    ;; 02:5a67 $c3 $60 $22
 .jr_02_5a6a_InGexCave:
     ld   HL, wDC5B_LevelIdFromTVButton                                     ;; 02:5a6a $21 $5b $dc
     ld   [HL], C                                       ;; 02:5a6d $71
-    jp   call_00_2260_FindAndFlagEntity_TVRemote                                    ;; 02:5a6e $c3 $60 $22
+    jp   call_00_2260_Entity_SetTVRemoteFlags                                    ;; 02:5a6e $c3 $60 $22
 .data_02_5a71:
     db   $00, $01, $02, $04                            ;; 02:5a71 ????
 
@@ -582,7 +582,7 @@ call_02_5cd0_EntityAction_EvilSanta_Death:
     call call_00_2a5d_Entity_CheckGraphicsFlag2
     ret  z
     ld   c,$03
-    call call_00_21ef_PlayRemoteSpawnSFX
+    call call_00_21ef_Entity_PlayRemoteSFX
     jp   call_00_2b7a_DeactivateEntity
 
 call_02_5d02_LoadEvilSantaPalette:
@@ -1377,7 +1377,7 @@ call_02_63d3_EntityAction_Coffin_Unk2:
     ld   c,$02
     jp   call_00_2299_Entity_UpdateFlags
 
-call_02_63db_EntityAction_Cactus_Unk0:
+call_02_63db_EntityAction_EnemyCactus_Unk0:
     ld   c,$28
     call call_00_28c8_Entity_SetXVelocity
     call call_00_2a68_Entity_ComputeXDistanceFromPlayer
@@ -1388,7 +1388,7 @@ call_02_63db_EntityAction_Cactus_Unk0:
     jp   z,call_02_72ac_SetEntityAction
     ret  
 
-call_02_63f0_EntityAction_Cactus_Unk1:
+call_02_63f0_EntityAction_EnemyCactus_Unk1:
     call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
     jr   z,.jr_00_63FD
     ld   c,TIMER_AMOUNT_60_FRAMES
@@ -1399,7 +1399,7 @@ call_02_63f0_EntityAction_Cactus_Unk1:
     ld   a,$02
     jp   z,call_02_72ac_SetEntityAction
 
-call_02_6405_Cactus_unk:
+call_02_6405_EnemyCactus_unk:
     call call_00_2a68_Entity_ComputeXDistanceFromPlayer
     ld   a,[wDA12_EntityDirectionRelativeToPlayer]
     ld   hl,wD80D_PlayerFacingDirection
@@ -1408,7 +1408,7 @@ call_02_6405_Cactus_unk:
     jp   nz,call_02_72ac_SetEntityAction
     ret  
 
-call_02_6415_EntityAction_Cactus_Unk4:
+call_02_6415_EntityAction_EnemyCactus_Unk4:
     call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
     ld   c,$20
     call nz,call_00_28dc_Entity_SetYVelocity
@@ -1418,7 +1418,7 @@ call_02_6415_EntityAction_Cactus_Unk4:
     ret  c
     ld   a,$03
     call call_02_72ac_SetEntityAction
-    jr   call_02_6405_Cactus_unk
+    jr   call_02_6405_EnemyCactus_unk
 
 call_02_642e_EntityAction_Rock_Unk0:
     call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
@@ -2110,7 +2110,7 @@ call_02_6965_EntityAction_MadBomber_Unk5:
     call call_00_2a5d_Entity_CheckGraphicsFlag2
     ret  z
     ld   c,$01
-    call call_00_21ef_PlayRemoteSpawnSFX
+    call call_00_21ef_Entity_PlayRemoteSFX
     jp   call_00_2b7a_DeactivateEntity
 
 call_02_6971_EntityAction_Bomb_Unk0:

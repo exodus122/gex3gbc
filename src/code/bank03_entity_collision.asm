@@ -235,7 +235,7 @@ call_03_4dc2_CollisionHandler_PawCoin:
 ; If collision:
 ; Looks up a flag mask (00, 20, 40, 80).
 ; ORs it into level data, increments wDCAF_PawCoinCounter.
-; Every 4 collected, increments wDC4F_PawCoinExtraHealth (if <4), resets counter, sets flag in wDB69.
+; Every 4 collected, increments wDC4F_PawCoinExtraHealth (if <4), resets counter, sets flag in wDB69_HUDGraphicsUpdateFlags.
 ; Plays sound 02, then handles entity hit.
 ; This is basically a collectible counter with milestones.
     call call_03_550e_Entity_CheckPlayerInteraction                                  ;; 03:4dc2 $cd $0e $55
@@ -265,7 +265,7 @@ call_03_4dc2_CollisionHandler_PawCoin:
     inc  [HL]                                          ;; 03:4dee $34
     xor  A, A                                          ;; 03:4def $af
     ld   [wDCAF_PawCoinCounter], A                                    ;; 03:4df0 $ea $af $dc
-    ld   HL, wDB69                                     ;; 03:4df3 $21 $69 $db
+    ld   HL, wDB69_HUDGraphicsUpdateFlags                                     ;; 03:4df3 $21 $69 $db
     set  1, [HL]                                       ;; 03:4df6 $cb $ce
 .jr_03_4df8:
     ld   A, SFX_ITEM_PICKUP                                        ;; 03:4df8 $3e $02
@@ -348,7 +348,7 @@ call_03_4e4b_CollisionHandler_IceSculpture:
     ld   A, [HL]                                       ;; 03:4e7b $7e
     cp   A, $05                                        ;; 03:4e7c $fe $05
     ld   C, $01                                        ;; 03:4e7e $0e $01
-    call Z, call_00_21ef_PlayRemoteSpawnSFX                               ;; 03:4e80 $cc $ef $21
+    call Z, call_00_21ef_Entity_PlayRemoteSFX                               ;; 03:4e80 $cc $ef $21
     ld   A, [wDCC3_IceSculptureCounter]                                    ;; 03:4e83 $fa $c3 $dc
     jp   call_00_2c09_Entity_SpawnGoalCounter                                  ;; 03:4e86 $c3 $09 $2c
 
@@ -468,7 +468,7 @@ call_03_4f23_CollisionHandler_HolidayTV_Elf:
     or   A, [HL]                                       ;; 03:4f59 $b6
     ret  NZ                                            ;; 03:4f5a $c0
     ld   C, $02                                        ;; 03:4f5b $0e $02
-    jp   call_00_21ef_PlayRemoteSpawnSFX                                  ;; 03:4f5d $c3 $ef $21
+    jp   call_00_21ef_Entity_PlayRemoteSFX                                  ;; 03:4f5d $c3 $ef $21
 
 call_03_4f60_CollisionHandler_BloodCooler:
 ; Only for entities in action 00.
@@ -493,7 +493,7 @@ call_03_4f60_CollisionHandler_BloodCooler:
     ld   a,[hl]
     cp   a,$03
     ld   c,$02
-    call z,call_00_21ef_PlayRemoteSpawnSFX
+    call z,call_00_21ef_Entity_PlayRemoteSFX
     ld   a,[wDCC5_BloodCoolerCounter]
     jp   call_00_2c09_Entity_SpawnGoalCounter
 
@@ -502,7 +502,7 @@ call_03_4f8c_CollisionHandler_MagicSword:
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     ld   c,$03
-    call call_00_21ef_PlayRemoteSpawnSFX
+    call call_00_21ef_Entity_PlayRemoteSFX
     jp   call_03_5671_HandleEntityHit
 
 call_03_4f98_CollisionHandler_GhostKnight:
@@ -553,7 +553,7 @@ call_03_4fca_CollisionHandler_LostArk:
     ld   a,[hl]
     cp   a,$03
     ld   c,$02
-    call z,call_00_21ef_PlayRemoteSpawnSFX
+    call z,call_00_21ef_Entity_PlayRemoteSFX
     ld   a,[wDCC6_LostArkCounter]
     jp   call_00_2c09_Entity_SpawnGoalCounter
     
@@ -572,7 +572,7 @@ call_03_4ff1_CollisionHandler_RaStaff:
     ld   a,[hl]
     cp   a,$03
     ld   c,$01
-    call z,call_00_21ef_PlayRemoteSpawnSFX
+    call z,call_00_21ef_Entity_PlayRemoteSFX
     ld   a,[wDCC7_RaStaffCounter]
     jp   call_00_2c09_Entity_SpawnGoalCounter
     
@@ -640,7 +640,7 @@ call_03_5069_CollisionHandler_PlayingCard:
     ld   a,[hl]
     cp   a,$05
     ld   c,$02
-    call z,call_00_21ef_PlayRemoteSpawnSFX
+    call z,call_00_21ef_Entity_PlayRemoteSFX
     ld   a,[wDCCF_PlayingCardCounter]
     jp   call_00_2c09_Entity_SpawnGoalCounter
 
@@ -688,7 +688,7 @@ call_03_50b6_CollisionHandler_AlienCultureTube:
     ld   a,[hl]
     cp   a,$03
     ld   c,$01
-    call z,call_00_21ef_PlayRemoteSpawnSFX
+    call z,call_00_21ef_Entity_PlayRemoteSFX
     ld   a,[wDCC9_AlienCultureTubeCounter]
     jp   call_00_2c09_Entity_SpawnGoalCounter
 
@@ -893,7 +893,7 @@ call_03_5231_CollisionHandler_Mech:
     ld   a,[hl]
     cp   a,$04
     ld   c,$03
-    call z,call_00_21ef_PlayRemoteSpawnSFX
+    call z,call_00_21ef_Entity_PlayRemoteSFX
     ld   a,[wDCCB_MechCounter]
     jp   call_00_2c09_Entity_SpawnGoalCounter
     call call_03_550e_Entity_CheckPlayerInteraction
@@ -914,7 +914,7 @@ call_03_5274_CollisionHandler_PlanetOBlast:
     cp   a,$01
     ret  nz
     ld   c,$02
-    call call_00_21ef_PlayRemoteSpawnSFX
+    call call_00_21ef_Entity_PlayRemoteSFX
     jp   call_00_22ff_Entity_SetTriggerInactive
     
 call_03_528c_CollisionHandler_StrayCat:
@@ -931,7 +931,7 @@ call_03_528c_CollisionHandler_StrayCat:
     ld   a,[hl]
     cp   a,$03
     ld   c,$02
-    call z,call_00_21ef_PlayRemoteSpawnSFX
+    call z,call_00_21ef_Entity_PlayRemoteSFX
     ld   a,[wDCCA_StrayCatCounter]
     jp   call_00_2c09_Entity_SpawnGoalCounter
     
@@ -950,7 +950,7 @@ call_03_52aa_CollisionHandler_Convict:
     ld   a,[hl]
     cp   a,$05
     ld   c,$03
-    call z,call_00_21ef_PlayRemoteSpawnSFX
+    call z,call_00_21ef_Entity_PlayRemoteSFX
     ld   a,[wDCCD_ConvictCounter]
     jp   call_00_2c09_Entity_SpawnGoalCounter
     
@@ -1061,16 +1061,16 @@ call_03_532f_CollisionHandler_GextremeSports_Elf:
     
 call_03_537a_CollisionHandler_BonusTimeCoin:
 ; On collision (interaction=1):
-; - Adds slot index to wDB6E.
+; - Adds parameter to wDB6E_BonusStageTimerHi.
 ; - Handles entity hit.
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
     ret  nz
     call call_00_230f_Entity_GetParameterIntoC
-    ld   a,[wDB6E]
+    ld   a,[wDB6E_BonusStageTimerHi]
     add  c
-    ld   [wDB6E],a
+    ld   [wDB6E_BonusStageTimerHi],a
     jp   call_03_5671_HandleEntityHit
     
 call_03_538e_CollisionHandler_Bell:
@@ -1514,8 +1514,8 @@ call_03_550e_Entity_CheckPlayerInteraction:
     db   $01 ; ENTITY_TUT_TV_RA_STATUE_DIAGONAL_PROJECTILE
     db   $00 ; ENTITY_TUT_TV_BREAKABLE_BLOCK
     db   $02 ; ENTITY_TUT_TV_COFFIN
-    db   $03 ; ENTITY_WESTERN_STATION_CACTUS
-    db   $01 ; ENTITY_UNK3A
+    db   $03 ; ENTITY_WESTERN_STATION_ENEMY_CACTUS
+    db   $01 ; ENTITY_WESTERN_STATION_CACTUS
     db   $00 ; ENTITY_WESTERN_STATION_ROCK_PLATFORM
     db   $03 ; ENTITY_WESTERN_STATION_HARD_HAT
     db   $06 ; ENTITY_WESTERN_STATION_PLAYING_CARD
@@ -1565,10 +1565,10 @@ call_03_550e_Entity_CheckPlayerInteraction:
     db   $02 ; ENTITY_LIZARD_OF_OZ_CANNON
     db   $01 ; ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE
     db   $00 ; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2
-    db   $00 ; ENTITY_UNK6C
-    db   $00 ; ENTITY_UNK6D
+    db   $00 ; ENTITY_CHANNEL_Z_GREEN_BLOCK
+    db   $00 ; ENTITY_CHANNEL_Z_ORANGE_BLOCK
     db   $03 ; ENTITY_CHANNEL_Z_REZ
-    db   $01 ; ENTITY_UNK6F
+    db   $01 ; ENTITY_CHANNEL_Z_BLUE_BEAM_BARRIER
     db   $01 ; ENTITY_CHANNEL_Z_METEOR
     db   $01 ; ENTITY_CHANNEL_Z_REZ_PROJECTILE
 

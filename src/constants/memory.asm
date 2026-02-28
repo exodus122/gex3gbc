@@ -277,7 +277,15 @@ wDB66_HDMATransferFlags:
 wDB67_HDMATempScratch:
     ds 2                                               ;; db67
 
-wDB69:
+wDB69_HUDGraphicsUpdateFlags:
+; bit 7 (80) = 
+; bit 6 (40) = 
+; bit 5 (20) = 
+; bit 4 (10) = update fly coins animation flag (in map)
+; bit 3 (08) = 
+; bit 2 (04) = update bonus stage timer flag
+; bit 1 (02) = update status bar health (player damaged / eat fly / collected paw coin)
+; bit 0 (01) = update status bar flag (collected fly coin)
     ds 1                                               ;; db69
 
 wDB6A_WarpFlags:
@@ -299,13 +307,11 @@ wDB6C_CurrentMapId: ; can freeze and enter level to get to another level
 ; also used for totals menu pages
     ds 1                                               ;; db6c
 
-wDB6D_InBonusLevel: ; 1 = in gextreme sports or marsupial madness
+wDB6D_InBonusStage: ; 1 = in gextreme sports or marsupial madness
     ds 1                                               ;; db6d
-
-wDB6E:
+wDB6E_BonusStageTimerHi:
     ds 1                                               ;; db6e
-
-wDB6F:
+wDB6F_BonusStageTimerLo:
     ds 1                                               ;; db6f
 
 wDB70_CollectibleScreenRelativeXOffset:
@@ -330,6 +336,8 @@ wDB90_PasswordCounter:
     ds 1                                               ;; db90
 wDB91_PasswordCompletionFlag:
     ds 1                                               ;; db91
+
+; Menu Type data
 wDB92_MenuTypeDataPointer:
     ds 2                                               ;; db92
 wDB94_MenuTypeData_Unk2:
@@ -348,6 +356,7 @@ wDB9B_MenuTypeData_Unk9:
     ds 1                                               ;; db9b
 wDB9C_MenuDynamicHandlerPtr:
     ds 2                                               ;; db9c
+
 wDB9E_MenuCommandBuffer_Unk0:
     ds 1                                               ;; db9e
 wDB9F_MenuCommandBuffer_Unk1:
@@ -442,7 +451,7 @@ wDBE1:
     ds 1                                               ;; dbe1
 wDBE2:
     ds 1                                               ;; dbe2
-wDBE3:
+wDBE3_Menu_AnimateFlag: ; set to 1 when a menu with animates sprites is open
     ds 1                                               ;; dbe3
 wDBE4:
     ds 1                                               ;; dbe4
@@ -452,7 +461,7 @@ wDBE6:
     ds 1                                               ;; dbe6
 wDBE7:
     ds 1                                               ;; dbe7
-wDBE8_ManuMapIDRelated:
+wDBE8_Menu_StoredMapId:
     ds 1                                               ;; dbe8
 wDBE9_MenuTypeRelated:
     ds 1                                               ;; dbe9
@@ -498,6 +507,7 @@ wDBFD_XPositionRelated:
 wDBFF_YPositionRelated:
     ds 2                                               ;; dbff
 
+; Map Data Pointers
 wDC01_MapBank:
     ds 1                                               ;; dc01
 wDC02_MapBankOffset:
@@ -543,7 +553,7 @@ wDC1E_CurrentLevelID: ; all maps in the same level share the same value here
 wDC1F_CurrentBgCollisionType:
     ds 1                                               ;; dc1f
 
-wDC20:
+wDC20_BgMapLoadingFlags:
     ds 1                                               ;; dc20
 
 wDC21:
@@ -947,7 +957,7 @@ wDD0A_BgPalettes:
     ds 32                                              ;; dd0a
 wDD2A_EntityPalettes:
     ds 32                                              ;; dd2a
-wDD4A_EntityPalettes:
+wDD4A_ObjectPalettes:
     ds 32                                              ;; dd4a
 wDD6A_GameBoyColorPaletteFlag: ; determines if colored palettes will be used
     ds 1                                               ;; dd6a

@@ -445,7 +445,7 @@ call_00_0513_DrawEntitiesWrapper:
     set  0, [HL]                                       ;; 00:0562 $cb $c6
     ld   A, $05                                        ;; 00:0564 $3e $05
     call call_00_0c10_QueueVRAMCopyRequest                                  ;; 00:0566 $cd $10 $0c
-    ld   HL, wDB69                                     ;; 00:0569 $21 $69 $db
+    ld   HL, wDB69_HUDGraphicsUpdateFlags                                     ;; 00:0569 $21 $69 $db
     ld   [HL], $17                                     ;; 00:056c $36 $17
 .jr_00_056e:
     call call_00_0b92_WaitForInterrupt                                  ;; 00:056e $cd $92 $0b
@@ -453,7 +453,7 @@ call_00_0513_DrawEntitiesWrapper:
     ld   A, [wDB66_HDMATransferFlags]                                    ;; 00:0574 $fa $66 $db
     and  A, $ff                                        ;; 00:0577 $e6 $ff
     jr   NZ, .jr_00_056e                               ;; 00:0579 $20 $f3
-    ld   A, [wDB69]                                    ;; 00:057b $fa $69 $db
+    ld   A, [wDB69_HUDGraphicsUpdateFlags]                                    ;; 00:057b $fa $69 $db
     and  A, $2f                                        ;; 00:057e $e6 $2f
     jr   NZ, .jr_00_056e                               ;; 00:0580 $20 $ec
     farcall call_03_5ec1_DrawAllEntitiesAndHandleCollision
@@ -487,19 +487,19 @@ call_00_05af_LoadMapPalettes:
     jp   call_00_0f08_RestoreBank                                  ;; 00:05c4 $c3 $08 $0f
 
 call_00_05c7:
-    ld   A, [wDB6D_InBonusLevel]                                    ;; 00:05c7 $fa $6d $db
+    ld   A, [wDB6D_InBonusStage]                                    ;; 00:05c7 $fa $6d $db
     and  A, A                                          ;; 00:05ca $a7
     ret  Z                                             ;; 00:05cb $c8
     ld   HL, wDCD2_FreestandingRemoteHitFlags                                     ;; 00:05cc $21 $d2 $dc
     bit  7, [HL]                                       ;; 00:05cf $cb $7e
     jr   NZ, .jr_00_05f1                               ;; 00:05d1 $20 $1e
-    ld   HL, wDB6F                                     ;; 00:05d3 $21 $6f $db
+    ld   HL, wDB6F_BonusStageTimerLo                                     ;; 00:05d3 $21 $6f $db
     dec  [HL]                                          ;; 00:05d6 $35
     ret  NZ                                            ;; 00:05d7 $c0
     ld   [HL], $3c                                     ;; 00:05d8 $36 $3c
-    ld   HL, wDB69                                     ;; 00:05da $21 $69 $db
+    ld   HL, wDB69_HUDGraphicsUpdateFlags                                     ;; 00:05da $21 $69 $db
     set  2, [HL]                                       ;; 00:05dd $cb $d6
-    ld   HL, wDB6E                                     ;; 00:05df $21 $6e $db
+    ld   HL, wDB6E_BonusStageTimerHi                                     ;; 00:05df $21 $6e $db
     ld   A, [HL]                                       ;; 00:05e2 $7e
     sub  A, $01                                        ;; 00:05e3 $d6 $01
     ld   [HL], A                                       ;; 00:05e5 $77
@@ -542,7 +542,7 @@ call_00_0624_SetFly_TimersAndFlags:
 ; Reads current state from wDC51_CurrentFlyRelated, swaps with A, and depending on the old state (01–05) 
 ; initializes timers/flags (wDCAA_FlyTimerOrFlags1, wDCAB_FlyTimerOrFlags2, wDCA8_FlyTimerOrFlags3, 
 ; wDCA9_FlyTimerOrFlags4, wDCAE_FlyTimerOrFlags5).
-; Special case for state 03: increments a counter, sets a flag in wDB69.
+; Special case for state 03: increments a counter, sets a flag in wDB69_HUDGraphicsUpdateFlags.
 ; Looks like it initializes different "modes" or "phases" (timers controlling durations).
     ld   hl,wDC51_CurrentFlyRelated
     ld   c,[hl]
@@ -597,7 +597,7 @@ call_00_0624_SetFly_TimersAndFlags:
     cp   [hl]
     ret  z
     inc  [hl]
-    ld   hl,wDB69
+    ld   hl,wDB69_HUDGraphicsUpdateFlags
     set  1,[hl]
     ret  
 
@@ -643,14 +643,14 @@ jp_00_06e8:
 
 call_00_06f6_DealDamageToPlayer:
 ; Returns if player is currently in damage cooldown.
-; If passes: sets timer wDC7E_PlayerDamageCooldownTimer=3C, sets flag bit1 in wDB69, plays sound 0A.
+; If passes: sets cooldown timer =3C, sets flag bit1 in wDB69_HUDGraphicsUpdateFlags, plays sound 0A.
 ; Then manipulates wDC51_CurrentFlyRelated and wDC50_PlayerHealth counters, decrementing until zero. If it hits 0, jumps to jp_00_0693.
 ; This is a hit/interaction response handler with timers, sound, and state decrement.
     call call_00_0759_IsPlayerDamageCooldownActive                                  ;; 00:06f6 $cd $59 $07
     ret  NZ                                            ;; 00:06f9 $c0
     ld   A, TIMER_AMOUNT_60_FRAMES                                        ;; 00:06fa $3e $3c
     ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 00:06fc $ea $7e $dc
-    ld   HL, wDB69                                     ;; 00:06ff $21 $69 $db
+    ld   HL, wDB69_HUDGraphicsUpdateFlags                                     ;; 00:06ff $21 $69 $db
     set  1, [HL]                                       ;; 00:0702 $cb $ce
     ld   A, SFX_PLAYER_DAMAGED                                        ;; 00:0704 $3e $0a
     call call_00_0ff5_QueueSoundEffect                                  ;; 00:0706 $cd $f5 $0f
@@ -672,12 +672,12 @@ call_00_06f6_DealDamageToPlayer:
     ret                                                ;; 00:0722 $c9
 
 call_00_0723_IncrementCollectibleCount:
-; Sets flag bit0 in wDB69, plays sound 02.
+; Sets flag bit0 in wDB69_HUDGraphicsUpdateFlags, plays sound 02.
 ; Increments counter wDC68_CollectibleCount, triggers sound effects and sets a per-level 
 ; completion flag when it reaches 0x32 or 0x64.
 ; Also increments wDC4E_LivesRemaining but caps at 63.
 ; Looks like it manages collectible counters / progress milestones.
-    ld   HL, wDB69                                     ;; 00:0723 $21 $69 $db
+    ld   HL, wDB69_HUDGraphicsUpdateFlags                                     ;; 00:0723 $21 $69 $db
     set  0, [HL]                                       ;; 00:0726 $cb $c6
     ld   A, SFX_ITEM_PICKUP                                        ;; 00:0728 $3e $02
     call call_00_0ff5_QueueSoundEffect                                  ;; 00:072a $cd $f5 $0f
@@ -700,10 +700,10 @@ call_00_0723_IncrementCollectibleCount:
 .jr_00_074b:
     ld   HL, wDC4E_LivesRemaining                                     ;; 00:074b $21 $4e $dc
     ld   A, [HL]                                       ;; 00:074e $7e
-    cp   A, $63                                        ;; 00:074f $fe $63
+    cp   A, 99                                        ;; 00:074f $fe $63
     ret  NC                                            ;; 00:0751 $d0
     inc  [HL]                                          ;; 00:0752 $34
-    ld   HL, wDB69                                     ;; 00:0753 $21 $69 $db
+    ld   HL, wDB69_HUDGraphicsUpdateFlags                                     ;; 00:0753 $21 $69 $db
     set  0, [HL]                                       ;; 00:0756 $cb $c6
     ret                                                ;; 00:0758 $c9
 
@@ -912,14 +912,14 @@ call_00_0865_LoadFromTextBank1C_2:
     jr   nz,.jr_00_0880
     jp   call_00_0f08_RestoreBank
 
-call_00_088a_HDMA_BackgroundAnimator:
+call_00_088a_AnimateMenuSprites:
 ; Animated HDMA effect updater.
 ; Increments counters, steps through a small table of structs,
 ; and sets up rHDMA1–rHDMA5 for transfers.
 ; Used for per-frame wavy/gradient background effects.
 ; Purpose: This one handles HDMA-driven background animations (parallax, waves, etc.).
-; It’s only called if wDBE3 is nonzero (animation active).
-    ld   A, [wDBE3]                                    ;; 00:088a $fa $e3 $db
+; It’s only called if wDBE3_Menu_AnimateFlag is nonzero (animation active).
+    ld   A, [wDBE3_Menu_AnimateFlag]                                    ;; 00:088a $fa $e3 $db
     and  A, A                                          ;; 00:088d $a7
     ret  Z                                             ;; 00:088e $c8
     ld   A, BANK_0A_ENTITY_SPRITES                                        ;; 00:088f $3e $0a
@@ -1289,7 +1289,7 @@ call_00_0b25_MainGameLoop_UpdateAndRenderFrame:
     push DE                                            ;; 00:0b27 $d5
     push HL                                            ;; 00:0b28 $e5
     call hFF80                                         ;; 00:0b29 $cd $80 $ff
-    call call_00_0b9f_Frame_TilemapUpdateHandler                                  ;; 00:0b2c $cd $9f $0b
+    call call_00_0b9f_Frame_GraphicsUpdateHandler                                  ;; 00:0b2c $cd $9f $0b
     ld   A, [wD9FD]                                    ;; 00:0b2f $fa $fd $d9
     bit  7, A                                          ;; 00:0b32 $cb $7f
     call Z, call_00_0c1b_LCDInterrupt_Setup                               ;; 00:0b34 $cc $1b $0c
@@ -1362,39 +1362,39 @@ call_00_0b92_WaitForInterrupt:
     jr   Z, .jr_00_0b96                                ;; 00:0b9c $28 $f8
     ret                                                ;; 00:0b9e $c9
 
-call_00_0b9f_Frame_TilemapUpdateHandler:
+call_00_0b9f_Frame_GraphicsUpdateHandler:
 ;; Bank switch to 3.
-; Checks wDC20 flags (bit 7 is a "dirty" flag).
+; Checks wDC20_BgMapLoadingFlags flags (bit 7 is a "dirty" flag).
 ; If set, applies queued tilemap updates:
 ;   - if low 2 bits set → update block (`75e3`)
 ;   - if bits 2–3 set  → update column (`7664`)
-; Clears wDC20 afterwards.
+; Clears wDC20_BgMapLoadingFlags afterwards.
 ; If no updates, calls status bar and animated background update.
 ; Purpose: This is the frame entry point for tilemap updates.
 ; It either processes pending updates (via buffers), or if nothing queued, it runs HUD/background effects.
     ld   A, BANK_03_COLLISION_AND_GRAPHICS_CODE                                        ;; 00:0b9f $3e $03
     call call_00_0f25_AltSwitchBank                                  ;; 00:0ba1 $cd $25 $0f
-    ld   HL, wDC20                                     ;; 00:0ba4 $21 $20 $dc
+    ld   HL, wDC20_BgMapLoadingFlags                                     ;; 00:0ba4 $21 $20 $dc
     bit  7, [HL]                                       ;; 00:0ba7 $cb $7e
     jr   Z, .jr_00_0bc6                                ;; 00:0ba9 $28 $1b
     res  7, [HL]                                       ;; 00:0bab $cb $be
-    ld   A, [wDC20]                                    ;; 00:0bad $fa $20 $dc
+    ld   A, [wDC20_BgMapLoadingFlags]                                    ;; 00:0bad $fa $20 $dc
     and  A, $0f                                        ;; 00:0bb0 $e6 $0f
     jr   Z, .jr_00_0bc6                                ;; 00:0bb2 $28 $12
     and  A, $03                                        ;; 00:0bb4 $e6 $03
     call NZ, call_03_75e3_Tilemap_UpdateBlockFromBuffer                              ;; 00:0bb6 $c4 $e3 $75
-    ld   A, [wDC20]                                    ;; 00:0bb9 $fa $20 $dc
+    ld   A, [wDC20_BgMapLoadingFlags]                                    ;; 00:0bb9 $fa $20 $dc
     and  A, $0c                                        ;; 00:0bbc $e6 $0c
     call NZ, call_03_7664_Tilemap_UpdateColumnFromBuffer                              ;; 00:0bbe $c4 $64 $76
     xor  A, A                                          ;; 00:0bc1 $af
-    ld   [wDC20], A                                    ;; 00:0bc2 $ea $20 $dc
+    ld   [wDC20_BgMapLoadingFlags], A                                    ;; 00:0bc2 $ea $20 $dc
     ret                                                ;; 00:0bc5 $c9
 .jr_00_0bc6:
-    call call_03_747d_StatusBar_UpdateOrTiles                                  ;; 00:0bc6 $cd $7d $74
-    call call_03_753e_AnimatedBackground_HDMA                                  ;; 00:0bc9 $cd $3e $75
-    jp   call_00_088a_HDMA_BackgroundAnimator                                    ;; 00:0bcc $c3 $8a $08
+    call call_03_747d_HUD_Update                                  ;; 00:0bc6 $cd $7d $74
+    call call_03_753e_AnimateFlyCoinCollectibles                                  ;; 00:0bc9 $cd $3e $75
+    jp   call_00_088a_AnimateMenuSprites                                    ;; 00:0bcc $c3 $8a $08
 
-jp_00_0bcf_CopyBlock16BytesLoop:
+call_00_0bcf_MemCopy16Loop:
 ; A tight copy loop: copies 16 bytes from [HL+] to [DE], decrements counter B, and repeats until zero.
 ; Generic block-copy routine used by the transfer queue.
     ld   A, [HL+]                                      ;; 00:0bcf $2a
@@ -1446,7 +1446,7 @@ jp_00_0bcf_CopyBlock16BytesLoop:
     ld   [DE], A                                       ;; 00:0bfd $12
     inc  DE                                            ;; 00:0bfe $13
     dec  B                                             ;; 00:0bff $05
-    jr   NZ, jp_00_0bcf_CopyBlock16BytesLoop                                ;; 00:0c00 $20 $cd
+    jr   NZ, call_00_0bcf_MemCopy16Loop                                ;; 00:0c00 $20 $cd
     ret                                                ;; 00:0c02 $c9
     
 call_00_0c03_WaitForVRAMCopyCompletion:
@@ -1784,7 +1784,7 @@ call_00_0df9_ProcessVRAMTransferQueue:
 ; First calls call_00_0c6a_HandlePendingHDMATransfers (HDMA/VRAM copy handler).
 ; Then checks a counter at wDBEF_UnkCounter. If nonzero, decrements it and uses wDBF0..wDBF7 
 ; as a state structure to fetch source/destination pointers and a bank.
-; Sets up a copy loop through jp_00_0bcf_CopyBlock16BytesLoop, which transfers a block of data from 
+; Sets up a copy loop through call_00_0bcf_MemCopy16Loop, which transfers a block of data from 
 ; ROM (after bank switching) into RAM/VRAM.
     call call_00_0c6a_HandlePendingHDMATransfers                                  ;; 00:0df9 $cd $6a $0c
     jp   .jp_00_0dff                                   ;; 00:0dfc $c3 $ff $0d
@@ -1817,7 +1817,7 @@ call_00_0df9_ProcessVRAMTransferQueue:
     ld   A, H                                          ;; 00:0e20 $7c
     ld   [wDBF7], A                                    ;; 00:0e21 $ea $f7 $db
     pop  HL                                            ;; 00:0e24 $e1
-    jp   jp_00_0bcf_CopyBlock16BytesLoop                                    ;; 00:0e25 $c3 $cf $0b
+    jp   call_00_0bcf_MemCopy16Loop                                    ;; 00:0e25 $c3 $cf $0b
 
 call_00_0e28_Return:
 ; Empty routine—just returns.
@@ -1851,12 +1851,12 @@ call_00_0e3b_ClearGameStateVariables:
 ; Use Case: Prepares the game for a fresh state, probably at start of a level or menu.
     xor  A, A                                          ;; 00:0e3b $af
     ld   [wDC7E_PlayerDamageCooldownTimer], A                                    ;; 00:0e3c $ea $7e $dc
-    ld   [wDC20], A                                    ;; 00:0e3f $ea $20 $dc
+    ld   [wDC20_BgMapLoadingFlags], A                                    ;; 00:0e3f $ea $20 $dc
     ld   [wDB66_HDMATransferFlags], A                                    ;; 00:0e42 $ea $66 $db
-    ld   [wDB69], A                                    ;; 00:0e45 $ea $69 $db
+    ld   [wDB69_HUDGraphicsUpdateFlags], A                                    ;; 00:0e45 $ea $69 $db
     ld   [wDBEF_UnkCounter], A                                    ;; 00:0e48 $ea $ef $db
     ld   [wDC72_FrameCounter2], A                                    ;; 00:0e4b $ea $72 $dc
-    ld   [wDBE3], A                                    ;; 00:0e4e $ea $e3 $db
+    ld   [wDBE3_Menu_AnimateFlag], A                                    ;; 00:0e4e $ea $e3 $db
     ld   [wDD6B], A                                    ;; 00:0e51 $ea $6b $dd
     farcall call_02_7123_ClearEntitySlotsExcludingPlayer
     jp   call_00_0b92_WaitForInterrupt                                  ;; 00:0e5f $c3 $92 $0b

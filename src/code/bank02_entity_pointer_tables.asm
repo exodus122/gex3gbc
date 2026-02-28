@@ -56,8 +56,8 @@ data_02_4000:
    dw   .data_02_44a0 ; ENTITY_TUT_TV_RA_STATUE_DIAGONAL_PROJECTILE
    dw   .data_02_44b0 ; ENTITY_TUT_TV_BREAKABLE_BLOCK
    dw   .data_02_44c0 ; ENTITY_TUT_TV_COFFIN
-   dw   .data_02_44cc ; ENTITY_WESTERN_STATION_CACTUS
-   dw   .data_02_44e8 ; ENTITY_UNK3A
+   dw   .data_02_44cc ; ENTITY_WESTERN_STATION_ENEMY_CACTUS
+   dw   .data_02_44e8 ; ENTITY_WESTERN_STATION_CACTUS
    dw   .data_02_44ec ; ENTITY_WESTERN_STATION_ROCK_PLATFORM
    dw   .data_02_44fc ; ENTITY_WESTERN_STATION_HARD_HAT
    dw   .data_02_4510 ; ENTITY_WESTERN_STATION_PLAYING_CARD
@@ -107,10 +107,10 @@ data_02_4000:
    dw   .data_02_4748 ; ENTITY_LIZARD_OF_OZ_CANNON
    dw   .data_02_475c ; ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE
    dw   .data_02_4760 ; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2
-   dw   .data_02_4764 ; ENTITY_UNK6C
-   dw   .data_02_4768 ; ENTITY_UNK6D
+   dw   .data_02_4764 ; ENTITY_CHANNEL_Z_GREEN_BLOCK
+   dw   .data_02_4768 ; ENTITY_CHANNEL_Z_ORANGE_BLOCK
    dw   .data_02_476c ; ENTITY_CHANNEL_Z_REZ
-   dw   .data_02_479c ; ENTITY_UNK6F
+   dw   .data_02_479c ; ENTITY_CHANNEL_Z_BLUE_BEAM_BARRIER
    dw   .data_02_47a0 ; ENTITY_CHANNEL_Z_METEOR
    dw   .data_02_47ac ; ENTITY_CHANNEL_Z_REZ_PROJECTILE
 .data_02_40e4:
@@ -416,11 +416,11 @@ data_02_4000:
     dw   call_02_582e_EntityAction_None, data_02_794b
     dw   call_02_63d3_EntityAction_Coffin_Unk2, data_02_7952
 .data_02_44cc:
-    dw   call_02_63db_EntityAction_Cactus_Unk0, data_02_7958
-    dw   call_02_63f0_EntityAction_Cactus_Unk1, data_02_7961
+    dw   call_02_63db_EntityAction_EnemyCactus_Unk0, data_02_7958
+    dw   call_02_63f0_EntityAction_EnemyCactus_Unk1, data_02_7961
     dw   call_02_582e_EntityAction_None, data_02_796a
     dw   call_02_582e_EntityAction_None, data_02_7971
-    dw   call_02_6415_EntityAction_Cactus_Unk4, data_02_7979
+    dw   call_02_6415_EntityAction_EnemyCactus_Unk4, data_02_7979
     dw   call_02_582e_EntityAction_None, data_02_7980
     dw   call_02_582f_EntityAction_DestroyWithoutParticles, data_02_7986
 .data_02_44e8:

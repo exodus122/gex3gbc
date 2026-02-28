@@ -175,12 +175,12 @@ DEF ENTITY_PURPLE_FLY_TV                               EQU $0A
 DEF ENTITY_UNK_FLY_TV_3                                EQU $0B
 DEF ENTITY_BLUE_FLY_TV                                 EQU $0C
 DEF ENTITY_UNK_FLY_TV_5                                EQU $0D
-DEF ENTITY_UNK0E                                       EQU $0E
-DEF ENTITY_UNK0F                                       EQU $0F
-DEF ENTITY_UNK10                                       EQU $10
+DEF ENTITY_UNK0E                                       EQU $0E ; unknown if used or not
+DEF ENTITY_UNK0F                                       EQU $0F ; unknown if used or not
+DEF ENTITY_UNK10                                       EQU $10 ; unknown if used or not
 DEF ENTITY_TV_BUTTON                                   EQU $11
 DEF ENTITY_TV_REMOTE                                   EQU $12
-DEF ENTITY_UNK13                                       EQU $13
+DEF ENTITY_UNK13                                       EQU $13 ; unknown if used or not, instantly destroys itself
 DEF ENTITY_GOAL_COUNTER_1                              EQU $14
 DEF ENTITY_GOAL_COUNTER_2                              EQU $15
 DEF ENTITY_GOAL_COUNTER_3                              EQU $16
@@ -218,8 +218,8 @@ DEF ENTITY_TUT_TV_RA_STATUE_HORIZONTAL_PROJECTILE      EQU $35
 DEF ENTITY_TUT_TV_RA_STATUE_DIAGONAL_PROJECTILE        EQU $36
 DEF ENTITY_TUT_TV_BREAKABLE_BLOCK                      EQU $37
 DEF ENTITY_TUT_TV_COFFIN                               EQU $38
-DEF ENTITY_WESTERN_STATION_CACTUS                      EQU $39
-DEF ENTITY_UNK3A                                       EQU $3A
+DEF ENTITY_WESTERN_STATION_ENEMY_CACTUS                EQU $39
+DEF ENTITY_WESTERN_STATION_CACTUS                      EQU $3A ; unused?
 DEF ENTITY_WESTERN_STATION_ROCK_PLATFORM               EQU $3B
 DEF ENTITY_WESTERN_STATION_HARD_HAT                    EQU $3C
 DEF ENTITY_WESTERN_STATION_PLAYING_CARD                EQU $3D
@@ -269,10 +269,10 @@ DEF ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE              EQU $68
 DEF ENTITY_LIZARD_OF_OZ_CANNON                         EQU $69
 DEF ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE         EQU $6A
 DEF ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2            EQU $6B
-DEF ENTITY_UNK6C                                       EQU $6C
-DEF ENTITY_UNK6D                                       EQU $6D
+DEF ENTITY_CHANNEL_Z_GREEN_BLOCK                       EQU $6C ; unused?
+DEF ENTITY_CHANNEL_Z_ORANGE_BLOCK                      EQU $6D ; unused?
 DEF ENTITY_CHANNEL_Z_REZ                               EQU $6E
-DEF ENTITY_UNK6F                                       EQU $6F
+DEF ENTITY_CHANNEL_Z_BLUE_BEAM_BARRIER                 EQU $6F ; unused?
 DEF ENTITY_CHANNEL_Z_METEOR                            EQU $70
 DEF ENTITY_CHANNEL_Z_REZ_PROJECTILE                    EQU $71
 DEF ENTITY_LIST_TERMINATOR                             EQU $FF
@@ -350,7 +350,7 @@ DEF RELATIVE_ENTITY_SPAWN_SECBOT_PROJECTILE_2        EQU $1A
 DEF RELATIVE_ENTITY_SPAWN_GHOST_KNIGHT_PROJECTILE    EQU $1B
 DEF RELATIVE_ENTITY_SPAWN_BIRD_PROJECTILE            EQU $1C
 DEF RELATIVE_ENTITY_SPAWN_REZ_PROJECTILE             EQU $1D
-DEF RELATIVE_ENTITY_SPAWN_REZ_PROJECTILE_2           EQU $1e
+DEF RELATIVE_ENTITY_SPAWN_REZ_PROJECTILE_2           EQU $1E
 
 ; Entity Facing Direction values
 ; really these seem to be sprite x flip flags...
@@ -506,7 +506,7 @@ DEF COLLISION_TYPE_FLY                       EQU $0A
 DEF COLLISION_TYPE_FLY_TV                    EQU $0B
 DEF COLLISION_TYPE_ICE_SCULPTURE             EQU $0C
 DEF COLLISION_TYPE_EVIL_SANTA_PROJECTILE     EQU $0D
-DEF COLLISION_TYPE_HOLIDAY_TV_ELF            EQU $0E
+DEF COLLISION_TYPE_ELF            EQU $0E
 DEF COLLISION_TYPE_BLOOD_COOLER              EQU $0F
 DEF COLLISION_TYPE_MAGIC_SWORD               EQU $10
 DEF COLLISION_TYPE_GHOST_KNIGHT              EQU $11
