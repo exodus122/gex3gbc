@@ -14,7 +14,7 @@ call_00_2cbf_LoadEntityPalettes:
     ld   L, A                                          ;; 00:2cd5 $6f
     ld   DE, wDD2A_EntityPalettes                                     ;; 00:2cd6 $11 $2a $dd
     ld   BC, $10                                       ;; 00:2cd9 $01 $10 $00
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:2cdc $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 00:2cdc $cd $6e $07
     jp   call_00_0f08_RestoreBank                                  ;; 00:2cdf $c3 $08 $0f
 
 call_00_2ce2_Entity_DrawGex:
@@ -578,11 +578,11 @@ call_00_2ff8_InitLevelEntitiesAndConfig:
     add  HL, DE                                        ;; 00:305f $19
     ld   DE, wDCB1_LevelTriggerBuffer                                     ;; 00:3060 $11 $b1 $dc
     ld   BC, $10                                       ;; 00:3063 $01 $10 $00
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:3066 $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 00:3066 $cd $6e $07
     ld   HL, .data_00_317a_ElevatorEntityInitialData                                     ;; 00:3069 $21 $7a $31
     ld   DE, wDCE2_ElevatorEntityUnkData                                     ;; 00:306c $11 $e2 $dc
     ld   BC, $06                                       ;; 00:306f $01 $06 $00
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:3072 $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 00:3072 $cd $6e $07
     ld   A, $02                                        ;; 00:3075 $3e $02
     ld   [wDCD5_ElfHealth1], A                                    ;; 00:3077 $ea $d5 $dc
     ld   [wDCD6_ElfHealth2], A                                    ;; 00:307a $ea $d6 $dc

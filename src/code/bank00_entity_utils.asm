@@ -1894,7 +1894,7 @@ call_00_2c20_Entity_CopyPaletteToBuffer:
     ld   D, H                                          ;; 00:2c3b $54
     pop  HL                                            ;; 00:2c3c $e1
     ld   BC, $08                                       ;; 00:2c3d $01 $08 $00
-    jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:2c40 $c3 $6e $07
+    jp   call_00_076e_MemCopy                                  ;; 00:2c40 $c3 $6e $07
 
 data_00_2c43_ParticleSlotPointerTable:
 ; The pointer table to the individual particle buffers.
@@ -1928,7 +1928,7 @@ call_00_2c67_Particle_InitBurst:
     inc  DE                                            ;; 00:2c6d $13
     ld   HL, .data_00_2c77_Particle_DefaultBurstTemplate                                     ;; 00:2c6e $21 $77 $2c
     ld   BC, $12                                       ;; 00:2c71 $01 $12 $00
-    jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:2c74 $c3 $6e $07
+    jp   call_00_076e_MemCopy                                  ;; 00:2c74 $c3 $6e $07
 .data_00_2c77_Particle_DefaultBurstTemplate:
 ; Default particle data copied during initialization.
     db   $0b, $00, $00, $f5, $00, $00, $10, $00        ;; 00:2c77 ........

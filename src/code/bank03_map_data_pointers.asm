@@ -15,7 +15,7 @@ call_03_6c89_LoadMapDataPtrs:
     ld   L, A                                          ;; 03:6c96 $6f
     ld   DE, wDC01_MapBank                                     ;; 03:6c97 $11 $01 $dc
     ld   BC, $1f                                       ;; 03:6c9a $01 $1f $00
-    jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 03:6c9d $c3 $6e $07
+    jp   call_00_076e_MemCopy                                  ;; 03:6c9d $c3 $6e $07
 .data_03_6ca0_MapDataPtrs:
     dw   .data_03_6d1a_MapData_GexCave1
     dw   .data_03_6d96_MapData_HolidayTV1

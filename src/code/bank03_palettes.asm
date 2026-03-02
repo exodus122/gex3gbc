@@ -24,7 +24,7 @@ call_03_6567_LoadFlyPalettes:
 .jr_03_6583:
     ld   DE, wDD2A_EntityPalettes                      ;; 03:6583 $11 $2a $dd
     ld   BC, $08                                       ;; 03:6586 $01 $08 $00
-    jp   call_00_076e_CopyBCBytesFromHLToDE            ;; 03:6589 $c3 $6e $07
+    jp   call_00_076e_MemCopy            ;; 03:6589 $c3 $6e $07
 .data_03_658c:
     db   $00, $00, $00, $00, $00, $42, $e0, $7f
 .data_03_6594:
@@ -68,10 +68,10 @@ call_03_65c6_LoadBgPalettes:
     ld   L, A                                          ;; 03:65de $6f
     ld   DE, wDCEA_BgPalettes                          ;; 03:65df $11 $ea $dc
     ld   BC, $40                                       ;; 03:65e2 $01 $40 $00
-    call call_00_076e_CopyBCBytesFromHLToDE            ;; 03:65e5 $cd $6e $07
+    call call_00_076e_MemCopy            ;; 03:65e5 $cd $6e $07
     ld   HL, .data_03_6803_palette                     ;; 03:65e8 $21 $03 $68
     ld   BC, $40                                       ;; 03:65eb $01 $40 $00
-    jp   call_00_076e_CopyBCBytesFromHLToDE            ;; 03:65ee $c3 $6e $07
+    jp   call_00_076e_MemCopy            ;; 03:65ee $c3 $6e $07
 .data_03_65f1_MenuPalettes:
     dw   $0000
     dw   .data_03_6603_palette, .data_03_6643_palette

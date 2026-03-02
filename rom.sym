@@ -58,8 +58,8 @@
 00:0723 call_00_0723_IncrementCollectibleCount
 00:074b call_00_0723_IncrementCollectibleCount.jr_00_074b
 00:0759 call_00_0759_IsPlayerDamageCooldownActive
-00:075f call_00_075f_SwitchBankAndCopyBCBytesFromHLToDE
-00:076e call_00_076e_CopyBCBytesFromHLToDE
+00:075f call_00_075f_FarMemCopy
+00:076e call_00_076e_MemCopy
 00:0777 call_00_0777_LoadPointerIndexAFromTableDEIntoHL
 00:0781 jp_00_0781
 00:07b2 jp_00_0781.jr_00_07b2

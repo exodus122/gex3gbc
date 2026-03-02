@@ -57,7 +57,7 @@ call_00_0150_Init:
     ld   DE, wC000_BgMapTileIds+1                                     ;; 00:0173 $11 $01 $c0 ; wC000_BgMapTileIds
     ld   BC, $1fff                                     ;; 00:0176 $01 $ff $1f
     ld   [HL], $00                                     ;; 00:0179 $36 $00
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:017b $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 00:017b $cd $6e $07
     xor  A, A                                          ;; 00:017e $af
     ldh  [rSCX], A                                     ;; 00:017f $e0 $43
     ldh  [rSCY], A                                     ;; 00:0181 $e0 $42
@@ -79,7 +79,7 @@ call_00_0150_Init:
     ld   HL, image_007_5b00                                     ;; 00:01a3 $21 $00 $5b
     ld   DE, _VRAM                                     ;; 00:01a6 $11 $00 $80
     ld   BC, $a00                                      ;; 00:01a9 $01 $00 $0a
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:01ac $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 00:01ac $cd $6e $07
     ld   HL, _SCRN0                                     ;; 00:01af $21 $00 $98
     ld   DE, image_007_5b00_bgmap_tile_ids                                     ;; 00:01b2 $11 $00 $65
     ld   C, $12                                        ;; 00:01b5 $0e $12
@@ -110,7 +110,7 @@ call_00_0150_Init:
     ld   HL, call_00_0e29_StartDMATransfer                                      ;; 00:01d9 $21 $29 $0e
     ld   DE, hFF80                                     ;; 00:01dc $11 $80 $ff
     ld   BC, $0a                                       ;; 00:01df $01 $0a $00
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:01e2 $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 00:01e2 $cd $6e $07
     ld   A, $01                                        ;; 00:01e5 $3e $01
 .jr_00_01e7:
     push AF                                            ;; 00:01e7 $f5
@@ -119,7 +119,7 @@ call_00_0150_Init:
     ld   DE, _VRAM+$0001                                     ;; 00:01ed $11 $01 $80
     ld   BC, $1fff                                     ;; 00:01f0 $01 $ff $1f
     ld   [HL], $00                                     ;; 00:01f3 $36 $00
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:01f5 $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 00:01f5 $cd $6e $07
     pop  AF                                            ;; 00:01f8 $f1
     dec  A                                             ;; 00:01f9 $3d
     bit  7, A                                          ;; 00:01fa $cb $7f
@@ -483,7 +483,7 @@ call_00_05af_LoadMapPalettes:
     ld   L, A                                          ;; 00:05ba $6f
     ld   DE, wDCEA_BgPalettes                                     ;; 00:05bb $11 $ea $dc
     ld   BC, $40                                       ;; 00:05be $01 $40 $00
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:05c1 $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 00:05c1 $cd $6e $07
     jp   call_00_0f08_RestoreBank                                  ;; 00:05c4 $c3 $08 $0f
 
 call_00_05c7_WarpAfterCompletingBonusStage:
@@ -713,7 +713,7 @@ call_00_0759_IsPlayerDamageCooldownActive:
     ret  NZ                                            ;; 00:075d $c0
     ret                                                ;; 00:075e $c9
 
-call_00_075f_SwitchBankAndCopyBCBytesFromHLToDE:
+call_00_075f_FarMemCopy:
     push HL                                            ;; 00:075f $e5
     push DE                                            ;; 00:0760 $d5
     push BC                                            ;; 00:0761 $c5
@@ -721,17 +721,17 @@ call_00_075f_SwitchBankAndCopyBCBytesFromHLToDE:
     pop  BC                                            ;; 00:0765 $c1
     pop  DE                                            ;; 00:0766 $d1
     pop  HL                                            ;; 00:0767 $e1
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:0768 $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 00:0768 $cd $6e $07
     jp   call_00_0f08_RestoreBank                                  ;; 00:076b $c3 $08 $0f
 
-call_00_076e_CopyBCBytesFromHLToDE:
+call_00_076e_MemCopy:
     ld   A, [HL+]                                      ;; 00:076e $2a
     ld   [DE], A                                       ;; 00:076f $12
     inc  DE                                            ;; 00:0770 $13
     dec  BC                                            ;; 00:0771 $0b
     ld   A, B                                          ;; 00:0772 $78
     or   A, C                                          ;; 00:0773 $b1
-    jr   NZ, call_00_076e_CopyBCBytesFromHLToDE                              ;; 00:0774 $20 $f8
+    jr   NZ, call_00_076e_MemCopy                              ;; 00:0774 $20 $f8
     ret                                                ;; 00:0776 $c9
 
 call_00_0777_LoadPointerIndexAFromTableDEIntoHL:
@@ -768,34 +768,34 @@ jp_00_0781:
     ld   DE, $1000                                     ;; 00:079f $11 $00 $10
     add  HL, DE                                        ;; 00:07a2 $19
     ld   DE, wC000_BgMapTileIds                                     ;; 00:07a3 $11 $00 $c0
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:07a6 $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 00:07a6 $cd $6e $07
     ld   C, $0a                                        ;; 00:07a9 $0e $0a
     call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:07ab $cd $6a $0a
     pop  HL                                            ;; 00:07ae $e1
     ld   BC, $1000                                     ;; 00:07af $01 $00 $10
 .jr_00_07b2:
     ld   DE, wC000_BgMapTileIds                                     ;; 00:07b2 $11 $00 $c0
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:07b5 $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 00:07b5 $cd $6e $07
     ld   HL, wDBB3_MenuCommandBuffer4_Unk2                                     ;; 00:07b8 $21 $b3 $db
     ld   A, [HL+]                                      ;; 00:07bb $2a
     ld   H, [HL]                                       ;; 00:07bc $66
     ld   L, A                                          ;; 00:07bd $6f
     ld   DE, wD400_TileBuffer                                     ;; 00:07be $11 $00 $d4
     ld   BC, $168                                      ;; 00:07c1 $01 $68 $01
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:07c4 $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 00:07c4 $cd $6e $07
     ld   A, [wDBB1_MenuCommandBuffer4_Unk0]                                    ;; 00:07c7 $fa $b1 $db
     and  A, A                                          ;; 00:07ca $a7
     jr   Z, .jr_00_07d9                                ;; 00:07cb $28 $0c
     ld   DE, wD578_TileBuffer2                                     ;; 00:07cd $11 $78 $d5
     ld   BC, $168                                      ;; 00:07d0 $01 $68 $01
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:07d3 $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 00:07d3 $cd $6e $07
     jp   call_00_0f08_RestoreBank                                  ;; 00:07d6 $c3 $08 $0f
 .jr_00_07d9:
     push HL                                            ;; 00:07d9 $e5
     ld   HL, wD400_TileBuffer                                     ;; 00:07da $21 $00 $d4
     ld   DE, wD578_TileBuffer2                                     ;; 00:07dd $11 $78 $d5
     ld   BC, $168                                      ;; 00:07e0 $01 $68 $01
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:07e3 $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 00:07e3 $cd $6e $07
     pop  DE                                            ;; 00:07e6 $d1
     ld   HL, wD578_TileBuffer2                                     ;; 00:07e7 $21 $78 $d5
     ld   BC, $168                                      ;; 00:07ea $01 $68 $01
@@ -1213,7 +1213,7 @@ call_00_0a6a_LoadMapConfigAndWaitVBlank:
     add  HL, DE                                        ;; 00:0a73 $19
     ld   DE, wDC2B_HDMATransferRelated1                                     ;; 00:0a74 $11 $2b $dc
     ld   BC, $08                                       ;; 00:0a77 $01 $08 $00
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:0a7a $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 00:0a7a $cd $6e $07
     ld   A, [wDC31_TilesetBankRelated]                                    ;; 00:0a7d $fa $31 $dc
     cp   A, $ff                                        ;; 00:0a80 $fe $ff
     jr   NZ, .jr_00_0a94                               ;; 00:0a82 $20 $10
@@ -1875,7 +1875,7 @@ call_00_0e62_ResetFlagsAndVRAMState:
     ld   DE, wD901                                     ;; 00:0e73 $11 $01 $d9
     ld   BC, $9f                                       ;; 00:0e76 $01 $9f $00
     ld   [HL], $00                                     ;; 00:0e79 $36 $00
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:0e7b $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 00:0e7b $cd $6e $07
     jp   call_00_0b92_WaitForInterrupt                                  ;; 00:0e7e $c3 $92 $0b
 
 call_00_0e81_LoadPalettesToHardware:

@@ -896,7 +896,7 @@ call_00_1633_HandleLevelWarpOrExit:
     ld   [wDB6C_CurrentMapId], A                                    ;; 00:1657 $ea $6c $db
     ld   DE, wDC6A_CheckpointStoredX                                     ;; 00:165a $11 $6a $dc
     ld   BC, $04                                       ;; 00:165d $01 $04 $00
-    jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 00:1660 $c3 $6e $07
+    jp   call_00_076e_MemCopy                                  ;; 00:1660 $c3 $6e $07
 .jr_00_1663:
     ld   L, A                                          ;; 00:1663 $6f
     ld   H, $00                                        ;; 00:1664 $26 $00

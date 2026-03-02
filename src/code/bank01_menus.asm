@@ -83,7 +83,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     add  HL, DE                                        ;; 01:4012 $19
     ld   DE, wDB92_MenuTypeDataPointer                                     ;; 01:4013 $11 $92 $db
     ld   BC, $0c                                       ;; 01:4016 $01 $0c $00
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4019 $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 01:4019 $cd $6e $07
     ld   A, [wDB6C_CurrentMapId]                                    ;; 01:401c $fa $6c $db
     ld   [wDBE8_Menu_StoredMapId], A                                    ;; 01:401f $ea $e8 $db
     ld   A, [wDC1E_CurrentLevelID]                                    ;; 01:4022 $fa $1e $dc
@@ -599,7 +599,7 @@ call_01_43c3_Menu_LoadTitleScreenObjectPalettes:
 .jr_01_43cf:
     ld   DE, wDD4A_ObjectPalettes                                     ;; 01:43cf $11 $4a $dd
     ld   BC, $10                                       ;; 01:43d2 $01 $10 $00
-    jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:43d5 $c3 $6e $07
+    jp   call_00_076e_MemCopy                                  ;; 01:43d5 $c3 $6e $07
 .data_01_43d8:
     db   $00, $00, $ff, $7f, $f7, $5e, $ef, $3d        ;; 01:43d8 ........
 .data_01_43e0:
@@ -704,7 +704,7 @@ call_01_446b_ExecuteMenuCommand:
     add  HL, DE                                        ;; 01:4482 $19
     ld   DE, wDB9E_MenuCommandBuffer_Unk0                                     ;; 01:4483 $11 $9e $db
     ld   BC, $06                                       ;; 01:4486 $01 $06 $00
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4489 $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 01:4489 $cd $6e $07
 .jr_01_448c:
     ld   HL, wDBB9_MenuUnknownPtr                                     ;; 01:448c $21 $b9 $db
     ld   A, [HL+]                                      ;; 01:448f $2a
@@ -712,7 +712,7 @@ call_01_446b_ExecuteMenuCommand:
     ld   L, A                                          ;; 01:4491 $6f
     ld   DE, wDBA4_MenuCommandBuffer2_Unk0                                     ;; 01:4492 $11 $a4 $db
     ld   BC, $07                                       ;; 01:4495 $01 $07 $00
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4498 $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 01:4498 $cd $6e $07
     ld   A, L                                          ;; 01:449b $7d
     ld   [wDBB9_MenuUnknownPtr], A                                    ;; 01:449c $ea $b9 $db
     ld   A, H                                          ;; 01:449f $7c
@@ -888,7 +888,7 @@ call_01_45a5_MenuHandler_LoadBgPalettesAndSecondaryTilesets:
     ld   HL, .data_01_45ef                             ;; 01:45a5 $21 $ef $45
     ld   DE, wDCEA_BgPalettes                                     ;; 01:45a8 $11 $ea $dc
     ld   BC, $80                                       ;; 01:45ab $01 $80 $00
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:45ae $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 01:45ae $cd $6e $07
     ld   A, [wDB6C_CurrentMapId]                                    ;; 01:45b1 $fa $6c $db
     ld   DE, data_00_0b01_SecondaryTilesetPtrs                                      ;; 01:45b4 $11 $01 $0b
     call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 01:45b7 $cd $77 $07
@@ -897,7 +897,7 @@ call_01_45a5_MenuHandler_LoadBgPalettesAndSecondaryTilesets:
     ld   DE, wDD0A_BgPalettes                                     ;; 01:45be $11 $0a $dd
     ld   BC, $20                                       ;; 01:45c1 $01 $20 $00
     ld   A, BANK_1F_SECONDARY_TILESETS                                        ;; 01:45c4 $3e $1f
-    call call_00_075f_SwitchBankAndCopyBCBytesFromHLToDE                                  ;; 01:45c6 $cd $5f $07
+    call call_00_075f_FarMemCopy                                  ;; 01:45c6 $cd $5f $07
     ld   A, [wDB6C_CurrentMapId]                                    ;; 01:45c9 $fa $6c $db
     ld   DE, data_00_0b01_SecondaryTilesetPtrs                                      ;; 01:45cc $11 $01 $0b
     call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 01:45cf $cd $77 $07
@@ -912,7 +912,7 @@ call_01_45a5_MenuHandler_LoadBgPalettesAndSecondaryTilesets:
     pop  HL                                            ;; 01:45e6 $e1
     ld   DE, $c010                                     ;; 01:45e7 $11 $10 $c0 ; wC000_BgMapTileIds
     ld   A, BANK_1F_SECONDARY_TILESETS                                        ;; 01:45ea $3e $1f
-    jp   call_00_075f_SwitchBankAndCopyBCBytesFromHLToDE                                  ;; 01:45ec $c3 $5f $07
+    jp   call_00_075f_FarMemCopy                                  ;; 01:45ec $c3 $5f $07
 .data_01_45ef:
     db   $00, $00, $00, $40, $ff, $03, $ff, $7f        ;; 01:45ef ........
     db   $00, $40, $ff, $03, $73, $02, $29, $01        ;; 01:45f7 ........
@@ -1147,7 +1147,7 @@ call_01_47b1_LoadMenuConfigData:
     call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 01:47b7 $cd $77 $07
     ld   DE, wDBB1_MenuCommandBuffer4_Unk0                                     ;; 01:47ba $11 $b1 $db
     ld   BC, $08                                       ;; 01:47bd $01 $08 $00
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:47c0 $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 01:47c0 $cd $6e $07
     jp   jp_00_0781                                    ;; 01:47c3 $c3 $81 $07
 .data_01_47c6:
     dw   .data_01_47d4, .data_01_47dc, .data_01_47e4, .data_01_47ec        ;; 01:47c6 ..??....
@@ -1245,7 +1245,7 @@ call_01_4875_ProcessTextTilemap:
     add  HL, DE                                        ;; 01:4881 $19
     ld   DE, wDBAB_MenuCommandBuffer3_Unk0                                     ;; 01:4882 $11 $ab $db
     ld   BC, $06                                       ;; 01:4885 $01 $06 $00
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4888 $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 01:4888 $cd $6e $07
     call call_01_49bb_FormatAndPaginateText                                  ;; 01:488b $cd $bb $49
 .jr_01_488e:
     ld   HL, wDBA7_MenuCommandBuffer2_Unk3                                     ;; 01:488e $21 $a7 $db
@@ -2128,7 +2128,7 @@ call_01_4d03_StreamTilemapBlockToBg:
     pop  HL                                            ;; 01:4d25 $e1
     ld   A, [HL+]                                      ;; 01:4d26 $2a
     and  A, A                                          ;; 01:4d27 $a7
-    jp   Z, call_00_076e_CopyBCBytesFromHLToDE                               ;; 01:4d28 $ca $6e $07
+    jp   Z, call_00_076e_MemCopy                               ;; 01:4d28 $ca $6e $07
     ret                                                ;; 01:4d2b $c9
 
 call_01_4d2c_ProcessTileStreamingLoop:
@@ -2334,17 +2334,17 @@ call_01_4f27_ClearBgAndTileBuffers:
     ld   DE, wC000_BgMapTileIds+1                                     ;; 01:4f2a $11 $01 $c0 ; wC000_BgMapTileIds
     ld   [HL], $00                                     ;; 01:4f2d $36 $00
     ld   BC, $0f                                       ;; 01:4f2f $01 $0f $00
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4f32 $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 01:4f32 $cd $6e $07
     ld   HL, wD400_TileBuffer                                     ;; 01:4f35 $21 $00 $d4
     ld   DE, wD400_TileBuffer+1                                     ;; 01:4f38 $11 $01 $d4
     ld   [HL], $00                                     ;; 01:4f3b $36 $00
     ld   BC, $167                                      ;; 01:4f3d $01 $67 $01
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4f40 $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 01:4f40 $cd $6e $07
     ld   HL, wD578_TileBuffer2                                     ;; 01:4f43 $21 $78 $d5
     ld   DE, wD578_TileBuffer2+1                                     ;; 01:4f46 $11 $79 $d5
     ld   [HL], $01                                     ;; 01:4f49 $36 $01
     ld   BC, $167                                      ;; 01:4f4b $01 $67 $01
-    jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4f4e $c3 $6e $07
+    jp   call_00_076e_MemCopy                                  ;; 01:4f4e $c3 $6e $07
 
 call_01_4f51_UploadSecondaryTileLayer:
 ; Copies the contents of wD578_TileBuffer2 into the background tilemap using call_01_4f67_CopyTileBufferToBgMap, 
@@ -2392,7 +2392,7 @@ call_01_4f7e_SeedTileLookupTable:
     ld   DE, wDB7E_PasswordValues+1                                     ;; 01:4f81 $11 $7f $db
     ld   BC, $11                                       ;; 01:4f84 $01 $11 $00
     ld   [HL], $20                                     ;; 01:4f87 $36 $20
-    jp   call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:4f89 $c3 $6e $07
+    jp   call_00_076e_MemCopy                                  ;; 01:4f89 $c3 $6e $07
 
 call_01_4f8c_BuildPasswordBitfieldAndChecksum:
 ; Description:
@@ -2493,7 +2493,7 @@ call_01_5027_BuildPasswordBufferFromBitfield:
     ld   DE, wDB7E_PasswordValues+1                                     ;; 01:502a $11 $7f $db
     ld   BC, $11                                       ;; 01:502d $01 $11 $00
     ld   [HL], $00                                     ;; 01:5030 $36 $00
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:5032 $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 01:5032 $cd $6e $07
     ld   HL, wDB72_PasswordEncodedBuffer                                     ;; 01:5035 $21 $72 $db
     ld   B, $80                                        ;; 01:5038 $06 $80
     ld   DE, wDB7E_PasswordValues                                     ;; 01:503a $11 $7e $db
@@ -2540,7 +2540,7 @@ call_01_505a_ValidatePassword:
     ld   DE, wDB73_PasswordLivesRemaining                                     ;; 01:506a $11 $73 $db
     ld   BC, $0b                                       ;; 01:506d $01 $0b $00
     ld   [HL], $00                                     ;; 01:5070 $36 $00
-    call call_00_076e_CopyBCBytesFromHLToDE                                  ;; 01:5072 $cd $6e $07
+    call call_00_076e_MemCopy                                  ;; 01:5072 $cd $6e $07
     ld   HL, wDB72_PasswordEncodedBuffer                                     ;; 01:5075 $21 $72 $db
     ld   B, $80                                        ;; 01:5078 $06 $80
     ld   DE, wDB7E_PasswordValues                                     ;; 01:507a $11 $7e $db
