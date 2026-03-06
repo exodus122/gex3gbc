@@ -172,7 +172,7 @@ call_02_4ee7_MapCollisionFlags:
 ; Reads high nibble of wDC81_CurrentInputsAlt. Searches .data_02_4F01 for a matching flag, returns mapped code or $FF if none.
 ; Purpose: Convert collision flags into an index or behavior code.
     ld   a,[wDC81_CurrentInputsAlt]
-    and  a,$F0
+    and  a,PADF_RIGHT | PADF_LEFT | PADF_UP | PADF_DOWN
     jr   z,.jr_00_4EFB
     ld   hl,.data_02_4F01
     ld   b,$08
@@ -234,43 +234,43 @@ call_02_4f32_PlayerUpdateMain:
     ld   HL, wDC80_Player_UnkStates                                     ;; 02:4f37 $21 $80 $dc
     bit  0, [HL]                                       ;; 02:4f3a $cb $46
     jr   Z, .jr_02_4f46                                ;; 02:4f3c $28 $08
-    bit  0, E                                          ;; 02:4f3e $cb $43
+    bit  PADF_A_BIT, E                                          ;; 02:4f3e $cb $43
     jr   NZ, .jr_02_4f44                               ;; 02:4f40 $20 $02
     res  0, [HL]                                       ;; 02:4f42 $cb $86
 .jr_02_4f44:
-    res  0, C                                          ;; 02:4f44 $cb $81
+    res  PADF_A_BIT, C                                          ;; 02:4f44 $cb $81
 .jr_02_4f46:
     bit  6, [HL]                                       ;; 02:4f46 $cb $76
     jr   Z, .jr_02_4f56                                ;; 02:4f48 $28 $0c
-    bit  1, E                                          ;; 02:4f4a $cb $4b
+    bit  PADF_B_BIT, E                                          ;; 02:4f4a $cb $4b
     jr   NZ, .jr_02_4f52                               ;; 02:4f4c $20 $04
     ld   A, [HL]                                       ;; 02:4f4e $7e
     and  A, $0f                                        ;; 02:4f4f $e6 $0f
     ld   [HL], A                                       ;; 02:4f51 $77
 .jr_02_4f52:
-    res  1, C                                          ;; 02:4f52 $cb $89
+    res  PADF_B_BIT, C                                          ;; 02:4f52 $cb $89
     jr   .jr_02_4f71                                   ;; 02:4f54 $18 $1b
 .jr_02_4f56:
     bit  7, [HL]                                       ;; 02:4f56 $cb $7e
     jr   Z, .jr_02_4f71                                ;; 02:4f58 $28 $17
-    res  1, C                                          ;; 02:4f5a $cb $89
+    res  PADF_B_BIT, C                                          ;; 02:4f5a $cb $89
     ld   A, [wDC8C_PlayerYVelocity]                                    ;; 02:4f5c $fa $8c $dc
     bit  7, A                                          ;; 02:4f5f $cb $7f
     jr   Z, .jr_02_4f71                                ;; 02:4f61 $28 $0e
-    bit  1, E                                          ;; 02:4f63 $cb $4b
+    bit  PADF_B_BIT, E                                          ;; 02:4f63 $cb $4b
     jr   NZ, .jr_02_4f6b                               ;; 02:4f65 $20 $04
     set  4, [HL]                                       ;; 02:4f67 $cb $e6
     jr   .jr_02_4f71                                   ;; 02:4f69 $18 $06
 .jr_02_4f6b:
     bit  4, [HL]                                       ;; 02:4f6b $cb $66
     jr   Z, .jr_02_4f71                                ;; 02:4f6d $28 $02
-    set  1, C                                          ;; 02:4f6f $cb $c9
+    set  PADF_B_BIT, C                                          ;; 02:4f6f $cb $c9
 .jr_02_4f71:
     ld   A, [wD801_Player_ActionId]                                    ;; 02:4f71 $fa $01 $d8
     cp   A, PLAYERACTION_UNK7                                        ;; 02:4f74 $fe $07
     jr   NZ, .jr_02_4f89                               ;; 02:4f76 $20 $11
-    res  4, C                                          ;; 02:4f78 $cb $a1
-    res  5, C                                          ;; 02:4f7a $cb $a9
+    res  PADF_RIGHT_BIT, C                                          ;; 02:4f78 $cb $a1
+    res  PADF_LEFT_BIT, C                                          ;; 02:4f7a $cb $a9
     ld   A, [wD80D_PlayerFacingDirection]                                    ;; 02:4f7c $fa $0d $d8
     and  A, $20                                        ;; 02:4f7f $e6 $20
     ld   A, $20                                        ;; 02:4f81 $3e $20
@@ -441,10 +441,10 @@ call_02_5081_Player_UpdateFacingAndMovementVector:
     jr   Z, .jr_02_50c4                                ;; 02:509b $28 $27
 .jr_02_509d:
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:509d $fa $81 $dc
-    and  A, $30                                        ;; 02:50a0 $e6 $30
+    and  A, PADF_RIGHT | PADF_LEFT                                        ;; 02:50a0 $e6 $30
     jr   Z, .jr_02_50b0                                ;; 02:50a2 $28 $0c
     ld   C, $00                                        ;; 02:50a4 $0e $00
-    and  A, $10                                        ;; 02:50a6 $e6 $10
+    and  A, PADF_RIGHT                                        ;; 02:50a6 $e6 $10
     jr   NZ, .jr_02_50ac                               ;; 02:50a8 $20 $02
     ld   C, $20                                        ;; 02:50aa $0e $20
 .jr_02_50ac:
@@ -453,7 +453,7 @@ call_02_5081_Player_UpdateFacingAndMovementVector:
 .jr_02_50b0:
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:50b0 $fa $81 $dc
     swap A                                             ;; 02:50b3 $cb $37
-    and  A, $0f                                        ;; 02:50b5 $e6 $0f
+    and  A, PADF_A | PADF_B | PADF_SELECT | PADF_START                                        ;; 02:50b5 $e6 $0f
     ld   L, A                                          ;; 02:50b7 $6f
     ld   H, $00                                        ;; 02:50b8 $26 $00
     ld   DE, .data_02_50f0                             ;; 02:50ba $11 $f0 $50
@@ -463,10 +463,10 @@ call_02_5081_Player_UpdateFacingAndMovementVector:
     jr   .jr_02_50e0                                   ;; 02:50c2 $18 $1c
 .jr_02_50c4:
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:50c4 $fa $81 $dc
-    and  A, $30                                        ;; 02:50c7 $e6 $30
+    and  A, PADF_RIGHT | PADF_LEFT                                        ;; 02:50c7 $e6 $30
     jr   Z, .jr_02_50db                                ;; 02:50c9 $28 $10
     ld   C, $00                                        ;; 02:50cb $0e $00
-    and  A, $10                                        ;; 02:50cd $e6 $10
+    and  A, PADF_RIGHT                                        ;; 02:50cd $e6 $10
     jr   NZ, .jr_02_50d3                               ;; 02:50cf $20 $02
     ld   C, $20                                        ;; 02:50d1 $0e $20
 .jr_02_50d3:
@@ -528,7 +528,7 @@ call_02_5100_Player_HorizontalMovementHandler:
     ld   A, [wD801_Player_ActionId]                                    ;; 02:5130 $fa $01 $d8
     cp   A, PLAYERACTION_WATER_SWIMMING                                        ;; 02:5133 $fe $19
     jr   Z, .jr_02_513a                                ;; 02:5135 $28 $03
-    cp   A, $1f                                        ;; 02:5137 $fe $1f
+    cp   A, PLAYERACTION_WATER_TAIL_SPIN                                        ;; 02:5137 $fe $1f
     ret  NZ                                            ;; 02:5139 $c0
 .jr_02_513a:
     ld   HL, wDC86_PlayerXVelocity                                     ;; 02:513a $21 $86 $dc
@@ -1117,7 +1117,7 @@ call_02_5431_HandleActionTriggersAndEvents:
     or   A, H                                          ;; 02:54de $b4
     ret  Z                                             ;; 02:54df $c8
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:54e0 $fa $81 $dc
-    and  A, $f3                                        ;; 02:54e3 $e6 $f3
+    and  A, PADF_A | PADF_B | PADF_RIGHT | PADF_LEFT | PADF_UP | PADF_DOWN    ;; 02:54e3 $e6 $f3
     ld   C, A                                          ;; 02:54e5 $4f
 .jr_02_54e6:
     ld   A, [HL+]                                      ;; 02:54e6 $2a

@@ -361,7 +361,7 @@ call_03_48ad_BgCollisionHandler_TopDown:
     call call_03_4b4c_TileCollisionCheck
     jr   nz,.jp_03_4950_CheckMove_StraightHorizontal
     ld   a,[wDC81_CurrentInputsAlt]
-    and  a,$0F
+    and  a,PADF_A | PADF_B | PADF_SELECT | PADF_START
     or   a,PADF_UP
     ld   [wDC81_CurrentInputsAlt],a
     ld   a,$01
@@ -394,7 +394,7 @@ call_03_48ad_BgCollisionHandler_TopDown:
     call call_03_4b4c_TileCollisionCheck
     jr   nz,.jp_03_4950_CheckMove_StraightHorizontal
     ld   a,[wDC81_CurrentInputsAlt]
-    and  a,$0F
+    and  a,PADF_A | PADF_B | PADF_SELECT | PADF_START
     or   a,PADF_DOWN
     ld   [wDC81_CurrentInputsAlt],a
     ld   a,$05
@@ -409,7 +409,7 @@ call_03_48ad_BgCollisionHandler_TopDown:
     call call_03_4b4c_TileCollisionCheck
     jr   nz,.jp_03_48E1_ResetDirectionState
     ld   a,[wDC81_CurrentInputsAlt]
-    and  a,$0F
+    and  a,PADF_A | PADF_B | PADF_SELECT | PADF_START
     or   a,PADF_RIGHT
     ld   [wDC81_CurrentInputsAlt],a
     ld   a,$03
@@ -440,7 +440,7 @@ call_03_48ad_BgCollisionHandler_TopDown:
     call call_03_4b4c_TileCollisionCheck
     jr   nz,.jp_03_49D2_CheckMove_Left
     ld   a,[wDC81_CurrentInputsAlt]
-    and  a,$0F
+    and  a,PADF_A | PADF_B | PADF_SELECT | PADF_START
     or   a,PADF_UP
     ld   [wDC81_CurrentInputsAlt],a
     ld   a,$01
@@ -470,7 +470,7 @@ call_03_48ad_BgCollisionHandler_TopDown:
     call call_03_4b4c_TileCollisionCheck
     jr   nz,.jp_03_49D2_CheckMove_Left
     ld   a,[wDC81_CurrentInputsAlt]
-    and  a,$0F
+    and  a,PADF_A | PADF_B | PADF_SELECT | PADF_START
     or   a,PADF_DOWN
     ld   [wDC81_CurrentInputsAlt],a
     ld   a,$05
@@ -485,7 +485,7 @@ call_03_48ad_BgCollisionHandler_TopDown:
     call call_03_4b4c_TileCollisionCheck
     jp   nz,.jp_03_48E1_ResetDirectionState
     ld   a,[wDC81_CurrentInputsAlt]
-    and  a,$0F
+    and  a,PADF_A | PADF_B | PADF_SELECT | PADF_START
     or   a,PADF_LEFT
     ld   [wDC81_CurrentInputsAlt],a
     ld   a,$07
@@ -595,7 +595,7 @@ call_03_4a3f_BgCollisionHandler_ByAction:
     jr   NZ, .jr_03_4a77                               ;; 03:4a7c $20 $f9
 .jr_03_4a7e:
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 03:4a7e $fa $81 $dc
-    and  A, $0f                                        ;; 03:4a81 $e6 $0f
+    and  A, PADF_A | PADF_B | PADF_SELECT | PADF_START                                        ;; 03:4a81 $e6 $0f
     ld   [wDC81_CurrentInputsAlt], A                                    ;; 03:4a83 $ea $81 $dc
     ret                                                ;; 03:4a86 $c9
 .jr_03_4a87:
@@ -655,7 +655,7 @@ call_03_4ae4_CollisionMask_LookupAndDispatch:
     jr   NZ, .jr_03_4afe                               ;; 03:4b03 $20 $f9
 .jr_03_4b05:
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 03:4b05 $fa $81 $dc
-    and  A, $0f                                        ;; 03:4b08 $e6 $0f
+    and  A, PADF_A | PADF_B | PADF_SELECT | PADF_START                                        ;; 03:4b08 $e6 $0f
     ld   [wDC81_CurrentInputsAlt], A                                    ;; 03:4b0a $ea $81 $dc
     ret                                                ;; 03:4b0d $c9
 .jr_03_4b0e:

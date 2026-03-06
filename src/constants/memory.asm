@@ -52,7 +52,7 @@ wD700_EntityFlags:
 
 ; From D800 to D900 is the loaded entities space
 ; There are 8 instances of 0x20 bytes each. 
-; Entity Instance Struct is defined in constants.inc
+; Entity Instance Struct is defined in constants.asm
 wD800_EntityMemory:
 wD800_Player_Id:
     ds 1                                               ;; d800

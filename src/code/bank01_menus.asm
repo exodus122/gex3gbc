@@ -130,7 +130,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     and  A, $01                                        ;; 01:4088 $e6 $01
     jp   Z, .jp_01_41cb                                ;; 01:408a $ca $cb $41
     ld   HL, wDAD7_CurrentInputs                                     ;; 01:408d $21 $d7 $da
-    bit  2, [HL] ; PADF_SELECT                                      ;; 01:4090 $cb $56
+    bit  PADF_SELECT_BIT, [HL] ;                                      ;; 01:4090 $cb $56
     jr   Z, .jr_01_40ad                                ;; 01:4092 $28 $19
     ld   A, SFX_MENU_SCROLL                                        ;; 01:4094 $3e $01
     call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4096 $cd $d7 $0f

@@ -1881,7 +1881,7 @@ call_00_217f_ProcessCutsceneMovement:
     and  A, $0f                                        ;; 00:219d $e6 $0f
     ld   C, A                                          ;; 00:219f $4f
     ld   HL, wDC81_CurrentInputsAlt                                     ;; 00:21a0 $21 $81 $dc
-    bit  4, [HL]                                       ;; 00:21a3 $cb $66
+    bit  PADF_RIGHT_BIT, [HL]                                       ;; 00:21a3 $cb $66
     jr   Z, .jr_00_21b6                                ;; 00:21a5 $28 $0f
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:21a7 $fa $0e $d8
     add  A, C                                          ;; 00:21aa $81
@@ -1890,7 +1890,7 @@ call_00_217f_ProcessCutsceneMovement:
     adc  A, $00                                        ;; 00:21b1 $ce $00
     ld   [wD80E_PlayerXPosition+1], A                                    ;; 00:21b3 $ea $0f $d8
 .jr_00_21b6:
-    bit  5, [HL]                                       ;; 00:21b6 $cb $6e
+    bit  PADF_LEFT_BIT, [HL]                                       ;; 00:21b6 $cb $6e
     jr   Z, .jr_00_21c9                                ;; 00:21b8 $28 $0f
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:21ba $fa $0e $d8
     sub  A, C                                          ;; 00:21bd $91
@@ -1899,7 +1899,7 @@ call_00_217f_ProcessCutsceneMovement:
     sbc  A, $00                                        ;; 00:21c4 $de $00
     ld   [wD80E_PlayerXPosition+1], A                                    ;; 00:21c6 $ea $0f $d8
 .jr_00_21c9:
-    bit  7, [HL]                                       ;; 00:21c9 $cb $7e
+    bit  PADF_DOWN_BIT, [HL]                                       ;; 00:21c9 $cb $7e
     jr   Z, .jr_00_21dc                                ;; 00:21cb $28 $0f
     ld   A, [wD810_PlayerYPosition]                                    ;; 00:21cd $fa $10 $d8
     add  A, C                                          ;; 00:21d0 $81
@@ -1908,7 +1908,7 @@ call_00_217f_ProcessCutsceneMovement:
     adc  A, $00                                        ;; 00:21d7 $ce $00
     ld   [wD810_PlayerYPosition+1], A                                    ;; 00:21d9 $ea $11 $d8
 .jr_00_21dc:
-    bit  6, [HL]                                       ;; 00:21dc $cb $76
+    bit  PADF_UP_BIT, [HL]                                       ;; 00:21dc $cb $76
     ret  Z                                             ;; 00:21de $c8
     ld   A, [wD810_PlayerYPosition]                                    ;; 00:21df $fa $10 $d8
     sub  A, C                                          ;; 00:21e2 $91

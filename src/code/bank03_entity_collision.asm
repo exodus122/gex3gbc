@@ -738,7 +738,7 @@ call_03_5116_CollisionHandler_Door:
     bit  7,[hl]
     ret  z
     ld   hl,wDC81_CurrentInputsAlt
-    bit  6,[hl]
+    bit  PADF_UP_BIT,[hl]
     ret  z
     ld   a,[wD801_Player_ActionId]
     cp   a,PLAYERACTION_IDLE
@@ -769,7 +769,7 @@ call_03_5156_CollisionHandler_Door2:
     bit  7,[hl]
     ret  z
     ld   hl,wDC81_CurrentInputsAlt
-    bit  6,[hl]
+    bit  PADF_UP_BIT,[hl]
     ret  z
     ld   a,[wD801_Player_ActionId]
     cp   a,PLAYERACTION_IDLE
@@ -851,9 +851,9 @@ call_03_5201_CollisionHandler_BigSilverRobot:
     call call_03_4cea_CollisionHandler_DamagePlayer
     ld   a,$02
     farcall call_02_72ac_SetEntityAction
-    jp   call_00_2410_Entity_FaceTorwardsPlayer
+    jp   call_00_2410_Entity_FaceTowardsPlayer
 .jr_00_5222:
-    call call_00_2410_Entity_FaceTorwardsPlayer
+    call call_00_2410_Entity_FaceTowardsPlayer
     call call_03_5671_HandleEntityHit
     call call_00_2962_Entity_GetActionId
     cp   a,$03

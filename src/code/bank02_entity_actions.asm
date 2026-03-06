@@ -816,7 +816,7 @@ call_02_5eb8_EntityAction_Penguin_Jump:
 call_02_5ecc_EntityAction_Rezling_Walk:
     ld   c,$14
     call call_00_28c8_Entity_SetXVelocity
-    call call_00_2410_Entity_FaceTorwardsPlayer
+    call call_00_2410_Entity_FaceTowardsPlayer
     call call_00_254a_Entity_AdvancePosition_XDelta
     jp   call_00_2879_Entity_HandleHorizontalBoundingBoxStop
 
@@ -861,7 +861,7 @@ call_02_5f01_EntityAction_SafariSam_Unk0:
     jr   z,.jr_00_5F22
     ld   a,[wDA11_EntityXDistFromPlayer]
     cp   a,$40
-    call c,call_00_2410_Entity_FaceTorwardsPlayer
+    call c,call_00_2410_Entity_FaceTowardsPlayer
 .jr_00_5F22:
     ld   c,$06
     call call_00_28c8_Entity_SetXVelocity
@@ -1393,7 +1393,7 @@ call_02_63f0_EntityAction_EnemyCactus_Unk1:
     jr   z,.jr_00_63FD
     ld   c,TIMER_AMOUNT_60_FRAMES
     call call_00_290d_Entity_SetMiscTimer
-    call call_00_2410_Entity_FaceTorwardsPlayer
+    call call_00_2410_Entity_FaceTowardsPlayer
 .jr_00_63FD:
     call call_00_2922_Entity_MiscTimerCountdown
     ld   a,$02
@@ -1528,7 +1528,7 @@ call_02_64e9_EntityAction_Bat_Unk0:
 call_02_6502_EntityAction_Bat_Unk2:
     call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
     jr   z,.jr_00_651D
-    call call_00_2410_Entity_FaceTorwardsPlayer
+    call call_00_2410_Entity_FaceTowardsPlayer
     call call_00_2976_Entity_GetFacingDirection
     ld   c,$10
     cp   a,$00
@@ -1705,7 +1705,7 @@ call_02_6641_EntityAction_SailorToonGirl_Unk0:
     call call_00_251c_Entity_HandleHorizontalBoundingBoxTurnAround
     call call_00_2722_Entity_IsNearPlayer
     ret  z
-    call call_00_2410_Entity_FaceTorwardsPlayer
+    call call_00_2410_Entity_FaceTowardsPlayer
     call call_00_2a68_Entity_ComputeXDistanceFromPlayer
     ld   a,[wDA11_EntityXDistFromPlayer]
     cp   a,$18
@@ -1764,7 +1764,7 @@ call_02_669d_EntityAction_SailorToonGirl_Unk5:
     ret  
 
 call_02_66bb_EntityAction_BigSilverRobot_Unk0:
-    call call_00_2410_Entity_FaceTorwardsPlayer
+    call call_00_2410_Entity_FaceTowardsPlayer
     call call_00_2a68_Entity_ComputeXDistanceFromPlayer
     ld   a,[wDA11_EntityXDistFromPlayer]
     cp   a,$38
@@ -2288,7 +2288,7 @@ call_02_6ab4_EntityAction_WaterTowerTank_Unk1:
 
 call_02_6acd_EntityAction_Convict_Unk0:
     call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
-    jp   nz,call_00_2410_Entity_FaceTorwardsPlayer
+    jp   nz,call_00_2410_Entity_FaceTowardsPlayer
     ret  
 
 call_02_6ad4_EntityAction_Convict_Unk2:    
@@ -2350,7 +2350,7 @@ call_02_6b35_EntityAction_Spider_Unk2:
     call call_00_28c8_Entity_SetXVelocity
     ld   c,TIMER_AMOUNT_SPIDER
     call call_00_290d_Entity_SetMiscTimer
-    call call_00_2410_Entity_FaceTorwardsPlayer
+    call call_00_2410_Entity_FaceTowardsPlayer
 .jr_00_6B47:
     call call_00_251c_Entity_HandleHorizontalBoundingBoxTurnAround
     call call_00_2922_Entity_MiscTimerCountdown
@@ -2389,7 +2389,7 @@ call_02_6b69_EntityAction_YellowGoon_Unk0:
     call call_00_2917_Entity_CheckIfMiscTimerIsZero
     ld   [hl],$03
     call call_00_2722_Entity_IsNearPlayer
-    call nz,call_00_2410_Entity_FaceTorwardsPlayer
+    call nz,call_00_2410_Entity_FaceTowardsPlayer
     ld   a,$02
     jp   call_02_72ac_SetEntityAction
 

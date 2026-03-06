@@ -237,7 +237,7 @@ call_02_4911_PlayerAction_TailSpin:
     jr   Z, .jr_02_4953                                ;; 02:4946 $28 $0b
     ld   C, PLAYERACTION_IDLE                                        ;; 02:4948 $0e $01
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:494a $fa $81 $dc
-    and  A, $30                                        ;; 02:494d $e6 $30
+    and  A, PADF_RIGHT | PADF_LEFT                                        ;; 02:494d $e6 $30
     jr   Z, .jr_02_4953                                ;; 02:494f $28 $02
     ld   C, PLAYERACTION_WALK                                        ;; 02:4951 $0e $03
 .jr_02_4953:
@@ -256,7 +256,7 @@ call_02_4957_PlayerAction_Fall:
     and  A, A                                          ;; 02:4969 $a7
     ret  NZ                                            ;; 02:496a $c0
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:496b $fa $81 $dc
-    and  A, $30                                        ;; 02:496e $e6 $30
+    and  A, PADF_RIGHT | PADF_LEFT                                        ;; 02:496e $e6 $30
     ld   A, PLAYERACTION_WALK                                        ;; 02:4970 $3e $03
     jp   NZ, call_02_54f9_SwitchPlayerAction                              ;; 02:4972 $c2 $f9 $54
     ld   A, PLAYERACTION_IDLE                                        ;; 02:4975 $3e $01
@@ -590,7 +590,7 @@ call_02_4bb7_PlayerAction_Snowboarding_StandOrWalk:
     set  6,[hl]
 .jr_00_4BDC:
     ld   a,[wDC81_CurrentInputsAlt]
-    bit  6,a
+    bit  PADF_UP_BIT,a
     call nz,call_00_1bbc_CheckForDoorAndEnter
     call call_02_4E0C_Player_SnowboardingTailSpin
     ld   a,[wDCA5_Player_SnowboardingRelated4]

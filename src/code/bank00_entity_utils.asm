@@ -382,7 +382,7 @@ call_00_233e_Entity_UpdatePatternedMovement:
     db   $1f, $fc, $1f, $fd, $1f, $fe, $1f, $ff        ;; 00:2406 ????????
     db   $1f, $00
 
-call_00_2410_Entity_FaceTorwardsPlayer:
+call_00_2410_Entity_FaceTowardsPlayer:
 ; Loads the current entity’s position ($0E/$0F).
 ; Compares it with the player’s X position (wD80E/F).
 ; Sets a nearby state byte (L xor $02) to $20 if the player is 
