@@ -332,7 +332,7 @@ call_00_0150_Init:
     bit  2, [HL]                                       ;; 00:0451 $cb $56
     jr   Z, .jr_00_045e_SkipLoadMap                                ;; 00:0453 $28 $09
     call call_00_1633_HandleLevelWarpOrExit                                  ;; 00:0455 $cd $33 $16
-    call call_00_2b3d_ClearAllEntitySlots                                  ;; 00:0458 $cd $3d $2b
+    call call_00_2b3d_Entity_ClearAllSlots                                  ;; 00:0458 $cd $3d $2b
     jp   .jp_00_038e_LoadMap                                   ;; 00:045b $c3 $8e $03
 .jr_00_045e_SkipLoadMap:
     ld   HL, wDB6A_WarpFlags                                     ;; 00:045e $21 $6a $db
@@ -1583,9 +1583,9 @@ call_00_0c6a_HandlePendingHDMATransfers:
     call call_00_0f25_AltSwitchBank                                  ;; 00:0cb4 $cd $25 $0f
     ld   H, HIGH(wD800_EntityMemory)                                        ;; 00:0cb7 $26 $d8
     ld   A, [wDB61_ActiveObjectSlot]                                    ;; 00:0cb9 $fa $61 $db
-    or   A, ENTITY_FIELD_GRAPHICS_FLAGS                                        ;; 00:0cbc $f6 $05
+    or   A, ENTITY_FIELD_ACTION_STATE_FLAGS                                        ;; 00:0cbc $f6 $05
     ld   L, A                                          ;; 00:0cbe $6f
-    bit  5, [HL]                                       ;; 00:0cbf $cb $6e
+    bit  ACTION_STATE_UNK20_BIT, [HL]                                       ;; 00:0cbf $cb $6e
     jr   NZ, .jr_00_0ceb                               ;; 00:0cc1 $20 $28
     ld   A, [wDB64_VRAMTransferSource+1]                                    ;; 00:0cc3 $fa $65 $db
     ldh  [rHDMA1], A                                   ;; 00:0cc6 $e0 $51

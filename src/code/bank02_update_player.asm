@@ -318,7 +318,7 @@ call_02_4f32_PlayerUpdateMain:
 .jr_02_4fed:
     call call_02_5100_Player_HorizontalMovementHandler                                  ;; 02:4fed $cd $00 $51
     call call_02_5047_CachePlayerTileCoords                                  ;; 02:4ff0 $cd $47 $50
-    ld   HL, wD805_Player_MovementFlags                                     ;; 02:4ff3 $21 $05 $d8
+    ld   HL, wD805_Player_ActionState                                     ;; 02:4ff3 $21 $05 $d8
     res  4, [HL]                                       ;; 02:4ff6 $cb $a6
     jp   call_02_724d_Entity_UpdateSpriteFields                                  ;; 02:4ff8 $c3 $4d $72
 

@@ -107,7 +107,7 @@ call_03_4cd7_CollisionHandler_Projectile:
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     call call_03_4cea_CollisionHandler_DamagePlayer
-    jp   call_00_2b80_DeactivateEntitySlot
+    jp   call_00_2b80_Entity_DeactivateSelf
 
 call_03_4ce1_CollisionHandler_GenericEnemy:
 ; Calls CheckPlayerEntityInteraction.
@@ -295,7 +295,7 @@ call_03_4e04_CollisionHandler_Fly:
     and  a,$F0
     or   a,$03
     ld   [hl],a
-    jp   call_00_2b80_DeactivateEntitySlot
+    jp   call_00_2b80_Entity_DeactivateSelf
 .data_03_4e2c:
     db   $03, $04, $01, $05, $02
 
@@ -375,7 +375,7 @@ call_03_4e89_CollisionHandler_EvilSantaProjectile:
     ld   [HL], A                                       ;; 03:4ea2 $77
     ld   C, ENTITY_HOLIDAY_TV_EVIL_SANTA                                        ;; 03:4ea3 $0e $1e
     call call_00_29ce_Entity_CheckExists                                  ;; 03:4ea5 $cd $ce $29
-    jp   NZ, call_00_2b80_DeactivateEntitySlot                              ;; 03:4ea8 $c2 $80 $2b
+    jp   NZ, call_00_2b80_Entity_DeactivateSelf                              ;; 03:4ea8 $c2 $80 $2b
     ld   A, L                                          ;; 03:4eab $7d
     or   A, ENTITY_FIELD_XPOS                                        ;; 03:4eac $f6 $0e
     ld   L, A                                          ;; 03:4eae $6f
@@ -1205,7 +1205,7 @@ call_03_5469_CollisionHandler_BrainOfOzProjectile:
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     call call_03_4cea_CollisionHandler_DamagePlayer
-    jp   call_00_2b7a_DeactivateEntity
+    jp   call_00_2b7a_Entity_DeactivateAndClearFlags
 
 call_03_5473_CollisionHandler_FreestandingRemote:
 ; On collision (interaction=1): set wDCD2_FreestandingRemoteHitFlags=0x81 (event flag).
@@ -1614,7 +1614,7 @@ call_03_5671_HandleEntityHit:
     ld   [HL], $00                                     ;; 03:5689 $36 $00
     call call_00_35e8_GetEntityCollisionFlags                                  ;; 03:568b $cd $e8 $35
     cp   A, $ff                                        ;; 03:568e $fe $ff
-    jp   Z, call_00_2b7a_DeactivateEntity                                 ;; 03:5690 $ca $7a $2b
+    jp   Z, call_00_2b7a_Entity_DeactivateAndClearFlags                                 ;; 03:5690 $ca $7a $2b
     bit  7, A                                          ;; 03:5693 $cb $7f
     jr   Z, .jr_03_56a6                                ;; 03:5695 $28 $0f
     push AF                                            ;; 03:5697 $f5

@@ -1444,14 +1444,14 @@ call_00_29ea_Entity_ClearFacingUnkFlag:
     res  7,[hl]
     ret  
 
-call_00_29f5_Entity_ClearGraphicsFlag4AndCheck:
+call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear:
 ; Gets entity entry byte at $D805+index.
 ; Clears bit 4 in memory.
 ; Returns with carry based on the old bit 4 state (bit 4,A).
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_GRAPHICS_FLAGS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_ACTION_STATE_FLAGS
     ld   A, [HL]                                       ;; 00:29fd $7e
-    res  4, [HL]                                       ;; 00:29fe $cb $a6
-    bit  4, A                                          ;; 00:2a00 $cb $67
+    res  ACTION_STATE_IS_FIRST_FRAME_BIT, [HL]                                       ;; 00:29fe $cb $a6
+    bit  ACTION_STATE_IS_FIRST_FRAME_BIT, A                                          ;; 00:2a00 $cb $67
     ret                                                ;; 00:2a02 $c9
 
 call_00_2a03_ResetEntityListIndex:
@@ -1534,8 +1534,8 @@ call_00_2a5d_Entity_CheckGraphicsFlag2:
 ; Computes HL = D805 + current entity index.
 ; Tests bit 2 of the entity’s flags.
 ; Purpose: Checks a particular state flag (likely "grounded," "active," or similar).
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_GRAPHICS_FLAGS
-    bit  2, [HL]                                       ;; 00:2a65 $cb $56
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_ACTION_STATE_FLAGS
+    bit  ACTION_STATE_UNK04_BIT, [HL]                                       ;; 00:2a65 $cb $56
     ret                                                ;; 00:2a67 $c9
 
 call_00_2a68_Entity_ComputeXDistanceFromPlayer:
@@ -1712,7 +1712,7 @@ call_00_2b10_Entity_FindDuplicateInstance:
     and  A, A                                          ;; 00:2b3b $a7
     ret                                                ;; 00:2b3c $c9
 
-call_00_2b3d_ClearAllEntitySlots:
+call_00_2b3d_Entity_ClearAllSlots:
 ; Iterates through entity slots in increments of $20, checking each slot in wD8xx. 
 ; If the slot value isn’t $FF (active), it clears the entry. 
 ; Restores wDA00_CurrentEntityAddrLo afterward. Essentially sweeps all entity entries and deactivates them.
@@ -1726,7 +1726,7 @@ call_00_2b3d_ClearAllEntitySlots:
     ld   H, HIGH(wD800_EntityMemory)                                        ;; 00:2b49 $26 $d8
     ld   A, [HL]                                       ;; 00:2b4b $7e
     cp   A, $ff                                        ;; 00:2b4c $fe $ff
-    call NZ, call_00_2b5d_ClearEntitySlot                              ;; 00:2b4e $c4 $5d $2b
+    call NZ, call_00_2b5d_Entity_ClearSlot                              ;; 00:2b4e $c4 $5d $2b
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 00:2b51 $fa $00 $da
     add  A, $20                                        ;; 00:2b54 $c6 $20
     jr   NZ, .jr_00_2b43                               ;; 00:2b56 $20 $eb
@@ -1734,7 +1734,7 @@ call_00_2b3d_ClearAllEntitySlots:
     ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 00:2b59 $ea $00 $da
     ret                                                ;; 00:2b5c $c9
 
-call_00_2b5d_ClearEntitySlot:
+call_00_2b5d_Entity_ClearSlot:
 ; Marks the current entity slot as inactive by writing $FF to wD8xx. Then computes a related index 
 ; from the slot address to access another table (wDA01_EntityListIndexesForCurrentEntities → wD7xx) and clears bit 6 of its status 
 ; byte—likely removing an "active" or "visible" flag for that entity.
@@ -1754,13 +1754,13 @@ call_00_2b5d_ClearEntitySlot:
     res  6, [HL]                                       ;; 00:2b77 $cb $b6
     ret                                                ;; 00:2b79 $c9
 
-call_00_2b7a_DeactivateEntity:
-; Calls call_00_2b80_DeactivateEntitySlot (sets slot to $FF), then jumps to call_00_2b94_ClearEntityFlags (zeroes a related entry in wD7xx). 
+call_00_2b7a_Entity_DeactivateAndClearFlags:
+; Calls call_00_2b80_Entity_DeactivateSelf (sets slot to $FF), then jumps to call_00_2b94_Entity_ClearFlags (zeroes a related entry in wD7xx). 
 ; Used as a branch to fully clear an entity before continuing.
-    call call_00_2b80_DeactivateEntitySlot                                  ;; 00:2b7a $cd $80 $2b
-    jp   call_00_2b94_ClearEntityFlags                                    ;; 00:2b7d $c3 $94 $2b
+    call call_00_2b80_Entity_DeactivateSelf                                  ;; 00:2b7a $cd $80 $2b
+    jp   call_00_2b94_Entity_ClearFlags                                    ;; 00:2b7d $c3 $94 $2b
 
-call_00_2b80_DeactivateEntitySlot:
+call_00_2b80_Entity_DeactivateSelf:
 ; Writes $FF to the current entity’s wD8xx slot. This is a lightweight variant 
 ; of call_00_2b5d without touching flags.
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_ENTITY_ID
@@ -1769,15 +1769,15 @@ call_00_2b80_DeactivateEntitySlot:
 
 call_00_2b8b_AttemptToSetEntityFlagsTo50:
 ; Get the entity's collision flags, tests bit 6 of A. If clear, 
-; jumps to call_00_2b94_ClearEntityFlags (zero related data). If set, 
-; jumps to call_00_2ba9_SetEntityFlagsTo50 to initialize a 
+; jumps to call_00_2b94_Entity_ClearFlags (zero related data). If set, 
+; jumps to call_00_2ba9_Entity_SetFlagsTo50 to initialize a 
 ; status value. Used to decide whether to zero or set $50.
     call call_00_35e8_GetEntityCollisionFlags                                  ;; 00:2b8b $cd $e8 $35
     bit  6, A                                          ;; 00:2b8e $cb $77
-    jr   Z, call_00_2b94_ClearEntityFlags                                 ;; 00:2b90 $28 $02
-    jr   call_00_2ba9_SetEntityFlagsTo50                                  ;; 00:2b92 $18 $15
+    jr   Z, call_00_2b94_Entity_ClearFlags                                 ;; 00:2b90 $28 $02
+    jr   call_00_2ba9_Entity_SetFlagsTo50                                  ;; 00:2b92 $18 $15
 
-call_00_2b94_ClearEntityFlags:
+call_00_2b94_Entity_ClearFlags:
 ; Computes an index from the entity address and writes $00 to a corresponding wD7xx status 
 ; byte—used to mark an entity as inactive or reset its state.
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 00:2b94 $fa $00 $da
@@ -1794,8 +1794,8 @@ call_00_2b94_ClearEntityFlags:
     ld   [HL], $00                                     ;; 00:2ba6 $36 $00
     ret                                                ;; 00:2ba8 $c9
 
-call_00_2ba9_SetEntityFlagsTo50:
-; Like call_00_2b94_ClearEntityFlags, but writes $50 instead of $00. 
+call_00_2ba9_Entity_SetFlagsTo50:
+; Like call_00_2b94_Entity_ClearFlags, but writes $50 instead of $00. 
 ; Likely initializes or flags an entity as partially active.
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 00:2ba9 $fa $00 $da
     rlca                                               ;; 00:2bac $07
@@ -1821,9 +1821,9 @@ call_00_2bbe_AttemptToConvertEntityToCollectible:
 ; This is the main "spawn/setup entity" function.
     call call_00_35e8_GetEntityCollisionFlags                                  ;; 00:2bbe $cd $e8 $35
     cp   A, $ff                                        ;; 00:2bc1 $fe $ff
-    jr   Z, call_00_2b7a_DeactivateEntity                                 ;; 00:2bc3 $28 $b5
+    jr   Z, call_00_2b7a_Entity_DeactivateAndClearFlags                                 ;; 00:2bc3 $28 $b5
     bit  6, A                                          ;; 00:2bc5 $cb $77
-    jr   Z, call_00_2b7a_DeactivateEntity                                 ;; 00:2bc7 $28 $b1
+    jr   Z, call_00_2b7a_Entity_DeactivateAndClearFlags                                 ;; 00:2bc7 $28 $b1
     ld   C, ENTITY_FLY_COIN_SPAWN                                        ;; 00:2bc9 $0e $02
     call call_00_2930_Entity_SetId                                  ;; 00:2bcb $cd $30 $29
     ld   C, COLLISION_TYPE_FLY_COIN                                        ;; 00:2bce $0e $08
@@ -1838,7 +1838,7 @@ call_00_2bbe_AttemptToConvertEntityToCollectible:
     call call_00_28aa_Entity_Set16                                  ;; 00:2be4 $cd $aa $28
     ld   C, $00                                        ;; 00:2be7 $0e $00
     call call_00_2299_Entity_UpdateFlags                                  ;; 00:2be9 $cd $99 $22
-    call call_00_2ba9_SetEntityFlagsTo50                                  ;; 00:2bec $cd $a9 $2b
+    call call_00_2ba9_Entity_SetFlagsTo50                                  ;; 00:2bec $cd $a9 $2b
     xor  A, A                                          ;; 00:2bef $af
     farcall call_02_72ac_SetEntityAction
     ld   HL, .data_02_2c01                                     ;; 00:2bfb $21 $01 $2c

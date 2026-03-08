@@ -680,7 +680,7 @@ call_03_5fc2_SetupEntitySprite:
     ld   [HL+], A                                      ;; 03:6035 $22
     ld   [HL], A                                       ;; 03:6036 $77
     call call_00_2a15_CheckCameraOverlapBoundingBox                                  ;; 03:6037 $cd $15 $2a
-    call C, call_00_2b5d_ClearEntitySlot                               ;; 03:603a $dc $5d $2b
+    call C, call_00_2b5d_Entity_ClearSlot                               ;; 03:603a $dc $5d $2b
     ret                                                ;; 03:603d $c9
 .jr_03_603e:
     LOAD_OBJ_FIELD_TO_HL_ALT ENTITY_FIELD_COOLDOWN_TIMER

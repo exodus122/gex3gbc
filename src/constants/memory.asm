@@ -60,7 +60,7 @@ wD801_Player_ActionId:
     ds 1                                               ;; d801
 wD802_Player_ActionFunc:
     ds 3                                               ;; d802
-wD805_Player_MovementFlags:
+wD805_Player_ActionState:
     ds 4                                               ;; d805
 wD809_Player_SpriteCounter:
     ds 1                                               ;; d809
@@ -262,7 +262,7 @@ wDB66_HDMATransferFlags:
 ; Bit 1 set →
 ; Copy tiles for the current interaction entity.
 ; - Uses wDB64/65 as the source pointer.
-; - Source bank depends on the entity’s data (ENTITY_FIELD_GRAPHICS_FLAGS, plus a VBK = 1 path if "extended" graphics).
+; - Source bank depends on the entity’s data (ENTITY_FIELD_ACTION_STATE_FLAGS, plus a VBK = 1 path if "extended" graphics).
 ; - Length depends on the entity’s type (wDB63_ActiveObjectType).
 ; - This looks like sprite/animation tiles for NPCs or items.
 ; Bit 2 set →

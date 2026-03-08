@@ -148,9 +148,9 @@ call_03_687c_AssignEntityPalette:
 ; Stores the palette ID in wDAAE_EntityPaletteIds.
 ; Calculates an address into wDD2A_EntityPalettes, then copies 8 palette bytes from data_03_68f9_EntityPalettes.
 ; Usage: Ensures each on-screen entity uses the correct colors.
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_GRAPHICS_FLAGS   ;; 03:6883 $6f
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_ACTION_STATE_FLAGS   ;; 03:6883 $6f
     ld   C, $00                                        ;; 03:6884 $0e $00
-    bit  7, [HL]                                       ;; 03:6886 $cb $7e
+    bit  ACTION_STATE_UNK80_BIT, [HL]                                       ;; 03:6886 $cb $7e
     jr   NZ, .jr_03_6893                               ;; 03:6888 $20 $09
     ld   A, [wDA00_CurrentEntityAddrLo]                ;; 03:688a $fa $00 $da
     rlca                                               ;; 03:688d $07

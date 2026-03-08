@@ -261,8 +261,8 @@ call_02_724d_Entity_UpdateSpriteFields:
 ; Purpose: Updates sprite flags, animation counters, and sprite id for an individual entity slot.
     LOAD_OBJ_FIELD_TO_HL_ALT ENTITY_FIELD_SPRITE_FLAGS2               ; HL = ENTITY_FIELD_SPRITE_FLAGS2
     ld   E, [HL]                                       ;; 02:7255 $5e
-    inc  L                                             ;; 02:7256 $2c ; HL = ENTITY_FIELD_GRAPHICS_FLAGS
-    res  2, [HL]                                       ;; 02:7257 $cb $96
+    inc  L                                             ;; 02:7256 $2c ; HL = ENTITY_FIELD_ACTION_STATE_FLAGS
+    res  ACTION_STATE_UNK04_BIT, [HL]                                       ;; 02:7257 $cb $96
     ld   B, [HL]                                       ;; 02:7259 $46 ; b = HL
     inc  L                                             ;; 02:725a $2c ; HL = ENTITY_FIELD_SPRITE_FRAME_COUNTER_MAX
     ld   C, [HL]                                       ;; 02:725b $4e ; c = HL
@@ -296,8 +296,8 @@ call_02_724d_Entity_UpdateSpriteFields:
     ld   [HL-], A                                      ;; 02:7282 $32
     dec  L                                             ;; 02:7283 $2d
     dec  L                                             ;; 02:7284 $2d
-    dec  L                                             ;; 02:7285 $2d ; HL = ENTITY_FIELD_GRAPHICS_FLAGS
-    set  2, [HL]                                       ;; 02:7286 $cb $d6 
+    dec  L                                             ;; 02:7285 $2d ; HL = ENTITY_FIELD_ACTION_STATE_FLAGS
+    set  ACTION_STATE_UNK04_BIT, [HL]                                       ;; 02:7286 $cb $d6 
 .jr_02_7288:
     ld   A, [wDA00_CurrentEntityAddrLo]                ;; 02:7288 $fa $00 $da
     or   A, $05                                        ;; 02:728b $f6 $05

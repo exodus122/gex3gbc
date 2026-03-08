@@ -9,7 +9,7 @@ call_02_582f_EntityAction_DestroyWithoutParticles:
     ret  
 
 call_02_583c_EntityAction_Destroy:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck                                  ;; 02:583c $cd $f5 $29
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear                                  ;; 02:583c $cd $f5 $29
     jr   Z, .jr_02_5850                                ;; 02:583f $28 $0f
     ld   HL, .data_02_5857_ParticlesPalette                             ;; 02:5841 $21 $57 $58
     call call_00_2c20_Entity_CopyPaletteToBuffer                                  ;; 02:5844 $cd $20 $2c
@@ -24,7 +24,7 @@ call_02_583c_EntityAction_Destroy:
     db   $00, $00, $08, $02, $04, $01, $ff, $7f        ;; 02:5857 ........
 
 call_02_585f_EntityAction_MovePlatformHorizontally:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_586E
     ld   c,$80
     call call_00_2980_Entity_SetMiscFlags
@@ -69,7 +69,7 @@ call_02_585f_EntityAction_MovePlatformHorizontally:
     jp   call_00_290d_Entity_SetMiscTimer
 
 call_02_58bd_EntityAction_MovePlatformVertically:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_58CC
     ld   c,$80
     call call_00_2980_Entity_SetMiscFlags
@@ -168,7 +168,7 @@ call_02_598f_EntityAction_FlyTV_SpawnFly:
     db   $07, $04, $08
 
 call_02_59aa_EntityAction_FlyTV_Reset:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   c,TIMER_AMOUNT_120_FRAMES
     call nz,call_00_290d_Entity_SetMiscTimer
     call call_02_59D2_FlyTV_unk
@@ -204,7 +204,7 @@ call_02_59D2_FlyTV_unk:
     db   $02, $06, $03, $07, $04, $08
     
 call_02_59ed_EntityAction_Unk_unk:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_5A00
     call call_00_2976_Entity_GetFacingDirection
     ld   c,$D0
@@ -218,7 +218,7 @@ call_02_59ed_EntityAction_Unk_unk:
     ret  
 
 call_02_5a04_EntityAction_TVButton_unk:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck                                  ;; 02:5a04 $cd $f5 $29
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear                                  ;; 02:5a04 $cd $f5 $29
     jr   NZ, call_02_5a83_EntityAction_TVButton_unk4                                ;; 02:5a07 $20 $7a
     ld   C, $00                                        ;; 02:5a09 $0e $00
     call call_00_22b1_Entity_UpdateFlagsAndSetAction                                  ;; 02:5a0b $cd $b1 $22
@@ -228,7 +228,7 @@ call_02_5a04_EntityAction_TVButton_unk:
     db   $00, $00, $00, $00, $73, $4e, $1f, $00        ;; 02:5a14 ........
 
 call_02_5a1c_EntityAction_TVButton_unk2:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck                                  ;; 02:5a1c $cd $f5 $29
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear                                  ;; 02:5a1c $cd $f5 $29
     jr   NZ, call_02_5a83_EntityAction_TVButton_unk4                                ;; 02:5a1f $20 $62
     call call_02_5a75_EntityAction_TVButton_unk3                                  ;; 02:5a21 $cd $75 $5a
     ld   A, [wDC7B_CurrentEntityAddrLoAlt]                                    ;; 02:5a24 $fa $7b $dc
@@ -322,19 +322,19 @@ call_02_5a83_EntityAction_TVButton_unk4:
     jp   call_02_72ac_SetEntityAction                                  ;; 02:5ad7 $c3 $ac $72
 
 call_02_5ada_EntityAction_TVRemote_unk:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck                                  ;; 02:5ada $cd $f5 $29
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear                                  ;; 02:5ada $cd $f5 $29
     jr   NZ, call_02_5af8_EntityAction_TVRemote_unk4                                ;; 02:5add $20 $19
     ld   C, $00                                        ;; 02:5adf $0e $00
     jp   call_00_22b1_Entity_UpdateFlagsAndSetAction                                  ;; 02:5ae1 $c3 $b1 $22
 
 call_02_5ae4_EntityAction_TVRemote_unk2:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck                                  ;; 02:5ae4 $cd $f5 $29
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear                                  ;; 02:5ae4 $cd $f5 $29
     jr   NZ, call_02_5af8_EntityAction_TVRemote_unk4                                ;; 02:5ae7 $20 $0f
     ld   C, $01                                        ;; 02:5ae9 $0e $01
     jp   call_00_22b1_Entity_UpdateFlagsAndSetAction         
 
 call_02_5aee_EntityAction_TVRemote_unk3:    ;; 02:5aeb $c3 $b1 $22
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   nz,call_02_5af8_EntityAction_TVRemote_unk4
     ld   c,$02
     jp   call_00_22b1_Entity_UpdateFlagsAndSetAction
@@ -411,7 +411,7 @@ call_02_5af8_EntityAction_TVRemote_unk4:
     db   $00, $00, $00, $00, $1f, $00, $ff, $03        ;; 02:5b92 ........
 
 call_02_5b9a_EntityAction_UpdateGoalCounter:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck                                  ;; 02:5b9a $cd $f5 $29
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear                                  ;; 02:5b9a $cd $f5 $29
     jr   Z, .jr_02_5ba9                                ;; 02:5b9d $28 $0a
     ld   C, $30                                        ;; 02:5b9f $0e $30
     call call_00_28dc_Entity_SetYVelocity                                  ;; 02:5ba1 $cd $dc $28
@@ -420,7 +420,7 @@ call_02_5b9a_EntityAction_UpdateGoalCounter:
 .jr_02_5ba9:
     call call_00_2475_Entity_ApplyVerticalVelocity                                  ;; 02:5ba9 $cd $4a $24
     call call_00_2922_Entity_MiscTimerCountdown                                  ;; 02:5bac $cd $22 $29
-    jp   Z, call_00_2b80_DeactivateEntitySlot                               ;; 02:5baf $ca $80 $2b
+    jp   Z, call_00_2b80_Entity_DeactivateSelf                               ;; 02:5baf $ca $80 $2b
     ret                                                ;; 02:5bb2 $c9
 
 call_02_5bb3_EntityAction_UpdateBonusStageTimer:
@@ -463,7 +463,7 @@ call_02_5bef_EntityAction_FreestandingRemote_unk1:
     ret                                                ;; 02:5bf9 $c9
 
 call_02_5bfa_EntityAction_FreestandingRemote_unk2:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck                                  ;; 02:5bfa $cd $f5 $29
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear                                  ;; 02:5bfa $cd $f5 $29
     jr   Z, .jr_02_5c23                                ;; 02:5bfd $28 $24
     ld   A, SFX_REMOTE                                        ;; 02:5bff $3e $1e
     call call_00_0ff5_QueueSoundEffect                                  ;; 02:5c01 $cd $f5 $0f
@@ -487,10 +487,10 @@ call_02_5bfa_EntityAction_FreestandingRemote_unk2:
     call call_00_230f_Entity_GetParameterIntoC                                  ;; 02:5c2b $cd $0f $23
     inc  C                                             ;; 02:5c2e $0c
     dec  C                                             ;; 02:5c2f $0d
-    jp   Z, call_00_2b7a_DeactivateEntity                                 ;; 02:5c30 $ca $7a $2b
+    jp   Z, call_00_2b7a_Entity_DeactivateAndClearFlags                                 ;; 02:5c30 $ca $7a $2b
     ld   HL, wDB6A_WarpFlags                                     ;; 02:5c33 $21 $6a $db
     set  4, [HL]                                       ;; 02:5c36 $cb $e6
-    jp   call_00_2b7a_DeactivateEntity                                    ;; 02:5c38 $c3 $7a $2b
+    jp   call_00_2b7a_Entity_DeactivateAndClearFlags                                    ;; 02:5c38 $c3 $7a $2b
 .data_02_5c3b:
     db   $00, $00, $08, $02, $04, $01, $ff, $7f        ;; 02:5c3b ........
 
@@ -502,7 +502,7 @@ call_02_5c43_EntityAction_EvilSanta_Init:
     jp   call_02_72ac_SetEntityAction                                  ;; 02:5c4d $c3 $ac $72
 
 call_02_5c50_EntityAction_EvilSanta_Jumping:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck                                  ;; 02:5c50 $cd $f5 $29
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear                                  ;; 02:5c50 $cd $f5 $29
     jr   Z, .jr_02_5c62                                ;; 02:5c53 $28 $0d
     call call_02_5d02_LoadEvilSantaPalette                                  ;; 02:5c55 $cd $02 $5d
     ld   C, $20                                        ;; 02:5c58 $0e $20
@@ -546,7 +546,7 @@ call_02_5c82_EntityAction_EvilSanta_Stand:
     jp   call_02_72ac_SetEntityAction                                  ;; 02:5ca2 $c3 $ac $72
 
 call_02_5ca5_EntityAction_EvilSanta_Damaged:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   a,SFX_SMALL_BANG
     call nz,call_00_0ff5_QueueSoundEffect
     ld   a,[wDC71_FrameCounter_Entities]
@@ -562,7 +562,7 @@ call_02_5ca5_EntityAction_EvilSanta_Damaged:
     db   $00, $00, $84, $10, $08, $21, $8c, $31
     
 call_02_5cd0_EntityAction_EvilSanta_Death:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_5CF0
     ld   a,SFX_LOUD_BANG
     call call_00_0ff5_QueueSoundEffect
@@ -583,7 +583,7 @@ call_02_5cd0_EntityAction_EvilSanta_Death:
     ret  z
     ld   c,$03
     call call_00_21ef_Entity_PlayRemoteSFX
-    jp   call_00_2b7a_DeactivateEntity
+    jp   call_00_2b7a_Entity_DeactivateAndClearFlags
 
 call_02_5d02_LoadEvilSantaPalette:
     ld   HL, .data_02_5d08_EvilSantaPalette                             ;; 02:5d02 $21 $08 $5d
@@ -652,7 +652,7 @@ call_02_5d80_EntityAction_EvilSantaProjectile_UpdateTrajectory:
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YPOS
     ld   A, [HL]                                       ;; 02:5d92 $7e
     sub  A, $88                                        ;; 02:5d93 $d6 $88
-    jp   NC, call_00_2b80_DeactivateEntitySlot                              ;; 02:5d95 $d2 $80 $2b
+    jp   NC, call_00_2b80_Entity_DeactivateSelf                              ;; 02:5d95 $d2 $80 $2b
     bit  7, C                                          ;; 02:5d98 $cb $79
     jr   Z, .jr_02_5db5                                ;; 02:5d9a $28 $19
     ld   C, $01                                        ;; 02:5d9c $0e $01
@@ -692,11 +692,11 @@ call_02_5d80_EntityAction_EvilSantaProjectile_UpdateTrajectory:
 
 call_02_5dd7_EntityAction_EvilSantaProjectile_Destroy:
     call call_00_2a5d_Entity_CheckGraphicsFlag2                                  ;; 02:5dd7 $cd $5d $2a
-    jp   NZ, call_00_2b80_DeactivateEntitySlot                              ;; 02:5dda $c2 $80 $2b
+    jp   NZ, call_00_2b80_Entity_DeactivateSelf                              ;; 02:5dda $c2 $80 $2b
     ret                                                ;; 02:5ddd $c9
 
 call_02_5dde_EntityAction_SkatingElf_Skate:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck                                  ;; 02:5dde $cd $f5 $29
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear                                  ;; 02:5dde $cd $f5 $29
     ld   C, $20                                        ;; 02:5de1 $0e $20
     call NZ, call_00_28c8_Entity_SetXVelocity                              ;; 02:5de3 $c4 $c8 $28
     ld   A, [wDC71_FrameCounter_Entities]                                    ;; 02:5de6 $fa $71 $dc
@@ -738,7 +738,7 @@ call_02_5e25_EntityAction_SkatingElf_Jump:
     ret                                                ;; 02:5e33 $c9
 
 call_02_5e34_EntityAction_SkatingElf_Damaged:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck                                  ;; 02:5e34 $cd $f5 $29
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear                                  ;; 02:5e34 $cd $f5 $29
     jr   Z, .jr_02_5e45                                ;; 02:5e37 $28 $0c
     call call_00_2766_Entity_ResetYPosIfBelowInitial                                  ;; 02:5e39 $cd $66 $27
     ld   C, $00                                        ;; 02:5e3c $0e $00
@@ -849,7 +849,7 @@ call_02_5ef9_EntityAction_Fish_Unk1:
     jp   call_00_251c_Entity_HandleHorizontalBoundingBoxTurnAround
 
 call_02_5f01_EntityAction_SafariSam_Unk0:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   c,TIMER_AMOUNT_240_FRAMES
     call nz,call_00_290d_Entity_SetMiscTimer
     call call_00_2722_Entity_IsNearPlayer
@@ -875,20 +875,20 @@ call_02_5f01_EntityAction_SafariSam_Unk0:
     ret  
 
 call_02_5f39_EntityAction_SafariSam_Unk2:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   c,RELATIVE_ENTITY_SPAWN_SAFARI_SAM_PROJECTILE
     call nz,call_00_3792_PrepareRelativeEntitySpawn
     ret  
 
 call_02_5f42_EntityAction_SafariSam_Unk3:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   c,$30
     call nz,call_00_28dc_Entity_SetYVelocity
     call call_00_2475_Entity_ApplyVerticalVelocity
     jp   call_00_2766_Entity_ResetYPosIfBelowInitial
 
 call_02_5f50_EntityAction_SafariSamProjectile_Update:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_5F5F
     ld   c,TIMER_AMOUNT_240_FRAMES
     call call_00_290d_Entity_SetMiscTimer
@@ -897,7 +897,7 @@ call_02_5f50_EntityAction_SafariSamProjectile_Update:
 .jr_00_5F5F:
     call call_00_254a_Entity_AdvancePosition_XDelta
     call call_00_2922_Entity_MiscTimerCountdown
-    jp   z,call_00_2b80_DeactivateEntitySlot
+    jp   z,call_00_2b80_Entity_DeactivateSelf
     ret  
 
 call_02_5f69_EntityAction_GhostKnight_Unk0:
@@ -909,7 +909,7 @@ call_02_5f69_EntityAction_GhostKnight_Unk0:
     jp   call_02_72ac_SetEntityAction
 
 call_02_5f78_EntityAction_GhostKnight_Unk1:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   c,TIMER_AMOUNT_GHOST_KNIGHT
     call nz,call_00_290d_Entity_SetMiscTimer
     call call_00_2922_Entity_MiscTimerCountdown
@@ -922,7 +922,7 @@ call_02_5f78_EntityAction_GhostKnight_Unk1:
     ret  
 
 call_02_5f91_EntityAction_GhostKnight_Unk3:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ret  z
     ld   hl,wDCD3_GhostKnightDamageCounter1
     inc  [hl]
@@ -987,7 +987,7 @@ call_02_5F9B_GhostKnight_unk:
     db   $00, $5d, $00
     
 call_02_60c7_EntityAction_GhostKnightProjectile_Update:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_60F2
     ld   a,[wDCD3_GhostKnightDamageCounter1]
     add  a
@@ -1016,7 +1016,7 @@ call_02_60c7_EntityAction_GhostKnightProjectile_Update:
     call call_00_24c0_Entity_ApplyXVelocity
     call call_00_24ee_Entity_ApplyYVelocity_NoClip
     call call_00_2922_Entity_MiscTimerCountdown
-    jp   z,call_00_2b7a_DeactivateEntity
+    jp   z,call_00_2b7a_Entity_DeactivateAndClearFlags
     ret  
 .data_02_60ff:
     db   $e0, $20, $00, $20, $20        ;; 02:60fc ????????
@@ -1038,7 +1038,7 @@ call_02_613f_EntityAction_Hand_Unk0:
     ret  
 
 call_02_614d_EntityAction_Hand_Unk1:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   c,$38
     call nz,call_00_28dc_Entity_SetYVelocity
 .jr_00_6155:
@@ -1057,7 +1057,7 @@ call_02_6163_EntityAction_Hand_Unk2:
     ret  
     
 call_02_616f_EntityAction_Hand_Unk3:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_61A1
     ld   a,SFX_SMALL_BANG
     call call_00_0ff5_QueueSoundEffect
@@ -1151,7 +1151,7 @@ call_02_6214_EntityAction_Raft_ResetAndWait:
 ; Sets a countdown timer (Timer1A = $28).
 ; In its idle loop: every 4 frames it slowly drifts upward (bc=$FFFF → add -1 to Y).
 ; When the timer expires, it switches the raft into the next action (via call_02_72ac_SetEntityAction).
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_6239
     call call_00_2826_Entity_ResetToInitialXPos
     call call_00_27e4_Entity_ResetToInitialYPos
@@ -1227,7 +1227,7 @@ call_02_6293_EntityAction_Raft_DriftDown:
 ; Otherwise, resets facing and X velocity to 0, and sets a timer (Timer1A = $28).
 ; In its loop: every 4 frames, nudges raft downward (bc=$0001 → +1 to Y).
 ; Once the timer expires, transitions raft back to state 0.
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_62A7
     ld   c,$00
     call call_00_28c8_Entity_SetXVelocity
@@ -1247,7 +1247,7 @@ call_02_6293_EntityAction_Raft_DriftDown:
     ret  
 
 call_02_62bc_EntityAction_Snake_Unk0:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_62D0
     ld   c,$08
     call call_00_2944_Entity_SetWidth
@@ -1297,7 +1297,7 @@ call_02_6315_EntityAction_Snake_Unk2:
     jp   call_00_2944_Entity_SetWidth
 
 call_02_631a_EntityAction_SnakeRightProjectile_Update:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_6329
     ld   c,$20
     call call_00_28c8_Entity_SetXVelocity
@@ -1306,11 +1306,11 @@ call_02_631a_EntityAction_SnakeRightProjectile_Update:
 .jr_00_6329:
     call call_00_24c0_Entity_ApplyXVelocity
     call call_00_2922_Entity_MiscTimerCountdown
-    jp   z,call_00_2b7a_DeactivateEntity
+    jp   z,call_00_2b7a_Entity_DeactivateAndClearFlags
     ret  
 
 call_02_6333_EntityAction_SnakeLeftProjectile_Update:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_6342
     ld   c,$E0
     call call_00_28c8_Entity_SetXVelocity
@@ -1319,7 +1319,7 @@ call_02_6333_EntityAction_SnakeLeftProjectile_Update:
 .jr_00_6342:
     call call_00_24c0_Entity_ApplyXVelocity
     call call_00_2922_Entity_MiscTimerCountdown
-    jp   z,call_00_2b7a_DeactivateEntity
+    jp   z,call_00_2b7a_Entity_DeactivateAndClearFlags
     ret  
 
 call_02_634c_EntityAction_RaStatue_Unk0:
@@ -1353,7 +1353,7 @@ call_02_6399_EntityAction_RaStatue_Unk3:
     ret
     
 call_02_63a8_EntityAction_BreakableBlock_Unk0:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_63B1
     xor  a
     ld   [wDCDC_HandEntityUnkFlag],a
@@ -1370,7 +1370,7 @@ call_02_63c0_EntityAction_BreakableBlock_Unk3:
     ld   a,SFX_LOUD_BANG
     call call_00_0ff5_QueueSoundEffect
     farcall call_03_57f8_ClearCollisionForEntity
-    jp   call_00_2b7a_DeactivateEntity
+    jp   call_00_2b7a_Entity_DeactivateAndClearFlags
 
 call_02_63d3_EntityAction_Coffin_Unk2:
     call call_00_22ef_Entity_SetTriggerActive
@@ -1389,7 +1389,7 @@ call_02_63db_EntityAction_EnemyCactus_Unk0:
     ret  
 
 call_02_63f0_EntityAction_EnemyCactus_Unk1:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_63FD
     ld   c,TIMER_AMOUNT_60_FRAMES
     call call_00_290d_Entity_SetMiscTimer
@@ -1409,7 +1409,7 @@ call_02_6405_EnemyCactus_unk:
     ret  
 
 call_02_6415_EntityAction_EnemyCactus_Unk4:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   c,$20
     call nz,call_00_28dc_Entity_SetYVelocity
     call call_00_251c_Entity_HandleHorizontalBoundingBoxTurnAround
@@ -1421,7 +1421,7 @@ call_02_6415_EntityAction_EnemyCactus_Unk4:
     jr   call_02_6405_EnemyCactus_unk
 
 call_02_642e_EntityAction_Rock_Unk0:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_643D
     ld   c,TIMER_AMOUNT_0_FRAMES
     call call_00_290d_Entity_SetMiscTimer
@@ -1500,7 +1500,7 @@ call_02_6491_EntityAction_HardHat_Walk:
     jp   call_02_72ac_SetEntityAction
 
 call_02_64cd_EntityAction_HardHat_Jump:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   c,$20
     call nz,call_00_28dc_Entity_SetYVelocity
     ld   c,$10
@@ -1513,7 +1513,7 @@ call_02_64cd_EntityAction_HardHat_Jump:
     ret  
 
 call_02_64e9_EntityAction_Bat_Unk0:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_64F4
     call call_00_2826_Entity_ResetToInitialXPos
     call call_00_27e4_Entity_ResetToInitialYPos
@@ -1526,7 +1526,7 @@ call_02_64e9_EntityAction_Bat_Unk0:
     ret  
 
 call_02_6502_EntityAction_Bat_Unk2:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_651D
     call call_00_2410_Entity_FaceTowardsPlayer
     call call_00_2976_Entity_GetFacingDirection
@@ -1642,7 +1642,7 @@ call_02_65c9_EntityAction_BlueBeamBarrier_Unk0:
     jp   call_02_72ac_SetEntityAction
 
 call_02_65d7_EntityAction_AnimeRisingPlatform_Update:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   c,TIMER_AMOUNT_0_FRAMES
     call nz,call_00_290d_Entity_SetMiscTimer
     ld   a,[wDC7B_CurrentEntityAddrLoAlt]
@@ -1749,7 +1749,7 @@ call_02_668d_EntityAction_SailorToonGirl_Unk3:
     ret  
 
 call_02_669d_EntityAction_SailorToonGirl_Unk5:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_66AC
     ld   c,$18
     call call_00_28c8_Entity_SetXVelocity
@@ -1794,7 +1794,7 @@ call_02_66e0_EntityAction_BigSilverRobot_Unk2:
 
 call_02_66ef_EntityAction_BigSilverRobot_Unk3:
     call call_00_2a5d_Entity_CheckGraphicsFlag2
-    jp   nz,call_00_2b7a_DeactivateEntity
+    jp   nz,call_00_2b7a_Entity_DeactivateAndClearFlags
     ret  
 
 call_02_66f6_EntityAction_SmallBlueRobot_Unk0:
@@ -1837,7 +1837,7 @@ call_02_6732_EntityAction_SmallBlueRobot_Unk1:
     ret  
 
 call_02_6746_EntityAction_Secbot_Unk0:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   c,TIMER_AMOUNT_0_FRAMES
     call nz,call_00_290d_Entity_SetMiscTimer
     ld   c,$04
@@ -1860,7 +1860,7 @@ call_02_6768_EntityAction_Secbot_Unk1:
     ld   bc,$FFFF
     call call_00_250d_Entity_AdjustYPosition
 .jr_00_6776:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   c,TIMER_AMOUNT_0_FRAMES
     call nz,call_00_290d_Entity_SetMiscTimer
     ld   c,$10
@@ -1878,7 +1878,7 @@ call_02_6768_EntityAction_Secbot_Unk1:
     ret  
 
 call_02_679b_EntityAction_SecbotProjectile_Update:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_67B3
     call call_00_2976_Entity_GetFacingDirection
     ld   c,$18
@@ -1891,13 +1891,13 @@ call_02_679b_EntityAction_SecbotProjectile_Update:
     call call_00_290d_Entity_SetMiscTimer
 .jr_00_67B3:
     call call_00_2922_Entity_MiscTimerCountdown
-    jp   z,call_00_2b7a_DeactivateEntity
+    jp   z,call_00_2b7a_Entity_DeactivateAndClearFlags
     call call_00_24c0_Entity_ApplyXVelocity
     call call_00_2475_Entity_ApplyVerticalVelocity
     jp   call_00_2766_Entity_ResetYPosIfBelowInitial
 
 call_02_67c2_EntityAction_Elevator_Update:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_67DF
     call call_02_688E_Elevator_unk
     ld   l,c
@@ -2025,7 +2025,7 @@ call_02_68af_EntityAction_FireWallEnemy_Update:
     jp   call_00_233e_Entity_UpdatePatternedMovement
 
 call_02_68b2_EntityAction_Grenade_Unk0:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ret  z
     ld   hl,.data_02_68e5
     call call_00_2c20_Entity_CopyPaletteToBuffer
@@ -2080,7 +2080,7 @@ call_02_68ed_EntityAction_Grenade_Unk1:
     db   $00, $20, $28, $30
 
 call_02_6928_EntityAction_Grenade_Unk2:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   bc,$0008
     call nz,call_00_250d_Entity_AdjustYPosition
     ld   hl,.data_02_6937
@@ -2089,7 +2089,7 @@ call_02_6928_EntityAction_Grenade_Unk2:
     db   $00, $00, $1b, $00, $5f, $02, $1f, $1b        ;; 02:6937 ????????
 
 call_02_693f_EntityAction_MadBomber_Unk2:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   c,RELATIVE_ENTITY_SPAWN_BOMB
     call nz,call_00_3792_PrepareRelativeEntitySpawn
 call_02_6947_EntityAction_MadBomber_Unk0:
@@ -2111,7 +2111,7 @@ call_02_6965_EntityAction_MadBomber_Unk5:
     ret  z
     ld   c,$01
     call call_00_21ef_Entity_PlayRemoteSFX
-    jp   call_00_2b7a_DeactivateEntity
+    jp   call_00_2b7a_Entity_DeactivateAndClearFlags
 
 call_02_6971_EntityAction_Bomb_Unk0:
     ld   c,ENTITY_SUPERHERO_SHOW_MAD_BOMBER
@@ -2149,7 +2149,7 @@ call_02_697e: ; unreferenced function?
     db   $50, $00, $1c, $00, $50, $00, $19, $00        ;; 02:69a7 ????????
 
 call_02_69af_EntityAction_Bomb_Unk1:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_69CB
     ld   hl,wDCCE_BombCounter
     ld   a,[hl]
@@ -2198,7 +2198,7 @@ call_02_6a04_EntityAction_Bomb_Unk2:
     ret  
 
 call_02_6a13_EntityAction_Bomb_Unk3:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_6A38
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
     ld   a,[hl]
@@ -2226,13 +2226,13 @@ call_02_6a13_EntityAction_Bomb_Unk3:
     db   $00, $71, $f9, $8f, $ea
     
 call_02_6a4c_EntityAction_Bomb_Unk4:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   a,SFX_SMALL_BANG
     call nz,call_00_0ff5_QueueSoundEffect
     ld   hl,.data_02_6a89
     call call_00_2c20_Entity_CopyPaletteToBuffer
     call call_00_2a5d_Entity_CheckGraphicsFlag2
-    jp   nz,call_00_2b7a_DeactivateEntity
+    jp   nz,call_00_2b7a_Entity_DeactivateAndClearFlags
     ld   c,ENTITY_SUPERHERO_SHOW_MAD_BOMBER
     call call_00_29b7_Entity_SearchForAndGetActionID
     ld   a,c
@@ -2258,7 +2258,7 @@ call_02_6a4c_EntityAction_Bomb_Unk4:
     db   $00, $00, $1b, $00, $5f, $02, $1f, $1b
     
 call_02_6a91_EntityAction_WaterTowerTank_Unk0:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_6AA1
     ld   bc,$FFD0
     call call_00_250d_Entity_AdjustYPosition
@@ -2275,7 +2275,7 @@ call_02_6a91_EntityAction_WaterTowerTank_Unk0:
     jp   call_02_72ac_SetEntityAction
 
 call_02_6ab4_EntityAction_WaterTowerTank_Unk1:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   c,$10
     call nz,call_00_294e_Entity_SetHeight
     call call_00_2475_Entity_ApplyVerticalVelocity
@@ -2287,18 +2287,18 @@ call_02_6ab4_EntityAction_WaterTowerTank_Unk1:
     jp   call_02_72ac_SetEntityAction
 
 call_02_6acd_EntityAction_Convict_Unk0:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jp   nz,call_00_2410_Entity_FaceTowardsPlayer
     ret  
 
 call_02_6ad4_EntityAction_Convict_Unk2:    
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   c,RELATIVE_ENTITY_SPAWN_CONVICT_PROJECTILE
     jp   nz,call_00_3792_PrepareRelativeEntitySpawn
     ret  
 
 call_02_6add_EntityAction_ConvictProjectile_Update:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_6AF5
     call call_00_2976_Entity_GetFacingDirection
     ld   c,$20
@@ -2311,13 +2311,13 @@ call_02_6add_EntityAction_ConvictProjectile_Update:
     call call_00_290d_Entity_SetMiscTimer
 .jr_00_6AF5:
     call call_00_2922_Entity_MiscTimerCountdown
-    jp   z,call_00_2b7a_DeactivateEntity
+    jp   z,call_00_2b7a_Entity_DeactivateAndClearFlags
     cp   a,$3C
     call c,call_00_2475_Entity_ApplyVerticalVelocity
     jp   call_00_24c0_Entity_ApplyXVelocity
 
 call_02_6b03_EntityAction_Spider_Unk0:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_6B0E
     call call_00_230f_Entity_GetParameterIntoC
     call call_00_290d_Entity_SetMiscTimer
@@ -2344,7 +2344,7 @@ call_02_6b20_EntityAction_Spider_Unk1:
     ret  
 
 call_02_6b35_EntityAction_Spider_Unk2:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_6B47
     ld   c,$20
     call call_00_28c8_Entity_SetXVelocity
@@ -2399,7 +2399,7 @@ call_02_6b9b_EntityAction_Rat_Unk0:
     jp   call_00_251c_Entity_HandleHorizontalBoundingBoxTurnAround
 
 call_02_6ba3_EntityAction_ChomperTV_Unk0:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_6BB3
     ld   c,$04
     call call_00_28c8_Entity_SetXVelocity
@@ -2455,11 +2455,11 @@ call_02_6c08_EntityAction_CrumblingFloor_Unk2:
     farcall call_03_57f8_ClearCollisionForEntity
     call call_00_2475_Entity_ApplyVerticalVelocity
     call call_00_2780_Entity_CheckIfOffscreenBelow
-    jp   nc,call_00_2b7a_DeactivateEntity
+    jp   nc,call_00_2b7a_Entity_DeactivateAndClearFlags
     ret  
 
 call_02_6c1d_EntityAction_GextremeSportsElf_Unk0:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   c,$20
     call nz,call_00_28c8_Entity_SetXVelocity
     ld   a,[wDC71_FrameCounter_Entities]
@@ -2501,7 +2501,7 @@ call_02_6c64_EntityAction_GextremeSportsElf_Unk3:
     ret  
 
 call_02_6c73_EntityAction_GextremeSportsElf_Unk4:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_6C84
     call call_00_2766_Entity_ResetYPosIfBelowInitial
     ld   c,$00
@@ -2537,7 +2537,7 @@ call_02_6c73_EntityAction_GextremeSportsElf_Unk4:
     ret 
     
 call_02_6cbb_EntityAction_Bird_Update:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_6CC6
     call call_00_230f_Entity_GetParameterIntoC
     call call_00_2958_Entity_SetFacingDirection
@@ -2555,7 +2555,7 @@ call_02_6cbb_EntityAction_Bird_Update:
     jp   call_00_3792_PrepareRelativeEntitySpawn
 
 call_02_6cdd_EntityAction_BirdProjectile_Update:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_6CF5
     call call_00_2976_Entity_GetFacingDirection
     ld   c,$14
@@ -2623,7 +2623,7 @@ call_02_6d49_EntityAction_RockHard_Unk5:
     ret  
 
 call_02_6d52_EntityAction_RockHard_Unk6:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_6D5C
     ld   c,TIMER_AMOUNT_120_FRAMES
     call call_00_290d_Entity_SetMiscTimer
@@ -2634,10 +2634,10 @@ call_02_6d52_EntityAction_RockHard_Unk6:
     ld   [wDC65_ProgressFlags_WWGex],a
     ld   hl,wDB6A_WarpFlags
     set  4,[hl]
-    jp   call_00_2b7a_DeactivateEntity
+    jp   call_00_2b7a_Entity_DeactivateAndClearFlags
 
 call_02_6d6d_EntityAction_BrainOfOz_Unk0:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_6D82
     call call_00_2917_Entity_CheckIfMiscTimerIsZero
     inc  [hl]
@@ -2702,7 +2702,7 @@ call_02_6dda_EntityAction_BrainOfOz_Unk4:
 
 call_02_6ddd_EntityAction_BrainOfOz_Unk5:
     call call_00_233e_Entity_UpdatePatternedMovement
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ret  z
     ld   a,SFX_BRAIN_OF_OZ
     call call_00_0ff5_QueueSoundEffect
@@ -2725,7 +2725,7 @@ call_02_6dee_EntityAction_BrainOfOz_Unk7:
     jp   call_02_72ac_SetEntityAction
 
 call_02_6e09_EntityAction_BrainOfOz_Unk8:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_6E27
     ld   a,SFX_LOUD_BANG
     call call_00_0ff5_QueueSoundEffect
@@ -2745,12 +2745,12 @@ call_02_6e09_EntityAction_BrainOfOz_Unk8:
     ld   [wDC66_ProgressFlags_LizardOfOz],a
     ld   hl,wDB6A_WarpFlags
     set  4,[hl]
-    jp   call_00_2b7a_DeactivateEntity
+    jp   call_00_2b7a_Entity_DeactivateAndClearFlags
 .data_6e3c:
     db   $00, $00, $08, $02, $04, $01, $ff, $7f
 
 call_02_6e44_EntityAction_BrainOfOzProjectile_Update:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_6E53
     ld   c,$00
     call call_00_28c8_Entity_SetXVelocity
@@ -2780,7 +2780,7 @@ call_02_6e44_EntityAction_BrainOfOzProjectile_Update:
     sub  e
     ld   a,[hl]
     sbc  d
-    jp   nc,call_00_2b7a_DeactivateEntity
+    jp   nc,call_00_2b7a_Entity_DeactivateAndClearFlags
     ret  
 
 call_02_6e88_EntityAction_Cannon_Unk0:
@@ -2799,7 +2799,7 @@ call_02_6e88_EntityAction_Cannon_Unk0:
     jp   call_02_72ac_SetEntityAction
 
 call_02_6ea8_EntityAction_Cannon_Unk2:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   a,SFX_DOOR2
     call nz,call_00_0ff5_QueueSoundEffect
     call call_00_2922_Entity_MiscTimerCountdown
@@ -2808,7 +2808,7 @@ call_02_6ea8_EntityAction_Cannon_Unk2:
     ret  
 
 call_02_6eb9_EntityAction_Cannon_Unk3:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ret  z
     ld   c,RELATIVE_ENTITY_SPAWN_CANNON_PROJECTILE
     call call_00_3792_PrepareRelativeEntitySpawn
@@ -2816,7 +2816,7 @@ call_02_6eb9_EntityAction_Cannon_Unk3:
     jp   call_00_0ff5_QueueSoundEffect
 
 call_02_6ec7_EntityAction_CannonProjectile_Update:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   c,$3C
     call nz,call_00_28dc_Entity_SetYVelocity
     ld   c,ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ
@@ -2847,18 +2847,18 @@ call_02_6ec7_EntityAction_CannonProjectile_Update:
     call call_00_0ff5_QueueSoundEffect
     ld   c,RELATIVE_ENTITY_SPAWN_CANNON_PROJECTILE_2
     call call_00_3792_PrepareRelativeEntitySpawn
-    jp   call_00_2b7a_DeactivateEntity
+    jp   call_00_2b7a_Entity_DeactivateAndClearFlags
 
 call_02_6f07_EntityAction_CannonProjectile2_Update:
     call call_00_2a5d_Entity_CheckGraphicsFlag2
-    jp   nz,call_00_2b7a_DeactivateEntity
+    jp   nz,call_00_2b7a_Entity_DeactivateAndClearFlags
     ret  
 
 call_02_6f0e_EntityAction_Unk_None:
     ret  
 
 call_02_6f0f_EntityAction_Rez_Unk0:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ret  z
     ld   c,$20
     call call_00_28c8_Entity_SetXVelocity
@@ -2885,7 +2885,7 @@ call_02_6f35_EntityAction_Rez_Unk3:
     ret  
 
 call_02_6f3e_EntityAction_Rez_Unk5:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   c,$00
     call nz,call_00_28dc_Entity_SetYVelocity
     call call_02_6FD3_Rez_unk
@@ -2896,7 +2896,7 @@ call_02_6f3e_EntityAction_Rez_Unk5:
     jp   call_02_72ac_SetEntityAction
 
 call_02_6f54_EntityAction_Rez_Unk6:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ret  z
     call call_00_2917_Entity_CheckIfMiscTimerIsZero
     inc  [hl]
@@ -2906,7 +2906,7 @@ call_02_6f54_EntityAction_Rez_Unk6:
     ret  
 
 call_02_6f64_EntityAction_Rez_Unk8:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_6F74
     call call_00_2826_Entity_ResetToInitialXPos
     call call_00_27e4_Entity_ResetToInitialYPos
@@ -2943,7 +2943,7 @@ call_02_6fa1_EntityAction_Rez_Unk10:
     ret  
 
 call_02_6faa_EntityAction_Rez_Unk11:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_6FBE
     ld   a,SFX_LOUD_BANG
     call call_00_0ff5_QueueSoundEffect
@@ -2960,7 +2960,7 @@ call_02_6faa_EntityAction_Rez_Unk11:
     ld   [wDC67_ProgressFlags_ChannelZ],a
     ld   hl,wDB6A_WarpFlags
     set  4,[hl]
-    jp   call_00_2b7a_DeactivateEntity
+    jp   call_00_2b7a_Entity_DeactivateAndClearFlags
 
 call_02_6FD3_Rez_unk:
     call call_00_28f1_Entity_CheckIfYVelocityIsZero
@@ -3009,7 +3009,7 @@ call_02_7019_EntityAction_Unk_None:
     ret  
 
 call_02_701a_EntityAction_Meteor_Update:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   a,SFX_METEOR
     call nz,call_00_0ff5_QueueSoundEffect
     call call_00_2475_Entity_ApplyVerticalVelocity
@@ -3019,7 +3019,7 @@ call_02_701a_EntityAction_Meteor_Update:
     ret  
 
 call_02_702e_EntityAction_RezProjectile_Update:
-    call call_00_29f5_Entity_ClearGraphicsFlag4AndCheck
+    call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_7056
     ld   hl,wDCDA_BrainOfOzAndRezCounter
     ld   a,[hl]
