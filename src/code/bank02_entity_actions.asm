@@ -247,7 +247,7 @@ call_02_5a1c_EntityAction_TVButton_unk2:
     jr   Z, .jr_02_5a45                                ;; 02:5a41 $28 $02
     ld   A, PLAYERACTION_STAND_ON_TV_BUTTON                                        ;; 02:5a43 $3e $0c
 .jr_02_5a45:
-    call call_02_54f9_SwitchPlayerAction                                  ;; 02:5a45 $cd $f9 $54
+    call call_02_54f9_Player_SwitchAction                                  ;; 02:5a45 $cd $f9 $54
     call call_00_230f_Entity_GetParameterIntoC                                  ;; 02:5a48 $cd $0f $23
     ld   A, [wDC1E_CurrentLevelID]                                    ;; 02:5a4b $fa $1e $dc
     and  A, A                                          ;; 02:5a4e $a7
@@ -1971,7 +1971,7 @@ call_02_67c2_EntityAction_Elevator_Update:
     ld   a,[wD801_Player_ActionId]
     cp   a,PLAYERACTION_RIDING_ELEVATOR
     ld   a,PLAYERACTION_IDLE
-    jp   z,call_02_54f9_SwitchPlayerAction
+    jp   z,call_02_54f9_Player_SwitchAction
     ret  
 .jr_00_6842:
     ld   bc,$FFFF
@@ -1982,7 +1982,7 @@ call_02_67c2_EntityAction_Elevator_Update:
     ld   a,PLAYERACTION_RIDING_ELEVATOR
     ld   hl,wD801_Player_ActionId
     cp   [hl]
-    jp   nz,call_02_54f9_SwitchPlayerAction
+    jp   nz,call_02_54f9_Player_SwitchAction
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
     ld   a,[wD80E_PlayerXPosition]
     sub  [hl]

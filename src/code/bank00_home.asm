@@ -534,7 +534,7 @@ call_00_05fd_CheckForEatFly:
     ret  NC                                            ;; 00:0615 $d0
 .jr_00_0616:
     ld   A, PLAYERACTION_EAT_FLY                                        ;; 00:0616 $3e $08
-    farcall call_02_54f9_SwitchPlayerAction
+    farcall call_02_54f9_Player_SwitchAction
     ret                                                ;; 00:0623 $c9
 
 call_00_0624_SetFly_TimersAndFlags:
@@ -615,7 +615,7 @@ jp_00_0693:
     jr   Z, .jr_00_06ae                                ;; 00:06aa $28 $02
     ld   A, PLAYERACTION_DEATH_IN_PIT_ALT                                        ;; 00:06ac $3e $1a
 .jr_00_06ae:
-    farcall call_02_54f9_SwitchPlayerAction
+    farcall call_02_54f9_Player_SwitchAction
     ret                                                ;; 00:06b9 $c9
 .jr_00_06ba:
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:06ba $fa $6c $db
@@ -628,17 +628,17 @@ jp_00_0693:
     jr   Z, .jr_00_06ce                                ;; 00:06ca $28 $02
     ld   A, PLAYERACTION_DEATH                                        ;; 00:06cc $3e $0a
 .jr_00_06ce:
-    farcall call_02_54f9_SwitchPlayerAction
+    farcall call_02_54f9_Player_SwitchAction
     ret                                                ;; 00:06d9 $c9
 
 jp_00_06da:
     ld   A, PLAYERACTION_DEATH_IN_PIT                                        ;; 00:06da $3e $1b
-    farcall call_02_54f9_SwitchPlayerAction
+    farcall call_02_54f9_Player_SwitchAction
     ret                                                ;; 00:06e7 $c9
 
 jp_00_06e8:
     ld   A, PLAYERACTION_UNK19                                        ;; 00:06e8 $3e $13
-    farcall call_02_54f9_SwitchPlayerAction
+    farcall call_02_54f9_Player_SwitchAction
     ret                                                ;; 00:06f5 $c9
 
 call_00_06f6_DealDamageToPlayer:
@@ -1511,15 +1511,15 @@ call_00_0c1b_LCDInterrupt_Setup:
 ; Purpose: This is a vector table and handler dispatcher for the STAT/LYC interrupts.
 ; Different entries configure palette changes, etc.
     db   $08, $00, $01
-    dw   .call_00_0c53
+    dw   .jr_00_0c53
     db   $08, $00, $15
-    dw   .call_00_0c55
+    dw   .jr_00_0c55
     db   $08, $00, $01
     dw   call_00_0df8 
-.call_00_0c53:
+.jr_00_0c53:
     reti
     ret
-.call_00_0c55:
+.jr_00_0c55:
     push af
     push hl
     ld   a,[wDB67_HDMATempScratch]

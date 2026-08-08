@@ -27,11 +27,11 @@ call_02_4dce_Player_SwitchActionToIdleOrWalk:
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:4dd3 $fa $6c $db
     cp   A, MAP_GEXTREME_SPORTS1                                        ;; 02:4dd6 $fe $07
     ld   A, PLAYERACTION_SNOWBOARDING_STAND_OR_WALK                                        ;; 02:4dd8 $3e $24
-    jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:4dda $ca $f9 $54
+    jp   Z, call_02_54f9_Player_SwitchAction                               ;; 02:4dda $ca $f9 $54
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:4ddd $fa $6c $db
     cp   A, MAP_MARSUPIAL_MADNESS1                                        ;; 02:4de0 $fe $08
     ld   A, PLAYERACTION_KANGAROO_IDLE                                        ;; 02:4de2 $3e $30
-    jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:4de4 $ca $f9 $54
+    jp   Z, call_02_54f9_Player_SwitchAction                               ;; 02:4de4 $ca $f9 $54
     ld   C, PLAYERACTION_IDLE                                        ;; 02:4de7 $0e $01
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:4de9 $fa $81 $dc
     and  A, PADF_LEFT | PADF_RIGHT                                        ;; 02:4dec $e6 $30
@@ -39,7 +39,7 @@ call_02_4dce_Player_SwitchActionToIdleOrWalk:
     ld   C, PLAYERACTION_WALK                                        ;; 02:4df0 $0e $03
 .jr_02_4df2:
     ld   A, C                                          ;; 02:4df2 $79
-    jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:4df3 $c3 $f9 $54
+    jp   call_02_54f9_Player_SwitchAction                                  ;; 02:4df3 $c3 $f9 $54
 
 call_02_4df6_Player_SetJumpRelatedState:
 ; Masks the lower nibble of UnkStates, sets the high bit, and stores it back.
@@ -63,7 +63,7 @@ call_02_4E0C_Player_SnowboardingTailSpin:
 ; Updates counters (wDCA2_Player_SnowboardingRelated–wDCA6_Player_SnowboardingRelated5) for a repeating animation or scripted sequence. 
 ; Fetch frame data from tables at $4EA1/$4EC3. Handles two cases: 
 ; when the player’s action ID is $27 (special move) or any other action. Sets attacking flag, 
-; triggers sound/action (call_02_54f9_SwitchPlayerAction) when counters overflow, and sets wDB66_HDMATransferFlags to signal a redraw.
+; triggers sound/action (call_02_54f9_Player_SwitchAction) when counters overflow, and sets wDB66_HDMATransferFlags to signal a redraw.
 ; Purpose: Manage complex animation or event sequences based on timers and player state.
     ld   a,[wDCA5_Player_SnowboardingRelated4]
     ld   [wDCA6_Player_SnowboardingRelated5],a
@@ -97,7 +97,7 @@ call_02_4E0C_Player_SnowboardingTailSpin:
     ld   hl,wDC80_Player_UnkStates
     set  6,[hl]
     ld   a,PLAYERACTION_SNOWBOARDING_STAND_OR_WALK
-    jp   call_02_54f9_SwitchPlayerAction
+    jp   call_02_54f9_Player_SwitchAction
 .jr_00_4E50:
     ld   a,[wDCA2_Player_SnowboardingRelated]
     and  a,$07
@@ -201,7 +201,7 @@ call_02_4f11_ChooseNextActionBasedOnLevel:
 ; If level is 07h → $28.
 ; If level is 08h → $35.
 ; Otherwise → $11.
-; It then jumps to call_02_54f9_SwitchPlayerAction to switch the player's action/animation.
+; It then jumps to call_02_54f9_Player_SwitchAction to switch the player's action/animation.
     ld   A, [wDABD_UnkBGCollisionFlags]                                    ;; 02:4f11 $fa $bd $da
     ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 02:4f14 $21 $be $da
     or   A, [HL]                                       ;; 02:4f17 $b6
@@ -217,9 +217,9 @@ call_02_4f11_ChooseNextActionBasedOnLevel:
     jr   Z, .jr_02_4f2f                                ;; 02:4f2b $28 $02
     ld   A, PLAYERACTION_FALL                                        ;; 02:4f2d $3e $11
 .jr_02_4f2f:
-    jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:4f2f $c3 $f9 $54
+    jp   call_02_54f9_Player_SwitchAction                                  ;; 02:4f2f $c3 $f9 $54
 
-call_02_4f32_PlayerUpdateMain:
+call_02_4f32_Player_UpdateMain:
 ; The main per-frame player update.
 ; Actions:
 ; - Processes inputs, clearing or setting bits in UnkStates/CurrentInputsAlt.
@@ -774,7 +774,7 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
 ; Purpose: Manages sloped surfaces, triggers, and speed modifiers.
 ; Details:
 ; Reads slope/collision data (wDC8C_PlayerYVelocity, wDC8F, etc.) and adjusts horizontal velocity.
-; Checks level ID and player action IDs to trigger special cases (calls call_02_54f9_SwitchPlayerAction).
+; Checks level ID and player action IDs to trigger special cases (calls call_02_54f9_Player_SwitchAction).
 ; Handles different terrain behaviors (e.g., slippery slopes or triggers unique to levels 7 & 8).
     call call_02_5541_GetPlayerStatesFromAction                                  ;; 02:5267 $cd $41 $55
     and  A, $a0                                        ;; 02:526a $e6 $a0
@@ -848,7 +848,7 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     jr   Z, .jr_02_52f2                                ;; 02:52ee $28 $02
     ld   A, PLAYERACTION_FALL                                        ;; 02:52f0 $3e $11
 .jr_02_52f2:
-    call call_02_54f9_SwitchPlayerAction                                  ;; 02:52f2 $cd $f9 $54
+    call call_02_54f9_Player_SwitchAction                                  ;; 02:52f2 $cd $f9 $54
     jp   .jp_02_5283                                   ;; 02:52f5 $c3 $83 $52
 .jr_02_52f8:
     xor  A, A                                          ;; 02:52f8 $af
@@ -859,15 +859,15 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     ld   A, [wD801_Player_ActionId]                                    ;; 02:5302 $fa $01 $d8
     cp   A, PLAYERACTION_DEATH_IN_PIT_ALT                                        ;; 02:5305 $fe $1a
     ld   A, PLAYERACTION_DEATH                                        ;; 02:5307 $3e $0a
-    jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:5309 $ca $f9 $54
+    jp   Z, call_02_54f9_Player_SwitchAction                               ;; 02:5309 $ca $f9 $54
     ld   A, [wD801_Player_ActionId]                                    ;; 02:530c $fa $01 $d8
     cp   A, PLAYERACTION_SNOWBOARDING_DEATH_IN_PIT_ALT                                        ;; 02:530f $fe $2e
     ld   A, PLAYERACTION_SNOWBOARDING_DIE                                        ;; 02:5311 $3e $2a
-    jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:5313 $ca $f9 $54
+    jp   Z, call_02_54f9_Player_SwitchAction                               ;; 02:5313 $ca $f9 $54
     ld   A, [wD801_Player_ActionId]                                    ;; 02:5316 $fa $01 $d8
     cp   A, PLAYERACTION_KANGAROO_DEATH_IN_PIT_ALT                                        ;; 02:5319 $fe $3b
     ld   A, PLAYERACTION_KANGAROO_DEATH                                        ;; 02:531b $3e $37
-    jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:531d $ca $f9 $54
+    jp   Z, call_02_54f9_Player_SwitchAction                               ;; 02:531d $ca $f9 $54
     ld   A, C                                          ;; 02:5320 $79
     cp   A, $08                                        ;; 02:5321 $fe $08
     jr   NC, .jr_02_532a                               ;; 02:5323 $30 $05
@@ -880,13 +880,13 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:532f $fa $6c $db
     cp   A, MAP_GEXTREME_SPORTS1                                        ;; 02:5332 $fe $07
     ld   A, PLAYERACTION_SNOWBOARDING_STAND_OR_WALK                                        ;; 02:5334 $3e $24
-    jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:5336 $ca $f9 $54
+    jp   Z, call_02_54f9_Player_SwitchAction                               ;; 02:5336 $ca $f9 $54
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:5339 $fa $6c $db
     cp   A, MAP_MARSUPIAL_MADNESS1                                        ;; 02:533c $fe $08
     ld   A, PLAYERACTION_KANGAROO_IDLE                                        ;; 02:533e $3e $30
-    jp   Z, call_02_54f9_SwitchPlayerAction                               ;; 02:5340 $ca $f9 $54
+    jp   Z, call_02_54f9_Player_SwitchAction                               ;; 02:5340 $ca $f9 $54
     ld   A, PLAYERACTION_LAND_FROM_FALL                                        ;; 02:5343 $3e $12
-    jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:5345 $c3 $f9 $54
+    jp   call_02_54f9_Player_SwitchAction                                  ;; 02:5345 $c3 $f9 $54
 .jp_02_5348:
     ld   A, [wDC8C_PlayerYVelocity]                                    ;; 02:5348 $fa $8c $dc
     sub  A, $02                                        ;; 02:534b $d6 $02
@@ -968,7 +968,7 @@ call_02_5374_LevelSpecificEventTrigger:
 .jr_02_53b7:
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:53b7 $ea $8c $dc
     ld   A, PLAYERACTION_BLOWN_UPWARDS                                        ;; 02:53ba $3e $1d
-    jp   call_02_54f9_SwitchPlayerAction                                  ;; 02:53bc $c3 $f9 $54
+    jp   call_02_54f9_Player_SwitchAction                                  ;; 02:53bc $c3 $f9 $54
 .data_02_53bf:
     db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 02:53bf ????????
     db   $00, $00, $d7, $53, $df, $53, $00, $00        ;; 02:53c7 ????????
@@ -1033,7 +1033,7 @@ call_02_5431_HandleActionTriggersAndEvents:
 ; Looks up the current action’s properties (data_02_554d_PlayerStatesPerAction) to check event bits.
 ; Compares nearby tile IDs (wDC92, wDC93) for special cases (e.g., doors, hazards).
 ; Calls LevelSpecificEventTrigger (5374) and call_02_553b_PlayerIsInWater (input polling).
-; May queue new action states via call_02_54f9_SwitchPlayerAction or reset collision variables if certain tile types are detected.
+; May queue new action states via call_02_54f9_Player_SwitchAction or reset collision variables if certain tile types are detected.
     ld   HL, wD801_Player_ActionId                                     ;; 02:5431 $21 $01 $d8
     ld   L, [HL]                                       ;; 02:5434 $6e
     ld   H, $00                                        ;; 02:5435 $26 $00
@@ -1072,7 +1072,7 @@ call_02_5431_HandleActionTriggersAndEvents:
     ld   A, $04                                        ;; 02:547c $3e $04
     ld   [wDC9D_Player_SwimmingRelated], A                                    ;; 02:547e $ea $9d $dc
     ld   A, PLAYERACTION_WATER_TREADING                                        ;; 02:5481 $3e $20
-    call call_02_54f9_SwitchPlayerAction                                  ;; 02:5483 $cd $f9 $54
+    call call_02_54f9_Player_SwitchAction                                  ;; 02:5483 $cd $f9 $54
     jr   .jr_02_54a7                                   ;; 02:5486 $18 $1f
 .jr_02_5488:
     ld   A, [wD801_Player_ActionId]                                    ;; 02:5488 $fa $01 $d8
@@ -1088,7 +1088,7 @@ call_02_5431_HandleActionTriggersAndEvents:
     ld   A, $04                                        ;; 02:549d $3e $04
     ld   [wDC9D_Player_SwimmingRelated], A                                    ;; 02:549f $ea $9d $dc
     ld   A, PLAYERACTION_WATER_TREADING                                        ;; 02:54a2 $3e $20
-    call call_02_54f9_SwitchPlayerAction                                  ;; 02:54a4 $cd $f9 $54
+    call call_02_54f9_Player_SwitchAction                                  ;; 02:54a4 $cd $f9 $54
 .jr_02_54a7:
     ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:54a7 $fa $81 $dc
     and  A, PADF_UP                                        ;; 02:54aa $e6 $40
@@ -1103,7 +1103,7 @@ call_02_5431_HandleActionTriggersAndEvents:
     ld   [wDC86_PlayerXVelocity], A                                    ;; 02:54c6 $ea $86 $dc
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:54c9 $ea $8c $dc
     ld   A, PLAYERACTION_CLIMBING                                        ;; 02:54cc $3e $22
-    jr   call_02_54f9_SwitchPlayerAction                                  ;; 02:54ce $18 $29
+    jr   call_02_54f9_Player_SwitchAction                                  ;; 02:54ce $18 $29
 .jr_02_54d0:
     ld   HL, wD801_Player_ActionId                                     ;; 02:54d0 $21 $01 $d8
     ld   L, [HL]                                       ;; 02:54d3 $6e
@@ -1136,7 +1136,7 @@ call_02_5431_HandleActionTriggersAndEvents:
 .jr_02_54f8:
     ld   A, [HL+]                                      ;; 02:54f8 $2a
 
-call_02_54f9_SwitchPlayerAction:
+call_02_54f9_Player_SwitchAction:
 ; Purpose: Safely change the player’s action/state.
 ; Behavior:
 ; Adjusts action index if in special level/bank.

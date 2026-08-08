@@ -352,29 +352,29 @@ ChannelZ_collectible_list:
 
 SECTION "bank22", ROMX[$4000], BANK[$22]
 GexCave_entity_list:
-    INCLUDE "data/maps/GexCave/GexCave_entity_list.asm"
+    INCBIN "data/maps/GexCave/GexCave_entity_list.bin"
 HolidayTV_entity_list:
-    INCLUDE "data/maps/HolidayTV/HolidayTV_entity_list.asm"
+    INCBIN "data/maps/HolidayTV/HolidayTV_entity_list.bin"
 MysteryTV_entity_list:
-    INCLUDE "data/maps/MysteryTV/MysteryTV_entity_list.asm"
+    INCBIN "data/maps/MysteryTV/MysteryTV_entity_list.bin"
 TutTV_entity_list:
-    INCLUDE "data/maps/TutTV/TutTV_entity_list.asm"
+    INCBIN "data/maps/TutTV/TutTV_entity_list.bin"
 WesternStation_entity_list:
-    INCLUDE "data/maps/WesternStation/WesternStation_entity_list.asm"
+    INCBIN "data/maps/WesternStation/WesternStation_entity_list.bin"
 AnimeChannel_entity_list:
-    INCLUDE "data/maps/AnimeChannel/AnimeChannel_entity_list.asm"
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_entity_list.bin"
 SuperheroShow_entity_list:
-    INCLUDE "data/maps/SuperheroShow/SuperheroShow_entity_list.asm"
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_entity_list.bin"
 GextremeSports_entity_list:
-    INCLUDE "data/maps/GextremeSports/GextremeSports_entity_list.asm"
+    INCBIN "data/maps/GextremeSports/GextremeSports_entity_list.bin"
 MarsupialMadness_entity_list:
-    INCLUDE "data/maps/MarsupialMadness/MarsupialMadness_entity_list.asm"
+    INCBIN "data/maps/MarsupialMadness/MarsupialMadness_entity_list.bin"
 WWGexWrestling_entity_list:
-    INCLUDE "data/maps/WWGexWrestling/WWGexWrestling_entity_list.asm"
+    INCBIN "data/maps/WWGexWrestling/WWGexWrestling_entity_list.bin"
 LizardOfOz_entity_list:
-    INCLUDE "data/maps/LizardOfOz/LizardOfOz_entity_list.asm"
+    INCBIN "data/maps/LizardOfOz/LizardOfOz_entity_list.bin"
 ChannelZ_entity_list:
-    INCLUDE "data/maps/ChannelZ/ChannelZ_entity_list.asm"
+    INCBIN "data/maps/ChannelZ/ChannelZ_entity_list.bin"
 
 SECTION "bank23", ROMX[$4000], BANK[$23]
 GexCave_1_collision_blockset:

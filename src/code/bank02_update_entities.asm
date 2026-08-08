@@ -219,7 +219,7 @@ call_02_7152_UpdateAllEntities:
 .jr_02_71f8:
     ld   A, $00                                        ;; 02:71f8 $3e $00
     ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 02:71fa $ea $00 $da
-    call call_02_4f32_PlayerUpdateMain                                  ;; 02:71fd $cd $32 $4f
+    call call_02_4f32_Player_UpdateMain                                  ;; 02:71fd $cd $32 $4f
 .jp_02_7200:
     call call_02_72fb_UpdateMapWindow                                  ;; 02:7200 $cd $fb $72
     ld   A, $20                                        ;; 02:7203 $3e $20
@@ -285,7 +285,7 @@ call_02_724d_Entity_UpdateSpriteFields:
     ld   A, [wDA00_CurrentEntityAddrLo]                ;; 02:7271 $fa $00 $da
     and  A, A                                          ;; 02:7274 $a7
     ld   A, E                                          ;; 02:7275 $7b
-    jp   Z, call_02_54f9_SwitchPlayerAction            ;; 02:7276 $ca $f9 $54
+    jp   Z, call_02_54f9_Player_SwitchAction            ;; 02:7276 $ca $f9 $54
     jp   call_02_72ac_SetEntityAction                  ;; 02:7279 $c3 $ac $72
 .jr_02_727c:
     bit  3, B                                          ;; 02:727c $cb $58
