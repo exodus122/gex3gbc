@@ -1,3 +1,5 @@
+; Disassembly of Gex: Deep Pocket Gecko (GBC)
+
 INCLUDE "constants/hardware.inc"
 INCLUDE "constants/constants.asm"
 INCLUDE "constants/memory.asm"
@@ -5,9 +7,10 @@ INCLUDE "code/macros/macros.asm"
 
 SECTION "bank00", ROM0[$0000]
 INCLUDE "code/bank00_home.asm"
-INCLUDE "code/bank00_maps_core.asm"
+INCLUDE "code/bank00_bg_map.asm"
+INCLUDE "code/bank00_mission_preview.asm"
 INCLUDE "code/bank00_entity_utils.asm"
-INCLUDE "code/bank00_entities_core.asm"
+INCLUDE "code/bank00_entity_load.asm"
 
 SECTION "bank01", ROMX[$4000], BANK[$01]
 INCLUDE "code/bank01_menus.asm"
@@ -36,8 +39,9 @@ INCLUDE "code/bank03_entity_collision.asm"
 INCLUDE "code/bank03_entity_graphics.asm"
 INCLUDE "code/bank03_map_boundaries_and_spawns.asm"
 INCLUDE "code/bank03_palettes.asm"
-INCLUDE "code/bank03_map_data_pointers.asm"
-INCLUDE "code/bank03_graphics.asm"
+INCLUDE "code/bank03_map_init_data.asm"
+INCLUDE "code/bank03_hud_graphics.asm"
+INCLUDE "code/bank03_vram_copy.asm"
 
 SECTION "bank04", ROMX[$4000], BANK[$04]
 INCLUDE "code/audio/bank04_audio1.asm"

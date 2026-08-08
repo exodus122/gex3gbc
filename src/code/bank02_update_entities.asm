@@ -403,9 +403,9 @@ call_02_72ac_SetEntityAction:
 call_02_72fb_UpdateMapWindow:
 ; Purpose: Updates player’s map window and handles scrolling or window movement triggers.
 ; Details:
-; Calls call_00_10de_UpdatePlayerMapWindow.
+; Calls call_00_10de_BgMap_UpdateWindowFromPlayerPos.
 ; Delegates Y-position checks to call_02_7305_CheckVerticalMapScroll and X-position checks to call_02_7337_CheckHorizontalMapScroll.
-    call call_00_10de_UpdatePlayerMapWindow                                  ;; 02:72fb $cd $de $10
+    call call_00_10de_BgMap_UpdateWindowFromPlayerPos                                  ;; 02:72fb $cd $de $10
     call call_02_7305_CheckVerticalMapScroll                                  ;; 02:72fe $cd $05 $73
     call call_02_7337_CheckHorizontalMapScroll                                  ;; 02:7301 $cd $37 $73
     ret                                                ;; 02:7304 $c9

@@ -238,7 +238,7 @@ call_00_0150_Init:
     call call_00_2f85_LoadAndSortCollectibleData                                  ;; 00:0347 $cd $85 $2f
     call call_00_2ff8_InitLevelEntitiesAndConfig                                  ;; 00:034a $cd $f8 $2f
     call call_00_0595_PlaySongBasedOnLevel                                  ;; 00:034d $cd $95 $05
-    call call_00_1ea0_LoadAndRunMissionPreviewCutscene                                  ;; 00:0350 $cd $a0 $1e
+    call call_00_1ea0_MissionPreview_LoadAndRun                                  ;; 00:0350 $cd $a0 $1e
     xor  A, A                                          ;; 00:0353 $af
     ld   [wDC69_PlayerSpawnIdInLevel], A                                    ;; 00:0354 $ea $69 $dc
 .jp_00_0357_RespawnAfterDeath:
@@ -307,7 +307,7 @@ call_00_0150_Init:
     ld   [wDCA7_DrawGexFlag], A                                    ;; 00:03f1 $ea $a7 $dc
     call call_00_04fb                                  ;; 00:03f4 $cd $fb $04
     farcall call_03_647c_InitPlayerPositionAndLevel
-    call call_00_1056_LoadFullMap                                  ;; 00:0402 $cd $56 $10
+    call call_00_1056_BgMap_LoadFull                                  ;; 00:0402 $cd $56 $10
     farcall call_02_708f_InitEntitiesAndSpawnPlayer
     call call_00_0513_DrawEntitiesWrapper                                  ;; 00:0410 $cd $13 $05
     xor  A, A                                          ;; 00:0413 $af
@@ -319,7 +319,7 @@ call_00_0150_Init:
 .jp_00_0421_Unpaused:
     call call_00_0595_PlaySongBasedOnLevel                                  ;; 00:0421 $cd $95 $05
     call call_00_04fb                                  ;; 00:0424 $cd $fb $04
-    call call_00_1056_LoadFullMap                                  ;; 00:0427 $cd $56 $10
+    call call_00_1056_BgMap_LoadFull                                  ;; 00:0427 $cd $56 $10
     farcall call_02_7142_RestoreEntityTable
     farcall call_03_68d9_AssignAllEntityPalettes
     call call_00_0513_DrawEntitiesWrapper                                  ;; 00:0440 $cd $13 $05
@@ -378,7 +378,7 @@ call_00_0150_Init:
     call call_00_05fd_CheckForEatFly                                  ;; 00:04d8 $cd $fd $05
     call call_00_05c7_WarpAfterCompletingBonusStage                                  ;; 00:04db $cd $c7 $05
     farcall call_02_7152_UpdateAllEntities
-    call call_00_11c8_LoadBgMapDirtyRegions                                  ;; 00:04e9 $cd $c8 $11
+    call call_00_11c8_BgMap_LoadDirtyRegions                                  ;; 00:04e9 $cd $c8 $11
     call call_00_0fc8_ProcessQueuedSoundEffect                                  ;; 00:04ec $cd $c8 $0f
     call call_00_150f_CheckAndSetLevelTrigger                                  ;; 00:04ef $cd $0f $15
     call call_00_35fa_WaitForLineThenSpawnEntity                                  ;; 00:04f2 $cd $fa $35

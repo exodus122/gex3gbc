@@ -135,7 +135,7 @@ call_03_647c_InitPlayerPositionAndLevel:
 ; Else, if level ID non-zero, fetches default spawn coords from .data_03_6537.
 ; If level ID is zero, pulls next-level ID from .data_03_652b, copies level data (call_03_6c89), 
 ; then fetches new spawn coords.
-; Calls call_03_6203 to set window boundaries and jumps to call_00_10de_UpdatePlayerMapWindow.
+; Calls call_03_6203 to set window boundaries and jumps to call_00_10de_BgMap_UpdateWindowFromPlayerPos.
     xor  A, A                                          ;; 03:647c $af
     ld   [wDCAC_Player_CrouchLookDownRelated], A                                    ;; 03:647d $ea $ac $dc
     ld   [wDCAD], A                                    ;; 03:6480 $ea $ad $dc
@@ -172,7 +172,7 @@ call_03_647c_InitPlayerPositionAndLevel:
     ld   [wD810_PlayerYPosition+1], A                                    ;; 03:64c3 $ea $11 $d8
 .jr_03_64c6:
     call call_03_6203_LoadLevelBoundariesFromId                                  ;; 03:64c6 $cd $03 $62
-    jp   call_00_10de_UpdatePlayerMapWindow                                  ;; 03:64c9 $c3 $de $10
+    jp   call_00_10de_BgMap_UpdateWindowFromPlayerPos                                  ;; 03:64c9 $c3 $de $10
 .jr_03_64cc:
     ld   HL, wDC5B_LevelIdFromTVButton                                     ;; 03:64cc $21 $5b $dc
     ld   L, [HL]                                       ;; 03:64cf $6e
