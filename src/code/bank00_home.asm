@@ -350,7 +350,7 @@ call_00_0150_Init:
     jp   .jp_00_02b2_LoadMainMenu                                   ;; 00:0484 $c3 $b2 $02
 .jr_00_0487:
     farcall call_02_5541_GetPlayerStatesFromAction
-    and  A, $08                                        ;; 00:0492 $e6 $08
+    and  A, PLAYER_STATE_DEAD_MASK                                        ;; 00:0492 $e6 $08
     jr   NZ, .jr_00_04d8_SkipPauseCheck                               ;; 00:0494 $20 $42
     call call_00_0f80_CheckInputStart                                  ;; 00:0496 $cd $80 $0f
     jr   Z, .jr_00_04d8_SkipPauseCheck                                ;; 00:0499 $28 $3d

@@ -107,7 +107,7 @@ call_00_2ce2_Entity_DrawGex:
     ld   A, [wDC88_CurrentEntity_UnkVerticalOffset]                                    ;; 00:2d6f $fa $88 $dc
     add  A, B                                          ;; 00:2d72 $80
     ld   B, A                                          ;; 00:2d73 $47
-    call call_00_2f00_CallBank2_Helper_AndCheckBit8                                  ;; 00:2d74 $cd $00 $2f
+    call call_00_2f00_PlayerIsDead                                  ;; 00:2d74 $cd $00 $2f
     jr   NZ, .jr_00_2d87                               ;; 00:2d77 $20 $0e
     ld   A, [wDC7E_PlayerDamageCooldownTimer]                                    ;; 00:2d79 $fa $7e $dc
     and  A, A                                          ;; 00:2d7c $a7
@@ -161,7 +161,7 @@ call_00_2ce2_Entity_DrawGex:
     ld   A, [wDC88_CurrentEntity_UnkVerticalOffset]                                    ;; 00:2dca $fa $88 $dc
     add  A, B                                          ;; 00:2dcd $80
     ld   B, A                                          ;; 00:2dce $47
-    call call_00_2f00_CallBank2_Helper_AndCheckBit8                                  ;; 00:2dcf $cd $00 $2f
+    call call_00_2f00_PlayerIsDead                                  ;; 00:2dcf $cd $00 $2f
     jr   NZ, .jr_00_2de2                               ;; 00:2dd2 $20 $0e
     ld   A, [wDC7E_PlayerDamageCooldownTimer]                                    ;; 00:2dd4 $fa $7e $dc
     and  A, A                                          ;; 00:2dd7 $a7
@@ -220,7 +220,7 @@ call_00_2ce2_Entity_DrawGex:
     ld   A, [wDC88_CurrentEntity_UnkVerticalOffset]                                    ;; 00:2e2e $fa $88 $dc
     add  A, B                                          ;; 00:2e31 $80
     ld   B, A                                          ;; 00:2e32 $47
-    call call_00_2f00_CallBank2_Helper_AndCheckBit8                                  ;; 00:2e33 $cd $00 $2f
+    call call_00_2f00_PlayerIsDead                                  ;; 00:2e33 $cd $00 $2f
     jr   NZ, .jr_00_2e46                               ;; 00:2e36 $20 $0e
     ld   A, [wDC7E_PlayerDamageCooldownTimer]                                    ;; 00:2e38 $fa $7e $dc
     and  A, A                                          ;; 00:2e3b $a7
@@ -277,7 +277,7 @@ call_00_2ce2_Entity_DrawGex:
     ld   A, [wDC88_CurrentEntity_UnkVerticalOffset]                                    ;; 00:2e8d $fa $88 $dc
     add  A, B                                          ;; 00:2e90 $80
     ld   B, A                                          ;; 00:2e91 $47
-    call call_00_2f00_CallBank2_Helper_AndCheckBit8                                  ;; 00:2e92 $cd $00 $2f
+    call call_00_2f00_PlayerIsDead                                  ;; 00:2e92 $cd $00 $2f
     jr   NZ, .jr_00_2ea4                               ;; 00:2e95 $20 $0d
     ld   A, [wDC7E_PlayerDamageCooldownTimer]                                    ;; 00:2e97 $fa $7e $dc
     and  A, A                                          ;; 00:2e9a $a7
@@ -350,11 +350,8 @@ call_00_2ce2_Entity_DrawGex:
     ld   [wDC6F_EntitySpriteRelated], A                                    ;; 00:2efa $ea $6f $dc
     jp   call_00_0f08_RestoreBank                                  ;; 00:2efd $c3 $08 $0f
 
-call_00_2f00_CallBank2_Helper_AndCheckBit8:
-; Switch to Bank 2 and Run Entry
-; Behavior: Saves registers, stores current bank (wDAD6_ReturnBank), switches to bank $02, 
-; and calls call_02_5541_GetPlayerStatesFromAction using the alternate-bank call routine. Restores registers, masks result with $08, and returns.
-; Purpose: Executes a helper routine from bank 2 and checks a specific status bit.
+call_00_2f00_PlayerIsDead:
+; Checks if the player is dead based on the current state flags.
     push HL                                            ;; 00:2f00 $e5
     push DE                                            ;; 00:2f01 $d5
     push BC                                            ;; 00:2f02 $c5
@@ -362,7 +359,7 @@ call_00_2f00_CallBank2_Helper_AndCheckBit8:
     pop  BC                                            ;; 00:2f0e $c1
     pop  DE                                            ;; 00:2f0f $d1
     pop  HL                                            ;; 00:2f10 $e1
-    and  A, $08                                        ;; 00:2f11 $e6 $08
+    and  A, PLAYER_STATE_DEAD_MASK                                        ;; 00:2f11 $e6 $08
     ret                                                ;; 00:2f13 $c9
 
 data_00_2f14:

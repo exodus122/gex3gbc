@@ -431,14 +431,14 @@ call_02_4aac_PlayerAction_Climbing:
     ld   l,[hl]
     ld   h,00
     add  hl,hl
-    ld   de,call_02_4adb_Player_Climbing_subroutine
+    ld   de,call_02_4adb_PLAYER_STATE_CLIMBING_MASK_subroutine
     add  hl,de
     ldi  a,[hl]
     ld   h,[hl]
     ld   l,a
     jp   hl
 
-call_02_4adb_Player_Climbing_subroutine:
+call_02_4adb_PLAYER_STATE_CLIMBING_MASK_subroutine:
     rst  $18
     ld   c,d
     ld   h,[hl]

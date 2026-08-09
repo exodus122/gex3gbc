@@ -134,7 +134,7 @@ call_02_7152_UpdateAllEntities:
     and  A, A                                          ;; 02:7162 $a7
     jp   Z, .jp_02_7200                                ;; 02:7163 $ca $00 $72
     call call_02_5541_GetPlayerStatesFromAction                                  ;; 02:7166 $cd $41 $55
-    and  A, $08                                        ;; 02:7169 $e6 $08
+    and  A, PLAYER_STATE_DEAD_MASK                                        ;; 02:7169 $e6 $08
     jr   NZ, .jr_02_717f                               ;; 02:716b $20 $12
     ld   A, [wDC93]                                    ;; 02:716d $fa $93 $dc
     cp   A, $15                                        ;; 02:7170 $fe $15
