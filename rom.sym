@@ -2952,8 +2952,8 @@
 00:d400 wD400_TileBuffer
 00:d578 wD578_TileBuffer2
 00:d700 wD700_EntityFlags
-00:d800 wD800_Player_Id
 00:d800 wD800_EntityMemory
+00:d800 wD800_Player_Id
 00:d801 wD801_Player_ActionId
 00:d802 wD802_Player_ActionFunc
 00:d805 wD805_Player_ActionState

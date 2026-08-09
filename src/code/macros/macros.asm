@@ -47,3 +47,9 @@ MACRO LOAD_OBJ_FIELD_TO_BC
     or   a, \1
     ld   c, a
 ENDM
+
+MACRO EntityChildSpawnData
+    db \1
+    dw \2, \3
+    db \4, 0, 0
+ENDM

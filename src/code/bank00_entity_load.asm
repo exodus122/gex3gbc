@@ -1451,42 +1451,43 @@ call_00_37a0_SpawnEntityRelative:
     ld   [HL], A                                       ;; 00:38b4 $77
     ret                                                ;; 00:38b5 $c9
 .data_00_38b6_EntityChildSpawnData:
-    db   $01, $00, $00, $e0, $ff, ENTITY_FLY_1, $00, $00        ;; 00:38b6 ????????
-    db   $01, $00, $00, $e0, $ff, ENTITY_FLY_2, $00, $00        ;; 00:38be ????????
-    db   $01, $00, $00, $e0, $ff, ENTITY_FLY_3, $00, $00        ;; 00:38c6 ????????
-    db   $01, $00, $00, $e0, $ff, ENTITY_FLY_4, $00, $00        ;; 00:38ce ????????
-    db   $01, $00, $00, $e0, $ff, ENTITY_FLY_5, $00, $00        ;; 00:38d6 ????????
-    db   $01, $f3, $ff, $fd, $ff, ENTITY_HOLIDAY_TV_EVIL_SANTA_PROJECTILE, $00, $00        ;; 00:38de .????w??
-    db   $01, $0e, $00, $fb, $ff, ENTITY_MYSTERY_TV_SAFARI_SAM_PROJECTILE, $00, $00        ;; 00:38e6 ????????
-    db   $01, $00, $00, $00, $00, ENTITY_GOAL_COUNTER_1, $00, $00        ;; 00:38ee .????w??
-    db   $01, $00, $00, $00, $00, ENTITY_GOAL_COUNTER_2, $00, $00        ;; 00:38f6 .????w??
-    db   $01, $00, $00, $00, $00, ENTITY_GOAL_COUNTER_3, $00, $00        ;; 00:38fe .????w??
-    db   $01, $00, $00, $00, $00, ENTITY_GOAL_COUNTER_4, $00, $00        ;; 00:3906 .????w??
-    db   $01, $00, $00, $00, $00, ENTITY_GOAL_COUNTER_5, $00, $00        ;; 00:390e ????????
-    db   $01, $00, $00, $00, $00, ENTITY_GOAL_COUNTER_6, $00, $00        ;; 00:3916 ????????
-    db   $01, $00, $00, $00, $00, ENTITY_GOAL_COUNTER_7, $00, $00        ;; 00:391e ????????
-    db   $01, $07, $00, $07, $00, ENTITY_TUT_TV_SNAKE_RIGHT_PROJECTILE, $00, $00        ;; 00:3926 ????????
-    db   $01, $07, $00, $07, $00, ENTITY_TUT_TV_SNAKE_LEFT_PROJECTILE, $00, $00        ;; 00:392e ????????
-    db   $01, $0c, $00, $00, $00, ENTITY_ANIME_CHANNEL_SECBOT_PROJECTILE, $00, $00        ;; 00:3936 ????????
-    db   $00, $00, $00, $00, $00, ENTITY_UNK0E, $00, $00        ;; 00:393e ????????
-    db   $00, $00, $00, $00, $00, ENTITY_UNK0F, $00, $00        ;; 00:3946 ????????
-    db   $00, $00, $00, $00, $00, ENTITY_UNK10, $00, $00        ;; 00:394e ????????
-    db   $00, $00, $00, $08, $00, ENTITY_SUPERHERO_SHOW_CONVICT_PROJECTILE, $00, $00        ;; 00:3956 ????????
-    db   $00, $f0, $ff, $04, $00, ENTITY_SUPERHERO_SHOW_BOMB, $00, $00        ;; 00:395e ????????
-    db   $00, $01, $00, $f0, $ff, ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE, $00, $00        ;; 00:3966 ????????
-    db   $00, $00, $00, $00, $00, ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2, $00, $00        ;; 00:396e ????????
-    db   $00, $00, $00, $08, $00, ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE, $00, $00        ;; 00:3976 ????????
-    db   $00, $00, $00, $00, $00, ENTITY_BONUS_STAGE_TIMER, $00, $00        ;; 00:397e ????????
-    db   $01, $00, $00, $00, $00, ENTITY_ANIME_CHANNEL_SECBOT_PROJECTILE, $00, $00        ;; 00:3986 ????????
-    db   $01, $04, $00, $f2, $ff, ENTITY_MYSTERY_TV_GHOST_KNIGHT_PROJECTILE, $00, $00        ;; 00:398e ????????
-    db   $00, $ff, $ff, $0b, $00, ENTITY_MARSUPIAL_MADNESS_BIRD_PROJECTILE, $00, $00        ;; 00:3996 ????????
-    db   $00, $c0, $ff, $50, $00, ENTITY_CHANNEL_Z_REZ_PROJECTILE, $00, $00        ;; 00:399e ????????
-    db   $00, $40, $00, $50, $00, ENTITY_CHANNEL_Z_REZ_PROJECTILE, $00, $00        ;; 00:39a6 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $6b        ;; 00:39ae ????????
-    db   $00, $00, $00, $00, $00, $08, $00, $6a        ;; 00:39b6 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $1b        ;; 00:39be ????????
-    db   $00, $00, $01, $00, $00, $00, $00, $50        ;; 00:39c6 ????????
-    db   $00, $00, $01, $04, $00, $f2, $ff, $29        ;; 00:39ce ????????
-    db   $00, $00, $00, $ff, $ff, $0b, $00, $65        ;; 00:39d6 ????????
-    db   $00, $00, $00, $c0, $ff, $50, $00, $71        ;; 00:39de ????????
-    db   $00, $00, $00, $40, $00, $50, $00, $71        ;; 00:39e6 ????????
+    EntityChildSpawnData $01, $0000, -$0020, ENTITY_FLY_1
+    EntityChildSpawnData $01, $0000, -$0020, ENTITY_FLY_2
+    EntityChildSpawnData $01, $0000, -$0020, ENTITY_FLY_3
+    EntityChildSpawnData $01, $0000, -$0020, ENTITY_FLY_4
+    EntityChildSpawnData $01, $0000, -$0020, ENTITY_FLY_5
+    EntityChildSpawnData $01, -$000D, -$0003, ENTITY_HOLIDAY_TV_EVIL_SANTA_PROJECTILE
+    EntityChildSpawnData $01, $000E, -$0005, ENTITY_MYSTERY_TV_SAFARI_SAM_PROJECTILE
+    EntityChildSpawnData $01, $0000, $0000, ENTITY_GOAL_COUNTER_1
+    EntityChildSpawnData $01, $0000, $0000, ENTITY_GOAL_COUNTER_2
+    EntityChildSpawnData $01, $0000, $0000, ENTITY_GOAL_COUNTER_3
+    EntityChildSpawnData $01, $0000, $0000, ENTITY_GOAL_COUNTER_4
+    EntityChildSpawnData $01, $0000, $0000, ENTITY_GOAL_COUNTER_5
+    EntityChildSpawnData $01, $0000, $0000, ENTITY_GOAL_COUNTER_6
+    EntityChildSpawnData $01, $0000, $0000, ENTITY_GOAL_COUNTER_7
+    EntityChildSpawnData $01, $0007, $0007, ENTITY_TUT_TV_SNAKE_RIGHT_PROJECTILE
+    EntityChildSpawnData $01, $0007, $0007, ENTITY_TUT_TV_SNAKE_LEFT_PROJECTILE
+    EntityChildSpawnData $01, $000C, $0000, ENTITY_ANIME_CHANNEL_SECBOT_PROJECTILE
+    EntityChildSpawnData $00, $0000, $0000, ENTITY_UNK0E
+    EntityChildSpawnData $00, $0000, $0000, ENTITY_UNK0F
+    EntityChildSpawnData $00, $0000, $0000, ENTITY_UNK10
+    EntityChildSpawnData $00, $0000, $0008, ENTITY_SUPERHERO_SHOW_CONVICT_PROJECTILE
+    EntityChildSpawnData $00, -$0010, $0004, ENTITY_SUPERHERO_SHOW_BOMB
+    EntityChildSpawnData $00, $0001, -$0010, ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE
+    EntityChildSpawnData $00, $0000, $0000, ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2
+    EntityChildSpawnData $00, $0000, $0008, ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE
+    EntityChildSpawnData $00, $0000, $0000, ENTITY_BONUS_STAGE_TIMER
+    EntityChildSpawnData $01, $0000, $0000, ENTITY_ANIME_CHANNEL_SECBOT_PROJECTILE
+    EntityChildSpawnData $01, $0004, -$000E, ENTITY_MYSTERY_TV_GHOST_KNIGHT_PROJECTILE
+    EntityChildSpawnData $00, -$0001, $000B, ENTITY_MARSUPIAL_MADNESS_BIRD_PROJECTILE
+    EntityChildSpawnData $00, -$0040, $0050, ENTITY_CHANNEL_Z_REZ_PROJECTILE
+    EntityChildSpawnData $00, $0040, $0050, ENTITY_CHANNEL_Z_REZ_PROJECTILE
+    db   $00, $00
+    EntityChildSpawnData $00, $0000, $0000, ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2
+    EntityChildSpawnData $00, $0000, $0008, ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE
+    EntityChildSpawnData $00, $0000, $0000, ENTITY_BONUS_STAGE_TIMER
+    EntityChildSpawnData $01, $0000, $0000, ENTITY_ANIME_CHANNEL_SECBOT_PROJECTILE
+    EntityChildSpawnData $01, $0004, -$000E, ENTITY_MYSTERY_TV_GHOST_KNIGHT_PROJECTILE
+    EntityChildSpawnData $00, -$0001, $000B, ENTITY_MARSUPIAL_MADNESS_BIRD_PROJECTILE
+    EntityChildSpawnData $00, -$0040, $0050, ENTITY_CHANNEL_Z_REZ_PROJECTILE
+    EntityChildSpawnData $00, $0040, $0050, ENTITY_CHANNEL_Z_REZ_PROJECTILE

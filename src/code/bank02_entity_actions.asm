@@ -521,7 +521,7 @@ call_02_5c50_EntityAction_EvilSanta_Jumping:
 call_02_5c74_EntityAction_EvilSanta_PrepareThrow:
     call call_00_2a5d_Entity_CheckGraphicsFlag2                                  ;; 02:5c74 $cd $5d $2a
     ret  Z                                             ;; 02:5c77 $c8
-    ld   C, RELATIVE_ENTITY_SPAWN_EVIL_SANTA_PROJECTILE                                        ;; 02:5c78 $0e $05
+    ld   C, SPAWN_CHILD_ENTITY_EVIL_SANTA_PROJECTILE                                        ;; 02:5c78 $0e $05
     call call_00_3792_PrepareRelativeEntitySpawn                                  ;; 02:5c7a $cd $92 $37
     ld   A, $03                                        ;; 02:5c7d $3e $03
     jp   call_02_72ac_SetEntityAction                                  ;; 02:5c7f $c3 $ac $72
@@ -876,7 +876,7 @@ call_02_5f01_EntityAction_SafariSam_Unk0:
 
 call_02_5f39_EntityAction_SafariSam_Unk2:
     call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
-    ld   c,RELATIVE_ENTITY_SPAWN_SAFARI_SAM_PROJECTILE
+    ld   c,SPAWN_CHILD_ENTITY_SAFARI_SAM_PROJECTILE
     call nz,call_00_3792_PrepareRelativeEntitySpawn
     ret  
 
@@ -917,7 +917,7 @@ call_02_5f78_EntityAction_GhostKnight_Unk1:
     jp   z,call_02_72ac_SetEntityAction
     ld   a,[hl]
     and  a,$0F
-    ld   c,RELATIVE_ENTITY_SPAWN_GHOST_KNIGHT_PROJECTILE
+    ld   c,SPAWN_CHILD_ENTITY_GHOST_KNIGHT_PROJECTILE
     jp   z,call_00_3792_PrepareRelativeEntitySpawn
     ret  
 
@@ -1283,10 +1283,10 @@ call_02_62f9_EntityAction_Snake_Unk1:
     ld   c,$10
     call call_00_2944_Entity_SetWidth
     call call_00_293a_Entity_GetId
-    ld   c,RELATIVE_ENTITY_SPAWN_SNAKE_RIGHT_PROJECTILE
+    ld   c,SPAWN_CHILD_ENTITY_SNAKE_RIGHT_PROJECTILE
     cp   a,$30
     jr   z,.jr_00_630D
-    ld   c,RELATIVE_ENTITY_SPAWN_SNAKE_LEFT_PROJECTILE
+    ld   c,SPAWN_CHILD_ENTITY_SNAKE_LEFT_PROJECTILE
 .jr_00_630D:
     call call_00_3792_PrepareRelativeEntitySpawn
     ld   a,$02
@@ -1848,7 +1848,7 @@ call_02_6746_EntityAction_Secbot_Unk0:
     call call_00_29ac_Entity_IsFacingPlayer
     ret  nz
     call call_00_2922_Entity_MiscTimerCountdown
-    ld   c,RELATIVE_ENTITY_SPAWN_SECBOT_PROJECTILE
+    ld   c,SPAWN_CHILD_ENTITY_SECBOT_PROJECTILE
     jp   nz,call_00_3792_PrepareRelativeEntitySpawn
     ret  
 
@@ -1873,7 +1873,7 @@ call_02_6768_EntityAction_Secbot_Unk1:
     call call_00_2922_Entity_MiscTimerCountdown
     ret  z
     and  a,$3F
-    ld   c,RELATIVE_ENTITY_SPAWN_SECBOT_PROJECTILE
+    ld   c,SPAWN_CHILD_ENTITY_SECBOT_PROJECTILE
     jp   z,call_00_3792_PrepareRelativeEntitySpawn
     ret  
 
@@ -2090,7 +2090,7 @@ call_02_6928_EntityAction_Grenade_Unk2:
 
 call_02_693f_EntityAction_MadBomber_Unk2:
     call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
-    ld   c,RELATIVE_ENTITY_SPAWN_BOMB
+    ld   c,SPAWN_CHILD_ENTITY_BOMB
     call nz,call_00_3792_PrepareRelativeEntitySpawn
 call_02_6947_EntityAction_MadBomber_Unk0:
     ld   hl,wDCD0_MadBomberFlag
@@ -2293,7 +2293,7 @@ call_02_6acd_EntityAction_Convict_Unk0:
 
 call_02_6ad4_EntityAction_Convict_Unk2:    
     call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
-    ld   c,RELATIVE_ENTITY_SPAWN_CONVICT_PROJECTILE
+    ld   c,SPAWN_CHILD_ENTITY_CONVICT_PROJECTILE
     jp   nz,call_00_3792_PrepareRelativeEntitySpawn
     ret  
 
@@ -2551,7 +2551,7 @@ call_02_6cbb_EntityAction_Bird_Update:
     ld   c,ENTITY_MARSUPIAL_MADNESS_BIRD_PROJECTILE
     call call_00_2b10_Entity_FindDuplicateInstance
     ret  nz
-    ld   c,RELATIVE_ENTITY_SPAWN_BIRD_PROJECTILE
+    ld   c,SPAWN_CHILD_ENTITY_BIRD_PROJECTILE
     jp   call_00_3792_PrepareRelativeEntitySpawn
 
 call_02_6cdd_EntityAction_BirdProjectile_Update:
@@ -2706,7 +2706,7 @@ call_02_6ddd_EntityAction_BrainOfOz_Unk5:
     ret  z
     ld   a,SFX_BRAIN_OF_OZ
     call call_00_0ff5_QueueSoundEffect
-    ld   c,RELATIVE_ENTITY_SPAWN_BRAIN_OF_OZ_PROJECTILE
+    ld   c,SPAWN_CHILD_ENTITY_BRAIN_OF_OZ_PROJECTILE
     jp   call_00_3792_PrepareRelativeEntitySpawn
 
 call_02_6dee_EntityAction_BrainOfOz_Unk7:
@@ -2810,7 +2810,7 @@ call_02_6ea8_EntityAction_Cannon_Unk2:
 call_02_6eb9_EntityAction_Cannon_Unk3:
     call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ret  z
-    ld   c,RELATIVE_ENTITY_SPAWN_CANNON_PROJECTILE
+    ld   c,SPAWN_CHILD_ENTITY_CANNON_PROJECTILE
     call call_00_3792_PrepareRelativeEntitySpawn
     ld   a,SFX_CANNON
     jp   call_00_0ff5_QueueSoundEffect
@@ -2845,7 +2845,7 @@ call_02_6ec7_EntityAction_CannonProjectile_Update:
 .jr_00_6EFA:
     ld   a,SFX_SMALL_BANG
     call call_00_0ff5_QueueSoundEffect
-    ld   c,RELATIVE_ENTITY_SPAWN_CANNON_PROJECTILE_2
+    ld   c,SPAWN_CHILD_ENTITY_CANNON_PROJECTILE_2
     call call_00_3792_PrepareRelativeEntitySpawn
     jp   call_00_2b7a_Entity_DeactivateAndClearFlags
 
@@ -2921,10 +2921,10 @@ call_02_6f64_EntityAction_Rez_Unk8:
     call call_00_2922_Entity_MiscTimerCountdown
     jr   z,.jr_00_6F93
     ld   a,[wDCDA_BrainOfOzAndRezCounter]
-    ld   c,RELATIVE_ENTITY_SPAWN_REZ_PROJECTILE
+    ld   c,SPAWN_CHILD_ENTITY_REZ_PROJECTILE
     and  a,$01
     jp   z,call_00_3792_PrepareRelativeEntitySpawn
-    ld   c,RELATIVE_ENTITY_SPAWN_REZ_PROJECTILE_2
+    ld   c,SPAWN_CHILD_ENTITY_REZ_PROJECTILE_2
     jp   call_00_3792_PrepareRelativeEntitySpawn
 .jr_00_6F93:
     ld   c,ENTITY_CHANNEL_Z_REZ_PROJECTILE
