@@ -168,6 +168,61 @@ DEF MAP_CHANNEL_Z3                 EQU $3A
 DEF MAP_CHANNEL_Z4                 EQU $3B
 DEF MAP_CHANNEL_Z5                 EQU $3C
 
+; ------------------------------------------------------------------
+; BG map geometry (see code/bank00_bg_map.asm)
+; ------------------------------------------------------------------
+DEF BGMAP_BLOCK_SIZE_PX          EQU 16  ; one block is 16x16 pixels...
+DEF BGMAP_BLOCK_SIZE_TILES       EQU 2   ; ...that is 2x2 tiles
+DEF BGMAP_BLOCKSET_ENTRY_SIZE    EQU 8   ; 4 tile ids then 4 GBC attribute bytes
+DEF BGMAP_COLLISION_ENTRY_SIZE   EQU 4   ; 4 collision tile ids, no attributes
+DEF BGMAP_STRIP_BLOCKS           EQU $0b ; blocks per loaded strip: 11 * 16px = 176px,
+                                         ; one block wider than the 160px screen
+DEF BGMAP_INITIAL_ROWS           EQU $16 ; rows drawn per pass when a map is first loaded
+
+; ------------------------------------------------------------------
+; wDC20_BgMapLoadingFlags. Each scroll bit names the direction the camera moved,
+; and therefore which edge of the screen has to be redrawn. Same bit assignments
+; as gex2's wD6F9_BgMap_LoadingFlags
+; ------------------------------------------------------------------
+DEF MAP_PENDING_VRAM_TRANSFER    EQU 7   ; bit 7 - a strip is assembled and waiting on vblank
+DEF MAP_SCROLL_UP                EQU $01 ; loads the row at camera Y - 1
+DEF MAP_SCROLL_DOWN              EQU $02 ; loads the row at camera Y + $88
+DEF MAP_SCROLL_LEFT              EQU $04 ; loads the column at camera X - 1
+DEF MAP_SCROLL_RIGHT             EQU $08 ; loads the column at camera X + $A0
+
+; ------------------------------------------------------------------
+; wDC33_BgMap_InitialLoadPass. call_00_1056_BgMap_LoadFull runs
+; call_00_1a22_BgMap_LoadAllRowsForPass once per value, in this order, flushing
+; wC000_BgMapTileIds to VRAM between the first two
+; ------------------------------------------------------------------
+DEF BGMAP_PASS_ATTRIBUTES        EQU $04 ; blockset bytes 4-7 -> VRAM bank 1
+DEF BGMAP_PASS_TILE_IDS          EQU $00 ; blockset bytes 0-3 -> VRAM bank 0
+DEF BGMAP_PASS_COLLISION         EQU $80 ; collision blockset -> stays in wC000_BgMapTileIds
+
+; ------------------------------------------------------------------
+; wDC8A_MapEdgeTouched - which map boundary the player is clamped against, and
+; the second index into .data_00_153f_MapEdgeSpawnIds
+; ------------------------------------------------------------------
+DEF MAP_EDGE_TOP                 EQU $00
+DEF MAP_EDGE_BOTTOM              EQU $01
+DEF MAP_EDGE_LEFT                EQU $02
+DEF MAP_EDGE_RIGHT               EQU $03
+DEF MAP_EDGE_NONE                EQU $ff ; any value with bit 7 set means "not touching an edge"
+
+DEF MAP_EDGE_SPAWN_NONE          EQU $ff ; that edge does not lead anywhere
+DEF MAP_EDGE_SPAWN_CONDITIONAL   EQU $fe ; use spawn $10, but only if wDCB1_LevelTriggerBuffer[0] is set
+
+; ------------------------------------------------------------------
+; Warp / door record layout (see call_00_1633_Map_LoadWarpDestination and
+; call_00_1bbc_CheckForDoorAndEnter)
+; ------------------------------------------------------------------
+DEF MAP_SPAWN_ENTRY_SIZE         EQU 8   ; map id, X, Y, linked spawn id, 2 spare
+DEF MAP_SPAWN_LINK_ABSOLUTE      EQU $ff ; spawn uses its own Y instead of the player's offset
+DEF MAP_DOOR_ENTRY_SIZE          EQU 6   ; spawn id, required trigger, X, Y
+DEF MAP_DOOR_LIST_END            EQU $ff ; terminates a map's door list
+DEF MAP_DOOR_NO_TRIGGER          EQU $ff ; door has no wDCB1_LevelTriggerBuffer condition
+DEF MAP_DOOR_X_TOLERANCE         EQU 8   ; player X must be within +/- 8 px of the door
+
 ; Entities
 DEF ENTITY_GEX                                         EQU $00
 DEF ENTITY_BONUS_COIN                                  EQU $01

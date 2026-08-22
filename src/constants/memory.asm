@@ -1,6 +1,23 @@
 SECTION "wram0", WRAM0[$c000]
 
 wC000_BgMapTileIds:
+; $C000-$C3FF is the 32x32-entry shadow of the BG tilemap at $9800, one byte per
+; tile, addressed exactly like VRAM: the loaders take the tilemap address they
+; are writing ($98xx-$9Bxx), mask the high byte with $03 and add $C0.
+;
+; During call_00_1056_BgMap_LoadFull this buffer is filled and flushed three
+; times over, once per pass of call_00_1a22_BgMap_LoadAllRowsForPass - see
+; wDC33_BgMap_InitialLoadPass. The first two passes are HDMA'd out to VRAM
+; (attributes to bank 1, tile ids to bank 0) by config entries 7 and 8 of
+; .data_00_0aa9_TilesetLoadConfigTable; the third pass leaves the map's
+; COLLISION tile ids sitting here, and they stay for the life of the map.
+;
+; So in gameplay this is the current collision map - the gex2 equivalent is
+; wC800_CurrentCollisionData - and it is what call_03_4b4c_BgCollision_TestTile
+; reads before indexing wC400_CollisionTilesetData. The scroll loaders keep it
+; in step with the camera the same way they keep the tilemap in step.
+; The menus reuse the same 1KB as a plain tilemap staging area, which is where
+; the label's name comes from
     ds 1024                                            ;; c000
 
 wC400_CollisionTilesetData: ; C400-CC00 is a copy of 03:4100-03:48FF but in a different order
@@ -11,16 +28,46 @@ wC980_NumberSprites: ; this is the start of the number sprites copied from bank 
     ds 896                                             ;; c980
 
 wCD00_RowOffsetTableForMap:
+; 256 entries of "byte offset of map row N", built by
+; call_00_10c7_BgMap_BuildRowOffsetTable as N * wDC1C_CurrentMapWidthAndHeightInBlocks.
+; Stored split, low bytes at $CD00+N and high bytes at $CE00+N, so a lookup is
+; `ld L,row / ld H,HIGH(wCD00...) / ld E,[HL] / inc H / ld D,[HL]`.
+;
+; This table is the price of gex3's variable map sizes. gex2 hardcodes a
+; 128-block-wide blockmap, so it can reach a row with three `add HL,HL` shifts;
+; gex3 maps are each their own width, so every row start is precomputed once at
+; load time and every strip loader indexes this instead of multiplying
     ds 512                                             ;; cd00
 
+; ------------------------------------------------------------------
+; BG map strip scratch, $CF00-$CFFF. The strip loaders never write VRAM
+; directly - they assemble 11 blocks worth of tile ids and GBC attribute bytes
+; here, then call_00_0b9f_Frame_GraphicsUpdateHandler flushes the pair to the
+; tilemap during vblank (call_03_75e3_Tilemap_UpdateBlockFromBuffer for a row,
+; call_03_7664_Tilemap_UpdateColumnFromBuffer for a column). gex2 has no
+; equivalent - it writes tiles into VRAM inside the loader itself.
+;
+; The row halves are indexed by wDC25_BgMap_ScratchRowOffset and the column
+; halves by wDC26_BgMap_ScratchColumnOffset; both wrap inside their own 32-byte
+; window with `res 5`, so the buffers behave as rings that track the camera.
+; ------------------------------------------------------------------
 wCF00_TileScratchBuffers:
-wCF00_MetatileScratchBuffer: ; where block ids from the map data get written temporarily. also where the extended map data is handled
+wCF00_BgMap_TempScratchRowTileIds:
+; Row strip, tile ids. Filled twice per strip: first with the block ids
+; themselves (low byte from the map data, high byte from the extended map data,
+; interleaved as id-lo/id-hi pairs), then overwritten in place with the two tile
+; ids the blockset expands each of those blocks into
     ds 64                                              ;; cf00
-wCF40_TileColumnScratchBuffer:
+wCF40_BgMap_TempScratchColumnTileIds:
+; Column strip, tile ids. Same two-stage use as the row buffer above
     ds 64                                              ;; cf40
-wCF80_MetatileScratchBuffer2:
+wCF80_BgMap_TempScratchRowAttributes:
+; Row strip, GBC attribute bytes (palette id, tile flips, VRAM bank) for the
+; tile ids in wCF00_BgMap_TempScratchRowTileIds. Written from bytes 4-7 of the
+; blockset entry while the ids come from bytes 0-3
     ds 64                                              ;; cf80
-wCFC0_TileColumnScratchBuffer2:
+wCFC0_BgMap_TempScratchColumnAttributes:
+; Column strip, GBC attribute bytes
     ds 64                                              ;; cfc0
 
 wD000_CollectibleUnusedMemory: ; seems unused?
@@ -505,12 +552,29 @@ wDBFD_XPositionRelated:
 wDBFF_YPositionRelated:
     ds 2                                               ;; dbff
 
-; Map Data Pointers
+; ------------------------------------------------------------------
+; Map Data Pointers, filled in for the current map by the bank 03 map init data
+; (see code/bank03_map_init_data.asm). Every one is a bank byte followed by a
+; 16-bit offset inside that bank, and the strip loaders in bank00_bg_map.asm
+; switch through them one after another to build a single strip.
+;
+; gex2 keeps the same idea in wD6F5-wD700, but with far fewer layers: it has a
+; blockmap, one "alt blockset" flag layer, a combined blockset+collision bank
+; and a tileset. gex3 splits them into six independent streams - map, extended
+; map, blockset, collision map, collision blockset, tileset - which is what lets
+; a gex3 map be any size and use more than 256 distinct blocks.
+; ------------------------------------------------------------------
 wDC01_MapBank:
+; Blockmap: one byte per 16x16 block, rows are wDC1C_CurrentMapWidthAndHeightInBlocks
+; bytes apart. Supplies the LOW byte of the block id
     ds 1                                               ;; dc01
 wDC02_MapBankOffset:
     ds 2                                               ;; dc02
 wDC04_MapExtendedBank:
+; Extended blockmap, laid out exactly like the blockmap above and read in the
+; same sweep. Supplies the HIGH byte of the block id, so a map can address more
+; than 256 blocks. gex2 has a same-shaped second layer but uses it as a one-bit
+; "alt blockset" selector instead
     ds 1                                               ;; dc04
 wDC05_MapExtendedBankOffset:
     ds 2                                               ;; dc05
@@ -518,16 +582,25 @@ wDC07_TilesetBank:
     ds 1                                               ;; dc07
 wDC08_TilesetBankOffset:
     ds 2                                               ;; dc08
-wDC0A_BlocksetBank: 
-; also contains palette ids for each block and flags to flip tiles horizontally, vertically, or use second vRAM bank
+wDC0A_BlocksetBank:
+; Blockset: 8 bytes per block id, indexed as (block id * 8) from
+; wDC0B_BlocksetBankOffset. Bytes 0-3 are the four tile ids of the block's 2x2
+; tiles in reading order; bytes 4-7 are the matching GBC attribute bytes
+; (palette id, horizontal/vertical flip, VRAM bank)
     ds 1                                               ;; dc0a
 wDC0B_BlocksetBankOffset:
     ds 2                                               ;; dc0b
 wDC0D_MapCollisionBank:
+; Collision map: a third layer over the same block grid, one byte per block,
+; naming the collision block to use there. gex2 has no separate layer - its
+; collision lives in the same bank as the blockset
     ds 1                                               ;; dc0d
 wDC0E_MapCollisionBankOffset:
     ds 2                                               ;; dc0e
 wDC10_CollisionBlockset:
+; Collision blockset: 4 bytes per collision block id, the four collision tile
+; ids of its 2x2 tiles. Expanded into wC000_BgMapTileIds, which is what
+; call_03_4b4c_BgCollision_TestTile probes
     ds 1                                               ;; dc10
 wDC11_CollisionBlocksetOffset:
     ds 2                                               ;; dc11
@@ -544,6 +617,9 @@ wDC19_CollectibleListBank:
 wDC1A_CollectibleListBankOffset:
     ds 2                                               ;; dc1a
 wDC1C_CurrentMapWidthAndHeightInBlocks:
+; +0 width in 16x16 blocks, +1 height in blocks. The width doubles as the map
+; data row stride, and is what call_00_10c7_BgMap_BuildRowOffsetTable multiplies
+; up into wCD00_RowOffsetTableForMap
     ds 2                                               ;; dc1c
 wDC1E_CurrentLevelID: ; all maps in the same level share the same value here
     ds 1                                               ;; dc1e
@@ -552,30 +628,57 @@ wDC1F_CurrentBgCollisionType:
     ds 1                                               ;; dc1f
 
 wDC20_BgMapLoadingFlags:
+; Which edges the camera has uncovered since the last vblank, plus the busy bit.
+; MAP_SCROLL_UP / MAP_SCROLL_DOWN ask for a row, MAP_SCROLL_LEFT /
+; MAP_SCROLL_RIGHT ask for a column; call_02_7305_CheckVerticalMapScroll and
+; call_02_7337_CheckHorizontalMapScroll raise them, call_00_11c8_BgMap_LoadDirtyRegions
+; services them and sets MAP_PENDING_VRAM_TRANSFER, and
+; call_00_0b9f_Frame_GraphicsUpdateHandler clears the whole byte after the
+; vblank flush. Same bit assignments as gex2's wD6F9_BgMap_LoadingFlags
     ds 1                                               ;; dc20
 
-wDC21:
+wDC21_BgMap_RowWritePosLo:
+; Tilemap address ($9800-$9BFF) that the pending ROW strip is flushed to, low
+; byte. Read back by call_03_75e3_Tilemap_UpdateBlockFromBuffer.
+; gex2 calls the same thing wD6FA_BgMap_RowWritePosLo
     ds 1                                               ;; dc21
 
-wDC22:
+wDC22_BgMap_RowWritePosHi:
+; High byte of the row's tilemap address. The loaders also reuse it to reach the
+; matching slot of wC000_BgMapTileIds, via (value AND $03) + $C0
     ds 1                                               ;; dc22
 
-wDC23:
+wDC23_BgMap_ColumnWritePosLo:
+; Tilemap address that the pending COLUMN strip is flushed to, low byte.
+; Read back by call_03_7664_Tilemap_UpdateColumnFromBuffer
     ds 1                                               ;; dc23
 
-wDC24:
+wDC24_BgMap_ColumnWritePosHi:
+; High byte of the column's tilemap address
     ds 1                                               ;; dc24
 
-wDC25:
+wDC25_BgMap_ScratchRowOffset:
+; Where in wCF00_BgMap_TempScratchRowTileIds (and, +$80, in
+; wCF80_BgMap_TempScratchRowAttributes) this row strip starts:
+; (block X * 2) AND $1E, so the buffer rotates with the camera
     ds 1                                               ;; dc25
 
-wDC26:
+wDC26_BgMap_ScratchColumnOffset:
+; Same idea for the column strip: ((block Y * 2) AND $1E) OR $40, which lands it
+; in wCF40_BgMap_TempScratchColumnTileIds / wCFC0_BgMap_TempScratchColumnAttributes
     ds 1                                               ;; dc26
 
-wDC27:
+wDC27_BgMap_ScrollBlockX:
+; Block X coordinate of the strip being loaded (camera X >> 4), written by
+; call_00_14e2_BgMap_SetScrollBlockCoords. Added to the row start pulled out of
+; wCD00_RowOffsetTableForMap to reach the first block of the strip.
+; gex2 equivalent: wD779_BgMap_ScrollBlockX
     ds 1                                               ;; dc27
 
-wDC28:
+wDC28_BgMap_ScrollBlockY:
+; Block Y coordinate of the strip being loaded (camera Y >> 4), and therefore
+; the index into wCD00_RowOffsetTableForMap.
+; gex2 equivalent: wD77A_BgMap_ScrollBlockY
     ds 1                                               ;; dc28
 
 wDC29_SkipMapWindowUpdateFlag: ; if set to 1, don't update the player window map
@@ -599,7 +702,15 @@ wDC31_TilesetBankRelated:
 wDC32_VRAMBank:
     ds 1                                               ;; dc32
 
-wDC33_BgMapRelated:
+wDC33_BgMap_InitialLoadPass:
+; Which of the three initial-load passes call_00_1a46_BgMap_LoadInitialRow is
+; running, one of BGMAP_PASS_TILE_IDS / BGMAP_PASS_ATTRIBUTES /
+; BGMAP_PASS_COLLISION. Bit 7 picks the collision layer over the graphics
+; layer; the low bits are added to the byte offset used inside each 8-byte
+; blockset entry, which is how the same loop reads tile ids on one pass and
+; attribute bytes on the next.
+; Only ever set by call_00_1a22_BgMap_LoadAllRowsForPass; the per-frame scroll
+; loaders do all three jobs in one visit and never look at it
     ds 1                                               ;; dc33
 
 ; Map rectangle bounds, and extended ones
@@ -687,11 +798,21 @@ wDC68_CollectibleCount:
     ds 1                                               ;; dc68
 
 wDC69_PlayerSpawnIdInLevel:
+; Which spawn point of the current level to place the player at after a warp.
+; Set by call_00_150f_Map_CheckEdgeTransition (walked off a map edge) or by
+; call_00_1bbc_CheckForDoorAndEnter (pressed Up in a doorway), then consumed by
+; call_00_1633_Map_LoadWarpDestination, which turns it into a map id and a
+; position
     ds 1                                               ;; dc69
 
 wDC6A_CheckpointStoredX:
+; World X the player is placed at after the pending warp, written by
+; call_00_1633_Map_LoadWarpDestination
     ds 2                                               ;; dc6a
 wDC6C_CheckpointStoredY:
+; World Y the player is placed at after the pending warp. For a spawn that links
+; to another spawn record, this is the linked spawn's Y plus the player's offset
+; from it, so walking off the side of a map keeps the player's height
     ds 2                                               ;; dc6c
 
 ; unused?
@@ -764,7 +885,20 @@ wDC88_CurrentEntity_UnkVerticalOffset:
 wDC89:
     ds 1                                               ;; dc89
 
-wDC8A:
+wDC8A_MapEdgeTouched:
+; Which side of the current map the player was last clamped against, one of
+; MAP_EDGE_TOP / MAP_EDGE_BOTTOM / MAP_EDGE_LEFT / MAP_EDGE_RIGHT, or
+; MAP_EDGE_NONE ($FF) when the player is not touching an edge.
+;
+; The four map-boundary clamps in bank02_update_player.asm write it, the main
+; loop resets it to MAP_EDGE_NONE each frame, and
+; call_00_150f_Map_CheckEdgeTransition reads it as the second index into
+; .data_00_153f_MapEdgeSpawnIds to decide which neighbouring map to warp to.
+; MAP_EDGE_NONE is detected by testing bit 7, so any value with bit 7 set counts
+; as "no edge".
+;
+; Nothing like this exists in gex2 - a gex2 level is one single map, so walking
+; into the edge just stops the player
     ds 1                                               ;; dc8a
 
 wDC8B:
@@ -859,9 +993,13 @@ wDCAF_PawCoinCounter: ; for every 4 collected, increment Gex's health
 wDCB1_LevelTriggerBuffer:
     ds 16                                              ;; dcb1
 
-wDCC1_EnterDoorRelated1:
+wDCC1_Door_TargetSpawnId:
+; Spawn id of the door call_00_1bbc_CheckForDoorAndEnter is currently testing.
+; On a hit it is copied to wDC69_PlayerSpawnIdInLevel and the warp is requested
     ds 1                                               ;; dcc1
-wDCC2_EnterDoorRelated2:
+wDCC2_Door_RequiredTriggerIndex:
+; Index into wDCB1_LevelTriggerBuffer that must be non-zero for that door to
+; open, or $FF for a door with no condition
     ds 1                                               ;; dcc2
 
 ; Entity counters and flags

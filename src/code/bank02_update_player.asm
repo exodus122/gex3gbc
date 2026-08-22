@@ -596,7 +596,8 @@ call_02_5195_ResolveLeftwardTilePushback:
 ; Purpose: Performs fine collision resolution when pushing left into a block.
 ; Details:
 ; Calculates distance between player and tile edges (wDC3C_MapBoundaryXMinLoPlus10, wD80E_PlayerXPosition).
-; Updates temporary velocity/direction flags (wDC8A).
+; Records MAP_EDGE_LEFT in wDC8A_MapEdgeTouched when the clamp fires, so
+; call_00_150f_Map_CheckEdgeTransition can warp to the map on the left.
 ; Chooses whether to store adjusted coordinates or preserve original deltas based on flags.
     ld   HL, wDC3C_MapBoundaryXMinLoPlus10                                     ;; 02:5195 $21 $3c $dc
     ld   A, [HL+]                                      ;; 02:5198 $2a
@@ -615,8 +616,8 @@ call_02_5195_ResolveLeftwardTilePushback:
     ld   A, D                                          ;; 02:51a9 $7a
     sbc  A, B                                          ;; 02:51aa $98
     jr   C, .jr_02_51b4                                ;; 02:51ab $38 $07
-    ld   A, $02                                        ;; 02:51ad $3e $02
-    ld   [wDC8A], A                                    ;; 02:51af $ea $8a $dc
+    ld   A, MAP_EDGE_LEFT                              ;; 02:51ad $3e $02
+    ld   [wDC8A_MapEdgeTouched], A                                    ;; 02:51af $ea $8a $dc
     jr   .jr_02_51b6                                   ;; 02:51b2 $18 $02
 .jr_02_51b4:
     ld   E, C                                          ;; 02:51b4 $59
@@ -692,7 +693,8 @@ call_02_5204_ResolveRightwardTilePushback:
 ; Purpose: Mirrors call_02_5195 for right side collisions.
 ; Details:
 ; Uses positive deltas to adjust player’s X-position when moving right.
-; pdates flags (wDC8A) and writes corrected values to player position.
+; Records MAP_EDGE_RIGHT in wDC8A_MapEdgeTouched when the clamp fires, and writes
+; the corrected values to the player position.
     ld   HL, wDC3E_MapBoundaryXMaxLoPlus90                                     ;; 02:5204 $21 $3e $dc
     ld   A, [HL+]                                      ;; 02:5207 $2a
     ld   D, [HL]                                       ;; 02:5208 $56
@@ -709,8 +711,8 @@ call_02_5204_ResolveRightwardTilePushback:
     ld   A, D                                          ;; 02:5216 $7a
     sbc  A, B                                          ;; 02:5217 $98
     jr   NC, .jr_02_5221                               ;; 02:5218 $30 $07
-    ld   A, $03                                        ;; 02:521a $3e $03
-    ld   [wDC8A], A                                    ;; 02:521c $ea $8a $dc
+    ld   A, MAP_EDGE_RIGHT                             ;; 02:521a $3e $03
+    ld   [wDC8A_MapEdgeTouched], A                                    ;; 02:521c $ea $8a $dc
     jr   .jr_02_5223                                   ;; 02:521f $18 $02
 .jr_02_5221:
     ld   E, C                                          ;; 02:5221 $59
@@ -982,7 +984,8 @@ call_02_53e7_ApplyVerticalMovementAndClamp:
 ; Behavior:
 ; Adds (C,B) delta to Y coordinates (wD810–wD811).
 ; If player isn’t in a special action (≠ $1B), compares the new position against stored map window bounds (wDC40_MapBoundaryYMinLoPlus10–wDC43_MapBoundaryYMaxHiPlus0).
-; If out of bounds, clamps Y to the limit and sets wDC8A as a collision indicator.
+; If out of bounds, clamps Y to the limit and records which edge was hit in
+; wDC8A_MapEdgeTouched (MAP_EDGE_BOTTOM or MAP_EDGE_TOP).
     ld   HL, wD810_PlayerYPosition                                     ;; 02:53e7 $21 $10 $d8
     ld   A, [HL]                                       ;; 02:53ea $7e
     add  A, C                                          ;; 02:53eb $81
@@ -1015,16 +1018,16 @@ call_02_53e7_ApplyVerticalMovementAndClamp:
     ld   [wD810_PlayerYPosition], A                                    ;; 02:5410 $ea $10 $d8
     ld   A, [wDC43_MapBoundaryYMaxHiPlus0]                                    ;; 02:5413 $fa $43 $dc
     ld   [wD810_PlayerYPosition+1], A                                    ;; 02:5416 $ea $11 $d8
-    ld   A, $01                                        ;; 02:5419 $3e $01
-    ld   [wDC8A], A                                    ;; 02:541b $ea $8a $dc
+    ld   A, MAP_EDGE_BOTTOM                            ;; 02:5419 $3e $01
+    ld   [wDC8A_MapEdgeTouched], A                                    ;; 02:541b $ea $8a $dc
     ret                                                ;; 02:541e $c9
 .jr_02_541f:
     ld   A, [wDC40_MapBoundaryYMinLoPlus10]                                    ;; 02:541f $fa $40 $dc
     ld   [wD810_PlayerYPosition], A                                    ;; 02:5422 $ea $10 $d8
     ld   A, [wDC41_MapBoundaryYMinHiPlus00]                                    ;; 02:5425 $fa $41 $dc
     ld   [wD810_PlayerYPosition+1], A                                    ;; 02:5428 $ea $11 $d8
-    ld   A, $00                                        ;; 02:542b $3e $00
-    ld   [wDC8A], A                                    ;; 02:542d $ea $8a $dc
+    ld   A, MAP_EDGE_TOP                               ;; 02:542b $3e $00
+    ld   [wDC8A_MapEdgeTouched], A                                    ;; 02:542d $ea $8a $dc
     ret                                                ;; 02:5430 $c9
 
 call_02_5431_HandleActionTriggersAndEvents:

@@ -33,7 +33,9 @@ entry:
     db   CART_INDICATOR_GB                             ;; 00:0146
     db   CART_ROM_MBC5, CART_ROM_2048KB, CART_SRAM_NONE ;; 00:0147
     db   CART_DEST_NON_JAPANESE, $33, $00              ;; 00:014a $01 $33 $00
-    ds   $03                                             ;; 00:014d
+    ds   $03                                           ;; 00:014d
+
+SECTION "bank00_0150", ROM0[$0150]
 
 call_00_0150_Init:
     di                                                 ;; 00:0150 $f3
@@ -313,8 +315,8 @@ call_00_0150_Init:
     xor  A, A                                          ;; 00:0413 $af
     ld   [wDB6A_WarpFlags], A                                    ;; 00:0414 $ea $6a $db
     ld   [wDCDB_EvilSantaHitByProjectileFlag], A                                    ;; 00:0417 $ea $db $dc
-    ld   A, $ff                                        ;; 00:041a $3e $ff
-    ld   [wDC8A], A                                    ;; 00:041c $ea $8a $dc
+    ld   A, MAP_EDGE_NONE                              ;; 00:041a $3e $ff
+    ld   [wDC8A_MapEdgeTouched], A                                    ;; 00:041c $ea $8a $dc
     jr   .jp_00_0443_MainGameplayLoop                                   ;; 00:041f $18 $22
 .jp_00_0421_Unpaused:
     call call_00_0595_PlaySongBasedOnLevel                                  ;; 00:0421 $cd $95 $05
@@ -331,7 +333,7 @@ call_00_0150_Init:
     ld   HL, wDB6A_WarpFlags                                     ;; 00:044e $21 $6a $db
     bit  2, [HL]                                       ;; 00:0451 $cb $56
     jr   Z, .jr_00_045e_SkipLoadMap                                ;; 00:0453 $28 $09
-    call call_00_1633_HandleLevelWarpOrExit                                  ;; 00:0455 $cd $33 $16
+    call call_00_1633_Map_LoadWarpDestination                                  ;; 00:0455 $cd $33 $16
     call call_00_2b3d_Entity_ClearAllSlots                                  ;; 00:0458 $cd $3d $2b
     jp   .jp_00_038e_LoadMap                                   ;; 00:045b $c3 $8e $03
 .jr_00_045e_SkipLoadMap:
@@ -380,7 +382,7 @@ call_00_0150_Init:
     farcall call_02_7152_UpdateAllEntities
     call call_00_11c8_BgMap_LoadDirtyRegions                                  ;; 00:04e9 $cd $c8 $11
     call call_00_0fc8_ProcessQueuedSoundEffect                                  ;; 00:04ec $cd $c8 $0f
-    call call_00_150f_CheckAndSetLevelTrigger                                  ;; 00:04ef $cd $0f $15
+    call call_00_150f_Map_CheckEdgeTransition                                  ;; 00:04ef $cd $0f $15
     call call_00_35fa_WaitForLineThenSpawnEntity                                  ;; 00:04f2 $cd $fa $35
     call call_00_08f8_SetupEntityVRAMTransfer                                  ;; 00:04f5 $cd $f8 $08
     jp   .jp_00_0443_MainGameplayLoop                                   ;; 00:04f8 $c3 $43 $04
