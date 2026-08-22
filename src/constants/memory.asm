@@ -1058,11 +1058,22 @@ wDCDB_EvilSantaHitByProjectileFlag:
 wDCDC_HandEntityUnkFlag:
     ds 2                                               ;; dcdc
 
-; Mission Preview Cutscene flags
-wDCDE_MissionPreviewCutsceneRelated:
+; ------------------------------------------------------------------
+; Cutscene state. A mission preview is a scripted camera move over a level that
+; has not started yet, driven by faking d-pad input into wDC81_CurrentInputsAlt
+; ------------------------------------------------------------------
+wDCDE_Cutscene_MoveFramesRemaining:
+; 16-bit countdown for the movement command currently running. Loaded from the
+; script, decremented once per frame; at zero the next command is fetched
     ds 2                                                ;; dcde
-wDCE0_MissionPreviewCutsceneMovementFlags:
-    ds 2                                               ;; dce0
+wDCE0_Cutscene_MoveSpeed:
+; movement speed in 1/16ths of a pixel per frame. Only ever $00 while a command
+; holds no direction, or CUTSCENE_MOVE_SPEED_MAX while it holds one
+    ds 1                                               ;; dce0
+wDCE1_Cutscene_MoveSubPixel:
+; sub-pixel accumulator. wDCE0_Cutscene_MoveSpeed is added to the low nibble
+; each frame and the carry out of the high nibble becomes the whole-pixel step
+    ds 1                                               ;; dce1
 
 ; Elevator entity data
 wDCE2_ElevatorEntityUnkData:

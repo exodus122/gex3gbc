@@ -240,7 +240,7 @@ call_00_0150_Init:
     call call_00_2f85_LoadAndSortCollectibleData                                  ;; 00:0347 $cd $85 $2f
     call call_00_2ff8_InitLevelEntitiesAndConfig                                  ;; 00:034a $cd $f8 $2f
     call call_00_0595_PlaySongBasedOnLevel                                  ;; 00:034d $cd $95 $05
-    call call_00_1ea0_MissionPreview_LoadAndRun                                  ;; 00:0350 $cd $a0 $1e
+    call call_00_1ea0_Cutscene_LoadAndRun                                  ;; 00:0350 $cd $a0 $1e
     xor  A, A                                          ;; 00:0353 $af
     ld   [wDC69_PlayerSpawnIdInLevel], A                                    ;; 00:0354 $ea $69 $dc
 .jp_00_0357_RespawnAfterDeath:

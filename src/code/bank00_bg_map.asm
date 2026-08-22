@@ -86,27 +86,33 @@
 ; walking off the side of a map continuous rather than a jump to a fixed spot.
 ;
 ; ------------------------------------------------------------------
-; Notes for anyone reading this next to gex2's bank00_bg_map.asm
+; How this differs from gex2's bank00_bg_map.asm
 ; ------------------------------------------------------------------
-; The two files do the same job and share wDC20_BgMapLoadingFlags, the strip
-; idea and most of the naming, but little of the geometry:
+; The two files answer the same question and share the flag byte, the strip
+; idea and most of the naming, but almost none of the geometry:
 ;
 ;   block size    gex2 32x32 px (4x4 tiles), gex3 16x16 px (2x2 tiles)
 ;   strip width   gex2 6 blocks, gex3 11 blocks (BGMAP_STRIP_BLOCKS)
-;   map size      gex2 blockmaps are always 128 blocks wide, so it reaches a row
-;                 by shifting rather than with a row offset table
-;   block ids     gex2 has 256 per map, and spends its second map layer on a
-;                 one-bit "alt blockset" selector plus a secondary-tileset
-;                 streaming system that gex3 has no counterpart for
-;   collision     gex2 reads collision out of the blockset bank instead of from
-;                 separate layers
-;   VRAM          gex2 writes tiles into VRAM inside the loader, toggling GBC
-;                 banks with `set 3, H`, with no scratch buffers or vblank flush
-;   levels        a gex2 level is a single map, so it has no edge transitions,
-;                 doors or spawn tables
-;   block patches gex2's BlockPatch subsystem - runtime geometry changes
+;   map size      gex2 is always 128 blocks wide, so it reaches a row by
+;                 shifting; gex3 maps are each their own size, so
+;                 call_00_10c7_BgMap_BuildRowOffsetTable precomputes every row
+;                 start into wCD00_RowOffsetTableForMap and the loaders index
+;                 that instead
+;   block ids     gex2 has 256 per map and spends its second map layer on a
+;                 one-bit "alt blockset" selector plus a whole secondary-tileset
+;                 streaming system; gex3 spends the same layer on the high byte
+;                 of a 16-bit block id and has no secondary tilesets at all
+;   collision     gex2 reads it out of the blockset bank; gex3 has a separate
+;                 collision map and collision blockset, expanded into
+;                 wC000_BgMapTileIds
+;   VRAM          gex2 writes tiles into VRAM inside the loader, toggling
+;                 GBC banks with `set 3, H`; gex3 stages into wCF00 and defers
+;                 the write to bank 03 in vblank
+;   levels        a gex2 level is one map; a gex3 level is many maps stitched
+;                 together with edge transitions and doors
+;   block patches gex2's whole BlockPatch subsystem - runtime geometry changes
 ;                 registered into the $CC00-$CF00 tables and reapplied as the
-;                 camera scrolls back over them - has no counterpart here
+;                 camera scrolls back - has no counterpart here
 ; ==================================================================
 
 call_00_1056_BgMap_LoadFull:

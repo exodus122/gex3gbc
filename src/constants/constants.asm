@@ -223,6 +223,15 @@ DEF MAP_DOOR_LIST_END            EQU $ff ; terminates a map's door list
 DEF MAP_DOOR_NO_TRIGGER          EQU $ff ; door has no wDCB1_LevelTriggerBuffer condition
 DEF MAP_DOOR_X_TOLERANCE         EQU 8   ; player X must be within +/- 8 px of the door
 
+; ------------------------------------------------------------------
+; Cutscenes - see code/bank00_cutscenes.asm
+; ------------------------------------------------------------------
+DEF CUTSCENE_SLOTS_PER_LEVEL     EQU $04 ; entries per level in the index lookup table
+DEF CUTSCENE_NONE                EQU $ff ; no cutscene for this level/mission
+DEF CUTSCENE_MOVE_END            EQU $ff ; terminator in a movement command list
+DEF CUTSCENE_MOVE_SPEED_MAX      EQU $10 ; 16/16ths = exactly one pixel per frame
+DEF CUTSCENE_HOLD_FRAMES         EQU $b4 ; 180 frames (3s) of dwell before returning
+
 ; Entities
 DEF ENTITY_GEX                                         EQU $00
 DEF ENTITY_BONUS_COIN                                  EQU $01

@@ -53,3 +53,25 @@ MACRO EntityChildSpawnData
     dw \2, \3
     db \4, 0, 0
 ENDM
+
+; ------------------------------------------------------------------
+; Cutscene scripts - see code/bank00_cutscenes.asm
+; ------------------------------------------------------------------
+; One cutscene script header: which map the scene is set in, where Gex is
+; teleported to, the movement command list to walk (or 0), and the animation
+; script (always 0 - the runner reads the field and discards it)
+MACRO cutscene_script  ; map id, start X, start Y, movement list, animation script
+    db   \1
+    dw   \2, \3, \4, \5
+ENDM
+
+; One movement command: which d-pad bits to fake into wDC81_CurrentInputsAlt,
+; and for how many frames. Two direction bits may be combined to pan diagonally
+MACRO cutscene_move    ; PADF_* direction bits, frames
+    db   \1
+    dw   \2
+ENDM
+
+MACRO cutscene_move_end
+    db   CUTSCENE_MOVE_END
+ENDM
