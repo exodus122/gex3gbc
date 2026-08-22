@@ -1,10 +1,10 @@
 ; This file handles collisions between the player and other entities.
 
 call_03_4c38_UpdateEntityCollision_Dispatch:
-; Main dispatcher: checks if collisions enabled (wDCA7_DrawGexFlag).
+; Main dispatcher: checks if collisions enabled (wDCA7_Player_UpdateFlag).
 ; Reads per-entity collision type/index, decrements a cooldown if nonzero.
 ; Uses jump table .data_03_4c63_EntityCollisionJumpTable to call the right handler.
-    ld   A, [wDCA7_DrawGexFlag]                                    ;; 03:4c38 $fa $a7 $dc
+    ld   A, [wDCA7_Player_UpdateFlag]                                    ;; 03:4c38 $fa $a7 $dc
     and  A, A                                          ;; 03:4c3b $a7
     ret  Z                                             ;; 03:4c3c $c8
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_COOLDOWN_TIMER
@@ -726,7 +726,7 @@ call_03_50f4_CollisionHandler_OnSwitch2:
     
 call_03_5116_CollisionHandler_Door:
 ; For action 00 only.
-; On collision: requires certain global flags (wDABE_UnkBGCollisionFlags2, wDC81_CurrentInputsAlt) and player action between 01–02.
+; On collision: requires certain global flags (wDABE_CollisionFlags, wDC81_Player_EffectiveInputs) and player action between 01–02.
 ; Checks entity slot flag; plays sound 1B if not set, else sound 18.
 ; Loads new entity data (bank 1).
     call call_00_2962_Entity_GetActionId
@@ -734,10 +734,10 @@ call_03_5116_CollisionHandler_Door:
     ret  nz
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
-    ld   hl,wDABE_UnkBGCollisionFlags2
+    ld   hl,wDABE_CollisionFlags
     bit  7,[hl]
     ret  z
-    ld   hl,wDC81_CurrentInputsAlt
+    ld   hl,wDC81_Player_EffectiveInputs
     bit  PADF_UP_BIT,[hl]
     ret  z
     ld   a,[wD801_Player_ActionId]
@@ -765,10 +765,10 @@ call_03_5156_CollisionHandler_Door2:
     ret  nz
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
-    ld   hl,wDABE_UnkBGCollisionFlags2
+    ld   hl,wDABE_CollisionFlags
     bit  7,[hl]
     ret  z
-    ld   hl,wDC81_CurrentInputsAlt
+    ld   hl,wDC81_Player_EffectiveInputs
     bit  PADF_UP_BIT,[hl]
     ret  z
     ld   a,[wD801_Player_ActionId]
@@ -1972,7 +1972,7 @@ call_03_581a_CollisionHandler_TVButton:
 call_03_58a9_ComputeCollisionOffset:
 ; Loads the entity’s parameter at $D8xx+1B.
 ; Flips it if the entity’s direction byte ($D8xx+19) has bit 7 set (sign extension trick).
-; Combines this with wDC84–wDC86_PlayerXVelocity (looks like camera or scroll deltas).
+; Combines this with wDC84_PlayerXDeltaExtra–wDC86_PlayerXVelocity (looks like camera or scroll deltas).
 ; Then checks wD80D_PlayerFacingDirection, and if bit 5 is set, flips the result.
 ; Role: This is a collision offset calculator: adjusts collision testing 
 ; depending on entity properties (size/offset) and player facing direction.
@@ -1986,9 +1986,9 @@ call_03_58a9_ComputeCollisionOffset:
     sub  b
     ld   b,a
     .jr_00_58BB:
-    ld   a,[wDC84]
+    ld   a,[wDC84_PlayerXDeltaExtra]
     ld   d,a
-    ld   a,[wDC85]
+    ld   a,[wDC85_PlayerXDeltaExtra2]
     add  d
     ld   d,a
     ld   a,[wDC86_PlayerXVelocity]

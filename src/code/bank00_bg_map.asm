@@ -86,7 +86,7 @@
 ; walking off the side of a map continuous rather than a jump to a fixed spot.
 ;
 ; ------------------------------------------------------------------
-; How this differs from gex2's bank00_bg_map.asm
+; Notes for anyone reading this next to gex2's bank03_bg_collision.asm
 ; ------------------------------------------------------------------
 ; The two files answer the same question and share the flag byte, the strip
 ; idea and most of the naming, but almost none of the geometry:

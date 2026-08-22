@@ -1,7 +1,7 @@
 call_02_708f_InitEntitiesAndSpawnPlayer:
 ; Purpose: Initializes core entity-related state when entering a level or respawning the player.
 ; Details:
-; Clears many entity/flag variables (wDC84–wDC8F, wDABD_UnkBGCollisionFlags–wDABE_UnkBGCollisionFlags2, etc.).
+; Clears many entity/flag variables (wDC84_PlayerXDeltaExtra–wDC8F, wDABD_CollisionFlagsPrev–wDABE_CollisionFlags, etc.).
 ; If a pending action ID exists, sets it.
 ; Resets player-facing direction and flags, clears entity slots, 
 ; and spawns required relative entities.
@@ -27,17 +27,17 @@ call_02_708f_InitEntitiesAndSpawnPlayer:
     ld   [wDC86_PlayerXVelocity], A                                    ;; 02:70b9 $ea $86 $dc
     ld   [wDC87_PlayerXMaxVelocity], A                                    ;; 02:70bc $ea $87 $dc
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:70bf $ea $8c $dc
-    ld   [wDC8D], A                                    ;; 02:70c2 $ea $8d $dc
+    ld   [wDC8D_Player_FloorSnapVelocity], A                                    ;; 02:70c2 $ea $8d $dc
     ld   [wDC8E_InitialYVelocity], A                                    ;; 02:70c5 $ea $8e $dc
     ld   [wDC8F], A                                    ;; 02:70c8 $ea $8f $dc
     ld   [wDC88_CurrentEntity_UnkVerticalOffset], A                                    ;; 02:70cb $ea $88 $dc
     ld   [wDC80_Player_UnkStates], A                                    ;; 02:70ce $ea $80 $dc
 .jr_02_70d1:
     xor  A, A                                          ;; 02:70d1 $af
-    ld   [wDC85], A                                    ;; 02:70d2 $ea $85 $dc
-    ld   [wDC84], A                                    ;; 02:70d5 $ea $84 $dc
-    ld   [wDABE_UnkBGCollisionFlags2], A                                    ;; 02:70d8 $ea $be $da
-    ld   [wDABD_UnkBGCollisionFlags], A                                    ;; 02:70db $ea $bd $da
+    ld   [wDC85_PlayerXDeltaExtra2], A                                    ;; 02:70d2 $ea $85 $dc
+    ld   [wDC84_PlayerXDeltaExtra], A                                    ;; 02:70d5 $ea $84 $dc
+    ld   [wDABE_CollisionFlags], A                                    ;; 02:70d8 $ea $be $da
+    ld   [wDABD_CollisionFlagsPrev], A                                    ;; 02:70db $ea $bd $da
     ld   A, $ff                                        ;; 02:70de $3e $ff
     ld   [wDC79_PlayerUnkFlags2], A                                    ;; 02:70e0 $ea $79 $dc
     xor  A, A                                          ;; 02:70e3 $af
@@ -119,29 +119,29 @@ call_02_7142_RestoreEntityTable:
 call_02_7152_UpdateAllEntities:
 ; Purpose: Master routine for per-frame entity updates and player-related checks.
 ; Details:
-; Resets temporary flags and checks conditions in wDCA7_DrawGexFlag.
+; Resets temporary flags and checks conditions in wDCA7_Player_UpdateFlag.
 ; Handles special cases for player actions/IDs, adjusts player Y-position (wD810/wD811).
 ; Invokes entity behavior routines (call_00_0f22_JumpHL) for special entities (wDC7B_CurrentEntityAddrLoAlt, wDC7B_CurrentEntityAddrLoAlt2).
 ; Calls call_02_72fb_UpdateMapWindow to update the scrolling window and environment.
 ; Iterates through all entities (wDA00_CurrentEntityAddrLo) to run their update logic and 
 ; finally draws entities and handles collision.
     xor  A, A                                          ;; 02:7152 $af
-    ld   [wDC85], A                                    ;; 02:7153 $ea $85 $dc
-    ld   [wDC84], A                                    ;; 02:7156 $ea $84 $dc
+    ld   [wDC85_PlayerXDeltaExtra2], A                                    ;; 02:7153 $ea $85 $dc
+    ld   [wDC84_PlayerXDeltaExtra], A                                    ;; 02:7156 $ea $84 $dc
     ld   [wD900], A                                    ;; 02:7159 $ea $00 $d9
     ld   [wD904], A                                    ;; 02:715c $ea $04 $d9
-    ld   A, [wDCA7_DrawGexFlag]                                    ;; 02:715f $fa $a7 $dc
+    ld   A, [wDCA7_Player_UpdateFlag]                                    ;; 02:715f $fa $a7 $dc
     and  A, A                                          ;; 02:7162 $a7
     jp   Z, .jp_02_7200                                ;; 02:7163 $ca $00 $72
     call call_02_5541_GetPlayerStatesFromAction                                  ;; 02:7166 $cd $41 $55
     and  A, PLAYER_STATE_DEAD_MASK                                        ;; 02:7169 $e6 $08
     jr   NZ, .jr_02_717f                               ;; 02:716b $20 $12
-    ld   A, [wDC93]                                    ;; 02:716d $fa $93 $dc
+    ld   A, [wDC93_TileTypeBehindGexsLowerBody]                                    ;; 02:716d $fa $93 $dc
     cp   A, $15                                        ;; 02:7170 $fe $15
     jr   Z, .jr_02_7196                                ;; 02:7172 $28 $22
     cp   A, $16                                        ;; 02:7174 $fe $16
     jr   Z, .jr_02_719a                                ;; 02:7176 $28 $22
-    ld   A, [wDC92]                                    ;; 02:7178 $fa $92 $dc
+    ld   A, [wDC92_TileTypeBehindGexsUpperBody]                                    ;; 02:7178 $fa $92 $dc
     cp   A, $17                                        ;; 02:717b $fe $17
     jr   Z, .jr_02_719e                                ;; 02:717d $28 $1f
 .jr_02_717f:
@@ -167,7 +167,7 @@ call_02_7152_UpdateAllEntities:
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:71a0 $ea $8c $dc
     jr   .jr_02_71a9                                   ;; 02:71a3 $18 $04
 .jr_02_71a5:
-    ld   HL, wDC84                                     ;; 02:71a5 $21 $84 $dc
+    ld   HL, wDC84_PlayerXDeltaExtra                                     ;; 02:71a5 $21 $84 $dc
     ld   [HL], C                                       ;; 02:71a8 $71
 .jr_02_71a9:
     ld   A, [wDC7B_CurrentEntityAddrLoAlt]                                    ;; 02:71a9 $fa $7b $dc

@@ -65,7 +65,7 @@ MACRO cutscene_script  ; map id, start X, start Y, movement list, animation scri
     dw   \2, \3, \4, \5
 ENDM
 
-; One movement command: which d-pad bits to fake into wDC81_CurrentInputsAlt,
+; One movement command: which d-pad bits to fake into wDC81_Player_EffectiveInputs,
 ; and for how many frames. Two direction bits may be combined to pan diagonally
 MACRO cutscene_move    ; PADF_* direction bits, frames
     db   \1
@@ -74,4 +74,27 @@ ENDM
 
 MACRO cutscene_move_end
     db   CUTSCENE_MOVE_END
+ENDM
+
+; ------------------------------------------------------------------
+; Background collision probe scripts - see code/bank03_bg_collision.asm
+; ------------------------------------------------------------------
+; Header: which d-pad bits this script answers for, how many entries follow,
+; and how big each one is
+MACRO climb_script ; d-pad mask, number of entries, entry size
+    db   \1
+    db   \2
+    dw   \3
+ENDM
+
+; Climbing entry: the input it matches, then the tile offset to probe
+MACRO climb_script_entry ; input, X offset, Y offset
+    db   \1, \2, \3
+ENDM
+
+; Swimming entry: same, but the offset is in pixels and pre-biased by
+; PLAYER_FEET_OFFSET - 1 so the handler can subtract it back out. The trailing
+; pair is the same direction in tiles and is never read
+MACRO swim_script_entry ; input, X offset, Y offset, unread X, unread Y
+    db   \1, \2, \3, \4, \5
 ENDM

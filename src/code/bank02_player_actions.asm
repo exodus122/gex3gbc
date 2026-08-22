@@ -24,7 +24,7 @@ call_02_47ce_PlayerAction_Idle:
     ld   A, TIMER_AMOUNT_240_FRAMES                                        ;; 02:47e4 $3e $f0
     ld   [wDC83_PlayerIdleTimer], A                                    ;; 02:47e6 $ea $83 $dc
 .jr_02_47e9:
-    ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:47e9 $fa $81 $dc
+    ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:47e9 $fa $81 $dc
     cp   A, PADF_UP                                        ;; 02:47ec $fe $40
     call Z, call_00_1bbc_CheckForDoorAndEnter                               ;; 02:47ee $cc $bc $1b
     call call_02_4f11_ChooseNextActionBasedOnLevel                                  ;; 02:47f1 $cd $11 $4f
@@ -35,7 +35,7 @@ call_02_47ce_PlayerAction_Idle:
     ret                                                ;; 02:47fd $c9
 
 call_02_47fe_PlayerAction_IdleAnimation:
-    ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:47fe $fa $81 $dc
+    ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:47fe $fa $81 $dc
     cp   A, PADF_UP                                        ;; 02:4801 $fe $40
     call Z, call_00_1bbc_CheckForDoorAndEnter                               ;; 02:4803 $cc $bc $1b
     call call_02_4f11_ChooseNextActionBasedOnLevel                                  ;; 02:4806 $cd $11 $4f
@@ -163,7 +163,7 @@ call_02_48bc_PlayerAction_Jump:
     ld   A, [wDC8E_InitialYVelocity]                                    ;; 02:48d6 $fa $8e $dc
     and  A, A                                          ;; 02:48d9 $a7
     ret  NZ                                            ;; 02:48da $c0
-    ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:48db $fa $81 $dc
+    ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:48db $fa $81 $dc
     and  A, PADF_B                                        ;; 02:48de $e6 $02
     ld   A, PLAYERACTION_DOUBLE_JUMP                                        ;; 02:48e0 $3e $0f
     jp   NZ, call_02_54f9_Player_SwitchAction                              ;; 02:48e2 $c2 $f9 $54
@@ -185,7 +185,7 @@ call_02_48e8_PlayerAction_DoubleJump:
     ld   A, [wDC8E_InitialYVelocity]                                    ;; 02:4902 $fa $8e $dc
     and  A, A                                          ;; 02:4905 $a7
     ret  NZ                                            ;; 02:4906 $c0
-    ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:4907 $fa $81 $dc
+    ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:4907 $fa $81 $dc
     and  A, PADF_B                                        ;; 02:490a $e6 $02
     jr   NZ, .jr_02_48ef                               ;; 02:490c $20 $e1
     jp   call_02_4dce_Player_SwitchActionToIdleOrWalk                                    ;; 02:490e $c3 $ce $4d
@@ -207,17 +207,17 @@ call_02_4911_PlayerAction_TailSpin:
     ret  Z                                             ;; 02:492f $c8
     xor  A, A                                          ;; 02:4930 $af
     ld   [wDC7F_Player_IsAttacking], A                                    ;; 02:4931 $ea $7f $dc
-    ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 02:4934 $21 $be $da
+    ld   HL, wDABE_CollisionFlags                                     ;; 02:4934 $21 $be $da
     bit  7, [HL]                                       ;; 02:4937 $cb $7e
     ret  Z                                             ;; 02:4939 $c8
     ld   HL, wDC80_Player_UnkStates                                     ;; 02:493a $21 $80 $dc
     set  6, [HL]                                       ;; 02:493d $cb $f6
     ld   C, PLAYERACTION_FALL                                        ;; 02:493f $0e $11
-    ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 02:4941 $21 $be $da
+    ld   HL, wDABE_CollisionFlags                                     ;; 02:4941 $21 $be $da
     bit  7, [HL]                                       ;; 02:4944 $cb $7e
     jr   Z, .jr_02_4953                                ;; 02:4946 $28 $0b
     ld   C, PLAYERACTION_IDLE                                        ;; 02:4948 $0e $01
-    ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:494a $fa $81 $dc
+    ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:494a $fa $81 $dc
     and  A, PADF_RIGHT | PADF_LEFT                                        ;; 02:494d $e6 $30
     jr   Z, .jr_02_4953                                ;; 02:494f $28 $02
     ld   C, PLAYERACTION_WALK                                        ;; 02:4951 $0e $03
@@ -236,7 +236,7 @@ call_02_4957_PlayerAction_Fall:
     ld   A, [wDC8E_InitialYVelocity]                                    ;; 02:4966 $fa $8e $dc
     and  A, A                                          ;; 02:4969 $a7
     ret  NZ                                            ;; 02:496a $c0
-    ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:496b $fa $81 $dc
+    ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:496b $fa $81 $dc
     and  A, PADF_RIGHT | PADF_LEFT                                        ;; 02:496e $e6 $30
     ld   A, PLAYERACTION_WALK                                        ;; 02:4970 $3e $03
     jp   NZ, call_02_54f9_Player_SwitchAction                              ;; 02:4972 $c2 $f9 $54
@@ -285,7 +285,7 @@ call_02_49b3_PlayerAction_Water_Swimming:
     xor  a
     ld   [wDC9B_Player_SwimmingRelated3],a
     ld   [wDC8C_PlayerYVelocity],a
-    ld   [wDC8D],a
+    ld   [wDC8D_Player_FloorSnapVelocity],a
     ld   a,01
     ld   [wDC87_PlayerXMaxVelocity],a
 .jr_00_49CE:
@@ -339,7 +339,7 @@ call_02_4a25_PlayerAction_DeathInPitAlt:
     ld   [wDC87_PlayerXMaxVelocity],a
     ld   a,TIMER_AMOUNT_60_FRAMES
     ld   [wDC7E_PlayerDamageCooldownTimer],a
-    ld   a,[wDC93]
+    ld   a,[wDC93_TileTypeBehindGexsLowerBody]
     cp   a,$28
     jp   z,jp_00_06da
     ret  
@@ -421,7 +421,7 @@ call_02_4aac_PlayerAction_Climbing:
     xor  a
     ld   [wDC9F_Player_ClimbingRelated],a
     ld   [wDC8C_PlayerYVelocity],a
-    ld   [wDC8D],a
+    ld   [wDC8D_Player_FloorSnapVelocity],a
     ld   a,$01
     ld   [wDC87_PlayerXMaxVelocity],a
     ld   a,$00
@@ -483,13 +483,13 @@ call_02_4adb_PLAYER_STATE_CLIMBING_MASK_subroutine:
     ld   hl,wDB66_HDMATransferFlags
     set  0,[hl]
 .jr_00_4B26:
-    ld   a,[wDC81_CurrentInputsAlt]
+    ld   a,[wDC81_Player_EffectiveInputs]
     and  a,PADF_B
     jr   z,.jr_00_4B32
     ld   a,PLAYERACTION_JUMP
     call call_02_54f9_Player_SwitchAction
 .jr_00_4B32:
-    ld   a,[wDC81_CurrentInputsAlt]
+    ld   a,[wDC81_Player_EffectiveInputs]
     and  a,PADF_A
     jr   z,.jr_02_4B55
     ld   a,SFX_GEX_TAIL_SPIN
@@ -570,7 +570,7 @@ call_02_4bb7_PlayerAction_Snowboarding_StandOrWalk:
     ld   hl,wDC80_Player_UnkStates
     set  6,[hl]
 .jr_00_4BDC:
-    ld   a,[wDC81_CurrentInputsAlt]
+    ld   a,[wDC81_Player_EffectiveInputs]
     bit  PADF_UP_BIT,a
     call nz,call_00_1bbc_CheckForDoorAndEnter
     call call_02_4E0C_Player_SnowboardingTailSpin
@@ -626,7 +626,7 @@ call_02_4c2c_PlayerAction_Snowboarding_Jump:
     ld   a,[wDC8E_InitialYVelocity]
     and  a
     ret  nz
-    ld   a,[wDC81_CurrentInputsAlt]
+    ld   a,[wDC81_Player_EffectiveInputs]
     and  a,PADF_B
     ld   a,PLAYERACTION_SNOWBOARDING_DOUBLE_JUMP
     jp   nz,call_02_54f9_Player_SwitchAction
@@ -709,7 +709,7 @@ call_02_4ce3_PlayerAction_Kangaroo_Idle:
     ld   a,PLAYERACTION_KANGAROO_HOPPING
     call call_02_54f9_Player_SwitchAction
     call call_02_4df6_Player_SetJumpRelatedState
-    ld   hl,wDABE_UnkBGCollisionFlags2
+    ld   hl,wDABE_CollisionFlags
     bit  7,[hl]
     jr   z,call_02_4d02_PlayerAction_Kangaroo_Hopping
     ld   a,$1E
@@ -719,7 +719,7 @@ call_02_4d02_PlayerAction_Kangaroo_Hopping:
     ld   a,[wDC8E_InitialYVelocity]
     and  a
     ret  nz
-    ld   a,[wDC81_CurrentInputsAlt]
+    ld   a,[wDC81_Player_EffectiveInputs]
     and  a,PADF_B
     ld   a,PLAYERACTION_KANGAROO_START_JUMP
     jp   nz,call_02_54f9_Player_SwitchAction
@@ -732,7 +732,7 @@ call_02_4d14_PlayerAction_Kangaroo_StartJump:
     ld   a,PLAYERACTION_KANGAROO_JUMP
     call call_02_54f9_Player_SwitchAction
     call call_02_4df6_Player_SetJumpRelatedState
-    ld   hl,wDABE_UnkBGCollisionFlags2
+    ld   hl,wDABE_CollisionFlags
     bit  7,[hl]
     jr   z,call_02_4d33_PlayerAction_Kangaroo_Jump
     ld   a,$36
@@ -742,7 +742,7 @@ call_02_4d33_PlayerAction_Kangaroo_Jump:
     ld   a,[wDC8E_InitialYVelocity]
     and  a
     ret  nz
-    ld   a,[wDC81_CurrentInputsAlt]
+    ld   a,[wDC81_Player_EffectiveInputs]
     and  a,PADF_B
     ld   a,PLAYERACTION_KANGAROO_START_JUMP
     jp   nz,call_02_54f9_Player_SwitchAction

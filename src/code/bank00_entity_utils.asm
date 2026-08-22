@@ -909,7 +909,7 @@ call_00_26c9_Entity_CarryPlayerHorizontally:
     cp   [hl]
     jr   nz,call_00_26F1_Entity_UpdatePlayerXPosition
     ld   a,c
-    ld   [wDC85],a
+    ld   [wDC85_PlayerXDeltaExtra2],a
     ret  
 
 call_00_26F1_Entity_UpdatePlayerXPosition:

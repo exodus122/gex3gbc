@@ -224,6 +224,49 @@ DEF MAP_DOOR_NO_TRIGGER          EQU $ff ; door has no wDCB1_LevelTriggerBuffer 
 DEF MAP_DOOR_X_TOLERANCE         EQU 8   ; player X must be within +/- 8 px of the door
 
 ; ------------------------------------------------------------------
+; Background collision - see code/bank03_bg_collision.asm
+; ------------------------------------------------------------------
+DEF COLLISION_MAP_COLS           EQU 32
+DEF COLLISION_MAP_ROWS           EQU 32
+DEF COLLISION_MAP_STRIDE         EQU $20 ; bytes from one tile row to the next
+
+; bits of a data_03_4000_TileCollisionFlags byte
+DEF TILECOLL_SOLID_BIT           EQU 0   ; blocks movement
+DEF TILECOLL_CEILING_BIT         EQU 1   ; bonks the head, zeroing Y velocity
+DEF TILECOLL_CLIMB_BACKING_BIT   EQU 3   ; a climber can hold onto it
+
+; bits of wDABE_CollisionFlags
+DEF BGCOLL_SLOPE_MASK            EQU $0f ; low nibble: pixels to step up
+DEF BGCOLL_WALL_BIT              EQU 6   ; ran into a wall this frame
+DEF BGCOLL_NO_COLLISION_BIT      EQU 7   ; grounded, swimming, climbing or otherwise
+
+DEF BGCOLL_WALL_PROBE_ROWS       EQU 4   ; tile rows sampled ahead of him
+DEF BGCOLL_FLOOR_SEARCH_ROWS     EQU 5   ; pixel rows scanned down for floor
+DEF PLAYER_FEET_OFFSET           EQU $10 ; from his origin down to his feet
+
+; wDC1F_CurrentBgCollisionType - which handler a map uses
+DEF BGCOLL_TYPE_SIDESCROLLER     EQU $00
+DEF BGCOLL_TYPE_TOP_DOWN         EQU $01
+
+; wDC89_BgCollision_TopDownDirection, and the index into
+; .data_03_4a1b_TopDownStepOffsets. Odd values are the cardinals, which are
+; stepped straight away; even values are the diagonals, which are probed first
+DEF BGCOLL_DIR_NONE              EQU 0
+DEF BGCOLL_DIR_UP                EQU 1
+DEF BGCOLL_DIR_UP_RIGHT          EQU 2
+DEF BGCOLL_DIR_RIGHT             EQU 3
+DEF BGCOLL_DIR_DOWN_RIGHT        EQU 4
+DEF BGCOLL_DIR_DOWN              EQU 5
+DEF BGCOLL_DIR_DOWN_LEFT         EQU 6
+DEF BGCOLL_DIR_LEFT              EQU 7
+DEF BGCOLL_DIR_UP_LEFT           EQU 8
+
+DEF CLIMB_SCRIPT_ENTRY_SIZE      EQU 3   ; input, X offset, Y offset
+DEF SWIM_SCRIPT_ENTRY_SIZE       EQU 5   ; ...plus a second, unread offset pair
+
+DEF TILE_TYPE_CLIMBABLE          EQU $3d ; the one type call_03_4c2e_BgCollision_IsTileClimbable tests for
+
+; ------------------------------------------------------------------
 ; Cutscenes - see code/bank00_cutscenes.asm
 ; ------------------------------------------------------------------
 DEF CUTSCENE_SLOTS_PER_LEVEL     EQU $04 ; entries per level in the index lookup table
@@ -438,6 +481,7 @@ DEF ENTITY_FACING_RIGHT                 EQU $00 ; also facing up
 DEF ENTITY_FACING_LEFT                  EQU $20 ; also facing down
 DEF ENTITY_FACING_VERTICAL_FLIP         EQU $40
 DEF ENTITY_FACING_UNK_FLAG              EQU $80
+DEF ENTITY_FACING_LEFT_BIT              EQU 5
 
 ; Entity position relative to Gex
 DEF ENTITY_LEFT_OF_GEX       EQU $00

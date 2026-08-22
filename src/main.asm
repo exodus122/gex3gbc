@@ -24,7 +24,7 @@ INCLUDE "code/bank02_update_entities.asm"
 INCLUDE "code/bank02_entity_animation_data.asm"
 
 SECTION "bank03", ROMX[$4000], BANK[$03]
-data_03_4000_bg_collision_tileset_flags:
+data_03_4000_TileCollisionFlags:
 ; these flags determine which collision tiles are walls, ceilings, or kill tiles
     INCBIN "data/bg_collision_tileset_flags.bin" 
 image_003_4100_collision_tileset:

@@ -252,7 +252,7 @@ call_00_0150_Init:
     ld   [wDCA9_FlyTimerOrFlags4], A                                    ;; 00:036c $ea $a9 $dc
     ld   [wDCAA_FlyTimerOrFlags1], A                                    ;; 00:036f $ea $aa $dc
     ld   [wDCAB_FlyTimerOrFlags2], A                                    ;; 00:0372 $ea $ab $dc
-    ld   [wDC89], A                                    ;; 00:0375 $ea $89 $dc
+    ld   [wDC89_BgCollision_TopDownDirection], A                                    ;; 00:0375 $ea $89 $dc
     ld   A, [wDC4F_PawCoinExtraHealth]                                    ;; 00:0378 $fa $4f $dc
     add  A, $04                                        ;; 00:037b $c6 $04
     ld   [wDC50_PlayerHealth], A                                    ;; 00:037d $ea $50 $dc
@@ -306,7 +306,7 @@ call_00_0150_Init:
     xor  A, A                                          ;; 00:03eb $af
     ld   [wDC29_SkipMapWindowUpdateFlag], A                                    ;; 00:03ec $ea $29 $dc
     ld   A, $01                                        ;; 00:03ef $3e $01
-    ld   [wDCA7_DrawGexFlag], A                                    ;; 00:03f1 $ea $a7 $dc
+    ld   [wDCA7_Player_UpdateFlag], A                                    ;; 00:03f1 $ea $a7 $dc
     call call_00_04fb                                  ;; 00:03f4 $cd $fb $04
     farcall call_03_647c_InitPlayerPositionAndLevel
     call call_00_1056_BgMap_LoadFull                                  ;; 00:0402 $cd $56 $10
@@ -604,7 +604,7 @@ call_00_0624_SetFly_TimersAndFlags:
     ret  
 
 jp_00_0693:
-    ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 00:0693 $21 $be $da
+    ld   HL, wDABE_CollisionFlags                                     ;; 00:0693 $21 $be $da
     bit  7, [HL]                                       ;; 00:0696 $cb $7e
     jr   NZ, .jr_00_06ba                               ;; 00:0698 $20 $20
     ld   A, [wDB6C_CurrentMapId]                                    ;; 00:069a $fa $6c $db

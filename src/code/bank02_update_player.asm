@@ -33,7 +33,7 @@ call_02_4dce_Player_SwitchActionToIdleOrWalk:
     ld   A, PLAYERACTION_KANGAROO_IDLE                                        ;; 02:4de2 $3e $30
     jp   Z, call_02_54f9_Player_SwitchAction                               ;; 02:4de4 $ca $f9 $54
     ld   C, PLAYERACTION_IDLE                                        ;; 02:4de7 $0e $01
-    ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:4de9 $fa $81 $dc
+    ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:4de9 $fa $81 $dc
     and  A, PADF_LEFT | PADF_RIGHT                                        ;; 02:4dec $e6 $30
     jr   Z, .jr_02_4df2                                ;; 02:4dee $28 $02
     ld   C, PLAYERACTION_WALK                                        ;; 02:4df0 $0e $03
@@ -67,13 +67,13 @@ call_02_4E0C_Player_SnowboardingTailSpin:
 ; Purpose: Manage complex animation or event sequences based on timers and player state.
     ld   a,[wDCA5_Player_SnowboardingRelated4]
     ld   [wDCA6_Player_SnowboardingRelated5],a
-    ld   hl,wDC95
+    ld   hl,wDC95_FloorTileType
     ld   e,[hl]
     call call_02_4E7A_LookupSnowboardingData
     inc  d
     dec  d
     jr   nz,.jr_00_4E24
-    ld   hl,wDC93
+    ld   hl,wDC93_TileTypeBehindGexsLowerBody
     ld   e,[hl]
     call call_02_4E7A_LookupSnowboardingData
 .jr_00_4E24:
@@ -169,9 +169,9 @@ call_02_4E7A_LookupSnowboardingData:
     db   $23, $2b, $ff
 
 call_02_4ee7_MapCollisionFlags:
-; Reads high nibble of wDC81_CurrentInputsAlt. Searches .data_02_4F01 for a matching flag, returns mapped code or $FF if none.
+; Reads high nibble of wDC81_Player_EffectiveInputs. Searches .data_02_4F01 for a matching flag, returns mapped code or $FF if none.
 ; Purpose: Convert collision flags into an index or behavior code.
-    ld   a,[wDC81_CurrentInputsAlt]
+    ld   a,[wDC81_Player_EffectiveInputs]
     and  a,PADF_RIGHT | PADF_LEFT | PADF_UP | PADF_DOWN
     jr   z,.jr_00_4EFB
     ld   hl,.data_02_4F01
@@ -195,15 +195,15 @@ call_02_4ee7_MapCollisionFlags:
     db   $60, $07, $a0, $05, $50, $01, $90, $03
 
 call_02_4f11_ChooseNextActionBasedOnLevel:
-; Reads two state flags (wDABD_UnkBGCollisionFlags and wDABE_UnkBGCollisionFlags2) and ORs them together. 
+; Reads two state flags (wDABD_CollisionFlagsPrev and wDABE_CollisionFlags) and ORs them together. 
 ; If bit 7 is set (likely "player busy/disabled"), it returns immediately. 
 ; Otherwise, it checks the current level ID (wDB6C_CurrentMapId) to pick an action ID:
 ; If level is 07h → $28.
 ; If level is 08h → $35.
 ; Otherwise → $11.
 ; It then jumps to call_02_54f9_Player_SwitchAction to switch the player's action/animation.
-    ld   A, [wDABD_UnkBGCollisionFlags]                                    ;; 02:4f11 $fa $bd $da
-    ld   HL, wDABE_UnkBGCollisionFlags2                                     ;; 02:4f14 $21 $be $da
+    ld   A, [wDABD_CollisionFlagsPrev]                                    ;; 02:4f11 $fa $bd $da
+    ld   HL, wDABE_CollisionFlags                                     ;; 02:4f14 $21 $be $da
     or   A, [HL]                                       ;; 02:4f17 $b6
     bit  7, A                                          ;; 02:4f18 $cb $7f
     ret  NZ                                            ;; 02:4f1a $c0
@@ -222,7 +222,7 @@ call_02_4f11_ChooseNextActionBasedOnLevel:
 call_02_4f32_Player_UpdateMain:
 ; The main per-frame player update.
 ; Actions:
-; - Processes inputs, clearing or setting bits in UnkStates/CurrentInputsAlt.
+; - Processes inputs, clearing or setting bits in UnkStates/wDC81_Player_EffectiveInputs.
 ; - Manages timers (wDC7E_PlayerDamageCooldownTimer, wDCA9_FlyTimerOrFlags4–wDCAB_FlyTimerOrFlags2) using call_02_4ffb_DecTimerEveryCycle.
 ; - Calls palette setup (call_03_6567_LoadFlyPalettes), BG collision update, entity caching, and entity loading.
 ; - Jumps to the player action function.
@@ -280,7 +280,7 @@ call_02_4f32_Player_UpdateMain:
     or   A, C                                          ;; 02:4f87 $b1
     ld   C, A                                          ;; 02:4f88 $4f
 .jr_02_4f89:
-    ld   HL, wDC81_CurrentInputsAlt                                     ;; 02:4f89 $21 $81 $dc
+    ld   HL, wDC81_Player_EffectiveInputs                                     ;; 02:4f89 $21 $81 $dc
     ld   [HL], C                                       ;; 02:4f8c $71
     ld   HL, wDC7E_PlayerDamageCooldownTimer                                     ;; 02:4f8d $21 $7e $dc
     ld   A, [HL]                                       ;; 02:4f90 $7e
@@ -298,7 +298,7 @@ call_02_4f32_Player_UpdateMain:
     call call_02_5081_Player_UpdateFacingAndMovementVector                                  ;; 02:4fb2 $cd $81 $50
     farcall call_03_46e0_BgCollision_Update
     call call_02_5267_PlatformSlopeAndTriggerHandler                                  ;; 02:4fc0 $cd $67 $52
-    farcall call_03_4bb6_BgCollision_CacheAdjacentTiles
+    farcall call_03_4bb6_BgCollision_CacheNearbyTileTypes
     call call_02_5431_HandleActionTriggersAndEvents                                  ;; 02:4fce $cd $31 $54
     ld   HL, wDC79_PlayerUnkFlags2                                     ;; 02:4fd1 $21 $79 $dc
     ld   A, [HL]                                       ;; 02:4fd4 $7e
@@ -440,7 +440,7 @@ call_02_5081_Player_UpdateFacingAndMovementVector:
     cp   A, BG_COLLISION_TYPE_SIDESCROLLER                                        ;; 02:5099 $fe $00
     jr   Z, .jr_02_50c4                                ;; 02:509b $28 $27
 .jr_02_509d:
-    ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:509d $fa $81 $dc
+    ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:509d $fa $81 $dc
     and  A, PADF_RIGHT | PADF_LEFT                                        ;; 02:50a0 $e6 $30
     jr   Z, .jr_02_50b0                                ;; 02:50a2 $28 $0c
     ld   C, $00                                        ;; 02:50a4 $0e $00
@@ -451,7 +451,7 @@ call_02_5081_Player_UpdateFacingAndMovementVector:
     ld   HL, wD80D_PlayerFacingDirection                                     ;; 02:50ac $21 $0d $d8
     ld   [HL], C                                       ;; 02:50af $71
 .jr_02_50b0:
-    ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:50b0 $fa $81 $dc
+    ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:50b0 $fa $81 $dc
     swap A                                             ;; 02:50b3 $cb $37
     and  A, PADF_A | PADF_B | PADF_SELECT | PADF_START                                        ;; 02:50b5 $e6 $0f
     ld   L, A                                          ;; 02:50b7 $6f
@@ -459,10 +459,10 @@ call_02_5081_Player_UpdateFacingAndMovementVector:
     ld   DE, .data_02_50f0                             ;; 02:50ba $11 $f0 $50
     add  HL, DE                                        ;; 02:50bd $19
     ld   A, [HL]                                       ;; 02:50be $7e
-    ld   [wDC89], A                                    ;; 02:50bf $ea $89 $dc
+    ld   [wDC89_BgCollision_TopDownDirection], A                                    ;; 02:50bf $ea $89 $dc
     jr   .jr_02_50e0                                   ;; 02:50c2 $18 $1c
 .jr_02_50c4:
-    ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:50c4 $fa $81 $dc
+    ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:50c4 $fa $81 $dc
     and  A, PADF_RIGHT | PADF_LEFT                                        ;; 02:50c7 $e6 $30
     jr   Z, .jr_02_50db                                ;; 02:50c9 $28 $10
     ld   C, $00                                        ;; 02:50cb $0e $00
@@ -515,12 +515,12 @@ call_02_5100_Player_HorizontalMovementHandler:
     ret  Z                                             ;; 02:5112 $c8
     ld   HL, wDC86_PlayerXVelocity                                     ;; 02:5113 $21 $86 $dc
     ld   C, [HL]                                       ;; 02:5116 $4e
-    ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:5117 $fa $81 $dc
+    ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:5117 $fa $81 $dc
     and  A, PADF_RIGHT                                        ;; 02:511a $e6 $10
     call NZ, call_02_51f9_ApplyRightwardCollisionAdjustment                              ;; 02:511c $c4 $f9 $51
     ld   HL, wDC86_PlayerXVelocity                                     ;; 02:511f $21 $86 $dc
     ld   C, [HL]                                       ;; 02:5122 $4e
-    ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:5123 $fa $81 $dc
+    ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:5123 $fa $81 $dc
     and  A, PADF_LEFT                                        ;; 02:5126 $e6 $20
     call NZ, call_02_518a_ApplyLeftwardCollisionAdjustment                              ;; 02:5128 $c4 $8a $51
     call call_02_553b_PlayerIsInWater                                  ;; 02:512b $cd $3b $55
@@ -534,7 +534,7 @@ call_02_5100_Player_HorizontalMovementHandler:
     ld   HL, wDC86_PlayerXVelocity                                     ;; 02:513a $21 $86 $dc
     ld   C, [HL]                                       ;; 02:513d $4e
     ld   B, $00                                        ;; 02:513e $06 $00
-    ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:5140 $fa $81 $dc
+    ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:5140 $fa $81 $dc
     and  A, PADF_DOWN                                        ;; 02:5143 $e6 $80
     call NZ, call_02_53e7_ApplyVerticalMovementAndClamp                              ;; 02:5145 $c4 $e7 $53
     ld   A, [wDC86_PlayerXVelocity]                                    ;; 02:5148 $fa $86 $dc
@@ -542,7 +542,7 @@ call_02_5100_Player_HorizontalMovementHandler:
     inc  A                                             ;; 02:514c $3c
     ld   C, A                                          ;; 02:514d $4f
     ld   B, $ff                                        ;; 02:514e $06 $ff
-    ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:5150 $fa $81 $dc
+    ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:5150 $fa $81 $dc
     and  A, PADF_UP                                        ;; 02:5153 $e6 $40
     call NZ, call_02_53e7_ApplyVerticalMovementAndClamp                              ;; 02:5155 $c4 $e7 $53
     ret                                                ;; 02:5158 $c9
@@ -554,13 +554,13 @@ call_02_5100_Player_HorizontalMovementHandler:
     cpl                                                ;; 02:5163 $2f
     inc  A                                             ;; 02:5164 $3c
 .jr_02_5165:
-    ld   HL, wDC85                                     ;; 02:5165 $21 $85 $dc
+    ld   HL, wDC85_PlayerXDeltaExtra2                                     ;; 02:5165 $21 $85 $dc
     add  A, [HL]                                       ;; 02:5168 $86
-    ld   HL, wDC84                                     ;; 02:5169 $21 $84 $dc
+    ld   HL, wDC84_PlayerXDeltaExtra                                     ;; 02:5169 $21 $84 $dc
     add  A, [HL]                                       ;; 02:516c $86
     ret  Z                                             ;; 02:516d $c8
     push AF                                            ;; 02:516e $f5
-    ld   A, [wDABE_UnkBGCollisionFlags2]                                    ;; 02:516f $fa $be $da
+    ld   A, [wDABE_CollisionFlags]                                    ;; 02:516f $fa $be $da
     and  A, $0f                                        ;; 02:5172 $e6 $0f
     jr   Z, .jr_02_517e                                ;; 02:5174 $28 $08
     cpl                                                ;; 02:5176 $2f
@@ -819,13 +819,13 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     dec  B                                             ;; 02:52af $05
     jp   call_02_53e7_ApplyVerticalMovementAndClamp                                  ;; 02:52b0 $c3 $e7 $53
 .jr_02_52b3:
-    ld   A, [wDABE_UnkBGCollisionFlags2]                                    ;; 02:52b3 $fa $be $da
+    ld   A, [wDABE_CollisionFlags]                                    ;; 02:52b3 $fa $be $da
     and  A, $80                                        ;; 02:52b6 $e6 $80
     jr   Z, .jr_02_52cf                                ;; 02:52b8 $28 $15
-    ld   A, [wDC8D]                                    ;; 02:52ba $fa $8d $dc
+    ld   A, [wDC8D_Player_FloorSnapVelocity]                                    ;; 02:52ba $fa $8d $dc
     and  A, A                                          ;; 02:52bd $a7
     jr   Z, .jr_02_52f8                                ;; 02:52be $28 $38
-    ld   HL, wDABD_UnkBGCollisionFlags                                     ;; 02:52c0 $21 $bd $da
+    ld   HL, wDABD_CollisionFlagsPrev                                     ;; 02:52c0 $21 $bd $da
     bit  7, [HL]                                       ;; 02:52c3 $cb $7e
     jr   NZ, .jr_02_529b                               ;; 02:52c5 $20 $d4
     ld   HL, wDC8C_PlayerYVelocity                                     ;; 02:52c7 $21 $8c $dc
@@ -833,7 +833,7 @@ call_02_5267_PlatformSlopeAndTriggerHandler:
     jr   NC, .jr_02_529b                               ;; 02:52cb $30 $ce
     jr   .jp_02_5283                                   ;; 02:52cd $18 $b4
 .jr_02_52cf:
-    ld   A, [wDABD_UnkBGCollisionFlags]                                    ;; 02:52cf $fa $bd $da
+    ld   A, [wDABD_CollisionFlagsPrev]                                    ;; 02:52cf $fa $bd $da
     and  A, $80                                        ;; 02:52d2 $e6 $80
     jr   NZ, .jr_02_52de                               ;; 02:52d4 $20 $08
     ld   A, [wDC8F]                                    ;; 02:52d6 $fa $8f $dc
@@ -927,7 +927,7 @@ call_02_5374_LevelSpecificEventTrigger:
     call call_02_5541_GetPlayerStatesFromAction                                  ;; 02:5374 $cd $41 $55
     and  A, PLAYER_STATE_DEAD_MASK                                        ;; 02:5377 $e6 $08
     ret  NZ                                            ;; 02:5379 $c0
-    ld   A, [wDC93]                                    ;; 02:537a $fa $93 $dc
+    ld   A, [wDC93_TileTypeBehindGexsLowerBody]                                    ;; 02:537a $fa $93 $dc
     cp   A, $3e                                        ;; 02:537d $fe $3e
     ret  C                                             ;; 02:537f $d8
     cp   A, $42                                        ;; 02:5380 $fe $42
@@ -1034,7 +1034,7 @@ call_02_5431_HandleActionTriggersAndEvents:
 ; Purpose: Central dispatcher for action-specific triggers, tile events, and scripted transitions.
 ; Behavior:
 ; Looks up the current action’s properties (data_02_554d_PlayerStatesPerAction) to check event bits.
-; Compares nearby tile IDs (wDC92, wDC93) for special cases (e.g., doors, hazards).
+; Compares nearby tile IDs (wDC92_TileTypeBehindGexsUpperBody, wDC93_TileTypeBehindGexsLowerBody) for special cases (e.g., doors, hazards).
 ; Calls LevelSpecificEventTrigger (5374) and call_02_553b_PlayerIsInWater (input polling).
 ; May queue new action states via call_02_54f9_Player_SwitchAction or reset collision variables if certain tile types are detected.
     ld   HL, wD801_Player_ActionId                                     ;; 02:5431 $21 $01 $d8
@@ -1046,14 +1046,14 @@ call_02_5431_HandleActionTriggersAndEvents:
     jr   NZ, .jr_02_545b                               ;; 02:543d $20 $1c
     bit  4, [HL]                                       ;; 02:543f $cb $66
     jr   NZ, .jr_02_5453                               ;; 02:5441 $20 $10
-    ld   A, [wDC92]                                    ;; 02:5443 $fa $92 $dc
+    ld   A, [wDC92_TileTypeBehindGexsUpperBody]                                    ;; 02:5443 $fa $92 $dc
     cp   A, $28                                        ;; 02:5446 $fe $28
     jp   Z, jp_00_06da                                 ;; 02:5448 $ca $da $06
-    ld   A, [wDC93]                                    ;; 02:544b $fa $93 $dc
+    ld   A, [wDC93_TileTypeBehindGexsLowerBody]                                    ;; 02:544b $fa $93 $dc
     cp   A, $28                                        ;; 02:544e $fe $28
     jp   Z, jp_00_06da                                 ;; 02:5450 $ca $da $06
 .jr_02_5453:
-    ld   A, [wDC93]                                    ;; 02:5453 $fa $93 $dc
+    ld   A, [wDC93_TileTypeBehindGexsLowerBody]                                    ;; 02:5453 $fa $93 $dc
     cp   A, $19                                        ;; 02:5456 $fe $19
     jp   Z, jp_00_06e8                                 ;; 02:5458 $ca $e8 $06
 .jr_02_545b:
@@ -1066,10 +1066,10 @@ call_02_5431_HandleActionTriggersAndEvents:
     cp   A, $1f                                        ;; 02:546a $fe $1f
     jr   NZ, .jr_02_54a7                               ;; 02:546c $20 $39
 .jr_02_546e:
-    ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:546e $fa $81 $dc
+    ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:546e $fa $81 $dc
     and  A, PADF_UP                                        ;; 02:5471 $e6 $40
     jr   Z, .jr_02_54a7                                ;; 02:5473 $28 $32
-    ld   A, [wDC92]                                    ;; 02:5475 $fa $92 $dc
+    ld   A, [wDC92_TileTypeBehindGexsUpperBody]                                    ;; 02:5475 $fa $92 $dc
     cp   A, $36                                        ;; 02:5478 $fe $36
     jr   NZ, .jr_02_54a7                               ;; 02:547a $20 $2b
     ld   A, $04                                        ;; 02:547c $3e $04
@@ -1085,7 +1085,7 @@ call_02_5431_HandleActionTriggersAndEvents:
     bit  7, A                                          ;; 02:5492 $cb $7f
     jr   Z, .jr_02_54a7                                ;; 02:5494 $28 $11
 .jr_02_5496:
-    ld   A, [wDC92]                                    ;; 02:5496 $fa $92 $dc
+    ld   A, [wDC92_TileTypeBehindGexsUpperBody]                                    ;; 02:5496 $fa $92 $dc
     cp   A, $36                                        ;; 02:5499 $fe $36
     jr   NZ, .jr_02_54a7                               ;; 02:549b $20 $0a
     ld   A, $04                                        ;; 02:549d $3e $04
@@ -1093,7 +1093,7 @@ call_02_5431_HandleActionTriggersAndEvents:
     ld   A, PLAYERACTION_WATER_TREADING                                        ;; 02:54a2 $3e $20
     call call_02_54f9_Player_SwitchAction                                  ;; 02:54a4 $cd $f9 $54
 .jr_02_54a7:
-    ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:54a7 $fa $81 $dc
+    ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:54a7 $fa $81 $dc
     and  A, PADF_UP                                        ;; 02:54aa $e6 $40
     jr   Z, .jr_02_54d0                                ;; 02:54ac $28 $22
     ld   A, [wD801_Player_ActionId]                                    ;; 02:54ae $fa $01 $d8
@@ -1119,7 +1119,7 @@ call_02_5431_HandleActionTriggersAndEvents:
     ld   L, A                                          ;; 02:54dd $6f
     or   A, H                                          ;; 02:54de $b4
     ret  Z                                             ;; 02:54df $c8
-    ld   A, [wDC81_CurrentInputsAlt]                                    ;; 02:54e0 $fa $81 $dc
+    ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:54e0 $fa $81 $dc
     and  A, PADF_A | PADF_B | PADF_RIGHT | PADF_LEFT | PADF_UP | PADF_DOWN    ;; 02:54e3 $e6 $f3
     ld   C, A                                          ;; 02:54e5 $4f
 .jr_02_54e6:

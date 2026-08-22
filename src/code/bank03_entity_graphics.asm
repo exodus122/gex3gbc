@@ -467,7 +467,7 @@ call_03_5ec1_DrawAllEntitiesAndHandleCollision:
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:5eed $fa $00 $da
     add  A, $20                                        ;; 03:5ef0 $c6 $20
     jr   NZ, .jr_03_5eda                               ;; 03:5ef2 $20 $e6
-    ld   A, [wDCA7_DrawGexFlag]                                    ;; 03:5ef4 $fa $a7 $dc
+    ld   A, [wDCA7_Player_UpdateFlag]                                    ;; 03:5ef4 $fa $a7 $dc
     and  A, A                                          ;; 03:5ef7 $a7
     call NZ, call_00_2ce2_Entity_DrawGex                              ;; 03:5ef8 $c4 $e2 $2c
     ld   A, LOW(wD820_EntityMemoryAfterPlayer)                                        ;; 03:5efb $3e $20
@@ -588,7 +588,7 @@ call_03_5ec1_DrawAllEntitiesAndHandleCollision:
     call NZ, call_03_5fc2_SetupEntitySprite                              ;; 03:5fad $c4 $c2 $5f
     jr   .jr_03_5fb9                                   ;; 03:5fb0 $18 $07
 .jr_03_5fb2:
-    ld   A, [wDCA7_DrawGexFlag]                                    ;; 03:5fb2 $fa $a7 $dc
+    ld   A, [wDCA7_Player_UpdateFlag]                                    ;; 03:5fb2 $fa $a7 $dc
     and  A, A                                          ;; 03:5fb5 $a7
     call NZ, call_00_2ce2_Entity_DrawGex                              ;; 03:5fb6 $c4 $e2 $2c
 .jr_03_5fb9:
@@ -938,7 +938,7 @@ call_03_615d_SetupCollectibleSprites:
     add  A, [HL]                                       ;; 03:61ab $86
     ld   B, A                                          ;; 03:61ac $47
     call call_03_61db_LoadCollectibleSprite                                  ;; 03:61ad $cd $db $61
-    ld   A, [wDCA7_DrawGexFlag]                                    ;; 03:61b0 $fa $a7 $dc
+    ld   A, [wDCA7_Player_UpdateFlag]                                    ;; 03:61b0 $fa $a7 $dc
     and  A, A                                          ;; 03:61b3 $a7
     jr   Z, .jr_03_61d4                                ;; 03:61b4 $28 $1e
     ld   A, [wDC90]                                    ;; 03:61b6 $fa $90 $dc

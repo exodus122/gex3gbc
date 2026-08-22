@@ -13,7 +13,7 @@ wC000_BgMapTileIds:
 ; COLLISION tile ids sitting here, and they stay for the life of the map.
 ;
 ; So in gameplay this is the current collision map - the gex2 equivalent is
-; wC800_CurrentCollisionData - and it is what call_03_4b4c_BgCollision_TestTile
+; wC800_CurrentCollisionData - and it is what call_03_4b4c_BgCollision_IsPixelSolid
 ; reads before indexing wC400_CollisionTilesetData. The scroll loaders keep it
 ; in step with the camera the same way they keep the tilemap in step.
 ; The menus reuse the same 1KB as a plain tilemap staging area, which is where
@@ -242,9 +242,17 @@ wDABC_CurrentEntityFlags:
 ; default value is $80 on initialization
     ds 1                                               ;; dabc
 
-wDABD_UnkBGCollisionFlags:
+; ------------------------------------------------------------------
+; What background collision decided this frame. See code/bank03_bg_collision.asm
+; ------------------------------------------------------------------
+wDABD_CollisionFlagsPrev:
+; last frame's wDABE_CollisionFlags, rolled over at the top of every handler so
+; the player code can tell a landing from having already been grounded
     ds 1                                               ;; dabd
-wDABE_UnkBGCollisionFlags2:
+wDABE_CollisionFlags:
+; BGCOLL_NO_COLLISION_BIT - grounded, or otherwise not to be corrected
+; BGCOLL_WALL_BIT         - ran into a wall this frame
+; BGCOLL_SLOPE_MASK       - low nibble, pixels of slope to step up
     ds 1                                               ;; dabe
 
 wDABF_GexSpriteBank:
@@ -600,7 +608,7 @@ wDC0E_MapCollisionBankOffset:
 wDC10_CollisionBlockset:
 ; Collision blockset: 4 bytes per collision block id, the four collision tile
 ; ids of its 2x2 tiles. Expanded into wC000_BgMapTileIds, which is what
-; call_03_4b4c_BgCollision_TestTile probes
+; call_03_4b4c_BgCollision_IsPixelSolid probes
     ds 1                                               ;; dc10
 wDC11_CollisionBlocksetOffset:
     ds 2                                               ;; dc11
@@ -862,16 +870,22 @@ wDC80_Player_UnkStates:
 ; bit 0 (01) = set during tailspin
     ds 1                                               ;; dc80
 
-wDC81_CurrentInputsAlt:
+wDC81_Player_EffectiveInputs:
     ds 2                                               ;; dc81
 
 wDC83_PlayerIdleTimer:
     ds 1                                               ;; dc83
 
 ; Entity collision related
-wDC84:
+; ------------------------------------------------------------------
+; Horizontal movement the player did not ask for - moving platforms, walkways
+; and the like. Both are cleared at the top of call_02_7152_UpdateAllEntities and
+; both are summed into the answer from call_03_4b37_BgCollision_GetPredictedXDelta,
+; so between them they are what gex2 keeps in wD75C_PlayerXDeltaExtra
+; ------------------------------------------------------------------
+wDC84_PlayerXDeltaExtra:
     ds 1                                               ;; dc84
-wDC85:
+wDC85_PlayerXDeltaExtra2:
     ds 1                                               ;; dc85
 
 wDC86_PlayerXVelocity:
@@ -882,7 +896,11 @@ wDC87_PlayerXMaxVelocity: ; if freeze this, gex can run faster
 wDC88_CurrentEntity_UnkVerticalOffset:
     ds 1                                               ;; dc88
 
-wDC89:
+wDC89_BgCollision_TopDownDirection:
+; Which way the player is trying to go in a top-down map, one of BGCOLL_DIR_*.
+; call_03_48ad_BgCollision_TopDownHandler dispatches on it and indexes
+; .data_03_4a1b_TopDownStepOffsets with it; when a diagonal is blocked the
+; handler rewrites it to the cardinal it fell back to
     ds 1                                               ;; dc89
 
 wDC8A_MapEdgeTouched:
@@ -901,13 +919,18 @@ wDC8A_MapEdgeTouched:
 ; into the edge just stops the player
     ds 1                                               ;; dc8a
 
-wDC8B:
+wDC8B_BgCollision_WallProbeLookahead:
+; How far above his head the wall probe starts, derived from the Y velocity so
+; that a wall is caught on the frame he would enter it rather than after
     ds 1                                               ;; dc8b
 
 wDC8C_PlayerYVelocity: ; can freeze to levitate
     ds 1                                               ;; dc8c
 
-wDC8D: ; set to $c0 when falling? maybe related to holding B for another jump
+wDC8D_Player_FloorSnapVelocity:
+; The gap to the floor found by the floor scan, negated and scaled, for the
+; player code to close. BGCOLL_FLOOR_SEARCH_ROWS - 1 rows (giving $c0) means no
+; floor was found within range and he is still falling
     ds 1                                               ;; dc8d
 
 wDC8E_InitialYVelocity: ; the y velocity gex had when he left the ground?
@@ -922,16 +945,26 @@ wDC90:
 wDC91:
     ds 1                                               ;; dc91
 
-; Nearby collision tiles
-wDC92:
+; ------------------------------------------------------------------
+; Nearby collision tiles, refreshed once a frame by
+; call_03_4bb6_BgCollision_CacheNearbyTileTypes so the player code can react to
+; water, doors, springs and climbable surfaces without repeating the lookup.
+; The first four are a straight column through the player, one tile row apart
+; ------------------------------------------------------------------
+wDC92_TileTypeBehindGexsUpperBody:
+; his head
     ds 1                                               ;; dc92
-wDC93:
+wDC93_TileTypeBehindGexsLowerBody:
+; one tile row down, his body
     ds 1                                               ;; dc93
-wDC94:
+wDC94_TileTypeBehindGexsFace:
+; one row up and one tile ahead in the direction he faces - what he is looking at
     ds 1                                               ;; dc94
-wDC95:
+wDC95_FloorTileType:
+; one row below his body: the tile he is standing on
     ds 2                                               ;; dc95
-wDC97:
+wDC97_TileTypeAboveGexsHead:
+; one tile row above his head, where the column scan starts
     ds 1                                               ;; dc97
 
 wDC98:
@@ -964,7 +997,7 @@ wDCA5_Player_SnowboardingRelated4:
 wDCA6_Player_SnowboardingRelated5:
     ds 1                                               ;; dca6
 
-wDCA7_DrawGexFlag:
+wDCA7_Player_UpdateFlag:
     ds 1                                               ;; dca7
 
 wDCA8_FlyTimerOrFlags3:
@@ -1060,7 +1093,7 @@ wDCDC_HandEntityUnkFlag:
 
 ; ------------------------------------------------------------------
 ; Cutscene state. A mission preview is a scripted camera move over a level that
-; has not started yet, driven by faking d-pad input into wDC81_CurrentInputsAlt
+; has not started yet, driven by faking d-pad input into wDC81_Player_EffectiveInputs
 ; ------------------------------------------------------------------
 wDCDE_Cutscene_MoveFramesRemaining:
 ; 16-bit countdown for the movement command currently running. Loaded from the

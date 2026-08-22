@@ -8,8 +8,8 @@
 ; There is no camera. Gex himself is teleported to the start of the shot and
 ; then *walked* along a scripted path, with the normal map window logic
 ; following him as it always does. The script does this by writing canned d-pad
-; values straight into wDC81_CurrentInputsAlt, so from the map and entity code's
-; point of view nothing unusual is happening. wDCA7_DrawGexFlag is cleared for
+; values straight into wDC81_Player_EffectiveInputs, so from the map and entity code's
+; point of view nothing unusual is happening. wDCA7_Player_UpdateFlag is cleared for
 ; the duration, which is what stops the real player update from fighting the
 ; script for control - and also why Gex is invisible during the preview.
 ;
@@ -52,7 +52,7 @@
 ;   1. movement - walk the command list. Each command is 3 bytes emitted by
 ;      cutscene_move (direction bits, then a 16-bit frame count) and the list
 ;      ends with CUTSCENE_MOVE_END. The direction byte goes into
-;      wDC81_CurrentInputsAlt and call_00_217f_Cutscene_UpdateMovement does the
+;      wDC81_Player_EffectiveInputs and call_00_217f_Cutscene_UpdateMovement does the
 ;      actual moving.
 ;   2. hold - CUTSCENE_HOLD_FRAMES of dwell so the objective stays on screen.
 ;
@@ -108,7 +108,7 @@ call_00_1ea0_Cutscene_LoadAndRun:
 ; there is exactly one exit path and it always restores.
 ;
 ; The movement phase reads three-byte commands until CUTSCENE_MOVE_END: the
-; direction byte goes to wDC81_CurrentInputsAlt, the 16-bit frame count to
+; direction byte goes to wDC81_Player_EffectiveInputs, the 16-bit frame count to
 ; wDCDE_Cutscene_MoveFramesRemaining, and the inner loop ticks a cut-down game
 ; loop until the count runs out. wDCE0_Cutscene_MoveSpeed and its sub-pixel
 ; partner are zeroed once, before the first command, so a scene accelerates from
@@ -166,7 +166,7 @@ call_00_1ea0_Cutscene_LoadAndRun:
     push BC                                            ;; 00:1edf $c5
     push DE                                            ;; 00:1ee0 $d5
     xor  A, A                                          ;; 00:1ee1 $af
-    ld   [wDCA7_DrawGexFlag], A                                    ;; 00:1ee2 $ea $a7 $dc  ; hand Gex to the script, and stop drawing him
+    ld   [wDCA7_Player_UpdateFlag], A                                    ;; 00:1ee2 $ea $a7 $dc  ; hand Gex to the script, and stop drawing him
     ld   A, PLAYERACTION_SPAWN                                        ;; 00:1ee5 $3e $00
     ld   [wDC78_PlayerPendingActionId], A                                    ;; 00:1ee7 $ea $78 $dc
     call call_00_04fb                                  ;; 00:1eea $cd $fb $04
@@ -192,7 +192,7 @@ call_00_1ea0_Cutscene_LoadAndRun:
     ld   [wDCE1_Cutscene_MoveSubPixel], A                                    ;; 00:1f27 $ea $e1 $dc
     ld   A, [HL+]                                      ;; 00:1f2a $2a
 .jr_00_1f2b:
-    ld   [wDC81_CurrentInputsAlt], A                                    ;; 00:1f2b $ea $81 $dc
+    ld   [wDC81_Player_EffectiveInputs], A                                    ;; 00:1f2b $ea $81 $dc
     ld   A, [HL+]                                      ;; 00:1f2e $2a
     ld   [wDCDE_Cutscene_MoveFramesRemaining], A                                    ;; 00:1f2f $ea $de $dc
     ld   A, [HL+]                                      ;; 00:1f32 $2a
@@ -257,7 +257,7 @@ call_00_1ea0_Cutscene_LoadAndRun:
     jr   NZ, .jr_00_1f7a                               ;; 00:1f9d $20 $db
 .jp_00_1f9f:
     ld   A, $01                                        ;; 00:1f9f $3e $01
-    ld   [wDCA7_DrawGexFlag], A                                    ;; 00:1fa1 $ea $a7 $dc  ; give control back to the player update
+    ld   [wDCA7_Player_UpdateFlag], A                                    ;; 00:1fa1 $ea $a7 $dc  ; give control back to the player update
     ld   HL, wD810_PlayerYPosition+1                                     ;; 00:1fa4 $21 $11 $d8
     pop  BC                                            ;; 00:1fa7 $c1
     ld   [HL], B                                       ;; 00:1fa8 $70
@@ -548,10 +548,10 @@ call_00_217f_Cutscene_UpdateMovement:
 ; frame; whatever carries into the high nibble is the whole-pixel step. At
 ; CUTSCENE_MOVE_SPEED_MAX that works out to exactly one pixel per frame.
 ;
-; The direction bits in wDC81_CurrentInputsAlt then decide which axis it goes
+; The direction bits in wDC81_Player_EffectiveInputs then decide which axis it goes
 ; on, and nothing stops two of them being set - which is how a script pans
 ; diagonally with PADF_RIGHT | PADF_UP or PADF_RIGHT | PADF_DOWN
-    ld   A, [wDC81_CurrentInputsAlt]                                    ;; 00:217f $fa $81 $dc
+    ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 00:217f $fa $81 $dc
     and  A, A                                          ;; 00:2182 $a7
     jr   NZ, .jr_00_218c                               ;; 00:2183 $20 $07
     ld   HL, wDCE0_Cutscene_MoveSpeed                                     ;; 00:2185 $21 $e0 $dc
@@ -571,7 +571,7 @@ call_00_217f_Cutscene_UpdateMovement:
     swap A                                             ;; 00:219b $cb $37
     and  A, $0f                                        ;; 00:219d $e6 $0f                ; carry out of the low nibble...
     ld   C, A                                          ;; 00:219f $4f                ; ...is this frame's whole-pixel step
-    ld   HL, wDC81_CurrentInputsAlt                                     ;; 00:21a0 $21 $81 $dc
+    ld   HL, wDC81_Player_EffectiveInputs                                     ;; 00:21a0 $21 $81 $dc
     bit  PADF_RIGHT_BIT, [HL]                                       ;; 00:21a3 $cb $66
     jr   Z, .jr_00_21b6                                ;; 00:21a5 $28 $0f
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:21a7 $fa $0e $d8
