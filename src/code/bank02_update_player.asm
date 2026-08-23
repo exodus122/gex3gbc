@@ -63,7 +63,7 @@ call_02_4E0C_Player_SnowboardingTailSpin:
 ; Updates counters (wDCA2_Player_SnowboardingRelated–wDCA6_Player_SnowboardingRelated5) for a repeating animation or scripted sequence. 
 ; Fetch frame data from tables at $4EA1/$4EC3. Handles two cases: 
 ; when the player’s action ID is $27 (special move) or any other action. Sets attacking flag, 
-; triggers sound/action (call_02_54f9_Player_SwitchAction) when counters overflow, and sets wDB66_HDMATransferFlags to signal a redraw.
+; triggers sound/action (call_02_54f9_Player_SwitchAction) when counters overflow, and sets wDB66_GfxTransferFlags to signal a redraw.
 ; Purpose: Manage complex animation or event sequences based on timers and player state.
     ld   a,[wDCA5_Player_SnowboardingRelated4]
     ld   [wDCA6_Player_SnowboardingRelated5],a
@@ -120,7 +120,7 @@ call_02_4E0C_Player_SnowboardingTailSpin:
     cp   [hl]
     ret  z
     ld   [hl],a
-    ld   hl,wDB66_HDMATransferFlags
+    ld   hl,wDB66_GfxTransferFlags
     set  0,[hl]
     ret  
 
@@ -223,12 +223,12 @@ call_02_4f32_Player_UpdateMain:
 ; The main per-frame player update.
 ; Actions:
 ; - Processes inputs, clearing or setting bits in UnkStates/wDC81_Player_EffectiveInputs.
-; - Manages timers (wDC7E_PlayerDamageCooldownTimer, wDCA9_FlyTimerOrFlags4–wDCAB_FlyTimerOrFlags2) using call_02_4ffb_DecTimerEveryCycle.
+; - Manages timers (wDC7E_Player_DamageCooldownTimer, wDCA9_FlyPowerup2_Timer–wDCAB_FlyPowerup5_Timer) using call_02_4ffb_DecTimerEveryCycle.
 ; - Calls palette setup (call_03_6567_LoadFlyPalettes), BG collision update, entity caching, and entity loading.
 ; - Jumps to the player action function.
 ; - Clears bits and finalizes state before call_02_724d.
 ; Purpose: Central routine for player state, input, collisions, and rendering per frame.
-    ld   A, [wDAD7_CurrentInputs]                                    ;; 02:4f32 $fa $d7 $da
+    ld   A, [wDAD7_RawInputs]                                    ;; 02:4f32 $fa $d7 $da
     ld   C, A                                          ;; 02:4f35 $4f
     ld   E, A                                          ;; 02:4f36 $5f
     ld   HL, wDC80_Player_UnkStates                                     ;; 02:4f37 $21 $80 $dc
@@ -282,17 +282,17 @@ call_02_4f32_Player_UpdateMain:
 .jr_02_4f89:
     ld   HL, wDC81_Player_EffectiveInputs                                     ;; 02:4f89 $21 $81 $dc
     ld   [HL], C                                       ;; 02:4f8c $71
-    ld   HL, wDC7E_PlayerDamageCooldownTimer                                     ;; 02:4f8d $21 $7e $dc
+    ld   HL, wDC7E_Player_DamageCooldownTimer                                     ;; 02:4f8d $21 $7e $dc
     ld   A, [HL]                                       ;; 02:4f90 $7e
     and  A, A                                          ;; 02:4f91 $a7
     jr   Z, .jr_02_4f95                                ;; 02:4f92 $28 $01
     dec  [HL]                                          ;; 02:4f94 $35
 .jr_02_4f95:
-    ld   HL, wDCA9_FlyTimerOrFlags4                                     ;; 02:4f95 $21 $a9 $dc
+    ld   HL, wDCA9_FlyPowerup2_Timer                                     ;; 02:4f95 $21 $a9 $dc
     call call_02_4ffb_DecTimerEveryCycle                                  ;; 02:4f98 $cd $fb $4f
-    ld   HL, wDCAA_FlyTimerOrFlags1                                     ;; 02:4f9b $21 $aa $dc
+    ld   HL, wDCAA_FlyPowerup1_Timer                                     ;; 02:4f9b $21 $aa $dc
     call call_02_4ffb_DecTimerEveryCycle                                  ;; 02:4f9e $cd $fb $4f
-    ld   HL, wDCAB_FlyTimerOrFlags2                                     ;; 02:4fa1 $21 $ab $dc
+    ld   HL, wDCAB_FlyPowerup5_Timer                                     ;; 02:4fa1 $21 $ab $dc
     call call_02_4ffb_DecTimerEveryCycle                                  ;; 02:4fa4 $cd $fb $4f
     farcall call_03_6567_LoadFlyPalettes
     call call_02_5081_Player_UpdateFacingAndMovementVector                                  ;; 02:4fb2 $cd $81 $50
@@ -323,17 +323,17 @@ call_02_4f32_Player_UpdateMain:
     jp   call_02_724d_Entity_UpdateSpriteFields                                  ;; 02:4ff8 $c3 $4d $72
 
 call_02_4ffb_DecTimerEveryCycle:
-; Decrements a timer in [HL] every wDCA8_FlyTimerOrFlags3 frames. Resets wDCA8_FlyTimerOrFlags3 to 3C when it wraps.
+; Decrements a timer in [HL] every wDCA8_FlyPowerup_FrameCounter frames. Resets wDCA8_FlyPowerup_FrameCounter to 3C when it wraps.
 ; Purpose: Frame-based countdown helper.
     ld   A, [HL]                                       ;; 02:4ffb $7e
     and  A, A                                          ;; 02:4ffc $a7
     ret  Z                                             ;; 02:4ffd $c8
-    ld   A, [wDCA8_FlyTimerOrFlags3]                                    ;; 02:4ffe $fa $a8 $dc
+    ld   A, [wDCA8_FlyPowerup_FrameCounter]                                    ;; 02:4ffe $fa $a8 $dc
     dec  A                                             ;; 02:5001 $3d
     jr   NZ, .jr_02_5006                               ;; 02:5002 $20 $02
     ld   A, TIMER_AMOUNT_60_FRAMES                                        ;; 02:5004 $3e $3c
 .jr_02_5006:
-    ld   [wDCA8_FlyTimerOrFlags3], A                                    ;; 02:5006 $ea $a8 $dc
+    ld   [wDCA8_FlyPowerup_FrameCounter], A                                    ;; 02:5006 $ea $a8 $dc
     cp   A, TIMER_AMOUNT_60_FRAMES                                        ;; 02:5009 $fe $3c
     ret  NZ                                            ;; 02:500b $c0
     dec  [HL]                                          ;; 02:500c $35
@@ -1048,14 +1048,14 @@ call_02_5431_HandleActionTriggersAndEvents:
     jr   NZ, .jr_02_5453                               ;; 02:5441 $20 $10
     ld   A, [wDC92_TileTypeBehindGexsUpperBody]                                    ;; 02:5443 $fa $92 $dc
     cp   A, $28                                        ;; 02:5446 $fe $28
-    jp   Z, jp_00_06da                                 ;; 02:5448 $ca $da $06
+    jp   Z, jp_00_06da_Player_DieInPit                 ;; 02:5448 $ca $da $06
     ld   A, [wDC93_TileTypeBehindGexsLowerBody]                                    ;; 02:544b $fa $93 $dc
     cp   A, $28                                        ;; 02:544e $fe $28
-    jp   Z, jp_00_06da                                 ;; 02:5450 $ca $da $06
+    jp   Z, jp_00_06da_Player_DieInPit                 ;; 02:5450 $ca $da $06
 .jr_02_5453:
     ld   A, [wDC93_TileTypeBehindGexsLowerBody]                                    ;; 02:5453 $fa $93 $dc
     cp   A, $19                                        ;; 02:5456 $fe $19
-    jp   Z, jp_00_06e8                                 ;; 02:5458 $ca $e8 $06
+    jp   Z, jp_00_06e8_Player_HitHazardTile            ;; 02:5458 $ca $e8 $06
 .jr_02_545b:
     call call_02_5374_LevelSpecificEventTrigger                                  ;; 02:545b $cd $74 $53
     call call_02_553b_PlayerIsInWater                                  ;; 02:545e $cd $3b $55

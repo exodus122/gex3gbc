@@ -9,7 +9,7 @@ wC000_BgMapTileIds:
 ; times over, once per pass of call_00_1a22_BgMap_LoadAllRowsForPass - see
 ; wDC33_BgMap_InitialLoadPass. The first two passes are HDMA'd out to VRAM
 ; (attributes to bank 1, tile ids to bank 0) by config entries 7 and 8 of
-; .data_00_0aa9_TilesetLoadConfigTable; the third pass leaves the map's
+; .data_00_0aa9_HdmaConfigTable; the third pass leaves the map's
 ; COLLISION tile ids sitting here, and they stay for the life of the map.
 ;
 ; So in gameplay this is the current collision map - the gex2 equivalent is
@@ -42,7 +42,7 @@ wCD00_RowOffsetTableForMap:
 ; ------------------------------------------------------------------
 ; BG map strip scratch, $CF00-$CFFF. The strip loaders never write VRAM
 ; directly - they assemble 11 blocks worth of tile ids and GBC attribute bytes
-; here, then call_00_0b9f_Frame_GraphicsUpdateHandler flushes the pair to the
+; here, then call_00_0b9f_VBlank_UpdateVRAM flushes the pair to the
 ; tilemap during vblank (call_03_75e3_Tilemap_UpdateBlockFromBuffer for a row,
 ; call_03_7664_Tilemap_UpdateColumnFromBuffer for a column). gex2 has no
 ; equivalent - it writes tiles into VRAM inside the loader itself.
@@ -88,9 +88,9 @@ wD300_CollectibleBucketLookupTable:
 ; So wD300 = quick lookup of "which collectibles live in this horizontal slice."
     ds 256                                             ;; d300
 
-wD400_TileBuffer:
+wD400_ScreenDraw_TileIds:
     ds 376                                               ;; d400
-wD578_TileBuffer2:
+wD578_ScreenDraw_PaletteIds:
     ds 392                                               ;; d578
 
 wD700_EntityFlags:
@@ -131,21 +131,45 @@ wD840_EntityMemoryAfterPlayer: ; why does some code use this and not wDB20? mayb
     ds 32 
 ; End of Loaded Entities space
 
-wD900:
+; ------------------------------------------------------------------
+; Shadow OAM. call_00_0e29_OamDmaRoutine, which runs from HRAM at
+; hFF80_OamDmaRoutine, DMAs SHADOW_OAM_SIZE bytes from here into OAM at the top
+; of every vblank, so this is the sprite list every drawing routine writes to.
+; gex2 keeps the same thing at wCC00_ShadowOAM
+; ------------------------------------------------------------------
+wD900_ShadowOAM:
+; sprite 0 - the first byte the DMA moves, and the one
+; call_00_0e62_ClearShadowOamAndResetScroll seeds when it wipes the list
     ds 1                                               ;; d900
-wD901:
+wD901_ShadowOAM_EntitySprites:
     ds 3                                               ;; d901
 wD904:
     ds 156                                             ;; d904
 
-; Graphics/Rendering related memory
-wD9A0: ; Interrupt code location?
+; ------------------------------------------------------------------
+; The LCD STAT handler, and the vblank hook that pairs with it.
+;
+; isrLCDC at $0048 is a bare `jp wD9A0_LcdIsrCode`, so the handler is not fixed
+; code but a template copied here by call_00_0c1b_InstallLcdIsr out of
+; .data_00_0c44_LcdIsrTable. The bytes just past the copied template are that
+; handler's vblank hook, and land in wD9FE_VBlankHookPtrLo.
+;
+; Exactly gex2's arrangement at wCCA0_LcdIsrCode / wCCFD_LcdIsrId, except that
+; gex3 never patches the installed template in place - it has no hblank tile
+; streamer to arm and disarm, because HDMA does that work here
+; ------------------------------------------------------------------
+wD9A0_LcdIsrCode:
     ds 93                                              ;; d9a0
-wD9FD:
+wD9FD_LcdIsrId:
+; the installed handler, one of the LCD_ISR_* ids. Bit 7 (LCD_ISR_INSTALLED) is
+; set once call_00_0c1b_InstallLcdIsr has copied it in; storing an id with that
+; bit clear is how call_00_0c10_RequestLcdIsr asks for a different one
     ds 1                                               ;; d9fd
-wD9FE:
+wD9FE_VBlankHookPtrLo:
+; called once per vblank by call_00_0b25_VBlank_Handler - the routine that
+; belongs to the installed handler
     ds 1                                               ;; d9fe
-wD9FF:
+wD9FF_VBlankHookPtrHi:
     ds 1                                               ;; d9ff
 
 ; DA00 through DA13 stores temporary information about the currently updating entity, or used by that entity
@@ -255,12 +279,21 @@ wDABE_CollisionFlags:
 ; BGCOLL_SLOPE_MASK       - low nibble, pixels of slope to step up
     ds 1                                               ;; dabe
 
-wDABF_GexSpriteBank:
+; ------------------------------------------------------------------
+; Gex's own tile graphics, as HDMA parameters. All three are filled in by
+; call_00_0513_Screen_PresentAndDrawEntities and by the player action code out
+; of the bank $7F sprite tables, and consumed by
+; call_00_0c6a_VBlank_StartPendingHdma under GFX_XFER_PLAYER_GFX.
+; gex2's equivalent is the GFX_XFER_PLAYER_GFX path in
+; call_00_08fc_StageNextGfxTransfer, which reads wD208_Player_SpriteID instead
+; ------------------------------------------------------------------
+wDABF_PlayerGfx_SrcBank:
     ds 1                                               ;; dabf
 
-wDAC0_GeneralPurposeDMASourceAddress:
+wDAC0_PlayerGfx_SrcAddr:
     ds 2                                               ;; dac0
-wDAC2_DMATransferLength:
+wDAC2_PlayerGfx_TileCount:
+; in 32-byte units: the transfer is (count * 2 - 1) HDMA blocks of 16 bytes
     ds 1                                               ;; dac2
 
 wDAC3_BankStack:
@@ -272,21 +305,36 @@ wDAD5_CurrentROMBank:
 wDAD6_ReturnBank:
     ds 1                                               ;; dad6
 
-wDAD7_CurrentInputs:
+wDAD7_RawInputs:
+; buttons held this frame, active high, in PADF_* order - d-pad in the high
+; nibble, buttons in the low one. Written once per vblank by
+; call_00_0f31_ReadJoypadInput and read by every CheckInput* helper. This is a
+; HELD state, not an edge; gex2 keeps the same thing in wD59F_RawInputs
     ds 1                                               ;; dad7
 
-wDAD8_LCDControlMirror:
+; ------------------------------------------------------------------
+; Shadow copies of the four video registers. Nothing writes rLCDC / rSCX / rSCY
+; / rWX / rWY directly during play - call_00_0b25_VBlank_Handler pushes these
+; out once per frame instead, so a mid-frame change can never tear
+; ------------------------------------------------------------------
+wDAD8_LCDCValue:
+; one of LCDC_GAMEPLAY / LCDC_INIT. call_00_0d8b_LcdIsr_LoadHudPalettesA also
+; reads it to build the hud strip's variant
     ds 1                                               ;; dad8
-wDAD9_ScrollX:
+wDAD9_BgMap_ScrollXLo:
     ds 1                                               ;; dad9
-wDADA_ScrollY:
+wDADA_BgMap_ScrollYLo:
     ds 1                                               ;; dada
 wDADB_WindowX:
     ds 1                                               ;; dadb
 wDADC_WindowY:
     ds 1                                               ;; dadc
 
-wDADD: ; menu related
+wDADD_MenuTextBuffer:
+; The string call_00_0835_Text_LoadStringToBuffer decompresses out of
+; BANK_1C_TEXT, and that call_00_0865_Text_AppendStringToBuffer then appends to.
+; Terminated by a byte with bit 7 set; the append routine finds the end by
+; scanning forward from wDADC_WindowY + 1, which is this address
     ds 1                                               ;; dadd
 
 wDADE:
@@ -301,70 +349,102 @@ wDAE0:
 wDAE1_TextBuffer:
     ds 128                                             ;; dae1
 
-; HDMA Transfer related ram
-wDB61_ActiveObjectSlot:
+; ------------------------------------------------------------------
+; The graphics transfer queue. Nothing in the game writes VRAM from game logic:
+; a routine fills in one of the three parameter sets below, raises its bit in
+; wDB66_GfxTransferFlags, and call_00_0c6a_VBlank_StartPendingHdma programs the
+; HDMA registers from it during the next vblank.
+;
+; gex2 has the same queue at wD60F_GfxTransferFlags, but no HDMA: there the
+; bits mean "stage a page into wD100_TilesToLoadBuffer and let the LCD STAT
+; handler dribble it out four bytes per hblank" instead
+; ------------------------------------------------------------------
+wDB61_EntityGfx_SlotOffset:
+; low byte of the entity being uploaded, i.e. its offset within
+; wD800_EntityMemory. Its top three bits also pick the destination VRAM page,
+; which is why every entity slot draws from a page of its own
     ds 2                                               ;; db61
-wDB63_ActiveObjectType:
+wDB63_EntityGfx_PageCount:
+; the entity's graphics size, from the second byte of its data_03_58d2 record
+; via call_03_59b6_LookupEntityPropertyFromType. rHDMA5 gets (count * 2 - 1)
     ds 1                                               ;; db63
-wDB64_VRAMTransferSource:
+wDB64_EntityGfx_SrcAddr:
     ds 2                                               ;; db64
-wDB66_HDMATransferFlags:
-; Bit 0 set →
-; Copy a fixed number of tiles from a general-purpose buffer (wDAC0–wDAC2).
-; - Source bank = wDABF_GexSpriteBank.
-; - Transfer length = wDAC2_DMATransferLength.
-; - Always writes to VRAM bank 0.
-; Bit 1 set →
-; Copy tiles for the current interaction entity.
-; - Uses wDB64/65 as the source pointer.
-; - Source bank depends on the entity’s data (ENTITY_FIELD_ACTION_STATE_FLAGS, plus a VBK = 1 path if "extended" graphics).
-; - Length depends on the entity’s type (wDB63_ActiveObjectType).
-; - This looks like sprite/animation tiles for NPCs or items.
-; Bit 2 set →
-; Perform a variable-length streaming transfer.
-; - Uses wDC2B_HDMATransferRelated1–wDC32 as a little "DMA job struct": source address, destination, length, VRAM bank, and continuation fields.
-; - After copying, it updates the struct so the next frame continues where this left off until finished.
-; - When finished, clears bit 2.
-; - Looks like it’s used for big transfers (maybe level backgrounds, cutscene art, or font pages).
+wDB66_GfxTransferFlags:
+; GFX_XFER_PLAYER_GFX (bit 0)
+;   Gex's tiles, from wDABF_PlayerGfx_SrcBank : wDAC0_PlayerGfx_SrcAddr, always
+;   into VRAM bank 0 at $8000.
+; GFX_XFER_ENTITY_GFX (bit 1)
+;   one entity's tiles, from wDB64_EntityGfx_SrcAddr, banked in from the slot's
+;   own ENTITY_FIELD_SPRITE_BANK. ACTION_STATE_UNK20_BIT sends it to VRAM
+;   bank 1 at $8400 instead of bank 0 at the slot's page.
+; GFX_XFER_HDMA_CONFIG (bit 2)
+;   the wDC2B_Hdma_SrcAddrLo job struct - an arbitrary source, destination,
+;   length and VRAM bank. Only HDMA_MAX_BLOCKS blocks move per frame and the
+;   struct is advanced in place, so a big transfer resumes across frames and
+;   the bit is only cleared when the length reaches zero.
+; GFX_XFER_PENDING (bit 7)
+;   set alongside any of the above; the handler returns immediately without it
     ds 1                                               ;; db66
-wDB67_HDMATempScratch:
+wDB67_LcdIsr_ScanlineCounter:
+; seeded from rLY at the end of every vblank and incremented once per hblank by
+; the installed LCD STAT handler, so it tracks the scanline being drawn.
+; LCD_ISR_HUD_PALETTE compares it against LCD_ISR_HUD_PALETTE_LINE_A / _B to
+; decide which half of the hud palette swap to perform
     ds 2                                               ;; db67
 
-wDB69_HUDGraphicsUpdateFlags:
-; bit 7 (80) = 
-; bit 6 (40) = 
-; bit 5 (20) = 
-; bit 4 (10) = update fly coins animation flag (in map)
-; bit 3 (08) = 
-; bit 2 (04) = update bonus stage timer flag
-; bit 1 (02) = update status bar health (player damaged / eat fly / collected paw coin)
-; bit 0 (01) = update status bar flag (collected fly coin)
+wDB69_HUDDirtyFlags:
+; What the status bar still has to redraw. Raised by whatever changed the value
+; and cleared by call_03_747d_HUD_Update and friends once they have.
+; See the HUD_DIRTY_* constants; gex2's is wD60E_HUDDirtyFlags
+; bit 7 (80) =
+; bit 6 (40) =
+; bit 5 (20) =
+; bit 4 (10) = HUD_DIRTY_FLY_COIN_ANIM - advance the spinning fly coin (in map)
+; bit 3 (08) =
+; bit 2 (04) = HUD_DIRTY_TIMER - bonus stage countdown
+; bit 1 (02) = HUD_DIRTY_HEALTH - player damaged / ate a fly / collected a paw coin
+; bit 0 (01) = HUD_DIRTY_COUNTERS - lives and fly coin digits
     ds 1                                               ;; db69
 
 wDB6A_WarpFlags:
-; bit 7 (80) = 
-; bit 6 (40) = 
-; bit 5 (20) = collected a remote that warps you?
-; bit 4 (10) = loading new area (entering tv, defeated minibosses, collected bonus tv remotes)
-; bit 3 (08) = 
-; bit 2 (04) = soft reset code used (A + B + Select + Start)
-; bit 1 (02) = died
-; bit 0 (01) = 
+; Why the map is about to be left. Tested in priority order at the top of the
+; per-frame loop; see the WARP_* constants. gex2's wD621_WarpFlags holds the
+; same idea, and its WARP_DIED / WARP_ENTERED_TV are these bits 1 and 2
+; bit 7 (80) =
+; bit 6 (40) =
+; bit 5 (20) = WARP_TIME_UP - the bonus stage countdown expired
+; bit 4 (10) = WARP_NEW_LEVEL - leave the level (entering a tv, minibosses defeated,
+;              bonus tv remote collected). call_01_435e_DetermineNextMapId picks where to
+; bit 3 (08) =
+; bit 2 (04) = WARP_CHANGE_MAP - a door or a map edge chose another map in this level
+; bit 1 (02) = WARP_DIED - the death animation finished
+; bit 0 (01) =
     ds 1                                               ;; db6a
 
-wDB6B_InterruptFlag:
-; gets set when an interrupt occurs. used when waiting for an interrupt
+wDB6B_VBlankDoneFlag:
+; Raised at the end of every vblank and cleared by
+; call_00_0b92_WaitForInterrupt, which halts until it comes back - so this is
+; what paces the whole game to 60fps. gex2's wD622_VBlankDoneFlag
     ds 1                                               ;; db6b
 
 wDB6C_CurrentMapId: ; can freeze and enter level to get to another level
 ; also used for totals menu pages
     ds 1                                               ;; db6c
 
+; ------------------------------------------------------------------
+; The bonus stage countdown, ticked by call_00_05c7_LevelTimer_Tick. gex2's
+; equivalent pair is wD76F_LevelTimer_Minutes / wD770_LevelTimer_SecondsBCD,
+; which are BCD and count minutes as well; gex3 keeps a plain second count
+; ------------------------------------------------------------------
 wDB6D_InBonusStage: ; 1 = in gextreme sports or marsupial madness
     ds 1                                               ;; db6d
-wDB6E_BonusStageTimerHi:
+wDB6E_LevelTimer_SecondsRemaining:
+; drawn by call_03_757e_HUD_AnimateBonusStageTimer. Reaching zero raises
+; WARP_NEW_LEVEL | WARP_TIME_UP and boots the player out
     ds 1                                               ;; db6e
-wDB6F_BonusStageTimerLo:
+wDB6F_LevelTimer_FrameCounter:
+; counts down from FRAMES_PER_SECOND, once per frame
     ds 1                                               ;; db6f
 
 wDB70_CollectibleScreenRelativeXOffset:
@@ -444,15 +524,29 @@ wDBAF_MenuCommandBuffer3_Unk4:
     ds 1                                               ;; dbaf
 wDBB0_MenuCommandBuffer3_Unk5:
     ds 1                                               ;; dbb0
-wDBB1_MenuCommandBuffer4_Unk0:
+; ------------------------------------------------------------------
+; The 8-byte record that describes one fullscreen image, copied here by
+; call_01_47b1_LoadMenuConfigData and consumed by
+; jp_00_0781_Screen_LoadFullscreenImage. gex2's equivalent is the
+; wD6A5_ScreenDraw_TileDataBank block behind
+; call_00_07c3_Screen_LoadTilesAndTilemap
+; ------------------------------------------------------------------
+wDBB1_ScreenDraw_HasPaletteIdMap:
+; 0 - the image has no per-tile palette map; build one by looking each tile id
+;     up in the 256-entry table that follows the tilemap in ROM
+; 1 - a second SCREEN_TILEMAP_BYTES block follows the tilemap and is the
+;     palette map, one entry per visible tile
     ds 1                                               ;; dbb1
-wDBB2_MenuCommandBuffer4_Bank:
+wDBB2_ScreenDraw_Bank:
     ds 1                                               ;; dbb2
-wDBB3_MenuCommandBuffer4_Unk2:
+wDBB3_ScreenDraw_TilemapPtr:
+; SCREEN_TILEMAP_BYTES of tile ids -> wD400_ScreenDraw_TileIds
     ds 2                                               ;; dbb3
-wDBB5_MenuCommandBuffer4_Unk4:
+wDBB5_ScreenDraw_TileDataPtr:
+; the tile graphics themselves, staged through wC000_BgMapTileIds
     ds 2                                               ;; dbb5
-wDBB7_MenuCommandBuffer4_BankOffset:
+wDBB7_ScreenDraw_TileDataSize:
+; in bytes. Anything past SCREEN_TILE_CHUNK_BYTES is uploaded as a second pass
     ds 2                                               ;; dbb7
 wDBB9_MenuUnknownPtr:
     ds 2                                               ;; dbb9
@@ -528,11 +622,19 @@ wDBED_PasswordColumnSelected:
     ds 1                                               ;; dbed
 wDBEE_PasswordRowSelected:
     ds 1                                               ;; dbee
-wDBEF_UnkCounter:
+; ------------------------------------------------------------------
+; The menu graphics stream: a list of (source, destination) pairs walked one
+; chunk per frame by call_00_0df9_VBlank_RunGfxStream, so a menu can redraw
+; itself without blanking the screen. Byte for byte the same idea as gex2's
+; wD6E2_GfxStream_ChunksRemaining block
+; ------------------------------------------------------------------
+wDBEF_GfxStream_ChunksRemaining:
+; zero means idle; each frame copies one chunk and decrements it
     ds 1                                               ;; dbef
-wDBF0:
+wDBF0_GfxStream_RowsPerChunk:
+; tiles per chunk, passed to call_00_0bcf_CopyTileRows in B
     ds 1                                               ;; dbf0
-wDBF1:
+wDBF1_GfxStream_SrcBank:
     ds 1                                               ;; dbf1
 wDBF2:
     ds 1                                               ;; dbf2
@@ -542,12 +644,16 @@ wDBF4:
     ds 1                                               ;; dbf4
 wDBF5:
     ds 1                                               ;; dbf5
-wDBF6:
+wDBF6_GfxStream_ListPtrLo:
+; cursor into the (source, destination) list; advanced by four bytes per chunk
     ds 1                                               ;; dbf6
-wDBF7:
+wDBF7_GfxStream_ListPtrHi:
     ds 1                                               ;; dbf7
 
-wDBF8: ; text related
+wDBF8_TextStringIndex:
+; which string of a BANK_1C_TEXT pointer table the menu wants, used by
+; call_00_0835_Text_LoadStringToBuffer and
+; call_00_0865_Text_AppendStringToBuffer
     ds 1                                               ;; dbf8
 
 ; Map-related wRAM starts here
@@ -641,7 +747,7 @@ wDC20_BgMapLoadingFlags:
 ; MAP_SCROLL_RIGHT ask for a column; call_02_7305_CheckVerticalMapScroll and
 ; call_02_7337_CheckHorizontalMapScroll raise them, call_00_11c8_BgMap_LoadDirtyRegions
 ; services them and sets MAP_PENDING_VRAM_TRANSFER, and
-; call_00_0b9f_Frame_GraphicsUpdateHandler clears the whole byte after the
+; call_00_0b9f_VBlank_UpdateVRAM clears the whole byte after the
 ; vblank flush. Same bit assignments as gex2's wD6F9_BgMap_LoadingFlags
     ds 1                                               ;; dc20
 
@@ -695,19 +801,29 @@ wDC29_SkipMapWindowUpdateFlag: ; if set to 1, don't update the player window map
 wDC2A_MapBoundaryIndex:
     ds 1                                               ;; dc2a
 
-wDC2B_HDMATransferRelated1:
+; ------------------------------------------------------------------
+; The GFX_XFER_HDMA_CONFIG job struct: one entry of
+; .data_00_0aa9_HdmaConfigTable copied here by
+; call_00_0a6a_Hdma_RunConfigEntry, then advanced in place by
+; call_00_0c6a_VBlank_StartPendingHdma until the length reaches zero. That is
+; what lets a transfer larger than HDMA_MAX_BLOCKS resume across frames.
+; gex2 has no counterpart - it streams through the LCD STAT handler instead
+; ------------------------------------------------------------------
+wDC2B_Hdma_SrcAddrLo:
     ds 1                                               ;; dc2b
-wDC2C_HDMATransferRelated2:
+wDC2C_Hdma_SrcAddrHi:
     ds 1                                               ;; dc2c
-wDC2D_HDMATransferRelated3:
+wDC2D_Hdma_DestAddrLo:
     ds 1                                               ;; dc2d
-wDC2E_HDMATransferRelated4:
+wDC2E_Hdma_DestAddrHi:
     ds 1                                               ;; dc2e
-wDC2F_HDMATransferRelated5:
+wDC2F_Hdma_BytesRemaining:
     ds 2                                               ;; dc2f
-wDC31_TilesetBankRelated:
+wDC31_Hdma_SrcBank:
+; HDMACFG_BANK_MAP_TILESET in a table entry means "relocate against the current
+; map's tileset", which call_00_0a6a_Hdma_RunConfigEntry resolves on the way in
     ds 1                                               ;; dc31
-wDC32_VRAMBank:
+wDC32_Hdma_VramBank:
     ds 1                                               ;; dc32
 
 wDC33_BgMap_InitialLoadPass:
@@ -766,10 +882,16 @@ wDC4E_LivesRemaining:
     ds 1                                               ;; dc4e
 wDC4F_PawCoinExtraHealth:
     ds 1                                               ;; dc4f
-wDC50_PlayerHealth:
+wDC50_Player_Health:
+; PLAYER_BASE_HEALTH plus wDC4F_PawCoinExtraHealth on every spawn. gex2's is
+; wD741_Player_Health, and is a flat PLAYER_MAX_HEALTH there
     ds 1                                               ;; dc50
 
-wDC51_CurrentFlyRelated:
+wDC51_Player_CurrentFly:
+; the FLY_POWERUP_* id being carried. Eating another fly swaps this and cashes
+; the old one in - see call_00_0624_Player_SwapFlyPowerup. Taking a hit while
+; holding one drops it instead of costing health, exactly as gex2's
+; wD742_Player_CurrentFly does
     ds 1                                               ;; dc51
 
 wDC52_GexSpriteRelated:
@@ -802,7 +924,12 @@ wDC66_ProgressFlags_LizardOfOz:
 wDC67_ProgressFlags_ChannelZ: ; 1 = got remote
     ds 1                                               ;; dc67
 
-wDC68_CollectibleCount:
+wDC68_CollectibleAmount:
+; fly coins picked up in this level. Only ever rises: COLLECTIBLE_EXTRA_LIFE
+; pays out a life and COLLECTIBLE_LEVEL_COMPLETE sets
+; PROGRESS_ALL_COLLECTIBLES_BIT. gex2's wD649_CollectibleAmount doubles as a
+; falling quota in its bonus levels; gex3 keeps the quota in the level timer
+; instead
     ds 1                                               ;; dc68
 
 wDC69_PlayerSpawnIdInLevel:
@@ -831,9 +958,15 @@ wDC6F_EntitySpriteRelated:
 wDC70_EntitySpriteRelated2:
     ds 1                                               ;; dc70
 
-wDC71_FrameCounter_Entities:
+wDC71_VBlankFrameCounter:
+; incremented by call_00_0b25_VBlank_Handler and by nothing else, so it keeps
+; running while a menu or a cutscene has play suspended. Most entity animation
+; timing is paced off it. gex2's wD73B_VBlankFrameCounter
     ds 1                                               ;; dc71
-wDC72_FrameCounter_Sprites:
+wDC72_AnimFrameCounter:
+; shared by the two things that animate on a fixed cycle and never run at the
+; same time: the hud's fly coin (wraps at 8, in call_03_753e) and the menu HDMA
+; animations (wraps at 10, in call_00_088a_Menu_RunHdmaAnimations)
     ds 1                                               ;; dc72
 wDC73_FrameCounter_FlyCoins:
     ds 5                                               ;; dc73
@@ -855,7 +988,10 @@ wDC7C_PlayerCollisionUnusedFlag:
 wDC7B_CurrentEntityAddrLoAlt2:
     ds 1                                               ;; dc7d
 
-wDC7E_PlayerDamageCooldownTimer:
+wDC7E_Player_DamageCooldownTimer:
+; the invincibility window after a hit, in frames. While it is nonzero
+; call_00_0759_Player_IsInvincible refuses further damage. gex2's
+; wD750_Player_DamageCooldownTimer
     ds 1                                               ;; dc7e
 wDC7F_Player_IsAttacking: ; set to 1 when using tail spin
     ds 1                                               ;; dc7f
@@ -1000,13 +1136,29 @@ wDCA6_Player_SnowboardingRelated5:
 wDCA7_Player_UpdateFlag:
     ds 1                                               ;; dca7
 
-wDCA8_FlyTimerOrFlags3:
+; ------------------------------------------------------------------
+; Fly power-up timers. Three of the five flies grant a timed power-up, and each
+; has a countdown of its own so that swapping one out cannot leave another
+; running. All three are seconds, not frames: call_02_4ffb_DecTimerEveryCycle
+; only decrements one when the shared wDCA8_FlyPowerup_FrameCounter wraps.
+;
+; Any of the three being nonzero is what the entity collision handlers read as
+; "Gex is powered up" and lets him destroy things he otherwise could not.
+; gex2 splits the same job between wD753_FlyPowerup1_Timer and
+; wD755_FlyPowerup2_Timer, which are 16-bit frame counts
+; ------------------------------------------------------------------
+wDCA8_FlyPowerup_FrameCounter:
+; shared by all three timers; reloaded with TIMER_AMOUNT_60_FRAMES
     ds 1                                               ;; dca8
-wDCA9_FlyTimerOrFlags4:
+wDCA9_FlyPowerup2_Timer:
+; armed by swapping out FLY_POWERUP_2
     ds 1                                               ;; dca9
-wDCAA_FlyTimerOrFlags1:
+wDCAA_FlyPowerup1_Timer:
+; armed by swapping out FLY_POWERUP_1
     ds 1                                               ;; dcaa
-wDCAB_FlyTimerOrFlags2:
+wDCAB_FlyPowerup5_Timer:
+; armed by swapping out FLY_POWERUP_5. Also what
+; call_03_6567_LoadFlyPalettes checks first, so this power-up's tint wins
     ds 1                                               ;; dcab
 
 wDCAC_Player_CrouchLookDownRelated:
@@ -1014,7 +1166,8 @@ wDCAC_Player_CrouchLookDownRelated:
 wDCAD:
     ds 1                                               ;; dcad
 
-wDCAE_FlyTimerOrFlags5:
+wDCAE_FlyPowerup_ActiveIndex:
+; which of the three timed power-ups was armed last, one of FLY_POWERUP_ACTIVE_*
     ds 1                                               ;; dcae
 
 wDCAF_PawCoinCounter: ; for every 4 collected, increment Gex's health
@@ -1127,7 +1280,10 @@ wDD2A_EntityPalettes:
     ds 32                                              ;; dd2a
 wDD4A_ObjectPalettes:
     ds 32                                              ;; dd4a
-wDD6A_GameBoyColorPaletteFlag: ; determines if colored palettes will be used
+wDD6A_PalettesReadyFlag:
+; 0 while a screen is being built: call_00_0e81_UploadCgbPalettes then fills
+; both palette rams with $80 bytes instead of the real colours, which is what
+; keeps a half-drawn screen from flashing. Raised once the screen is ready
     ds 1                                               ;; dd6a
 
 wDD6B: ; unused except set to 0?
@@ -1433,7 +1589,10 @@ wDF7E:
 
 SECTION "hram", HRAM[$ff80]
 
-hFF80:
+hFF80_OamDmaRoutine:
+; call_00_0e29_OamDmaRoutine is copied here at boot and called from vblank. It
+; has to run out of HRAM because the CPU can reach nothing else while an OAM
+; DMA is in progress. gex2 does the same at hFF80_OamDmaRoutine
     ds 112                                             ;; ff80
 hFFF0:
     ds 12                                              ;; fff0

@@ -117,9 +117,9 @@ data_03_58d2:
 call_03_59b6_LookupEntityPropertyFromType:
 ; Entity Property Lookup (DB61-based)
 ; Description:
-; Uses the byte at wDB61_ActiveObjectSlot as an index into a two-byte table at data_03_58d3 to return an entity property byte. 
+; Uses the byte at wDB61_EntityGfx_SlotOffset as an index into a two-byte table at data_03_58d3 to return an entity property byte. 
 ; Likely retrieves a behavior or sprite index based on some game state or entity slot.
-    ld   HL, wDB61_ActiveObjectSlot                                     ;; 03:59b6 $21 $61 $db
+    ld   HL, wDB61_EntityGfx_SlotOffset                                     ;; 03:59b6 $21 $61 $db
     ld   L, [HL]                                       ;; 03:59b9 $6e
     ld   h, HIGH(wD800_EntityMemory)                                        ;; 03:59ba $26 $d8
     ld   L, [HL]                                       ;; 03:59bc $6e ; ENTITY_FIELD_ENTITY_ID
@@ -687,7 +687,7 @@ call_03_5fc2_SetupEntitySprite:
     ld   A, [HL]                                       ;; 03:6046 $7e
     and  A, A                                          ;; 03:6047 $a7
     jr   Z, .jr_03_6050                                ;; 03:6048 $28 $06
-    ld   A, [wDC71_FrameCounter_Entities]                                    ;; 03:604a $fa $71 $dc
+    ld   A, [wDC71_VBlankFrameCounter]                                    ;; 03:604a $fa $71 $dc
     and  A, $07                                        ;; 03:604d $e6 $07
     ret  NZ                                            ;; 03:604f $c0
 .jr_03_6050:
@@ -752,7 +752,7 @@ call_03_5fc2_SetupEntitySprite:
     res  5, [HL]                                       ;; 03:60b2 $cb $ae
 .jr_03_60b4:
     ld   DE, data_03_59ea_SpriteData                              ;; 03:60b4 $11 $ea $59
-    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 03:60b7 $cd $77 $07
+    call call_00_0777_GetPointerFromTable                                  ;; 03:60b7 $cd $77 $07
     ld   A, [wDC6F_EntitySpriteRelated]                                    ;; 03:60ba $fa $6f $dc
     ld   E, A                                          ;; 03:60bd $5f
     ld   D, $d9                                        ;; 03:60be $16 $d9
@@ -955,7 +955,7 @@ call_03_615d_SetupCollectibleSprites:
     set  7, E                                          ;; 03:61cb $cb $fb
     ld   A, $ff                                        ;; 03:61cd $3e $ff
     ld   [DE], A                                       ;; 03:61cf $12
-    call call_00_0723_IncrementCollectibleCount                                  ;; 03:61d0 $cd $23 $07
+    call call_00_0723_Player_ObtainedCollectible                                  ;; 03:61d0 $cd $23 $07
     pop  DE                                            ;; 03:61d3 $d1
 .jr_03_61d4:
     inc  E                                             ;; 03:61d4 $1c

@@ -113,7 +113,7 @@ call_02_58bd_EntityAction_MovePlatformVertically:
     jp   call_00_290d_Entity_SetMiscTimer
 
 call_02_5918_EntityAction_Fly_Update:
-    ld   a,[wDC71_FrameCounter_Entities]
+    ld   a,[wDC71_VBlankFrameCounter]
     rrca 
     and  a,$0F
     ld   l,a
@@ -286,7 +286,7 @@ call_02_5a83_EntityAction_TVButton_unk4:
     ret  NZ                                            ;; 02:5a87 $c0
     call call_00_230f_Entity_GetParameterIntoC                                  ;; 02:5a88 $cd $0f $23
     ld   B, $00                                        ;; 02:5a8b $06 $00
-    ld   HL, data_00_0b19                                      ;; 02:5a8d $21 $19 $0b
+    ld   HL, data_00_0b19_TvUnlockRequirements                                      ;; 02:5a8d $21 $19 $0b
     add  HL, BC                                        ;; 02:5a90 $09
     bit  7, [HL]                                       ;; 02:5a91 $cb $7e
     jr   Z, .jr_02_5aaa                                ;; 02:5a93 $28 $15
@@ -345,7 +345,7 @@ call_02_5af8_EntityAction_TVRemote_unk4:
     ret  NZ                                            ;; 02:5afc $c0
     call call_00_230f_Entity_GetParameterIntoC                                  ;; 02:5afd $cd $0f $23
     ld   B, $00                                        ;; 02:5b00 $06 $00
-    ld   HL, data_00_0b19                                      ;; 02:5b02 $21 $19 $0b
+    ld   HL, data_00_0b19_TvUnlockRequirements                                      ;; 02:5b02 $21 $19 $0b
     add  HL, BC                                        ;; 02:5b05 $09
     bit  7, [HL]                                       ;; 02:5b06 $cb $7e
     jr   Z, .jr_02_5b1f                                ;; 02:5b08 $28 $15
@@ -466,7 +466,7 @@ call_02_5bfa_EntityAction_FreestandingRemote_unk2:
     call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear                                  ;; 02:5bfa $cd $f5 $29
     jr   Z, .jr_02_5c23                                ;; 02:5bfd $28 $24
     ld   A, SFX_REMOTE                                        ;; 02:5bff $3e $1e
-    call call_00_0ff5_QueueSoundEffect                                  ;; 02:5c01 $cd $f5 $0f
+    call call_00_0ff5_QueueSFX                                  ;; 02:5c01 $cd $f5 $0f
     ld   HL, .data_02_5c3b                             ;; 02:5c04 $21 $3b $5c
     call call_00_2c20_Entity_CopyPaletteToBuffer                                  ;; 02:5c07 $cd $20 $2c
     call call_00_288a_Entity_SetCollisionTypeNone                                  ;; 02:5c0a $cd $8a $28
@@ -548,8 +548,8 @@ call_02_5c82_EntityAction_EvilSanta_Stand:
 call_02_5ca5_EntityAction_EvilSanta_Damaged:
     call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   a,SFX_SMALL_BANG
-    call nz,call_00_0ff5_QueueSoundEffect
-    ld   a,[wDC71_FrameCounter_Entities]
+    call nz,call_00_0ff5_QueueSFX
+    ld   a,[wDC71_VBlankFrameCounter]
     and  a,$0F
     cp   a,$0C
     ld   hl,.data_02_5cc8_EvilSantaDamagedPalette2
@@ -565,7 +565,7 @@ call_02_5cd0_EntityAction_EvilSanta_Death:
     call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_5CF0
     ld   a,SFX_LOUD_BANG
-    call call_00_0ff5_QueueSoundEffect
+    call call_00_0ff5_QueueSFX
     call call_02_5d02_LoadEvilSantaPalette
     call call_00_2976_Entity_GetFacingDirection
     ld   c,$F2
@@ -699,7 +699,7 @@ call_02_5dde_EntityAction_SkatingElf_Skate:
     call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear                                  ;; 02:5dde $cd $f5 $29
     ld   C, $20                                        ;; 02:5de1 $0e $20
     call NZ, call_00_28c8_Entity_SetXVelocity                              ;; 02:5de3 $c4 $c8 $28
-    ld   A, [wDC71_FrameCounter_Entities]                                    ;; 02:5de6 $fa $71 $dc
+    ld   A, [wDC71_VBlankFrameCounter]                                    ;; 02:5de6 $fa $71 $dc
     and  A, $07                                        ;; 02:5de9 $e6 $07
     ld   C, $10                                        ;; 02:5deb $0e $10
     call Z, call_00_2588_Entity_ApproachXVelocity                               ;; 02:5ded $cc $88 $25
@@ -749,7 +749,7 @@ call_02_5e34_EntityAction_SkatingElf_Damaged:
 .jr_02_5e45:
     call call_00_298a_Entity_GetMiscFlags                                  ;; 02:5e45 $cd $8a $29
     jr   Z, .jr_02_5e6d                                ;; 02:5e48 $28 $23
-    ld   A, [wDC71_FrameCounter_Entities]                                    ;; 02:5e4a $fa $71 $dc
+    ld   A, [wDC71_VBlankFrameCounter]                                    ;; 02:5e4a $fa $71 $dc
     and  A, $07                                        ;; 02:5e4d $e6 $07
     ld   C, $10                                        ;; 02:5e4f $0e $10
     call Z, call_00_2588_Entity_ApproachXVelocity                               ;; 02:5e51 $cc $88 $25
@@ -1060,7 +1060,7 @@ call_02_616f_EntityAction_Hand_Unk3:
     call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_61A1
     ld   a,SFX_SMALL_BANG
-    call call_00_0ff5_QueueSoundEffect
+    call call_00_0ff5_QueueSFX
     ld   c,$10
     call call_00_28dc_Entity_SetYVelocity
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
@@ -1086,7 +1086,7 @@ call_02_616f_EntityAction_Hand_Unk3:
     call call_00_2766_Entity_ResetYPosIfBelowInitial
     ret  c
     ld   a,SFX_SMALL_BANG
-    call call_00_0ff5_QueueSoundEffect
+    call call_00_0ff5_QueueSFX
     ld   a,$04
     jp   call_02_72ac_SetEntityAction
 
@@ -1166,7 +1166,7 @@ call_02_6214_EntityAction_Raft_ResetAndWait:
     ld   c,TIMER_AMOUNT_RAFT
     call call_00_290d_Entity_SetMiscTimer
 .jr_00_6239:
-    ld   a,[wDC71_FrameCounter_Entities]
+    ld   a,[wDC71_VBlankFrameCounter]
     and  a,$03
     ret  nz
     ld   bc,$FFFF
@@ -1185,7 +1185,7 @@ call_02_624e_EntityAction_Raft_MoveRightAndCarryPlayer:
 ; If raft goes fully off-screen: switch to reset state (action 0).
 ; If raft snaps against the right edge: switch to state 2.
 ; Otherwise, keeps moving right.
-    ld   a,[wDC71_FrameCounter_Entities]
+    ld   a,[wDC71_VBlankFrameCounter]
     and  a,$01
     ld   c,$00
     jp   z,call_00_28c8_Entity_SetXVelocity
@@ -1236,7 +1236,7 @@ call_02_6293_EntityAction_Raft_DriftDown:
     ld   c,TIMER_AMOUNT_RAFT
     call call_00_290d_Entity_SetMiscTimer
 .jr_00_62A7:
-    ld   a,[wDC71_FrameCounter_Entities]
+    ld   a,[wDC71_VBlankFrameCounter]
     and  a,$03
     ret  nz
     ld   bc,$0001
@@ -1368,7 +1368,7 @@ call_02_63a8_EntityAction_BreakableBlock_Unk0:
 
 call_02_63c0_EntityAction_BreakableBlock_Unk3:
     ld   a,SFX_LOUD_BANG
-    call call_00_0ff5_QueueSoundEffect
+    call call_00_0ff5_QueueSFX
     farcall call_03_57f8_ClearCollisionForEntity
     jp   call_00_2b7a_Entity_DeactivateAndClearFlags
 
@@ -1592,7 +1592,7 @@ call_02_6569_EntityAction_FanLift_Unk0:
 call_02_6577_EntityAction_FanLift_Unk2:
     call call_00_2917_Entity_CheckIfMiscTimerIsZero
     inc  [hl]
-    ld   hl,wDC71_FrameCounter_Entities
+    ld   hl,wDC71_VBlankFrameCounter
     and  [hl]
     and  a,$1F
     jr   z,.jr_00_6589
@@ -1658,7 +1658,7 @@ call_02_65d7_EntityAction_AnimeRisingPlatform_Update:
     ld   bc,$FFFF
     jp   call_00_250d_Entity_AdjustYPosition
 .jr_00_65F8:
-    ld   a,[wDC71_FrameCounter_Entities]
+    ld   a,[wDC71_VBlankFrameCounter]
     and  a,$03
     ret  nz
     call call_00_2917_Entity_CheckIfMiscTimerIsZero
@@ -2030,7 +2030,7 @@ call_02_68b2_EntityAction_Grenade_Unk0:
     ld   hl,.data_02_68e5
     call call_00_2c20_Entity_CopyPaletteToBuffer
     call call_00_2826_Entity_ResetToInitialXPos
-    ld   a,[wDC71_FrameCounter_Entities]
+    ld   a,[wDC71_VBlankFrameCounter]
     and  a,$0F
     ld   c,a
     ld   b,$00
@@ -2065,7 +2065,7 @@ call_02_68ed_EntityAction_Grenade_Unk1:
     call call_00_28dc_Entity_SetYVelocity
     call call_00_28e6_Entity_CheckIfXVelocityIsZero
     ret  nz
-    ld   a,[wDC71_FrameCounter_Entities]
+    ld   a,[wDC71_VBlankFrameCounter]
     swap a
     and  a,$03
     ld   l,a
@@ -2182,14 +2182,14 @@ call_02_69af_EntityAction_Bomb_Unk1:
     ld   c,TIMER_AMOUNT_BOMB
     call call_00_290d_Entity_SetMiscTimer
     ld   a,SFX_BOMB
-    call call_00_0ff5_QueueSoundEffect
+    call call_00_0ff5_QueueSFX
     ld   a,$02
     jp   call_02_72ac_SetEntityAction
 .data_02_69fc:    
     db   $10, $f0, $08, $f8, $10, $f0, $04, $fc
     
 call_02_6a04_EntityAction_Bomb_Unk2:
-    ld   a,[wDC71_FrameCounter_Entities]
+    ld   a,[wDC71_VBlankFrameCounter]
     and  a,$03
     ret  nz
     call call_00_2922_Entity_MiscTimerCountdown
@@ -2228,7 +2228,7 @@ call_02_6a13_EntityAction_Bomb_Unk3:
 call_02_6a4c_EntityAction_Bomb_Unk4:
     call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   a,SFX_SMALL_BANG
-    call nz,call_00_0ff5_QueueSoundEffect
+    call nz,call_00_0ff5_QueueSFX
     ld   hl,.data_02_6a89
     call call_00_2c20_Entity_CopyPaletteToBuffer
     call call_00_2a5d_Entity_CheckGraphicsFlag2
@@ -2268,7 +2268,7 @@ call_02_6a91_EntityAction_WaterTowerTank_Unk0:
     call call_00_22d4_Entity_CheckTriggerFlag
     ret  z
     ld   a,SFX_LOUD_BANG
-    call call_00_0ff5_QueueSoundEffect
+    call call_00_0ff5_QueueSFX
     ld   c,$02
     call call_00_2299_Entity_UpdateFlags
     ld   a,$01
@@ -2282,7 +2282,7 @@ call_02_6ab4_EntityAction_WaterTowerTank_Unk1:
     call call_00_2766_Entity_ResetYPosIfBelowInitial
     ret  c
     ld   a,SFX_SMALL_BANG
-    call call_00_0ff5_QueueSoundEffect
+    call call_00_0ff5_QueueSFX
     ld   a,$02
     jp   call_02_72ac_SetEntityAction
 
@@ -2418,7 +2418,7 @@ call_02_6ba3_EntityAction_ChomperTV_Unk0:
 
 call_02_6bc8_EntityAction_ChomperTV_Unk2:
     call call_00_2917_Entity_CheckIfMiscTimerIsZero
-    ld   a,[wDC71_FrameCounter_Entities]
+    ld   a,[wDC71_VBlankFrameCounter]
     and  [hl]
     and  a,$3F
     jr   nz,.jr_00_6BDC
@@ -2462,7 +2462,7 @@ call_02_6c1d_EntityAction_GextremeSportsElf_Unk0:
     call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   c,$20
     call nz,call_00_28c8_Entity_SetXVelocity
-    ld   a,[wDC71_FrameCounter_Entities]
+    ld   a,[wDC71_VBlankFrameCounter]
     and  a,$07
     ld   c,$10
     call z,call_00_2588_Entity_ApproachXVelocity
@@ -2512,7 +2512,7 @@ call_02_6c73_EntityAction_GextremeSportsElf_Unk4:
 .jr_00_6C84:
     call call_00_298a_Entity_GetMiscFlags
     jr   z,.jr_00_6CAC
-    ld   a,[wDC71_FrameCounter_Entities]
+    ld   a,[wDC71_VBlankFrameCounter]
     and  a,$07
     ld   c,$10
     call z,call_00_2588_Entity_ApproachXVelocity
@@ -2592,7 +2592,7 @@ call_02_6cdd_EntityAction_BirdProjectile_Update:
     dec  l
     ld   [hl],e
     ld   a,SFX_SMALL_BANG
-    call call_00_0ff5_QueueSoundEffect
+    call call_00_0ff5_QueueSFX
     call call_00_2922_Entity_MiscTimerCountdown
     ld   c,$20
     jp   nz,call_00_28dc_Entity_SetYVelocity
@@ -2612,7 +2612,7 @@ call_02_6d3b_EntityAction_RockHard_Unk2:
     call call_00_2a5d_Entity_CheckGraphicsFlag2
     ret  z
     ld   a,SFX_LOUD_BANG
-    call call_00_0ff5_QueueSoundEffect
+    call call_00_0ff5_QueueSFX
     ld   a,$03
     jp   call_02_72ac_SetEntityAction
 
@@ -2705,7 +2705,7 @@ call_02_6ddd_EntityAction_BrainOfOz_Unk5:
     call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ret  z
     ld   a,SFX_BRAIN_OF_OZ
-    call call_00_0ff5_QueueSoundEffect
+    call call_00_0ff5_QueueSFX
     ld   c,SPAWN_CHILD_ENTITY_BRAIN_OF_OZ_PROJECTILE
     jp   call_00_3792_PrepareRelativeEntitySpawn
 
@@ -2728,7 +2728,7 @@ call_02_6e09_EntityAction_BrainOfOz_Unk8:
     call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_6E27
     ld   a,SFX_LOUD_BANG
-    call call_00_0ff5_QueueSoundEffect
+    call call_00_0ff5_QueueSFX
     ld   hl,.data_6e3c
     call call_00_2c20_Entity_CopyPaletteToBuffer
     call call_00_288a_Entity_SetCollisionTypeNone
@@ -2801,7 +2801,7 @@ call_02_6e88_EntityAction_Cannon_Unk0:
 call_02_6ea8_EntityAction_Cannon_Unk2:
     call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   a,SFX_DOOR2
-    call nz,call_00_0ff5_QueueSoundEffect
+    call nz,call_00_0ff5_QueueSFX
     call call_00_2922_Entity_MiscTimerCountdown
     ld   a,$04
     jp   z,call_02_72ac_SetEntityAction
@@ -2813,7 +2813,7 @@ call_02_6eb9_EntityAction_Cannon_Unk3:
     ld   c,SPAWN_CHILD_ENTITY_CANNON_PROJECTILE
     call call_00_3792_PrepareRelativeEntitySpawn
     ld   a,SFX_CANNON
-    jp   call_00_0ff5_QueueSoundEffect
+    jp   call_00_0ff5_QueueSFX
 
 call_02_6ec7_EntityAction_CannonProjectile_Update:
     call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
@@ -2844,7 +2844,7 @@ call_02_6ec7_EntityAction_CannonProjectile_Update:
     ld   [hl],e
 .jr_00_6EFA:
     ld   a,SFX_SMALL_BANG
-    call call_00_0ff5_QueueSoundEffect
+    call call_00_0ff5_QueueSFX
     ld   c,SPAWN_CHILD_ENTITY_CANNON_PROJECTILE_2
     call call_00_3792_PrepareRelativeEntitySpawn
     jp   call_00_2b7a_Entity_DeactivateAndClearFlags
@@ -2915,7 +2915,7 @@ call_02_6f64_EntityAction_Rez_Unk8:
 .jr_00_6F74:
     call call_00_2917_Entity_CheckIfMiscTimerIsZero
     jr   z,.jr_00_6F93
-    ld   a,[wDC71_FrameCounter_Entities]
+    ld   a,[wDC71_VBlankFrameCounter]
     and  a,$3F
     ret  nz
     call call_00_2922_Entity_MiscTimerCountdown
@@ -2946,7 +2946,7 @@ call_02_6faa_EntityAction_Rez_Unk11:
     call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     jr   z,.jr_00_6FBE
     ld   a,SFX_LOUD_BANG
-    call call_00_0ff5_QueueSoundEffect
+    call call_00_0ff5_QueueSFX
     ld   c,TIMER_AMOUNT_180_FRAMES
     call call_00_290d_Entity_SetMiscTimer
     ld   c,$30
@@ -3011,7 +3011,7 @@ call_02_7019_EntityAction_Unk_None:
 call_02_701a_EntityAction_Meteor_Update:
     call call_00_29f5_Entity_CheckIfFirstFrameOfActionAndClear
     ld   a,SFX_METEOR
-    call nz,call_00_0ff5_QueueSoundEffect
+    call nz,call_00_0ff5_QueueSFX
     call call_00_2475_Entity_ApplyVerticalVelocity
     call call_00_2766_Entity_ResetYPosIfBelowInitial
     ld   a,$02
@@ -3062,7 +3062,7 @@ call_02_702e_EntityAction_RezProjectile_Update:
     dec  hl
     ld   [hl],e
     ld   a,SFX_SMALL_BANG
-    call call_00_0ff5_QueueSoundEffect
+    call call_00_0ff5_QueueSFX
     ld   a,$01
     jp   call_02_72ac_SetEntityAction
 .data_02_707f:

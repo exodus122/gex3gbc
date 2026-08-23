@@ -275,6 +275,225 @@ DEF CUTSCENE_MOVE_END            EQU $ff ; terminator in a movement command list
 DEF CUTSCENE_MOVE_SPEED_MAX      EQU $10 ; 16/16ths = exactly one pixel per frame
 DEF CUTSCENE_HOLD_FRAMES         EQU $b4 ; 180 frames (3s) of dwell before returning
 
+; ==================================================================
+; bank00_home.asm - boot, the outer game loop, and the shared video,
+; banking, input and sfx helpers. Named to match gex2's own home-bank
+; constants wherever the two engines do the same thing
+; ==================================================================
+
+; The A register the boot ROM hands to the cartridge entry point. $11 means a CGB
+; started us. gex3 is CGB-only (CART_COMPATIBLE_GBC), so unlike gex2 this is not
+; recorded anywhere - anything else drops into the "GAME BOY COLOR ONLY" screen
+DEF BOOT_A_CGB                   EQU $11
+
+; rLY value Init spins for before switching the LCD off: one line past the last
+; visible scanline, i.e. the first line of vblank
+DEF LY_VBLANK_START              EQU SCRN_Y + 1
+
+; rSVBK. $D000-$DFFF holds game state, so WRAM bank 1 must always be the mapped one
+DEF WRAM_BANK_GAME_STATE         EQU $01
+
+; The three LCDC values this bank ever writes.
+;
+; gex3 leaves LCDCF_WINON set for the whole frame and pulls the hud's colours in
+; mid-frame instead - see LCD_ISR_HUD_PALETTE. gex2 does the opposite: its window
+; is off in LCDC and its raster handler switches it on at RASTER_SPLIT_SCANLINE
+DEF LCDC_GAMEPLAY                EQU LCDCF_ON | LCDCF_WIN9C00 | LCDCF_WINON | LCDCF_BLK21 | LCDCF_BG9800 | LCDCF_OBJ16 | LCDCF_OBJON | LCDCF_BGON
+DEF LCDC_INIT                    EQU LCDCF_ON | LCDCF_WIN9C00 | LCDCF_WINOFF | LCDCF_BLK21 | LCDCF_BG9800 | LCDCF_OBJ16 | LCDCF_OBJON | LCDCF_BGON
+DEF LCDC_DMG_ERROR_SCREEN        EQU LCDCF_ON | LCDCF_WIN9C00 | LCDCF_WINOFF | LCDCF_BLK01 | LCDCF_BG9800 | LCDCF_OBJ16 | LCDCF_OBJOFF | LCDCF_BGON
+
+; What call_00_0d8b_LcdIsr_LoadHudPalettesA does to wDAD8_LCDCValue on its way to
+; rLCDC: the hud strip is drawn out of the $8000 tile block and has no sprites
+DEF LCDC_HUD_CLEAR_MASK          EQU ~LCDCF_OBJON & $FF
+DEF LCDC_HUD_SET_MASK            EQU LCDCF_BLK01
+
+; The DMG palette the "GAME BOY COLOR ONLY" screen is shown with
+DEF BGP_DMG_ERROR_SCREEN         EQU $93
+
+; Window position. gex3 parks the window one line below the screen at boot and
+; the menu / hud code moves it; WX is flush left for the whole game
+DEF WINDOW_X_FLUSH_LEFT          EQU $07
+DEF WINDOW_Y_OFFSCREEN           EQU $80
+
+; ------------------------------------------------------------------
+; LCD STAT interrupt handler ids, passed to call_00_0c10_RequestLcdIsr /
+; call_00_0c1b_InstallLcdIsr and stored in the low 7 bits of wD9FD_LcdIsrId.
+; Each id is a byte offset into .data_00_0c44_LcdIsrTable, and an entry there is
+; five bytes - rSTAT value, rLYC value, template length, template pointer - so
+; the ids run 0, 5, 10 rather than 0, 1, 2.
+;
+; Same mechanism as gex2's LCD_ISR_*, including the "installed" bit: the id is
+; stored with bit 7 clear to request it, and the vblank handler installs it and
+; sets bit 7. gex3's two real handlers do different jobs from gex2's, though -
+; there is no hblank tile streamer here, because gex3 has HDMA
+; ------------------------------------------------------------------
+DEF LCD_ISR_NONE                 EQU $00 ; handler is just a reti
+DEF LCD_ISR_HUD_PALETTE          EQU $05 ; two-scanline BG palette swap for the hud strip
+DEF LCD_ISR_MENU_GFX_STREAM      EQU $0a ; reti handler; its vblank hook runs the menu gfx stream
+DEF LCD_ISR_INSTALLED            EQU $80 ; bit 7 of wD9FD_LcdIsrId
+DEF LCD_ISR_INSTALLED_BIT        EQU 7   ; the same, for `bit` / `set`
+DEF LCD_ISR_ID_MASK              EQU $7F ; the id with that bit stripped off
+
+; The scanline counter the hud palette handler works off. wDB67_LcdIsr_ScanlineCounter
+; is seeded from rLY at the end of every vblank and then incremented once per
+; hblank, so these are effectively scanline numbers
+DEF LCD_ISR_HUD_PALETTE_LINE_A   EQU $7F ; first half of the swap
+DEF LCD_ISR_HUD_PALETTE_LINE_B   EQU $80 ; second half, on the next line
+
+; rBCPS indices the two halves write, with BCPSF_AUTOINC already set
+DEF BCPS_HUD_PAL0_COLORS_01      EQU BCPSF_AUTOINC | $00
+DEF BCPS_HUD_PAL1_COLORS_01      EQU BCPSF_AUTOINC | $08
+DEF BCPS_HUD_PAL0_COLORS_23      EQU BCPSF_AUTOINC | $04
+DEF BCPS_HUD_PAL1_COLORS_23      EQU BCPSF_AUTOINC | $0C
+
+; Opcode the LCD STAT vector table's "do nothing" template is made of. gex3 never
+; patches its handlers in place the way gex2 does, so this is the only one needed
+DEF OPCODE_RETI                  EQU $D9
+
+; ------------------------------------------------------------------
+; wDB66_GfxTransferFlags - pending HDMA jobs, serviced by
+; call_00_0c6a_VBlank_StartPendingHdma highest priority first. Plays the same
+; role as gex2's wD60F_GfxTransferFlags, but each bit here names a source of
+; HDMA parameters rather than a page to dribble out over hblanks
+; ------------------------------------------------------------------
+DEF GFX_XFER_PLAYER_GFX          EQU 0 ; wDAC0_PlayerGfx_SrcAddr / wDAC2_PlayerGfx_TileCount -> $8000
+DEF GFX_XFER_ENTITY_GFX          EQU 1 ; wDB64_EntityGfx_SrcAddr -> the slot's own VRAM page
+DEF GFX_XFER_HDMA_CONFIG         EQU 2 ; the wDC2B_Hdma_SrcAddrLo job struct, resumed across frames
+DEF GFX_XFER_PENDING             EQU 7 ; at least one of the above is waiting on vblank
+
+; ------------------------------------------------------------------
+; wDB69_HUDDirtyFlags - what the status bar has to redraw, read by
+; call_03_747d_HUD_Update and friends. gex2's wD60E_HUDDirtyFlags with the same
+; idea and a different bit order
+; ------------------------------------------------------------------
+DEF HUD_DIRTY_COUNTERS           EQU 0 ; lives + fly coin digits
+DEF HUD_DIRTY_HEALTH             EQU 1
+DEF HUD_DIRTY_TIMER              EQU 2 ; bonus stage countdown
+DEF HUD_DIRTY_FLY_COIN_ANIM      EQU 4 ; the spinning fly coin on the status bar
+; call_00_0513_Screen_PresentAndDrawEntities raises these and then blocks until
+; every bit of HUD_DIRTY_BLOCKING has been serviced
+DEF HUD_DIRTY_ON_SCREEN_PRESENT  EQU $17
+DEF HUD_DIRTY_BLOCKING           EQU $2f
+
+; ------------------------------------------------------------------
+; wDB6A_WarpFlags - the reasons to leave the map, tested in priority order at
+; the top of the per-frame loop. Bits 1 and 2 line up with gex2's WARP_DIED and
+; WARP_ENTERED_TV; the top two bits are gex3's, and are what the level-to-level
+; structure needs that gex2's one-map levels did not
+; ------------------------------------------------------------------
+DEF WARP_DIED                    EQU $02 ; spend a life and respawn, or game over
+DEF WARP_CHANGE_MAP              EQU $04 ; a door or map edge picked a new map in this level
+DEF WARP_NEW_LEVEL               EQU $10 ; leave the level entirely - tv entered, boss beaten, bonus won
+DEF WARP_TIME_UP                 EQU $20 ; the bonus stage countdown ran out
+DEF WARP_DIED_BIT                EQU 1   ; the same four, for `bit` / `set`
+DEF WARP_CHANGE_MAP_BIT          EQU 2
+DEF WARP_NEW_LEVEL_BIT           EQU 4
+DEF WARP_TIME_UP_BIT             EQU 5
+
+; ------------------------------------------------------------------
+; .data_00_0aa9_HdmaConfigTable indices, passed in C to
+; call_00_0a6a_Hdma_RunConfigEntry. An entry whose bank byte is
+; HDMACFG_BANK_MAP_TILESET is relocated against the current map's tileset
+; ------------------------------------------------------------------
+DEF HDMACFG_HUD_TILES            EQU 0  ; status bar tile graphics -> $8000, VRAM bank 1
+DEF HDMACFG_HUD_ATTRIBUTES       EQU 1  ; status bar window attributes -> $9C00, VRAM bank 1
+DEF HDMACFG_HUD_TILEMAP          EQU 2  ; status bar window tile ids -> $9C00, VRAM bank 0
+DEF HDMACFG_TILESET_0            EQU 3  ; map tileset $0000 -> $9000, VRAM bank 0
+DEF HDMACFG_TILESET_1            EQU 4  ; map tileset $0800 -> $8800, VRAM bank 0
+DEF HDMACFG_TILESET_2            EQU 5  ; map tileset $1000 -> $9000, VRAM bank 1
+DEF HDMACFG_TILESET_3            EQU 6  ; map tileset $1800 -> $8800, VRAM bank 1
+DEF HDMACFG_BGMAP_ATTRIBUTES     EQU 7  ; wC000_BgMapTileIds -> $9800, VRAM bank 1
+DEF HDMACFG_BGMAP_TILE_IDS       EQU 8  ; wC000_BgMapTileIds -> $9800, VRAM bank 0
+DEF HDMACFG_WRAM_TILES_BANK0     EQU 9  ; wC000_BgMapTileIds -> $8000, VRAM bank 0
+DEF HDMACFG_WRAM_TILES_BANK1     EQU 10 ; wC000_BgMapTileIds -> $8000, VRAM bank 1
+DEF HDMACFG_ENTRY_SIZE           EQU 8  ; src, dest, length, then bank and VRAM bank
+DEF HDMACFG_BANK_MAP_TILESET     EQU $ff ; use wDC07_TilesetBank + wDC08_TilesetBankOffset
+DEF HDMA_MAX_BLOCKS              EQU $40 ; rHDMA5 counts 16-byte blocks, 64 at a time
+
+; ------------------------------------------------------------------
+; jp_00_0781_Screen_LoadFullscreenImage - the 8-byte record menus fill in at
+; wDBB1_ScreenDraw_HasPaletteIdMap, and the two $168-byte buffers it produces
+; ------------------------------------------------------------------
+DEF SCREEN_TILEMAP_BYTES         EQU $168 ; SCRN_X_B * SCRN_Y_B, one byte per visible tile
+DEF SCREEN_TILE_CHUNK_BYTES      EQU $1000 ; tile data is uploaded to VRAM one $1000 block at a time
+
+; call_00_0800_Screen_LoadSecondaryTilesetRow - 6 rows of 8 tile ids lifted out
+; of a bank $1F tileset's tilemap and written into a caller's 20-wide buffer
+DEF SECONDARY_TILESET_MAP_OFFSET EQU $300 ; past the tile data, at the tilemap
+DEF SECONDARY_TILESET_MAP_ROWS   EQU $06
+DEF SECONDARY_TILESET_MAP_COLS   EQU $08
+
+; ------------------------------------------------------------------
+; Player state written once per continue / per life
+; ------------------------------------------------------------------
+DEF PLAYER_STARTING_LIVES        EQU $04
+DEF PLAYER_MAX_LIVES             EQU 99  ; call_00_0723_Player_ObtainedCollectible clamps here
+DEF PLAYER_BASE_HEALTH           EQU $04 ; plus wDC4F_PawCoinExtraHealth, four paw coins per point
+DEF PROGRESS_FLAG_COUNT          EQU $0c ; entries of wDC5C_ProgressFlags wiped on a new game
+
+; ------------------------------------------------------------------
+; Fly coins. Unlike gex2 the counter only ever rises, and the payouts are two
+; fixed thresholds rather than a milestone table plus a repeating interval
+; ------------------------------------------------------------------
+DEF COLLECTIBLE_EXTRA_LIFE       EQU 50  ; grants a life
+DEF COLLECTIBLE_LEVEL_COMPLETE   EQU 100 ; sets PROGRESS_ALL_COLLECTIBLES_BIT for this level
+DEF PROGRESS_ALL_COLLECTIBLES_BIT EQU 3  ; bit of wDC5C_ProgressFlags[level]
+
+; ------------------------------------------------------------------
+; Fly power-ups. Eating a fly with SELECT swaps it in and cashes the old one
+; out - see call_00_0624_Player_SwapFlyPowerup, gex3's
+; call_00_0647_Player_SwapFlyPowerup. Three of the five ids arm a timer, and
+; each has a countdown byte of its own
+; ------------------------------------------------------------------
+DEF FLY_POWERUP_NONE             EQU $00
+DEF FLY_POWERUP_1                EQU $01 ; arms wDCAA_FlyPowerup1_Timer
+DEF FLY_POWERUP_2                EQU $02 ; arms wDCA9_FlyPowerup2_Timer
+DEF FLY_POWERUP_HEALTH           EQU $03 ; one health point back, up to the paw coin maximum
+DEF FLY_POWERUP_EXTRA_LIFE       EQU $04
+DEF FLY_POWERUP_5                EQU $05 ; arms wDCAB_FlyPowerup5_Timer
+
+; wDCAE_FlyPowerup_ActiveIndex - which of the three timed power-ups is running,
+; read by the palette code to tint Gex
+DEF FLY_POWERUP_ACTIVE_1         EQU $00
+DEF FLY_POWERUP_ACTIVE_5         EQU $01
+DEF FLY_POWERUP_ACTIVE_2         EQU $02
+
+; A power-up lasts FLY_POWERUP_SECONDS ticks of wDCA8_FlyPowerup_FrameCounter,
+; which call_02_4ffb_DecTimerEveryCycle reloads with TIMER_AMOUNT_60_FRAMES
+DEF FLY_POWERUP_SECONDS          EQU $14
+
+; ------------------------------------------------------------------
+; Bonus stage countdown - call_00_05c7_LevelTimer_Tick. gex3 keeps a plain
+; seconds count rather than gex2's BCD minutes and seconds
+; ------------------------------------------------------------------
+DEF FRAMES_PER_SECOND            EQU $3c
+
+; ------------------------------------------------------------------
+; Menu results. call_01_4000_MenuHandler_LoadAndProcess returns one of these in
+; A, and the outer game loop branches on it
+; ------------------------------------------------------------------
+DEF MENU_RESULT_START_GAME       EQU $10 ; title screen: begin a new game
+DEF MENU_RESULT_PASSWORD_ACCEPTED EQU $20 ; title screen: resume from a password, keep the decoded state
+DEF MENU_RESULT_CONTINUE         EQU $40 ; game over screen: hand out a fresh set of lives
+DEF MENU_RESULT_CONFIRM_QUIT     EQU $60 ; pause menu: leave the level
+
+; ------------------------------------------------------------------
+; Sizes of the fixed copies bank00_home performs
+; ------------------------------------------------------------------
+DEF WRAM_CLEAR_SIZE              EQU $1fff ; $C000-$DFFE, seeded and copied forward over itself
+DEF VRAM_CLEAR_SIZE              EQU $1fff ; the same trick per VRAM bank
+DEF SHADOW_OAM_SIZE              EQU $A0   ; 40 sprites x 4 bytes at wD900_ShadowOAM
+DEF OAM_DMA_WAIT_LOOPS           EQU $28   ; busy-wait in call_00_0e29_OamDmaRoutine
+DEF OAM_DMA_ROUTINE_SIZE         EQU $0a   ; bytes copied to hFF80_OamDmaRoutine at boot
+DEF CGB_PALETTE_RAM_SIZE         EQU $40   ; 8 palettes x 4 colours x 2 bytes
+DEF BG_PALETTE_BYTES             EQU $40   ; one map's worth, copied to wDCEA_BgPalettes
+DEF ENTITY_SLOT_STRIDE           EQU $20   ; bytes per entity in wD800_EntityMemory
+
+; The "GAME BOY COLOR ONLY" screen Init draws on a DMG, straight into VRAM with
+; the interrupts still off
+DEF DMG_ERROR_TILES_SIZE         EQU $a00
+DEF SFX_PRIORITY_NONE            EQU $00   ; wDE5F_CurrentSoundEffectPriority when nothing is playing
+
 ; Entities
 DEF ENTITY_GEX                                         EQU $00
 DEF ENTITY_BONUS_COIN                                  EQU $01

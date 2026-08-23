@@ -117,7 +117,7 @@ call_00_1ea0_Cutscene_LoadAndRun:
 ; The hold phase then dwells for CUTSCENE_HOLD_FRAMES with the same cut-down
 ; loop but no movement update, leaving the objective on screen.
 ;
-; A press of anything on wDAD7_CurrentInputs aborts either phase
+; A press of anything on wDAD7_RawInputs aborts either phase
     ld   HL, wDC1E_CurrentLevelID                                     ;; 00:1ea0 $21 $1e $dc
     ld   L, [HL]                                       ;; 00:1ea3 $6e
     ld   H, $00                                        ;; 00:1ea4 $26 $00
@@ -169,13 +169,13 @@ call_00_1ea0_Cutscene_LoadAndRun:
     ld   [wDCA7_Player_UpdateFlag], A                                    ;; 00:1ee2 $ea $a7 $dc  ; hand Gex to the script, and stop drawing him
     ld   A, PLAYERACTION_SPAWN                                        ;; 00:1ee5 $3e $00
     ld   [wDC78_PlayerPendingActionId], A                                    ;; 00:1ee7 $ea $78 $dc
-    call call_00_04fb                                  ;; 00:1eea $cd $fb $04
+    call call_00_04fb_ResetAudioAndVideoState          ;; 00:1eea $cd $fb $04
     farcall call_03_6c89_LoadMapDataPtrs
     farcall call_03_6203_LoadLevelBoundariesFromId
     call call_00_10de_BgMap_UpdateWindowFromPlayerPos                                  ;; 00:1f03 $cd $de $10
     call call_00_1056_BgMap_LoadFull                                  ;; 00:1f06 $cd $56 $10
     farcall call_02_708f_InitEntitiesAndSpawnPlayer
-    call call_00_0513_DrawEntitiesWrapper                                  ;; 00:1f14 $cd $13 $05
+    call call_00_0513_Screen_PresentAndDrawEntities                                  ;; 00:1f14 $cd $13 $05
     pop  HL                                            ;; 00:1f17 $e1
     ld   E, [HL]                                       ;; 00:1f18 $5e
     inc  HL                                            ;; 00:1f19 $23
@@ -199,7 +199,7 @@ call_00_1ea0_Cutscene_LoadAndRun:
     ld   [wDCDE_Cutscene_MoveFramesRemaining+1], A                                    ;; 00:1f33 $ea $df $dc
     push HL                                            ;; 00:1f36 $e5
 .jr_00_1f37:
-    ld   A, [wDAD7_CurrentInputs]                                    ;; 00:1f37 $fa $d7 $da
+    ld   A, [wDAD7_RawInputs]                                    ;; 00:1f37 $fa $d7 $da
     and  A, A                                          ;; 00:1f3a $a7
     jr   Z, .jr_00_1f42                                ;; 00:1f3b $28 $05
     pop  HL                                            ;; 00:1f3d $e1
@@ -211,7 +211,7 @@ call_00_1ea0_Cutscene_LoadAndRun:
     farcall call_02_7152_UpdateAllEntities
     call call_00_11c8_BgMap_LoadDirtyRegions                                  ;; 00:1f53 $cd $c8 $11
     call call_00_35fa_WaitForLineThenSpawnEntity                                  ;; 00:1f56 $cd $fa $35
-    call call_00_08f8_SetupEntityVRAMTransfer                                  ;; 00:1f59 $cd $f8 $08
+    call call_00_08f8_StageNextGfxTransfer                                  ;; 00:1f59 $cd $f8 $08
     ld   HL, wDCDE_Cutscene_MoveFramesRemaining                                     ;; 00:1f5c $21 $de $dc
     ld   A, [HL]                                       ;; 00:1f5f $7e
     sub  A, $01                                        ;; 00:1f60 $d6 $01
@@ -245,8 +245,8 @@ call_00_1ea0_Cutscene_LoadAndRun:
     farcall call_02_7152_UpdateAllEntities
     call call_00_11c8_BgMap_LoadDirtyRegions                                  ;; 00:1f89 $cd $c8 $11
     call call_00_35fa_WaitForLineThenSpawnEntity                                  ;; 00:1f8c $cd $fa $35
-    call call_00_08f8_SetupEntityVRAMTransfer                                  ;; 00:1f8f $cd $f8 $08
-    ld   A, [wDAD7_CurrentInputs]                                    ;; 00:1f92 $fa $d7 $da
+    call call_00_08f8_StageNextGfxTransfer                                  ;; 00:1f8f $cd $f8 $08
+    ld   A, [wDAD7_RawInputs]                                    ;; 00:1f92 $fa $d7 $da
     and  A, A                                          ;; 00:1f95 $a7
     jr   Z, .jr_00_1f9b                                ;; 00:1f96 $28 $03
     pop  AF                                            ;; 00:1f98 $f1

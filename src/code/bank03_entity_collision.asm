@@ -94,10 +94,10 @@ call_03_4ccf_CollisionHandler_None:
 
 call_03_4cd0_CollisionHandler_InvulnerableEnemy:
 ; Checks for player-entity interaction.
-; If collision is detected (carry set), jumps to call_00_06f6_DealDamageToPlayer (probably a generic "hit" or interaction response).
+; If collision is detected (carry set), jumps to call_00_06f6_Player_TakeDamage (probably a generic "hit" or interaction response).
 ; Otherwise returns.
     call call_03_550e_Entity_CheckPlayerInteraction
-    jp   c,call_00_06f6_DealDamageToPlayer
+    jp   c,call_00_06f6_Player_TakeDamage
     ret  
 
 call_03_4cd7_CollisionHandler_Projectile:
@@ -131,7 +131,7 @@ call_03_4cea_CollisionHandler_DamagePlayer:
     cp   A, PLAYERACTION_KANGAROO_TAKE_DAMAGE                                        ;; 03:4cf5 $fe $36
     jr   Z, .jr_03_4cfe                                ;; 03:4cf7 $28 $05
     cp   A, PLAYERACTION_TOPDOWN_TAKE_DAMAGE                                        ;; 03:4cf9 $fe $45
-    call NZ, call_00_06f6_DealDamageToPlayer                              ;; 03:4cfb $c4 $f6 $06
+    call NZ, call_00_06f6_Player_TakeDamage                              ;; 03:4cfb $c4 $f6 $06
 .jr_03_4cfe:
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
     ld   A, [wD80E_PlayerXPosition]                                    ;; 03:4d06 $fa $0e $d8
@@ -162,7 +162,7 @@ call_03_4d38_CollisionHandler_GenericEnemyUnused:
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_TOUCHED_ENTITY
-    jp   z,call_00_06f6_DealDamageToPlayer
+    jp   z,call_00_06f6_Player_TakeDamage
     jp   call_03_5671_HandleEntityHit
 
 call_03_4d44_CollisionHandler_DamagePlayerUnused:
@@ -183,7 +183,7 @@ call_03_4d44_CollisionHandler_DamagePlayerUnused:
     cp   a,PLAYER_ATTACKED_ENTITY
     jp   z,call_03_5671_HandleEntityHit
     ld   a,TIMER_AMOUNT_60_FRAMES
-    ld   [wDC7E_PlayerDamageCooldownTimer],a
+    ld   [wDC7E_Player_DamageCooldownTimer],a
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
     ld   a,[wD80E_PlayerXPosition]
     sub  [hl]
@@ -219,23 +219,23 @@ call_03_4d9b_CollisionHandler_BonusCoin:
     add  HL, DE                                        ;; 03:4da8 $19
     set  4, [HL]                                       ;; 03:4da9 $cb $e6
     ld   A, SFX_ITEM_PICKUP                                        ;; 03:4dab $3e $02
-    call call_00_0ff5_QueueSoundEffect                                  ;; 03:4dad $cd $f5 $0f
+    call call_00_0ff5_QueueSFX                                  ;; 03:4dad $cd $f5 $0f
     jp   call_03_5671_HandleEntityHit                                    ;; 03:4db0 $c3 $71 $56
 
 call_03_4db3_CollisionHandler_FlyCoin:
 ; If collision: calls IncrementProgressCounter, plays sound 02, then handles entity hit.
     call call_03_550e_Entity_CheckPlayerInteraction                                  ;; 03:4db3 $cd $0e $55
     ret  NC                                            ;; 03:4db6 $d0
-    call call_00_0723_IncrementCollectibleCount                                  ;; 03:4db7 $cd $23 $07
+    call call_00_0723_Player_ObtainedCollectible                                  ;; 03:4db7 $cd $23 $07
     ld   A, SFX_ITEM_PICKUP                                        ;; 03:4dba $3e $02
-    call call_00_0ff5_QueueSoundEffect                                  ;; 03:4dbc $cd $f5 $0f
+    call call_00_0ff5_QueueSFX                                  ;; 03:4dbc $cd $f5 $0f
     jp   call_03_5671_HandleEntityHit                                    ;; 03:4dbf $c3 $71 $56
 
 call_03_4dc2_CollisionHandler_PawCoin:
 ; If collision:
 ; Looks up a flag mask (00, 20, 40, 80).
 ; ORs it into level data, increments wDCAF_PawCoinCounter.
-; Every 4 collected, increments wDC4F_PawCoinExtraHealth (if <4), resets counter, sets flag in wDB69_HUDGraphicsUpdateFlags.
+; Every 4 collected, increments wDC4F_PawCoinExtraHealth (if <4), resets counter, sets flag in wDB69_HUDDirtyFlags.
 ; Plays sound 02, then handles entity hit.
 ; This is basically a collectible counter with milestones.
     call call_03_550e_Entity_CheckPlayerInteraction                                  ;; 03:4dc2 $cd $0e $55
@@ -265,17 +265,17 @@ call_03_4dc2_CollisionHandler_PawCoin:
     inc  [HL]                                          ;; 03:4dee $34
     xor  A, A                                          ;; 03:4def $af
     ld   [wDCAF_PawCoinCounter], A                                    ;; 03:4df0 $ea $af $dc
-    ld   HL, wDB69_HUDGraphicsUpdateFlags                                     ;; 03:4df3 $21 $69 $db
+    ld   HL, wDB69_HUDDirtyFlags                                     ;; 03:4df3 $21 $69 $db
     set  1, [HL]                                       ;; 03:4df6 $cb $ce
 .jr_03_4df8:
     ld   A, SFX_ITEM_PICKUP                                        ;; 03:4df8 $3e $02
-    call call_00_0ff5_QueueSoundEffect                                  ;; 03:4dfa $cd $f5 $0f
+    call call_00_0ff5_QueueSFX                                  ;; 03:4dfa $cd $f5 $0f
     jp   call_03_5671_HandleEntityHit                                    ;; 03:4dfd $c3 $71 $56
 .data_03_4e00:
     db   $00, $20, $40, $80
 
 call_03_4e04_CollisionHandler_Fly:
-; If collision: gets entity ID, looks up a state value in .data_03_4e2c, calls call_00_0624_SetFly_TimersAndFlags.
+; If collision: gets entity ID, looks up a state value in .data_03_4e2c, calls call_00_0624_Player_SwapFlyPowerup.
 ; Modifies entity graphics/status, then clears the entity.
 ; Looks like a pickup that triggers a phase/state change.
     call call_03_550e_Entity_CheckPlayerInteraction
@@ -287,7 +287,7 @@ call_03_4e04_CollisionHandler_Fly:
     ld   de,.data_03_4e2c
     add  hl,de
     ld   a,[hl]
-    call call_00_0624_SetFly_TimersAndFlags
+    call call_00_0624_Player_SwapFlyPowerup
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_PARENT
     ld   l,[hl]
     ld   h,HIGH(wD700_EntityFlags)
@@ -310,7 +310,7 @@ call_03_4e31_CollisionHandler_FlyTV:
     cp   a,PLAYER_ATTACKED_ENTITY
     ret  nz
     ld   a,SFX_FLY_TV
-    call call_00_0ff5_QueueSoundEffect
+    call call_00_0ff5_QueueSFX
     call call_03_5671_HandleEntityHit
     ld   c,$02
     jp   call_00_2299_Entity_UpdateFlags
@@ -331,7 +331,7 @@ call_03_4e4b_CollisionHandler_IceSculpture:
     cp   A, PLAYER_ATTACKED_ENTITY                                        ;; 03:4e55 $fe $01
     ret  NZ                                            ;; 03:4e57 $c0
     ld   A, SFX_SMALL_BANG                                        ;; 03:4e58 $3e $19
-    call call_00_0ff5_QueueSoundEffect                                  ;; 03:4e5a $cd $f5 $0f
+    call call_00_0ff5_QueueSFX                                  ;; 03:4e5a $cd $f5 $0f
     call call_00_2962_Entity_GetActionId                                  ;; 03:4e5d $cd $62 $29
     inc  A                                             ;; 03:4e60 $3c
     push AF                                            ;; 03:4e61 $f5
@@ -485,7 +485,7 @@ call_03_4f60_CollisionHandler_BloodCooler:
     ret  nz
     call call_03_5671_HandleEntityHit
     ld   a,SFX_SMALL_BANG
-    call call_00_0ff5_QueueSoundEffect
+    call call_00_0ff5_QueueSFX
     ld   c,$01
     call call_00_2299_Entity_UpdateFlags
     ld   hl,wDCC5_BloodCoolerCounter
@@ -591,7 +591,7 @@ call_03_500d_CollisionHandler_Coffin:
     ret  
    
 call_03_5028_CollisionHandler_Cactus:
-; Collision logic depends on nearby flags (wDCA9_FlyTimerOrFlags4–wDCAB_FlyTimerOrFlags2).
+; Collision logic depends on nearby flags (wDCA9_FlyPowerup2_Timer–wDCAB_FlyPowerup5_Timer).
 ; Sometimes triggers entity hit if action ID < 5.
 ; Otherwise, for action 05, can trigger a player action change.
 ; If action < 4 and player within 0x28 in X vector → loads new entity data (bank 5).
@@ -599,7 +599,7 @@ call_03_5028_CollisionHandler_Cactus:
     jr   nc,.jr_00_504C
     cp   a,PLAYER_TOUCHED_ENTITY
     jr   z,.jr_00_5044
-    ld   hl,wDCA9_FlyTimerOrFlags4
+    ld   hl,wDCA9_FlyPowerup2_Timer
     ldi  a,[hl]
     or   [hl]
     inc  hl
@@ -750,10 +750,10 @@ call_03_5116_CollisionHandler_Door:
     jr   z,.jr_00_5143
     call call_00_22d4_Entity_CheckTriggerFlag
     ld   a,SFX_DOOR2
-    jp   z,call_00_0ff5_QueueSoundEffect
+    jp   z,call_00_0ff5_QueueSFX
 .jr_00_5143:
     ld   a,SFX_DOOR1
-    call call_00_0ff5_QueueSoundEffect
+    call call_00_0ff5_QueueSFX
     ld   a,$01
     farcall call_02_72ac_SetEntityAction
     ret  
@@ -781,10 +781,10 @@ call_03_5156_CollisionHandler_Door2:
     jr   z,.jr_00_5183
     call call_00_22d4_Entity_CheckTriggerFlag
     ld   a,SFX_DOOR2
-    jp   z,call_00_0ff5_QueueSoundEffect
+    jp   z,call_00_0ff5_QueueSFX
 .jr_00_5183:
     ld   a,SFX_DOOR1
-    call call_00_0ff5_QueueSoundEffect
+    call call_00_0ff5_QueueSFX
     ld   a,$03
     farcall call_02_72ac_SetEntityAction
     ret  
@@ -863,7 +863,7 @@ call_03_5201_CollisionHandler_BigSilverRobot:
 call_03_5231_CollisionHandler_Mech:
 ; If collision →
 ; - If interaction ≠ 1 → player action change.
-; - If = 1 and wDCA9_FlyTimerOrFlags4–wDCAB_FlyTimerOrFlags2 flags are set:
+; - If = 1 and wDCA9_FlyPowerup2_Timer–wDCAB_FlyPowerup5_Timer flags are set:
 ;   - Handle entity hit, increment wDCCB_MechCounter.
 ;   - Every 4th, play sound 1E, then dispatch offset action.
 ; Special case for levels $29/$2A only.
@@ -871,7 +871,7 @@ call_03_5231_CollisionHandler_Mech:
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
     jp   nz,call_03_4cea_CollisionHandler_DamagePlayer
-    ld   hl,wDCA9_FlyTimerOrFlags4
+    ld   hl,wDCA9_FlyPowerup2_Timer
     ldi  a,[hl]
     or   [hl]
     inc  hl
@@ -1000,12 +1000,12 @@ call_03_52fa_CollisionHandler_Bomb:
     
 call_03_531a_CollisionHandler_WaterTowerStand:
 ; On collision (interaction=1):
-; - If wDCA9_FlyTimerOrFlags4–wDCAB_FlyTimerOrFlags2 flags set → handle entity hit, then set slot active.
+; - If wDCA9_FlyPowerup2_Timer–wDCAB_FlyPowerup5_Timer flags set → handle entity hit, then set slot active.
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
     ret  nz
-    ld   hl,wDCA9_FlyTimerOrFlags4
+    ld   hl,wDCA9_FlyPowerup2_Timer
     ldi  a,[hl]
     or   [hl]
     inc  hl
@@ -1061,16 +1061,16 @@ call_03_532f_CollisionHandler_GextremeSports_Elf:
     
 call_03_537a_CollisionHandler_BonusTimeCoin:
 ; On collision (interaction=1):
-; - Adds parameter to wDB6E_BonusStageTimerHi.
+; - Adds parameter to wDB6E_LevelTimer_SecondsRemaining.
 ; - Handles entity hit.
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
     ret  nz
     call call_00_230f_Entity_GetParameterIntoC
-    ld   a,[wDB6E_BonusStageTimerHi]
+    ld   a,[wDB6E_LevelTimer_SecondsRemaining]
     add  c
-    ld   [wDB6E_BonusStageTimerHi],a
+    ld   [wDB6E_LevelTimer_SecondsRemaining],a
     jp   call_03_5671_HandleEntityHit
     
 call_03_538e_CollisionHandler_Bell:
@@ -1439,7 +1439,7 @@ call_03_550e_Entity_CheckPlayerInteraction:
     add  A, $03                                        ;; 03:55f0 $c6 $03
     ret                                                ;; 03:55f2 $c9
 .jr_03_55f3:
-    call call_00_0759_IsPlayerDamageCooldownActive                                  ;; 03:55f3 $cd $59 $07
+    call call_00_0759_Player_IsInvincible                                  ;; 03:55f3 $cd $59 $07
     jr   NZ, .jr_03_55fd_ReturnNoInteraction                                ;; 03:55f6 $20 $05
     ld   A, $ff                                        ;; 03:55f8 $3e $ff
     add  A, $01                                        ;; 03:55fa $c6 $01
@@ -1628,13 +1628,13 @@ call_03_5671_HandleEntityHit:
     and  A, $3f                                        ;; 03:56a6 $e6 $3f
     farcall call_02_72ac_SetEntityAction
     ld   A, SFX_ENEMY_KILLED                                        ;; 03:56b3 $3e $10
-    jp   call_00_0ff5_QueueSoundEffect                                  ;; 03:56b5 $c3 $f5 $0f
+    jp   call_00_0ff5_QueueSFX                                  ;; 03:56b5 $c3 $f5 $0f
 .jr_03_56b8:
     ld   [HL], A                                       ;; 03:56b8 $77
     dec  L                                             ;; 03:56b9 $2d ; HL = ENTITY_FIELD_COOLDOWN_TIMER
     ld   [HL], TIMER_AMOUNT_60_FRAMES                                     ;; 03:56ba $36 $3c
     ld   A, SFX_ENEMY_DAMAGED                                        ;; 03:56bc $3e $0f
-    jp   call_00_0ff5_QueueSoundEffect                                  ;; 03:56be $c3 $f5 $0f
+    jp   call_00_0ff5_QueueSFX                                  ;; 03:56be $c3 $f5 $0f
 
 call_03_56c1_CollisionHandler_Platform:
 ; Early exit if the player’s ActionId is in certain states 

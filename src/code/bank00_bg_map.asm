@@ -38,7 +38,7 @@
 ;   * call_00_1056_BgMap_LoadFull runs when a map is entered. It sweeps the
 ;     whole visible area three times, once per value of
 ;     wDC33_BgMap_InitialLoadPass, staging each sweep in wC000_BgMapTileIds.
-;     Config entries 7 and 8 of .data_00_0aa9_TilesetLoadConfigTable HDMA the
+;     Config entries 7 and 8 of .data_00_0aa9_HdmaConfigTable HDMA the
 ;     first two sweeps out to VRAM - attributes to bank 1, tile ids to bank 0.
 ;     The third sweep is collision, and is simply left in wC000_BgMapTileIds,
 ;     which is where call_03_4b4c_BgCollision_TestTile reads it for the rest of
@@ -51,7 +51,7 @@
 ;     (call_00_11e5_BgMap_LoadRowForVerticalScroll), a column for horizontal
 ;     (call_00_1351_BgMap_LoadColumnForHorizontalScroll) - into the wCF00
 ;     scratch buffers, then sets MAP_PENDING_VRAM_TRANSFER.
-;     call_00_0b9f_Frame_GraphicsUpdateHandler flushes those buffers to the
+;     call_00_0b9f_VBlank_UpdateVRAM flushes those buffers to the
 ;     tilemap during the next vblank and clears the flags.
 ;
 ; A strip loader is five bank switches in a row: read the block id low bytes,
@@ -120,7 +120,7 @@ call_00_1056_BgMap_LoadFull:
 ;
 ; After clearing game state and building wCD00_RowOffsetTableForMap for the new
 ; map's width, it loads the BG palettes and then walks
-; .data_00_0aa9_TilesetLoadConfigTable entries 3-6, which stream the map's tile
+; .data_00_0aa9_HdmaConfigTable entries 3-6, which stream the map's tile
 ; graphics into VRAM. Entries 7 and 8 are the interesting ones: each is an HDMA
 ; job that copies wC000_BgMapTileIds to $9800, entry 7 into VRAM bank 1 and
 ; entry 8 into VRAM bank 0. That is why the map is drawn three times over:
@@ -141,27 +141,27 @@ call_00_1056_BgMap_LoadFull:
 ;
 ; gex2's call_00_1264_BgMap_LoadFull does the same job in a single pass of 22
 ; rows, because there it is the row loader itself that writes VRAM
-    call call_00_0e3b_ClearGameStateVariables                                  ;; 00:1056 $cd $3b $0e
-    call call_00_0e62_ResetFlagsAndVRAMState                                  ;; 00:1059 $cd $62 $0e
+    call call_00_0e3b_ResetVideoState                                  ;; 00:1056 $cd $3b $0e
+    call call_00_0e62_ClearShadowOamAndResetScroll                                  ;; 00:1059 $cd $62 $0e
     call call_00_10c7_BgMap_BuildRowOffsetTable                                  ;; 00:105c $cd $c7 $10
     ld   C, $00                                        ;; 00:105f $0e $00
     farcall call_03_65c6_LoadBgPalettes
     ld   C, $03                                        ;; 00:106c $0e $03
-    call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:106e $cd $6a $0a
+    call call_00_0a6a_Hdma_RunConfigEntry                                  ;; 00:106e $cd $6a $0a
     ld   C, $04                                        ;; 00:1071 $0e $04
-    call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:1073 $cd $6a $0a
+    call call_00_0a6a_Hdma_RunConfigEntry                                  ;; 00:1073 $cd $6a $0a
     ld   C, $05                                        ;; 00:1076 $0e $05
-    call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:1078 $cd $6a $0a
+    call call_00_0a6a_Hdma_RunConfigEntry                                  ;; 00:1078 $cd $6a $0a
     ld   C, $06                                        ;; 00:107b $0e $06
-    call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:107d $cd $6a $0a
+    call call_00_0a6a_Hdma_RunConfigEntry                                  ;; 00:107d $cd $6a $0a
     ld   A, BGMAP_PASS_ATTRIBUTES                      ;; 00:1080 $3e $04
     call call_00_1a22_BgMap_LoadAllRowsForPass                                  ;; 00:1082 $cd $22 $1a  ; -> config 7 flushes this to VRAM bank 1
     ld   C, $07                                        ;; 00:1085 $0e $07
-    call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:1087 $cd $6a $0a
+    call call_00_0a6a_Hdma_RunConfigEntry                                  ;; 00:1087 $cd $6a $0a
     ld   A, BGMAP_PASS_TILE_IDS                        ;; 00:108a $3e $00
     call call_00_1a22_BgMap_LoadAllRowsForPass                                  ;; 00:108c $cd $22 $1a  ; -> config 8 flushes this to VRAM bank 0
     ld   C, $08                                        ;; 00:108f $0e $08
-    call call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 00:1091 $cd $6a $0a
+    call call_00_0a6a_Hdma_RunConfigEntry                                  ;; 00:1091 $cd $6a $0a
     ld   A, BGMAP_PASS_COLLISION                       ;; 00:1094 $3e $80
     call call_00_1a22_BgMap_LoadAllRowsForPass                                  ;; 00:1096 $cd $22 $1a  ; no flush - stays in wC000_BgMapTileIds
     ld   A, BANK_03_COLLISION_AND_GRAPHICS_CODE                                        ;; 00:1099 $3e $03
@@ -412,7 +412,7 @@ call_00_11c8_BgMap_LoadDirtyRegions:
 ; loader, a horizontal scroll bit calls the column loader, and both can fire in
 ; the same frame when the camera moved diagonally. Setting
 ; MAP_PENDING_VRAM_TRANSFER at the end hands the buffers to
-; call_00_0b9f_Frame_GraphicsUpdateHandler, which flushes them and clears the
+; call_00_0b9f_VBlank_UpdateVRAM, which flushes them and clears the
 ; whole flag byte.
 ;
 ; Structurally identical to gex2's call_00_1455_BgMap_LoadDirtyRegions - the

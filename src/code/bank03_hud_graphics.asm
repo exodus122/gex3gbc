@@ -1,10 +1,10 @@
 call_03_747d_HUD_Update:
 ; Updates the numbers on status bar for lives and collectibles, then updates the bonus stage timer, 
 ; then player health on the status bar
-; Checks status flags in wDB69_HUDGraphicsUpdateFlags. If bit 0 is set, clears it and draws numbers to tilemap using call_03_74f5_HUD_DrawNumberOnStatusBar. 
+; Checks status flags in wDB69_HUDDirtyFlags. If bit 0 is set, clears it and draws numbers to tilemap using call_03_74f5_HUD_DrawNumberOnStatusBar. 
 ; If bit 1 is set, clears it and draws a multi-digit value to VRAM using a lookup table.
 ; Effectively manages HUD/status bar updates.
-    ld   HL, wDB69_HUDGraphicsUpdateFlags                                     ;; 03:747d $21 $69 $db
+    ld   HL, wDB69_HUDDirtyFlags                                     ;; 03:747d $21 $69 $db
     bit  0, [HL]                                       ;; 03:7480 $cb $46
     jr   Z, .jr_03_749d                                ;; 03:7482 $28 $19
     res  0, [HL]                                       ;; 03:7484 $cb $86
@@ -12,7 +12,7 @@ call_03_747d_HUD_Update:
     ld   HL, $9c02                                     ;; 03:7489 $21 $02 $9c
     ld   DE, $9c22                                     ;; 03:748c $11 $22 $9c
     call call_03_74f5_HUD_DrawNumberOnStatusBar                                  ;; 03:748f $cd $f5 $74
-    ld   A, [wDC68_CollectibleCount]                                    ;; 03:7492 $fa $68 $dc
+    ld   A, [wDC68_CollectibleAmount]                                    ;; 03:7492 $fa $68 $dc
     ld   HL, $9c11                                     ;; 03:7495 $21 $11 $9c
     ld   DE, $9c31                                     ;; 03:7498 $11 $31 $9c
     jr   call_03_74f5_HUD_DrawNumberOnStatusBar                                  ;; 03:749b $18 $58
@@ -22,7 +22,7 @@ call_03_747d_HUD_Update:
     res  1, [HL]                                       ;; 03:74a2 $cb $8e
     ld   B, $00                                        ;; 03:74a4 $06 $00
 .jr_03_74a6:
-    ld   A, [wDC50_PlayerHealth]                                    ;; 03:74a6 $fa $50 $dc
+    ld   A, [wDC50_Player_Health]                                    ;; 03:74a6 $fa $50 $dc
     sub  A, $04                                        ;; 03:74a9 $d6 $04
     jr   NC, .jr_03_74ae                               ;; 03:74ab $30 $01
     xor  A, A                                          ;; 03:74ad $af
@@ -30,7 +30,7 @@ call_03_747d_HUD_Update:
     ld   D, A                                          ;; 03:74ae $57
     ld   E, $00                                        ;; 03:74af $1e $00
     ld   A, B                                          ;; 03:74b1 $78
-    ld   HL, wDC50_PlayerHealth                                     ;; 03:74b2 $21 $50 $dc
+    ld   HL, wDC50_Player_Health                                     ;; 03:74b2 $21 $50 $dc
     cp   A, [HL]                                       ;; 03:74b5 $be
     jr   NC, .jr_03_74ba                               ;; 03:74b6 $30 $02
     set  0, E                                          ;; 03:74b8 $cb $c3
@@ -133,12 +133,12 @@ call_03_74f5_HUD_DrawNumberOnStatusBar:
     ret                                                ;; 03:753d $c9
 
 call_03_753e_AnimateFlyCoinCollectibles:
-; If bit 4 of wDB69_HUDGraphicsUpdateFlags is set, advances frame counters (wDC72_FrameCounter_Sprites/wDC73_FrameCounter_FlyCoins) and uses HDMA to copy a 
+; If bit 4 of wDB69_HUDDirtyFlags is set, advances frame counters (wDC72_AnimFrameCounter/wDC73_FrameCounter_FlyCoins) and uses HDMA to copy a 
 ; tile graphic from image_003_4400 into VRAM bank 1. Provides a cycling background or HUD animation.
-    ld   HL, wDB69_HUDGraphicsUpdateFlags                                     ;; 03:753e $21 $69 $db
+    ld   HL, wDB69_HUDDirtyFlags                                     ;; 03:753e $21 $69 $db
     bit  4, [HL]                                       ;; 03:7541 $cb $66
     ret  Z                                             ;; 03:7543 $c8
-    ld   HL, wDC72_FrameCounter_Sprites                                     ;; 03:7544 $21 $72 $dc
+    ld   HL, wDC72_AnimFrameCounter                                     ;; 03:7544 $21 $72 $dc
     inc  [HL]                                          ;; 03:7547 $34
     ld   A, [HL]                                       ;; 03:7548 $7e
     sub  A, $08                                        ;; 03:7549 $d6 $08
@@ -176,17 +176,17 @@ call_03_753e_AnimateFlyCoinCollectibles:
     ret                                                ;; 03:757d $c9
 
 call_03_757e_HUD_AnimateBonusStageTimer:
-; If bit 2 of wDB69_HUDGraphicsUpdateFlags is set and a value exists in wDB6D_InBonusStage, converts values in wDB6E_BonusStageTimerHi 
+; If bit 2 of wDB69_HUDDirtyFlags is set and a value exists in wDB6D_InBonusStage, converts values in wDB6E_LevelTimer_SecondsRemaining 
 ; to tile indices and issues several HDMA transfers from image_003_4580 to VRAM 
 ; positions ($8400+). Loads a 4×2 block of HUD sprite tiles.
-    ld   HL, wDB69_HUDGraphicsUpdateFlags                                     ;; 03:757e $21 $69 $db
+    ld   HL, wDB69_HUDDirtyFlags                                     ;; 03:757e $21 $69 $db
     bit  2, [HL]                                       ;; 03:7581 $cb $56
     ret  Z                                             ;; 03:7583 $c8
     res  2, [HL]                                       ;; 03:7584 $cb $96
     ld   A, [wDB6D_InBonusStage]                                    ;; 03:7586 $fa $6d $db
     and  A, A                                          ;; 03:7589 $a7
     ret  Z                                             ;; 03:758a $c8
-    ld   A, [wDB6E_BonusStageTimerHi]                                    ;; 03:758b $fa $6e $db
+    ld   A, [wDB6E_LevelTimer_SecondsRemaining]                                    ;; 03:758b $fa $6e $db
     ld   C, $ff                                        ;; 03:758e $0e $ff
 .jr_03_7590:
     inc  C                                             ;; 03:7590 $0c

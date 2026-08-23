@@ -128,7 +128,7 @@ call_02_7152_UpdateAllEntities:
     xor  A, A                                          ;; 02:7152 $af
     ld   [wDC85_PlayerXDeltaExtra2], A                                    ;; 02:7153 $ea $85 $dc
     ld   [wDC84_PlayerXDeltaExtra], A                                    ;; 02:7156 $ea $84 $dc
-    ld   [wD900], A                                    ;; 02:7159 $ea $00 $d9
+    ld   [wD900_ShadowOAM], A                          ;; 02:7159 $ea $00 $d9
     ld   [wD904], A                                    ;; 02:715c $ea $04 $d9
     ld   A, [wDCA7_Player_UpdateFlag]                                    ;; 02:715f $fa $a7 $dc
     and  A, A                                          ;; 02:7162 $a7
@@ -323,11 +323,11 @@ call_02_72a1_CheckIfPlayerActorUpdatedAction:
 ; Mark Entity Slot Active
 ; Description:
 ; Checks if wDA00_CurrentEntityAddrLo is zero (no active entity). If so, sets bit0 of 
-; wDB66_HDMATransferFlags, likely to indicate that the player actor has changed it's action.
+; wDB66_GfxTransferFlags, likely to indicate that the player actor has changed it's action.
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 02:72a1 $fa $00 $da
     and  A, A                                          ;; 02:72a4 $a7
     ret  NZ                                            ;; 02:72a5 $c0
-    ld   HL, wDB66_HDMATransferFlags                                     ;; 02:72a6 $21 $66 $db
+    ld   HL, wDB66_GfxTransferFlags                                     ;; 02:72a6 $21 $66 $db
     set  0, [HL]                                       ;; 02:72a9 $cb $c6
     ret                                                ;; 02:72ab $c9
 
@@ -337,7 +337,7 @@ call_02_72ac_SetEntityAction:
 ; Details:
 ; Uses the entity ID (masked with $7F) as an index into the entity data table.
 ; Copies attributes like behavior pointers and timers into the entity's memory slot.
-; Sets auxiliary values and flags (wDB66_HDMATransferFlags bit 0) to indicate a new entity was loaded.
+; Sets auxiliary values and flags (wDB66_GfxTransferFlags bit 0) to indicate a new entity was loaded.
     and  A, $7f                                        ;; 02:72ac $e6 $7f
     ld   HL, wDA00_CurrentEntityAddrLo                   ;; 02:72ae $21 $00 $da
     ld   L, [HL]                                       ;; 02:72b1 $6e
@@ -413,13 +413,13 @@ call_02_72fb_UpdateMapWindow:
 call_02_7305_CheckVerticalMapScroll:
 ; Purpose: Compares current Y-position against previous to determine vertical scrolling needs.
 ; Details:
-; Stores the fine Y-position (wDADA_ScrollY).
+; Stores the fine Y-position (wDADA_BgMap_ScrollYLo).
 ; Shifts and subtracts to compute movement delta.
 ; Sets flags in wDC20_BgMapLoadingFlags for upward or downward scroll events.
     ld   HL, wDBFB_YPositionInMap                                     ;; 02:7305 $21 $fb $db
     ld   A, [HL+]                                      ;; 02:7308 $2a
     ld   D, [HL]                                       ;; 02:7309 $56
-    ld   [wDADA_ScrollY], A                                    ;; 02:730a $ea $da $da
+    ld   [wDADA_BgMap_ScrollYLo], A                                    ;; 02:730a $ea $da $da
     srl  D                                             ;; 02:730d $cb $3a
     rra                                                ;; 02:730f $1f
     srl  D                                             ;; 02:7310 $cb $3a
@@ -460,7 +460,7 @@ call_02_7337_CheckHorizontalMapScroll:
     ld   HL, wDBF9_XPositionInMap                                     ;; 02:7337 $21 $f9 $db
     ld   A, [HL+]                                      ;; 02:733a $2a
     ld   D, [HL]                                       ;; 02:733b $56
-    ld   [wDAD9_ScrollX], A                                    ;; 02:733c $ea $d9 $da
+    ld   [wDAD9_BgMap_ScrollXLo], A                                    ;; 02:733c $ea $d9 $da
     srl  D                                             ;; 02:733f $cb $3a
     rra                                                ;; 02:7341 $1f
     srl  D                                             ;; 02:7342 $cb $3a

@@ -129,11 +129,11 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   A, [wDB94_MenuTypeData_Unk2]                                    ;; 01:4085 $fa $94 $db
     and  A, $01                                        ;; 01:4088 $e6 $01
     jp   Z, .jp_01_41cb                                ;; 01:408a $ca $cb $41
-    ld   HL, wDAD7_CurrentInputs                                     ;; 01:408d $21 $d7 $da
+    ld   HL, wDAD7_RawInputs                                     ;; 01:408d $21 $d7 $da
     bit  PADF_SELECT_BIT, [HL] ;                                      ;; 01:4090 $cb $56
     jr   Z, .jr_01_40ad                                ;; 01:4092 $28 $19
     ld   A, SFX_MENU_SCROLL                                        ;; 01:4094 $3e $01
-    call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4096 $cd $d7 $0f
+    call call_00_0fd7_PlaySFX                                  ;; 01:4096 $cd $d7 $0f
     ld   A, [wDBE8_Menu_StoredMapId]                                    ;; 01:4099 $fa $e8 $db
     ld   [wDB6C_CurrentMapId], A                                    ;; 01:409c $ea $6c $db
     farcall call_03_6c89_LoadMapDataPtrs
@@ -189,7 +189,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   [HL], $01                                     ;; 01:4107 $36 $01
 .jr_01_4109:
     ld   A, SFX_MENU_SCROLL                                        ;; 01:4109 $3e $01
-    call call_00_0fd7_TriggerSoundEffect                                  ;; 01:410b $cd $d7 $0f
+    call call_00_0fd7_PlaySFX                                  ;; 01:410b $cd $d7 $0f
     jp   .jp_01_4070                                   ;; 01:410e $c3 $70 $40
 .jr_01_4111:
     ld   HL, wDBEE_PasswordRowSelected                                     ;; 01:4111 $21 $ee $db
@@ -233,7 +233,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   [HL], A                                       ;; 01:4152 $77
 .jr_01_4153:
     ld   A, SFX_MENU_SCROLL                                        ;; 01:4153 $3e $01
-    call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4155 $cd $d7 $0f
+    call call_00_0fd7_PlaySFX                                  ;; 01:4155 $cd $d7 $0f
     jp   .jp_01_4070                                   ;; 01:4158 $c3 $70 $40
 .jp_01_415b:
     call call_01_505a_ValidatePassword                                  ;; 01:415b $cd $5a $50
@@ -243,7 +243,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     jr   Z, .jr_01_4167                                ;; 01:4163 $28 $02
     ld   A, SFX_NONE                                        ;; 01:4165 $3e $ff
 .jr_01_4167:
-    call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4167 $cd $d7 $0f
+    call call_00_0fd7_PlaySFX                                  ;; 01:4167 $cd $d7 $0f
     ld   B, $3c                                        ;; 01:416a $06 $3c
 .jr_01_416c:
     push BC                                            ;; 01:416c $c5
@@ -296,7 +296,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   [HL], $02                                     ;; 01:41c1 $36 $02
 .jr_01_41c3:
     ld   A, SFX_MENU_SCROLL                                        ;; 01:41c3 $3e $01
-    call call_00_0fd7_TriggerSoundEffect                                  ;; 01:41c5 $cd $d7 $0f
+    call call_00_0fd7_PlaySFX                                  ;; 01:41c5 $cd $d7 $0f
     jp   .jp_01_4070                                   ;; 01:41c8 $c3 $70 $40
 .jp_01_41cb:
     ld   A, [wDB95_MenuTypeData_Unk3]                                    ;; 01:41cb $fa $95 $db
@@ -321,7 +321,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     inc  [HL]                                          ;; 01:41f0 $34
 .jr_01_41f1:
     ld   A, SFX_MENU_SCROLL                                        ;; 01:41f1 $3e $01
-    call call_00_0fd7_TriggerSoundEffect                                  ;; 01:41f3 $cd $d7 $0f
+    call call_00_0fd7_PlaySFX                                  ;; 01:41f3 $cd $d7 $0f
     call call_01_43ba_JumpToDynamicHandler                                  ;; 01:41f6 $cd $ba $43
     jp   .jp_01_4070                                   ;; 01:41f9 $c3 $70 $40
 .jp_01_41fc:
@@ -351,13 +351,13 @@ call_01_4000_MenuHandler_LoadAndProcess:
     ld   HL, data_01_5692                              ;; 01:422e $21 $92 $56
     call call_01_4454_SetMenuPointer                                  ;; 01:4231 $cd $54 $44
     ld   A, SFX_MENU_SCROLL                                        ;; 01:4234 $3e $01
-    call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4236 $cd $d7 $0f
+    call call_00_0fd7_PlaySFX                                  ;; 01:4236 $cd $d7 $0f
     jp   .jp_01_4070                                   ;; 01:4239 $c3 $70 $40
 .jr_01_423c:
     call call_00_0f9c_CheckInputB                                  ;; 01:423c $cd $9c $0f
     jp   Z, .jp_01_4078                                ;; 01:423f $ca $78 $40
     ld   A, SFX_MENU_SCROLL                                        ;; 01:4242 $3e $01
-    call call_00_0fd7_TriggerSoundEffect                                  ;; 01:4244 $cd $d7 $0f
+    call call_00_0fd7_PlaySFX                                  ;; 01:4244 $cd $d7 $0f
     call call_00_0f5e_WaitUntilNoInputPressed                                  ;; 01:4247 $cd $5e $0f
     ld   A, [wDBE8_Menu_StoredMapId]                                    ;; 01:424a $fa $e8 $db
     ld   [wDB6C_CurrentMapId], A                                    ;; 01:424d $ea $6c $db
@@ -446,18 +446,18 @@ call_01_4000_MenuHandler_LoadAndProcess:
     call call_01_4b6b_StreamTileDataToBuffer                                  ;; 01:42eb $cd $6b $4b
     ld   HL, wDBDC                                     ;; 01:42ee $21 $dc $db
     dec  [HL]                                          ;; 01:42f1 $35
-    ld   A, [wDAD7_CurrentInputs]                                    ;; 01:42f2 $fa $d7 $da
+    ld   A, [wDAD7_RawInputs]                                    ;; 01:42f2 $fa $d7 $da
     and  A, A                                          ;; 01:42f5 $a7
     jr   Z, .jr_01_42e5                                ;; 01:42f6 $28 $ed
     ld   A, SFX_MENU_SCROLL                                        ;; 01:42f8 $3e $01
-    jp   call_00_0fd7_TriggerSoundEffect                                  ;; 01:42fa $c3 $d7 $0f
+    jp   call_00_0fd7_PlaySFX                                  ;; 01:42fa $c3 $d7 $0f
 
 call_01_42fd_LoadMenu_GameOver:
 ; Behavior:
 ; Requests song bank 15 and starts playback, then immediately jumps to LoadMenu with ID $03.
 ; Likely Purpose: Entry point to show a specific menu screen (e.g., pause/options).
     ld   A, SONG_GAME_OVER_OR_TIME_UP                                        ;; 01:42fd $3e $15
-    call call_00_0fa2_PlaySong                                  ;; 01:42ff $cd $a2 $0f
+    call call_00_0fa2_SetupMusic                                  ;; 01:42ff $cd $a2 $0f
     ld   A, MENU_GAME_OVER                                        ;; 01:4302 $3e $03
     jp   call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:4304 $c3 $00 $40
 
@@ -467,7 +467,7 @@ call_01_4307_LoadCreditsMenus:
 ; Likely Purpose: Preloads multiple menu assets into VRAM (like caching 
 ; graphics for level select or transitions).
     ld   A, SONG_CREDITS                                        ;; 01:4307 $3e $19
-    call call_00_0fa2_PlaySong                                  ;; 01:4309 $cd $a2 $0f
+    call call_00_0fa2_SetupMusic                                  ;; 01:4309 $cd $a2 $0f
     ld   A, MENU_END_CREDITS_1                                        ;; 01:430c $3e $15
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:430e $cd $00 $40
     ld   A, MENU_END_CREDITS_2                                        ;; 01:4311 $3e $16
@@ -493,7 +493,7 @@ call_01_432b_SetLevelMenuAndPalette:
     and  A, A                                          ;; 01:432e $a7
     ret  Z                                             ;; 01:432f $c8
     ld   A, SONG_GEX_CAVE                                        ;; 01:4330 $3e $04
-    call call_00_0fa2_PlaySong                                  ;; 01:4332 $cd $a2 $0f
+    call call_00_0fa2_SetupMusic                                  ;; 01:4332 $cd $a2 $0f
     ld   A, [wDB6C_CurrentMapId]                                    ;; 01:4335 $fa $6c $db
     cp   A, MAP_GEXTREME_SPORTS1                                        ;; 01:4338 $fe $07
     jr   C, .jr_01_434d                                ;; 01:433a $38 $11
@@ -541,13 +541,13 @@ call_01_435e_DetermineNextMapId:
     jr   Z, .jr_01_4384                                ;; 01:4374 $28 $0e
     res  5, [HL]                                       ;; 01:4376 $cb $ae
     ld   A, SONG_GAME_OVER_OR_TIME_UP                                        ;; 01:4378 $3e $15
-    call call_00_0fa2_PlaySong                                  ;; 01:437a $cd $a2 $0f
+    call call_00_0fa2_SetupMusic                                  ;; 01:437a $cd $a2 $0f
     ld   A, MENU_TIME_UP                                        ;; 01:437d $3e $0a
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:437f $cd $00 $40
     jr   .jr_01_43ae                                   ;; 01:4382 $18 $2a
 .jr_01_4384:
     ld   A, SONG_MISSION_SUCCESS                                        ;; 01:4384 $3e $13
-    call call_00_0fa2_PlaySong                                  ;; 01:4386 $cd $a2 $0f
+    call call_00_0fa2_SetupMusic                                  ;; 01:4386 $cd $a2 $0f
     ld   A, MENU_WELL_DONE                                        ;; 01:4389 $3e $1b
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:438b $cd $00 $40
     jr   .jr_01_43ae                                   ;; 01:438e $18 $1e
@@ -563,7 +563,7 @@ call_01_435e_DetermineNextMapId:
     jr   .jr_01_43ae                                   ;; 01:43a2 $18 $0a
 .jr_01_43a4_MapLessThan7:
     ld   A, SONG_MISSION_SUCCESS                                        ;; 01:43a4 $3e $13
-    call call_00_0fa2_PlaySong                                  ;; 01:43a6 $cd $a2 $0f
+    call call_00_0fa2_SetupMusic                                  ;; 01:43a6 $cd $a2 $0f
     ld   A, MENU_CONGRATULATIONS_GOT_REMOTE                                        ;; 01:43a9 $3e $09
     call call_01_4000_MenuHandler_LoadAndProcess                                  ;; 01:43ab $cd $00 $40
 .jr_01_43ae:
@@ -615,8 +615,8 @@ call_01_43f0_MenuEngine_MainLoop:
 ; Updates palettes and LCD control, then finalizes VRAM updates.
 ; Likely Purpose: Core loop for processing menu scripts or transitions.
     push HL                                            ;; 01:43f0 $e5
-    call call_00_0e3b_ClearGameStateVariables                                  ;; 01:43f1 $cd $3b $0e
-    call call_00_0e62_ResetFlagsAndVRAMState                                  ;; 01:43f4 $cd $62 $0e
+    call call_00_0e3b_ResetVideoState                                  ;; 01:43f1 $cd $3b $0e
+    call call_00_0e62_ClearShadowOamAndResetScroll                                  ;; 01:43f4 $cd $62 $0e
     call call_01_4f27_ClearBgAndTileBuffers                                  ;; 01:43f7 $cd $27 $4f
     ld   A, $ff                                        ;; 01:43fa $3e $ff
     ld   [wDBC7], A                                    ;; 01:43fc $ea $c7 $db
@@ -624,7 +624,7 @@ call_01_43f0_MenuEngine_MainLoop:
     ld   [wDBDE], A                                    ;; 01:4400 $ea $de $db
     ld   [wDBE3_Menu_AnimateFlag], A                                    ;; 01:4403 $ea $e3 $db
     ld   A, $0a                                        ;; 01:4406 $3e $0a
-    call call_00_0c10_QueueVRAMCopyRequest                                  ;; 01:4408 $cd $10 $0c
+    call call_00_0c10_RequestLcdIsr                                  ;; 01:4408 $cd $10 $0c
     pop  HL                                            ;; 01:440b $e1
 .jr_01_440c:
     ld   A, L                                          ;; 01:440c $7d
@@ -638,7 +638,7 @@ call_01_43f0_MenuEngine_MainLoop:
     cp   A, $ff                                        ;; 01:441f $fe $ff
     jr   Z, .jr_01_442b                                ;; 01:4421 $28 $08
     ld   DE, data_01_5596                              ;; 01:4423 $11 $96 $55
-    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 01:4426 $cd $77 $07
+    call call_00_0777_GetPointerFromTable                                  ;; 01:4426 $cd $77 $07
     jr   .jr_01_440c                                   ;; 01:4429 $18 $e1
 .jr_01_442b:
     call call_01_4f51_UploadSecondaryTileLayer                                  ;; 01:442b $cd $51 $4f
@@ -651,9 +651,9 @@ call_01_43f0_MenuEngine_MainLoop:
 .jr_01_4444:
     call call_01_43ba_JumpToDynamicHandler                                  ;; 01:4444 $cd $ba $43
     ld   A, $d3                                        ;; 01:4447 $3e $d3
-    call call_00_0e33_SetLCDControlRegister                                  ;; 01:4449 $cd $33 $0e
+    call call_00_0e33_SetLCDCAndWait                                  ;; 01:4449 $cd $33 $0e
     ld   A, $01                                        ;; 01:444c $3e $01
-    ld   [wDD6A_GameBoyColorPaletteFlag], A                                    ;; 01:444e $ea $6a $dd
+    ld   [wDD6A_PalettesReadyFlag], A                                    ;; 01:444e $ea $6a $dd
     jp   call_00_0b92_WaitForInterrupt                                  ;; 01:4451 $c3 $92 $0b
 
 call_01_4454_SetMenuPointer:
@@ -733,7 +733,7 @@ call_01_446b_ExecuteMenuCommand:
     sub  A, $e0                                        ;; 01:44c0 $d6 $e0
     jr   C, .jr_01_44cd                                ;; 01:44c2 $38 $09
     ld   DE, .data_01_456b_MenuCommandJumpTable                             ;; 01:44c4 $11 $6b $45
-    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 01:44c7 $cd $77 $07
+    call call_00_0777_GetPointerFromTable                                  ;; 01:44c7 $cd $77 $07
     call call_00_0f22_JumpHL                                  ;; 01:44ca $cd $22 $0f
 .jr_01_44cd:
     ld   A, [wDBAA_MenuCommandBuffer2_Unk6]                                    ;; 01:44cd $fa $aa $db
@@ -759,7 +759,7 @@ call_01_446b_ExecuteMenuCommand:
     add  HL, HL                                        ;; 01:44f2 $29
     add  HL, BC                                        ;; 01:44f3 $09
     add  HL, DE                                        ;; 01:44f4 $19
-    ld   DE, wD400_TileBuffer                                     ;; 01:44f5 $11 $00 $d4
+    ld   DE, wD400_ScreenDraw_TileIds                                     ;; 01:44f5 $11 $00 $d4
     add  HL, DE                                        ;; 01:44f8 $19
     ld   A, [wDBAA_MenuCommandBuffer2_Unk6]                                    ;; 01:44f9 $fa $aa $db
     and  A, $04                                        ;; 01:44fc $e6 $04
@@ -786,7 +786,7 @@ call_01_446b_ExecuteMenuCommand:
     ld   A, [wDBA3_MenuCommandBuffer_Unk5]                                    ;; 01:4520 $fa $a3 $db
     cp   A, $ff                                        ;; 01:4523 $fe $ff
     jr   NZ, .jr_01_452e                               ;; 01:4525 $20 $07
-    call call_00_0800_LoadLevelSelectMenu_SecondaryTileset                                  ;; 01:4527 $cd $00 $08
+    call call_00_0800_Screen_LoadSecondaryTilesetRow                                  ;; 01:4527 $cd $00 $08
     pop  BC                                            ;; 01:452a $c1
     pop  HL                                            ;; 01:452b $e1
     jr   .jr_01_4546                                   ;; 01:452c $18 $18
@@ -840,7 +840,7 @@ call_01_446b_ExecuteMenuCommand:
     and  A, $80                                        ;; 01:4563 $e6 $80
     ret  Z                                             ;; 01:4565 $c8
     ld   C, $09                                        ;; 01:4566 $0e $09
-    jp   call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 01:4568 $c3 $6a $0a
+    jp   call_00_0a6a_Hdma_RunConfigEntry                                  ;; 01:4568 $c3 $6a $0a
 .data_01_456b_MenuCommandJumpTable: ; probably menutype jump table
 ; Behavior:
 ; List of function pointers (call_01_458d_MenuHandler_LoadAssetsAndJump, call_01_4599_MenuHandler_LoadAssetsAndJump, etc.) for specific menu command handlers.
@@ -869,7 +869,7 @@ call_01_458d_MenuHandler_LoadAssetsAndJump:
 ; Likely Purpose: Load specific menu graphics and branch to a menu update routine.
     ld   a,[wDBA7_MenuCommandBuffer2_Unk3]
     ld   de,data_01_6f39
-    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL
+    call call_00_0777_GetPointerFromTable
     jp   call_01_4d03_StreamTilemapBlockToBg
 
 call_01_4599_MenuHandler_LoadAssetsAndJump:
@@ -877,7 +877,7 @@ call_01_4599_MenuHandler_LoadAssetsAndJump:
 ; same as above
     ld   A, [wDBA7_MenuCommandBuffer2_Unk3]                                    ;; 01:4599 $fa $a7 $db
     ld   DE, data_01_6f39                              ;; 01:459c $11 $39 $6f
-    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 01:459f $cd $77 $07
+    call call_00_0777_GetPointerFromTable                                  ;; 01:459f $cd $77 $07
     jp   call_01_4d03_StreamTilemapBlockToBg                                    ;; 01:45a2 $c3 $03 $4d
 
 call_01_45a5_MenuHandler_LoadBgPalettesAndSecondaryTilesets:
@@ -891,7 +891,7 @@ call_01_45a5_MenuHandler_LoadBgPalettesAndSecondaryTilesets:
     call call_00_076e_MemCopy                                  ;; 01:45ae $cd $6e $07
     ld   A, [wDB6C_CurrentMapId]                                    ;; 01:45b1 $fa $6c $db
     ld   DE, data_00_0b01_SecondaryTilesetPtrs                                      ;; 01:45b4 $11 $01 $0b
-    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 01:45b7 $cd $77 $07
+    call call_00_0777_GetPointerFromTable                                  ;; 01:45b7 $cd $77 $07
     ld   DE, $330                                      ;; 01:45ba $11 $30 $03
     add  HL, DE                                        ;; 01:45bd $19
     ld   DE, wDD0A_BgPalettes                                     ;; 01:45be $11 $0a $dd
@@ -900,7 +900,7 @@ call_01_45a5_MenuHandler_LoadBgPalettesAndSecondaryTilesets:
     call call_00_075f_FarMemCopy                                  ;; 01:45c6 $cd $5f $07
     ld   A, [wDB6C_CurrentMapId]                                    ;; 01:45c9 $fa $6c $db
     ld   DE, data_00_0b01_SecondaryTilesetPtrs                                      ;; 01:45cc $11 $01 $0b
-    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 01:45cf $cd $77 $07
+    call call_00_0777_GetPointerFromTable                                  ;; 01:45cf $cd $77 $07
     ld   A, [wDBA6_MenuCommandBuffer2_Unk2]                                    ;; 01:45d2 $fa $a6 $db
     ld   [wDBA2_MenuCommandBuffer_Unk4], A                                    ;; 01:45d5 $ea $a2 $db
     ld   A, $08                                        ;; 01:45d8 $3e $08
@@ -972,7 +972,7 @@ call_01_467b_MenuState_UpdateLevelCursor:
     add  A, A                                          ;; 01:46a1 $87
     add  A, A                                          ;; 01:46a2 $87
     add  A, A                                          ;; 01:46a3 $87
-    ld   [wDADD], A                                    ;; 01:46a4 $ea $dd $da
+    ld   [wDADD_MenuTextBuffer], A                     ;; 01:46a4 $ea $dd $da
     ld   A, [wDBA0_MenuCommandBuffer_Unk2]                                    ;; 01:46a7 $fa $a0 $db
     inc  A                                             ;; 01:46aa $3c
     sub  A, $02                                        ;; 01:46ab $d6 $02
@@ -1026,12 +1026,12 @@ call_01_46f9_MenuState_ResetTemporaryFlags:
     ret                                                ;; 01:470b $c9
 
 call_01_470c_MenuState_DispatchAndDraw:
-; Description: Writes $80 to wDADD, calls a state handler table (4722), conditionally triggers 4D49 if 
+; Description: Writes $80 to wDADD_MenuTextBuffer, calls a state handler table (4722), conditionally triggers 4D49 if 
 ; a flag is set, then loads data_01_4e97 and jumps to 4CFA. Acts as a generic dispatcher.
-    ld   HL, wDADD                                     ;; 01:470c $21 $dd $da
+    ld   HL, wDADD_MenuTextBuffer                      ;; 01:470c $21 $dd $da
     ld   [HL], $80                                     ;; 01:470f $36 $80
     call call_01_4722_MenuStateHandlerTable                                  ;; 01:4711 $cd $22 $47
-    ld   HL, wDADD                                     ;; 01:4714 $21 $dd $da
+    ld   HL, wDADD_MenuTextBuffer                      ;; 01:4714 $21 $dd $da
     bit  7, [HL]                                       ;; 01:4717 $cb $7e
     call NZ, call_01_4d49_FormatDecimalToAsciiDigits                              ;; 01:4719 $c4 $49 $4d
     ld   HL, data_01_4e97                              ;; 01:471c $21 $97 $4e
@@ -1042,7 +1042,7 @@ call_01_4722_MenuStateHandlerTable:
 ; Contains inline small handlers (.4744, .4748, .474c, etc.) that return values or constants.
     ld   A, [wDBA7_MenuCommandBuffer2_Unk3]                                    ;; 01:4722 $fa $a7 $db
     ld   DE, .data_01_472c                             ;; 01:4725 $11 $2c $47
-    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 01:4728 $cd $77 $07
+    call call_00_0777_GetPointerFromTable                                  ;; 01:4728 $cd $77 $07
     jp   HL                                            ;; 01:472b $e9
 .data_01_472c:
     dw   call_01_4acf_CountCollectedBitsForLevel                                  ;; 01:472c pP
@@ -1058,7 +1058,7 @@ call_01_4722_MenuStateHandlerTable:
     dw   .jp_01_475c                                 ;; 01:4740 pP
     dw   call_00_2f34_CountActiveEntities                                      ;; 01:4742 ??
 .jp_01_4744:
-    ld   A, [wDC68_CollectibleCount]                                    ;; 01:4744 $fa $68 $dc
+    ld   A, [wDC68_CollectibleAmount]                                    ;; 01:4744 $fa $68 $dc
     ret                                                ;; 01:4747 $c9
 .jp_01_4748:
     ld   A, [wDCAF_PawCoinCounter]                                    ;; 01:4748 $fa $af $dc
@@ -1092,7 +1092,7 @@ call_01_4760_MenuState_SubmenuHandler:
 .jr_01_476f:
     ld   A, [wDBA7_MenuCommandBuffer2_Unk3]                                    ;; 01:476f $fa $a7 $db
     ld   DE, data_01_5b61                              ;; 01:4772 $11 $61 $5b
-    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 01:4775 $cd $77 $07
+    call call_00_0777_GetPointerFromTable                                  ;; 01:4775 $cd $77 $07
     jp   call_01_4c45_ParseAndLoadTextIntoBuffer                                  ;; 01:4778 $c3 $45 $4c
 
 call_01_477b_MenuState_NoOp:
@@ -1101,7 +1101,7 @@ call_01_477b_MenuState_NoOp:
 
 call_01_477c_DrawMenuNumberSprite:
 ; Description: Uses wDBA7_MenuCommandBuffer2_Unk3 to compute sprite data offsets into wC980_NumberSprites, 
-;then uses wDB7E_PasswordValues to pick a number graphic, combines with data_01_66f9, and jumps to call_00_0bcf_MemCopy16Loop (sprite draw). Likely draws a numeric value (e.g., score).
+;then uses wDB7E_PasswordValues to pick a number graphic, combines with data_01_66f9, and jumps to call_00_0bcf_CopyTileRows (sprite draw). Likely draws a numeric value (e.g., score).
     ld   HL, wDBA7_MenuCommandBuffer2_Unk3                                     ;; 01:477c $21 $a7 $db
     ld   L, [HL]                                       ;; 01:477f $6e
     ld   H, $00                                        ;; 01:4780 $26 $00
@@ -1131,7 +1131,7 @@ call_01_477c_DrawMenuNumberSprite:
     ld   BC, data_01_66f9                              ;; 01:47a1 $01 $f9 $66
     add  HL, BC                                        ;; 01:47a4 $09
     ld   B, $04                                        ;; 01:47a5 $06 $04
-    jp   call_00_0bcf_MemCopy16Loop                                    ;; 01:47a7 $c3 $cf $0b
+    jp   call_00_0bcf_CopyTileRows                                    ;; 01:47a7 $c3 $cf $0b
 
 call_01_47aa_StoreCurrentMenuIndex:
 ; Description: Copies wDBA7_MenuCommandBuffer2_Unk3 to wDBDD. Probably stores the current selection.
@@ -1141,14 +1141,14 @@ call_01_47aa_StoreCurrentMenuIndex:
 
 call_01_47b1_LoadMenuConfigData:
 ; Description: Uses a jump table (.data_01_47c6) to pick a configuration, 
-; copies 8 bytes into wDBB1_MenuCommandBuffer4_Unk0, then jumps to jp_00_0781 (likely continues processing).
+; copies 8 bytes into wDBB1_ScreenDraw_HasPaletteIdMap, then jumps to jp_00_0781_Screen_LoadFullscreenImage (likely continues processing).
     ld   A, [wDBA7_MenuCommandBuffer2_Unk3]                                    ;; 01:47b1 $fa $a7 $db
     ld   DE, .data_01_47c6                             ;; 01:47b4 $11 $c6 $47
-    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 01:47b7 $cd $77 $07
-    ld   DE, wDBB1_MenuCommandBuffer4_Unk0                                     ;; 01:47ba $11 $b1 $db
+    call call_00_0777_GetPointerFromTable                                  ;; 01:47b7 $cd $77 $07
+    ld   DE, wDBB1_ScreenDraw_HasPaletteIdMap                                     ;; 01:47ba $11 $b1 $db
     ld   BC, $08                                       ;; 01:47bd $01 $08 $00
     call call_00_076e_MemCopy                                  ;; 01:47c0 $cd $6e $07
-    jp   jp_00_0781                                    ;; 01:47c3 $c3 $81 $07
+    jp   jp_00_0781_Screen_LoadFullscreenImage         ;; 01:47c3 $c3 $81 $07
 .data_01_47c6:
     dw   .data_01_47d4, .data_01_47dc, .data_01_47e4, .data_01_47ec        ;; 01:47c6 ..??....
     dw   .data_01_47f4, .data_01_47fc, .data_01_4804
@@ -1168,15 +1168,15 @@ call_01_47b1_LoadMenuConfigData:
     db   $01, $11, $90, $51, $00, $40, $90, $11
 
 call_01_480c_MenuState_DrawWithOffset:
-; Description: Writes $80 to wDADD, performs some setup with call_01_4ab9_CountSetBitsInFlags and 4acf, 
-; adjusts wDADD based on result, then prepares data_01_4e97 and jumps to 4CFA. Similar to 470c but with extra processing.
-    ld   hl,wDADD
+; Description: Writes $80 to wDADD_MenuTextBuffer, performs some setup with call_01_4ab9_CountSetBitsInFlags and 4acf, 
+; adjusts wDADD_MenuTextBuffer based on result, then prepares data_01_4e97 and jumps to 4CFA. Similar to 470c but with extra processing.
+    ld   hl,wDADD_MenuTextBuffer
     ld   [hl],$80
     ld   de,call_01_4ab9_CountSetBitsInFlags.jr_01_4ac3
-    call call_00_0865_LoadFromTextBank1C_2
+    call call_00_0865_Text_AppendStringToBuffer
     call call_01_4acf_CountCollectedBitsForLevel
     add  a,$30
-    ld   [wDADD],a
+    ld   [wDADD_MenuTextBuffer],a
     ld   hl,data_01_4e97
     jp   call_01_4cfa_SetStreamPointerHL
 
@@ -1212,7 +1212,7 @@ call_01_4826_MenuState_UpdateCursorAlt:
     add  a
     add  a
     add  a
-    ld   [wDADD],a
+    ld   [wDADD_MenuTextBuffer],a
     ld   a,[wDBA0_MenuCommandBuffer_Unk2]
     inc  a
     add  a
@@ -1453,12 +1453,12 @@ call_01_499f_ClearTilemapRegion:
 
 call_01_49bb_FormatAndPaginateText:
 ; Description:
-; Main text/selection loop. Loads a text bank (via call_00_0835_LoadFromTextBank1C), 
+; Main text/selection loop. Loads a text bank (via call_00_0835_Text_LoadStringToBuffer), 
 ; repeatedly checks available text width (call_01_4a55_MeasureTextWidth), compares the width against the text buffer, and either:
 ; Scans backward to replace the last space with a break marker ($80) if overfull.
 ; Scans forward, invoking call_01_4cfa_SetStreamPointerHL to process text entries.
 ; Also updates indices (wDBA5_MenuCommandBuffer2_Unk1, wDBB0_MenuCommandBuffer3_Unk5, etc.) and computes offsets for selecting the next text chunk.
-    call call_00_0835_LoadFromTextBank1C                                  ;; 01:49bb $cd $35 $08
+    call call_00_0835_Text_LoadStringToBuffer                                  ;; 01:49bb $cd $35 $08
 .jr_01_49be:
     call call_01_4a55_MeasureTextWidth                                  ;; 01:49be $cd $55 $4a
     ld   HL, wDB9E_MenuCommandBuffer_Unk0                                     ;; 01:49c1 $21 $9e $db
@@ -1514,7 +1514,7 @@ call_01_49bb_FormatAndPaginateText:
 .jr_01_4a06:
     ld   A, [wDBA4_MenuCommandBuffer2_Unk0]                                    ;; 01:4a06 $fa $a4 $db
     ld   [wDBE1], A                                    ;; 01:4a09 $ea $e1 $db
-    ld   HL, wDADD                                     ;; 01:4a0c $21 $dd $da
+    ld   HL, wDADD_MenuTextBuffer                      ;; 01:4a0c $21 $dd $da
     call call_01_4cfa_SetStreamPointerHL                                  ;; 01:4a0f $cd $fa $4c
     ld   A, [wDBB0_MenuCommandBuffer3_Unk5]                                    ;; 01:4a12 $fa $b0 $db
     inc  A                                             ;; 01:4a15 $3c
@@ -1797,12 +1797,12 @@ call_01_4b43_LookupLevelBasePointer:
 call_01_4b6b_StreamTileDataToBuffer:
 ; Description:
 ; Handles timed or input-triggered loading of map/tile data. Decrements a countdown (wDBDE), 
-; checks input, fetches a data stream (data_01_5b61), and writes tile values into wD900 as a buffer.
+; checks input, fetches a data stream (data_01_5b61), and writes tile values into wD900_ShadowOAM as a buffer.
     ld   HL, wDBDE                                     ;; 01:4b6b $21 $de $db
     ld   A, [HL]                                       ;; 01:4b6e $7e
     and  A, A                                          ;; 01:4b6f $a7
     ret  Z                                             ;; 01:4b70 $c8
-    ld   A, [wDAD7_CurrentInputs]                                    ;; 01:4b71 $fa $d7 $da
+    ld   A, [wDAD7_RawInputs]                                    ;; 01:4b71 $fa $d7 $da
     and  A, A                                          ;; 01:4b74 $a7
     jr   Z, .jr_01_4b79                                ;; 01:4b75 $28 $02
     ld   [HL], $01                                     ;; 01:4b77 $36 $01
@@ -1813,7 +1813,7 @@ call_01_4b6b_StreamTileDataToBuffer:
     jp   .jp_01_4b81                                   ;; 01:4b7e $c3 $81 $4b
 .jp_01_4b81:
     ld   DE, data_01_5b61                              ;; 01:4b81 $11 $61 $5b
-    call call_00_0777_LoadPointerIndexAFromTableDEIntoHL                                  ;; 01:4b84 $cd $77 $07
+    call call_00_0777_GetPointerFromTable                                  ;; 01:4b84 $cd $77 $07
     ld   A, [HL+]                                      ;; 01:4b87 $2a
     cp   A, $ff                                        ;; 01:4b88 $fe $ff
     ret  Z                                             ;; 01:4b8a $c8
@@ -1822,7 +1822,7 @@ call_01_4b6b_StreamTileDataToBuffer:
     ld   H, $00                                        ;; 01:4b8d $26 $00
     add  HL, HL                                        ;; 01:4b8f $29
     add  HL, HL                                        ;; 01:4b90 $29
-    ld   DE, wD900                                     ;; 01:4b91 $11 $00 $d9
+    ld   DE, wD900_ShadowOAM                           ;; 01:4b91 $11 $00 $d9
     add  HL, DE                                        ;; 01:4b94 $19
     ld   E, L                                          ;; 01:4b95 $5d
     ld   D, H                                          ;; 01:4b96 $54
@@ -1922,7 +1922,7 @@ call_01_4bb8_UpdateInterpolationStep:
     ld   H, $00                                        ;; 01:4c1a $26 $00
     add  HL, HL                                        ;; 01:4c1c $29
     add  HL, HL                                        ;; 01:4c1d $29
-    ld   DE, wD900                                     ;; 01:4c1e $11 $00 $d9
+    ld   DE, wD900_ShadowOAM                           ;; 01:4c1e $11 $00 $d9
     add  HL, DE                                        ;; 01:4c21 $19
     ld   A, [wDBEE_PasswordRowSelected]                                    ;; 01:4c22 $fa $ee $db
     add  A, A                                          ;; 01:4c25 $87
@@ -1954,7 +1954,7 @@ call_01_4c45_ParseAndLoadTextIntoBuffer:
 ; Reads a sequence text records from memory until a $FF terminator. 
 ; For each record, extracts an ID, X/Y offsets (adjusted by $10/$08), attribute flags 
 ; (with optional lookup in wDAE1_TextBuffer), and a size (C,B). Calls call_01_4c7e_CopyTextBlockToBuffer to copy tile entries 
-; into the staging buffer at wD900.
+; into the staging buffer at wD900_ShadowOAM.
     ld   A, [HL+]                                      ;; 01:4c45 $2a
     cp   A, $ff                                        ;; 01:4c46 $fe $ff
     ret  Z                                             ;; 01:4c48 $c8
@@ -1964,7 +1964,7 @@ call_01_4c45_ParseAndLoadTextIntoBuffer:
     cp   A, $ff                                        ;; 01:4c4d $fe $ff
     ret  Z                                             ;; 01:4c4f $c8
     add  A, $10                                        ;; 01:4c50 $c6 $10
-    ld   [wDADD], A                                    ;; 01:4c52 $ea $dd $da
+    ld   [wDADD_MenuTextBuffer], A                     ;; 01:4c52 $ea $dd $da
     ld   A, [HL+]                                      ;; 01:4c55 $2a
     add  A, $08                                        ;; 01:4c56 $c6 $08
     ld   [wDADE], A                                    ;; 01:4c58 $ea $de $da
@@ -1994,25 +1994,25 @@ call_01_4c45_ParseAndLoadTextIntoBuffer:
 
 call_01_4c7e_CopyTextBlockToBuffer:
 ; Description:
-; Copies a rectangular block of sprite/tile data into wD900. Uses wDBDB as a tile index, 
+; Copies a rectangular block of sprite/tile data into wD900_ShadowOAM. Uses wDBDB as a tile index, 
 ; increments coordinates, and fills multiple rows/columns according to width (B) and height (C).
     ld   HL, wDBDB                                     ;; 01:4c7e $21 $db $db
     ld   L, [HL]                                       ;; 01:4c81 $6e
     ld   H, $00                                        ;; 01:4c82 $26 $00
     add  HL, HL                                        ;; 01:4c84 $29
     add  HL, HL                                        ;; 01:4c85 $29
-    ld   DE, wD900                                     ;; 01:4c86 $11 $00 $d9
+    ld   DE, wD900_ShadowOAM                           ;; 01:4c86 $11 $00 $d9
     add  HL, DE                                        ;; 01:4c89 $19
-    ld   A, [wDADD]                                    ;; 01:4c8a $fa $dd $da
+    ld   A, [wDADD_MenuTextBuffer]                     ;; 01:4c8a $fa $dd $da
 .jr_01_4c8d:
     push BC                                            ;; 01:4c8d $c5
     push AF                                            ;; 01:4c8e $f5
-    ld   [wDADD], A                                    ;; 01:4c8f $ea $dd $da
+    ld   [wDADD_MenuTextBuffer], A                     ;; 01:4c8f $ea $dd $da
 .jr_01_4c92:
-    ld   A, [wDADD]                                    ;; 01:4c92 $fa $dd $da
+    ld   A, [wDADD_MenuTextBuffer]                     ;; 01:4c92 $fa $dd $da
     ld   [HL+], A                                      ;; 01:4c95 $22
     add  A, $08                                        ;; 01:4c96 $c6 $08
-    ld   [wDADD], A                                    ;; 01:4c98 $ea $dd $da
+    ld   [wDADD_MenuTextBuffer], A                     ;; 01:4c98 $ea $dd $da
     ld   A, [wDADE]                                    ;; 01:4c9b $fa $de $da
     ld   [HL+], A                                      ;; 01:4c9e $22
     ld   A, [wDADF]                                    ;; 01:4c9f $fa $df $da
@@ -2142,7 +2142,7 @@ call_01_4d2c_ProcessTileStreamingLoop:
     dec  [HL]                                          ;; 01:4d38 $35
     ld   A, [wDB94_MenuTypeData_Unk2]                                    ;; 01:4d39 $fa $94 $db
     and  A, $01                                        ;; 01:4d3c $e6 $01
-    ld   A, [wDAD7_CurrentInputs]                                    ;; 01:4d3e $fa $d7 $da
+    ld   A, [wDAD7_RawInputs]                                    ;; 01:4d3e $fa $d7 $da
     jr   Z, .jr_01_4d45                                ;; 01:4d41 $28 $02
     and  A, PADF_B | PADF_SELECT | PADF_START | PADF_RIGHT | PADF_LEFT | PADF_UP | PADF_DOWN   ;; 01:4d43 $e6 $fe
 .jr_01_4d45:
@@ -2153,9 +2153,9 @@ call_01_4d2c_ProcessTileStreamingLoop:
 call_01_4d49_FormatDecimalToAsciiDigits:
 ; Description:
 ; Converts a value in A into three ASCII digits (hundreds, tens, ones), 
-; writes them to wDADD (with $80 terminator), using $2F as prefill. 
+; writes them to wDADD_MenuTextBuffer (with $80 terminator), using $2F as prefill. 
 ; Essentially formats a decimal number for display.
-    ld   HL, wDADD                                     ;; 01:4d49 $21 $dd $da
+    ld   HL, wDADD_MenuTextBuffer                      ;; 01:4d49 $21 $dd $da
     cp   A, $0a                                        ;; 01:4d4c $fe $0a
     jr   C, .jr_01_4d68                                ;; 01:4d4e $38 $18
     cp   A, $64                                        ;; 01:4d50 $fe $64
@@ -2183,18 +2183,18 @@ call_01_4d49_FormatDecimalToAsciiDigits:
 
 call_01_4d6e_PrepareStreamingPointers:
 ; Description:
-; Waits for wDBEF_UnkCounter to clear, sets up several control flags (wDBEF_UnkCounter–wDBF7), 
+; Waits for wDBEF_GfxStream_ChunksRemaining to clear, sets up several control flags (wDBEF_GfxStream_ChunksRemaining–wDBF7_GfxStream_ListPtrHi), 
 ; calculates offsets into two data tables (data_01_66f9 and VRAM $8000), 
 ; and stores resulting pointers. Prepares for a rendering or data streaming operation.
-    ld   A, [wDBEF_UnkCounter]                                    ;; 01:4d6e $fa $ef $db
+    ld   A, [wDBEF_GfxStream_ChunksRemaining]                                    ;; 01:4d6e $fa $ef $db
     and  A, A                                          ;; 01:4d71 $a7
     jr   NZ, call_01_4d6e_PrepareStreamingPointers                              ;; 01:4d72 $20 $fa
     ld   A, $01                                        ;; 01:4d74 $3e $01
-    ld   [wDBEF_UnkCounter], A                                    ;; 01:4d76 $ea $ef $db
+    ld   [wDBEF_GfxStream_ChunksRemaining], A                                    ;; 01:4d76 $ea $ef $db
     ld   A, $04                                        ;; 01:4d79 $3e $04
-    ld   [wDBF0], A                                    ;; 01:4d7b $ea $f0 $db
+    ld   [wDBF0_GfxStream_RowsPerChunk], A             ;; 01:4d7b $ea $f0 $db
     ld   A, $01                                        ;; 01:4d7e $3e $01
-    ld   [wDBF1], A                                    ;; 01:4d80 $ea $f1 $db
+    ld   [wDBF1_GfxStream_SrcBank], A                  ;; 01:4d80 $ea $f1 $db
     call call_01_4dc9_GetTileIdFromMapCoords                                  ;; 01:4d83 $cd $c9 $4d
     ld   L, A                                          ;; 01:4d86 $6f
     ld   H, $00                                        ;; 01:4d87 $26 $00
@@ -2223,17 +2223,17 @@ call_01_4d6e_PrepareStreamingPointers:
     ld   [wDBF4], A                                    ;; 01:4daa $ea $f4 $db
     ld   A, H                                          ;; 01:4dad $7c
     ld   [wDBF5], A                                    ;; 01:4dae $ea $f5 $db
-    ld   HL, wDBEF_UnkCounter                                     ;; 01:4db1 $21 $ef $db
+    ld   HL, wDBEF_GfxStream_ChunksRemaining                                     ;; 01:4db1 $21 $ef $db
     ld   A, [HL+]                                      ;; 01:4db4 $2a
-    ld   [wDBEF_UnkCounter], A                                    ;; 01:4db5 $ea $ef $db
+    ld   [wDBEF_GfxStream_ChunksRemaining], A                                    ;; 01:4db5 $ea $ef $db
     ld   A, [HL+]                                      ;; 01:4db8 $2a
-    ld   [wDBF0], A                                    ;; 01:4db9 $ea $f0 $db
+    ld   [wDBF0_GfxStream_RowsPerChunk], A             ;; 01:4db9 $ea $f0 $db
     ld   A, [HL+]                                      ;; 01:4dbc $2a
-    ld   [wDBF1], A                                    ;; 01:4dbd $ea $f1 $db
+    ld   [wDBF1_GfxStream_SrcBank], A                  ;; 01:4dbd $ea $f1 $db
     ld   A, L                                          ;; 01:4dc0 $7d
-    ld   [wDBF6], A                                    ;; 01:4dc1 $ea $f6 $db
+    ld   [wDBF6_GfxStream_ListPtrLo], A                ;; 01:4dc1 $ea $f6 $db
     ld   A, H                                          ;; 01:4dc4 $7c
-    ld   [wDBF7], A                                    ;; 01:4dc5 $ea $f7 $db
+    ld   [wDBF7_GfxStream_ListPtrHi], A                ;; 01:4dc5 $ea $f7 $db
     ret                                                ;; 01:4dc8 $c9
 
 call_01_4dc9_GetTileIdFromMapCoords:
@@ -2328,39 +2328,39 @@ data_01_4e97:
 
 call_01_4f27_ClearBgAndTileBuffers:
 ; Description:
-; Clears and initializes background map (wC000), tile buffers (wD400_TileBuffer, wD578_TileBuffer2) 
+; Clears and initializes background map (wC000), tile buffers (wD400_ScreenDraw_TileIds, wD578_ScreenDraw_PaletteIds) 
 ; by filling them with zeros or $01. Uses CopyBCBytesFromHLToDE to perform block clears.
     ld   HL, wC000_BgMapTileIds                                     ;; 01:4f27 $21 $00 $c0
     ld   DE, wC000_BgMapTileIds+1                                     ;; 01:4f2a $11 $01 $c0 ; wC000_BgMapTileIds
     ld   [HL], $00                                     ;; 01:4f2d $36 $00
     ld   BC, $0f                                       ;; 01:4f2f $01 $0f $00
     call call_00_076e_MemCopy                                  ;; 01:4f32 $cd $6e $07
-    ld   HL, wD400_TileBuffer                                     ;; 01:4f35 $21 $00 $d4
-    ld   DE, wD400_TileBuffer+1                                     ;; 01:4f38 $11 $01 $d4
+    ld   HL, wD400_ScreenDraw_TileIds                                     ;; 01:4f35 $21 $00 $d4
+    ld   DE, wD400_ScreenDraw_TileIds+1                                     ;; 01:4f38 $11 $01 $d4
     ld   [HL], $00                                     ;; 01:4f3b $36 $00
     ld   BC, $167                                      ;; 01:4f3d $01 $67 $01
     call call_00_076e_MemCopy                                  ;; 01:4f40 $cd $6e $07
-    ld   HL, wD578_TileBuffer2                                     ;; 01:4f43 $21 $78 $d5
-    ld   DE, wD578_TileBuffer2+1                                     ;; 01:4f46 $11 $79 $d5
+    ld   HL, wD578_ScreenDraw_PaletteIds                                     ;; 01:4f43 $21 $78 $d5
+    ld   DE, wD578_ScreenDraw_PaletteIds+1                                     ;; 01:4f46 $11 $79 $d5
     ld   [HL], $01                                     ;; 01:4f49 $36 $01
     ld   BC, $167                                      ;; 01:4f4b $01 $67 $01
     jp   call_00_076e_MemCopy                                  ;; 01:4f4e $c3 $6e $07
 
 call_01_4f51_UploadSecondaryTileLayer:
-; Copies the contents of wD578_TileBuffer2 into the background tilemap using call_01_4f67_CopyTileBufferToBgMap, 
-; then calls call_00_0a6a_LoadMapConfigAndWaitVBlank with C=$07 (likely triggers VRAM transfer).
-    ld   DE, wD578_TileBuffer2                                     ;; 01:4f51 $11 $78 $d5
+; Copies the contents of wD578_ScreenDraw_PaletteIds into the background tilemap using call_01_4f67_CopyTileBufferToBgMap, 
+; then calls call_00_0a6a_Hdma_RunConfigEntry with C=$07 (likely triggers VRAM transfer).
+    ld   DE, wD578_ScreenDraw_PaletteIds                                     ;; 01:4f51 $11 $78 $d5
     call call_01_4f67_CopyTileBufferToBgMap                                  ;; 01:4f54 $cd $67 $4f
     ld   C, $07                                        ;; 01:4f57 $0e $07
-    jp   call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 01:4f59 $c3 $6a $0a
+    jp   call_00_0a6a_Hdma_RunConfigEntry                                  ;; 01:4f59 $c3 $6a $0a
 
 call_01_4f5c_UploadPrimaryTileLayer:
 ; Description:
-; Same as above but copies from wD400_TileBuffer instead of wD578_TileBuffer2 and uses C=$08.
-    ld   DE, wD400_TileBuffer                                     ;; 01:4f5c $11 $00 $d4
+; Same as above but copies from wD400_ScreenDraw_TileIds instead of wD578_ScreenDraw_PaletteIds and uses C=$08.
+    ld   DE, wD400_ScreenDraw_TileIds                                     ;; 01:4f5c $11 $00 $d4
     call call_01_4f67_CopyTileBufferToBgMap                                  ;; 01:4f5f $cd $67 $4f
     ld   C, $08                                        ;; 01:4f62 $0e $08
-    jp   call_00_0a6a_LoadMapConfigAndWaitVBlank                                  ;; 01:4f64 $c3 $6a $0a
+    jp   call_00_0a6a_Hdma_RunConfigEntry                                  ;; 01:4f64 $c3 $6a $0a
 
 call_01_4f67_CopyTileBufferToBgMap:
 ; Description:

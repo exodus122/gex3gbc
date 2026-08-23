@@ -1,15 +1,15 @@
 call_03_6567_LoadFlyPalettes:
 ; Purpose: Chooses which entity palette set to load based on state flags.
 ; Behavior:
-; If wDCAB_FlyTimerOrFlags2 non-zero, uses default palette table .data_03_658c.
-; Otherwise, checks wDC51_CurrentFlyRelated, indexes .data_03_6594, and resolves an HL pointer to palette data.
+; If wDCAB_FlyPowerup5_Timer non-zero, uses default palette table .data_03_658c.
+; Otherwise, checks wDC51_Player_CurrentFly, indexes .data_03_6594, and resolves an HL pointer to palette data.
 ; Copies 8 bytes into wDD2A_EntityPalettes.
 ; Usage: Called when loading or switching level themes/entities.
     ld   HL, .data_03_658c                             ;; 03:6567 $21 $8c $65
-    ld   A, [wDCAB_FlyTimerOrFlags2]                   ;; 03:656a $fa $ab $dc
+    ld   A, [wDCAB_FlyPowerup5_Timer]                  ;; 03:656a $fa $ab $dc
     and  A, A                                          ;; 03:656d $a7
     jr   NZ, .jr_03_6583                               ;; 03:656e $20 $13
-    ld   A, [wDC51_CurrentFlyRelated]                  ;; 03:6570 $fa $51 $dc
+    ld   A, [wDC51_Player_CurrentFly]                  ;; 03:6570 $fa $51 $dc
     and  A, A                                          ;; 03:6573 $a7
     jp   Z, call_00_2cbf_LoadEntityPalettes            ;; 03:6574 $ca $bf $2c
     dec  A                                             ;; 03:6577 $3d
@@ -44,7 +44,7 @@ call_03_6567_LoadFlyPalettes:
 call_03_65c6_LoadBgPalettes:
 ; Purpose: Loads either level palettes or menu palettes depending on C.
 ; Behavior:
-; If C is zero, loads map and entity palettes via call_00_05af_LoadMapPalettes 
+; If C is zero, loads map and entity palettes via call_00_05af_BgPalettes_LoadForMap 
 ; and call_00_2cbf_LoadEntityPalettes.
 ; If bit 7 of C is set, returns immediately.
 ; Else, uses C as index into .data_03_65f1_MenuPalettes to copy 0x40 bytes to wDCEA_BgPalettes, 
@@ -52,7 +52,7 @@ call_03_65c6_LoadBgPalettes:
     inc  C                                             ;; 03:65c6 $0c
     dec  C                                             ;; 03:65c7 $0d
     jr   NZ, .jr_03_65d1                               ;; 03:65c8 $20 $07
-    call call_00_05af_LoadMapPalettes                  ;; 03:65ca $cd $af $05
+    call call_00_05af_BgPalettes_LoadForMap            ;; 03:65ca $cd $af $05
     call call_00_2cbf_LoadEntityPalettes               ;; 03:65cd $cd $bf $2c
     ret                                                ;; 03:65d0 $c9
 .jr_03_65d1:

@@ -19,20 +19,20 @@ call_00_2cbf_LoadEntityPalettes:
 
 call_00_2ce2_Entity_DrawGex:
 ; This is a complex sprite/OAM population routine. It:
-; Sets wDAC2_DMATransferLength=1 and combines the player’s facing direction with a state byte (wDC7A_PlayerClimbingOrSwimmingRelated) into wDC53_GexSpriteRelated2.
+; Sets wDAC2_PlayerGfx_TileCount=1 and combines the player’s facing direction with a state byte (wDC7A_PlayerClimbingOrSwimmingRelated) into wDC53_GexSpriteRelated2.
 ; Switches banks to retrieve sprite graphics metadata based on the current level (wDB6C_CurrentMapId).
 ; Computes the address of Gex’s sprite frame data (using offsets and increments).
 ; Reads sprite tiles, positions, and attributes, adjusting for the player’s position 
 ; relative to the map (wDBF9, wDBFB, wD80E, wD810).
 ; Handles flipped and mirrored variants depending on direction bits (bits 5 and 6 in wDC53_GexSpriteRelated2).
 ; Writes formatted sprite entries (X, Y, tile index, attributes) into a buffer at D9xx.
-; Optionally writes extra entries if a certain flag (wDC51_CurrentFlyRelated) is set, using offsets from data_00_2f14.
+; Optionally writes extra entries if a certain flag (wDC51_Player_CurrentFly) is set, using offsets from data_00_2f14.
 ; Updates wDC6F_EntitySpriteRelated with the new buffer pointer and restores the previous ROM bank.
 ; Usage:
 ; Populates the hardware sprite list for Gex’s current animation frame, handling mirroring, flipping, 
 ; and level-specific offsets.
     ld   A, $01                                        ;; 00:2ce2 $3e $01
-    ld   [wDAC2_DMATransferLength], A                                    ;; 00:2ce4 $ea $c2 $da
+    ld   [wDAC2_PlayerGfx_TileCount], A                                    ;; 00:2ce4 $ea $c2 $da
     ld   A, [wD80D_PlayerFacingDirection]                                    ;; 00:2ce7 $fa $0d $d8
     ld   HL, wDC7A_PlayerClimbingOrSwimmingRelated                                     ;; 00:2cea $21 $7a $dc
     or   A, [HL]                                       ;; 00:2ced $b6
@@ -48,7 +48,7 @@ call_00_2ce2_Entity_DrawGex:
     ld   HL, data_7f_403d                                     ;; 00:2d01 $21 $3d $40
     add  HL, DE                                        ;; 00:2d04 $19
     ld   A, [HL+]                                      ;; 00:2d05 $2a
-    ld   [wDABF_GexSpriteBank], A                                    ;; 00:2d06 $ea $bf $da
+    ld   [wDABF_PlayerGfx_SrcBank], A                                    ;; 00:2d06 $ea $bf $da
     ld   A, [HL+]                                      ;; 00:2d09 $2a
     ld   H, [HL]                                       ;; 00:2d0a $66
     ld   L, A                                          ;; 00:2d0b $6f
@@ -64,21 +64,21 @@ call_00_2ce2_Entity_DrawGex:
     ld   H, [HL]                                       ;; 00:2d18 $66
     ld   L, A                                          ;; 00:2d19 $6f
     push HL                                            ;; 00:2d1a $e5
-    ld   A, [wDABF_GexSpriteBank]                                    ;; 00:2d1b $fa $bf $da
+    ld   A, [wDABF_PlayerGfx_SrcBank]                                    ;; 00:2d1b $fa $bf $da
     add  A, C                                          ;; 00:2d1e $81
-    ld   [wDABF_GexSpriteBank], A                                    ;; 00:2d1f $ea $bf $da
+    ld   [wDABF_PlayerGfx_SrcBank], A                                    ;; 00:2d1f $ea $bf $da
     call call_00_0f08_RestoreBank                                  ;; 00:2d22 $cd $08 $0f
-    ld   A, [wDABF_GexSpriteBank]                                    ;; 00:2d25 $fa $bf $da
+    ld   A, [wDABF_PlayerGfx_SrcBank]                                    ;; 00:2d25 $fa $bf $da
     call call_00_0eee_SwitchBank                                  ;; 00:2d28 $cd $ee $0e
     pop  HL                                            ;; 00:2d2b $e1
     ld   A, [HL+]                                      ;; 00:2d2c $2a
-    ld   [wDAC2_DMATransferLength], A                                    ;; 00:2d2d $ea $c2 $da
+    ld   [wDAC2_PlayerGfx_TileCount], A                                    ;; 00:2d2d $ea $c2 $da
     inc  HL                                            ;; 00:2d30 $23
     inc  HL                                            ;; 00:2d31 $23
     ld   A, [HL+]                                      ;; 00:2d32 $2a
-    ld   [wDAC0_GeneralPurposeDMASourceAddress], A                                    ;; 00:2d33 $ea $c0 $da
+    ld   [wDAC0_PlayerGfx_SrcAddr], A                                    ;; 00:2d33 $ea $c0 $da
     ld   A, [HL+]                                      ;; 00:2d36 $2a
-    ld   [wDAC0_GeneralPurposeDMASourceAddress+1], A                                    ;; 00:2d37 $ea $c1 $da
+    ld   [wDAC0_PlayerGfx_SrcAddr+1], A                                    ;; 00:2d37 $ea $c1 $da
     xor  A, A                                          ;; 00:2d3a $af
     ld   [wDC52_GexSpriteRelated], A                                    ;; 00:2d3b $ea $52 $dc
     ld   A, [wDC6F_EntitySpriteRelated]                                    ;; 00:2d3e $fa $6f $dc
@@ -109,14 +109,14 @@ call_00_2ce2_Entity_DrawGex:
     ld   B, A                                          ;; 00:2d73 $47
     call call_00_2f00_PlayerIsDead                                  ;; 00:2d74 $cd $00 $2f
     jr   NZ, .jr_00_2d87                               ;; 00:2d77 $20 $0e
-    ld   A, [wDC7E_PlayerDamageCooldownTimer]                                    ;; 00:2d79 $fa $7e $dc
+    ld   A, [wDC7E_Player_DamageCooldownTimer]                                    ;; 00:2d79 $fa $7e $dc
     and  A, A                                          ;; 00:2d7c $a7
     jr   Z, .jr_00_2d87                                ;; 00:2d7d $28 $08
-    ld   A, [wDC71_FrameCounter_Entities]                                    ;; 00:2d7f $fa $71 $dc
+    ld   A, [wDC71_VBlankFrameCounter]                                    ;; 00:2d7f $fa $71 $dc
     and  A, $07                                        ;; 00:2d82 $e6 $07
     jp   NZ, .jp_00_2ece                               ;; 00:2d84 $c2 $ce $2e
 .jr_00_2d87:
-    ld   A, [wDAC2_DMATransferLength]                                    ;; 00:2d87 $fa $c2 $da
+    ld   A, [wDAC2_PlayerGfx_TileCount]                                    ;; 00:2d87 $fa $c2 $da
 .jr_00_2d8a:
     push AF                                            ;; 00:2d8a $f5
     ld   A, [HL+]                                      ;; 00:2d8b $2a
@@ -163,14 +163,14 @@ call_00_2ce2_Entity_DrawGex:
     ld   B, A                                          ;; 00:2dce $47
     call call_00_2f00_PlayerIsDead                                  ;; 00:2dcf $cd $00 $2f
     jr   NZ, .jr_00_2de2                               ;; 00:2dd2 $20 $0e
-    ld   A, [wDC7E_PlayerDamageCooldownTimer]                                    ;; 00:2dd4 $fa $7e $dc
+    ld   A, [wDC7E_Player_DamageCooldownTimer]                                    ;; 00:2dd4 $fa $7e $dc
     and  A, A                                          ;; 00:2dd7 $a7
     jr   Z, .jr_00_2de2                                ;; 00:2dd8 $28 $08
-    ld   A, [wDC71_FrameCounter_Entities]                                    ;; 00:2dda $fa $71 $dc
+    ld   A, [wDC71_VBlankFrameCounter]                                    ;; 00:2dda $fa $71 $dc
     and  A, $07                                        ;; 00:2ddd $e6 $07
     jp   NZ, .jp_00_2ece                               ;; 00:2ddf $c2 $ce $2e
 .jr_00_2de2:
-    ld   A, [wDAC2_DMATransferLength]                                    ;; 00:2de2 $fa $c2 $da
+    ld   A, [wDAC2_PlayerGfx_TileCount]                                    ;; 00:2de2 $fa $c2 $da
 .jr_00_2de5:
     push AF                                            ;; 00:2de5 $f5
     ld   A, [HL+]                                      ;; 00:2de6 $2a
@@ -222,14 +222,14 @@ call_00_2ce2_Entity_DrawGex:
     ld   B, A                                          ;; 00:2e32 $47
     call call_00_2f00_PlayerIsDead                                  ;; 00:2e33 $cd $00 $2f
     jr   NZ, .jr_00_2e46                               ;; 00:2e36 $20 $0e
-    ld   A, [wDC7E_PlayerDamageCooldownTimer]                                    ;; 00:2e38 $fa $7e $dc
+    ld   A, [wDC7E_Player_DamageCooldownTimer]                                    ;; 00:2e38 $fa $7e $dc
     and  A, A                                          ;; 00:2e3b $a7
     jr   Z, .jr_00_2e46                                ;; 00:2e3c $28 $08
-    ld   A, [wDC71_FrameCounter_Entities]                                    ;; 00:2e3e $fa $71 $dc
+    ld   A, [wDC71_VBlankFrameCounter]                                    ;; 00:2e3e $fa $71 $dc
     and  A, $07                                        ;; 00:2e41 $e6 $07
     jp   NZ, .jp_00_2ece                               ;; 00:2e43 $c2 $ce $2e
 .jr_00_2e46:
-    ld   A, [wDAC2_DMATransferLength]                                    ;; 00:2e46 $fa $c2 $da
+    ld   A, [wDAC2_PlayerGfx_TileCount]                                    ;; 00:2e46 $fa $c2 $da
 .jr_00_2e49:
     push AF                                            ;; 00:2e49 $f5
     ld   A, [HL+]                                      ;; 00:2e4a $2a
@@ -279,14 +279,14 @@ call_00_2ce2_Entity_DrawGex:
     ld   B, A                                          ;; 00:2e91 $47
     call call_00_2f00_PlayerIsDead                                  ;; 00:2e92 $cd $00 $2f
     jr   NZ, .jr_00_2ea4                               ;; 00:2e95 $20 $0d
-    ld   A, [wDC7E_PlayerDamageCooldownTimer]                                    ;; 00:2e97 $fa $7e $dc
+    ld   A, [wDC7E_Player_DamageCooldownTimer]                                    ;; 00:2e97 $fa $7e $dc
     and  A, A                                          ;; 00:2e9a $a7
     jr   Z, .jr_00_2ea4                                ;; 00:2e9b $28 $07
-    ld   A, [wDC71_FrameCounter_Entities]                                    ;; 00:2e9d $fa $71 $dc
+    ld   A, [wDC71_VBlankFrameCounter]                                    ;; 00:2e9d $fa $71 $dc
     and  A, $07                                        ;; 00:2ea0 $e6 $07
     jr   NZ, .jp_00_2ece                               ;; 00:2ea2 $20 $2a
 .jr_00_2ea4:
-    ld   A, [wDAC2_DMATransferLength]                                    ;; 00:2ea4 $fa $c2 $da
+    ld   A, [wDAC2_PlayerGfx_TileCount]                                    ;; 00:2ea4 $fa $c2 $da
 .jr_00_2ea7:
     push AF                                            ;; 00:2ea7 $f5
     ld   A, [HL+]                                      ;; 00:2ea8 $2a
@@ -318,10 +318,10 @@ call_00_2ce2_Entity_DrawGex:
     dec  A                                             ;; 00:2ecb $3d
     jr   NZ, .jr_00_2ea7                               ;; 00:2ecc $20 $d9
 .jp_00_2ece:
-    ld   A, [wDC51_CurrentFlyRelated]                                    ;; 00:2ece $fa $51 $dc
+    ld   A, [wDC51_Player_CurrentFly]                                    ;; 00:2ece $fa $51 $dc
     and  A, A                                          ;; 00:2ed1 $a7
     jr   Z, .jr_00_2ef9                                ;; 00:2ed2 $28 $25
-    ld   A, [wDC71_FrameCounter_Entities]                                    ;; 00:2ed4 $fa $71 $dc
+    ld   A, [wDC71_VBlankFrameCounter]                                    ;; 00:2ed4 $fa $71 $dc
     rrca                                               ;; 00:2ed7 $0f
     and  A, $0f                                        ;; 00:2ed8 $e6 $0f
     add  A, A                                          ;; 00:2eda $87
@@ -434,7 +434,7 @@ call_00_2f85_LoadAndSortCollectibleData:
 ; then returns to original bank.
 ; Purpose: Initializes and sorts collectible positions for the current level.
     xor  A, A                                          ;; 00:2f85 $af
-    ld   [wDC68_CollectibleCount], A                                    ;; 00:2f86 $ea $68 $dc
+    ld   [wDC68_CollectibleAmount], A                                    ;; 00:2f86 $ea $68 $dc
     ld   A, [wDC19_CollectibleListBank]                                    ;; 00:2f89 $fa $19 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:2f8c $cd $ee $0e
     ld   L, LOW(wD100_CollectibleXPositions)                                        ;; 00:2f8f $2e $00
@@ -601,9 +601,9 @@ call_00_2ff8_InitLevelEntitiesAndConfig:
     jr   Z, .jr_00_30a3                                ;; 00:309f $28 $02
     ld   A, $69                                        ;; 00:30a1 $3e $69
 .jr_00_30a3:
-    ld   [wDB6E_BonusStageTimerHi], A                                    ;; 00:30a3 $ea $6e $db
+    ld   [wDB6E_LevelTimer_SecondsRemaining], A                                    ;; 00:30a3 $ea $6e $db
     ld   A, $3c                                        ;; 00:30a6 $3e $3c
-    ld   [wDB6F_BonusStageTimerLo], A                                    ;; 00:30a8 $ea $6f $db
+    ld   [wDB6F_LevelTimer_FrameCounter], A                                    ;; 00:30a8 $ea $6f $db
 .jr_00_30ab:
     call call_00_3180_MarkInitialLevelEntities                                  ;; 00:30ab $cd $80 $31
     call call_00_31d9_CheckAndClearBonusCoinEntityFlags                                  ;; 00:30ae $cd $d9 $31

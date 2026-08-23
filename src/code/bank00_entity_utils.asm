@@ -3,7 +3,7 @@ call_00_21ef_Entity_PlayRemoteSFX:
 ; Just plays the remote spawned/obtained sound effect
     push BC                                            ;; 00:21ef $c5
     ld   A, SFX_REMOTE                                        ;; 00:21f0 $3e $1e
-    call call_00_0ff5_QueueSoundEffect                                  ;; 00:21f2 $cd $f5 $0f
+    call call_00_0ff5_QueueSFX                                  ;; 00:21f2 $cd $f5 $0f
     pop  BC                                            ;; 00:21f5 $c1
 
 call_00_21f6_Entity_SetTVButtonFlags:
