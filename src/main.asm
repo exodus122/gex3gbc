@@ -15,6 +15,9 @@ INCLUDE "code/bank00_level_init.asm"
 INCLUDE "code/bank00_entity_load.asm"
 
 SECTION "bank01", ROMX[$4000], BANK[$01]
+INCLUDE "code/menus/bank01_menu_load.asm"
+INCLUDE "code/menus/bank01_menu_script.asm"
+INCLUDE "code/menus/bank01_text_render.asm"
 INCLUDE "code/bank01_menus.asm"
 
 SECTION "bank02", ROMX[$4000], BANK[$02]
