@@ -43,8 +43,8 @@ wCD00_RowOffsetTableForMap:
 ; BG map strip scratch, $CF00-$CFFF. The strip loaders never write VRAM
 ; directly - they assemble 11 blocks worth of tile ids and GBC attribute bytes
 ; here, then call_00_0b9f_VBlank_UpdateVRAM flushes the pair to the
-; tilemap during vblank (call_03_75e3_Tilemap_UpdateBlockFromBuffer for a row,
-; call_03_7664_Tilemap_UpdateColumnFromBuffer for a column). gex2 has no
+; tilemap during vblank (call_03_75e3_VRAM_WriteBgMapRow for a row,
+; call_03_7664_VRAM_WriteBgMapColumn for a column). gex2 has no
 ; equivalent - it writes tiles into VRAM inside the loader itself.
 ;
 ; The row halves are indexed by wDC25_BgMap_ScratchRowOffset and the column
@@ -827,7 +827,7 @@ wDC20_BgMapLoadingFlags:
 
 wDC21_BgMap_RowWritePosLo:
 ; Tilemap address ($9800-$9BFF) that the pending ROW strip is flushed to, low
-; byte. Read back by call_03_75e3_Tilemap_UpdateBlockFromBuffer.
+; byte. Read back by call_03_75e3_VRAM_WriteBgMapRow.
 ; gex2 calls the same thing wD6FA_BgMap_RowWritePosLo
     ds 1                                               ;; dc21
 
@@ -838,7 +838,7 @@ wDC22_BgMap_RowWritePosHi:
 
 wDC23_BgMap_ColumnWritePosLo:
 ; Tilemap address that the pending COLUMN strip is flushed to, low byte.
-; Read back by call_03_7664_Tilemap_UpdateColumnFromBuffer
+; Read back by call_03_7664_VRAM_WriteBgMapColumn
     ds 1                                               ;; dc23
 
 wDC24_BgMap_ColumnWritePosHi:

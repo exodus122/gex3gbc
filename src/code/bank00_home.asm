@@ -1844,8 +1844,8 @@ call_00_0b9f_VBlank_UpdateVRAM:
 ;   a bg map strip is waiting  MAP_PENDING_VRAM_TRANSFER in
 ;                              wDC20_BgMapLoadingFlags. Whichever of the four
 ;                              scroll bits are set decide whether a row
-;                              (call_03_75e3_Tilemap_UpdateBlockFromBuffer) or a
-;                              column (call_03_7664_Tilemap_UpdateColumnFromBuffer) is
+;                              (call_03_75e3_VRAM_WriteBgMapRow) or a column
+;                              (call_03_7664_VRAM_WriteBgMapColumn) is
 ;                              flushed, and the flags are cleared afterwards.
 ;                              Nothing else runs this frame
 ;   nothing is waiting         the housekeeping instead: the status bar, the
@@ -1864,10 +1864,10 @@ call_00_0b9f_VBlank_UpdateVRAM:
     and  A, $0f                                        ;; 00:0bb0 $e6 $0f
     jr   Z, .jr_00_0bc6                                ;; 00:0bb2 $28 $12
     and  A, $03                                        ;; 00:0bb4 $e6 $03
-    call NZ, call_03_75e3_Tilemap_UpdateBlockFromBuffer ;; 00:0bb6 $c4 $e3 $75
+    call NZ, call_03_75e3_VRAM_WriteBgMapRow          ;; 00:0bb6 $c4 $e3 $75
     ld   A, [wDC20_BgMapLoadingFlags]                  ;; 00:0bb9 $fa $20 $dc
     and  A, $0c                                        ;; 00:0bbc $e6 $0c
-    call NZ, call_03_7664_Tilemap_UpdateColumnFromBuffer ;; 00:0bbe $c4 $64 $76
+    call NZ, call_03_7664_VRAM_WriteBgMapColumn       ;; 00:0bbe $c4 $64 $76
     xor  A, A                                          ;; 00:0bc1 $af
     ld   [wDC20_BgMapLoadingFlags], A                  ;; 00:0bc2 $ea $20 $dc
     ret                                                ;; 00:0bc5 $c9

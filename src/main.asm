@@ -40,7 +40,7 @@ INCLUDE "code/bank03_map_boundaries_and_spawns.asm"
 INCLUDE "code/bank03_palettes.asm"
 INCLUDE "code/bank03_map_init_data.asm"
 INCLUDE "code/bank03_hud_graphics.asm"
-INCLUDE "code/bank03_vram_copy.asm"
+INCLUDE "code/bank03_vram_write.asm"
 
 SECTION "bank04", ROMX[$4000], BANK[$04]
 INCLUDE "code/audio/bank04_audio1.asm"

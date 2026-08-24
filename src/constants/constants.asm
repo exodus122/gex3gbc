@@ -1389,6 +1389,21 @@ DEF BG_COLLISION_SLOPE_MASK               EQU $0F
 ; left or right edge to clamp against - the X position's high byte is masked instead
 DEF MAP_WRAP_XPOS_MASK                    EQU $0F
 
+; The BG tilemap is SCRN_VX_B x SCRN_VY_B tiles at _SCRN0, of which only
+; SCRN_X_B x SCRN_Y_B are on screen at once. The strip writers in
+; code/bank03_vram_write.asm work in whole rows and columns of the virtual map,
+; not of the screen
+DEF BGMAP_ROW_TILES              EQU SCRN_VX_B ; 32 across
+DEF BGMAP_COLUMN_TILES           EQU SCRN_VX_B ; and 32 down - the map is square
+DEF BGMAP_ROW_STRIDE             EQU SCRN_VX_B ; bytes between one row and the next
+DEF BGMAP_ROW_MASK               EQU $E0 ; snaps a tilemap address to the start of its row
+DEF BGMAP_COLUMN_MASK            EQU $1F ; the column index within a row
+
+; rVBK. Tile ids live in bank 0 and their CGB attributes at the same addresses in
+; bank 1, which is why every strip write here happens twice
+DEF VRAM_BANK_TILE_IDS           EQU 0
+DEF VRAM_BANK_ATTRIBUTES         EQU 1
+
 ; Player Action State flags
 ; One byte per player action id in data_02_554d_PlayerStatesPerAction: what the
 ; action is, and what the rest of the player code is allowed to do while it runs.

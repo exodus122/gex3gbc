@@ -2241,10 +2241,10 @@
 03:7590 call_03_757e_HUD_AnimateBonusStageTimer.jr_03_7590
 03:7599 call_03_757e_HUD_AnimateBonusStageTimer.jr_03_7599
 03:75be call_03_75be_HUD_LoadBonusStageTimerSprite
-03:75e3 call_03_75e3_Tilemap_UpdateBlockFromBuffer
-03:7604 call_03_7604_MemCopy32Bytes
-03:7664 call_03_7664_Tilemap_UpdateColumnFromBuffer
-03:7685 call_03_7685_MemCopyColumn16
+03:75e3 call_03_75e3_VRAM_WriteBgMapRow
+03:7604 call_03_7604_VRAM_Copy32Bytes
+03:7664 call_03_7664_VRAM_WriteBgMapColumn
+03:7685 call_03_7685_VRAM_WriteColumn32Bytes
 04:4000 call_04_4000_Audio
 04:4006 call_04_4006_Audio
 04:4009 call_04_4009
