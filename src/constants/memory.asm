@@ -1355,7 +1355,7 @@ wDCAA_FlyPowerup1_Timer:
     ds 1                                               ;; dcaa
 wDCAB_FlyPowerup5_Timer:
 ; armed by swapping out FLY_POWERUP_5. Also what
-; call_03_6567_LoadFlyPalettes checks first, so this power-up's tint wins
+; call_03_6567_FlyPowerup_LoadPalette checks first, so this power-up's tint wins
     ds 1                                               ;; dcab
 
 wDCAC_Player_CrouchLookDownRelated:
@@ -1469,13 +1469,30 @@ wDCE9_EntitySpawnPosOffsetFlag:
     ds 1                                               ;; dce9
 
 ; Palletes and related flags
+; ------------------------------------------------------------------
+; The CGB palette buffers. Two blocks of CGB_PALETTE_RAM_SIZE bytes, back to back,
+; and call_00_0e81_UploadCgbPalettes walks HL straight through all $80 of them - the
+; first block to rBCPD, the second to rOCPD.
+;
+; The four labels below are a disassembly artifact, not a structure. Each block is
+; eight palettes of CGB_PALETTE_SIZE bytes and the writers cross the halfway label
+; freely: call_03_65c6_Palettes_LoadForScreen copies $40 bytes from wDCEA_BgPalettes
+; and another $40 straight after, and an entity holding palette 4 or more has its
+; colours written past wDD2A_EntityPalettes into wDD4A_ObjectPalettes
+; ------------------------------------------------------------------
 wDCEA_BgPalettes:
+; BG palettes 0-3
     ds 32                                              ;; dcea
 wDD0A_BgPalettes:
+; BG palettes 4-7
     ds 32                                              ;; dd0a
 wDD2A_EntityPalettes:
+; OBJ palettes 0-3. Palette 0 is the player's - the map supplies it and
+; call_03_6567_FlyPowerup_LoadPalette tints it - and 1 upwards are handed out one per
+; entity slot by call_03_687c_AssignEntityPalette
     ds 32                                              ;; dd2a
 wDD4A_ObjectPalettes:
+; OBJ palettes 4-7, for entity slots 4 to 7. Nothing addresses this label directly
     ds 32                                              ;; dd4a
 wDD6A_PalettesReadyFlag:
 ; 0 while a screen is being built: call_00_0e81_UploadCgbPalettes then fills

@@ -145,7 +145,7 @@ call_00_1056_BgMap_LoadFull:
     call call_00_0e62_ClearShadowOamAndResetScroll                                  ;; 00:1059 $cd $62 $0e
     call call_00_10c7_BgMap_BuildRowOffsetTable                                  ;; 00:105c $cd $c7 $10
     ld   C, $00                                        ;; 00:105f $0e $00
-    farcall call_03_65c6_LoadBgPalettes
+    farcall call_03_65c6_Palettes_LoadForScreen
     ld   C, $03                                        ;; 00:106c $0e $03
     call call_00_0a6a_Hdma_RunConfigEntry                                  ;; 00:106e $cd $6a $0a
     ld   C, $04                                        ;; 00:1071 $0e $04

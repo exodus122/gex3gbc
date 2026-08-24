@@ -477,7 +477,7 @@ call_02_4f32_Player_UpdateMain:
     call call_02_4ffb_Player_DecrementPowerupTimer    ;; 02:4f9e $cd $fb $4f
     ld   HL, wDCAB_FlyPowerup5_Timer                  ;; 02:4fa1 $21 $ab $dc
     call call_02_4ffb_Player_DecrementPowerupTimer    ;; 02:4fa4 $cd $fb $4f
-    farcall call_03_6567_LoadFlyPalettes
+    farcall call_03_6567_FlyPowerup_LoadPalette
     call call_02_5081_Player_UpdateFacing             ;; 02:4fb2 $cd $81 $50
     farcall call_03_46e0_BgCollision_Update
     call call_02_5267_Player_ApplyYVelocity           ;; 02:4fc0 $cd $67 $52

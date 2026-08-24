@@ -506,6 +506,17 @@ DEF OAM_DMA_WAIT_LOOPS           EQU $28   ; busy-wait in call_00_0e29_OamDmaRou
 DEF OAM_DMA_ROUTINE_SIZE         EQU $0a   ; bytes copied to hFF80_OamDmaRoutine at boot
 DEF CGB_PALETTE_RAM_SIZE         EQU $40   ; 8 palettes x 4 colours x 2 bytes
 DEF BG_PALETTE_BYTES             EQU $40   ; one map's worth, copied to wDCEA_BgPalettes
+DEF CGB_PALETTE_SIZE             EQU $08   ; one palette - four colours, two bytes each
+
+; ------------------------------------------------------------------
+; Menu palettes - code/bank03_palettes.asm
+; ------------------------------------------------------------------
+; call_03_65c6_Palettes_LoadForScreen takes a menu id in C. Zero means "not a menu,
+; load the current map's colours instead", and a menu whose id has this bit set gets no
+; palette load at all and keeps whatever is already there. The menu loader in bank 1
+; tests the same bit before it calls, so the check inside the routine is a second line
+; of defence rather than the one that fires
+DEF MENU_PALETTE_NONE_BIT        EQU 7
 DEF ENTITY_SLOT_STRIDE           EQU $20   ; bytes per entity in wD800_EntityMemory
 
 ; The "GAME BOY COLOR ONLY" screen Init draws on a DMG, straight into VRAM with
