@@ -3,7 +3,7 @@ call_02_4db1_Player_SnapXPosToEntity:
 ; If the entity is left of the player (carry set), branches to a special handler. If they are perfectly aligned, 
 ; it returns. Otherwise jumps to a general trigger routine.
 ; Purpose: Detects horizontal proximity for events.
-    call call_00_29ce_Entity_CheckExists                                  ;; 02:4db1 $cd $ce $29
+    call call_00_29ce_Entity_FindSlotById                                  ;; 02:4db1 $cd $ce $29
     ret  NZ                                            ;; 02:4db4 $c0
     ld   A, L                                          ;; 02:4db5 $7d
     or   A, $0e                                        ;; 02:4db6 $f6 $0e
@@ -581,14 +581,14 @@ call_02_5100_Player_HorizontalMovementHandler:
 call_02_518a_ApplyLeftwardCollisionAdjustment:
 ; Purpose: Adjusts the player's X-position when moving left against solid tiles or obstacles.
 ; Details:
-; Checks flags (wDC7C_PlayerCollisionUnusedFlag, wDC7B_CurrentEntityAddrLoAlt2) for collision state.
+; Checks flags (wDC7C_PlayerCollisionUnusedFlag, wDC7D_Player_PushedMovingPlatformLo) for collision state.
 ; Computes the delta between player position and reference points.
 ; Writes corrected position back to wD80E_PlayerXPosition or clamps based on collision checks.
 ; Works together with call_02_5195_ResolveLeftwardTilePushback to fine-tune adjustments.
     ld   A, [wDC7C_PlayerCollisionUnusedFlag]                                    ;; 02:518a $fa $7c $dc
     and  A, A                                          ;; 02:518d $a7
     jr   NZ, call_02_51cb_CheckLeftCollisionAndStoreOffset                                ;; 02:518e $20 $3b
-    ld   A, [wDC7B_CurrentEntityAddrLoAlt2]                                    ;; 02:5190 $fa $7d $dc
+    ld   A, [wDC7D_Player_PushedMovingPlatformLo]                                    ;; 02:5190 $fa $7d $dc
     and  A, A                                          ;; 02:5193 $a7
     ret  NZ                                            ;; 02:5194 $c0
 
@@ -685,7 +685,7 @@ call_02_51f9_ApplyRightwardCollisionAdjustment:
     ld   A, [wDC7C_PlayerCollisionUnusedFlag]                                    ;; 02:51f9 $fa $7c $dc
     and  A, A                                          ;; 02:51fc $a7
     jr   NZ, call_02_5238_CheckRightCollisionAndStoreOffset                                ;; 02:51fd $20 $39
-    ld   A, [wDC7B_CurrentEntityAddrLoAlt2]                                    ;; 02:51ff $fa $7d $dc
+    ld   A, [wDC7D_Player_PushedMovingPlatformLo]                                    ;; 02:51ff $fa $7d $dc
     and  A, A                                          ;; 02:5202 $a7
     ret  NZ                                            ;; 02:5203 $c0
 

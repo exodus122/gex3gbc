@@ -610,6 +610,7 @@ DEF ENTITY_CHANNEL_Z_BLUE_BEAM_BARRIER                 EQU $6F ; unused?
 DEF ENTITY_CHANNEL_Z_METEOR                            EQU $70
 DEF ENTITY_CHANNEL_Z_REZ_PROJECTILE                    EQU $71
 DEF ENTITY_LIST_TERMINATOR                             EQU $FF
+DEF ENTITY_ID_NONE                                     EQU $FF ; a free entity slot
 
 ; Entity Instance Struct
 DEF ENTITY_FIELD_ENTITY_ID                  EQU $00
@@ -620,11 +621,15 @@ DEF ENTITY_FIELD_ACTION_STATE_FLAGS         EQU $05
     DEF ACTION_STATE_UNK80_BIT             EQU 7
     DEF ACTION_STATE_UNK20_BIT             EQU 5
     DEF ACTION_STATE_IS_FIRST_FRAME_BIT    EQU 4
-    DEF ACTION_STATE_UNK04_BIT             EQU 2
+    DEF ACTION_STATE_ANIM_ENDED_BIT        EQU 2 ; set on the one frame an action's animation wraps,
+                                                 ; cleared at the top of every sprite update.
+                                                 ; call_00_2a5d_Entity_CheckAnimationEnded reads it and
+                                                 ; it is how most actions hand off to the next one.
+                                                 ; gex2's SPRITE_FLAG_ANIM_ENDED_BIT
     DEF ACTION_STATE_UNK80                 EQU $80
     DEF ACTION_STATE_UNK20                 EQU $20
     DEF ACTION_STATE_IS_FIRST_FRAME        EQU $10
-    DEF ACTION_STATE_UNK04                 EQU $04
+    DEF ACTION_STATE_ANIM_ENDED                 EQU $04
 DEF ENTITY_FIELD_SPRITE_FRAME_COUNTER_MAX   EQU $06 ; how many frames to use this sprite
 DEF ENTITY_FIELD_SPRITE_FRAME_COUNTER       EQU $07 ; counter for the above
 DEF ENTITY_FIELD_SPRITE_COUNTER_MAX         EQU $08 ; total sprite frames for current action
@@ -645,9 +650,14 @@ DEF ENTITY_FIELD_MISC_FLAGS                 EQU $19 ; only used by moving platfo
                                                     ; initially set to data_00_3258[entity_id*8][5]
 DEF ENTITY_FIELD_MISC_TIMER                 EQU $1A ; timer which can be used for various purposes
 DEF ENTITY_FIELD_XVEL                       EQU $1B
-DEF ENTITY_FIELD_XVEL_RELATED               EQU $1C ; used with XVEL to calculate X delta
+DEF ENTITY_FIELD_XVEL_RELATED               EQU $1C ; subpixel accumulator: the low nibble carries the
+                                                    ; fraction of a pixel XVEL has not paid out yet
 DEF ENTITY_FIELD_YVEL                       EQU $1D
-DEF ENTITY_FIELD_UNK1E                      EQU $1E ; seems unused, likely would have been used for Y velocity delta
+DEF ENTITY_FIELD_YVEL_RELATED               EQU $1E ; the same accumulator for YVEL. Only the facing-based
+                                                    ; mover call_00_25cb_Entity_MoveYByFacingSpeed uses it;
+                                                    ; call_00_24ee_Entity_ApplyYVelocity_Subpixel accumulates
+                                                    ; into $1E's neighbour instead, so most entities leave
+                                                    ; this byte at zero
 DEF ENTITY_FIELD_PARENT                     EQU $1F ; stores entity list index of this entity's parent (used for projectiles, flies)
 
 ; Entity Spawn Struct
@@ -706,8 +716,64 @@ DEF ENTITY_FACING_LEFT_BIT              EQU 5
 DEF ENTITY_LEFT_OF_GEX       EQU $00
 DEF ENTITY_RIGHT_OF_GEX      EQU $20
 
-; Entity flags, used in wD700_EntityFlags
-DEF ENTITY_FLAG_80_ACTIVE    EQU $80
+; Entity list flags, used in wD700_EntityFlags - one byte per entry in the level's
+; entity list. High nibble = flags, low nibble = the action id the entry respawns
+; with. See the wD700_EntityFlags block in memory.asm for the full story.
+;
+; gex2's equivalents are ENTITY_LIST_FLAG_ABSENT / _PLACED / _NEVER_AGAIN, which
+; are a plain three-value enum; gex3 turned the same idea into a bitfield and gave
+; $00 the "never again" meaning that gex2 spells $FF
+DEF ENTITY_LIST_FLAG_ABSENT     EQU $00 ; zeroed - never spawns again (gex2: _NEVER_AGAIN)
+DEF ENTITY_LIST_FLAG_PRESENT    EQU $80 ; entry exists; written for every entry when the list loads
+DEF ENTITY_LIST_FLAG_PLACED     EQU $40 ; currently occupying one of the eight entity slots
+DEF ENTITY_LIST_FLAG_FLY_COIN   EQU $10 ; respawn as ENTITY_FLY_COIN_SPAWN, not as the listed entity
+DEF ENTITY_LIST_FLAG_MASK       EQU $F0
+DEF ENTITY_LIST_STATE_MASK      EQU $0F ; the respawn action id
+    DEF ENTITY_LIST_FLAG_PLACED_BIT   EQU 6
+    DEF ENTITY_LIST_FLAG_FLY_COIN_BIT EQU 4
+
+; What a defeated entity's list entry is left as when it drops a fly coin:
+; still placed, and marked to come back as the coin rather than as itself
+DEF ENTITY_LIST_FLAGS_DEFEATED  EQU ENTITY_LIST_FLAG_PLACED | ENTITY_LIST_FLAG_FLY_COIN
+
+; Respawn action ids written into the low nibble from outside the entity, so that
+; scenery the player has already dealt with comes back in the state it was left in
+DEF ENTITY_LIST_STATE_DEFAULT       EQU $00
+DEF ENTITY_LIST_STATE_TV_BUTTON_ON  EQU $01 ; tv button already pressed
+DEF ENTITY_LIST_STATE_TV_BUTTON_LIT EQU $02 ; pressed, and this level's progress flag is already set
+DEF ENTITY_LIST_STATE_REMOTE_TAKEN  EQU $04 ; remote already collected
+
+; Per-level trigger scratchpad, wDCB1_LevelTriggerBuffer. The trigger helpers in
+; bank00_entity_utils.asm index it with an entity's spawn parameter and ignore
+; anything that does not fit
+DEF LEVEL_TRIGGER_COUNT         EQU $10
+DEF LEVEL_TRIGGER_SET           EQU $01
+DEF LEVEL_TRIGGER_CLEAR         EQU $00
+
+; Entity physics, as used by the movement helpers in bank00_entity_utils.asm.
+; Velocities are 1/16 pixel per frame, so the movers accumulate a subpixel
+; fraction and shift right four times to get whole pixels
+DEF ENTITY_SUBPIXEL_SHIFT       EQU 4
+DEF ENTITY_SUBPIXEL_MASK        EQU $0F
+DEF ENTITY_GRAVITY_PER_FRAME    EQU $02 ; subtracted from YVEL each frame
+DEF ENTITY_TERMINAL_YVEL        EQU $C0 ; -64/16 px per frame, the fastest an entity may fall
+
+; Margins used when an entity is placed relative to the camera rather than the map
+DEF ENTITY_BELOW_CAMERA_MARGIN  EQU $B0 ; call_00_2780_Entity_IsBelowCameraBottom
+DEF ENTITY_ABOVE_CAMERA_MARGIN  EQU $14 ; call_00_27cb_Entity_SetYToAboveCameraTop
+
+; The fly coin a defeated enemy leaves behind (call_00_2bbe_Entity_TurnIntoFlyCoin)
+DEF FLY_COIN_SIZE               EQU $12
+DEF FLY_COIN_DAMAGE_STATE       EQU $01
+
+; Particle burst slots, wDDC4_ParticleSlot1 onwards
+DEF PARTICLE_SLOT_COUNT         EQU 8
+DEF PARTICLE_BURST_DURATION     EQU $40 ; frames
+DEF PARTICLE_TEMPLATE_SIZE      EQU $12 ; bytes copied after the timer byte
+DEF PARTICLE_BURST_PAIRS        EQU 3   ; x/y pairs stepped per frame
+
+; One entity's CGB palette in wDD2A_EntityPalettes: four colours, two bytes each
+DEF ENTITY_PALETTE_SIZE         EQU 8
 
 ; Player vs Entity interaction events
 DEF PLAYER_TOUCHED_ENTITY   EQU $00

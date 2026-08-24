@@ -94,7 +94,39 @@ wD578_ScreenDraw_PaletteIds:
     ds 392                                               ;; d578
 
 wD700_EntityFlags:
-; Each byte stores the current flags for each entity in the entity list for the level
+; One byte per entry in the level's entity list - the persistent, per-list-entry
+; state that survives an entity leaving its slot, and the thing that decides
+; whether call_00_3618_HandleEntitySpawn is allowed to place that entry at all.
+; Indexed by the 1-based list index, so wD700 itself is never a real entry.
+;
+; The byte is split in two. The high nibble is flags:
+;
+;   ENTITY_LIST_FLAG_PRESENT  ($80)  written for every entry when the list is
+;                                    loaded; just means "this entry exists"
+;   ENTITY_LIST_FLAG_PLACED   ($40)  currently occupying one of the eight slots.
+;                                    The spawner refuses to place an entry that
+;                                    already has it, and call_00_2b5d_Entity_ClearSlot
+;                                    clears it again when the slot is freed
+;   ENTITY_LIST_FLAG_FLY_COIN ($10)  respawn this entry as ENTITY_FLY_COIN_SPAWN
+;                                    instead of whatever the list says. Set by
+;                                    call_00_2ba9_Entity_MarkRespawnAsFlyCoin when a
+;                                    defeated enemy leaves a fly coin behind
+;
+; ENTITY_LIST_FLAG_ABSENT ($00) is the whole byte being zero, and it is the one
+; the spawner tests first: a zeroed entry never comes back. That makes it gex3's
+; equivalent of gex2's ENTITY_LIST_FLAG_NEVER_AGAIN ($FF) rather than of gex2's
+; ENTITY_LIST_FLAG_ABSENT, and call_00_2b94_Entity_MarkNeverRespawn is what writes it.
+;
+; The low nibble (ENTITY_LIST_STATE_MASK) is a spawn action id: the spawner passes
+; it straight to call_02_72ac_SetEntityAction, so an entry can be brought back in a
+; different state from the one it was first placed in. That is how a pressed tv
+; button stays pressed and a collected remote stays collected across a map change -
+; see call_00_21f6_Entity_MarkTVButtonPressed and
+; call_00_2260_Entity_MarkRemoteCollected, which write it from outside the entity,
+; and call_00_2299_Entity_SetListState, which writes it from the entity itself.
+;
+; gex2's equivalent is wD000_EntityFlags, which is a plain enum with three values
+; and no state nibble
     ds 256
 
 ; From D800 to D900 is the loaded entities space
@@ -208,19 +240,32 @@ wDA1A_CameraPos_Bottom:
 ; 12 bytes are copied from the entity spawn data, but in a different order
 ; 0x0 wDA1C_EntityBoundingBoxXMax
 ; 0x2 wDA1E_EntityBoundingBoxXMin
-; 0x4 wDA20_EntityBoundingBoxYMin
-; 0x6 wDA22_EntityBoundingBoxYMax
+; 0x4 wDA20_EntityBoundingBoxYMax
+; 0x6 wDA22_EntityBoundingBoxYMin
 ; 0x8 wDA24_EntityInitialXPos
 ; 0xA wDA26_EntityInitialYPos
 ; 0xC DA28 - unused
 ; 0xE DA2A - unused
+;
+; This is the entity's patrol range, not its hitbox: it is the box the entity is
+; allowed to move inside, and the bounds getters in bank00_entity_utils.asm read
+; from here. Unlike gex2, which stores one byte per bound in block units and
+; multiplies by 32 on every read, gex3 stores all four as 16-bit pixel positions
+; already scaled, by the spawn-record copy inside
+; call_00_3618_HandleEntitySpawn.
+;
+; Note the Y pair: larger Y is lower on the screen, so wDA20 - the one the "move
+; down until you stop" helpers clamp against - is the FLOOR and therefore the
+; maximum. It used to be labelled YMin here purely because it comes first in
+; memory; the ordering is XMax, XMin, YMax, YMin, exactly as in gex2's
+; wD309_EntityBoundingBoxXMax..wD30C_EntityBoundingBoxYMin
 wDA1C_EntityBoundingBoxXMax:
     ds 2                                               ;; da1c
 wDA1E_EntityBoundingBoxXMin:
     ds 2                                               ;; da1e
-wDA20_EntityBoundingBoxYMin:
+wDA20_EntityBoundingBoxYMax:
     ds 2                                               ;; da20
-wDA22_EntityBoundingBoxYMax:
+wDA22_EntityBoundingBoxYMin:
     ds 2                                               ;; da22
 wDA24_EntityInitialXPos:
     ds 2                                               ;; da24
@@ -246,6 +291,12 @@ wDAAD_CameraYHi: ; Camera Y position related
     ds 1                                               ;; daad
 
 wDAAE_EntityPaletteIds:
+; One byte per loaded slot: which of the eight-byte palettes in
+; wDD2A_EntityPalettes this entity draws with. call_00_2c0f_Entity_AssignPaletteId
+; writes it and call_00_2c20_Entity_CopyPaletteToBuffer uses it to find the palette
+; to overwrite, so an entity can carry its own colours rather than borrowing the
+; level's. gex2 has no equivalent - there the per-entity colour is just the OBJ
+; palette number in wD32D_Entity_OamAttrBase
     ds 8                                               ;; daae
 wDAB6_SpriteFlags:
     ds 1                                               ;; dab6
@@ -979,13 +1030,21 @@ wDC79_PlayerUnkFlags2:
 wDC7A_PlayerClimbingOrSwimmingRelated:
     ds 1                                               ;; dc7a
 
-wDC7B_CurrentEntityAddrLoAlt:
+wDC7B_Player_EntityStoodOnLo:
+; Low byte of the entity slot base ($20, $40 ... $E0) the player is currently
+; standing on, or $00 for nothing. call_00_26c9_Entity_CarryOrPushPlayerX compares
+; it against its own slot base to decide whether it is a moving platform carrying
+; the player. gex2's wD74D_Player_EntityStoodOnLo
     ds 1                                               ;; dc7b
 
 wDC7C_PlayerCollisionUnusedFlag:
     ds 1                                               ;; dc7c
 
-wDC7B_CurrentEntityAddrLoAlt2:
+wDC7D_Player_PushedMovingPlatformLo:
+; Same idea, for the entity the player is walking INTO rather than standing on.
+; call_00_26f1_Entity_PushPlayerX only shoves the player when this names its slot,
+; which is what stops one moving block from pushing the player through another.
+; gex2's wD74F_Player_PushedMovingPlatformLo
     ds 1                                               ;; dc7d
 
 wDC7E_Player_DamageCooldownTimer:

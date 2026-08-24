@@ -41,9 +41,9 @@ call_02_708f_InitEntitiesAndSpawnPlayer:
     ld   A, $ff                                        ;; 02:70de $3e $ff
     ld   [wDC79_PlayerUnkFlags2], A                                    ;; 02:70e0 $ea $79 $dc
     xor  A, A                                          ;; 02:70e3 $af
-    ld   [wDC7B_CurrentEntityAddrLoAlt], A                                    ;; 02:70e4 $ea $7b $dc
+    ld   [wDC7B_Player_EntityStoodOnLo], A                                    ;; 02:70e4 $ea $7b $dc
     ld   [wDC7C_PlayerCollisionUnusedFlag], A                                    ;; 02:70e7 $ea $7c $dc
-    ld   [wDC7B_CurrentEntityAddrLoAlt2], A                                    ;; 02:70ea $ea $7d $dc
+    ld   [wDC7D_Player_PushedMovingPlatformLo], A                                    ;; 02:70ea $ea $7d $dc
     call call_02_7123_ClearEntitySlotsExcludingPlayer                                  ;; 02:70ed $cd $23 $71
     ld   A, [wDB6D_InBonusStage]                                    ;; 02:70f0 $fa $6d $db
     and  A, A                                          ;; 02:70f3 $a7
@@ -53,7 +53,7 @@ call_02_708f_InitEntitiesAndSpawnPlayer:
     ld   C, $19                                        ;; 02:70fa $0e $19
     call call_00_3792_PrepareRelativeEntitySpawn                                  ;; 02:70fc $cd $92 $37
     ld   C, ENTITY_BONUS_STAGE_TIMER                                        ;; 02:70ff $0e $1b
-    call call_00_29ce_Entity_CheckExists                                  ;; 02:7101 $cd $ce $29
+    call call_00_29ce_Entity_FindSlotById                                  ;; 02:7101 $cd $ce $29
     jr   NZ, .jr_02_7115                               ;; 02:7104 $20 $0f
     ld   A, L                                          ;; 02:7106 $7d
     ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 02:7107 $ea $00 $da
@@ -121,7 +121,7 @@ call_02_7152_UpdateAllEntities:
 ; Details:
 ; Resets temporary flags and checks conditions in wDCA7_Player_UpdateFlag.
 ; Handles special cases for player actions/IDs, adjusts player Y-position (wD810/wD811).
-; Invokes entity behavior routines (call_00_0f22_JumpHL) for special entities (wDC7B_CurrentEntityAddrLoAlt, wDC7B_CurrentEntityAddrLoAlt2).
+; Invokes entity behavior routines (call_00_0f22_JumpHL) for special entities (wDC7B_Player_EntityStoodOnLo, wDC7D_Player_PushedMovingPlatformLo).
 ; Calls call_02_72fb_UpdateMapWindow to update the scrolling window and environment.
 ; Iterates through all entities (wDA00_CurrentEntityAddrLo) to run their update logic and 
 ; finally draws entities and handles collision.
@@ -170,7 +170,7 @@ call_02_7152_UpdateAllEntities:
     ld   HL, wDC84_PlayerXDeltaExtra                                     ;; 02:71a5 $21 $84 $dc
     ld   [HL], C                                       ;; 02:71a8 $71
 .jr_02_71a9:
-    ld   A, [wDC7B_CurrentEntityAddrLoAlt]                                    ;; 02:71a9 $fa $7b $dc
+    ld   A, [wDC7B_Player_EntityStoodOnLo]                                    ;; 02:71a9 $fa $7b $dc
     and  A, A                                          ;; 02:71ac $a7
     jr   Z, .jr_02_71e4                                ;; 02:71ad $28 $35
     ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 02:71af $ea $00 $da
@@ -181,11 +181,11 @@ call_02_7152_UpdateAllEntities:
     ld   H, [HL]                                       ;; 02:71b8 $66
     ld   L, A                                          ;; 02:71b9 $6f
     call call_00_0f22_JumpHL                                  ;; 02:71ba $cd $22 $0f
-    ld   A, [wDC7B_CurrentEntityAddrLoAlt]                                    ;; 02:71bd $fa $7b $dc
+    ld   A, [wDC7B_Player_EntityStoodOnLo]                                    ;; 02:71bd $fa $7b $dc
     and  A, A                                          ;; 02:71c0 $a7
     jr   Z, .jr_02_71e4                                ;; 02:71c1 $28 $21
     ld   H, HIGH(wD800_EntityMemory)                                        ;; 02:71c3 $26 $d8
-    ld   A, [wDC7B_CurrentEntityAddrLoAlt]                                    ;; 02:71c5 $fa $7b $dc
+    ld   A, [wDC7B_Player_EntityStoodOnLo]                                    ;; 02:71c5 $fa $7b $dc
     and  A, $e0                                        ;; 02:71c8 $e6 $e0
     or   A, $10                                        ;; 02:71ca $f6 $10
     ld   L, A                                          ;; 02:71cc $6f
@@ -205,7 +205,7 @@ call_02_7152_UpdateAllEntities:
     sbc  A, $00                                        ;; 02:71df $de $00
     ld   [wD810_PlayerYPosition+1], A                                    ;; 02:71e1 $ea $11 $d8
 .jr_02_71e4:
-    ld   A, [wDC7B_CurrentEntityAddrLoAlt2]                                    ;; 02:71e4 $fa $7d $dc
+    ld   A, [wDC7D_Player_PushedMovingPlatformLo]                                    ;; 02:71e4 $fa $7d $dc
     and  A, A                                          ;; 02:71e7 $a7
     jr   Z, .jr_02_71f8                                ;; 02:71e8 $28 $0e
     ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 02:71ea $ea $00 $da
@@ -232,10 +232,10 @@ call_02_7152_UpdateAllEntities:
     cp   A, $ff                                        ;; 02:720e $fe $ff
     jr   Z, .jr_02_723a                                ;; 02:7210 $28 $28
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 02:7212 $fa $00 $da
-    ld   HL, wDC7B_CurrentEntityAddrLoAlt                                     ;; 02:7215 $21 $7b $dc
+    ld   HL, wDC7B_Player_EntityStoodOnLo                                     ;; 02:7215 $21 $7b $dc
     cp   A, [HL]                                       ;; 02:7218 $be
     jr   Z, .jr_02_722c                                ;; 02:7219 $28 $11
-    ld   HL, wDC7B_CurrentEntityAddrLoAlt2                                     ;; 02:721b $21 $7d $dc
+    ld   HL, wDC7D_Player_PushedMovingPlatformLo                                     ;; 02:721b $21 $7d $dc
     cp   A, [HL]                                       ;; 02:721e $be
     jr   Z, .jr_02_722c                                ;; 02:721f $28 $0b
     or   A, $02                                        ;; 02:7221 $f6 $02
@@ -262,7 +262,7 @@ call_02_724d_Entity_UpdateSpriteFields:
     LOAD_OBJ_FIELD_TO_HL_ALT ENTITY_FIELD_SPRITE_FLAGS2               ; HL = ENTITY_FIELD_SPRITE_FLAGS2
     ld   E, [HL]                                       ;; 02:7255 $5e
     inc  L                                             ;; 02:7256 $2c ; HL = ENTITY_FIELD_ACTION_STATE_FLAGS
-    res  ACTION_STATE_UNK04_BIT, [HL]                                       ;; 02:7257 $cb $96
+    res  ACTION_STATE_ANIM_ENDED_BIT, [HL]                                       ;; 02:7257 $cb $96
     ld   B, [HL]                                       ;; 02:7259 $46 ; b = HL
     inc  L                                             ;; 02:725a $2c ; HL = ENTITY_FIELD_SPRITE_FRAME_COUNTER_MAX
     ld   C, [HL]                                       ;; 02:725b $4e ; c = HL
@@ -297,7 +297,7 @@ call_02_724d_Entity_UpdateSpriteFields:
     dec  L                                             ;; 02:7283 $2d
     dec  L                                             ;; 02:7284 $2d
     dec  L                                             ;; 02:7285 $2d ; HL = ENTITY_FIELD_ACTION_STATE_FLAGS
-    set  ACTION_STATE_UNK04_BIT, [HL]                                       ;; 02:7286 $cb $d6 
+    set  ACTION_STATE_ANIM_ENDED_BIT, [HL]                                       ;; 02:7286 $cb $d6 
 .jr_02_7288:
     ld   A, [wDA00_CurrentEntityAddrLo]                ;; 02:7288 $fa $00 $da
     or   A, $05                                        ;; 02:728b $f6 $05

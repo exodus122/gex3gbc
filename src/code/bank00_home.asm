@@ -795,7 +795,7 @@ call_00_05c7_LevelTimer_Tick:
     ret                                                ;; 00:05f0 $c9
 .jr_00_05f1:
     ld   C, ENTITY_FREESTANDING_REMOTE                 ;; 00:05f1 $0e $1c
-    call call_00_29ce_Entity_CheckExists               ;; 00:05f3 $cd $ce $29
+    call call_00_29ce_Entity_FindSlotById               ;; 00:05f3 $cd $ce $29
     ret  Z                                             ;; 00:05f6 $c8
     ld   HL, wDB6A_WarpFlags                           ;; 00:05f7 $21 $6a $db
     set  WARP_NEW_LEVEL_BIT, [HL]                      ;; 00:05fa $cb $e6

@@ -125,7 +125,7 @@ call_03_6833:
     ldi  a,[hl]
     dec  a
     ld   c,a
-    call call_00_28aa_Entity_Set16
+    call call_00_28aa_Entity_SetDamageState
     ld   c,ENTITY_FACING_RIGHT
     call call_00_2958_Entity_SetFacingDirection
     pop  bc

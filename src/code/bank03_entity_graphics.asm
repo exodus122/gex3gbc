@@ -679,7 +679,7 @@ call_03_5fc2_SetupEntitySprite:
     xor  A, A                                          ;; 03:6034 $af
     ld   [HL+], A                                      ;; 03:6035 $22
     ld   [HL], A                                       ;; 03:6036 $77
-    call call_00_2a15_CheckCameraOverlapBoundingBox                                  ;; 03:6037 $cd $15 $2a
+    call call_00_2a15_Entity_CheckIfOnScreen                                  ;; 03:6037 $cd $15 $2a
     call C, call_00_2b5d_Entity_ClearSlot                               ;; 03:603a $dc $5d $2b
     ret                                                ;; 03:603d $c9
 .jr_03_603e:

@@ -539,7 +539,7 @@ call_00_2ff8_InitLevelEntitiesAndConfig:
     inc  [HL]                                          ;; 00:3011 $34
     ld   L, A                                          ;; 00:3012 $6f
     ld   H, HIGH(wD700_EntityFlags)                                        ;; 00:3013 $26 $d7
-    ld   [HL], ENTITY_FLAG_80_ACTIVE                                     ;; 00:3015 $36 $80
+    ld   [HL], ENTITY_LIST_FLAG_PRESENT                                     ;; 00:3015 $36 $80
     pop  HL                                            ;; 00:3017 $e1
     ld   DE, $10                                       ;; 00:3018 $11 $10 $00
     add  HL, DE                                        ;; 00:301b $19
@@ -656,7 +656,7 @@ call_00_3180_MarkInitialLevelEntities:
 .jr_00_3190:
     push BC                                            ;; 00:3190 $c5
     bit  0, B                                          ;; 00:3191 $cb $40
-    call NZ, call_00_21f6_Entity_SetTVButtonFlags                              ;; 00:3193 $c4 $f6 $21
+    call NZ, call_00_21f6_Entity_MarkTVButtonPressed                              ;; 00:3193 $c4 $f6 $21
     pop  BC                                            ;; 00:3196 $c1
     rr   B                                             ;; 00:3197 $cb $18
     inc  C                                             ;; 00:3199 $0c
@@ -674,7 +674,7 @@ call_00_3180_MarkInitialLevelEntities:
     ld   HL, .data_00_31cd                                     ;; 00:31b1 $21 $cd $31
     add  HL, BC                                        ;; 00:31b4 $09
     cp   A, [HL]                                       ;; 00:31b5 $be
-    call NC, call_00_21f6_Entity_SetTVButtonFlags                              ;; 00:31b6 $d4 $f6 $21
+    call NC, call_00_21f6_Entity_MarkTVButtonPressed                              ;; 00:31b6 $d4 $f6 $21
     pop  BC                                            ;; 00:31b9 $c1
     inc  C                                             ;; 00:31ba $0c
     ld   A, C                                          ;; 00:31bb $79
@@ -969,7 +969,7 @@ call_00_3618_HandleEntitySpawn:
 ; If within range, copies multiple fields from the spawn table into working entity memory (wDA24_EntityInitialXPos, wDA1C_EntityBoundingBoxXMax, etc.).
 ; Sets up animation/state data, calls alt-bank functions to finish initialization.
 ; Usage: Core routine that validates and copies entity-spawn data into live entity RAM.
-    call call_00_2afc_FindFreeEntitySlot                                  ;; 00:3618 $cd $fc $2a
+    call call_00_2afc_Entity_FindFreeSlot                                  ;; 00:3618 $cd $fc $2a
     jr   NZ, .jr_00_3641                               ;; 00:361b $20 $24
     ld   HL, wDC17_EntityListBankOffset                                     ;; 00:361d $21 $17 $dc
     ld   A, [HL+]                                      ;; 00:3620 $2a
@@ -1243,7 +1243,7 @@ call_00_37a0_SpawnEntityRelative:
 ; Calls 2a03_ResetEntityTempSlot and finalizes setup with banked calls.
 ; Usage: Spawns a new entity at a position relative to the parent entity, 
 ; handling direction and mirroring.
-    call call_00_2afc_FindFreeEntitySlot                                  ;; 00:37a0 $cd $fc $2a
+    call call_00_2afc_Entity_FindFreeSlot                                  ;; 00:37a0 $cd $fc $2a
     ret  Z                                             ;; 00:37a3 $c8
     push DE                                            ;; 00:37a4 $d5
     farcall call_03_59c6_IsEntityFlaggedHighBit
@@ -1371,12 +1371,12 @@ call_00_37a0_SpawnEntityRelative:
     ld   [DE], A                                       ;; 00:3845 $12
     inc  E                                             ;; 00:3846 $1c ; ENTITY_FIELD_YVEL
     ld   [DE], A                                       ;; 00:3847 $12
-    inc  E                                             ;; 00:3848 $1c ; ENTITY_FIELD_UNK1E
+    inc  E                                             ;; 00:3848 $1c ; ENTITY_FIELD_YVEL_RELATED
     ld   [DE], A                                       ;; 00:3849 $12
     inc  E                                             ;; 00:384a $1c ; ENTITY_FIELD_PARENT
     ld   A, [wDCE8_CurrentEntity_ParentListIndex]                                    ;; 00:384b $fa $e8 $dc
     ld   [DE], A                                       ;; 00:384e $12 
-    call call_00_2a03_ResetEntityListIndex                                  ;; 00:384f $cd $03 $2a
+    call call_00_2a03_Entity_ResetEntityListIndex                                  ;; 00:384f $cd $03 $2a
     xor  A, A                                          ;; 00:3852 $af
     farcall call_02_72ac_SetEntityAction
     farcall call_03_687c_AssignEntityPalette

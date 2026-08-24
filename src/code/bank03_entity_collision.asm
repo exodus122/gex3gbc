@@ -313,7 +313,7 @@ call_03_4e31_CollisionHandler_FlyTV:
     call call_00_0ff5_QueueSFX
     call call_03_5671_HandleEntityHit
     ld   c,$02
-    jp   call_00_2299_Entity_UpdateFlags
+    jp   call_00_2299_Entity_SetListState
 
 call_03_4e4b_CollisionHandler_IceSculpture:
 ; If entity action ID<2 and collision A==01:
@@ -337,7 +337,7 @@ call_03_4e4b_CollisionHandler_IceSculpture:
     push AF                                            ;; 03:4e61 $f5
     push AF                                            ;; 03:4e62 $f5
     ld   C, A                                          ;; 03:4e63 $4f
-    call call_00_2299_Entity_UpdateFlags                                  ;; 03:4e64 $cd $99 $22
+    call call_00_2299_Entity_SetListState                                  ;; 03:4e64 $cd $99 $22
     pop  AF                                            ;; 03:4e67 $f1
     farcall call_02_72ac_SetEntityAction
     pop  AF                                            ;; 03:4e73 $f1
@@ -374,7 +374,7 @@ call_03_4e89_CollisionHandler_EvilSantaProjectile:
     inc  A                                             ;; 03:4ea1 $3c
     ld   [HL], A                                       ;; 03:4ea2 $77
     ld   C, ENTITY_HOLIDAY_TV_EVIL_SANTA                                        ;; 03:4ea3 $0e $1e
-    call call_00_29ce_Entity_CheckExists                                  ;; 03:4ea5 $cd $ce $29
+    call call_00_29ce_Entity_FindSlotById                                  ;; 03:4ea5 $cd $ce $29
     jp   NZ, call_00_2b80_Entity_DeactivateSelf                              ;; 03:4ea8 $c2 $80 $2b
     ld   A, L                                          ;; 03:4eab $7d
     or   A, ENTITY_FIELD_XPOS                                        ;; 03:4eac $f6 $0e
@@ -458,7 +458,7 @@ call_03_4f23_CollisionHandler_HolidayTV_Elf:
     dec  [HL]                                          ;; 03:4f45 $35
     ret  NZ                                            ;; 03:4f46 $c0
     call call_00_288a_Entity_SetCollisionTypeNone                                  ;; 03:4f47 $cd $8a $28
-    call call_00_2b8b_AttemptToSetEntityFlagsTo50                                  ;; 03:4f4a $cd $8b $2b
+    call call_00_2b8b_Entity_MarkDefeated                                  ;; 03:4f4a $cd $8b $2b
     ld   HL, wDCC8_ElfCounter                                     ;; 03:4f4d $21 $c8 $dc
     inc  [HL]                                          ;; 03:4f50 $34
     ld   A, [HL]                                       ;; 03:4f51 $7e
@@ -487,7 +487,7 @@ call_03_4f60_CollisionHandler_BloodCooler:
     ld   a,SFX_SMALL_BANG
     call call_00_0ff5_QueueSFX
     ld   c,$01
-    call call_00_2299_Entity_UpdateFlags
+    call call_00_2299_Entity_SetListState
     ld   hl,wDCC5_BloodCoolerCounter
     inc  [hl]
     ld   a,[hl]
@@ -525,7 +525,7 @@ call_03_4fad_CollisionHandler_Hand:
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
     jp   nz,call_03_4cea_CollisionHandler_DamagePlayer
-    call call_00_2995_Entity_GetActionId
+    call call_00_2995_Entity_GetActionId_Copy
     cp   a,$00
     ret  nz
     ld   a,$01
@@ -547,7 +547,7 @@ call_03_4fca_CollisionHandler_LostArk:
     ret  nz
     call call_03_5671_HandleEntityHit
     ld   c,$04
-    call call_00_2299_Entity_UpdateFlags
+    call call_00_2299_Entity_SetListState
     ld   hl,wDCC6_LostArkCounter
     inc  [hl]
     ld   a,[hl]
@@ -682,7 +682,7 @@ call_03_50b6_CollisionHandler_AlienCultureTube:
     call call_03_5671_HandleEntityHit
     call call_00_22ef_Entity_SetTriggerActive
     ld   c,$02
-    call call_00_2299_Entity_UpdateFlags
+    call call_00_2299_Entity_SetListState
     ld   hl,wDCC9_AlienCultureTubeCounter
     inc  [hl]
     ld   a,[hl]
@@ -719,7 +719,7 @@ call_03_50f4_CollisionHandler_OnSwitch2:
     cp   a,PLAYER_ATTACKED_ENTITY
     ret  nz
     ld   c,$01
-    call call_00_2299_Entity_UpdateFlags
+    call call_00_2299_Entity_SetListState
     ld   a,$01
     farcall call_02_72ac_SetEntityAction
     jp   call_00_22e0_Entity_IncrementTriggerFlag
@@ -822,7 +822,7 @@ call_03_51b8_CollisionHandler_SailorToonGirl:
     call call_00_2962_Entity_GetActionId
     cp   a,$02
     ld   c,$02
-    jp   z,call_00_2299_Entity_UpdateFlags
+    jp   z,call_00_2299_Entity_SetListState
     ld   a,$03
     farcall call_02_72ac_SetEntityAction
     ret  
@@ -1040,7 +1040,7 @@ call_03_532f_CollisionHandler_GextremeSports_Elf:
     dec  [hl]
     ret  nz
     call call_00_288a_Entity_SetCollisionTypeNone
-    call call_00_2b8b_AttemptToSetEntityFlagsTo50
+    call call_00_2b8b_Entity_MarkDefeated
     ld   hl,wDCC8_ElfCounter
     inc  [hl]
     ld   a,[hl]
@@ -1097,7 +1097,7 @@ call_03_538e_CollisionHandler_Bell:
     ld   a,$01
     farcall call_02_72ac_SetEntityAction
     ld   c,$02
-    jp   call_00_2299_Entity_UpdateFlags
+    jp   call_00_2299_Entity_SetListState
 
 call_03_53c2_CollisionHandler_RockHard:
 ; For actions < 5.
@@ -1141,11 +1141,11 @@ call_03_5406_CollisionHandler_BrainOfOz:
 ; - Handle entity hit.
 ; - If action≠7 → transform to bank 6.
     call call_03_4ce1_CollisionHandler_GenericEnemy
-    call call_00_2995_Entity_GetActionId
+    call call_00_2995_Entity_GetActionId_Copy
     cp   a,$06
     ret  nc
     ld   c,ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE
-    call call_00_29ce_Entity_CheckExists
+    call call_00_29ce_Entity_FindSlotById
     ret  nz
     ld   a,l
     or   a,$1D
@@ -1193,7 +1193,7 @@ call_03_5406_CollisionHandler_BrainOfOz:
     cp   a,$18
     ret  nc
     call call_03_5671_HandleEntityHit
-    call call_00_2995_Entity_GetActionId
+    call call_00_2995_Entity_GetActionId_Copy
     cp   a,$07
     ret  z
     ld   a,$06
@@ -1205,7 +1205,7 @@ call_03_5469_CollisionHandler_BrainOfOzProjectile:
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     call call_03_4cea_CollisionHandler_DamagePlayer
-    jp   call_00_2b7a_Entity_DeactivateAndClearFlags
+    jp   call_00_2b7a_Entity_DeactivateAndMarkNeverRespawn
 
 call_03_5473_CollisionHandler_FreestandingRemote:
 ; On collision (interaction=1): set wDCD2_FreestandingRemoteHitFlags=0x81 (event flag).
@@ -1233,7 +1233,7 @@ call_03_5483_CollisionHandler_Meteor:
     jp   z,call_03_4cea_CollisionHandler_DamagePlayer
     ret  
 .jr_03_5497:
-    call call_00_2780_Entity_CheckIfOffscreenAbove
+    call call_00_27cb_Entity_SetYToAboveCameraTop
     ld   a,$01
     farcall call_02_72ac_SetEntityAction
     ret                                          ;; 03:5482 $c9
@@ -1244,7 +1244,7 @@ call_03_54a8_CollisionHandler_Rez:
 ; - Handle entity hit, zero out byte at offset 15.
 ; - Get entity property, decide an action (03/06/09/0C → action3 else → action9).
 ; - Transform via that action.
-    call call_00_2995_Entity_GetActionId
+    call call_00_2995_Entity_GetActionId_Copy
     cp   a,$03
     ret  nc
     call call_03_550e_Entity_CheckPlayerInteraction
@@ -1254,10 +1254,10 @@ call_03_54a8_CollisionHandler_Rez:
     call call_03_5671_HandleEntityHit
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_COOLDOWN_TIMER
     ld   [hl],$00
-    call call_00_2995_Entity_GetActionId
+    call call_00_2995_Entity_GetActionId_Copy
     cp   a,$0A
     ret  z
-    call call_00_28b4_Entity_Get16
+    call call_00_28b4_Entity_GetDamageState
     ld   c,$03
     cp   a,$03
     jr   z,.jr_00_54E1
@@ -1614,7 +1614,7 @@ call_03_5671_HandleEntityHit:
     ld   [HL], $00                                     ;; 03:5689 $36 $00
     call call_00_35e8_GetEntityCollisionFlags                                  ;; 03:568b $cd $e8 $35
     cp   A, $ff                                        ;; 03:568e $fe $ff
-    jp   Z, call_00_2b7a_Entity_DeactivateAndClearFlags                                 ;; 03:5690 $ca $7a $2b
+    jp   Z, call_00_2b7a_Entity_DeactivateAndMarkNeverRespawn                                 ;; 03:5690 $ca $7a $2b
     bit  7, A                                          ;; 03:5693 $cb $7f
     jr   Z, .jr_03_56a6                                ;; 03:5695 $28 $0f
     push AF                                            ;; 03:5697 $f5
@@ -1834,49 +1834,49 @@ call_03_56c1_CollisionHandler_Platform:
 
 call_03_57e6_ResolveCollision_Reset:
 ; Clears wDC88_CurrentEntity_UnkVerticalOffset (the player’s vertical delta).
-; Stores the current entity ID (wDA00_CurrentEntityAddrLo) into wDC7B_CurrentEntityAddrLoAlt.
-; If that ID was already in wDC7B_CurrentEntityAddrLoAlt2, resets it to zero.
+; Stores the current entity ID (wDA00_CurrentEntityAddrLo) into wDC7B_Player_EntityStoodOnLo.
+; If that ID was already in wDC7D_Player_PushedMovingPlatformLo, resets it to zero.
 ; Role: This looks like a collision resolution / reset routine. 
 ; It wipes motion and registers the colliding entity as "current collision", 
 ; while clearing old records.
     xor  A, A                                          ;; 03:57e6 $af
     ld   [wDC88_CurrentEntity_UnkVerticalOffset], A                                    ;; 03:57e7 $ea $88 $dc
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:57ea $fa $00 $da
-    ld   [wDC7B_CurrentEntityAddrLoAlt], A                                    ;; 03:57ed $ea $7b $dc
-    ld   HL, wDC7B_CurrentEntityAddrLoAlt2                                     ;; 03:57f0 $21 $7d $dc
+    ld   [wDC7B_Player_EntityStoodOnLo], A                                    ;; 03:57ed $ea $7b $dc
+    ld   HL, wDC7D_Player_PushedMovingPlatformLo                                     ;; 03:57f0 $21 $7d $dc
     cp   A, [HL]                                       ;; 03:57f3 $be
     ret  NZ                                            ;; 03:57f4 $c0
     ld   [HL], $00                                     ;; 03:57f5 $36 $00
     ret                                                ;; 03:57f7 $c9
 
 call_03_57f8_ClearCollisionForEntity:
-; Compares the current entity ID to the two "last touched entity" slots (wDC7B_CurrentEntityAddrLoAlt and wDC7B_CurrentEntityAddrLoAlt2).
+; Compares the current entity ID to the two "last touched entity" slots (wDC7B_Player_EntityStoodOnLo and wDC7D_Player_PushedMovingPlatformLo).
 ; If it matches, clears those slots.
 ; Effectively means: "This entity is no longer colliding with the player, remove it from tracking."
 ; Role: Collision cleanup when no intersection occurs.
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:57f8 $fa $00 $da
-    ld   HL, wDC7B_CurrentEntityAddrLoAlt                                     ;; 03:57fb $21 $7b $dc
+    ld   HL, wDC7B_Player_EntityStoodOnLo                                     ;; 03:57fb $21 $7b $dc
     cp   A, [HL]                                       ;; 03:57fe $be
     jr   NZ, .jr_03_5803                               ;; 03:57ff $20 $02
     ld   [HL], $00                                     ;; 03:5801 $36 $00
 .jr_03_5803:
-    ld   HL, wDC7B_CurrentEntityAddrLoAlt2                                     ;; 03:5803 $21 $7d $dc
+    ld   HL, wDC7D_Player_PushedMovingPlatformLo                                     ;; 03:5803 $21 $7d $dc
     cp   A, [HL]                                       ;; 03:5806 $be
     ret  NZ                                            ;; 03:5807 $c0
     ld   [HL], $00                                     ;; 03:5808 $36 $00
     ret                                                ;; 03:580a $c9
 
 call_03_580b_RegisterSecondaryCollision:
-; Marks the current entity as the "secondary" collision slot (wDC7B_CurrentEntityAddrLoAlt2).
-; If it was in wDC7B_CurrentEntityAddrLoAlt, clears that first.
+; Marks the current entity as the "secondary" collision slot (wDC7D_Player_PushedMovingPlatformLo).
+; If it was in wDC7B_Player_EntityStoodOnLo, clears that first.
 ; Role: Assigns the entity as the active secondary collision candidate.
     ld   a,[wDA00_CurrentEntityAddrLo]
-    ld   hl,wDC7B_CurrentEntityAddrLoAlt
+    ld   hl,wDC7B_Player_EntityStoodOnLo
     cp   [hl]
     jr   nz,.jr_00_5816
     ld   [hl],$00
 .jr_00_5816:
-    ld   [wDC7B_CurrentEntityAddrLoAlt2],a
+    ld   [wDC7D_Player_PushedMovingPlatformLo],a
     ret  
 
 call_03_581a_CollisionHandler_TVButton:
