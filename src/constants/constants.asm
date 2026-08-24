@@ -990,6 +990,10 @@ DEF MENUCMD_HANDLER_BASE         EQU $e0 ; a source-pointer high byte at or abov
                                          ; is a sub-handler index, not an address
 DEF MENUCMD_OPTION_ROW_MASK      EQU $0f ; wDBA9: which selectable row this command owns
 DEF MENUCMD_OPTION_ACTION_MASK   EQU $f0 ; ...and the MENU_RESULT_* it returns
+DEF MENUCMD_OPTION_NONE          EQU $0f ; row 15 with no action - the slot every
+                                         ; command that is not selectable writes to,
+                                         ; and the reason wDBCB_Menu_OptionActions is
+                                         ; sixteen bytes when no menu has that many rows
 ; wDBAA_MenuCmd_Flags. NOTE the bit assignments are not gex2's - last-block is $20
 ; here where gex2 uses $80, and $80 means something else entirely
 DEF MENUCMD_FLAG_CLEAR_BUFFER    EQU $01 ; blank the staging tiles first
@@ -1001,6 +1005,35 @@ DEF MENUCMD_FLAG_UPLOAD_TILES    EQU $80 ; HDMA the staging buffer to VRAM after
 DEF MENUCMD_ATTR_TILESET_ROW     EQU $ff ; wDBA3: no constant attribute - pull a row from
                                          ; the secondary tileset instead
 DEF MENU_CHAINED_NONE            EQU $ff ; wDBDD: no follow-on script
+
+; The sub-handlers a command can reach, indexed as id - MENUCMD_HANDLER_BASE into
+; data_01_456b_MenuCmd_SubHandlers. Everything screen-specific in the menu system is
+; one of these seventeen
+DEF MENUCMD_SUB_STAGE_IMAGE1     EQU $e0
+DEF MENUCMD_SUB_STAGE_IMAGE2     EQU $e1 ; the same routine as $e0
+DEF MENUCMD_SUB_STAGE_TV_SCREEN  EQU $e2
+DEF MENUCMD_SUB_SET_LEVEL_TEXT   EQU $e3
+DEF MENUCMD_SUB_SET_TV_NAME_TEXT EQU $e4
+DEF MENUCMD_SUB_SET_MISSION_TEXT EQU $e5
+DEF MENUCMD_SUB_DRAW_CURSOR      EQU $e6
+DEF MENUCMD_SUB_ENABLE_ANIMATION EQU $e7
+DEF MENUCMD_SUB_SET_COUNTER_TEXT EQU $e8
+DEF MENUCMD_SUB_DRAW_SPRITE_GROUP EQU $e9
+DEF MENUCMD_SUB_NOP              EQU $ea ; a bare ret
+DEF MENUCMD_SUB_PASSWORD_GLYPH   EQU $eb
+DEF MENUCMD_SUB_SET_CHAINED_SCRIPT EQU $ec
+DEF MENUCMD_SUB_FULLSCREEN_IMAGE EQU $ed
+DEF MENUCMD_SUB_COLLECTED_COUNT  EQU $ee
+DEF MENUCMD_SUB_NOP2             EQU $ef ; another
+DEF MENUCMD_SUB_DRAW_REMOTE_MARKER EQU $f0
+
+; Three more values a script can put in a row's action nibble. Unlike the
+; MENU_RESULT_* above these never reach the caller - call_01_4000_MenuLoad handles
+; them itself and opens another menu
+DEF MENU_ACTION_SEE_PASSWORD     EQU $30 ; encode the save state and show it
+DEF MENU_ACTION_QUIT             EQU $50 ; MENU_QUIT_GAME in the cave, MENU_GO_TO_MAP
+                                         ; in a level
+DEF MENU_ACTION_VIEW_TOTALS      EQU $70
 
 ; The two screen planes, wD400_ScreenDraw_TileIds and wD578_ScreenDraw_PaletteIds
 DEF SCREEN_ATTR_PLANE_OFFSET     EQU $178 ; distance between them, = SCREEN_TILEMAP_BYTES

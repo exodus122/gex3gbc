@@ -413,7 +413,7 @@ call_01_4000_MenuLoad:
     ld   [HL], $06                                    ;; 01:4221 $36 $06
 .jr_01_4223:
     farcall call_03_6c89_MapData_LoadForCurrentMap
-    ld   HL, data_01_5692                             ;; 01:422e $21 $92 $56
+    ld   HL, data_01_5692_MenuScript_Totals                             ;; 01:422e $21 $92 $56
     call call_01_4454_MenuScript_RunFrom              ;; 01:4231 $cd $54 $44
     ld   A, SFX_MENU_SCROLL                           ;; 01:4234 $3e $01
     call call_00_0fd7_PlaySFX                         ;; 01:4236 $cd $d7 $0f
@@ -1266,7 +1266,7 @@ call_01_477c_MenuCmd_StagePasswordGlyph:
 ; player put there; that key indexes data_01_66f9_PasswordFont at
 ; PASSWORD_GLYPH_BYTES each. The destination is wC980_NumberSprites, also stepped by
 ; PASSWORD_GLYPH_BYTES, so the whole grid can be staged by one script running this
-; command eighteen times - which is exactly what data_01_5a47 does.
+; command eighteen times - which is exactly what data_01_5a47_MenuScript_PasswordGrid does.
 ;
 ; It draws no number and writes no sprite; the old name was wrong on both. gex2's
 ; call_01_48fd_MenuCmd_SetPasswordCharText does the same job by pushing one character
@@ -3134,121 +3134,121 @@ data_01_53c6_MenuTypeRecords:
 ; highlight the selected option.
 ;
 ; gex2's data_01_5574_MenuTypeRecords
-    dw   data_01_559a                               ; MENU_TITLE_SCREEN
+    dw   data_01_559a_MenuScript_TitleScreen                    ; MENU_TITLE_SCREEN
     db   $00, $02, $20, $54, $00, $10, $d3, $04       ;; 01:53c8 ........
     dw   call_01_43c3_Menu_HighlightTitleOption       ;; 01:53d0 pP
     db   $00, $00, $00, $00                           ;; 01:53d2 ????
 
-    dw   data_01_55c3                               ; MENU_CURSOR_PASSWORD
+    dw   data_01_55c3_MenuScript_EnterPassword                  ; MENU_ENTER_PASSWORD
     db   $01, $12, $08, $20, $18, $18, $d3, $07       ;; 01:53d8 ........
     db   $00, $00, $00, $00, $00, $00                 ;; 01:53e0 ..????
 
-    dw   data_01_55ec                               ; MENU_CURSOR_ATTR_DIM
+    dw   data_01_55ec_MenuScript_SeePassword                    ; MENU_SEE_PASSWORD
     db   $01, $00, $00, $00, $00, $00, $d3, $07       ;; 01:53e8 ........
     db   $00, $00, $00, $00, $00, $00                 ;; 01:53f0 ..????
 
-    dw   data_01_55fd                               ; MENU_CURSOR_ATTR_BRIGHT
+    dw   data_01_55fd_MenuScript_GameOver                       ; MENU_GAME_OVER
     db   $08, $00, $00, $00, $00, $00, $d3, $01       ;; 01:53f8 ........
     db   $00, $00, $00, $00, $00, $00                 ;; 01:5400 ..????
 
-    dw   data_01_5606                               ; MENU_FLAG_HOLD_SKIPPABLE
+    dw   data_01_5606_MenuScript_BadPassword                    ; MENU_BAD_PASSWORD
     db   $08, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5408 ........
     db   $00, $00, $00, $00, $00, $00
     
-    dw   $560f                                      ; MENU_MISSION_SELECT_1_REMOTE
+    dw   data_01_560f_MenuScript_MissionSelect1Remote           ; MENU_MISSION_SELECT_1_REMOTE
     db   $00, $01, $00, $50, $00, $18, $d3, $80       ;; 01:5418 ????????
     db   $00, $00, $00, $00, $00, $00
     
-    dw   $5648                                      ; MENU_UNK06
+    dw   data_01_5648_MenuScript_Unk06                          ; MENU_UNK06
     db   $00, $02, $00, $40, $00, $20, $d3, $80       ;; 01:5428 ????????
     db   $00, $00, $00, $00, $00, $00                 ;; 01:5430 ??????
 
-    dw   data_01_5649                               ; MENU_MISSION_SELECT_3_REMOTES
+    dw   data_01_5649_MenuScript_MissionSelect3Remotes          ; MENU_MISSION_SELECT_3_REMOTES
     db   $00, $03, $00, $38, $00, $18, $d3, $80       ;; 01:5438 ........
     db   $00, $00, $00, $00, $00, $00                 ;; 01:5440 ..????
 
-    dw   data_01_5692                               ; MENU_FLAG_WAIT_RELEASE
+    dw   data_01_5692_MenuScript_Totals                         ; MENU_TOTALS
     db   $10, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5448 ........
     db   $00, $00, $00, $00, $00, $00
     
-    dw   $571b                                      ; MENU_CONGRATULATIONS_GOT_REMOTE
+    dw   data_01_571b_MenuScript_CongratulationsGotRemote       ; MENU_CONGRATULATIONS_GOT_REMOTE
     db   $00, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5458 ????????
     db   $00, $00, $00, $00, $00, $00
     
-    dw   $57a4                                      ; MENU_TIME_UP
+    dw   data_01_57a4_MenuScript_TimeUp                         ; MENU_TIME_UP
     db   $00, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5468 ????????
     db   $00, $00, $00, $00, $00, $00
     
-    dw   $57ad                                      ; MENU_PAUSE_IN_GEX_CAVE
+    dw   data_01_57ad_MenuScript_PauseInGexCave                 ; MENU_PAUSE_IN_GEX_CAVE
     db   $00, $04, $08, $20, $00, $10, $d3, $01       ;; 01:5478 ????????
     db   $00, $00, $00, $00, $00, $00
     
-    dw   $57be                                      ; MENU_QUIT_GAME
+    dw   data_01_57be_MenuScript_QuitGame                       ; MENU_QUIT_GAME
     db   $00, $02, $08, $30, $00, $10, $d3, $01       ;; 01:5488 ????????
     db   $00, $00, $00, $00, $00, $00                 ;; 01:5490 ??????
 
-    dw   data_01_57d7                               ; MENU_PAUSE_IN_LEVEL
+    dw   data_01_57d7_MenuScript_PauseInLevel                   ; MENU_PAUSE_IN_LEVEL
     db   $00, $04, $08, $20, $00, $10, $d3, $01       ;; 01:5498 ........
     db   $00, $00, $00, $00, $00, $00                 ;; 01:54a0 ..????
 
-    dw   data_01_57e8                               ; MENU_GO_TO_MAP
+    dw   data_01_57e8_MenuScript_GoToMap                        ; MENU_GO_TO_MAP
     db   $00, $02, $08, $30, $00, $10, $d3, $01       ;; 01:54a8 ........
     db   $00, $00, $00, $00, $00, $00                 ;; 01:54b0 ..????
 
-    dw   data_01_5801                               ; MENU_DAVID_A_PALMER
+    dw   data_01_5801_MenuScript_DavidAPalmer                   ; MENU_DAVID_A_PALMER
     db   $04, $00, $00, $00, $00, $00, $d3, $02       ;; 01:54b8 ........
     db   $00, $00, $00, $00, $00, $00
     
-    dw   $580a                                      ; MENU_CURSOR_BLINK_MASK
+    dw   data_01_580a_MenuScript_Unk10                          ; MENU_UNK10
     db   $00, $05, $18, $10, $00, $18, $d3, $03       ;; 01:54c8 ????????
     db   $00, $00, $00, $00, $00, $00                 ;; 01:54d0 ??????
 
     ; MENU_OPENING_CREDITS_1
-    dw   data_01_5843                               ; MENU_OPENING_CREDITS_1
+    dw   data_01_5843_MenuScript_OpeningCredits1                ; MENU_OPENING_CREDITS_1
     db   $02, $00, $00, $00, $00, $00, $d3, $01       ;; 01:54d8 ........
     db   $00, $00, $00, $00, $00, $00                 ;; 01:54e0 ..????
 
-    dw   data_01_586c                               ; MENU_OPENING_CREDITS_2
+    dw   data_01_586c_MenuScript_OpeningCredits2                ; MENU_OPENING_CREDITS_2
     db   $04, $00, $00, $00, $00, $00, $d3, $01       ;; 01:54e8 ........
     db   $00, $00, $00, $00, $00, $00                 ;; 01:54f0 ..????
 
-    dw   data_01_588d                               ; MENU_OPENING_CRYSTAL_DYNAMICS
+    dw   data_01_588d_MenuScript_OpeningCrystalDynamics         ; MENU_OPENING_CRYSTAL_DYNAMICS
     db   $04, $00, $00, $00, $00, $00, $d3, $05       ;; 01:54f8 ........
     db   $00, $00, $00, $00, $00, $00                 ;; 01:5500 ..????
 
-    dw   data_01_5896                               ; MENU_EIDOS_INTERACTIVE
+    dw   data_01_5896_MenuScript_EidosInteractive               ; MENU_EIDOS_INTERACTIVE
     db   $04, $00, $00, $00, $00, $00, $d3, $06       ;; 01:5508 ........
     db   $00, $00, $00, $00, $00, $00
     
-    dw   $589f                                      ; MENU_END_CREDITS_1
+    dw   data_01_589f_MenuScript_EndCredits1                    ; MENU_END_CREDITS_1
     db   $04, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5518 ????????
     db   $00, $00, $00, $00, $00, $00
     
-    dw   $58b8                                      ; MENU_END_CREDITS_2
+    dw   data_01_58b8_MenuScript_EndCredits2                    ; MENU_END_CREDITS_2
     db   $04, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5528 ????????
     db   $00, $00, $00, $00, $00, $00
     
-    dw   $5929                                      ; MENU_END_CREDITS_3
+    dw   data_01_5929_MenuScript_EndCredits3                    ; MENU_END_CREDITS_3
     db   $04, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5538 ????????
     db   $00, $00, $00, $00, $00, $00
     
-    dw   $59a2                                      ; MENU_END_CREDITS_4
+    dw   data_01_59a2_MenuScript_EndCredits4                    ; MENU_END_CREDITS_4
     db   $04, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5548 ????????
     db   $00, $00, $00, $00, $00, $00
     
-    dw   $59c3                                      ; MENU_END_CREDITS_5
+    dw   data_01_59c3_MenuScript_EndCredits5                    ; MENU_END_CREDITS_5
     db   $04, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5558 ????????
     db   $00, $00, $00, $00, $00, $00
     
-    dw   $5a14                                      ; MENU_END_CREDITS_6
+    dw   data_01_5a14_MenuScript_EndCredits6                    ; MENU_END_CREDITS_6
     db   $04, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5568 ????????
     db   $00, $00, $00, $00, $00, $00
     
-    dw   $5a35                                      ; MENU_WELL_DONE
+    dw   data_01_5a35_MenuScript_WellDone                       ; MENU_WELL_DONE
     db   $00, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5578 ????????
     db   $00, $00, $00, $00, $00, $00
     
-    dw   $5a3e                                      ; menu id $1c - no MENU_* constant
+    dw   data_01_5a3e_MenuScript_C                              ; menu id $1c - no MENU_* constant
     db   $04, $00, $20, $54, $00, $10, $d3, $08       ;; 01:5588 ????????
     db   $00, $00, $00, $00, $00, $00                 ;; 01:5590 ??????
 
@@ -3256,265 +3256,306 @@ data_01_5596_ChainedScriptTable:
 ; The two scripts a command can queue up behind the current one through
 ; call_01_47aa_MenuCmd_SetChainedScript: the password grid and the totals sub-screen.
 ; gex2's data_01_568c_ChainedScriptTable
-    dw   data_01_5a47                                 ;; 01:5596 pP
-    dw   data_01_5ad8                                 ;; 01:5598 pP
+    dw   data_01_5a47_MenuScript_PasswordGrid                                 ;; 01:5596 pP
+    dw   data_01_5ad8_MenuScript_TotalsStats                                 ;; 01:5598 pP
 
-data_01_559a:
-    db   $00, $00, $00, $00, $02, $ed, $0f, $60       ;; 01:559a w...w...
-    db   $14, $fe, $fe, $00                           ;; 01:55a2 w..w
-    dw   $477c                                        ;; 01:55a6 wW
-    db   $10, $63, $00, $00, $00, $00, $03, $e9       ;; 01:55a8 ..w...w.
-    db   $0f, $60, $15, $fe, $fe, $00                 ;; 01:55b0 ..w..w
-    dw   $47c7                                        ;; 01:55b6 wW
-    db   $21, $63, $00, $00, $00, $fc, $02, $e6       ;; 01:55b8 ..w..ww.
-    db   $0f, $e0, $ff                                ;; 01:55c0 ...
+; ------------------------------------------------------------------
+; THE MENU SCRIPTS
+;
+; One script per screen, and between them they contain everything about how a menu
+; looks. call_01_445c_MenuScript_RunToEnd walks a script;
+; call_01_446b_MenuScript_RunCommand executes one command and the file header explains
+; what a command can do.
+;
+; Every command here is an opcode plus exactly one parameter block, so each is
+; MENUCMD_PARAM_BYTES + 1 bytes and the two macros below the interpreter emit them:
+;
+;   menu_cmd      opcode, pen X, pen Y, arg, string table, option, flags
+;   menu_cmd_sub  opcode, pen X, pen Y, arg, sub-handler, handler arg, option, flags
+;
+; The two differ only in what goes in the source-pointer slot. menu_cmd puts a real
+; address there - always a BANK_1C_TEXT string-pointer table, never a bank 1 address,
+; which is why they are written as bare numbers. menu_cmd_sub puts
+; MENUCMD_SUB_* in the high byte and its argument in the low byte, and the interpreter
+; spots that because the high byte is at or above MENUCMD_HANDLER_BASE.
+;
+; The option field is what makes a row selectable: its low nibble is the row number
+; and its high nibble the MENU_RESULT_* or MENU_ACTION_* that row produces. A command
+; with $00 there draws something the player cannot choose
+; ------------------------------------------------------------------
+data_01_559a_MenuScript_TitleScreen:
+    menu_cmd_sub $00,             $00,             $00, $00, MENUCMD_SUB_FULLSCREEN_IMAGE, $02,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL
+    menu_cmd     $14, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, $477c,                                MENU_RESULT_START_GAME | 0,        MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT | MENUCMD_FLAG_NO_TILE_FILL
+    menu_cmd_sub $00,             $00,             $00, $00, MENUCMD_SUB_DRAW_SPRITE_GROUP, $03,   MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL
+    menu_cmd     $15, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, $47c7,                                MENU_RESULT_PASSWORD_ACCEPTED | 1, MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT | MENUCMD_FLAG_NO_TILE_FILL
+    menu_cmd_sub $00,             $00,             $00, $fc, MENUCMD_SUB_DRAW_CURSOR, $02,         MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
 
-data_01_55c3:
-    db   $00, $00, $00, $00, $05, $ed, $0f, $60       ;; 01:55c3 w...w...
-    db   $12, $fe, $fe, $02                           ;; 01:55cb w..w
-    dw   $4e62                                        ;; 01:55cf wW
-    db   $0f, $23, $13, $fe, $fe, $02                 ;; 01:55d1 ..w..w
-    dw   $4e7d                                        ;; 01:55d7 wW
-    db   $0f, $23, $00, $00, $00, $fc, $01, $e6       ;; 01:55d9 ..w..ww.
-    db   $0f, $60, $00, $00, $00, $00, $00, $ec       ;; 01:55e1 ..w...w.
-    db   $0f, $60, $ff                                ;; 01:55e9 ...
+data_01_55c3_MenuScript_EnterPassword:
+    menu_cmd_sub $00,             $00,             $00, $00, MENUCMD_SUB_FULLSCREEN_IMAGE, $05,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL
+    menu_cmd     $12, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $02, $4e62,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $13, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $02, $4e7d,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $00,             $00,             $00, $fc, MENUCMD_SUB_DRAW_CURSOR, $01,         MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL
+    menu_cmd_sub $00,             $00,             $00, $00, MENUCMD_SUB_SET_CHAINED_SCRIPT, $00,  MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL
+    db   MENUSCRIPT_END
 
-data_01_55ec:
-    db   $00, $00, $00, $00, $05, $ed, $0f, $60       ;; 01:55ec w...w...
-    db   $00, $00, $00, $00, $00, $ec, $0f, $60       ;; 01:55f4 w...w...
-    db   $ff                                          ;; 01:55fc .
+data_01_55ec_MenuScript_SeePassword:
+    menu_cmd_sub $00,             $00,             $00, $00, MENUCMD_SUB_FULLSCREEN_IMAGE, $05,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL
+    menu_cmd_sub $00,             $00,             $00, $00, MENUCMD_SUB_SET_CHAINED_SCRIPT, $00,  MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL
+    db   MENUSCRIPT_END
 
-data_01_55fd:
-    db   $4c, $fe, $fe, $01                           ;; 01:55fd w..w
-    dw   $4c09                                        ;; 01:5601 wW
-    db   $0f, $a3, $ff                                ;; 01:5603 ...
+data_01_55fd_MenuScript_GameOver:
+    menu_cmd     $4c, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, $4c09,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
 
-data_01_5606:
-    db   $2f, $fe, $fe, $00                           ;; 01:5606 w..w
-    dw   $4e03                                        ;; 01:560a wW
-    db   $0f, $a3, $ff, $1a, $00, $fe, $00, $00       ;; 01:560c ...?????
-    db   $e5, $00, $23, $1c, $fe, $fe, $00, $16       ;; 01:5614 ????????
-    db   $49, $0f, $23, $17, $fe, $fe, $01, $00       ;; 01:561c ????????
-    db   $e3, $0f, $23, $1d, $fe, $fe, $00, $00       ;; 01:5624 ????????
-    db   $e4, $0f, $23, $16, $00, $00, $01, $00       ;; 01:562c ????????
-    db   $e2, $0f, $20, $00, $00, $00, $e4, $04       ;; 01:5634 ????????
-    db   $e1, $0f, $60, $00, $00, $00, $fc, $02       ;; 01:563c ????????
-    db   $e6, $0f, $e0, $ff, $ff                      ;; 01:5644 ?????
+data_01_5606_MenuScript_BadPassword:
+    menu_cmd     $2f, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, $4e03,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
 
-data_01_5649:
-    db   $19, $00, $fe, $00, $00, $e5, $00, $23       ;; 01:5649 w..ww...
-    db   $1a, $00, $fe, $00, $01, $e5, $01, $23       ;; 01:5651 w..ww...
-    db   $1b, $00, $fe, $00, $02, $e5, $02, $23       ;; 01:5659 w..ww...
-    db   $1c, $fe, $fe, $00                           ;; 01:5661 w..w
-    dw   $4803                                        ;; 01:5665 wW
-    db   $0f, $23, $17, $fe, $fe, $01, $00, $e3       ;; 01:5667 ..w..w..
-    db   $0f, $23, $18, $fe, $fe, $00, $00, $e4       ;; 01:566f ..w..w..
-    db   $0f, $23, $16, $00, $00, $01, $00, $e2       ;; 01:5677 ..w.....
-    db   $0f, $20, $00, $00, $00, $e4, $04, $e1       ;; 01:567f ..w..ww.
-    db   $0f, $60, $00, $00, $00, $fc, $02, $e6       ;; 01:5687 ..w..ww.
-    db   $0f, $e0, $ff                                ;; 01:568f ...
+data_01_560f_MenuScript_MissionSelect1Remote:
+    menu_cmd_sub $1a,             $00, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_MISSION_TEXT, $00,    $00,                               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $1c, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, $4916,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $17, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, MENUCMD_SUB_SET_LEVEL_TEXT, $00,      MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $1d, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_TV_NAME_TEXT, $00,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $16,             $00,             $00, $01, MENUCMD_SUB_STAGE_TV_SCREEN, $00,     MENUCMD_OPTION_NONE,               0
+    menu_cmd_sub $00,             $00,             $00, $e4, MENUCMD_SUB_STAGE_IMAGE2, $04,        MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL
+    menu_cmd_sub $00,             $00,             $00, $fc, MENUCMD_SUB_DRAW_CURSOR, $02,         MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
 
-data_01_5692:
-    db   $1e, $fe, $fe, $01, $00, $e3, $0f, $23       ;; 01:5692 w..w....
-    db   $1f, $fe, $fe, $00, $00, $e4, $0f, $23       ;; 01:569a w..w....
-    db   $20, $fe, $fe, $00                           ;; 01:56a2 w..w
-    dw   $49cb                                        ;; 01:56a6 wW
-    db   $0f, $23, $21, $fe, $fe, $00                 ;; 01:56a8 ..w..w
-    dw   $4916                                        ;; 01:56ae wW
-    db   $0f, $23, $22, $fe, $fe, $00, $00, $e8       ;; 01:56b0 ..w..ww.
-    db   $0f, $23, $23, $fe, $fe, $00                 ;; 01:56b8 ..w..w
-    dw   $4a63                                        ;; 01:56be wW
-    db   $0f, $23, $24, $fe, $fe, $00, $07, $e8       ;; 01:56c0 ..w..ww.
-    db   $0f, $23, $25, $fe, $fe, $00, $01, $e8       ;; 01:56c8 ..w..ww.
-    db   $0f, $23, $26, $fe, $fe, $00                 ;; 01:56d0 ..w..w
-    dw   $4a63                                        ;; 01:56d6 wW
-    db   $0f, $23, $27, $fe, $fe, $00, $08, $e8       ;; 01:56d8 ..w..ww.
-    db   $0f, $23, $28, $fe, $fe, $00, $02, $e8       ;; 01:56e0 ..w..ww.
-    db   $0f, $23, $29, $fe, $fe, $00                 ;; 01:56e8 ..w..w
-    dw   $4a63                                        ;; 01:56ee wW
-    db   $0f, $23, $2a, $fe, $fe, $00, $09, $e8       ;; 01:56f0 ..w..ww.
-    db   $0f, $23, $2b, $00, $00, $00, $00, $00       ;; 01:56f8 ..w.....
-    db   $0f, $25, $2c, $00, $00, $00, $00, $00       ;; 01:5700 ..w.....
-    db   $0f, $25, $2d, $00, $00, $00, $00, $00       ;; 01:5708 ..w.....
-    db   $0f, $25, $00, $00, $00, $00, $00, $e7       ;; 01:5710 ..w.....
-    db   $0f, $e0, $ff, $2e, $fe, $fe, $01, $6f       ;; 01:5718 ...?????
-    db   $4a, $0f, $23, $2f, $fe, $fe, $00, $00       ;; 01:5720 ????????
-    db   $ee, $0f, $23, $30, $fe, $fe, $00, $16       ;; 01:5728 ????????
-    db   $49, $0f, $23, $31, $fe, $fe, $00, $03       ;; 01:5730 ????????
-    db   $e8, $0f, $23, $32, $fe, $fe, $00, $63       ;; 01:5738 ????????
-    db   $4a, $0f, $23, $33, $fe, $fe, $00, $0b       ;; 01:5740 ????????
-    db   $e8, $0f, $23, $34, $fe, $fe, $00, $04       ;; 01:5748 ????????
-    db   $e8, $0f, $23, $35, $fe, $fe, $00, $05       ;; 01:5750 ????????
-    db   $e8, $0f, $23, $36, $00, $00, $00, $00       ;; 01:5758 ????????
-    db   $00, $0f, $25, $37, $00, $00, $00, $00       ;; 01:5760 ????????
-    db   $00, $0f, $25, $38, $00, $00, $00, $00       ;; 01:5768 ????????
-    db   $00, $0f, $25, $39, $00, $00, $00, $00       ;; 01:5770 ????????
-    db   $f0, $0f, $60, $3a, $00, $00, $00, $01       ;; 01:5778 ????????
-    db   $f0, $0f, $60, $3b, $00, $00, $00, $02       ;; 01:5780 ????????
-    db   $f0, $0f, $60, $3c, $00, $00, $00, $03       ;; 01:5788 ????????
-    db   $f0, $0f, $60, $00, $00, $00, $e4, $04       ;; 01:5790 ????????
-    db   $e1, $0f, $60, $00, $00, $00, $00, $00       ;; 01:5798 ????????
-    db   $e7, $0f, $e0, $ff, $3f, $fe, $fe, $01       ;; 01:57a0 ????????
-    db   $79, $4b, $0f, $a3, $ff, $40, $fe, $fe       ;; 01:57a8 ????????
-    db   $01, $bf, $4c, $53, $23, $00, $00, $00       ;; 01:57b0 ????????
-    db   $00, $01, $ec, $0f, $60, $ff, $3e, $fe       ;; 01:57b8 ????????
-    db   $fe, $01, $bf, $4c, $60, $23, $3f, $fe       ;; 01:57c0 ????????
-    db   $fe, $01, $b6, $4d, $01, $23, $00, $00       ;; 01:57c8 ????????
-    db   $00, $fc, $02, $e6, $0f, $e0, $ff            ;; 01:57d0 ???????
+data_01_5648_MenuScript_Unk06:
+    db   MENUSCRIPT_END
 
-data_01_57d7:
-    db   $40, $fe, $fe, $01                           ;; 01:57d7 w..w
-    dw   $4d63                                        ;; 01:57db wW
-    db   $53, $23, $00, $00, $00, $00, $01, $ec       ;; 01:57dd ..w...w.
-    db   $0f, $60, $ff                                ;; 01:57e5 ...
+data_01_5649_MenuScript_MissionSelect3Remotes:
+    menu_cmd_sub $19,             $00, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_MISSION_TEXT, $00,    $00,                               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $1a,             $00, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_MISSION_TEXT, $01,    $00 | 1,                           MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $1b,             $00, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_MISSION_TEXT, $02,    $00 | 2,                           MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $1c, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, $4803,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $17, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, MENUCMD_SUB_SET_LEVEL_TEXT, $00,      MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $18, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_TV_NAME_TEXT, $00,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $16,             $00,             $00, $01, MENUCMD_SUB_STAGE_TV_SCREEN, $00,     MENUCMD_OPTION_NONE,               0
+    menu_cmd_sub $00,             $00,             $00, $e4, MENUCMD_SUB_STAGE_IMAGE2, $04,        MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL
+    menu_cmd_sub $00,             $00,             $00, $fc, MENUCMD_SUB_DRAW_CURSOR, $02,         MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
 
-data_01_57e8:
-    db   $3e, $fe, $fe, $01                           ;; 01:57e8 w..w
-    dw   $4d63                                        ;; 01:57ec wW
-    db   $60, $23, $3f, $fe, $fe, $01                 ;; 01:57ee ..w..w
-    dw   $4db6                                        ;; 01:57f4 wW
-    db   $01, $23, $00, $00, $00, $fc, $02, $e6       ;; 01:57f6 ..w..ww.
-    db   $0f, $e0, $ff                                ;; 01:57fe ...
+data_01_5692_MenuScript_Totals:
+    menu_cmd_sub $1e, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, MENUCMD_SUB_SET_LEVEL_TEXT, $00,      MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $1f, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_TV_NAME_TEXT, $00,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $20, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, $49cb,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $21, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, $4916,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $22, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_COUNTER_TEXT, $00,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $23, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, $4a63,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $24, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_COUNTER_TEXT, $07,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $25, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_COUNTER_TEXT, $01,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $26, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, $4a63,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $27, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_COUNTER_TEXT, $08,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $28, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_COUNTER_TEXT, $02,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $29, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, $4a63,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $2a, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_COUNTER_TEXT, $09,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $2b,             $00,             $00, $00, $0000,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_TRANSPOSED
+    menu_cmd     $2c,             $00,             $00, $00, $0000,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_TRANSPOSED
+    menu_cmd     $2d,             $00,             $00, $00, $0000,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_TRANSPOSED
+    menu_cmd_sub $00,             $00,             $00, $00, MENUCMD_SUB_ENABLE_ANIMATION, $00,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
 
-data_01_5801:
-    db   $00, $00, $00, $00, $00, $ed, $0f, $e0       ;; 01:5801 w...w...
-    db   $ff, $00, $00, $00, $00, $01, $ed, $0f       ;; 01:5809 .???????
-    db   $e0, $4d, $fe, $fe, $01, $20, $47, $00       ;; 01:5811 ????????
-    db   $23, $4e, $fe, $fe, $01, $32, $47, $01       ;; 01:5819 ????????
-    db   $23, $4f, $fe, $fe, $01, $45, $47, $02       ;; 01:5821 ????????
-    db   $23, $50, $fe, $fe, $01, $57, $47, $03       ;; 01:5829 ????????
-    db   $23, $51, $fe, $fe, $01, $69, $47, $04       ;; 01:5831 ????????
-    db   $23, $00, $00, $00, $fc, $00, $e6, $0f       ;; 01:5839 ????????
-    db   $e0, $ff                                     ;; 01:5841 ??
+data_01_571b_MenuScript_CongratulationsGotRemote:
+    menu_cmd     $2e, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, $4a6f,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $2f, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_COLLECTED_COUNT, $00,     MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $30, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, $4916,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $31, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_COUNTER_TEXT, $03,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $32, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, $4a63,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $33, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_COUNTER_TEXT, $0b,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $34, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_COUNTER_TEXT, $04,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $35, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_COUNTER_TEXT, $05,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $36,             $00,             $00, $00, $0000,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_TRANSPOSED
+    menu_cmd     $37,             $00,             $00, $00, $0000,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_TRANSPOSED
+    menu_cmd     $38,             $00,             $00, $00, $0000,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_TRANSPOSED
+    menu_cmd_sub $39,             $00,             $00, $00, MENUCMD_SUB_DRAW_REMOTE_MARKER, $00,  MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL
+    menu_cmd_sub $3a,             $00,             $00, $00, MENUCMD_SUB_DRAW_REMOTE_MARKER, $01,  MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL
+    menu_cmd_sub $3b,             $00,             $00, $00, MENUCMD_SUB_DRAW_REMOTE_MARKER, $02,  MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL
+    menu_cmd_sub $3c,             $00,             $00, $00, MENUCMD_SUB_DRAW_REMOTE_MARKER, $03,  MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL
+    menu_cmd_sub $00,             $00,             $00, $e4, MENUCMD_SUB_STAGE_IMAGE2, $04,        MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL
+    menu_cmd_sub $00,             $00,             $00, $00, MENUCMD_SUB_ENABLE_ANIMATION, $00,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
 
-data_01_5843:
-    db   $52, $fe, $00, $00                           ;; 01:5843 w..w
-    dw   $4000                                        ;; 01:5847 wW
-    db   $0f, $23, $52, $fe, $17, $00                 ;; 01:5849 ..w..w
-    dw   $4022                                        ;; 01:584f wW
-    db   $0f, $22, $52, $fe, $35, $00                 ;; 01:5851 ..w..w
-    dw   $404f                                        ;; 01:5857 wW
-    db   $0f, $22, $52, $fe, $53, $00                 ;; 01:5859 ..w..w
-    dw   $4082                                        ;; 01:585f wW
-    db   $0f, $22, $52, $fe, $78, $00                 ;; 01:5861 ..w..w
-    dw   $40d9                                        ;; 01:5867 wW
-    db   $0f, $a2, $ff                                ;; 01:5869 ...
+data_01_57a4_MenuScript_TimeUp:
+    menu_cmd     $3f, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, $4b79,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
 
-data_01_586c:
-    db   $52, $fe, $05, $00                           ;; 01:586c w..w
-    dw   $40f8                                        ;; 01:5870 wW
-    db   $0f, $23, $52, $fe, $29, $00                 ;; 01:5872 ..w..w
-    dw   $4171                                        ;; 01:5878 wW
-    db   $0f, $22, $52, $fe, $45, $00                 ;; 01:587a ..w..w
-    dw   $41bf                                        ;; 01:5880 wW
-    db   $0f, $22, $52, $fe, $69, $00                 ;; 01:5882 ..w..w
-    dw   $422a                                        ;; 01:5888 wW
-    db   $0f, $a2, $ff                                ;; 01:588a ...
+data_01_57ad_MenuScript_PauseInGexCave:
+    menu_cmd     $40, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, $4cbf,                                MENU_ACTION_QUIT | 3,              MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $00,             $00,             $00, $00, MENUCMD_SUB_SET_CHAINED_SCRIPT, $01,  MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL
+    db   MENUSCRIPT_END
 
-data_01_588d:
-    db   $00, $00, $00, $00, $03, $ed, $0f, $e0       ;; 01:588d w...w...
-    db   $ff                                          ;; 01:5895 .
+data_01_57be_MenuScript_QuitGame:
+    menu_cmd     $3e, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, $4cbf,                                MENU_RESULT_CONFIRM_QUIT | 0,      MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $3f, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, $4db6,                                $00 | 1,                           MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $00,             $00,             $00, $fc, MENUCMD_SUB_DRAW_CURSOR, $02,         MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
 
-data_01_5896:
-    db   $00, $00, $00, $00, $04, $ed, $0f, $e0       ;; 01:5896 w...w...
-    db   $ff, $52, $fe, $08, $00, $69, $42, $0f       ;; 01:589e .???????
-    db   $23, $52, $fe, $36, $00, $8c, $42, $0f       ;; 01:58a6 ????????
-    db   $22, $52, $fe, $40, $00, $a9, $42, $0f       ;; 01:58ae ????????
-    db   $a2, $ff, $52, $fe, $00, $00, $be, $42       ;; 01:58b6 ????????
-    db   $0f, $23, $52, $fe, $08, $00, $d5, $42       ;; 01:58be ????????
-    db   $0f, $22, $52, $fe, $18, $00, $e9, $42       ;; 01:58c6 ????????
-    db   $0f, $22, $52, $fe, $20, $00, $ff, $42       ;; 01:58ce ????????
-    db   $0f, $22, $52, $fe, $31, $00, $16, $43       ;; 01:58d6 ????????
-    db   $0f, $22, $52, $fe, $39, $00, $28, $43       ;; 01:58de ????????
-    db   $0f, $22, $52, $fe, $41, $00, $41, $43       ;; 01:58e6 ????????
-    db   $0f, $22, $52, $fe, $49, $00, $57, $43       ;; 01:58ee ????????
-    db   $0f, $22, $52, $fe, $51, $00, $6e, $43       ;; 01:58f6 ????????
-    db   $0f, $22, $52, $fe, $59, $00, $82, $43       ;; 01:58fe ????????
-    db   $0f, $22, $52, $fe, $61, $00, $99, $43       ;; 01:5906 ????????
-    db   $0f, $22, $52, $fe, $69, $00, $b1, $43       ;; 01:590e ????????
-    db   $0f, $22, $52, $fe, $71, $00, $ca, $43       ;; 01:5916 ????????
-    db   $0f, $22, $52, $fe, $79, $00, $e1, $43       ;; 01:591e ????????
-    db   $0f, $a2, $ff, $52, $fe, $00, $00, $f6       ;; 01:5926 ????????
-    db   $43, $0f, $23, $52, $fe, $08, $00, $1a       ;; 01:592e ????????
-    db   $44, $0f, $22, $52, $fe, $19, $00, $32       ;; 01:5936 ????????
-    db   $44, $0f, $22, $52, $fe, $21, $00, $4e       ;; 01:593e ????????
-    db   $44, $0f, $22, $52, $fe, $29, $00, $67       ;; 01:5946 ????????
-    db   $44, $0f, $22, $52, $fe, $31, $00, $7f       ;; 01:594e ????????
-    db   $44, $0f, $22, $52, $fe, $39, $00, $92       ;; 01:5956 ????????
-    db   $44, $0f, $22, $52, $fe, $41, $00, $a6       ;; 01:595e ????????
-    db   $44, $0f, $22, $52, $fe, $49, $00, $bb       ;; 01:5966 ????????
-    db   $44, $0f, $22, $52, $fe, $51, $00, $d5       ;; 01:596e ????????
-    db   $44, $0f, $22, $52, $fe, $59, $00, $eb       ;; 01:5976 ????????
-    db   $44, $0f, $22, $52, $fe, $61, $00, $02       ;; 01:597e ????????
-    db   $45, $0f, $22, $52, $fe, $69, $00, $18       ;; 01:5986 ????????
-    db   $45, $0f, $22, $52, $fe, $71, $00, $2e       ;; 01:598e ????????
-    db   $45, $0f, $22, $52, $fe, $79, $00, $47       ;; 01:5996 ????????
-    db   $45, $0f, $a2, $ff, $52, $fe, $08, $00       ;; 01:599e ????????
-    db   $60, $45, $0f, $23, $52, $fe, $18, $00       ;; 01:59a6 ????????
-    db   $92, $45, $0f, $22, $52, $fe, $36, $00       ;; 01:59ae ????????
-    db   $ac, $45, $0f, $22, $52, $fe, $40, $00       ;; 01:59b6 ????????
-    db   $d1, $45, $0f, $a2, $ff, $52, $fe, $00       ;; 01:59be ????????
-    db   $00, $e7, $45, $0f, $23, $52, $fe, $08       ;; 01:59c6 ????????
-    db   $00, $fd, $45, $0f, $22, $52, $fe, $1a       ;; 01:59ce ????????
-    db   $00, $0b, $46, $0f, $22, $52, $fe, $22       ;; 01:59d6 ????????
-    db   $00, $23, $46, $0f, $22, $52, $fe, $34       ;; 01:59de ????????
-    db   $00, $3a, $46, $0f, $22, $52, $fe, $3c       ;; 01:59e6 ????????
-    db   $00, $50, $46, $0f, $22, $52, $fe, $4e       ;; 01:59ee ????????
-    db   $00, $64, $46, $0f, $22, $52, $fe, $56       ;; 01:59f6 ????????
-    db   $00, $7d, $46, $0f, $22, $52, $fe, $68       ;; 01:59fe ????????
-    db   $00, $95, $46, $0f, $22, $52, $fe, $70       ;; 01:5a06 ????????
-    db   $00, $a7, $46, $0f, $a2, $ff, $52, $fe       ;; 01:5a0e ????????
-    db   $2e, $00, $bd, $46, $0f, $23, $52, $fe       ;; 01:5a16 ????????
-    db   $36, $00, $d9, $46, $0f, $22, $52, $fe       ;; 01:5a1e ????????
-    db   $3e, $00, $f3, $46, $0f, $22, $52, $fe       ;; 01:5a26 ????????
-    db   $46, $00, $08, $47, $0f, $a2, $ff, $3f       ;; 01:5a2e ????????
-    db   $fe, $fe, $01, $c5, $4b, $0f, $a3, $ff       ;; 01:5a36 ????????
-    db   $00, $00, $00, $00, $06, $ed, $0f, $e0       ;; 01:5a3e ????????
-    db   $ff                                          ;; 01:5a46 ?
+data_01_57d7_MenuScript_PauseInLevel:
+    menu_cmd     $40, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, $4d63,                                MENU_ACTION_QUIT | 3,              MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $00,             $00,             $00, $00, MENUCMD_SUB_SET_CHAINED_SCRIPT, $01,  MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL
+    db   MENUSCRIPT_END
 
-data_01_5a47:
-    db   $00, $00, $00, $03, $00, $eb, $0f, $24       ;; 01:5a47 w...w...
-    db   $01, $00, $00, $03, $01, $eb, $0f, $24       ;; 01:5a4f w...w...
-    db   $02, $00, $00, $03, $02, $eb, $0f, $24       ;; 01:5a57 w...w...
-    db   $03, $00, $00, $03, $03, $eb, $0f, $24       ;; 01:5a5f w...w...
-    db   $04, $00, $00, $03, $04, $eb, $0f, $24       ;; 01:5a67 w...w...
-    db   $05, $00, $00, $03, $05, $eb, $0f, $24       ;; 01:5a6f w...w...
-    db   $06, $00, $00, $03, $06, $eb, $0f, $24       ;; 01:5a77 w...w...
-    db   $07, $00, $00, $03, $07, $eb, $0f, $24       ;; 01:5a7f w...w...
-    db   $08, $00, $00, $03, $08, $eb, $0f, $24       ;; 01:5a87 w...w...
-    db   $09, $00, $00, $03, $09, $eb, $0f, $24       ;; 01:5a8f w...w...
-    db   $0a, $00, $00, $03, $0a, $eb, $0f, $24       ;; 01:5a97 w...w...
-    db   $0b, $00, $00, $03, $0b, $eb, $0f, $24       ;; 01:5a9f w...w...
-    db   $0c, $00, $00, $03, $0c, $eb, $0f, $24       ;; 01:5aa7 w...w...
-    db   $0d, $00, $00, $03, $0d, $eb, $0f, $24       ;; 01:5aaf w...w...
-    db   $0e, $00, $00, $03, $0e, $eb, $0f, $24       ;; 01:5ab7 w...w...
-    db   $0f, $00, $00, $03, $0f, $eb, $0f, $24       ;; 01:5abf w...w...
-    db   $10, $00, $00, $03, $10, $eb, $0f, $24       ;; 01:5ac7 w...w...
-    db   $11, $00, $00, $03, $11, $eb, $0f, $a4       ;; 01:5acf w...w...
-    db   $ff                                          ;; 01:5ad7 .
+data_01_57e8_MenuScript_GoToMap:
+    menu_cmd     $3e, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, $4d63,                                MENU_RESULT_CONFIRM_QUIT | 0,      MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $3f, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, $4db6,                                $00 | 1,                           MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $00,             $00,             $00, $fc, MENUCMD_SUB_DRAW_CURSOR, $02,         MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
 
-data_01_5ad8:
-    db   $3d, $fe, $fe, $01                           ;; 01:5ad8 w..w
-    dw   $4c56                                        ;; 01:5adc wW
-    db   $00, $23, $3e, $fe, $fe, $01                 ;; 01:5ade ..w..w
-    dw   $4d0f                                        ;; 01:5ae4 wW
-    db   $31, $23, $3f, $fe, $fe, $01                 ;; 01:5ae6 ..w..w
-    dw   $4c8f                                        ;; 01:5aec wW
-    db   $72, $23, $41, $fe, $fe, $00, $03, $e8       ;; 01:5aee ..w..ww.
-    db   $0f, $23, $42, $fe, $fe, $00, $05, $e8       ;; 01:5af6 ..w..ww.
-    db   $0f, $23, $43, $fe, $fe, $00, $04, $e8       ;; 01:5afe ..w..ww.
-    db   $0f, $23, $44, $fe, $fe, $00, $06, $e8       ;; 01:5b06 ..w..ww.
-    db   $0f, $23, $45, $fe, $fe, $00, $0a, $e8       ;; 01:5b0e ..w..ww.
-    db   $0f, $23, $46, $00, $00, $00, $00, $00       ;; 01:5b16 ..w.....
-    db   $0f, $25, $47, $00, $00, $00, $00, $00       ;; 01:5b1e ..w.....
-    db   $0f, $25, $48, $00, $00, $00, $00, $00       ;; 01:5b26 ..w.....
-    db   $0f, $25, $49, $00, $00, $00, $00, $00       ;; 01:5b2e ..w.....
-    db   $0f, $25, $4a, $00, $00, $00, $00, $00       ;; 01:5b36 ..w.....
-    db   $0f, $21, $4b, $00, $00, $00, $00, $00       ;; 01:5b3e ..w.....
-    db   $0f, $21, $00, $00, $00, $85, $05, $e1       ;; 01:5b46 ..w..ww.
-    db   $0f, $60, $00, $00, $00, $00, $00, $e7       ;; 01:5b4e ..w.....
-    db   $0f, $60, $00, $00, $00, $fc, $02, $e6       ;; 01:5b56 ..w..ww.
-    db   $0f, $e0, $ff                                ;; 01:5b5e ...
+data_01_5801_MenuScript_DavidAPalmer:
+    menu_cmd_sub $00,             $00,             $00, $00, MENUCMD_SUB_FULLSCREEN_IMAGE, $00,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
+
+data_01_580a_MenuScript_Unk10:
+    menu_cmd_sub $00,             $00,             $00, $00, MENUCMD_SUB_FULLSCREEN_IMAGE, $01,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL | MENUCMD_FLAG_UPLOAD_TILES
+    menu_cmd     $4d, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, $4720,                                $00,                               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $4e, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, $4732,                                $00 | 1,                           MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $4f, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, $4745,                                $00 | 2,                           MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $50, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, $4757,                                $00 | 3,                           MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $51, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, $4769,                                $00 | 4,                           MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $00,             $00,             $00, $fc, MENUCMD_SUB_DRAW_CURSOR, $00,         MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
+
+data_01_5843_MenuScript_OpeningCredits1:
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $00, $00, $4000,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $17, $00, $4022,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $35, $00, $404f,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $53, $00, $4082,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $78, $00, $40d9,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
+
+data_01_586c_MenuScript_OpeningCredits2:
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $05, $00, $40f8,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $29, $00, $4171,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $45, $00, $41bf,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $69, $00, $422a,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
+
+data_01_588d_MenuScript_OpeningCrystalDynamics:
+    menu_cmd_sub $00,             $00,             $00, $00, MENUCMD_SUB_FULLSCREEN_IMAGE, $03,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
+
+data_01_5896_MenuScript_EidosInteractive:
+    menu_cmd_sub $00,             $00,             $00, $00, MENUCMD_SUB_FULLSCREEN_IMAGE, $04,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
+
+data_01_589f_MenuScript_EndCredits1:
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $08, $00, $4269,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $36, $00, $428c,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $40, $00, $42a9,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
+
+data_01_58b8_MenuScript_EndCredits2:
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $00, $00, $42be,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $08, $00, $42d5,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $18, $00, $42e9,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $20, $00, $42ff,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $31, $00, $4316,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $39, $00, $4328,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $41, $00, $4341,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $49, $00, $4357,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $51, $00, $436e,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $59, $00, $4382,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $61, $00, $4399,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $69, $00, $43b1,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $71, $00, $43ca,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $79, $00, $43e1,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
+
+data_01_5929_MenuScript_EndCredits3:
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $00, $00, $43f6,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $08, $00, $441a,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $19, $00, $4432,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $21, $00, $444e,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $29, $00, $4467,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $31, $00, $447f,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $39, $00, $4492,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $41, $00, $44a6,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $49, $00, $44bb,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $51, $00, $44d5,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $59, $00, $44eb,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $61, $00, $4502,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $69, $00, $4518,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $71, $00, $452e,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $79, $00, $4547,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
+
+data_01_59a2_MenuScript_EndCredits4:
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $08, $00, $4560,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $18, $00, $4592,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $36, $00, $45ac,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $40, $00, $45d1,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
+
+data_01_59c3_MenuScript_EndCredits5:
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $00, $00, $45e7,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $08, $00, $45fd,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $1a, $00, $460b,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $22, $00, $4623,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $34, $00, $463a,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $3c, $00, $4650,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $4e, $00, $4664,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $56, $00, $467d,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $68, $00, $4695,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $70, $00, $46a7,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
+
+data_01_5a14_MenuScript_EndCredits6:
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $2e, $00, $46bd,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $36, $00, $46d9,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $3e, $00, $46f3,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $52, TEXT_AUTO_ALIGN,             $46, $00, $4708,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_DRAW_TEXT | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
+
+data_01_5a35_MenuScript_WellDone:
+    menu_cmd     $3f, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, $4bc5,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
+
+data_01_5a3e_MenuScript_C:
+    menu_cmd_sub $00,             $00,             $00, $00, MENUCMD_SUB_FULLSCREEN_IMAGE, $06,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
+
+data_01_5a47_MenuScript_PasswordGrid:
+    menu_cmd_sub $00,             $00,             $00, $03, MENUCMD_SUB_PASSWORD_GLYPH, $00,      MENUCMD_OPTION_NONE,               MENUCMD_FLAG_TRANSPOSED
+    menu_cmd_sub $01,             $00,             $00, $03, MENUCMD_SUB_PASSWORD_GLYPH, $01,      MENUCMD_OPTION_NONE,               MENUCMD_FLAG_TRANSPOSED
+    menu_cmd_sub $02,             $00,             $00, $03, MENUCMD_SUB_PASSWORD_GLYPH, $02,      MENUCMD_OPTION_NONE,               MENUCMD_FLAG_TRANSPOSED
+    menu_cmd_sub $03,             $00,             $00, $03, MENUCMD_SUB_PASSWORD_GLYPH, $03,      MENUCMD_OPTION_NONE,               MENUCMD_FLAG_TRANSPOSED
+    menu_cmd_sub $04,             $00,             $00, $03, MENUCMD_SUB_PASSWORD_GLYPH, $04,      MENUCMD_OPTION_NONE,               MENUCMD_FLAG_TRANSPOSED
+    menu_cmd_sub $05,             $00,             $00, $03, MENUCMD_SUB_PASSWORD_GLYPH, $05,      MENUCMD_OPTION_NONE,               MENUCMD_FLAG_TRANSPOSED
+    menu_cmd_sub $06,             $00,             $00, $03, MENUCMD_SUB_PASSWORD_GLYPH, $06,      MENUCMD_OPTION_NONE,               MENUCMD_FLAG_TRANSPOSED
+    menu_cmd_sub $07,             $00,             $00, $03, MENUCMD_SUB_PASSWORD_GLYPH, $07,      MENUCMD_OPTION_NONE,               MENUCMD_FLAG_TRANSPOSED
+    menu_cmd_sub $08,             $00,             $00, $03, MENUCMD_SUB_PASSWORD_GLYPH, $08,      MENUCMD_OPTION_NONE,               MENUCMD_FLAG_TRANSPOSED
+    menu_cmd_sub $09,             $00,             $00, $03, MENUCMD_SUB_PASSWORD_GLYPH, $09,      MENUCMD_OPTION_NONE,               MENUCMD_FLAG_TRANSPOSED
+    menu_cmd_sub $0a,             $00,             $00, $03, MENUCMD_SUB_PASSWORD_GLYPH, $0a,      MENUCMD_OPTION_NONE,               MENUCMD_FLAG_TRANSPOSED
+    menu_cmd_sub $0b,             $00,             $00, $03, MENUCMD_SUB_PASSWORD_GLYPH, $0b,      MENUCMD_OPTION_NONE,               MENUCMD_FLAG_TRANSPOSED
+    menu_cmd_sub $0c,             $00,             $00, $03, MENUCMD_SUB_PASSWORD_GLYPH, $0c,      MENUCMD_OPTION_NONE,               MENUCMD_FLAG_TRANSPOSED
+    menu_cmd_sub $0d,             $00,             $00, $03, MENUCMD_SUB_PASSWORD_GLYPH, $0d,      MENUCMD_OPTION_NONE,               MENUCMD_FLAG_TRANSPOSED
+    menu_cmd_sub $0e,             $00,             $00, $03, MENUCMD_SUB_PASSWORD_GLYPH, $0e,      MENUCMD_OPTION_NONE,               MENUCMD_FLAG_TRANSPOSED
+    menu_cmd_sub $0f,             $00,             $00, $03, MENUCMD_SUB_PASSWORD_GLYPH, $0f,      MENUCMD_OPTION_NONE,               MENUCMD_FLAG_TRANSPOSED
+    menu_cmd_sub $10,             $00,             $00, $03, MENUCMD_SUB_PASSWORD_GLYPH, $10,      MENUCMD_OPTION_NONE,               MENUCMD_FLAG_TRANSPOSED
+    menu_cmd_sub $11,             $00,             $00, $03, MENUCMD_SUB_PASSWORD_GLYPH, $11,      MENUCMD_OPTION_NONE,               MENUCMD_FLAG_TRANSPOSED | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
+
+data_01_5ad8_MenuScript_TotalsStats:
+    menu_cmd     $3d, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, $4c56,                                $00,                               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $3e, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, $4d0f,                                MENU_ACTION_SEE_PASSWORD | 1,      MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $3f, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, $4c8f,                                MENU_ACTION_VIEW_TOTALS | 2,       MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $41, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_COUNTER_TEXT, $03,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $42, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_COUNTER_TEXT, $05,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $43, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_COUNTER_TEXT, $04,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $44, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_COUNTER_TEXT, $06,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd_sub $45, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $00, MENUCMD_SUB_SET_COUNTER_TEXT, $0a,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT
+    menu_cmd     $46,             $00,             $00, $00, $0000,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_TRANSPOSED
+    menu_cmd     $47,             $00,             $00, $00, $0000,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_TRANSPOSED
+    menu_cmd     $48,             $00,             $00, $00, $0000,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_TRANSPOSED
+    menu_cmd     $49,             $00,             $00, $00, $0000,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_TRANSPOSED
+    menu_cmd     $4a,             $00,             $00, $00, $0000,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER
+    menu_cmd     $4b,             $00,             $00, $00, $0000,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER
+    menu_cmd_sub $00,             $00,             $00, $85, MENUCMD_SUB_STAGE_IMAGE2, $05,        MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL
+    menu_cmd_sub $00,             $00,             $00, $00, MENUCMD_SUB_ENABLE_ANIMATION, $00,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL
+    menu_cmd_sub $00,             $00,             $00, $fc, MENUCMD_SUB_DRAW_CURSOR, $02,         MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL | MENUCMD_FLAG_UPLOAD_TILES
+    db   MENUSCRIPT_END
 
 data_01_5b61_SpriteScriptTable:
 ; Four sprite scripts. A script is a starting OAM slot, then six-byte records - Y, X,

@@ -221,3 +221,30 @@ ENDM
 MACRO spawn_pos ; X, Y
     dw \1, \2
 ENDM
+
+; ------------------------------------------------------------------
+; Menu script commands - see code/bank01_menus.asm
+; ------------------------------------------------------------------
+; One command: an opcode byte then a MENUCMD_PARAM_BYTES parameter block. The opcode
+; indexes data_01_512e_MenuCmd_Descriptors for the rectangle this command occupies;
+; the block says what to put in it.
+;
+; These emit exactly ONE block, so MENUCMD_FLAG_LAST_BLOCK is OR'd in here rather than
+; written out on all 181 command lines - and every command in the ROM does carry it. A
+; command with a second block would have to be written out by hand
+MACRO menu_cmd ; opcode, pen X, pen Y, arg, BANK_1C_TEXT string table, option, flags
+    db   \1
+    db   \2, \3, \4
+    dw   \5
+    db   \6, \7 | MENUCMD_FLAG_LAST_BLOCK
+ENDM
+
+; The same, for a command that calls a sub-handler instead of naming a string. The
+; handler id lands in the HIGH byte of the source pointer, which is how
+; call_01_446b_MenuScript_RunCommand tells the two apart
+MACRO menu_cmd_sub ; opcode, pen X, pen Y, arg, MENUCMD_SUB_*, handler arg, option, flags
+    db   \1
+    db   \2, \3, \4
+    dw   (\5 << 8) | \6
+    db   \7, \8 | MENUCMD_FLAG_LAST_BLOCK
+ENDM
