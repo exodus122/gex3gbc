@@ -355,7 +355,7 @@ call_00_2f00_PlayerIsDead:
     push HL                                            ;; 00:2f00 $e5
     push DE                                            ;; 00:2f01 $d5
     push BC                                            ;; 00:2f02 $c5
-    farcall call_02_5541_GetPlayerStatesFromAction
+    farcall call_02_5541_Player_GetActionStates
     pop  BC                                            ;; 00:2f0e $c1
     pop  DE                                            ;; 00:2f0f $d1
     pop  HL                                            ;; 00:2f10 $e1

@@ -98,7 +98,7 @@ call_03_46e0_BgCollision_Update:
 ; sidescrolling and top-down handlers through
 ; .data_03_4704_BgCollisionTypeHandlers, and the jump is a tail call - the chosen
 ; handler returns to this routine's caller
-    farcall call_02_5541_GetPlayerStatesFromAction
+    farcall call_02_5541_Player_GetActionStates
     bit  PLAYER_STATE_IN_WATER, A                                          ;; 03:46eb $cb $6f
     jp   NZ, call_03_4a3f_BgCollision_SwimmingHandler            ;; 03:46ed $c2 $3f $4a
     bit  PLAYER_STATE_CLIMBING, A                                          ;; 03:46f0 $cb $7f

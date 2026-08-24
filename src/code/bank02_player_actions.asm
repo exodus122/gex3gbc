@@ -15,7 +15,7 @@ call_02_47ce_PlayerAction_Idle:
     ld   HL, wD805_Player_ActionState                                     ;; 02:47ce $21 $05 $d8
     bit  4, [HL]                                       ;; 02:47d1 $cb $66
     jr   Z, .jr_02_47e9                                ;; 02:47d3 $28 $14
-    ld   HL, wDC80_Player_UnkStates                                     ;; 02:47d5 $21 $80 $dc
+    ld   HL, wDC80_ButtonBlockingFlags                                     ;; 02:47d5 $21 $80 $dc
     set  6, [HL]                                       ;; 02:47d8 $cb $f6
     xor  A, A                                          ;; 02:47da $af
     ld   [wDC86_PlayerXVelocity], A                                    ;; 02:47db $ea $86 $dc
@@ -27,18 +27,18 @@ call_02_47ce_PlayerAction_Idle:
     ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:47e9 $fa $81 $dc
     cp   A, PADF_UP                                        ;; 02:47ec $fe $40
     call Z, call_00_1bbc_CheckForDoorAndEnter                               ;; 02:47ee $cc $bc $1b
-    call call_02_4f11_ChooseNextActionBasedOnLevel                                  ;; 02:47f1 $cd $11 $4f
+    call call_02_4f11_Player_RequestFallAction                                  ;; 02:47f1 $cd $11 $4f
     ld   HL, wDC83_PlayerIdleTimer                                     ;; 02:47f4 $21 $83 $dc
     dec  [HL]                                          ;; 02:47f7 $35
     ld   A, PLAYERACTION_IDLE_ANIMATION                                        ;; 02:47f8 $3e $02
-    jp   Z, call_02_54f9_Player_SwitchAction                               ;; 02:47fa $ca $f9 $54
+    jp   Z, call_02_54f9_Player_RequestAction                               ;; 02:47fa $ca $f9 $54
     ret                                                ;; 02:47fd $c9
 
 call_02_47fe_PlayerAction_IdleAnimation:
     ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:47fe $fa $81 $dc
     cp   A, PADF_UP                                        ;; 02:4801 $fe $40
     call Z, call_00_1bbc_CheckForDoorAndEnter                               ;; 02:4803 $cc $bc $1b
-    call call_02_4f11_ChooseNextActionBasedOnLevel                                  ;; 02:4806 $cd $11 $4f
+    call call_02_4f11_Player_RequestFallAction                                  ;; 02:4806 $cd $11 $4f
     ret                                                ;; 02:4809 $c9
 
 call_02_480a_PlayerAction_Walk:
@@ -48,7 +48,7 @@ call_02_480a_PlayerAction_Walk:
     ld   A, $02                                        ;; 02:4811 $3e $02
     ld   [wDC87_PlayerXMaxVelocity], A                                    ;; 02:4813 $ea $87 $dc
 .jr_02_4816:
-    call call_02_4f11_ChooseNextActionBasedOnLevel                                  ;; 02:4816 $cd $11 $4f
+    call call_02_4f11_Player_RequestFallAction                                  ;; 02:4816 $cd $11 $4f
     ret                                                ;; 02:4819 $c9
 
 call_02_481a_PlayerAction_StartCrouch:
@@ -94,7 +94,7 @@ call_02_484d_PlayerAction_TakeDamage:
     ld   A, $1c                                        ;; 02:4854 $3e $1c
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:4856 $ea $8c $dc
     ld   [wDC8E_InitialYVelocity], A                                    ;; 02:4859 $ea $8e $dc
-    call call_02_4e01_SetOneTimeFlag                                  ;; 02:485c $cd $01 $4e
+    call call_02_4e01_Player_EnsureMinXSpeed                                  ;; 02:485c $cd $01 $4e
     ld   A, SFX_PLAYER_DAMAGED                                        ;; 02:485f $3e $0a
     call call_00_0ff5_QueueSFX                                  ;; 02:4861 $cd $f5 $0f
 .jr_02_4864:
@@ -103,7 +103,7 @@ call_02_484d_PlayerAction_TakeDamage:
     ld   A, [wDC8E_InitialYVelocity]                                    ;; 02:4869 $fa $8e $dc
     and  A, A                                          ;; 02:486c $a7
     ld   A, PLAYERACTION_IDLE                                        ;; 02:486d $3e $01
-    jp   Z, call_02_54f9_Player_SwitchAction                               ;; 02:486f $ca $f9 $54
+    jp   Z, call_02_54f9_Player_RequestAction                               ;; 02:486f $ca $f9 $54
     ret                                                ;; 02:4872 $c9
 
 call_02_4873_PlayerAction_Death:
@@ -138,7 +138,7 @@ call_02_48a1_PlayerAction_StandOnTVButton:
     ld   A, SFX_UNK1D                                        ;; 02:48a6 $3e $1d
     call NZ, call_00_0ff5_QueueSFX                              ;; 02:48a8 $c4 $f5 $0f
     ld   C, ENTITY_TV_BUTTON                                        ;; 02:48ab $0e $11
-    jp   call_02_4db1_Player_SnapXPosToEntity                                    ;; 02:48ad $c3 $b1 $4d
+    jp   call_02_4db1_Player_PushOutOfEntity                                    ;; 02:48ad $c3 $b1 $4d
 
 call_02_48b0_PlayerAction_EnterTV:
     ld   A, [wD805_Player_ActionState]                                    ;; 02:48b0 $fa $05 $d8
@@ -157,8 +157,8 @@ call_02_48bc_PlayerAction_Jump:
     ld   A, $2a                                        ;; 02:48c8 $3e $2a
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:48ca $ea $8c $dc
     ld   [wDC8E_InitialYVelocity], A                                    ;; 02:48cd $ea $8e $dc
-    call call_02_4df6_Player_SetJumpRelatedState                                  ;; 02:48d0 $cd $f6 $4d
-    call call_02_4e01_SetOneTimeFlag                                  ;; 02:48d3 $cd $01 $4e
+    call call_02_4df6_Player_LockBPress                                  ;; 02:48d0 $cd $f6 $4d
+    call call_02_4e01_Player_EnsureMinXSpeed                                  ;; 02:48d3 $cd $01 $4e
 .jr_02_48d6:
     ld   A, [wDC8E_InitialYVelocity]                                    ;; 02:48d6 $fa $8e $dc
     and  A, A                                          ;; 02:48d9 $a7
@@ -166,8 +166,8 @@ call_02_48bc_PlayerAction_Jump:
     ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:48db $fa $81 $dc
     and  A, PADF_B                                        ;; 02:48de $e6 $02
     ld   A, PLAYERACTION_DOUBLE_JUMP                                        ;; 02:48e0 $3e $0f
-    jp   NZ, call_02_54f9_Player_SwitchAction                              ;; 02:48e2 $c2 $f9 $54
-    jp   call_02_4dce_Player_SwitchActionToIdleOrWalk                                    ;; 02:48e5 $c3 $ce $4d
+    jp   NZ, call_02_54f9_Player_RequestAction                              ;; 02:48e2 $c2 $f9 $54
+    jp   call_02_4dce_Player_SetLandingAction                                    ;; 02:48e5 $c3 $ce $4d
 
 call_02_48e8_PlayerAction_DoubleJump:
     ld   HL, wD805_Player_ActionState                                     ;; 02:48e8 $21 $05 $d8
@@ -179,8 +179,8 @@ call_02_48e8_PlayerAction_DoubleJump:
     ld   A, $3e                                        ;; 02:48f4 $3e $3e
     ld   [wDC8C_PlayerYVelocity], A                                    ;; 02:48f6 $ea $8c $dc
     ld   [wDC8E_InitialYVelocity], A                                    ;; 02:48f9 $ea $8e $dc
-    call call_02_4df6_Player_SetJumpRelatedState                                  ;; 02:48fc $cd $f6 $4d
-    call call_02_4e01_SetOneTimeFlag                                  ;; 02:48ff $cd $01 $4e
+    call call_02_4df6_Player_LockBPress                                  ;; 02:48fc $cd $f6 $4d
+    call call_02_4e01_Player_EnsureMinXSpeed                                  ;; 02:48ff $cd $01 $4e
 .jr_02_4902:
     ld   A, [wDC8E_InitialYVelocity]                                    ;; 02:4902 $fa $8e $dc
     and  A, A                                          ;; 02:4905 $a7
@@ -188,7 +188,7 @@ call_02_48e8_PlayerAction_DoubleJump:
     ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:4907 $fa $81 $dc
     and  A, PADF_B                                        ;; 02:490a $e6 $02
     jr   NZ, .jr_02_48ef                               ;; 02:490c $20 $e1
-    jp   call_02_4dce_Player_SwitchActionToIdleOrWalk                                    ;; 02:490e $c3 $ce $4d
+    jp   call_02_4dce_Player_SetLandingAction                                    ;; 02:490e $c3 $ce $4d
 
 call_02_4911_PlayerAction_TailSpin:
     ld   HL, wD805_Player_ActionState                                     ;; 02:4911 $21 $05 $d8
@@ -196,11 +196,11 @@ call_02_4911_PlayerAction_TailSpin:
     jr   Z, .jr_02_492a                                ;; 02:4916 $28 $12
     ld   A, SFX_GEX_TAIL_SPIN                                        ;; 02:4918 $3e $04
     call call_00_0ff5_QueueSFX                                  ;; 02:491a $cd $f5 $0f
-    ld   HL, wDC80_Player_UnkStates                                     ;; 02:491d $21 $80 $dc
+    ld   HL, wDC80_ButtonBlockingFlags                                     ;; 02:491d $21 $80 $dc
     set  0, [HL]                                       ;; 02:4920 $cb $c6
     ld   A, $01                                        ;; 02:4922 $3e $01
     ld   [wDC7F_Player_IsAttacking], A                                    ;; 02:4924 $ea $7f $dc
-    call call_02_4e01_SetOneTimeFlag                                  ;; 02:4927 $cd $01 $4e
+    call call_02_4e01_Player_EnsureMinXSpeed                                  ;; 02:4927 $cd $01 $4e
 .jr_02_492a:
     ld   A, [wD805_Player_ActionState]                                    ;; 02:492a $fa $05 $d8
     and  A, $04                                        ;; 02:492d $e6 $04
@@ -210,7 +210,7 @@ call_02_4911_PlayerAction_TailSpin:
     ld   HL, wDABE_CollisionFlags                                     ;; 02:4934 $21 $be $da
     bit  7, [HL]                                       ;; 02:4937 $cb $7e
     ret  Z                                             ;; 02:4939 $c8
-    ld   HL, wDC80_Player_UnkStates                                     ;; 02:493a $21 $80 $dc
+    ld   HL, wDC80_ButtonBlockingFlags                                     ;; 02:493a $21 $80 $dc
     set  6, [HL]                                       ;; 02:493d $cb $f6
     ld   C, PLAYERACTION_FALL                                        ;; 02:493f $0e $11
     ld   HL, wDABE_CollisionFlags                                     ;; 02:4941 $21 $be $da
@@ -223,7 +223,7 @@ call_02_4911_PlayerAction_TailSpin:
     ld   C, PLAYERACTION_WALK                                        ;; 02:4951 $0e $03
 .jr_02_4953:
     ld   A, C                                          ;; 02:4953 $79
-    jp   call_02_54f9_Player_SwitchAction                                  ;; 02:4954 $c3 $f9 $54
+    jp   call_02_54f9_Player_RequestAction                                  ;; 02:4954 $c3 $f9 $54
 
 call_02_4957_PlayerAction_Fall:
     ld   HL, wD805_Player_ActionState                                     ;; 02:4957 $21 $05 $d8
@@ -231,7 +231,7 @@ call_02_4957_PlayerAction_Fall:
     jr   Z, .jr_02_4966                                ;; 02:495c $28 $08
     ld   A, $01                                        ;; 02:495e $3e $01
     ld   [wDC8E_InitialYVelocity], A                                    ;; 02:4960 $ea $8e $dc
-    call call_02_4e01_SetOneTimeFlag                                  ;; 02:4963 $cd $01 $4e
+    call call_02_4e01_Player_EnsureMinXSpeed                                  ;; 02:4963 $cd $01 $4e
 .jr_02_4966:
     ld   A, [wDC8E_InitialYVelocity]                                    ;; 02:4966 $fa $8e $dc
     and  A, A                                          ;; 02:4969 $a7
@@ -239,9 +239,9 @@ call_02_4957_PlayerAction_Fall:
     ld   A, [wDC81_Player_EffectiveInputs]                                    ;; 02:496b $fa $81 $dc
     and  A, PADF_RIGHT | PADF_LEFT                                        ;; 02:496e $e6 $30
     ld   A, PLAYERACTION_WALK                                        ;; 02:4970 $3e $03
-    jp   NZ, call_02_54f9_Player_SwitchAction                              ;; 02:4972 $c2 $f9 $54
+    jp   NZ, call_02_54f9_Player_RequestAction                              ;; 02:4972 $c2 $f9 $54
     ld   A, PLAYERACTION_IDLE                                        ;; 02:4975 $3e $01
-    jp   call_02_54f9_Player_SwitchAction                                  ;; 02:4977 $c3 $f9 $54
+    jp   call_02_54f9_Player_RequestAction                                  ;; 02:4977 $c3 $f9 $54
 
 call_02_497a_PlayerAction_FallingLand:
     ld   HL, wD805_Player_ActionState                                     ;; 02:497a $21 $05 $d8
@@ -259,7 +259,7 @@ call_02_4989_PlayerAction_Unk19:
     ld   a,$30
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E_InitialYVelocity],a
-    call call_02_4e01_SetOneTimeFlag
+    call call_02_4e01_Player_EnsureMinXSpeed
     call call_00_06f6_Player_TakeDamage
     ld   a,SFX_UNK0B
     call call_00_0ff5_QueueSFX
@@ -270,7 +270,7 @@ call_02_49a8_PlayerAction_EnterIdle:
     ld   a,[wDC8E_InitialYVelocity]
     and  a
     ld   a,PLAYERACTION_IDLE
-    jp   z,call_02_54f9_Player_SwitchAction
+    jp   z,call_02_54f9_Player_RequestAction
     ret  
     
 call_02_49b2_PlayerAction_None:  
@@ -280,7 +280,7 @@ call_02_49b3_PlayerAction_Water_Swimming:
     ld   hl,wD805_Player_ActionState
     bit  4,[hl]
     jr   z,.jr_00_49CE
-    ld   hl,wDC80_Player_UnkStates
+    ld   hl,wDC80_ButtonBlockingFlags
     set  6,[hl]
     xor  a
     ld   [wDC9B_Player_SwimmingRelated3],a
@@ -289,7 +289,7 @@ call_02_49b3_PlayerAction_Water_Swimming:
     ld   a,01
     ld   [wDC87_PlayerXMaxVelocity],a
 .jr_00_49CE:
-    call call_02_4ee7_MapCollisionFlags
+    call call_02_4ee7_Player_GetDPadDirectionIndex
     ld   hl,wDC9D_Player_SwimmingRelated
     cp   a,$FF
     jr   z,.jr_00_49D9
@@ -367,16 +367,16 @@ call_02_4a52_PlayerAction_BlownUpwards:
     jr   z,.jr_00_4A61
     ld   a,$01
     ld   [wDC8E_InitialYVelocity],a
-    call call_02_4e01_SetOneTimeFlag
+    call call_02_4e01_Player_EnsureMinXSpeed
 .jr_00_4A61:
     ld   a,[wDC8E_InitialYVelocity]
     and  a
-    jp   z,call_02_4dce_Player_SwitchActionToIdleOrWalk
+    jp   z,call_02_4dce_Player_SetLandingAction
     ret  
 
 call_02_4a69_PlayerAction_RidingElevator:
     ld   c,ENTITY_ANIME_CHANNEL_ELEVATOR
-    jp   call_02_4db1_Player_SnapXPosToEntity
+    jp   call_02_4db1_Player_PushOutOfEntity
 
 call_02_4a6e_PlayerAction_Water_TailSpin:
     ld   hl,wD805_Player_ActionState
@@ -384,7 +384,7 @@ call_02_4a6e_PlayerAction_Water_TailSpin:
     jr   z,.jr_00_4A87
     ld   a,SFX_GEX_TAIL_SPIN
     call call_00_0ff5_QueueSFX
-    ld   hl,wDC80_Player_UnkStates
+    ld   hl,wDC80_ButtonBlockingFlags
     set  0,[hl]
     ld   a,$01
     ld   [wDC7F_Player_IsAttacking],a
@@ -395,10 +395,10 @@ call_02_4a6e_PlayerAction_Water_TailSpin:
     ret  z
     xor  a
     ld   [wDC7F_Player_IsAttacking],a
-    ld   hl,wDC80_Player_UnkStates
+    ld   hl,wDC80_ButtonBlockingFlags
     set  6,[hl]
     ld   a,PLAYERACTION_WATER_SWIMMING
-    jp   call_02_54f9_Player_SwitchAction
+    jp   call_02_54f9_Player_RequestAction
 
 call_02_4a9b_PlayerAction_Water_Treading:
     ld   a,$01
@@ -416,7 +416,7 @@ call_02_4aac_PlayerAction_Climbing:
     ld   hl,wD805_Player_ActionState
     bit  4,[hl]
     jr   z,.jr_00_4ACC
-    ld   hl,wDC80_Player_UnkStates
+    ld   hl,wDC80_ButtonBlockingFlags
     set  6,[hl]
     xor  a
     ld   [wDC9F_Player_ClimbingRelated],a
@@ -443,7 +443,7 @@ call_02_4adb_PLAYER_STATE_CLIMBING_MASK_subroutine:
     ld   c,d
     ld   h,[hl]
     ld   c,e
-    call call_02_4ee7_MapCollisionFlags
+    call call_02_4ee7_Player_GetDPadDirectionIndex
     ld   hl,wDCA1_Player_ClimbingRelated4
     cp   a,$FF
     jr   z,.jr_00_4AEA
@@ -487,16 +487,16 @@ call_02_4adb_PLAYER_STATE_CLIMBING_MASK_subroutine:
     and  a,PADF_B
     jr   z,.jr_00_4B32
     ld   a,PLAYERACTION_JUMP
-    call call_02_54f9_Player_SwitchAction
+    call call_02_54f9_Player_RequestAction
 .jr_00_4B32:
     ld   a,[wDC81_Player_EffectiveInputs]
     and  a,PADF_A
     jr   z,.jr_02_4B55
     ld   a,SFX_GEX_TAIL_SPIN
     call call_00_0ff5_QueueSFX
-    ld   hl,wDC80_Player_UnkStates
+    ld   hl,wDC80_ButtonBlockingFlags
     set  0,[hl]
-    call call_02_4e01_SetOneTimeFlag
+    call call_02_4e01_Player_EnsureMinXSpeed
     ld   a,$01
     ld   [wDC9E_Player_ClimbingRelated2],a
     xor  a
@@ -512,7 +512,7 @@ call_02_4adb_PLAYER_STATE_CLIMBING_MASK_subroutine:
     db   $00, $00, $00, $00, $60, $20, $20, $20
 
 call_02_4B66: ; unreferenced function?
-    call call_02_4ee7_MapCollisionFlags
+    call call_02_4ee7_Player_GetDPadDirectionIndex
     ld   hl,wDCA1_Player_ClimbingRelated4
     cp   a,$FF
     jr   z,.jr_00_4B71
@@ -549,7 +549,7 @@ call_02_4B66: ; unreferenced function?
     xor  a
     ld   [wDC9F_Player_ClimbingRelated],a
     ld   [wDC7F_Player_IsAttacking],a
-    ld   hl,wDC80_Player_UnkStates
+    ld   hl,wDC80_ButtonBlockingFlags
     set  6,[hl]
     ret  
 
@@ -567,13 +567,13 @@ call_02_4bb7_PlayerAction_Snowboarding_StandOrWalk:
     ld   a,$01
     ld   [wDCA5_Player_SnowboardingRelated4],a
     ld   [wDCA6_Player_SnowboardingRelated5],a
-    ld   hl,wDC80_Player_UnkStates
+    ld   hl,wDC80_ButtonBlockingFlags
     set  6,[hl]
 .jr_00_4BDC:
     ld   a,[wDC81_Player_EffectiveInputs]
     bit  PADF_UP_BIT,a
     call nz,call_00_1bbc_CheckForDoorAndEnter
-    call call_02_4E0C_Player_SnowboardingTailSpin
+    call call_02_4e0c_Player_UpdateSnowboardSprite
     ld   a,[wDCA5_Player_SnowboardingRelated4]
     and  a
     jr   z,.jr_02_4C11
@@ -620,8 +620,8 @@ call_02_4c2c_PlayerAction_Snowboarding_Jump:
     ld   a,$2A
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E_InitialYVelocity],a
-    call call_02_4df6_Player_SetJumpRelatedState
-    call call_02_4e01_SetOneTimeFlag
+    call call_02_4df6_Player_LockBPress
+    call call_02_4e01_Player_EnsureMinXSpeed
 .jr_00_4C46:
     ld   a,[wDC8E_InitialYVelocity]
     and  a
@@ -629,8 +629,8 @@ call_02_4c2c_PlayerAction_Snowboarding_Jump:
     ld   a,[wDC81_Player_EffectiveInputs]
     and  a,PADF_B
     ld   a,PLAYERACTION_SNOWBOARDING_DOUBLE_JUMP
-    jp   nz,call_02_54f9_Player_SwitchAction
-    jp   call_02_4dce_Player_SwitchActionToIdleOrWalk
+    jp   nz,call_02_54f9_Player_RequestAction
+    jp   call_02_4dce_Player_SetLandingAction
 
 call_02_4c58_PlayerAction_Snowboarding_DoubleJump:
     ld   hl,wD805_Player_ActionState
@@ -641,12 +641,12 @@ call_02_4c58_PlayerAction_Snowboarding_DoubleJump:
     ld   a,$3E
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E_InitialYVelocity],a
-    call call_02_4df6_Player_SetJumpRelatedState
-    call call_02_4e01_SetOneTimeFlag
+    call call_02_4df6_Player_LockBPress
+    call call_02_4e01_Player_EnsureMinXSpeed
 .jr_00_4C72:
     ld   a,[wDC8E_InitialYVelocity]
     and  a
-    jp   z,call_02_4dce_Player_SwitchActionToIdleOrWalk
+    jp   z,call_02_4dce_Player_SetLandingAction
     ret  
 
 call_02_4c7a_PlayerAction_Snowboarding_TailSpin:
@@ -661,13 +661,13 @@ call_02_4c7a_PlayerAction_Snowboarding_TailSpin:
     ld   [wDCA4_Player_SnowboardingRelated3],a
     ld   a,SFX_GEX_TAIL_SPIN
     call call_00_0ff5_QueueSFX
-    ld   hl,wDC80_Player_UnkStates
+    ld   hl,wDC80_ButtonBlockingFlags
     set  0,[hl]
     ld   a,$01
     ld   [wDC7F_Player_IsAttacking],a
-    call call_02_4e01_SetOneTimeFlag
+    call call_02_4e01_Player_EnsureMinXSpeed
 .jr_00_4CA1:
-    jp   call_02_4E0C_Player_SnowboardingTailSpin
+    jp   call_02_4e0c_Player_UpdateSnowboardSprite
 
 call_02_4ca4_PlayerAction_Snowboarding_Fall:
     ld   hl,wD805_Player_ActionState
@@ -675,12 +675,12 @@ call_02_4ca4_PlayerAction_Snowboarding_Fall:
     jr   z,.jr_00_4CB3
     ld   a,$01
     ld   [wDC8E_InitialYVelocity],a
-    call call_02_4e01_SetOneTimeFlag
+    call call_02_4e01_Player_EnsureMinXSpeed
 .jr_00_4CB3:
     ld   a,[wDC8E_InitialYVelocity]
     and  a
     ld   a,PLAYERACTION_SNOWBOARDING_STAND_OR_WALK
-    jp   z,call_02_54f9_Player_SwitchAction
+    jp   z,call_02_54f9_Player_RequestAction
     ret  
 
 call_02_4cbd_PlayerAction_Snowboarding_TakeDamage:
@@ -690,7 +690,7 @@ call_02_4cbd_PlayerAction_Snowboarding_TakeDamage:
     ld   a,$1C
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E_InitialYVelocity],a
-    call call_02_4e01_SetOneTimeFlag
+    call call_02_4e01_Player_EnsureMinXSpeed
     ld   a,SFX_PLAYER_DAMAGED
     call call_00_0ff5_QueueSFX
 .jr_00_4CD4:
@@ -699,16 +699,16 @@ call_02_4cbd_PlayerAction_Snowboarding_TakeDamage:
     ld   a,[wDC8E_InitialYVelocity]
     and  a
     ld   a,PLAYERACTION_SNOWBOARDING_STAND_OR_WALK
-    jp   z,call_02_54f9_Player_SwitchAction
+    jp   z,call_02_54f9_Player_RequestAction
     ret  
 
 call_02_4ce3_PlayerAction_Kangaroo_Idle:
     ld   a,SFX_GEX_JUMP
     call call_00_0ff5_QueueSFX
-    call call_02_4e01_SetOneTimeFlag
+    call call_02_4e01_Player_EnsureMinXSpeed
     ld   a,PLAYERACTION_KANGAROO_HOPPING
-    call call_02_54f9_Player_SwitchAction
-    call call_02_4df6_Player_SetJumpRelatedState
+    call call_02_54f9_Player_RequestAction
+    call call_02_4df6_Player_LockBPress
     ld   hl,wDABE_CollisionFlags
     bit  7,[hl]
     jr   z,call_02_4d02_PlayerAction_Kangaroo_Hopping
@@ -722,16 +722,16 @@ call_02_4d02_PlayerAction_Kangaroo_Hopping:
     ld   a,[wDC81_Player_EffectiveInputs]
     and  a,PADF_B
     ld   a,PLAYERACTION_KANGAROO_START_JUMP
-    jp   nz,call_02_54f9_Player_SwitchAction
-    jp   call_02_4dce_Player_SwitchActionToIdleOrWalk
+    jp   nz,call_02_54f9_Player_RequestAction
+    jp   call_02_4dce_Player_SetLandingAction
 
 call_02_4d14_PlayerAction_Kangaroo_StartJump:
     ld   a,SFX_GEX_DOUBLE_JUMP
     call call_00_0ff5_QueueSFX
-    call call_02_4e01_SetOneTimeFlag
+    call call_02_4e01_Player_EnsureMinXSpeed
     ld   a,PLAYERACTION_KANGAROO_JUMP
-    call call_02_54f9_Player_SwitchAction
-    call call_02_4df6_Player_SetJumpRelatedState
+    call call_02_54f9_Player_RequestAction
+    call call_02_4df6_Player_LockBPress
     ld   hl,wDABE_CollisionFlags
     bit  7,[hl]
     jr   z,call_02_4d33_PlayerAction_Kangaroo_Jump
@@ -745,8 +745,8 @@ call_02_4d33_PlayerAction_Kangaroo_Jump:
     ld   a,[wDC81_Player_EffectiveInputs]
     and  a,PADF_B
     ld   a,PLAYERACTION_KANGAROO_START_JUMP
-    jp   nz,call_02_54f9_Player_SwitchAction
-    jp   call_02_4dce_Player_SwitchActionToIdleOrWalk
+    jp   nz,call_02_54f9_Player_RequestAction
+    jp   call_02_4dce_Player_SetLandingAction
 
 call_02_4d45_PlayerAction_Kangaroo_TailSpin:
     ld   hl,wD805_Player_ActionState
@@ -754,21 +754,21 @@ call_02_4d45_PlayerAction_Kangaroo_TailSpin:
     jr   z,.jr_00_4D5E
     ld   a,SFX_GEX_TAIL_SPIN
     call call_00_0ff5_QueueSFX
-    ld   hl,wDC80_Player_UnkStates
+    ld   hl,wDC80_ButtonBlockingFlags
     set  0,[hl]
     ld   a,$01
     ld   [wDC7F_Player_IsAttacking],a
-    call call_02_4e01_SetOneTimeFlag
+    call call_02_4e01_Player_EnsureMinXSpeed
 .jr_00_4D5E:
     ld   a,[wD805_Player_ActionState]
     and  a,$04
     ret  z
     xor  a
     ld   [wDC7F_Player_IsAttacking],a
-    ld   hl,wDC80_Player_UnkStates
+    ld   hl,wDC80_ButtonBlockingFlags
     set  6,[hl]
     ld   a,PLAYERACTION_KANGAROO_IDLE
-    jp   call_02_54f9_Player_SwitchAction
+    jp   call_02_54f9_Player_RequestAction
 
 call_02_4d72_PlayerAction_Kangaroo_Fall:
     ld   hl,wD805_Player_ActionState
@@ -776,12 +776,12 @@ call_02_4d72_PlayerAction_Kangaroo_Fall:
     jr   z,.jr_00_4D81
     ld   a,$01
     ld   [wDC8E_InitialYVelocity],a
-    call call_02_4e01_SetOneTimeFlag
+    call call_02_4e01_Player_EnsureMinXSpeed
 .jr_00_4D81:
     ld   a,[wDC8E_InitialYVelocity]
     and  a
     ld   a,PLAYERACTION_KANGAROO_IDLE
-    jp   z,call_02_54f9_Player_SwitchAction
+    jp   z,call_02_54f9_Player_RequestAction
     ret  
 
 call_02_4d8b_PlayerAction_Kangaroo_TakeDamage:
@@ -791,7 +791,7 @@ call_02_4d8b_PlayerAction_Kangaroo_TakeDamage:
     ld   a,$1C
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8E_InitialYVelocity],a
-    call call_02_4e01_SetOneTimeFlag
+    call call_02_4e01_Player_EnsureMinXSpeed
     ld   a,SFX_PLAYER_DAMAGED
     call call_00_0ff5_QueueSFX
 .jr_00_4DA2:
@@ -800,5 +800,5 @@ call_02_4d8b_PlayerAction_Kangaroo_TakeDamage:
     ld   a,[wDC8E_InitialYVelocity]
     and  a
     ld   a,PLAYERACTION_KANGAROO_IDLE
-    jp   z,call_02_54f9_Player_SwitchAction
+    jp   z,call_02_54f9_Player_RequestAction
     ret  

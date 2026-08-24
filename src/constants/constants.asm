@@ -271,6 +271,9 @@ DEF CLIMB_SCRIPT_ENTRY_SIZE      EQU 3   ; input, X offset, Y offset
 DEF SWIM_SCRIPT_ENTRY_SIZE       EQU 5   ; ...plus a second, unread offset pair
 
 DEF TILE_TYPE_CLIMBABLE          EQU $3d ; the one type call_03_4c2e_BgCollision_IsTileClimbable tests for
+DEF TILE_TYPE_HAZARD             EQU $19 ; costs a hit (jp_00_06e8_Player_HitHazardTile)
+DEF TILE_TYPE_INSTANT_KILL       EQU $28 ; the pit floor (jp_00_06da_Player_DieInPit)
+DEF TILE_TYPE_WATER_SURFACE      EQU $36 ; hold UP at this to break the surface and tread water
 
 ; Tile types that move Gex on their own, applied once a frame at the top of
 ; call_02_7152_Entities_UpdateAll. The two horizontal ones are read from the tile
@@ -475,7 +478,7 @@ DEF FLY_POWERUP_ACTIVE_5         EQU $01
 DEF FLY_POWERUP_ACTIVE_2         EQU $02
 
 ; A power-up lasts FLY_POWERUP_SECONDS ticks of wDCA8_FlyPowerup_FrameCounter,
-; which call_02_4ffb_DecTimerEveryCycle reloads with TIMER_AMOUNT_60_FRAMES
+; which call_02_4ffb_Player_DecrementPowerupTimer reloads with TIMER_AMOUNT_60_FRAMES
 DEF FLY_POWERUP_SECONDS          EQU $14
 
 ; ------------------------------------------------------------------
@@ -1136,26 +1139,95 @@ DEF PLAYERACTION_TOPDOWN_KANGAROO_STAND_ON_TV_BUTTON     EQU $75
 DEF PLAYERACTION_TOPDOWN_KANGAROO_ENTER_TV               EQU $76
 DEF PLAYERACTION_TOPDOWN_KANGAROO_DEATH_IN_PIT_ALT       EQU $77
 DEF PLAYERACTION_NONE_PENDING                            EQU $FF
+
+; wDC80_ButtonBlockingFlags. A blocked face button is cleared out of
+; wDC81_Player_EffectiveInputs until the player physically lets go, which is why the
+; face buttons read as one-frame events while the d-pad stays set for as long as it
+; is held - the d-pad is never blocked. Same four bits as gex2's
+; wD759_ButtonBlockingFlags
+DEF BTN_BLOCK_A_BIT                       EQU 0 ; suppress A until released
+DEF BTN_BLOCK_B_REPRESS_LATCH_BIT         EQU 4 ; B was released during the rise, so allow
+                                                ; one re-press - this is the double jump
+DEF BTN_BLOCK_B_UNTIL_RELEASE_BIT         EQU 6 ; suppress B until released
+DEF BTN_BLOCK_B_WHILE_RISING_BIT          EQU 7 ; suppress B while Y velocity is upward
+DEF BTN_BLOCK_A                           EQU $01
+DEF BTN_BLOCK_B_REPRESS_LATCH             EQU $10
+DEF BTN_BLOCK_B_UNTIL_RELEASE             EQU $40
+DEF BTN_BLOCK_B_WHILE_RISING              EQU $80
+DEF BTN_BLOCK_KEEP_MASK                   EQU $0F ; what survives when B is let go
+
+; Player physics. Y velocity is signed with positive meaning UPWARD, so falling is
+; the negative half and "still rising" is just the sign bit being clear
+DEF PLAYER_GRAVITY_PER_FRAME              EQU $02
+DEF PLAYER_MAX_FALL_VELOCITY              EQU $C0 ; -$40 as a signed byte
+
+; How far Gex fell, counted in frames spent at terminal velocity by
+; call_02_5267_Player_ApplyYVelocity and read back when he lands
+DEF PLAYER_FALL_SHORT                     EQU $08 ; below this, land without a recovery
+DEF PLAYER_FALL_LONG                      EQU $10 ; at or above this, land in the heavy-landing action
+
+; The updraft tiles handled by call_02_5374_Player_CheckUpdraftTiles. Four
+; consecutive types, and the tile's position in the run indexes that level's table
+DEF TILE_TYPE_UPDRAFT_FIRST               EQU $3E
+DEF TILE_TYPE_UPDRAFT_LAST                EQU $42 ; exclusive
+DEF PLAYER_UPDRAFT_ACCEL                  EQU $03 ; added to Y velocity each frame
+DEF PLAYER_UPDRAFT_MAX_YVEL               EQU $20
+DEF UPDRAFT_NO_REQUIREMENT                EQU $FF ; this updraft is always on
+
+; The per-action input lists in data_02_55c5_ActionInputTransitionTable: pairs of
+; (input byte, action id), scanned against wDC81_Player_EffectiveInputs. Same two
+; sentinels as gex2
+DEF ACTION_INPUT_ANY                      EQU $FE ; matches any nonzero input
+DEF ACTION_INPUT_END                      EQU $FF ; end of list
+DEF ACTION_INPUT_MASK                     EQU $F3 ; the bits a list entry can name:
+                                                  ; the d-pad plus A and B
+
+; call_02_4ee7_Player_GetDPadDirectionIndex returns one of eight directions, or this
+DEF DPAD_DIRECTION_NONE                   EQU $FF
+
+; The Y velocity is turned into a whole-pixel delta by negating and swapping
+; nibbles, which leaves a 4-bit signed value: bit 3 is its sign
+DEF PLAYER_YDELTA_MASK                    EQU $0F
+DEF PLAYER_YDELTA_SIGN_EXTEND             EQU $F0
+
+; The low nibble of wDABE_CollisionFlags is how far the slope under Gex rises over
+; the step he is about to take; zero means level ground
+DEF BG_COLLISION_SLOPE_MASK               EQU $0F
+
+; On a map that wraps (wDC2A_MapBoundaryIndex = MAP_WRAP_BOUNDARY_INDEX) there is no
+; left or right edge to clamp against - the X position's high byte is masked instead
+DEF MAP_WRAP_XPOS_MASK                    EQU $0F
 DEF PLAYERACTION_OFFSET_TOPDOWN                          EQU $3C
 
 ; Player Action State flags
-DEF PLAYER_STATE_UNK01      EQU 0
-DEF PLAYER_STATE_UNK02      EQU 1
-DEF PLAYER_STATE_UNK04      EQU 2
-DEF PLAYER_STATE_DEAD       EQU 3
-DEF PLAYER_STATE_UNK10      EQU 4 ; unused?
-DEF PLAYER_STATE_IN_WATER   EQU 5
-DEF PLAYER_STATE_UNK40      EQU 6 ; unused?
-DEF PLAYER_STATE_CLIMBING   EQU 7
+; One byte per player action id in data_02_554d_PlayerStatesPerAction: what the
+; action is, and what the rest of the player code is allowed to do while it runs.
+; gex2 keeps the first two bits in a table of their own
+; (.data_02_4cf5_ActionTransitionFlagsTable, ACTION_TRANSITION_INSTANT / _LOCKED)
+; and the rest as separate state; gex3 packs all of it into this one byte
+DEF PLAYER_STATE_ACTION_INSTANT  EQU 0 ; a request for this action is always honoured,
+                                       ; whatever is already queued. gex2's
+                                       ; ACTION_TRANSITION_INSTANT_BIT
+DEF PLAYER_STATE_ACTION_LOCKED   EQU 1 ; while this action is queued, every request that
+                                       ; is not INSTANT is silently dropped - what stops
+                                       ; the player mashing out of a death or a warp.
+                                       ; gex2's ACTION_TRANSITION_LOCKED_BIT
+DEF PLAYER_STATE_NO_INPUT_CONTROL EQU 2 ; the action steers Gex itself: the d-pad does not
+                                       ; set his facing and his speed is zeroed each frame
+DEF PLAYER_STATE_DEAD            EQU 3 ; skip the instant-kill tile checks; he is already dying
+DEF PLAYER_STATE_UNK10           EQU 4 ; nothing in the table sets it
+DEF PLAYER_STATE_IN_WATER        EQU 5
+DEF PLAYER_STATE_UNK40           EQU 6 ; nothing in the table sets it
+DEF PLAYER_STATE_CLIMBING        EQU 7
 
 DEF PLAYER_STATE_NONE_MASK      EQU $00
-DEF PLAYER_STATE_UNK01_MASK     EQU $01
-DEF PLAYER_STATE_UNK02_MASK     EQU $02
-DEF PLAYER_STATE_UNK04_MASK     EQU $04
+DEF PLAYER_STATE_ACTION_INSTANT_MASK     EQU $01
+DEF PLAYER_STATE_ACTION_LOCKED_MASK     EQU $02
+DEF PLAYER_STATE_NO_INPUT_CONTROL_MASK     EQU $04
 DEF PLAYER_STATE_DEAD_MASK      EQU $08
-DEF PLAYER_STATE_UNK10_MASK     EQU $10 ; unused?
+DEF PLAYER_STATE_UNK10_MASK     EQU $10 ; unused
 DEF PLAYER_STATE_IN_WATER_MASK  EQU $20
-DEF PLAYER_STATE_UNK40_MASK     EQU $40 ; unused?
+DEF PLAYER_STATE_UNK40_MASK     EQU $40 ; unused
 DEF PLAYER_STATE_CLIMBING_MASK  EQU $80
 
 ; Entity Action Ids

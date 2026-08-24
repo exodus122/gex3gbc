@@ -570,7 +570,7 @@ call_00_0150_Init:
     jp   Z, .jp_00_02cc_LoadMainMenuAfterGameOver      ;; 00:0481 $ca $cc $02
     jp   .jp_00_02b2_LoadMainMenu                      ;; 00:0484 $c3 $b2 $02
 .jr_00_0487:
-    farcall call_02_5541_GetPlayerStatesFromAction
+    farcall call_02_5541_Player_GetActionStates
     and  A, PLAYER_STATE_DEAD_MASK                     ;; 00:0492 $e6 $08
     jr   NZ, .jr_00_04d8_SkipPauseCheck                ;; 00:0494 $20 $42
     call call_00_0f80_CheckInputStart                  ;; 00:0496 $cd $80 $0f
@@ -828,7 +828,7 @@ call_00_05fd_Player_CheckEatFlyInput:
     ret  NC                                            ;; 00:0615 $d0
 .jr_00_0616:
     ld   A, PLAYERACTION_EAT_FLY                       ;; 00:0616 $3e $08
-    farcall call_02_54f9_Player_SwitchAction
+    farcall call_02_54f9_Player_RequestAction
     ret                                                ;; 00:0623 $c9
 
 call_00_0624_Player_SwapFlyPowerup:
@@ -940,7 +940,7 @@ jp_00_0693_Player_Die:
     jr   Z, .jr_00_06ae                                ;; 00:06aa $28 $02
     ld   A, PLAYERACTION_DEATH_IN_PIT_ALT              ;; 00:06ac $3e $1a
 .jr_00_06ae:
-    farcall call_02_54f9_Player_SwitchAction
+    farcall call_02_54f9_Player_RequestAction
     ret                                                ;; 00:06b9 $c9
 .jr_00_06ba:
     ld   A, [wDB6C_CurrentMapId]                       ;; 00:06ba $fa $6c $db
@@ -953,23 +953,23 @@ jp_00_0693_Player_Die:
     jr   Z, .jr_00_06ce                                ;; 00:06ca $28 $02
     ld   A, PLAYERACTION_DEATH                         ;; 00:06cc $3e $0a
 .jr_00_06ce:
-    farcall call_02_54f9_Player_SwitchAction
+    farcall call_02_54f9_Player_RequestAction
     ret                                                ;; 00:06d9 $c9
 
 jp_00_06da_Player_DieInPit:
 ; Instant death on tile type $28, the pit tile. Called from
-; call_02_5431_HandleActionTriggersAndEvents when either of the two tiles behind
+; call_02_5431_Player_CheckTileInteractions when either of the two tiles behind
 ; Gex is one, and from the two pit-death actions themselves so that landing in a
 ; second pit re-triggers
     ld   A, PLAYERACTION_DEATH_IN_PIT                  ;; 00:06da $3e $1b
-    farcall call_02_54f9_Player_SwitchAction
+    farcall call_02_54f9_Player_RequestAction
     ret                                                ;; 00:06e7 $c9
 
 jp_00_06e8_Player_HitHazardTile:
 ; Requests PLAYERACTION_UNK19 when tile type $19 is behind Gex's lower body.
-; Reached only from call_02_5431_HandleActionTriggersAndEvents
+; Reached only from call_02_5431_Player_CheckTileInteractions
     ld   A, PLAYERACTION_UNK19                         ;; 00:06e8 $3e $13
-    farcall call_02_54f9_Player_SwitchAction
+    farcall call_02_54f9_Player_RequestAction
     ret                                                ;; 00:06f5 $c9
 
 call_00_06f6_Player_TakeDamage:

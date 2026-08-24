@@ -1041,7 +1041,18 @@ wDC73_FrameCounter_FlyCoins:
 ; Misc player variables
 wDC78_PlayerPendingActionId:
     ds 1                                               ;; dc78
-wDC79_PlayerUnkFlags2:
+wDC79_Player_QueuedAction:
+; The action Gex will switch to at the top of the next frame, or
+; PLAYERACTION_NONE_PENDING for none.
+;
+; Nothing writes wD801_Player_ActionId directly. Every action change goes through
+; call_02_54f9_Player_RequestAction, which parks the id here, and
+; call_02_4f32_Player_UpdateMain reads it back, resets it to
+; PLAYERACTION_NONE_PENDING and commits it through call_02_72ac_Entity_SetAction.
+; That is what makes an action change always land on a frame boundary no matter how
+; many things ask for one during the frame - the last request of the frame wins.
+;
+; gex2's wD745_Player_QueuedAction, with the same one-frame delay
     ds 1                                               ;; dc79
 wDC7A_PlayerClimbingOrSwimmingRelated:
     ds 1                                               ;; dc7a
@@ -1070,15 +1081,29 @@ wDC7E_Player_DamageCooldownTimer:
     ds 1                                               ;; dc7e
 wDC7F_Player_IsAttacking: ; set to 1 when using tail spin
     ds 1                                               ;; dc7f
-wDC80_Player_UnkStates:
-; bit 7 (80) = jump related (set in call_02_4df6_Player_SetJumpRelatedState)
-; bit 6 (40) = set in idle/swimming/climbing, and after a tailspin
-; bit 5 (20) = unused?
-; bit 4 (10) = unused?
-; bit 3 (08) = unused?
-; bit 2 (04) = unused?
-; bit 1 (02) = unused?
-; bit 0 (01) = set during tailspin
+wDC80_ButtonBlockingFlags:
+; Which face buttons Gex is currently deaf to. The top of
+; call_02_4f32_Player_UpdateMain filters the raw pad through this byte on its way
+; into wDC81_Player_EffectiveInputs, and a blocked button stays blocked until the
+; player physically lets go - which is why A and B read as one-frame events while
+; the d-pad stays set for as long as it is held.
+;
+;   BTN_BLOCK_A_BIT (0)                 A is ignored until released. Set by the
+;                                       tail spin so one press cannot chain
+;   BTN_BLOCK_B_REPRESS_LATCH_BIT (4)   B was let go during the rise, so one fresh
+;                                       press is allowed - this is what makes the
+;                                       double jump need a new press rather than a
+;                                       held button
+;   BTN_BLOCK_B_UNTIL_RELEASE_BIT (6)   B is ignored until released. Set by idle,
+;                                       swimming, climbing and the tail spin
+;   BTN_BLOCK_B_WHILE_RISING_BIT (7)    B is ignored for as long as Y velocity is
+;                                       upward. Set by call_02_4df6_Player_LockBPress
+;                                       at the start of every jump
+;
+; Letting go of B clears everything above BTN_BLOCK_KEEP_MASK, so the three B bits
+; reset together. Bits 1, 2, 3 and 5 are never set.
+;
+; gex2's wD759_ButtonBlockingFlags, same four bits in the same positions
     ds 1                                               ;; dc80
 
 wDC81_Player_EffectiveInputs:
@@ -1100,8 +1125,14 @@ wDC85_PlayerXDeltaExtra2:
     ds 1                                               ;; dc85
 
 wDC86_PlayerXVelocity:
+; The horizontal speed actually in use this frame.
+; call_02_5081_Player_UpdateFacing nudges it one step per frame toward
+; wDC87_PlayerXMaxVelocity rather than snapping to it, and resets it to zero when
+; Gex turns around or lets go of the d-pad - so he always accelerates from a
+; standstill after a direction change. gex2's wD75D_PlayerXSpeedPrev
     ds 1                                               ;; dc86
 wDC87_PlayerXMaxVelocity: ; if freeze this, gex can run faster
+; The speed the current action is ramping toward. gex2's wD75E_PlayerXSpeed
     ds 1                                               ;; dc87
 
 wDC88_CurrentEntity_UnkVerticalOffset:
@@ -1147,7 +1178,15 @@ wDC8D_Player_FloorSnapVelocity:
 wDC8E_InitialYVelocity: ; the y velocity gex had when he left the ground?
     ds 1                                               ;; dc8e
 
-wDC8F:
+wDC8F_FallDistanceCounter:
+; How long Gex has been falling, counted only in frames spent AT
+; PLAYER_MAX_FALL_VELOCITY - so it measures time at terminal velocity rather than
+; total airtime, and a short hop never touches it. It saturates rather than wrapping.
+;
+; call_02_5267_Player_ApplyYVelocity reads it back the moment he lands and picks
+; the landing from it: below PLAYER_FALL_SHORT he keeps his footing, below
+; PLAYER_FALL_LONG he lands in idle or walk, and at or above it he lands heavily.
+; gex2's wD763_FallDistanceCounter
     ds 1                                               ;; dc8f
 
 wDC90:
@@ -1229,7 +1268,7 @@ wDCA7_Player_UpdateFlag:
 ; ------------------------------------------------------------------
 ; Fly power-up timers. Three of the five flies grant a timed power-up, and each
 ; has a countdown of its own so that swapping one out cannot leave another
-; running. All three are seconds, not frames: call_02_4ffb_DecTimerEveryCycle
+; running. All three are seconds, not frames: call_02_4ffb_Player_DecrementPowerupTimer
 ; only decrements one when the shared wDCA8_FlyPowerup_FrameCounter wraps.
 ;
 ; Any of the three being nonzero is what the entity collision handlers read as

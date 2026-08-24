@@ -154,7 +154,7 @@ call_03_4cea_CollisionHandler_DamagePlayer:
     jr   Z, .jr_03_4d2c                                ;; 03:4d28 $28 $02
     ld   A, PLAYERACTION_TAKE_DAMAGE                                        ;; 03:4d2a $3e $09
 .jr_03_4d2c:
-    farcall call_02_54f9_Player_SwitchAction
+    farcall call_02_54f9_Player_RequestAction
     ret                                                ;; 03:4d37 $c9
 
 call_03_4d38_CollisionHandler_GenericEnemyUnused:
@@ -205,7 +205,7 @@ call_03_4d44_CollisionHandler_DamagePlayerUnused:
     jr   z,.jr_00_4D8F
     ld   a,PLAYERACTION_TAKE_DAMAGE
 .jr_00_4D8F:
-    farcall call_02_54f9_Player_SwitchAction
+    farcall call_02_54f9_Player_RequestAction
     ret  
 
 call_03_4d9b_CollisionHandler_BonusCoin:

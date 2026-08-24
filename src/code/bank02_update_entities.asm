@@ -148,9 +148,9 @@ call_02_708f_Entities_InitAndSpawnAll:
     ld   [wDC8C_PlayerYVelocity], A                   ;; 02:70bf $ea $8c $dc
     ld   [wDC8D_Player_FloorSnapVelocity], A          ;; 02:70c2 $ea $8d $dc
     ld   [wDC8E_InitialYVelocity], A                  ;; 02:70c5 $ea $8e $dc
-    ld   [wDC8F], A                                   ;; 02:70c8 $ea $8f $dc
+    ld   [wDC8F_FallDistanceCounter], A               ;; 02:70c8 $ea $8f $dc
     ld   [wDC88_CurrentEntity_UnkVerticalOffset], A   ;; 02:70cb $ea $88 $dc
-    ld   [wDC80_Player_UnkStates], A                  ;; 02:70ce $ea $80 $dc
+    ld   [wDC80_ButtonBlockingFlags], A               ;; 02:70ce $ea $80 $dc
 .jr_02_70d1:
     xor  A, A                                         ;; 02:70d1 $af
     ld   [wDC85_PlayerXDeltaExtra2], A                ;; 02:70d2 $ea $85 $dc
@@ -158,7 +158,7 @@ call_02_708f_Entities_InitAndSpawnAll:
     ld   [wDABE_CollisionFlags], A                    ;; 02:70d8 $ea $be $da
     ld   [wDABD_CollisionFlagsPrev], A                ;; 02:70db $ea $bd $da
     ld   A, PLAYERACTION_NONE_PENDING                 ;; 02:70de $3e $ff
-    ld   [wDC79_PlayerUnkFlags2], A                   ;; 02:70e0 $ea $79 $dc
+    ld   [wDC79_Player_QueuedAction], A               ;; 02:70e0 $ea $79 $dc
     xor  A, A                                         ;; 02:70e3 $af
     ld   [wDC7B_Player_EntityStoodOnLo], A            ;; 02:70e4 $ea $7b $dc
     ld   [wDC7C_PlayerCollisionUnusedFlag], A         ;; 02:70e7 $ea $7c $dc
@@ -280,7 +280,7 @@ call_02_7152_Entities_UpdateAll:
     ld   A, [wDCA7_Player_UpdateFlag]                 ;; 02:715f $fa $a7 $dc
     and  A, A                                         ;; 02:7162 $a7
     jp   Z, .jp_02_7200                               ;; 02:7163 $ca $00 $72
-    call call_02_5541_GetPlayerStatesFromAction       ;; 02:7166 $cd $41 $55
+    call call_02_5541_Player_GetActionStates          ;; 02:7166 $cd $41 $55
     and  A, PLAYER_STATE_DEAD_MASK                    ;; 02:7169 $e6 $08
     jr   NZ, .jr_02_717f                              ;; 02:716b $20 $12
     ld   A, [wDC93_TileTypeBehindGexsLowerBody]       ;; 02:716d $fa $93 $dc
@@ -418,7 +418,7 @@ call_02_724d_Entity_TickAction:
 ;
 ;   PENDING_ACTION_PRESENT set   hand over to the action in the low bits of
 ;                                ENTITY_FIELD_PENDING_ACTION and stop. Slot 0 goes
-;                                through call_02_54f9_Player_SwitchAction, everyone
+;                                through call_02_54f9_Player_RequestAction, everyone
 ;                                else through call_02_72ac_Entity_SetAction
 ;   ACTION_STATE_LOOP_LAST_FRAME restart at SPRITE_COUNTER_MAX - 1, so the animation
 ;                                plays once and sits on its final pose
@@ -459,7 +459,7 @@ call_02_724d_Entity_TickAction:
     ld   A, [wDA00_CurrentEntityAddrLo]               ;; 02:7271 $fa $00 $da
     and  A, A                                         ;; 02:7274 $a7
     ld   A, E                                         ;; 02:7275 $7b
-    jp   Z, call_02_54f9_Player_SwitchAction          ;; 02:7276 $ca $f9 $54
+    jp   Z, call_02_54f9_Player_RequestAction         ;; 02:7276 $ca $f9 $54
     jp   call_02_72ac_Entity_SetAction                ;; 02:7279 $c3 $ac $72
 .jr_02_727c:
     bit  ACTION_STATE_LOOP_LAST_FRAME_BIT, B          ;; 02:727c $cb $58
