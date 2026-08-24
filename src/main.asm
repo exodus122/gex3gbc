@@ -35,7 +35,7 @@ image_003_4580:
     INCBIN ".gfx/misc_sprites/image_003_4580.bin"
 INCLUDE "code/bank03_bg_collision.asm"
 INCLUDE "code/bank03_entity_collision.asm"
-INCLUDE "code/bank03_entity_graphics.asm"
+INCLUDE "code/bank03_oam_build.asm"
 INCLUDE "code/bank03_map_boundaries_and_spawns.asm"
 INCLUDE "code/bank03_palettes.asm"
 INCLUDE "code/bank03_map_init_data.asm"
