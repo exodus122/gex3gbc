@@ -2996,124 +2996,116 @@ call_01_50b5_Password_ApplyPayload:
 data_01_512e_MenuCmd_Descriptors:
 ; The shape of every menu command opcode: MENUCMD_DESCRIPTOR_SIZE bytes per id, of
 ; which call_01_446b_MenuScript_RunCommand copies MENUCMD_DESCRIPTOR_COPY_BYTES into
-; wDB9E onwards. The trailing two bytes are $00 in all 83 records.
+; wDB9E onwards. The last two bytes are $00 in all 83 records and are never read.
 ;
-;   +0  width in tiles       +1  height in tiles
-;   +2  destination tile X   +3  destination tile Y
-;   +4  first tile id        +5  attribute byte, or MENUCMD_ATTR_TILESET_ROW
+;   width and height  in tiles. They are the fill's two loop counters, and the text
+;                     renderer's block size - a string is wrapped to width * 8 pixels
+;   dest tile X, Y    where the block sits, indexed into wD400_ScreenDraw_TileIds as
+;                     y * SCRN_X_B + x
+;   first tile id     the fill writes consecutive ids from here; the text renderer
+;                     stages its glyphs at this tile in wC000_BgMapTileIds
+;   attribute         the BG attribute byte written across the block, or
+;                     MENUCMD_ATTR_TILESET_ROW to pull a row from the secondary
+;                     tileset instead
 ;
-; So an opcode is a rectangle on the screen, and the parameter block that follows it
-; says what to put there. Opcode $00 doubles as the "shape does not matter" id for
-; commands that only call a sub-handler.
+; So an opcode is a RECTANGLE, and the script's parameter block says what goes in it.
+; Opcode $00 is the "shape does not matter" id used by every command that only calls a
+; sub-handler, which is why eighteen different scripts share it.
 ;
-; Ids $00-$11 are the eighteen password cells - 2x2 tiles at six X positions across
-; three rows, first tiles stepping by PASSWORD_CELL_TILES from
-; PASSWORD_CELL_TILE_BASE, which is what call_01_4de3_Password_GetCellTileIndex
-; recomputes. Ids $12 and $13 are the two PASSWORD_KEY_COLUMNS-wide keyboard rows.
+; Ids $00-$11 are the password entry grid - PASSWORD_CELL_COUNT cells of 2x2 tiles at
+; PASSWORD_GRID_COLUMNS x PASSWORD_GRID_ROWS positions, first tiles stepping by
+; PASSWORD_CELL_TILES from PASSWORD_CELL_TILE_BASE. That is the same arithmetic
+; call_01_4de3_Password_GetCellTileIndex does at runtime, so the two agree by
+; construction. Ids $12 and $13 are the two PASSWORD_KEY_COLUMNS-wide keyboard rows.
+;
+; NOTE the rows below are on MENUCMD_DESCRIPTOR_SIZE boundaries. The raw disassembly's
+; `db` lines were not - from $5316 on they drifted out of step - so anything that
+; counted rows there was reading fields from two adjacent records.
 ;
 ; gex2's data_01_5324_MenuCmd_Descriptors, same layout
-    db   $02, $02, $01, $04, $98, $07, $00, $00       ;; 01:512e ..ww..??
-    db   $02, $02, $04, $04, $9c, $07, $00, $00       ;; 01:5136 ..ww..??
-    db   $02, $02, $07, $04, $a0, $07, $00, $00       ;; 01:513e ..ww..??
-    db   $02, $02, $0a, $04, $a4, $07, $00, $00       ;; 01:5146 ..ww..??
-    db   $02, $02, $0d, $04, $a8, $07, $00, $00       ;; 01:514e ..ww..??
-    db   $02, $02, $10, $04, $ac, $07, $00, $00       ;; 01:5156 ..ww..??
-    db   $02, $02, $01, $07, $b0, $07, $00, $00       ;; 01:515e ..ww..??
-    db   $02, $02, $04, $07, $b4, $07, $00, $00       ;; 01:5166 ..ww..??
-    db   $02, $02, $07, $07, $b8, $07, $00, $00       ;; 01:516e ..ww..??
-    db   $02, $02, $0a, $07, $bc, $07, $00, $00       ;; 01:5176 ..ww..??
-    db   $02, $02, $0d, $07, $c0, $07, $00, $00       ;; 01:517e ..ww..??
-    db   $02, $02, $10, $07, $c4, $07, $00, $00       ;; 01:5186 ..ww..??
-    db   $02, $02, $01, $0a, $c8, $07, $00, $00       ;; 01:518e ..ww..??
-    db   $02, $02, $04, $0a, $cc, $07, $00, $00       ;; 01:5196 ..ww..??
-    db   $02, $02, $07, $0a, $d0, $07, $00, $00       ;; 01:519e ..ww..??
-    db   $02, $02, $0a, $0a, $d4, $07, $00, $00       ;; 01:51a6 ..ww..??
-    db   $02, $02, $0d, $0a, $d8, $07, $00, $00       ;; 01:51ae ..ww..??
-    db   $02, $02, $10, $0a, $dc, $07, $00, $00       ;; 01:51b6 ..ww..??
-    db   $10, $01, $01, $01, $e0, $07, $00, $00       ;; 01:51be w.www.??
-    db   $10, $01, $01, $02, $f0, $07, $00, $00       ;; 01:51c6 w.www.??
-    db   $08, $01, $06, $0b, $d0, $00, $00, $00       ;; 01:51ce w...w.??
-    db   $08, $01, $06, $0d, $d8, $00, $00, $00       ;; 01:51d6 w...w.??
-    db   $08, $06, $01, $00, $01, $ff, $00, $00       ;; 01:51de ..ww..??
-    db   $0b, $02, $09, $01, $31, $01, $00, $00       ;; 01:51e6 w.www.??
-    db   $0b, $02, $09, $04, $47, $02, $00, $00       ;; 01:51ee w.www.??
-    db   $10, $02, $04, $07, $5d, $02, $00, $00       ;; 01:51f6 w.www.??
-    db   $10, $02, $04, $0a, $7d, $02, $00, $00       ;; 01:51fe w.www.??
-    db   $10, $02, $04, $0d, $9d, $02, $00, $00       ;; 01:5206 w.www.??
-    db   $12, $02, $01, $10, $bd, $02, $00, $00       ;; 01:520e w.www.??
-    db   $0b, $03, $09, $04, $47, $02, $00, $00       ;; 01:5216 ????????
-    db   $0c, $02, $04, $01, $01, $01, $00, $00       ;; 01:521e w.www.??
-    db   $0c, $02, $04, $03, $19, $02, $00, $00       ;; 01:5226 w.www.??
-    db   $14, $01, $00, $0f, $31, $02, $00, $00       ;; 01:522e w.www.??
-    db   $14, $02, $00, $10, $45, $02, $00, $00       ;; 01:5236 w.www.??
-    db   $01, $01, $0b, $06, $6d, $02, $00, $00       ;; 01:523e w.www.??
-    db   $01, $02, $0c, $06, $6e, $02, $00, $00       ;; 01:5246 w.www.??
-    db   $01, $01, $0d, $07, $70, $02, $00, $00       ;; 01:524e w.www.??
-    db   $01, $01, $0b, $09, $71, $02, $00, $00       ;; 01:5256 w.www.??
-    db   $01, $02, $0c, $09, $72, $02, $00, $00       ;; 01:525e w.www.??
-    db   $01, $01, $0d, $0a, $74, $02, $00, $00       ;; 01:5266 w.www.??
-    db   $01, $01, $0b, $0c, $75, $02, $00, $00       ;; 01:526e w.www.??
-    db   $01, $02, $0c, $0c, $76, $02, $00, $00       ;; 01:5276 w.www.??
-    db   $01, $01, $0d, $0d, $78, $02, $00, $00       ;; 01:527e w.www.??
-    db   $02, $02, $07, $06, $f8, $04, $00, $00       ;; 01:5286 ..www.??
-    db   $02, $02, $07, $09, $f4, $07, $00, $00       ;; 01:528e ..www.??
-    db   $02, $02, $07, $0c, $ec, $05, $00, $00       ;; 01:5296 ..www.??
-    db   $10, $02, $02, $00, $01, $01, $00, $00       ;; 01:529e ????????
-    db   $12, $02, $01, $05, $21, $02, $00, $00       ;; 01:52a6 w.www.??
-    db   $14, $02, $00, $10, $45, $02, $00, $00       ;; 01:52ae ????????
-    db   $02, $01, $07, $0a, $6d, $02, $00, $00       ;; 01:52b6 ????????
-    db   $02, $02, $09, $0a, $6f, $02, $00, $00       ;; 01:52be ????????
-    db   $02, $01, $0b, $0b, $73, $02, $00, $00       ;; 01:52c6 ????????
-    db   $02, $02, $04, $0e, $75, $02, $00, $00       ;; 01:52ce ????????
-    db   $02, $02, $0e, $0e, $79, $02, $00, $00       ;; 01:52d6 ????????
-    db   $02, $02, $09, $08, $f0, $06, $00, $00       ;; 01:52de ????????
-    db   $02, $02, $04, $0c, $ec, $05, $00, $00       ;; 01:52e6 ????????
-    db   $02, $02, $0e, $0c, $f4, $07, $00, $00       ;; 01:52ee ????????
-    db   $02, $02, $03, $03, $7d, $03, $00, $00       ;; 01:52f6 ????????
-    db   $02, $02, $07, $03, $81, $03, $00, $00       ;; 01:52fe ????????
-    db   $02, $02, $0b, $03, $85, $03, $00, $00       ;; 01:5306 ????????
-    db   $02, $02, $0f, $03, $89, $03, $00, $00       ;; 01:530e ????????
-    db   $0e, $02, $03, $04                           ;; 01:5316 w.ww
-    db   %00000001                                    ;; 01:531a $01
-
-    db   $01, $00, $00, $0e, $02, $03, $06, $1d       ;; 01:531b .??w.www
-    db   $01, $00, $00, $0e, $02, $03, $08, $39       ;; 01:5323 .??w.www
-    db   $01, $00, $00, $0e, $02, $03, $0a            ;; 01:532b .??w.ww
-    db   %01010101                                    ;; 01:5332 $55
-
-    db   $01, $00, $00, $02, $02, $03, $10, $71       ;; 01:5333 .??w.www
-    db   $02, $00, $00, $02, $02, $07, $10, $75       ;; 01:533b .??w.www
-    db   $02, $00, $00, $02, $02, $0b, $10, $79       ;; 01:5343 .??w.www
-    db   $02, $00, $00, $02, $02, $0f, $10, $7d       ;; 01:534b .??w.www
-    db   $02, $00, $00, $02, $02, $03, $01            ;; 01:5353 .??w.ww
-    db   %10000001                                    ;; 01:535a $81
-
-    db   $02, $00, $00, $02, $02, $03, $0e            ;; 01:535b .??..ww
-    db   %11110000                                    ;; 01:5362 $f0
-
-    db   $06, $00, $00, $02, $02, $07, $0e            ;; 01:5363 .??..ww
-    db   %11110100                                    ;; 01:536a $f4
-
-    db   $07, $00, $00, $02, $02, $0b, $0e            ;; 01:536b .??..ww
-    db   %11101100                                    ;; 01:5372 $ec
-
-    db   $05, $00, $00, $02, $02, $0f, $0e            ;; 01:5373 .??..ww
-    db   %11111000                                    ;; 01:537a $f8
-
-    db   $04, $00, $00, $02, $01, $01, $01            ;; 01:537b .??..ww
-    db   %10000101                                    ;; 01:5382 $85
-
-    db   $03, $00, $00, $02, $01, $01, $02            ;; 01:5383 .??..ww
-    db   %10000111                                    ;; 01:538a $87
-
-    db   $00, $00, $00, $14, $03, $00, $08, $01       ;; 01:538b .??w.www
-    db   $01, $00, $00, $0a, $02, $0a, $02, $80       ;; 01:5393 .???????
-    db   $03, $00, $00, $0a, $02, $0a, $05, $94       ;; 01:539b ????????
-    db   $03, $00, $00, $0a, $02, $0a, $08, $a8       ;; 01:53a3 ????????
-    db   $03, $00, $00, $0a, $02, $0a, $0b, $bc       ;; 01:53ab ????????
-    db   $03, $00, $00, $0a, $02, $0a, $0e, $d0       ;; 01:53b3 ????????
-    db   $03, $00, $00, $10, $10, $02, $01, $01       ;; 01:53bb ???w.www
-    db   $02, $00, $00                                ;; 01:53c3 .??
+    menu_cmd_shape   2,   2,   1,   4, $98, $07                      ; $00  many
+    menu_cmd_shape   2,   2,   4,   4, $9c, $07                      ; $01  PasswordGrid
+    menu_cmd_shape   2,   2,   7,   4, $a0, $07                      ; $02  PasswordGrid
+    menu_cmd_shape   2,   2,  10,   4, $a4, $07                      ; $03  PasswordGrid
+    menu_cmd_shape   2,   2,  13,   4, $a8, $07                      ; $04  PasswordGrid
+    menu_cmd_shape   2,   2,  16,   4, $ac, $07                      ; $05  PasswordGrid
+    menu_cmd_shape   2,   2,   1,   7, $b0, $07                      ; $06  PasswordGrid
+    menu_cmd_shape   2,   2,   4,   7, $b4, $07                      ; $07  PasswordGrid
+    menu_cmd_shape   2,   2,   7,   7, $b8, $07                      ; $08  PasswordGrid
+    menu_cmd_shape   2,   2,  10,   7, $bc, $07                      ; $09  PasswordGrid
+    menu_cmd_shape   2,   2,  13,   7, $c0, $07                      ; $0a  PasswordGrid
+    menu_cmd_shape   2,   2,  16,   7, $c4, $07                      ; $0b  PasswordGrid
+    menu_cmd_shape   2,   2,   1,  10, $c8, $07                      ; $0c  PasswordGrid
+    menu_cmd_shape   2,   2,   4,  10, $cc, $07                      ; $0d  PasswordGrid
+    menu_cmd_shape   2,   2,   7,  10, $d0, $07                      ; $0e  PasswordGrid
+    menu_cmd_shape   2,   2,  10,  10, $d4, $07                      ; $0f  PasswordGrid
+    menu_cmd_shape   2,   2,  13,  10, $d8, $07                      ; $10  PasswordGrid
+    menu_cmd_shape   2,   2,  16,  10, $dc, $07                      ; $11  PasswordGrid
+    menu_cmd_shape  16,   1,   1,   1, $e0, $07                      ; $12  EnterPassword
+    menu_cmd_shape  16,   1,   1,   2, $f0, $07                      ; $13  EnterPassword
+    menu_cmd_shape   8,   1,   6,  11, $d0, $00                      ; $14  TitleScreen
+    menu_cmd_shape   8,   1,   6,  13, $d8, $00                      ; $15  TitleScreen
+    menu_cmd_shape   8,   6,   1,   0, $01, MENUCMD_ATTR_TILESET_ROW ; $16  MissionSelect1Remote, MissionSelect3Remotes
+    menu_cmd_shape  11,   2,   9,   1, $31, $01                      ; $17  MissionSelect1Remote, MissionSelect3Remotes
+    menu_cmd_shape  11,   2,   9,   4, $47, $02                      ; $18  MissionSelect3Remotes
+    menu_cmd_shape  16,   2,   4,   7, $5d, $02                      ; $19  MissionSelect3Remotes
+    menu_cmd_shape  16,   2,   4,  10, $7d, $02                      ; $1a  MissionSelect1Remote, MissionSelect3Remotes
+    menu_cmd_shape  16,   2,   4,  13, $9d, $02                      ; $1b  MissionSelect3Remotes
+    menu_cmd_shape  18,   2,   1,  16, $bd, $02                      ; $1c  MissionSelect1Remote, MissionSelect3Remotes
+    menu_cmd_shape  11,   3,   9,   4, $47, $02                      ; $1d  MissionSelect1Remote
+    menu_cmd_shape  12,   2,   4,   1, $01, $01                      ; $1e  Totals
+    menu_cmd_shape  12,   2,   4,   3, $19, $02                      ; $1f  Totals
+    menu_cmd_shape  20,   1,   0,  15, $31, $02                      ; $20  Totals
+    menu_cmd_shape  20,   2,   0,  16, $45, $02                      ; $21  Totals
+    menu_cmd_shape   1,   1,  11,   6, $6d, $02                      ; $22  Totals
+    menu_cmd_shape   1,   2,  12,   6, $6e, $02                      ; $23  Totals
+    menu_cmd_shape   1,   1,  13,   7, $70, $02                      ; $24  Totals
+    menu_cmd_shape   1,   1,  11,   9, $71, $02                      ; $25  Totals
+    menu_cmd_shape   1,   2,  12,   9, $72, $02                      ; $26  Totals
+    menu_cmd_shape   1,   1,  13,  10, $74, $02                      ; $27  Totals
+    menu_cmd_shape   1,   1,  11,  12, $75, $02                      ; $28  Totals
+    menu_cmd_shape   1,   2,  12,  12, $76, $02                      ; $29  Totals
+    menu_cmd_shape   1,   1,  13,  13, $78, $02                      ; $2a  Totals
+    menu_cmd_shape   2,   2,   7,   6, $f8, $04                      ; $2b  Totals
+    menu_cmd_shape   2,   2,   7,   9, $f4, $07                      ; $2c  Totals
+    menu_cmd_shape   2,   2,   7,  12, $ec, $05                      ; $2d  Totals
+    menu_cmd_shape  16,   2,   2,   0, $01, $01                      ; $2e  CongratulationsGotRemote
+    menu_cmd_shape  18,   2,   1,   5, $21, $02                      ; $2f  BadPassword, CongratulationsGotRemote
+    menu_cmd_shape  20,   2,   0,  16, $45, $02                      ; $30  CongratulationsGotRemote
+    menu_cmd_shape   2,   1,   7,  10, $6d, $02                      ; $31  CongratulationsGotRemote
+    menu_cmd_shape   2,   2,   9,  10, $6f, $02                      ; $32  CongratulationsGotRemote
+    menu_cmd_shape   2,   1,  11,  11, $73, $02                      ; $33  CongratulationsGotRemote
+    menu_cmd_shape   2,   2,   4,  14, $75, $02                      ; $34  CongratulationsGotRemote
+    menu_cmd_shape   2,   2,  14,  14, $79, $02                      ; $35  CongratulationsGotRemote
+    menu_cmd_shape   2,   2,   9,   8, $f0, $06                      ; $36  CongratulationsGotRemote
+    menu_cmd_shape   2,   2,   4,  12, $ec, $05                      ; $37  CongratulationsGotRemote
+    menu_cmd_shape   2,   2,  14,  12, $f4, $07                      ; $38  CongratulationsGotRemote
+    menu_cmd_shape   2,   2,   3,   3, $7d, $03                      ; $39  CongratulationsGotRemote
+    menu_cmd_shape   2,   2,   7,   3, $81, $03                      ; $3a  CongratulationsGotRemote
+    menu_cmd_shape   2,   2,  11,   3, $85, $03                      ; $3b  CongratulationsGotRemote
+    menu_cmd_shape   2,   2,  15,   3, $89, $03                      ; $3c  CongratulationsGotRemote
+    menu_cmd_shape  14,   2,   3,   4, $01, $01                      ; $3d  TotalsStats
+    menu_cmd_shape  14,   2,   3,   6, $1d, $01                      ; $3e  QuitGame, GoToMap, TotalsStats
+    menu_cmd_shape  14,   2,   3,   8, $39, $01                      ; $3f  many
+    menu_cmd_shape  14,   2,   3,  10, $55, $01                      ; $40  PauseInGexCave, PauseInLevel
+    menu_cmd_shape   2,   2,   3,  16, $71, $02                      ; $41  TotalsStats
+    menu_cmd_shape   2,   2,   7,  16, $75, $02                      ; $42  TotalsStats
+    menu_cmd_shape   2,   2,  11,  16, $79, $02                      ; $43  TotalsStats
+    menu_cmd_shape   2,   2,  15,  16, $7d, $02                      ; $44  TotalsStats
+    menu_cmd_shape   2,   2,   3,   1, $81, $02                      ; $45  TotalsStats
+    menu_cmd_shape   2,   2,   3,  14, $f0, $06                      ; $46  TotalsStats
+    menu_cmd_shape   2,   2,   7,  14, $f4, $07                      ; $47  TotalsStats
+    menu_cmd_shape   2,   2,  11,  14, $ec, $05                      ; $48  TotalsStats
+    menu_cmd_shape   2,   2,  15,  14, $f8, $04                      ; $49  TotalsStats
+    menu_cmd_shape   2,   1,   1,   1, $85, $03                      ; $4a  TotalsStats
+    menu_cmd_shape   2,   1,   1,   2, $87, $00                      ; $4b  TotalsStats
+    menu_cmd_shape  20,   3,   0,   8, $01, $01                      ; $4c  GameOver
+    menu_cmd_shape  10,   2,  10,   2, $80, $03                      ; $4d  Unk10
+    menu_cmd_shape  10,   2,  10,   5, $94, $03                      ; $4e  Unk10
+    menu_cmd_shape  10,   2,  10,   8, $a8, $03                      ; $4f  Unk10
+    menu_cmd_shape  10,   2,  10,  11, $bc, $03                      ; $50  Unk10
+    menu_cmd_shape  10,   2,  10,  14, $d0, $03                      ; $51  Unk10
+    menu_cmd_shape  16,  16,   2,   1, $01, $02                      ; $52  many
 
 data_01_53c6_MenuTypeRecords:
 ; One record per MENU_* id, MENUTYPE_RECORD_SIZE bytes, of which
@@ -3248,7 +3240,7 @@ data_01_53c6_MenuTypeRecords:
     db   $00, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5578 ????????
     db   $00, $00, $00, $00, $00, $00
     
-    dw   data_01_5a3e_MenuScript_C                              ; menu id $1c - no MENU_* constant
+    dw   data_01_5a3e_MenuScript_Unk1C                              ; menu id $1c - no MENU_* constant
     db   $04, $00, $20, $54, $00, $10, $d3, $08       ;; 01:5588 ????????
     db   $00, $00, $00, $00, $00, $00                 ;; 01:5590 ??????
 
@@ -3512,7 +3504,7 @@ data_01_5a35_MenuScript_WellDone:
     menu_cmd     $3f, TEXT_AUTO_ALIGN, TEXT_AUTO_ALIGN, $01, $4bc5,                                MENUCMD_OPTION_NONE,               MENUCMD_FLAG_CLEAR_BUFFER | MENUCMD_FLAG_DRAW_TEXT | MENUCMD_FLAG_UPLOAD_TILES
     db   MENUSCRIPT_END
 
-data_01_5a3e_MenuScript_C:
+data_01_5a3e_MenuScript_Unk1C:
     menu_cmd_sub $00,             $00,             $00, $00, MENUCMD_SUB_FULLSCREEN_IMAGE, $06,    MENUCMD_OPTION_NONE,               MENUCMD_FLAG_NO_TILE_FILL | MENUCMD_FLAG_UPLOAD_TILES
     db   MENUSCRIPT_END
 
@@ -3558,18 +3550,43 @@ data_01_5ad8_MenuScript_TotalsStats:
     db   MENUSCRIPT_END
 
 data_01_5b61_SpriteScriptTable:
-; Four sprite scripts. A script is a starting OAM slot, then six-byte records - Y, X,
-; tile, attributes, width, height - terminated by SPRITE_RECORD_END;
-; call_01_4c45_Menu_BuildSpriteBlock draws them and
-; call_01_4b6b_Menu_TickHideSprites erases them again.
+; Four sprite groups a script can draw through MENUCMD_SUB_DRAW_SPRITE_GROUP.
 ;
-; The first three entries point at wDBBF_MenuCursor_OamSlot - the cursor record built
-; in WRAM at runtime by call_01_46d4_MenuCmd_DrawCursorSprite - rather than at ROM.
-; Only the last is a static script. gex2 keeps its equivalents in
-; bank01_sprite_scripts.asm
-    db   $bf, $db, $bf, $db, $bf, $db, $69, $5b       ;; 01:5b61 ??????..
-    db   $04, $58, $34, $d0, $04, $08, $01, $68       ;; 01:5b69 w.......
-    db   $34, $d8, $05, $08, $01, $ff                 ;; 01:5b71 ......
+; A group is one byte - the OAM slot to start writing at - then six-byte records, and
+; SPRITE_RECORD_END ends both the header and the record list:
+;
+;   Y, X            screen position; call_01_4c45_Menu_BuildSpriteBlock adds
+;                   OAM_Y_BIAS and OAM_X_BIAS on the way into OAM
+;   tile            a tile id, unless bit 0 is set - then the rest of the byte is an
+;                   index into wDAE1_TextBuffer and the tile is looked up at draw
+;                   time, which is how one static group can show a changing number
+;   attributes      the OAM attribute byte
+;   width, height   in 8x8 sprites; call_01_4c7e_Menu_WriteSpriteRect emits the
+;                   rectangle column by column
+;
+; The first three entries are not ROM addresses at all - they point at
+; wDBBF_MenuCursor_OamSlot, the cursor record built in WRAM by
+; call_01_46d4_MenuCmd_DrawCursorSprite. Only entry 3 is a static group, and only one
+; command in the whole game draws it: the title screen's.
+;
+; call_01_4b6b_Menu_TickHideSprites can erase a group again after a delay, and gex2
+; uses that for its "press B to continue" prompts. In gex3 it is DEAD CODE: the only
+; MENUCMD_SUB_DRAW_SPRITE_GROUP command passes 0 as its delay, and nothing else ever
+; writes wDBDE_Menu_HideSpritesDelay with a non-zero value, so the countdown is never
+; armed. Worth knowing before trusting that routine - its erase loop halves the height
+; where the draw does not, so on a one-row group it would run 256 times, not zero
+;
+; gex2 keeps its equivalents in bank01_sprite_scripts.asm
+    dw   wDBBF_MenuCursor_OamSlot                     ; 0 - the live cursor, in WRAM
+    dw   wDBBF_MenuCursor_OamSlot                     ; 1 - the live cursor, in WRAM
+    dw   wDBBF_MenuCursor_OamSlot                     ; 2 - the live cursor, in WRAM
+    dw   .data_01_5b69_TitleScreenBanner              ; 3
+.data_01_5b69_TitleScreenBanner:
+; Two 8x1 rows of sprites under the title logo, at OAM slot 4
+    db   $04                                      ; first OAM slot
+    sprite_rect $58, $34, $d0, $04,  8,  1
+    sprite_rect $68, $34, $d8, $05,  8,  1
+    db   SPRITE_RECORD_END
 
 data_01_5b77_FontDescriptors:
 ; Four fonts, eight bytes each, of which call_01_4875_Text_Render copies six:

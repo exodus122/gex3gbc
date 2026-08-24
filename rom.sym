@@ -816,10 +816,11 @@
 01:59c3 data_01_59c3_MenuScript_EndCredits5
 01:5a14 data_01_5a14_MenuScript_EndCredits6
 01:5a35 data_01_5a35_MenuScript_WellDone
-01:5a3e data_01_5a3e_MenuScript_C
+01:5a3e data_01_5a3e_MenuScript_Unk1C
 01:5a47 data_01_5a47_MenuScript_PasswordGrid
 01:5ad8 data_01_5ad8_MenuScript_TotalsStats
 01:5b61 data_01_5b61_SpriteScriptTable
+01:5b69 data_01_5b61_SpriteScriptTable.data_01_5b69_TitleScreenBanner
 01:5b77 data_01_5b77_FontDescriptors
 01:5b97 data_01_5b77_FontDescriptors.data_01_5b97
 01:5bde data_01_5b77_FontDescriptors.data_01_5bde

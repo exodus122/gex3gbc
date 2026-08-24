@@ -248,3 +248,15 @@ MACRO menu_cmd_sub ; opcode, pen X, pen Y, arg, MENUCMD_SUB_*, handler arg, opti
     dw   (\5 << 8) | \6
     db   \7, \8 | MENUCMD_FLAG_LAST_BLOCK
 ENDM
+
+; The rectangle a menu command opcode occupies, in data_01_512e_MenuCmd_Descriptors.
+; The two trailing bytes are padding to MENUCMD_DESCRIPTOR_SIZE and are never read
+MACRO menu_cmd_shape ; width, height, dest tile X, dest tile Y, first tile id, attribute
+    db   \1, \2, \3, \4, \5, \6, 0, 0
+ENDM
+
+; One rectangle of 8x8 sprites in a menu sprite group - see
+; data_01_5b61_SpriteScriptTable
+MACRO sprite_rect ; Y, X, tile, OAM attributes, width in tiles, height in tiles
+    db   \1, \2, \3, \4, \5, \6
+ENDM
