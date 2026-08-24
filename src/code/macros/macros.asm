@@ -98,3 +98,14 @@ ENDM
 MACRO swim_script_entry ; input, X offset, Y offset, unread X, unread Y
     db   \1, \2, \3, \4, \5
 ENDM
+
+; ------------------------------------------------------------------
+; Entity sprite shapes - see code/bank03_oam_build.asm
+; ------------------------------------------------------------------
+; One 8x16 OBJ of a sprite shape. The Y and X offsets are signed and relative to the
+; entity's already-biased screen position; the tile is relative to the entity's tile
+; base from data_03_58d2_EntitySpriteDescriptors; the attribute bits are OR'd on top
+; of the entity's own, so a piece can only add to them
+MACRO oam_piece ; Y offset, X offset, tile, OAMF_* bits
+    db   \1, \2, \3, \4
+ENDM

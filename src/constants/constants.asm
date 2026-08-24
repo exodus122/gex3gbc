@@ -1263,6 +1263,31 @@ DEF SPRITE_DESC_DRAW_FIRST_BIT   EQU 6
 DEF SPRITE_SHAPES_PER_ENTITY     EQU 4
 DEF SPRITE_FACING_MASK           EQU $03
 
+; The eighteen shapes, indexed by byte +0 of an entity's descriptor. A shape is a
+; rectangle of 8x16 OBJs, and the name is its size in pixels; a _BANK1 suffix means
+; its pieces set OAMF_BANK1, so the artwork is in the second VRAM tile bank.
+;
+; The first eight are the plain grids and cover a hundred of the hundred and
+; fourteen entities. The rest are one-offs
+DEF SPRITE_SHAPE_8X32                EQU 0
+DEF SPRITE_SHAPE_16X32               EQU 1
+DEF SPRITE_SHAPE_24X32               EQU 2
+DEF SPRITE_SHAPE_32X32               EQU 3
+DEF SPRITE_SHAPE_8X16                EQU 4
+DEF SPRITE_SHAPE_16X16               EQU 5
+DEF SPRITE_SHAPE_24X16               EQU 6
+DEF SPRITE_SHAPE_32X16               EQU 7
+DEF SPRITE_SHAPE_64X48_BANK1         EQU 8 ; ENTITY_HOLIDAY_TV_EVIL_SANTA
+DEF SPRITE_SHAPE_8X128               EQU 9 ; the beam barriers - one tile repeated down a column
+DEF SPRITE_SHAPE_32X64               EQU 10 ; no entity uses this one
+DEF SPRITE_SHAPE_32X64_BANK1         EQU 11
+DEF SPRITE_SHAPE_16X48               EQU 12
+DEF SPRITE_SHAPE_32X64_MIRRORED      EQU 13 ; mirrors itself, so it needs no left-facing twin
+DEF SPRITE_SHAPE_32X48_BANK1         EQU 14
+DEF SPRITE_SHAPE_48X48_BANK1         EQU 15
+DEF SPRITE_SHAPE_32X16_BANK1         EQU 16 ; ENTITY_BONUS_STAGE_TIMER
+DEF SPRITE_SHAPE_56X64_BANK1         EQU 17 ; ENTITY_CHANNEL_Z_REZ, the largest shape in the game
+
 ; How far off screen an entity may be before Entity_BuildSprites stops drawing it.
 ; The two X limits differ because the compare is done on the low byte after the high
 ; byte has already settled the sign
@@ -1286,7 +1311,6 @@ DEF OAM_DAMAGE_FLASH_MASK        EQU $07
 DEF PARTICLE_SPRITE_COUNT        EQU 3
 DEF PARTICLE_AGE_MAX             EQU $40
 DEF PARTICLE_AGE_CLAMP           EQU $3F
-DEF PARTICLE_OAM_ATTR_FLAG       EQU $08 ; OR'd into the attribute byte for every particle
 
 ; Collectibles are placed on a 16x16 cell grid, so the camera reduces to a cell
 ; coordinate plus a sub-cell bias
@@ -1296,7 +1320,6 @@ DEF COLLECTIBLE_ORIGIN_Y         EQU $18
 DEF COLLECTIBLE_ROWS_ON_SCREEN   EQU $0A
 DEF COLLECTIBLE_TILE_TOP         EQU $3C
 DEF COLLECTIBLE_TILE_BOTTOM      EQU $3E
-DEF COLLECTIBLE_OAM_ATTR         EQU $08
 DEF COLLECTIBLE_PICKUP_RANGE     EQU $12 ; the +/- 9 pixel window, biased and compared once
 DEF COLLECTIBLE_PICKUP_BIAS      EQU $09
 DEF COLLECTIBLE_TAKEN            EQU $FF
