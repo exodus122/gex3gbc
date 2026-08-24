@@ -1189,10 +1189,17 @@ wDC8F_FallDistanceCounter:
 ; gex2's wD763_FallDistanceCounter
     ds 1                                               ;; dc8f
 
-wDC90:
+; Where Gex is on the SCREEN rather than in the map: his world position minus the
+; camera, plus the sprite's own offset. Recomputed once a frame by the player sprite
+; builder in bank00_entity_load.asm and used by everything that has to reason in
+; screen space - the OAM rows themselves, and
+; call_02_4a37_PlayerAction_DeathInPit, which waits for wDC91_Player_ScreenY to pass
+; PLAYER_OFFSCREEN_BOTTOM_Y before asking for the respawn, so that the fall is seen
+; to finish rather than cutting away mid-air
+wDC90_Player_ScreenX:
     ds 1                                               ;; dc90
 
-wDC91:
+wDC91_Player_ScreenY:
     ds 1                                               ;; dc91
 
 ; ------------------------------------------------------------------
@@ -1234,7 +1241,10 @@ wDC9C_Player_SwimmingRelated2:
 wDC9D_Player_SwimmingRelated:
     ds 1                                               ;; dc9d
 
-wDC9E_Player_ClimbingRelated2:
+wDC9E_Player_ClimbSubState:
+; Which half of PLAYERACTION_CLIMBING is running: CLIMB_SUBSTATE_NORMAL for the
+; ordinary climb, CLIMB_SUBSTATE_TAIL_SPIN for the spin Gex can do while hanging on.
+; It indexes data_02_4adb_ClimbSubStateTable, so one action id is really two routines
     ds 1                                               ;; dc9e
 wDC9F_Player_ClimbingRelated:
     ds 1                                               ;; dc9f

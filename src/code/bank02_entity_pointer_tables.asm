@@ -1,3 +1,35 @@
+; ==================================================================
+; Bank 2. Two levels of table between "this entity is doing action N" and the code
+; that runs, plus the animation data blocks each action carries.
+;
+;   data_02_4000_EntityActionJumpTable  one word per entity id, pointing at that
+;       entity type's own action table. Row order IS the ENTITY_* numbering
+;   the per-type tables below  four bytes per action id: the action function, then
+;       a pointer to that action's data block in bank02_entity_animation_data.asm
+;
+; call_02_72ac_Entity_SetAction does both lookups in one go - entity id doubled into
+; the first table, action id times four into the result - so an entity's action ids
+; are positions in its own table and mean nothing outside it. The data block it
+; lands on carries the frame timings, the first sprite id, the pending action and
+; the pointer to the sprite id list; see call_02_724d_Entity_TickAction for what
+; happens to each field.
+;
+; Gex's table is the first one, .data_02_40e4, and it is the odd one out: 120 rows
+; rather than a handful, because it holds the whole player action list TWICE.
+; $00-$3B are the side-scrolling actions and $3C-$77 are the top-down ones, which is
+; the PLAYERACTION_TOPDOWN offset that call_02_54f9_Player_RequestAction adds when
+; the map's collision type is BG_COLLISION_TYPE_TOPDOWN.
+;
+; The second copy is identical to the first in 59 of its 60 rows. The exception is
+; PLAYERACTION_CROUCH_LOOK_DOWN, which becomes call_02_582e_EntityAction_None -
+; there is no looking down on a top-down map. Everything else that differs between
+; the two modes differs inside the shared routine, not here.
+;
+; gex2's equivalent is data_02_4000_EntityActionJumpTable in
+; bank02_update_entities.asm, with the same two-level layout and the same four-byte
+; rows. It has no second player block, because gex2 has no top-down maps
+; ==================================================================
+
 data_02_4000_EntityActionJumpTable:
    dw   .data_02_40e4 ; ENTITY_GEX
    dw   .data_02_42c4 ; ENTITY_BONUS_COIN
@@ -114,10 +146,13 @@ data_02_4000_EntityActionJumpTable:
    dw   .data_02_47a0 ; ENTITY_CHANNEL_Z_METEOR
    dw   .data_02_47ac ; ENTITY_CHANNEL_Z_REZ_PROJECTILE
 .data_02_40e4:
-    ; The second half of the player actions below are used for Top-Down sections of the game,
-    ; rather than sidescroller sections.
-    ; The only difference from the first set is that call_02_481f_PlayerAction_CrouchLookDown
-    ; is replaced by call_02_582e_EntityAction_None
+; Gex's action table, and the only one here with two halves. Rows $00-$3B are the
+; side-scrolling actions; rows $3C-$77 are the same 60 actions again for top-down
+; maps, which is what the PLAYERACTION_TOPDOWN offset indexes.
+;
+; Verbatim duplicates except for one row: PLAYERACTION_CROUCH_LOOK_DOWN is
+; call_02_582e_EntityAction_None in the second half, because looking down does
+; nothing on a top-down map
     dw  call_02_47b4_PlayerAction_Spawn, data_02_739b ; PLAYERACTION_SPAWN
     dw  call_02_47ce_PlayerAction_Idle, data_02_73ab ; PLAYERACTION_IDLE
     dw  call_02_47fe_PlayerAction_IdleAnimation, data_02_73b1 ; PLAYERACTION_IDLE_ANIMATION
@@ -136,7 +171,7 @@ data_02_4000_EntityActionJumpTable:
     dw  call_02_48e8_PlayerAction_DoubleJump, data_02_7442 ; PLAYERACTION_DOUBLE_JUMP
     dw  call_02_4911_PlayerAction_TailSpin, data_02_744e ; PLAYERACTION_TAIL_SPIN
     dw  call_02_4957_PlayerAction_Fall, data_02_745b ; PLAYERACTION_FALL
-    dw  call_02_497a_PlayerAction_FallingLand, data_02_746d ; PLAYERACTION_LAND_FROM_FALL
+    dw  call_02_497a_PlayerAction_LandFromFall, data_02_746d ; PLAYERACTION_LAND_FROM_FALL
     dw  call_02_4989_PlayerAction_Unk19, data_02_7473 ; PLAYERACTION_UNK19
     dw  call_02_49a8_PlayerAction_EnterIdle, data_02_7473 ; PLAYERACTION_ENTER_IDLE
     dw  call_02_49b2_PlayerAction_None, data_02_7479 ; PLAYERACTION_NONE_1
@@ -179,66 +214,66 @@ data_02_4000_EntityActionJumpTable:
     dw  call_02_48b0_PlayerAction_EnterTV, data_02_7582 ; PLAYERACTION_KANGAROO_ENTER_TV
     dw  call_02_4a25_PlayerAction_DeathInPitAlt, data_02_75bb ; PLAYERACTION_KANGAROO_DEATH_IN_PIT_ALT
 
-    dw  call_02_47b4_PlayerAction_Spawn, data_02_739b ; PLAYERACTION_SPAWN
-    dw  call_02_47ce_PlayerAction_Idle, data_02_73ab ; PLAYERACTION_IDLE
-    dw  call_02_47fe_PlayerAction_IdleAnimation, data_02_73b1 ; PLAYERACTION_IDLE_ANIMATION
-    dw  call_02_480a_PlayerAction_Walk, data_02_73c5 ; PLAYERACTION_WALK
-    dw  call_02_481a_PlayerAction_StartCrouch, data_02_73da ; PLAYERACTION_START_CROUCH
-    dw  call_02_582e_EntityAction_None, data_02_73e6 ; PLAYERACTION_CROUCH_LOOK_DOWN
-    dw  call_02_582e_EntityAction_None, data_02_73ef ; PLAYERACTION_NONE_0
-    dw  call_02_482e_PlayerAction_Unk7, data_02_73da ; PLAYERACTION_UNK7
-    dw  call_02_483e_PlayerAction_EatFly, data_02_73fb ; PLAYERACTION_EAT_FLY
-    dw  call_02_484d_PlayerAction_TakeDamage, data_02_7401 ; PLAYERACTION_TAKE_DAMAGE
-    dw  call_02_4873_PlayerAction_Death, data_02_7408 ; PLAYERACTION_DEATH
-    dw  call_02_4889_PlayerAction_DeathSetUpWarp, data_02_7411 ; PLAYERACTION_DEATH_SET_UP_WARP
-    dw  call_02_48a1_PlayerAction_StandOnTVButton, data_02_7422 ; PLAYERACTION_STAND_ON_TV_BUTTON
-    dw  call_02_48b0_PlayerAction_EnterTV, data_02_7428 ; PLAYERACTION_ENTER_TV
-    dw  call_02_48bc_PlayerAction_Jump, data_02_7435 ; PLAYERACTION_JUMP
-    dw  call_02_48e8_PlayerAction_DoubleJump, data_02_7442 ; PLAYERACTION_DOUBLE_JUMP
-    dw  call_02_4911_PlayerAction_TailSpin, data_02_744e ; PLAYERACTION_TAIL_SPIN
-    dw  call_02_4957_PlayerAction_Fall, data_02_745b ; PLAYERACTION_FALL
-    dw  call_02_497a_PlayerAction_FallingLand, data_02_746d ; PLAYERACTION_LAND_FROM_FALL
-    dw  call_02_4989_PlayerAction_Unk19, data_02_7473 ; PLAYERACTION_UNK19
-    dw  call_02_49a8_PlayerAction_EnterIdle, data_02_7473 ; PLAYERACTION_ENTER_IDLE
-    dw  call_02_49b2_PlayerAction_None, data_02_7479 ; PLAYERACTION_NONE_1
-    dw  call_02_49b2_PlayerAction_None, data_02_747f ; PLAYERACTION_NONE_2
-    dw  call_02_49b2_PlayerAction_None, data_02_748f ; PLAYERACTION_NONE_3
-    dw  call_02_49b2_PlayerAction_None, data_02_749f ; PLAYERACTION_NONE_4
-    dw  call_02_49b3_PlayerAction_Water_Swimming, data_02_74a5 ; PLAYERACTION_WATER_SWIMMING
-    dw  call_02_4a25_PlayerAction_DeathInPitAlt, data_02_745b ; PLAYERACTION_DEATH_IN_PIT_ALT
-    dw  call_02_4a37_PlayerAction_DeathInPit, data_02_74ab ; PLAYERACTION_DEATH_IN_PIT
-    dw  call_02_4a51_PlayerAction_None2, data_02_74bd ; PLAYERACTION_NONE_5
-    dw  call_02_4a52_PlayerAction_BlownUpwards, data_02_74c8 ; PLAYERACTION_BLOWN_UPWARDS
-    dw  call_02_4a69_PlayerAction_RidingElevator, data_02_74ce ; PLAYERACTION_RIDING_ELEVATOR
-    dw  call_02_4a6e_PlayerAction_Water_TailSpin, data_02_74d4 ; PLAYERACTION_WATER_TAIL_SPIN
-    dw  call_02_4a9b_PlayerAction_Water_Treading, data_02_74e1 ; PLAYERACTION_WATER_TREADING
-    dw  call_02_4aa1_PlayerAction_Water_Diving, data_02_74ed ; PLAYERACTION_WATER_DIVING
-    dw  call_02_4aac_PlayerAction_Climbing, data_02_74f7 ; PLAYERACTION_CLIMBING
-    dw  call_02_47b4_PlayerAction_Spawn, data_02_74fd ; PLAYERACTION_SNOWBOARDING_SPAWN
-    dw  call_02_4bb7_PlayerAction_Snowboarding_StandOrWalk, data_02_750d ; PLAYERACTION_SNOWBOARDING_STAND_OR_WALK
-    dw  call_02_4c2c_PlayerAction_Snowboarding_Jump, data_02_753b ; PLAYERACTION_SNOWBOARDING_JUMP
-    dw  call_02_4c58_PlayerAction_Snowboarding_DoubleJump, data_02_7543 ; PLAYERACTION_SNOWBOARDING_DOUBLE_JUMP
-    dw  call_02_4c7a_PlayerAction_Snowboarding_TailSpin, data_02_754b ; PLAYERACTION_SNOWBOARDING_TAIL_SPIN
-    dw  call_02_4ca4_PlayerAction_Snowboarding_Fall, data_02_7551 ; PLAYERACTION_SNOWBOARDING_FALL
-    dw  call_02_4cbd_PlayerAction_Snowboarding_TakeDamage, data_02_7513 ; PLAYERACTION_SNOWBOARDING_TAKE_DAMAGE
-    dw  call_02_4873_PlayerAction_Death, data_02_7519 ; PLAYERACTION_SNOWBOARDING_DIE
-    dw  call_02_4889_PlayerAction_DeathSetUpWarp, data_02_7522 ; PLAYERACTION_SNOWBOARDING_DIE_WARP
-    dw  call_02_48a1_PlayerAction_StandOnTVButton, data_02_7528 ; PLAYERACTION_SNOWBOARDING_STAND_ON_TV_BUTTON
-    dw  call_02_48b0_PlayerAction_EnterTV, data_02_752e ; PLAYERACTION_SNOWBOARDING_ENTER_TV
-    dw  call_02_4a25_PlayerAction_DeathInPitAlt, data_02_7551 ; PLAYERACTION_SNOWBOARDING_DEATH_IN_PIT_ALT
-    dw  call_02_47b4_PlayerAction_Spawn, data_02_7559 ; PLAYERACTION_KANGAROO_SPAWN
-    dw  call_02_4ce3_PlayerAction_Kangaroo_Idle, data_02_758e ; PLAYERACTION_KANGAROO_IDLE
-    dw  call_02_4d02_PlayerAction_Kangaroo_Hopping, data_02_7594 ; PLAYERACTION_KANGAROO_HOPPING
-    dw  call_02_4d14_PlayerAction_Kangaroo_StartJump, data_02_759f ; PLAYERACTION_KANGAROO_START_JUMP
-    dw  call_02_4d33_PlayerAction_Kangaroo_Jump, data_02_75a5 ; PLAYERACTION_KANGAROO_JUMP
-    dw  call_02_4d45_PlayerAction_Kangaroo_TailSpin, data_02_75ae ; PLAYERACTION_KANGAROO_TAIL_SPIN
-    dw  call_02_4d72_PlayerAction_Kangaroo_Fall, data_02_75bb ; PLAYERACTION_KANGAROO_FALL
-    dw  call_02_4d8b_PlayerAction_Kangaroo_TakeDamage, data_02_7569 ; PLAYERACTION_KANGAROO_TAKE_DAMAGE
-    dw  call_02_4873_PlayerAction_Death, data_02_756f ; PLAYERACTION_KANGAROO_DEATH
-    dw  call_02_4889_PlayerAction_DeathSetUpWarp, data_02_7576 ; PLAYERACTION_KANGAROO_DEATH_SET_UP_WARP
-    dw  call_02_48a1_PlayerAction_StandOnTVButton, data_02_757c ; PLAYERACTION_KANGAROO_STAND_ON_TV_BUTTON
-    dw  call_02_48b0_PlayerAction_EnterTV, data_02_7582 ; PLAYERACTION_KANGAROO_ENTER_TV
-    dw  call_02_4a25_PlayerAction_DeathInPitAlt, data_02_75bb ; PLAYERACTION_KANGAROO_DEATH_IN_PIT_ALT
+    dw  call_02_47b4_PlayerAction_Spawn, data_02_739b ; PLAYERACTION_SPAWN + PLAYERACTION_TOPDOWN
+    dw  call_02_47ce_PlayerAction_Idle, data_02_73ab ; PLAYERACTION_IDLE + PLAYERACTION_TOPDOWN
+    dw  call_02_47fe_PlayerAction_IdleAnimation, data_02_73b1 ; PLAYERACTION_IDLE_ANIMATION + PLAYERACTION_TOPDOWN
+    dw  call_02_480a_PlayerAction_Walk, data_02_73c5 ; PLAYERACTION_WALK + PLAYERACTION_TOPDOWN
+    dw  call_02_481a_PlayerAction_StartCrouch, data_02_73da ; PLAYERACTION_START_CROUCH + PLAYERACTION_TOPDOWN
+    dw  call_02_582e_EntityAction_None, data_02_73e6 ; PLAYERACTION_CROUCH_LOOK_DOWN + PLAYERACTION_TOPDOWN
+    dw  call_02_582e_EntityAction_None, data_02_73ef ; PLAYERACTION_NONE_0 + PLAYERACTION_TOPDOWN
+    dw  call_02_482e_PlayerAction_Unk7, data_02_73da ; PLAYERACTION_UNK7 + PLAYERACTION_TOPDOWN
+    dw  call_02_483e_PlayerAction_EatFly, data_02_73fb ; PLAYERACTION_EAT_FLY + PLAYERACTION_TOPDOWN
+    dw  call_02_484d_PlayerAction_TakeDamage, data_02_7401 ; PLAYERACTION_TAKE_DAMAGE + PLAYERACTION_TOPDOWN
+    dw  call_02_4873_PlayerAction_Death, data_02_7408 ; PLAYERACTION_DEATH + PLAYERACTION_TOPDOWN
+    dw  call_02_4889_PlayerAction_DeathSetUpWarp, data_02_7411 ; PLAYERACTION_DEATH_SET_UP_WARP + PLAYERACTION_TOPDOWN
+    dw  call_02_48a1_PlayerAction_StandOnTVButton, data_02_7422 ; PLAYERACTION_STAND_ON_TV_BUTTON + PLAYERACTION_TOPDOWN
+    dw  call_02_48b0_PlayerAction_EnterTV, data_02_7428 ; PLAYERACTION_ENTER_TV + PLAYERACTION_TOPDOWN
+    dw  call_02_48bc_PlayerAction_Jump, data_02_7435 ; PLAYERACTION_JUMP + PLAYERACTION_TOPDOWN
+    dw  call_02_48e8_PlayerAction_DoubleJump, data_02_7442 ; PLAYERACTION_DOUBLE_JUMP + PLAYERACTION_TOPDOWN
+    dw  call_02_4911_PlayerAction_TailSpin, data_02_744e ; PLAYERACTION_TAIL_SPIN + PLAYERACTION_TOPDOWN
+    dw  call_02_4957_PlayerAction_Fall, data_02_745b ; PLAYERACTION_FALL + PLAYERACTION_TOPDOWN
+    dw  call_02_497a_PlayerAction_LandFromFall, data_02_746d ; PLAYERACTION_LAND_FROM_FALL + PLAYERACTION_TOPDOWN
+    dw  call_02_4989_PlayerAction_Unk19, data_02_7473 ; PLAYERACTION_UNK19 + PLAYERACTION_TOPDOWN
+    dw  call_02_49a8_PlayerAction_EnterIdle, data_02_7473 ; PLAYERACTION_ENTER_IDLE + PLAYERACTION_TOPDOWN
+    dw  call_02_49b2_PlayerAction_None, data_02_7479 ; PLAYERACTION_NONE_1 + PLAYERACTION_TOPDOWN
+    dw  call_02_49b2_PlayerAction_None, data_02_747f ; PLAYERACTION_NONE_2 + PLAYERACTION_TOPDOWN
+    dw  call_02_49b2_PlayerAction_None, data_02_748f ; PLAYERACTION_NONE_3 + PLAYERACTION_TOPDOWN
+    dw  call_02_49b2_PlayerAction_None, data_02_749f ; PLAYERACTION_NONE_4 + PLAYERACTION_TOPDOWN
+    dw  call_02_49b3_PlayerAction_Water_Swimming, data_02_74a5 ; PLAYERACTION_WATER_SWIMMING + PLAYERACTION_TOPDOWN
+    dw  call_02_4a25_PlayerAction_DeathInPitAlt, data_02_745b ; PLAYERACTION_DEATH_IN_PIT_ALT + PLAYERACTION_TOPDOWN
+    dw  call_02_4a37_PlayerAction_DeathInPit, data_02_74ab ; PLAYERACTION_DEATH_IN_PIT + PLAYERACTION_TOPDOWN
+    dw  call_02_4a51_PlayerAction_None2, data_02_74bd ; PLAYERACTION_NONE_5 + PLAYERACTION_TOPDOWN
+    dw  call_02_4a52_PlayerAction_BlownUpwards, data_02_74c8 ; PLAYERACTION_BLOWN_UPWARDS + PLAYERACTION_TOPDOWN
+    dw  call_02_4a69_PlayerAction_RidingElevator, data_02_74ce ; PLAYERACTION_RIDING_ELEVATOR + PLAYERACTION_TOPDOWN
+    dw  call_02_4a6e_PlayerAction_Water_TailSpin, data_02_74d4 ; PLAYERACTION_WATER_TAIL_SPIN + PLAYERACTION_TOPDOWN
+    dw  call_02_4a9b_PlayerAction_Water_Treading, data_02_74e1 ; PLAYERACTION_WATER_TREADING + PLAYERACTION_TOPDOWN
+    dw  call_02_4aa1_PlayerAction_Water_Diving, data_02_74ed ; PLAYERACTION_WATER_DIVING + PLAYERACTION_TOPDOWN
+    dw  call_02_4aac_PlayerAction_Climbing, data_02_74f7 ; PLAYERACTION_CLIMBING + PLAYERACTION_TOPDOWN
+    dw  call_02_47b4_PlayerAction_Spawn, data_02_74fd ; PLAYERACTION_SNOWBOARDING_SPAWN + PLAYERACTION_TOPDOWN
+    dw  call_02_4bb7_PlayerAction_Snowboarding_StandOrWalk, data_02_750d ; PLAYERACTION_SNOWBOARDING_STAND_OR_WALK + PLAYERACTION_TOPDOWN
+    dw  call_02_4c2c_PlayerAction_Snowboarding_Jump, data_02_753b ; PLAYERACTION_SNOWBOARDING_JUMP + PLAYERACTION_TOPDOWN
+    dw  call_02_4c58_PlayerAction_Snowboarding_DoubleJump, data_02_7543 ; PLAYERACTION_SNOWBOARDING_DOUBLE_JUMP + PLAYERACTION_TOPDOWN
+    dw  call_02_4c7a_PlayerAction_Snowboarding_TailSpin, data_02_754b ; PLAYERACTION_SNOWBOARDING_TAIL_SPIN + PLAYERACTION_TOPDOWN
+    dw  call_02_4ca4_PlayerAction_Snowboarding_Fall, data_02_7551 ; PLAYERACTION_SNOWBOARDING_FALL + PLAYERACTION_TOPDOWN
+    dw  call_02_4cbd_PlayerAction_Snowboarding_TakeDamage, data_02_7513 ; PLAYERACTION_SNOWBOARDING_TAKE_DAMAGE + PLAYERACTION_TOPDOWN
+    dw  call_02_4873_PlayerAction_Death, data_02_7519 ; PLAYERACTION_SNOWBOARDING_DIE + PLAYERACTION_TOPDOWN
+    dw  call_02_4889_PlayerAction_DeathSetUpWarp, data_02_7522 ; PLAYERACTION_SNOWBOARDING_DIE_WARP + PLAYERACTION_TOPDOWN
+    dw  call_02_48a1_PlayerAction_StandOnTVButton, data_02_7528 ; PLAYERACTION_SNOWBOARDING_STAND_ON_TV_BUTTON + PLAYERACTION_TOPDOWN
+    dw  call_02_48b0_PlayerAction_EnterTV, data_02_752e ; PLAYERACTION_SNOWBOARDING_ENTER_TV + PLAYERACTION_TOPDOWN
+    dw  call_02_4a25_PlayerAction_DeathInPitAlt, data_02_7551 ; PLAYERACTION_SNOWBOARDING_DEATH_IN_PIT_ALT + PLAYERACTION_TOPDOWN
+    dw  call_02_47b4_PlayerAction_Spawn, data_02_7559 ; PLAYERACTION_KANGAROO_SPAWN + PLAYERACTION_TOPDOWN
+    dw  call_02_4ce3_PlayerAction_Kangaroo_Idle, data_02_758e ; PLAYERACTION_KANGAROO_IDLE + PLAYERACTION_TOPDOWN
+    dw  call_02_4d02_PlayerAction_Kangaroo_Hopping, data_02_7594 ; PLAYERACTION_KANGAROO_HOPPING + PLAYERACTION_TOPDOWN
+    dw  call_02_4d14_PlayerAction_Kangaroo_StartJump, data_02_759f ; PLAYERACTION_KANGAROO_START_JUMP + PLAYERACTION_TOPDOWN
+    dw  call_02_4d33_PlayerAction_Kangaroo_Jump, data_02_75a5 ; PLAYERACTION_KANGAROO_JUMP + PLAYERACTION_TOPDOWN
+    dw  call_02_4d45_PlayerAction_Kangaroo_TailSpin, data_02_75ae ; PLAYERACTION_KANGAROO_TAIL_SPIN + PLAYERACTION_TOPDOWN
+    dw  call_02_4d72_PlayerAction_Kangaroo_Fall, data_02_75bb ; PLAYERACTION_KANGAROO_FALL + PLAYERACTION_TOPDOWN
+    dw  call_02_4d8b_PlayerAction_Kangaroo_TakeDamage, data_02_7569 ; PLAYERACTION_KANGAROO_TAKE_DAMAGE + PLAYERACTION_TOPDOWN
+    dw  call_02_4873_PlayerAction_Death, data_02_756f ; PLAYERACTION_KANGAROO_DEATH + PLAYERACTION_TOPDOWN
+    dw  call_02_4889_PlayerAction_DeathSetUpWarp, data_02_7576 ; PLAYERACTION_KANGAROO_DEATH_SET_UP_WARP + PLAYERACTION_TOPDOWN
+    dw  call_02_48a1_PlayerAction_StandOnTVButton, data_02_757c ; PLAYERACTION_KANGAROO_STAND_ON_TV_BUTTON + PLAYERACTION_TOPDOWN
+    dw  call_02_48b0_PlayerAction_EnterTV, data_02_7582 ; PLAYERACTION_KANGAROO_ENTER_TV + PLAYERACTION_TOPDOWN
+    dw  call_02_4a25_PlayerAction_DeathInPitAlt, data_02_75bb ; PLAYERACTION_KANGAROO_DEATH_IN_PIT_ALT + PLAYERACTION_TOPDOWN
 .data_02_42c4:
     dw   call_02_582e_EntityAction_None, data_02_75c8
     dw   call_02_583c_EntityAction_Destroy, data_02_75c2

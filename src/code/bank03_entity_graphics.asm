@@ -941,12 +941,12 @@ call_03_615d_SetupCollectibleSprites:
     ld   A, [wDCA7_Player_UpdateFlag]                                    ;; 03:61b0 $fa $a7 $dc
     and  A, A                                          ;; 03:61b3 $a7
     jr   Z, .jr_03_61d4                                ;; 03:61b4 $28 $1e
-    ld   A, [wDC90]                                    ;; 03:61b6 $fa $90 $dc
+    ld   A, [wDC90_Player_ScreenX]                                    ;; 03:61b6 $fa $90 $dc
     sub  A, B                                          ;; 03:61b9 $90
     add  A, $09                                        ;; 03:61ba $c6 $09
     cp   A, $12                                        ;; 03:61bc $fe $12
     jr   NC, .jr_03_61d4                               ;; 03:61be $30 $14
-    ld   A, [wDC91]                                    ;; 03:61c0 $fa $91 $dc
+    ld   A, [wDC91_Player_ScreenY]                                    ;; 03:61c0 $fa $91 $dc
     sub  A, C                                          ;; 03:61c3 $91
     add  A, $09                                        ;; 03:61c4 $c6 $09
     cp   A, $12                                        ;; 03:61c6 $fe $12

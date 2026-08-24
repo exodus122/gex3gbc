@@ -94,14 +94,14 @@ call_00_2ce2_Entity_DrawGex:
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2d55 $fa $0e $d8
     sub  A, C                                          ;; 00:2d58 $91
     add  A, $08                                        ;; 00:2d59 $c6 $08
-    ld   [wDC90], A                                    ;; 00:2d5b $ea $90 $dc
+    ld   [wDC90_Player_ScreenX], A                                    ;; 00:2d5b $ea $90 $dc
     ld   C, A                                          ;; 00:2d5e $4f
     ld   A, [wDBFB_YPositionInMap]                                    ;; 00:2d5f $fa $fb $db
     ld   B, A                                          ;; 00:2d62 $47
     ld   A, [wD810_PlayerYPosition]                                    ;; 00:2d63 $fa $10 $d8
     sub  A, B                                          ;; 00:2d66 $90
     add  A, $10                                        ;; 00:2d67 $c6 $10
-    ld   [wDC91], A                                    ;; 00:2d69 $ea $91 $dc
+    ld   [wDC91_Player_ScreenY], A                                    ;; 00:2d69 $ea $91 $dc
     add  A, $10                                        ;; 00:2d6c $c6 $10
     ld   B, A                                          ;; 00:2d6e $47
     ld   A, [wDC88_CurrentEntity_UnkVerticalOffset]                                    ;; 00:2d6f $fa $88 $dc
@@ -148,14 +148,14 @@ call_00_2ce2_Entity_DrawGex:
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2db0 $fa $0e $d8
     sub  A, C                                          ;; 00:2db3 $91
     add  A, $08                                        ;; 00:2db4 $c6 $08
-    ld   [wDC90], A                                    ;; 00:2db6 $ea $90 $dc
+    ld   [wDC90_Player_ScreenX], A                                    ;; 00:2db6 $ea $90 $dc
     ld   C, A                                          ;; 00:2db9 $4f
     ld   A, [wDBFB_YPositionInMap]                                    ;; 00:2dba $fa $fb $db
     ld   B, A                                          ;; 00:2dbd $47
     ld   A, [wD810_PlayerYPosition]                                    ;; 00:2dbe $fa $10 $d8
     sub  A, B                                          ;; 00:2dc1 $90
     add  A, $10                                        ;; 00:2dc2 $c6 $10
-    ld   [wDC91], A                                    ;; 00:2dc4 $ea $91 $dc
+    ld   [wDC91_Player_ScreenY], A                                    ;; 00:2dc4 $ea $91 $dc
     add  A, $10                                        ;; 00:2dc7 $c6 $10
     ld   B, A                                          ;; 00:2dc9 $47
     ld   A, [wDC88_CurrentEntity_UnkVerticalOffset]                                    ;; 00:2dca $fa $88 $dc
@@ -207,14 +207,14 @@ call_00_2ce2_Entity_DrawGex:
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2e14 $fa $0e $d8
     sub  A, C                                          ;; 00:2e17 $91
     add  A, $08                                        ;; 00:2e18 $c6 $08
-    ld   [wDC90], A                                    ;; 00:2e1a $ea $90 $dc
+    ld   [wDC90_Player_ScreenX], A                                    ;; 00:2e1a $ea $90 $dc
     ld   C, A                                          ;; 00:2e1d $4f
     ld   A, [wDBFB_YPositionInMap]                                    ;; 00:2e1e $fa $fb $db
     ld   B, A                                          ;; 00:2e21 $47
     ld   A, [wD810_PlayerYPosition]                                    ;; 00:2e22 $fa $10 $d8
     sub  A, B                                          ;; 00:2e25 $90
     add  A, $10                                        ;; 00:2e26 $c6 $10
-    ld   [wDC91], A                                    ;; 00:2e28 $ea $91 $dc
+    ld   [wDC91_Player_ScreenY], A                                    ;; 00:2e28 $ea $91 $dc
     add  A, $10                                        ;; 00:2e2b $c6 $10
     ld   B, A                                          ;; 00:2e2d $47
     ld   A, [wDC88_CurrentEntity_UnkVerticalOffset]                                    ;; 00:2e2e $fa $88 $dc
@@ -264,14 +264,14 @@ call_00_2ce2_Entity_DrawGex:
     ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2e73 $fa $0e $d8
     sub  A, C                                          ;; 00:2e76 $91
     add  A, $08                                        ;; 00:2e77 $c6 $08
-    ld   [wDC90], A                                    ;; 00:2e79 $ea $90 $dc
+    ld   [wDC90_Player_ScreenX], A                                    ;; 00:2e79 $ea $90 $dc
     ld   C, A                                          ;; 00:2e7c $4f
     ld   A, [wDBFB_YPositionInMap]                                    ;; 00:2e7d $fa $fb $db
     ld   B, A                                          ;; 00:2e80 $47
     ld   A, [wD810_PlayerYPosition]                                    ;; 00:2e81 $fa $10 $d8
     sub  A, B                                          ;; 00:2e84 $90
     add  A, $10                                        ;; 00:2e85 $c6 $10
-    ld   [wDC91], A                                    ;; 00:2e87 $ea $91 $dc
+    ld   [wDC91_Player_ScreenY], A                                    ;; 00:2e87 $ea $91 $dc
     add  A, $10                                        ;; 00:2e8a $c6 $10
     ld   B, A                                          ;; 00:2e8c $47
     ld   A, [wDC88_CurrentEntity_UnkVerticalOffset]                                    ;; 00:2e8d $fa $88 $dc
@@ -329,13 +329,13 @@ call_00_2ce2_Entity_DrawGex:
     ld   H, $00                                        ;; 00:2edc $26 $00
     ld   BC, data_00_2f14                                     ;; 00:2ede $01 $14 $2f
     add  HL, BC                                        ;; 00:2ee1 $09
-    ld   A, [wDC91]                                    ;; 00:2ee2 $fa $91 $dc
+    ld   A, [wDC91_Player_ScreenY]                                    ;; 00:2ee2 $fa $91 $dc
     add  A, [HL]                                       ;; 00:2ee5 $86
     sub  A, $20                                        ;; 00:2ee6 $d6 $20
     ld   [DE], A                                       ;; 00:2ee8 $12
     inc  E                                             ;; 00:2ee9 $1c
     inc  HL                                            ;; 00:2eea $23
-    ld   A, [wDC90]                                    ;; 00:2eeb $fa $90 $dc
+    ld   A, [wDC90_Player_ScreenX]                                    ;; 00:2eeb $fa $90 $dc
     add  A, [HL]                                       ;; 00:2eee $86
     ld   [DE], A                                       ;; 00:2eef $12
     inc  E                                             ;; 00:2ef0 $1c

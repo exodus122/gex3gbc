@@ -94,7 +94,7 @@
 ;                  direction index rather than a facing, and "gravity" becomes a
 ;                  hop offset in wDC88_CurrentEntity_UnkVerticalOffset
 ;   action offset  every side-scrolling action has a top-down twin
-;                  PLAYERACTION_OFFSET_TOPDOWN higher, and
+;                  PLAYERACTION_TOPDOWN higher, and
 ;                  call_02_54f9_Player_RequestAction adds that offset on the way
 ;                  through. So "walk" is one request that lands in two different
 ;                  actions depending on the map. gex2 has nothing like it
@@ -1426,7 +1426,7 @@ call_02_54f9_Player_RequestAction:
 ; The only way anything changes Gex's action. The id goes in A.
 ;
 ; First the top-down fixup: on a BG_COLLISION_TYPE_TOPDOWN map every action below
-; PLAYERACTION_OFFSET_TOPDOWN is shifted up by that offset, so a caller asks for
+; PLAYERACTION_TOPDOWN is shifted up by that offset, so a caller asks for
 ; "walk" and gets the top-down walk without knowing there are two. Actions already
 ; at or above the offset are passed through unchanged.
 ;
@@ -1447,13 +1447,13 @@ call_02_54f9_Player_RequestAction:
 ; gex2's call_02_4ccd_Player_RequestAction, with the same queue and the same
 ; instant/locked pair
     ld   L, A                                         ;; 02:54f9 $6f
-    cp   A, PLAYERACTION_OFFSET_TOPDOWN               ;; 02:54fa $fe $3c
+    cp   A, PLAYERACTION_TOPDOWN                      ;; 02:54fa $fe $3c
     jr   NC, .jr_02_5509                              ;; 02:54fc $30 $0b
     ld   A, [wDC1F_CurrentBgCollisionType]            ;; 02:54fe $fa $1f $dc
     cp   A, BG_COLLISION_TYPE_TOPDOWN                 ;; 02:5501 $fe $01
     jr   NZ, .jr_02_5509                              ;; 02:5503 $20 $04
     ld   A, L                                         ;; 02:5505 $7d
-    add  A, PLAYERACTION_OFFSET_TOPDOWN               ;; 02:5506 $c6 $3c
+    add  A, PLAYERACTION_TOPDOWN                      ;; 02:5506 $c6 $3c
     ld   L, A                                         ;; 02:5508 $6f
 .jr_02_5509:
     ld   A, L                                         ;; 02:5509 $7d

@@ -371,7 +371,7 @@ call_00_0150_Init:
 ;                           which action Gex spawns with. LEVEL_GEXTREME_SPORTS
 ;                           and LEVEL_MARSUPIAL_MADNESS have vehicle actions of
 ;                           their own, and on a BG_COLLISION_TYPE_TOPDOWN map
-;                           the action is shifted by PLAYERACTION_OFFSET_TOPDOWN
+;                           the action is shifted by PLAYERACTION_TOPDOWN
 ;                           so that the same walk or idle becomes its top-down
 ;                           counterpart. Then the bg map, the entities and the
 ;                           screen
@@ -507,7 +507,7 @@ call_00_0150_Init:
     cp   A, PLAYERACTION_SPAWN ; entered sidescroller level ;; 00:03c9 $fe $00
     jr   Z, .jr_00_03e8_SetPendingPlayerAction         ;; 00:03cb $28 $1b
     ld   A, [wD801_Player_ActionId]                    ;; 00:03cd $fa $01 $d8
-    sub  A, PLAYERACTION_OFFSET_TOPDOWN                ;; 00:03d0 $d6 $3c
+    sub  A, PLAYERACTION_TOPDOWN                ;; 00:03d0 $d6 $3c
     jr   C, .jr_00_03eb                                ;; 00:03d2 $38 $17
     jr   .jr_00_03e8_SetPendingPlayerAction            ;; 00:03d4 $18 $12
 .jr_00_03d6_InTopDownCollision:
@@ -518,7 +518,7 @@ call_00_0150_Init:
     ld   A, [wD801_Player_ActionId]                    ;; 00:03df $fa $01 $d8
     cp   A, PLAYERACTION_TOPDOWN_SPAWN                 ;; 00:03e2 $fe $3c
     jr   NC, .jr_00_03eb                               ;; 00:03e4 $30 $05
-    add  A, PLAYERACTION_OFFSET_TOPDOWN                ;; 00:03e6 $c6 $3c
+    add  A, PLAYERACTION_TOPDOWN                ;; 00:03e6 $c6 $3c
 .jr_00_03e8_SetPendingPlayerAction:
     ld   [wDC78_PlayerPendingActionId], A              ;; 00:03e8 $ea $78 $dc
 .jr_00_03eb:
