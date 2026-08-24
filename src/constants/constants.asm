@@ -1071,6 +1071,23 @@ DEF COLLISION_TYPE_UNK_PLATFORM_FLAG         EQU $80
 DEF BG_COLLISION_TYPE_SIDESCROLLER  EQU $00
 DEF BG_COLLISION_TYPE_TOPDOWN       EQU $01
 
+; ------------------------------------------------------------------
+; Map descriptors and boundaries - code/bank03_map_init_data.asm and
+; code/bank03_map_boundaries_and_spawns.asm
+; ------------------------------------------------------------------
+; One descriptor per map, copied wholesale into wDC01_MapBank..wDC1F on a map load:
+; nine farpointers naming where the map's data lives, then four bytes of geometry
+DEF MAPDATA_RECORD_SIZE          EQU $1F
+
+; A map's boundary record gives the CAMERA's travel. The player is allowed a little
+; further in every direction, and the loader writes that second, inset rectangle into
+; wDC3C_PlayerBoundaryXMinLo.. by adding these. The max insets are a screen less a
+; margin, which is what stops Gex walking through the edge of the world
+DEF PLAYER_BOUNDARY_X_MIN_INSET  EQU $10
+DEF PLAYER_BOUNDARY_X_MAX_INSET  EQU $90 ; SCRN_X - 16
+DEF PLAYER_BOUNDARY_Y_MIN_INSET  EQU $10
+DEF PLAYER_BOUNDARY_Y_MAX_INSET  EQU $78 ; SCRN_Y - 24
+
 ; Player Actions
 ;
 ; Two blocks of the same 60 actions. $00-$3B are the side-scrolling set; $3C-$77 are

@@ -200,3 +200,24 @@ IF !\3
     jp   .jp_00_2ece
 ENDC
 ENDM
+
+; ------------------------------------------------------------------
+; Map descriptors and boundaries - see code/bank03_map_init_data.asm and
+; code/bank03_map_boundaries_and_spawns.asm
+; ------------------------------------------------------------------
+; The last four bytes of a map's descriptor record: its size in 16x16 blocks, the
+; level it belongs to, and which of the two movement models it uses. They land in
+; wDC1C_CurrentMapWidthAndHeightInBlocks through wDC1F_CurrentBgCollisionType
+MACRO map_geometry ; width in blocks, height in blocks, LEVEL_*, BG_COLLISION_TYPE_*
+    db \1, \2, \3, \4
+ENDM
+
+; One map's rectangle, in world pixels
+MACRO map_bounds ; X min, X max, Y min, Y max
+    dw \1, \2, \3, \4
+ENDM
+
+; A player spawn position, in world pixels
+MACRO spawn_pos ; X, Y
+    dw \1, \2
+ENDM

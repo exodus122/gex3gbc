@@ -953,21 +953,21 @@ wDC3A_MapBoundaryYMaxLo:
     ds 1                                               ;; dc3a
 wDC3B_MapBoundaryYMaxHi:
     ds 1                                               ;; dc3b
-wDC3C_MapBoundaryXMinLoPlus10:
+wDC3C_PlayerBoundaryXMinLo:
     ds 1                                               ;; dc3c
-wDC3D_MapBoundaryXMinHiPlus0:
+wDC3D_PlayerBoundaryXMinHi:
     ds 1                                               ;; dc3d
-wDC3E_MapBoundaryXMaxLoPlus90:
+wDC3E_PlayerBoundaryXMaxLo:
     ds 1                                               ;; dc3e
-wDC3F_MapBoundaryXMaxHiPlus0:
+wDC3F_PlayerBoundaryXMaxHi:
     ds 1                                               ;; dc3f
-wDC40_MapBoundaryYMinLoPlus10:
+wDC40_PlayerBoundaryYMinLo:
     ds 1                                               ;; dc40
-wDC41_MapBoundaryYMinHiPlus00:
+wDC41_PlayerBoundaryYMinHi:
     ds 1                                               ;; dc41
-wDC42_MapBoundaryYMaxLoPlus78:
+wDC42_PlayerBoundaryYMaxLo:
     ds 1                                               ;; dc42
-wDC43_MapBoundaryYMaxHiPlus0:
+wDC43_PlayerBoundaryYMaxHi:
     ds 1                                               ;; dc43
 
 ; Sprite draw order, used only on the top-down maps that need it. The buffer is
@@ -1057,11 +1057,11 @@ wDC69_PlayerSpawnIdInLevel:
 ; position
     ds 1                                               ;; dc69
 
-wDC6A_CheckpointStoredX:
+wDC6A_WarpDestinationX:
 ; World X the player is placed at after the pending warp, written by
 ; call_00_1633_Map_LoadWarpDestination
     ds 2                                               ;; dc6a
-wDC6C_CheckpointStoredY:
+wDC6C_WarpDestinationY:
 ; World Y the player is placed at after the pending warp. For a spawn that links
 ; to another spawn record, this is the linked spawn's Y plus the player's offset
 ; from it, so walking off the side of a map keeps the player's height

@@ -811,7 +811,7 @@ call_02_518a_Player_MoveLeft:
 
 call_02_5195_Player_MoveLeftClampedToMap:
 ; Move left, stopping at the map's left boundary
-; (wDC3C_MapBoundaryXMinLoPlus10).
+; (wDC3C_PlayerBoundaryXMinLo).
 ;
 ; Hitting it records MAP_EDGE_LEFT in wDC8A_MapEdgeTouched rather than just
 ; stopping, because in gex3 the edge of a map is usually the way into the next one -
@@ -821,7 +821,7 @@ call_02_5195_Player_MoveLeftClampedToMap:
 ; wDC2A_MapBoundaryIndex is MAP_WRAP_BOUNDARY_INDEX there is no left edge, so the
 ; clamped value is thrown away and the raw position is stored with its high byte
 ; masked to $0F - which is the wrap itself, done with an AND
-    ld   HL, wDC3C_MapBoundaryXMinLoPlus10            ;; 02:5195 $21 $3c $dc
+    ld   HL, wDC3C_PlayerBoundaryXMinLo            ;; 02:5195 $21 $3c $dc
     ld   A, [HL+]                                     ;; 02:5198 $2a
     ld   D, [HL]                                      ;; 02:5199 $56
     ld   E, A                                         ;; 02:519a $5f
@@ -916,8 +916,8 @@ call_02_51f9_Player_MoveRight:
 
 call_02_5204_Player_MoveRightClampedToMap:
 ; The mirror of call_02_5195_Player_MoveLeftClampedToMap, against
-; wDC3E_MapBoundaryXMaxLoPlus90 and recording MAP_EDGE_RIGHT
-    ld   HL, wDC3E_MapBoundaryXMaxLoPlus90            ;; 02:5204 $21 $3e $dc
+; wDC3E_PlayerBoundaryXMaxLo and recording MAP_EDGE_RIGHT
+    ld   HL, wDC3E_PlayerBoundaryXMaxLo            ;; 02:5204 $21 $3e $dc
     ld   A, [HL+]                                     ;; 02:5207 $2a
     ld   D, [HL]                                      ;; 02:5208 $56
     ld   E, A                                         ;; 02:5209 $5f
@@ -1242,9 +1242,9 @@ call_02_53e7_Player_MoveYClampedToMap:
 ; the point of it, so the clamp would defeat it.
 ;
 ; Otherwise the sign of the result picks which end to test: negative means he has
-; gone off the top and is clamped to wDC40_MapBoundaryYMinLoPlus10 with
+; gone off the top and is clamped to wDC40_PlayerBoundaryYMinLo with
 ; MAP_EDGE_TOP recorded, and past the bottom bound clamps to
-; wDC42_MapBoundaryYMaxLoPlus78 with MAP_EDGE_BOTTOM. As with the horizontal
+; wDC42_PlayerBoundaryYMaxLo with MAP_EDGE_BOTTOM. As with the horizontal
 ; clamps, the record in wDC8A_MapEdgeTouched is what lets
 ; call_00_150f_Map_CheckEdgeTransition treat the edge as a way into the next map
     ld   HL, wD810_PlayerYPosition                    ;; 02:53e7 $21 $10 $d8
@@ -1261,7 +1261,7 @@ call_02_53e7_Player_MoveYClampedToMap:
     ret  Z                                            ;; 02:53f7 $c8
     bit  7, B                                         ;; 02:53f8 $cb $78
     jr   NZ, .jr_02_541f                              ;; 02:53fa $20 $23
-    ld   HL, wDC40_MapBoundaryYMinLoPlus10            ;; 02:53fc $21 $40 $dc
+    ld   HL, wDC40_PlayerBoundaryYMinLo            ;; 02:53fc $21 $40 $dc
     ld   A, C                                         ;; 02:53ff $79
     sub  A, [HL]                                      ;; 02:5400 $96
     inc  HL                                           ;; 02:5401 $23
@@ -1275,17 +1275,17 @@ call_02_53e7_Player_MoveYClampedToMap:
     ld   A, B                                         ;; 02:540a $78
     sbc  A, [HL]                                      ;; 02:540b $9e
     ret  C                                            ;; 02:540c $d8
-    ld   A, [wDC42_MapBoundaryYMaxLoPlus78]           ;; 02:540d $fa $42 $dc
+    ld   A, [wDC42_PlayerBoundaryYMaxLo]           ;; 02:540d $fa $42 $dc
     ld   [wD810_PlayerYPosition], A                   ;; 02:5410 $ea $10 $d8
-    ld   A, [wDC43_MapBoundaryYMaxHiPlus0]            ;; 02:5413 $fa $43 $dc
+    ld   A, [wDC43_PlayerBoundaryYMaxHi]            ;; 02:5413 $fa $43 $dc
     ld   [wD810_PlayerYPosition+1], A                 ;; 02:5416 $ea $11 $d8
     ld   A, MAP_EDGE_BOTTOM                           ;; 02:5419 $3e $01
     ld   [wDC8A_MapEdgeTouched], A                    ;; 02:541b $ea $8a $dc
     ret                                               ;; 02:541e $c9
 .jr_02_541f:
-    ld   A, [wDC40_MapBoundaryYMinLoPlus10]           ;; 02:541f $fa $40 $dc
+    ld   A, [wDC40_PlayerBoundaryYMinLo]           ;; 02:541f $fa $40 $dc
     ld   [wD810_PlayerYPosition], A                   ;; 02:5422 $ea $10 $d8
-    ld   A, [wDC41_MapBoundaryYMinHiPlus00]           ;; 02:5425 $fa $41 $dc
+    ld   A, [wDC41_PlayerBoundaryYMinHi]           ;; 02:5425 $fa $41 $dc
     ld   [wD810_PlayerYPosition+1], A                 ;; 02:5428 $ea $11 $d8
     ld   A, MAP_EDGE_TOP                              ;; 02:542b $3e $00
     ld   [wDC8A_MapEdgeTouched], A                    ;; 02:542d $ea $8a $dc

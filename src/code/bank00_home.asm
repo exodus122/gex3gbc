@@ -450,7 +450,7 @@ call_00_0150_Init:
     jr   Z, .jr_00_0326                                ;; 00:0319 $28 $0b
     farcall call_01_435e_DetermineNextMapId
 .jr_00_0326:
-    farcall call_03_6c89_LoadMapDataPtrs
+    farcall call_03_6c89_MapData_LoadForCurrentMap
     ld   A, [wDC4F_PawCoinExtraHealth]                 ;; 00:0331 $fa $4f $dc
     add  A, PLAYER_BASE_HEALTH                         ;; 00:0334 $c6 $04
     ld   [wDC50_Player_Health], A                      ;; 00:0336 $ea $50 $dc
@@ -465,7 +465,7 @@ call_00_0150_Init:
 .jp_00_0357_RespawnAfterDeath:
     ld   A, [wDC1E_CurrentLevelID]                     ;; 00:0357 $fa $1e $dc
     ld   [wDB6C_CurrentMapId], A                       ;; 00:035a $ea $6c $db
-    farcall call_03_6c89_LoadMapDataPtrs
+    farcall call_03_6c89_MapData_LoadForCurrentMap
     xor  A, A                                          ;; 00:0368 $af
     ld   [wDC51_Player_CurrentFly], A                  ;; 00:0369 $ea $51 $dc
     ld   [wDCA9_FlyPowerup2_Timer], A                  ;; 00:036c $ea $a9 $dc
@@ -481,7 +481,7 @@ call_00_0150_Init:
     call call_00_2f85_CollectibleList_LoadForCurrentLevel       ;; 00:0388 $cd $85 $2f
     call call_00_2ff8_Level_InitEntitiesAndState       ;; 00:038b $cd $f8 $2f
 .jp_00_038e_LoadMap:
-    farcall call_03_6c89_LoadMapDataPtrs
+    farcall call_03_6c89_MapData_LoadForCurrentMap
     ld   A, [wDC1E_CurrentLevelID]                     ;; 00:0399 $fa $1e $dc
     cp   A, LEVEL_GEXTREME_SPORTS                      ;; 00:039c $fe $07
     jr   NZ, .jr_00_03b6_NotInGextremeSports           ;; 00:039e $20 $16
@@ -527,7 +527,7 @@ call_00_0150_Init:
     ld   A, $01                                        ;; 00:03ef $3e $01
     ld   [wDCA7_Player_UpdateFlag], A                  ;; 00:03f1 $ea $a7 $dc
     call call_00_04fb_ResetAudioAndVideoState          ;; 00:03f4 $cd $fb $04
-    farcall call_03_647c_InitPlayerPositionAndLevel
+    farcall call_03_647c_Map_SetSpawnPosition
     call call_00_1056_BgMap_LoadFull                   ;; 00:0402 $cd $56 $10
     farcall call_02_708f_Entities_InitAndSpawnAll
     call call_00_0513_Screen_PresentAndDrawEntities    ;; 00:0410 $cd $13 $05

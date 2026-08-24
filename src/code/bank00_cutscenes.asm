@@ -45,7 +45,7 @@
 ; ------------------------------------------------------------------
 ; The routine stashes the current map id and Gex's position, loads the script's
 ; map and start position, rebuilds the world for it
-; (call_03_6c89_LoadMapDataPtrs, call_03_6203_LoadLevelBoundariesFromId,
+; (call_03_6c89_MapData_LoadForCurrentMap, call_03_6203_MapBounds_LoadForCurrentMap,
 ; call_00_1056_BgMap_LoadFull, call_02_708f_Entities_InitAndSpawnAll), then
 ; runs two phases:
 ;
@@ -62,7 +62,7 @@
 ; restore code, so every preview is skippable.
 ;
 ; On the way out Gex's position and the original map id are popped back and
-; call_03_6c89_LoadMapDataPtrs re-points the map data at the real starting map.
+; call_03_6c89_MapData_LoadForCurrentMap re-points the map data at the real starting map.
 ;
 ; ------------------------------------------------------------------
 ; Notes for anyone reading this next to gex2's bank00_cutscenes.asm
@@ -170,8 +170,8 @@ call_00_1ea0_Cutscene_LoadAndRun:
     ld   A, PLAYERACTION_SPAWN                                        ;; 00:1ee5 $3e $00
     ld   [wDC78_PlayerPendingActionId], A                                    ;; 00:1ee7 $ea $78 $dc
     call call_00_04fb_ResetAudioAndVideoState          ;; 00:1eea $cd $fb $04
-    farcall call_03_6c89_LoadMapDataPtrs
-    farcall call_03_6203_LoadLevelBoundariesFromId
+    farcall call_03_6c89_MapData_LoadForCurrentMap
+    farcall call_03_6203_MapBounds_LoadForCurrentMap
     call call_00_10de_BgMap_UpdateWindowFromPlayerPos                                  ;; 00:1f03 $cd $de $10
     call call_00_1056_BgMap_LoadFull                                  ;; 00:1f06 $cd $56 $10
     farcall call_02_708f_Entities_InitAndSpawnAll
@@ -270,7 +270,7 @@ call_00_1ea0_Cutscene_LoadAndRun:
     ld   [HL], C                                       ;; 00:1faf $71
     pop  AF                                            ;; 00:1fb0 $f1
     ld   [wDB6C_CurrentMapId], A                                    ;; 00:1fb1 $ea $6c $db
-    farcall call_03_6c89_LoadMapDataPtrs
+    farcall call_03_6c89_MapData_LoadForCurrentMap
     ret                                                ;; 00:1fbf $c9
 .data_00_1fc0_CutsceneIndexLookupTable:
 ; 12 rows of CUTSCENE_SLOTS_PER_LEVEL bytes, indexed by (level id, mission number).

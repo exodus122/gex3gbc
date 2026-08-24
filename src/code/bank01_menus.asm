@@ -2,7 +2,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
 ; Purpose:
 ; Initializes menu variables (wDBE9_MenuTypeRelated, wDBEA_MenuType, etc.) and copies menu-type–specific data into wDB92.
 ; Saves/restores the current level ID when transitioning to the menu.
-; Loads map/VRAM data for menu backgrounds (call_03_6c89_LoadMapDataPtrs).
+; Loads map/VRAM data for menu backgrounds (call_03_6c89_MapData_LoadForCurrentMap).
 ; Handles multiple input modes:
 ; Navigation (up/down/left/right) through menu entries.
 ; Page wrapping, clamping, and cursor movement (wDBED_PasswordColumnSelected, wDBEE_PasswordRowSelected, etc.).
@@ -96,7 +96,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     xor  A, A                                          ;; 01:4033 $af
     ld   [wDB6C_CurrentMapId], A  ; if on totals screen, set mapid to 0  ;; 01:4034 $ea $6c $db
 .jr_01_4037_SkipZeroingMapID:
-    farcall call_03_6c89_LoadMapDataPtrs
+    farcall call_03_6c89_MapData_LoadForCurrentMap
     xor  A, A                                          ;; 01:4042 $af
     ld   [wDBEB_MenuColumnSelected], A                                    ;; 01:4043 $ea $eb $db
     ld   [wDBEC_MenuRowSelected], A                                    ;; 01:4046 $ea $ec $db
@@ -136,7 +136,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     call call_00_0fd7_PlaySFX                                  ;; 01:4096 $cd $d7 $0f
     ld   A, [wDBE8_Menu_StoredMapId]                                    ;; 01:4099 $fa $e8 $db
     ld   [wDB6C_CurrentMapId], A                                    ;; 01:409c $ea $6c $db
-    farcall call_03_6c89_LoadMapDataPtrs
+    farcall call_03_6c89_MapData_LoadForCurrentMap
     jp   .jp_01_4285                                   ;; 01:40aa $c3 $85 $42
 .jr_01_40ad:
     ld   A, [wDB95_MenuTypeData_Unk3]                                    ;; 01:40ad $fa $95 $db
@@ -347,7 +347,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     jr   Z, .jr_01_4223                                ;; 01:421f $28 $02
     ld   [HL], $06                                     ;; 01:4221 $36 $06
 .jr_01_4223:
-    farcall call_03_6c89_LoadMapDataPtrs
+    farcall call_03_6c89_MapData_LoadForCurrentMap
     ld   HL, data_01_5692                              ;; 01:422e $21 $92 $56
     call call_01_4454_SetMenuPointer                                  ;; 01:4231 $cd $54 $44
     ld   A, SFX_MENU_SCROLL                                        ;; 01:4234 $3e $01
@@ -361,7 +361,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
     call call_00_0f5e_WaitUntilNoInputPressed                                  ;; 01:4247 $cd $5e $0f
     ld   A, [wDBE8_Menu_StoredMapId]                                    ;; 01:424a $fa $e8 $db
     ld   [wDB6C_CurrentMapId], A                                    ;; 01:424d $ea $6c $db
-    farcall call_03_6c89_LoadMapDataPtrs
+    farcall call_03_6c89_MapData_LoadForCurrentMap
     ld   A, [wDB95_MenuTypeData_Unk3]                                    ;; 01:425b $fa $95 $db
     and  A, A                                          ;; 01:425e $a7
     jr   Z, .jp_01_4285                                ;; 01:425f $28 $24

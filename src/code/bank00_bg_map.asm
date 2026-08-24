@@ -1192,7 +1192,7 @@ call_00_1633_Map_LoadWarpDestination:
     pop  HL                                            ;; 00:1655 $e1
     ld   A, [HL+]                                      ;; 00:1656 $2a
     ld   [wDB6C_CurrentMapId], A                                    ;; 00:1657 $ea $6c $db
-    ld   DE, wDC6A_CheckpointStoredX                                     ;; 00:165a $11 $6a $dc
+    ld   DE, wDC6A_WarpDestinationX                                     ;; 00:165a $11 $6a $dc
     ld   BC, $04                                       ;; 00:165d $01 $04 $00
     jp   call_00_076e_MemCopy                                  ;; 00:1660 $c3 $6e $07
 .jr_00_1663:
@@ -1215,9 +1215,9 @@ call_00_1633_Map_LoadWarpDestination:
     ld   A, [HL+]                                      ;; 00:167a $2a
     ld   [wDB6C_CurrentMapId], A                                    ;; 00:167b $ea $6c $db
     ld   A, [HL+]                                      ;; 00:167e $2a
-    ld   [wDC6A_CheckpointStoredX], A                                    ;; 00:167f $ea $6a $dc
+    ld   [wDC6A_WarpDestinationX], A                                    ;; 00:167f $ea $6a $dc
     ld   A, [HL+]                                      ;; 00:1682 $2a
-    ld   [wDC6A_CheckpointStoredX+1], A                                    ;; 00:1683 $ea $6b $dc
+    ld   [wDC6A_WarpDestinationX+1], A                                    ;; 00:1683 $ea $6b $dc
     ld   A, [HL+]                                      ;; 00:1686 $2a
     add  A, E                                          ;; 00:1687 $83
     ld   E, A                                          ;; 00:1688 $5f
@@ -1234,7 +1234,7 @@ call_00_1633_Map_LoadWarpDestination:
 .jr_00_1698:
     ld   DE, $10                                       ;; 00:1698 $11 $10 $00        ; floor: never arrive above y=$10
 .jr_00_169b:
-    ld   HL, wDC6C_CheckpointStoredY                                     ;; 00:169b $21 $6c $dc
+    ld   HL, wDC6C_WarpDestinationY                                     ;; 00:169b $21 $6c $dc
     ld   [HL], E                                       ;; 00:169e $73
     inc  HL                                            ;; 00:169f $23
     ld   [HL], D                                       ;; 00:16a0 $72
