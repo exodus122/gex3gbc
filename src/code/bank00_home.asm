@@ -709,7 +709,7 @@ call_00_0513_Screen_PresentAndDrawEntities:
     ld   A, [wDB69_HUDDirtyFlags]                      ;; 00:057b $fa $69 $db
     and  A, HUD_DIRTY_BLOCKING                         ;; 00:057e $e6 $2f
     jr   NZ, .jr_00_056e                               ;; 00:0580 $20 $ec
-    farcall call_03_5ec1_DrawAllEntitiesAndHandleCollision
+    farcall call_03_5ec1_OAM_BuildFrame
     ld   A, $01                                        ;; 00:058d $3e $01
     ld   [wDD6A_PalettesReadyFlag], A                  ;; 00:058f $ea $6a $dd
     jp   call_00_0b92_WaitForInterrupt                 ;; 00:0592 $c3 $92 $0b
@@ -1524,7 +1524,7 @@ call_00_08f8_StageNextGfxTransfer:
     ld   [wDB64_EntityGfx_SrcAddr], A                  ;; 00:0956 $ea $64 $db
     ld   A, H                                          ;; 00:0959 $7c
     ld   [wDB64_EntityGfx_SrcAddr+1], A                ;; 00:095a $ea $65 $db
-    farcall call_03_59b6_LookupEntityPropertyFromType
+    farcall call_03_59b6_Entity_GetSpriteTileBase
     ld   [wDB63_EntityGfx_PageCount], A                ;; 00:0968 $ea $63 $db
     ld   HL, wDB66_GfxTransferFlags                    ;; 00:096b $21 $66 $db
 .jr_00_096e_RaiseEntityGfxRequest:
@@ -1548,7 +1548,7 @@ call_00_08f8_StageNextGfxTransfer:
     ld   L, A                                          ;; 00:09a5 $6f
     ld   A, [HL]                                       ;; 00:09a6 $7e
     push AF                                            ;; 00:09a7 $f5
-    farcall call_03_59b6_LookupEntityPropertyFromType
+    farcall call_03_59b6_Entity_GetSpriteTileBase
     ld   [wDB63_EntityGfx_PageCount], A                ;; 00:09b3 $ea $63 $db
     ld   L, A                                          ;; 00:09b6 $6f
     ld   H, $00                                        ;; 00:09b7 $26 $00
@@ -1653,7 +1653,7 @@ call_00_08f8_StageNextGfxTransfer:
     ret                                                ;; 00:0a57 $c9
 .data_00_0a58_EntityVRAMSourceResolvers:
 ; One resolver per entity graphics type, as returned by
-; call_03_59b6_LookupEntityPropertyFromType. Each computes
+; call_03_59b6_Entity_GetSpriteTileBase. Each computes
 ; base + frame * (tiles per frame) with shifts and adds, which is why there is
 ; one entry per distinct sprite size rather than a single multiply
     dw   .jr_00_0a17, .jr_00_0a17, .jr_00_0a29         ;; 00:0a58 ??

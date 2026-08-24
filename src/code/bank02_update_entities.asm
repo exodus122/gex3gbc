@@ -26,7 +26,7 @@
 ;      checks decide whether a new row or column has to be loaded
 ;   7. every slot from $20 upward: run its action function - unless it is one of
 ;      the two already run in steps 4 and 5 - and then tick its animation
-;   8. call_03_5ec1_DrawAllEntitiesAndHandleCollision builds all the sprites
+;   8. call_03_5ec1_OAM_BuildFrame builds all the sprites
 ;
 ; How an entity's action works
 ; ----------------------------
@@ -401,7 +401,7 @@ call_02_7152_Entities_UpdateAll:
     ld   A, [wDA00_CurrentEntityAddrLo]               ;; 02:723a $fa $00 $da
     add  A, ENTITY_SLOT_SIZE                          ;; 02:723d $c6 $20
     jr   NZ, .jr_02_7205                              ;; 02:723f $20 $c4
-    farcall call_03_5ec1_DrawAllEntitiesAndHandleCollision
+    farcall call_03_5ec1_OAM_BuildFrame
     ret                                               ;; 02:724c $c9
 
 call_02_724d_Entity_TickAction:

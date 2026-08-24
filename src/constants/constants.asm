@@ -1232,6 +1232,103 @@ DEF PLAYER_DIR_VERTICAL_MASK              EQU $40 ; -> wDC7A_PlayerClimbingOrSwi
 DEF PLAYER_SNOWBOARD_SPRITE_BASE          EQU $05 ; what Spawn and StandOrWalk seed
 DEF PLAYER_SNOWBOARD_SPIN_SPRITE_BASE     EQU $0B ; what the tail spin seeds
 
+; ------------------------------------------------------------------
+; OAM build
+; ------------------------------------------------------------------
+; wD900_ShadowOAM is $A0 bytes, forty 4-byte entries, and gex3 carves it up by
+; convention rather than by allocation: Gex owns the first two entries and
+; everything else is handed out in order from OAM_ENTITY_FIRST_BYTE through the
+; single write cursor wDC6F_Oam_WriteOffset. Whoever runs out of room first simply
+; stops drawing, so the pass order in call_03_5ec1_OAM_BuildFrame is the whole of
+; the arbitration
+DEF OAM_ENTRY_SIZE               EQU 4
+DEF OAM_ENTITY_FIRST_BYTE        EQU $08 ; entities start after Gex's two entries
+DEF OAM_LAST_BYTE                EQU $9F ; one past the last usable entry
+DEF OAM_FULL                     EQU $A0 ; the builders stop when the cursor reaches this
+DEF OAM_COLLECTIBLE_LIMIT        EQU $9C ; a collectible needs two entries, so it needs
+                                         ; four bytes more headroom than an entity does
+
+; The two-byte record per entity id in data_03_58d2_EntitySpriteDescriptors.
+;   +0  flags in the top two bits, shape index in the rest
+;   +1  tile id base, added to every tile number the chosen shape names
+DEF SPRITE_DESC_IGNORE_FACING    EQU $80 ; one sprite for both directions - do not X-flip
+                                         ; it and drop the facing from the shape index
+DEF SPRITE_DESC_DRAW_FIRST       EQU $40 ; drawn in the pass BEFORE Gex, so he covers it
+DEF SPRITE_DESC_SHAPE_MASK       EQU $3F
+DEF SPRITE_DESC_IGNORE_FACING_BIT EQU 7
+DEF SPRITE_DESC_DRAW_FIRST_BIT   EQU 6
+
+; Each entity's four consecutive shape entries, one per facing direction, so the
+; index into data_03_59ea_SpriteShapeTable is (shape index * 4) + facing
+DEF SPRITE_SHAPES_PER_ENTITY     EQU 4
+DEF SPRITE_FACING_MASK           EQU $03
+
+; How far off screen an entity may be before Entity_BuildSprites stops drawing it.
+; The two X limits differ because the compare is done on the low byte after the high
+; byte has already settled the sign
+DEF OAM_CULL_X_RIGHT             EQU $B8
+DEF OAM_CULL_X_LEFT              EQU $D8
+DEF OAM_CULL_Y                   EQU $F0
+
+; The sprite hardware puts (0,0) off the top left of the screen
+DEF OAM_X_BIAS                   EQU $08
+DEF OAM_Y_BIAS                   EQU $10
+
+; Two bytes per slot in wDA9C_EntityScreenPos, so the slot base swaps down to an
+; even index into it
+DEF ENTITY_SCREEN_POS_INDEX_MASK EQU $0E
+
+; A damaged entity is drawn on only some frames, which is the hit flash
+DEF OAM_DAMAGE_FLASH_MASK        EQU $07
+
+; call_03_60e6_Particle_BuildSprites draws this many sprites per burst, and picks
+; their tile from the burst timer through .data_03_6140_ParticleTileByAge
+DEF PARTICLE_SPRITE_COUNT        EQU 3
+DEF PARTICLE_AGE_MAX             EQU $40
+DEF PARTICLE_AGE_CLAMP           EQU $3F
+DEF PARTICLE_OAM_ATTR_FLAG       EQU $08 ; OR'd into the attribute byte for every particle
+
+; Collectibles are placed on a 16x16 cell grid, so the camera reduces to a cell
+; coordinate plus a sub-cell bias
+DEF COLLECTIBLE_CELL_MASK        EQU $0F
+DEF COLLECTIBLE_ORIGIN_X         EQU $10
+DEF COLLECTIBLE_ORIGIN_Y         EQU $18
+DEF COLLECTIBLE_ROWS_ON_SCREEN   EQU $0A
+DEF COLLECTIBLE_TILE_TOP         EQU $3C
+DEF COLLECTIBLE_TILE_BOTTOM      EQU $3E
+DEF COLLECTIBLE_OAM_ATTR         EQU $08
+DEF COLLECTIBLE_PICKUP_RANGE     EQU $12 ; the +/- 9 pixel window, biased and compared once
+DEF COLLECTIBLE_PICKUP_BIAS      EQU $09
+DEF COLLECTIBLE_TAKEN            EQU $FF
+
+; ------------------------------------------------------------------
+; HUD
+; ------------------------------------------------------------------
+; wDB69_HUDDirtyFlags. Each bit names a part of the status bar that has changed and
+; needs redrawing; call_03_747d_HUD_Update clears the bit as it services it
+DEF HUD_DIRTY_COUNTERS_BIT       EQU 0 ; lives and collectibles
+DEF HUD_DIRTY_HEALTH_BIT         EQU 1 ; the four health pips
+DEF HUD_DIRTY_TIMER_BIT          EQU 2 ; the bonus stage countdown
+DEF HUD_DIRTY_FLY_COINS_BIT      EQU 4 ; the animated fly coin tiles
+
+; The status bar is drawn into the window tilemap, two rows of two tiles per digit
+DEF HUD_TILEMAP_LIVES            EQU $9C02
+DEF HUD_TILEMAP_COLLECTIBLES     EQU $9C11
+DEF HUD_TILEMAP_HEALTH           EQU $9C05
+DEF HUD_TILEMAP_ROW_STRIDE       EQU $20
+DEF HUD_TILE_BLANK_TOP           EQU $30
+DEF HUD_TILE_BLANK_BOTTOM        EQU $31
+DEF HUD_HEALTH_PIP_COUNT         EQU 4
+DEF HUD_HEALTH_PIP_SPACING       EQU $02
+
+; The fly coin tiles cycle through this many frames, one step every this many frames
+DEF HUD_FLY_COIN_FRAME_DELAY     EQU $08
+DEF HUD_FLY_COIN_FRAME_COUNT     EQU $06
+
+; The bonus stage clock is minutes:seconds, drawn as four HDMA'd 16x16 glyphs
+DEF HUD_TIMER_GLYPH_COLON        EQU $0A
+DEF SECONDS_PER_MINUTE           EQU $3C
+
 ; How far Gex fell, counted in frames spent at terminal velocity by
 ; call_02_5267_Player_ApplyYVelocity and read back when he lands
 DEF PLAYER_FALL_SHORT                     EQU $08 ; below this, land without a recovery

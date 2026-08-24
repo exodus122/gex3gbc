@@ -20,7 +20,7 @@ call_01_4000_MenuHandler_LoadAndProcess:
 ; - Background setup:
 ;   - Calls call_03_6c89_CopyLevelData (or similar) to copy map data so the menu’s background appears.
 ;   - Loads background and entity palettes for the menu screen.
-;   - Resets the OAM pointer (wDC6F_EntitySpriteRelated) and clears unused sprite slots.
+;   - Resets the OAM pointer (wDC6F_Oam_WriteOffset) and clears unused sprite slots.
 ;
 ; 2. Main Menu Loop
 ; - This loop runs each frame while the menu is active:

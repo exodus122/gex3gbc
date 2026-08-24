@@ -286,7 +286,11 @@ wDA26_EntityInitialYPos:
     ds 16
 ; end extra entity memory
 
-wDA9C:
+wDA9C_EntityScreenPos:
+; Two bytes per entity slot - screen X then screen Y - written by
+; call_03_5fc2_Entity_BuildSprites as it works out where the slot lands this frame,
+; and zeroed for a slot it decides is off screen. The collision code in bank 3 reads
+; it back rather than redoing the world-minus-camera subtraction
     ds 16                                              ;; da9c
 
 wDAAC_CameraXHi: ; Camera X position related
@@ -302,9 +306,17 @@ wDAAE_EntityPaletteIds:
 ; level's. gex2 has no equivalent - there the per-entity colour is just the OBJ
 ; palette number in wD32D_Entity_OamAttrBase
     ds 8                                               ;; daae
-wDAB6_SpriteFlags:
+wDAB6_Oam_Attributes:
+; The OAM attribute byte for the entity being drawn right now: its palette id from
+; wDAAE_EntityPaletteIds OR'd with its own facing byte, so the facing bits double as
+; the X and Y flip bits. Built once at the top of
+; call_03_5fc2_Entity_BuildSprites and then OR'd into every attribute byte that
+; entity writes. gex2 keeps the same thing in wD335_Entity_OamAttr
     ds 1                                               ;; dab6
-wDAB7_ParticleVelocity:
+wDAB7_Particle_TileId:
+; The tile a particle burst is drawn with this frame, picked from its age through
+; .data_03_6140_ParticleTileByAge - so the burst shrinks as it gets older without
+; any per-particle animation state
     ds 1                                               ;; dab7
 wDAB8_EntityCounter:
 ; this starts at 1 and goes up by 1 for each entity in the entity list for this level
@@ -420,8 +432,8 @@ wDB61_EntityGfx_SlotOffset:
 ; which is why every entity slot draws from a page of its own
     ds 2                                               ;; db61
 wDB63_EntityGfx_PageCount:
-; the entity's graphics size, from the second byte of its data_03_58d2 record
-; via call_03_59b6_LookupEntityPropertyFromType. rHDMA5 gets (count * 2 - 1)
+; the entity's graphics size, from the second byte of its data_03_58d2_EntitySpriteDescriptors record
+; via call_03_59b6_Entity_GetSpriteTileBase. rHDMA5 gets (count * 2 - 1)
     ds 1                                               ;; db63
 wDB64_EntityGfx_SrcAddr:
     ds 2                                               ;; db64
@@ -938,11 +950,19 @@ wDC42_MapBoundaryYMaxLoPlus78:
 wDC43_MapBoundaryYMaxHiPlus0:
     ds 1                                               ;; dc43
 
-wDC44_UnkGraphicsBuffer:
+; Sprite draw order, used only on the top-down maps that need it. The buffer is
+; filled with the slot bases of every live entity, bubble-sorted by Y position, and
+; then walked in order so that entities lower down the screen are drawn later and
+; therefore appear in front. wDC4C_Oam_SortSwapped is the sort's "something moved"
+; flag and wDC4D_Oam_DrawOrderCount is how many slots went in.
+;
+; Side-scrolling maps skip all of this and draw in slot order - see the two passes
+; at the top of call_03_5ec1_OAM_BuildFrame
+wDC44_Oam_DrawOrderBuffer:
     ds 8                                               ;; dc44
-wDC4C_UnkGraphicsFlags:
+wDC4C_Oam_SortSwapped:
     ds 1                                               ;; dc4c
-wDC4D_UnkGraphicsCounter:
+wDC4D_Oam_DrawOrderCount:
     ds 1                                               ;; dc4d
 
 wDC4E_LivesRemaining:
@@ -1020,9 +1040,17 @@ wDC6C_CheckpointStoredY:
 ; unused?
     ds 1                                               ;; dc6e
 
-wDC6F_EntitySpriteRelated:
+wDC6F_Oam_WriteOffset:
+; The single write cursor into wD900_ShadowOAM, as a low byte. Seeded to
+; OAM_ENTITY_FIRST_BYTE at the top of call_03_5ec1_OAM_BuildFrame and advanced by
+; every builder that writes an entry, so entities, particles and collectibles all
+; share one running allocation. Each of them checks it against a limit and simply
+; stops when OAM is full. gex2's wD739_Entity_OamWriteOffset
     ds 1                                               ;; dc6f
-wDC70_EntitySpriteRelated2:
+wDC70_Oam_TileBase:
+; The tile number added to every tile id the current entity's shape names. Usually
+; derived from the slot base - so each slot draws from its own VRAM page - but $40
+; for the entities whose descriptor says they share a page instead
     ds 1                                               ;; dc70
 
 wDC71_VBlankFrameCounter:

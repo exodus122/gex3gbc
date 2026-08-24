@@ -27,7 +27,7 @@ call_00_2ce2_Entity_DrawGex:
 ; Handles flipped and mirrored variants depending on direction bits (bits 5 and 6 in wDC53_GexSpriteRelated2).
 ; Writes formatted sprite entries (X, Y, tile index, attributes) into a buffer at D9xx.
 ; Optionally writes extra entries if a certain flag (wDC51_Player_CurrentFly) is set, using offsets from data_00_2f14.
-; Updates wDC6F_EntitySpriteRelated with the new buffer pointer and restores the previous ROM bank.
+; Updates wDC6F_Oam_WriteOffset with the new buffer pointer and restores the previous ROM bank.
 ; Usage:
 ; Populates the hardware sprite list for Gex’s current animation frame, handling mirroring, flipping, 
 ; and level-specific offsets.
@@ -81,7 +81,7 @@ call_00_2ce2_Entity_DrawGex:
     ld   [wDAC0_PlayerGfx_SrcAddr+1], A                                    ;; 00:2d37 $ea $c1 $da
     xor  A, A                                          ;; 00:2d3a $af
     ld   [wDC52_GexSpriteRelated], A                                    ;; 00:2d3b $ea $52 $dc
-    ld   A, [wDC6F_EntitySpriteRelated]                                    ;; 00:2d3e $fa $6f $dc
+    ld   A, [wDC6F_Oam_WriteOffset]                                    ;; 00:2d3e $fa $6f $dc
     ld   E, A                                          ;; 00:2d41 $5f
     ld   D, $d9                                        ;; 00:2d42 $16 $d9
     ld   A, [wDC53_GexSpriteRelated2]                                    ;; 00:2d44 $fa $53 $dc
@@ -347,7 +347,7 @@ call_00_2ce2_Entity_DrawGex:
     inc  E                                             ;; 00:2ef8 $1c
 .jr_00_2ef9:
     ld   A, E                                          ;; 00:2ef9 $7b
-    ld   [wDC6F_EntitySpriteRelated], A                                    ;; 00:2efa $ea $6f $dc
+    ld   [wDC6F_Oam_WriteOffset], A                                    ;; 00:2efa $ea $6f $dc
     jp   call_00_0f08_RestoreBank                                  ;; 00:2efd $c3 $08 $0f
 
 call_00_2f00_PlayerIsDead:
@@ -1235,7 +1235,7 @@ call_00_3792_PrepareRelativeEntitySpawn:
 
 call_00_37a0_SpawnEntityRelative:
 ; Finds a free slot.
-; Calls a banked routine (call_03_59c6_IsEntityFlaggedHighBit) to fetch spawn data.
+; Calls a banked routine (call_03_59c6_Entity_SpriteIgnoresFacing) to fetch spawn data.
 ; Derives offsets using the current entity address.
 ; Reads a table (.data_00_38b6_EntityChildSpawnData) and copies positional deltas.
 ; Depending on a flag in wDCE9_EntitySpawnPosOffsetFlag, adds or subtracts position offsets.
@@ -1246,7 +1246,7 @@ call_00_37a0_SpawnEntityRelative:
     call call_00_2afc_Entity_FindFreeSlot                                  ;; 00:37a0 $cd $fc $2a
     ret  Z                                             ;; 00:37a3 $c8
     push DE                                            ;; 00:37a4 $d5
-    farcall call_03_59c6_IsEntityFlaggedHighBit
+    farcall call_03_59c6_Entity_SpriteIgnoresFacing
     ld   [wDCE9_EntitySpawnPosOffsetFlag], A                                    ;; 00:37b0 $ea $e9 $dc
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 00:37b3 $fa $00 $da
     rlca                                               ;; 00:37b6 $07
