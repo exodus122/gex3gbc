@@ -190,6 +190,12 @@ DEF MAP_SCROLL_DOWN              EQU $02 ; loads the row at camera Y + $88
 DEF MAP_SCROLL_LEFT              EQU $04 ; loads the column at camera X - 1
 DEF MAP_SCROLL_RIGHT             EQU $08 ; loads the column at camera X + $A0
 
+; Maps whose wDC2A_MapBoundaryIndex is zero wrap around horizontally, so the step
+; from the last column back to column 0 is a move RIGHT, not a jump left across the
+; whole map. call_02_7337_MapScroll_CheckHorizontal special-cases both directions
+DEF MAP_WRAP_BOUNDARY_INDEX      EQU $00
+DEF MAP_WRAP_LAST_COLUMN         EQU $01FF
+
 ; ------------------------------------------------------------------
 ; wDC33_BgMap_InitialLoadPass. call_00_1056_BgMap_LoadFull runs
 ; call_00_1a22_BgMap_LoadAllRowsForPass once per value, in this order, flushing
@@ -265,6 +271,16 @@ DEF CLIMB_SCRIPT_ENTRY_SIZE      EQU 3   ; input, X offset, Y offset
 DEF SWIM_SCRIPT_ENTRY_SIZE       EQU 5   ; ...plus a second, unread offset pair
 
 DEF TILE_TYPE_CLIMBABLE          EQU $3d ; the one type call_03_4c2e_BgCollision_IsTileClimbable tests for
+
+; Tile types that move Gex on their own, applied once a frame at the top of
+; call_02_7152_Entities_UpdateAll. The two horizontal ones are read from the tile
+; behind his lower body and the updraft from the tile behind his upper body
+DEF TILE_TYPE_PUSH_RIGHT         EQU $15
+DEF TILE_TYPE_PUSH_LEFT          EQU $16
+DEF TILE_TYPE_PUSH_UP            EQU $17
+DEF TILE_PUSH_RIGHT_DELTA        EQU $02 ; into wDC84_PlayerXDeltaExtra
+DEF TILE_PUSH_LEFT_DELTA         EQU $FE ; the same, negated
+DEF TILE_PUSH_UP_YVEL            EQU $20 ; written straight over wDC8C_PlayerYVelocity
 
 ; ------------------------------------------------------------------
 ; Cutscenes - see code/bank00_cutscenes.asm
@@ -612,15 +628,42 @@ DEF ENTITY_CHANNEL_Z_REZ_PROJECTILE                    EQU $71
 DEF ENTITY_LIST_TERMINATOR                             EQU $FF
 DEF ENTITY_ID_NONE                                     EQU $FF ; a free entity slot
 
+; The eight entity slots at wD800_EntityMemory. Slot 0 is always Gex, so seven are
+; available to everything else. A slot base is $00, $20, $40 ... $E0, which is why
+; the loops here walk with `add A, $20` and stop on the wrap to $00
+DEF ENTITY_SLOT_SIZE                                   EQU $20
+DEF ENTITY_NPC_SLOT_COUNT                              EQU 7
+DEF ENTITY_SLOT_BASE_MASK                              EQU $E0
+
 ; Entity Instance Struct
 DEF ENTITY_FIELD_ENTITY_ID                  EQU $00
 DEF ENTITY_FIELD_ACTION_ID                  EQU $01
 DEF ENTITY_FIELD_ACTION_FUNC                EQU $02
-DEF ENTITY_FIELD_SPRITE_FLAGS2              EQU $04
+; Not sprite flags, despite the name it carried for a long time: this is the
+; action to switch to when the current animation runs out. Bit 7 says there is one,
+; the low bits are its id, and call_02_724d_Entity_TickAction consumes both on the
+; wrap frame. gex2 keeps the same two pieces in the top of its ACTION_STATE byte
+DEF ENTITY_FIELD_PENDING_ACTION             EQU $04
+    DEF PENDING_ACTION_PRESENT_BIT         EQU 7 ; gex2's ACTION_STATE_HAS_PENDING_BIT
+    DEF PENDING_ACTION_PRESENT             EQU $80
+    DEF PENDING_ACTION_ID_MASK             EQU $7F ; gex2's ACTION_STATE_PENDING_ACTION_MASK
+
+; The per-frame animation flags. gex3 keeps here what gex2 splits between its
+; ACTION_STATE and SPRITE_FLAGS bytes, so the gex2 names below carry a different
+; prefix but mean the same thing
 DEF ENTITY_FIELD_ACTION_STATE_FLAGS         EQU $05
     DEF ACTION_STATE_UNK80_BIT             EQU 7
     DEF ACTION_STATE_UNK20_BIT             EQU 5
     DEF ACTION_STATE_IS_FIRST_FRAME_BIT    EQU 4
+    DEF ACTION_STATE_LOOP_LAST_FRAME_BIT   EQU 3 ; on wrap, restart ON the last frame
+                                                 ; instead of the first, so the animation
+                                                 ; plays once and holds its final pose.
+                                                 ; gex2's SPRITE_FLAG_LOOP_LAST_FRAME_BIT
+    DEF ACTION_STATE_ID_CHANGED_BIT        EQU 1 ; pulse: the sprite id changed this frame
+                                                 ; and its tiles need refetching. Nothing
+                                                 ; is notified - call_00_08f8_StageNextGfxTransfer
+                                                 ; polls every slot for it each frame.
+                                                 ; gex2's SPRITE_FLAG_ID_CHANGED_BIT
     DEF ACTION_STATE_ANIM_ENDED_BIT        EQU 2 ; set on the one frame an action's animation wraps,
                                                  ; cleared at the top of every sprite update.
                                                  ; call_00_2a5d_Entity_CheckAnimationEnded reads it and
@@ -630,8 +673,12 @@ DEF ENTITY_FIELD_ACTION_STATE_FLAGS         EQU $05
     DEF ACTION_STATE_UNK20                 EQU $20
     DEF ACTION_STATE_IS_FIRST_FRAME        EQU $10
     DEF ACTION_STATE_ANIM_ENDED                 EQU $04
+    DEF ACTION_STATE_LOOP_LAST_FRAME       EQU $08
+    DEF ACTION_STATE_ID_CHANGED            EQU $02
 DEF ENTITY_FIELD_SPRITE_FRAME_COUNTER_MAX   EQU $06 ; how many frames to use this sprite
 DEF ENTITY_FIELD_SPRITE_FRAME_COUNTER       EQU $07 ; counter for the above
+    DEF SPRITE_FRAME_COUNTER_HOLD          EQU $FF ; hold this frame forever - how an entity
+                                                   ; freezes its animation without a flag
 DEF ENTITY_FIELD_SPRITE_COUNTER_MAX         EQU $08 ; total sprite frames for current action
 DEF ENTITY_FIELD_SPRITE_COUNTER             EQU $09 ; counter for above
 DEF ENTITY_FIELD_SPRITE_ID                  EQU $0A ; current sprite id

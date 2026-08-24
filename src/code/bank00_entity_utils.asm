@@ -285,7 +285,7 @@ call_00_2299_Entity_SetListState:
 call_00_22b1_Entity_SetListStateAndAction:
 ; Same lookup, but this one compares first: if the stored state already equals C it
 ; returns, and otherwise it does NOT write the nibble at all - it calls
-; call_02_72ac_SetEntityAction with C and lets the action change speak for itself.
+; call_02_72ac_Entity_SetAction with C and lets the action change speak for itself.
 ;
 ; Worth reading twice, because the name the routine had before said it wrote the
 ; flags. It does not; only call_00_2299_Entity_SetListState does that
@@ -304,7 +304,7 @@ call_00_22b1_Entity_SetListStateAndAction:
     and  A, ENTITY_LIST_STATE_MASK                    ;; 00:22c4 $e6 $0f
     cp   A, C                                         ;; 00:22c6 $b9
     ret  Z                                            ;; 00:22c7 $c8
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ret                                               ;; 00:22d3 $c9
     
 call_00_22d4_Entity_CheckTriggerFlag:
@@ -1844,7 +1844,7 @@ call_00_2a15_Entity_CheckIfOnScreen:
 call_00_2a5d_Entity_CheckAnimationEnded:
 ; NZ on the single frame the current action's animation wraps.
 ;
-; call_02_724d_Entity_UpdateSpriteFields clears ACTION_STATE_ANIM_ENDED at the top
+; call_02_724d_Entity_TickAction clears ACTION_STATE_ANIM_ENDED at the top
 ; of every entity's sprite update and sets it again only when the frame index
 ; reaches ENTITY_FIELD_SPRITE_COUNTER_MAX, so this is a one-frame pulse and reading
 ; it twice in a frame is safe.
@@ -1909,7 +1909,7 @@ call_00_2a98_Entity_CheckPlayerInHotspotAndSetAction:
 ; half-width - one compare per axis instead of two.
 ;
 ; On a hit the payload is copied into ENTITY_FIELD_MISC_TIMER onwards and the fifth
-; byte is passed to call_02_72ac_SetEntityAction, so the table decides both the
+; byte is passed to call_02_72ac_Entity_SetAction, so the table decides both the
 ; entity's new state and the action that shows it
     push de
     call call_00_230f_Entity_GetParameterIntoC
@@ -1979,7 +1979,7 @@ call_00_2a98_Entity_CheckPlayerInHotspotAndSetAction:
     xor  a
     ld   [de],a
     ld   a,[hl]
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ret  
 
 call_00_2afc_Entity_FindFreeSlot:
@@ -2184,7 +2184,7 @@ call_00_2bbe_Entity_TurnIntoFlyCoin:
 ; call_00_2b7a_Entity_DeactivateAndMarkNeverRespawn and no coin appears. Otherwise
 ; it rewrites the live slot field by field - id, collision type, size, facing,
 ; damage state - resets the list entry's state nibble, marks the entry
-; ENTITY_LIST_FLAGS_DEFEATED, hands the new action to call_02_72ac_SetEntityAction
+; ENTITY_LIST_FLAGS_DEFEATED, hands the new action to call_02_72ac_Entity_SetAction
 ; and finally copies .data_00_2c01_FlyCoinPalette over the slot's palette.
 ;
 ; The palette copy is why the coin looks right immediately rather than a frame
@@ -2210,7 +2210,7 @@ call_00_2bbe_Entity_TurnIntoFlyCoin:
     call call_00_2299_Entity_SetListState             ;; 00:2be9 $cd $99 $22
     call call_00_2ba9_Entity_MarkRespawnAsFlyCoin     ;; 00:2bec $cd $a9 $2b
     xor  A, A                                         ;; 00:2bef $af
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ld   HL, .data_00_2c01_FlyCoinPalette             ;; 00:2bfb $21 $01 $2c
     jp   call_00_2c20_Entity_CopyPaletteToBuffer      ;; 00:2bfe $c3 $20 $2c
 .data_00_2c01_FlyCoinPalette:

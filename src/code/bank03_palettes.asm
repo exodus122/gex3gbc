@@ -138,7 +138,7 @@ call_03_6833:
     add  hl,de
     call call_00_2c20_Entity_CopyPaletteToBuffer
     xor  a
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ret  
 
 call_03_687c_AssignEntityPalette:

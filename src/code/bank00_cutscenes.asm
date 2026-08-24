@@ -46,7 +46,7 @@
 ; The routine stashes the current map id and Gex's position, loads the script's
 ; map and start position, rebuilds the world for it
 ; (call_03_6c89_LoadMapDataPtrs, call_03_6203_LoadLevelBoundariesFromId,
-; call_00_1056_BgMap_LoadFull, call_02_708f_InitEntitiesAndSpawnPlayer), then
+; call_00_1056_BgMap_LoadFull, call_02_708f_Entities_InitAndSpawnAll), then
 ; runs two phases:
 ;
 ;   1. movement - walk the command list. Each command is 3 bytes emitted by
@@ -174,7 +174,7 @@ call_00_1ea0_Cutscene_LoadAndRun:
     farcall call_03_6203_LoadLevelBoundariesFromId
     call call_00_10de_BgMap_UpdateWindowFromPlayerPos                                  ;; 00:1f03 $cd $de $10
     call call_00_1056_BgMap_LoadFull                                  ;; 00:1f06 $cd $56 $10
-    farcall call_02_708f_InitEntitiesAndSpawnPlayer
+    farcall call_02_708f_Entities_InitAndSpawnAll
     call call_00_0513_Screen_PresentAndDrawEntities                                  ;; 00:1f14 $cd $13 $05
     pop  HL                                            ;; 00:1f17 $e1
     ld   E, [HL]                                       ;; 00:1f18 $5e
@@ -208,7 +208,7 @@ call_00_1ea0_Cutscene_LoadAndRun:
 .jr_00_1f42:
     call call_00_0b92_WaitForInterrupt                                  ;; 00:1f42 $cd $92 $0b
     call call_00_217f_Cutscene_UpdateMovement                                  ;; 00:1f45 $cd $7f $21
-    farcall call_02_7152_UpdateAllEntities
+    farcall call_02_7152_Entities_UpdateAll
     call call_00_11c8_BgMap_LoadDirtyRegions                                  ;; 00:1f53 $cd $c8 $11
     call call_00_35fa_WaitForLineThenSpawnEntity                                  ;; 00:1f56 $cd $fa $35
     call call_00_08f8_StageNextGfxTransfer                                  ;; 00:1f59 $cd $f8 $08
@@ -242,7 +242,7 @@ call_00_1ea0_Cutscene_LoadAndRun:
 .jr_00_1f7a:
     push AF                                            ;; 00:1f7a $f5
     call call_00_0b92_WaitForInterrupt                                  ;; 00:1f7b $cd $92 $0b
-    farcall call_02_7152_UpdateAllEntities
+    farcall call_02_7152_Entities_UpdateAll
     call call_00_11c8_BgMap_LoadDirtyRegions                                  ;; 00:1f89 $cd $c8 $11
     call call_00_35fa_WaitForLineThenSpawnEntity                                  ;; 00:1f8c $cd $fa $35
     call call_00_08f8_StageNextGfxTransfer                                  ;; 00:1f8f $cd $f8 $08

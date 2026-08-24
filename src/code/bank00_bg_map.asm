@@ -184,7 +184,7 @@ call_00_1056_BgMap_LoadFull:
     jr   NZ, .jr_00_10a4                               ;; 00:10af $20 $f3
     call call_00_0f08_RestoreBank                                  ;; 00:10b1 $cd $08 $0f
     call call_00_0b92_WaitForInterrupt                                  ;; 00:10b4 $cd $92 $0b
-    farcall call_02_72fb_UpdateMapWindow
+    farcall call_02_72fb_MapWindow_Update
     xor  A, A                                          ;; 00:10c2 $af
     ld   [wDC20_BgMapLoadingFlags], A                                    ;; 00:10c3 $ea $20 $dc
     ret                                                ;; 00:10c6 $c9

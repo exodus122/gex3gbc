@@ -1218,7 +1218,7 @@ call_00_3618_HandleEntitySpawn:
     or   A, $40                                        ;; 00:3776 $f6 $40
     ld   [HL], A                                       ;; 00:3778 $77
     and  A, $0f                                        ;; 00:3779 $e6 $0f
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     farcall call_03_687c_AssignEntityPalette
     ret                                                ;; 00:3791 $c9
 
@@ -1378,7 +1378,7 @@ call_00_37a0_SpawnEntityRelative:
     ld   [DE], A                                       ;; 00:384e $12 
     call call_00_2a03_Entity_ResetEntityListIndex                                  ;; 00:384f $cd $03 $2a
     xor  A, A                                          ;; 00:3852 $af
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     farcall call_03_687c_AssignEntityPalette
     pop  AF                                            ;; 00:3869 $f1
     ld   HL, wDA00_CurrentEntityAddrLo                                     ;; 00:386a $21 $00 $da

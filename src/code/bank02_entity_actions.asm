@@ -162,7 +162,7 @@ call_02_598f_EntityAction_FlyTV_SpawnFly:
     ld   c,b
     call z,call_00_3792_PrepareRelativeEntitySpawn
     ld   a,$03
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
     
     db   $00, $04, $01, $05, $02, $06, $03        ;; 02:599f ????????
     db   $07, $04, $08
@@ -185,7 +185,7 @@ call_02_59aa_EntityAction_FlyTV_Reset:
     ld   c,$00
     call call_00_2299_Entity_SetListState
     ld   a,$04
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_59D2_FlyTV_unk:
     call call_00_293a_Entity_GetId
@@ -236,7 +236,7 @@ call_02_5a1c_EntityAction_TVButton_unk2:
     cp   A, [HL]                                       ;; 02:5a2a $be
     ret  NZ                                            ;; 02:5a2b $c0
     ld   A, $02                                        ;; 02:5a2c $3e $02
-    call call_02_72ac_SetEntityAction                                  ;; 02:5a2e $cd $ac $72
+    call call_02_72ac_Entity_SetAction                                  ;; 02:5a2e $cd $ac $72
     ld   A, [wDB6C_CurrentMapId]                                    ;; 02:5a31 $fa $6c $db
     cp   A, MAP_GEXTREME_SPORTS1                                        ;; 02:5a34 $fe $07
     ld   A, PLAYERACTION_SNOWBOARDING_STAND_ON_TV_BUTTON                                        ;; 02:5a36 $3e $2c
@@ -311,7 +311,7 @@ call_02_5a83_EntityAction_TVButton_unk4:
     ld   C, $00                                        ;; 02:5ac0 $0e $00
     call call_00_2299_Entity_SetListState                                  ;; 02:5ac2 $cd $99 $22
     ld   A, $00                                        ;; 02:5ac5 $3e $00
-    jp   call_02_72ac_SetEntityAction                                  ;; 02:5ac7 $c3 $ac $72
+    jp   call_02_72ac_Entity_SetAction                                  ;; 02:5ac7 $c3 $ac $72
 .jr_02_5aca:
     call call_00_2962_Entity_GetActionId                                  ;; 02:5aca $cd $62 $29
     cp   A, $01                                        ;; 02:5acd $fe $01
@@ -319,7 +319,7 @@ call_02_5a83_EntityAction_TVButton_unk4:
     ld   C, $01                                        ;; 02:5ad0 $0e $01
     call call_00_2299_Entity_SetListState                                  ;; 02:5ad2 $cd $99 $22
     ld   A, $01                                        ;; 02:5ad5 $3e $01
-    jp   call_02_72ac_SetEntityAction                                  ;; 02:5ad7 $c3 $ac $72
+    jp   call_02_72ac_Entity_SetAction                                  ;; 02:5ad7 $c3 $ac $72
 
 call_02_5ada_EntityAction_TVRemote_unk:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear                                  ;; 02:5ada $cd $f5 $29
@@ -370,7 +370,7 @@ call_02_5af8_EntityAction_TVRemote_unk4:
     ld   C, $03                                        ;; 02:5b36 $0e $03
     call call_00_2299_Entity_SetListState                                  ;; 02:5b38 $cd $99 $22
     ld   A, $03                                        ;; 02:5b3b $3e $03
-    call call_02_72ac_SetEntityAction                                  ;; 02:5b3d $cd $ac $72
+    call call_02_72ac_Entity_SetAction                                  ;; 02:5b3d $cd $ac $72
 .jr_02_5b40:
     call call_00_230f_Entity_GetParameterIntoC                                  ;; 02:5b40 $cd $0f $23
     ld   B, $00                                        ;; 02:5b43 $06 $00
@@ -401,7 +401,7 @@ call_02_5af8_EntityAction_TVRemote_unk4:
     ld   C, $01                                        ;; 02:5b74 $0e $01
     call call_00_2299_Entity_SetListState                                  ;; 02:5b76 $cd $99 $22
     ld   A, $01                                        ;; 02:5b79 $3e $01
-    jp   call_02_72ac_SetEntityAction                                  ;; 02:5b7b $c3 $ac $72
+    jp   call_02_72ac_Entity_SetAction                                  ;; 02:5b7b $c3 $ac $72
 .data_02_5b7e:
     db   $00, $00, $01, $02, $03, $05, $07, $09        ;; 02:5b7e ?.......
     db   $0a, $04, $06, $08                            ;; 02:5b86 ....
@@ -446,20 +446,20 @@ call_02_5bd4_EntityAction_FreestandingRemote_unk0:
     ld   A, [wDCD2_FreestandingRemoteHitFlags]                                    ;; 02:5bda $fa $d2 $dc
     and  A, A                                          ;; 02:5bdd $a7
     ld   A, $01                                        ;; 02:5bde $3e $01
-    jp   NZ, call_02_72ac_SetEntityAction                              ;; 02:5be0 $c2 $ac $72
+    jp   NZ, call_02_72ac_Entity_SetAction                              ;; 02:5be0 $c2 $ac $72
     ret                                                ;; 02:5be3 $c9
 .jr_02_5be4:
     ld   HL, wDC5C_ProgressFlags                                     ;; 02:5be4 $21 $5c $dc
     bit  0, [HL]                                       ;; 02:5be7 $cb $46
     ld   A, $01                                        ;; 02:5be9 $3e $01
-    jp   Z, call_02_72ac_SetEntityAction                               ;; 02:5beb $ca $ac $72
+    jp   Z, call_02_72ac_Entity_SetAction                               ;; 02:5beb $ca $ac $72
     ret                                                ;; 02:5bee $c9
 
 call_02_5bef_EntityAction_FreestandingRemote_unk1:
     ld   A, [wDCD2_FreestandingRemoteHitFlags]                                    ;; 02:5bef $fa $d2 $dc
     cp   A, $81                                        ;; 02:5bf2 $fe $81
     ld   A, $02                                        ;; 02:5bf4 $3e $02
-    jp   Z, call_02_72ac_SetEntityAction                               ;; 02:5bf6 $ca $ac $72
+    jp   Z, call_02_72ac_Entity_SetAction                               ;; 02:5bf6 $ca $ac $72
     ret                                                ;; 02:5bf9 $c9
 
 call_02_5bfa_EntityAction_FreestandingRemote_unk2:
@@ -499,7 +499,7 @@ call_02_5c43_EntityAction_EvilSanta_Init:
     ld   [wDCC4_EvilSantaHealth], A                                    ;; 02:5c45 $ea $c4 $dc
     call call_02_5d02_LoadEvilSantaPalette                                  ;; 02:5c48 $cd $02 $5d
     ld   A, $01                                        ;; 02:5c4b $3e $01
-    jp   call_02_72ac_SetEntityAction                                  ;; 02:5c4d $c3 $ac $72
+    jp   call_02_72ac_Entity_SetAction                                  ;; 02:5c4d $c3 $ac $72
 
 call_02_5c50_EntityAction_EvilSanta_Jumping:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear                                  ;; 02:5c50 $cd $f5 $29
@@ -516,7 +516,7 @@ call_02_5c50_EntityAction_EvilSanta_Jumping:
     ret  C                                             ;; 02:5c6b $d8
     call call_00_299f_Entity_TurnAround                                  ;; 02:5c6c $cd $9f $29
     ld   A, $02                                        ;; 02:5c6f $3e $02
-    jp   call_02_72ac_SetEntityAction                                  ;; 02:5c71 $c3 $ac $72
+    jp   call_02_72ac_Entity_SetAction                                  ;; 02:5c71 $c3 $ac $72
 
 call_02_5c74_EntityAction_EvilSanta_PrepareThrow:
     call call_00_2a5d_Entity_CheckAnimationEnded                                  ;; 02:5c74 $cd $5d $2a
@@ -524,7 +524,7 @@ call_02_5c74_EntityAction_EvilSanta_PrepareThrow:
     ld   C, SPAWN_CHILD_ENTITY_EVIL_SANTA_PROJECTILE                                        ;; 02:5c78 $0e $05
     call call_00_3792_PrepareRelativeEntitySpawn                                  ;; 02:5c7a $cd $92 $37
     ld   A, $03                                        ;; 02:5c7d $3e $03
-    jp   call_02_72ac_SetEntityAction                                  ;; 02:5c7f $c3 $ac $72
+    jp   call_02_72ac_Entity_SetAction                                  ;; 02:5c7f $c3 $ac $72
 
 call_02_5c82_EntityAction_EvilSanta_Stand:
     ld   A, [wDCDB_EvilSantaHitByProjectileFlag]                                    ;; 02:5c82 $fa $db $dc
@@ -533,7 +533,7 @@ call_02_5c82_EntityAction_EvilSanta_Stand:
     ld   C, ENTITY_HOLIDAY_TV_EVIL_SANTA_PROJECTILE                                        ;; 02:5c88 $0e $1f
     call call_00_2b10_Entity_FindDuplicateInstance                                  ;; 02:5c8a $cd $10 $2b
     ld   A, $01                                        ;; 02:5c8d $3e $01
-    jp   Z, call_02_72ac_SetEntityAction                               ;; 02:5c8f $ca $ac $72
+    jp   Z, call_02_72ac_Entity_SetAction                               ;; 02:5c8f $ca $ac $72
     ret                                                ;; 02:5c92 $c9
 .jr_02_5c93:
     xor  A, A                                          ;; 02:5c93 $af
@@ -541,9 +541,9 @@ call_02_5c82_EntityAction_EvilSanta_Stand:
     ld   HL, wDCC4_EvilSantaHealth                                     ;; 02:5c97 $21 $c4 $dc
     dec  [HL]                                          ;; 02:5c9a $35
     ld   A, $05                                        ;; 02:5c9b $3e $05
-    jp   NZ, call_02_72ac_SetEntityAction                              ;; 02:5c9d $c2 $ac $72
+    jp   NZ, call_02_72ac_Entity_SetAction                              ;; 02:5c9d $c2 $ac $72
     ld   A, $06                                        ;; 02:5ca0 $3e $06
-    jp   call_02_72ac_SetEntityAction                                  ;; 02:5ca2 $c3 $ac $72
+    jp   call_02_72ac_Entity_SetAction                                  ;; 02:5ca2 $c3 $ac $72
 
 call_02_5ca5_EntityAction_EvilSanta_Damaged:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
@@ -635,7 +635,7 @@ call_02_5d10_EntityAction_EvilSantaProjectile_Init:
     ld   C, $10                                        ;; 02:5d4d $0e $10
     call call_00_28dc_Entity_SetYVelocity                                  ;; 02:5d4f $cd $dc $28
     ld   A, $01                                        ;; 02:5d52 $3e $01
-    jp   call_02_72ac_SetEntityAction                                  ;; 02:5d54 $c3 $ac $72
+    jp   call_02_72ac_Entity_SetAction                                  ;; 02:5d54 $c3 $ac $72
 .data_02_5d57:
     db   $00, $01, $02, $03, $04, $05, $06, $07        ;; 02:5d57 ??.....?
     db   $08, $09, $0a, $0b, $0d, $0e, $0f, $10        ;; 02:5d5f ??.?.??.
@@ -683,12 +683,12 @@ call_02_5d80_EntityAction_EvilSantaProjectile_UpdateTrajectory:
     ld   C, $04                                        ;; 02:5dc7 $0e $04
 .jr_02_5dc9:
     ld   A, C                                          ;; 02:5dc9 $79
-    jp   call_02_72ac_SetEntityAction                                  ;; 02:5dca $c3 $ac $72
+    jp   call_02_72ac_Entity_SetAction                                  ;; 02:5dca $c3 $ac $72
 .jr_02_5dcd:
     ld   A, $01                                        ;; 02:5dcd $3e $01
     ld   [wDCDB_EvilSantaHitByProjectileFlag], A                                    ;; 02:5dcf $ea $db $dc
     ld   A, $05                                        ;; 02:5dd2 $3e $05
-    jp   call_02_72ac_SetEntityAction                                  ;; 02:5dd4 $c3 $ac $72
+    jp   call_02_72ac_Entity_SetAction                                  ;; 02:5dd4 $c3 $ac $72
 
 call_02_5dd7_EntityAction_EvilSantaProjectile_Destroy:
     call call_00_2a5d_Entity_CheckAnimationEnded                                  ;; 02:5dd7 $cd $5d $2a
@@ -714,7 +714,7 @@ call_02_5dde_EntityAction_SkatingElf_Skate:
     ld   A, [wDA11_EntityXDistFromPlayer]                                    ;; 02:5e02 $fa $11 $da
     cp   A, $40                                        ;; 02:5e05 $fe $40
     ld   A, $02                                        ;; 02:5e07 $3e $02
-    jp   C, call_02_72ac_SetEntityAction                               ;; 02:5e09 $da $ac $72
+    jp   C, call_02_72ac_Entity_SetAction                               ;; 02:5e09 $da $ac $72
     ret                                                ;; 02:5e0c $c9
 
 call_02_5e0d_EntityAction_SkatingElf_PrepareJump:
@@ -726,7 +726,7 @@ call_02_5e0d_EntityAction_SkatingElf_PrepareJump:
     call call_00_28be_Entity_GetXVelocity                                  ;; 02:5e1a $cd $be $28
     cp   A, $28                                        ;; 02:5e1d $fe $28
     ld   A, $03                                        ;; 02:5e1f $3e $03
-    jp   Z, call_02_72ac_SetEntityAction                               ;; 02:5e21 $ca $ac $72
+    jp   Z, call_02_72ac_Entity_SetAction                               ;; 02:5e21 $ca $ac $72
     ret                                                ;; 02:5e24 $c9
 
 call_02_5e25_EntityAction_SkatingElf_Jump:
@@ -734,7 +734,7 @@ call_02_5e25_EntityAction_SkatingElf_Jump:
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped                                  ;; 02:5e28 $cd $4a $24
     call call_00_2766_Entity_ClampYToSpawnFloor                                  ;; 02:5e2b $cd $66 $27
     ld   A, $00                                        ;; 02:5e2e $3e $00
-    jp   NC, call_02_72ac_SetEntityAction                              ;; 02:5e30 $d2 $ac $72
+    jp   NC, call_02_72ac_Entity_SetAction                              ;; 02:5e30 $d2 $ac $72
     ret                                                ;; 02:5e33 $c9
 
 call_02_5e34_EntityAction_SkatingElf_Damaged:
@@ -762,9 +762,9 @@ call_02_5e34_EntityAction_SkatingElf_Damaged:
     ld   A, [HL]                                       ;; 02:5e61 $7e
     and  A, A                                          ;; 02:5e62 $a7
     ld   A, $00                                        ;; 02:5e63 $3e $00
-    jp   NZ, call_02_72ac_SetEntityAction                              ;; 02:5e65 $c2 $ac $72
+    jp   NZ, call_02_72ac_Entity_SetAction                              ;; 02:5e65 $c2 $ac $72
     ld   A, $05                                        ;; 02:5e68 $3e $05
-    jp   call_02_72ac_SetEntityAction                                  ;; 02:5e6a $c3 $ac $72
+    jp   call_02_72ac_Entity_SetAction                                  ;; 02:5e6a $c3 $ac $72
 .jr_02_5e6d:
     call call_00_251c_Entity_MoveXByFacingMomentum_BoundsChecked                                  ;; 02:5e6d $cd $1c $25
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped                                  ;; 02:5e70 $cd $4a $24
@@ -801,7 +801,7 @@ call_02_5e7c_EntityAction_Penguin_WalkOrRun:
     ld   C, $30                                        ;; 02:5eae $0e $30
     call call_00_28dc_Entity_SetYVelocity                                  ;; 02:5eb0 $cd $dc $28
     ld   A, ENTITYACTION_PENGUIN_JUMP                                        ;; 02:5eb3 $3e $01
-    jp   call_02_72ac_SetEntityAction                                  ;; 02:5eb5 $c3 $ac $72
+    jp   call_02_72ac_Entity_SetAction                                  ;; 02:5eb5 $c3 $ac $72
 
 call_02_5eb8_EntityAction_Penguin_Jump:
     ld   C, $10                                        ;; 02:5eb8 $0e $10
@@ -810,7 +810,7 @@ call_02_5eb8_EntityAction_Penguin_Jump:
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped                                  ;; 02:5ec0 $cd $4a $24
     call call_00_2766_Entity_ClampYToSpawnFloor                                  ;; 02:5ec3 $cd $66 $27
     ld   A, ENTITYACTION_PENGUIN_WALK_OR_RUN                                        ;; 02:5ec6 $3e $00
-    jp   NC, call_02_72ac_SetEntityAction                              ;; 02:5ec8 $d2 $ac $72
+    jp   NC, call_02_72ac_Entity_SetAction                              ;; 02:5ec8 $d2 $ac $72
     ret                                                ;; 02:5ecb $c9
 
 call_02_5ecc_EntityAction_Rezling_Walk:
@@ -837,7 +837,7 @@ call_02_5edd_EntityAction_Fish_Unk0:
     ld   hl,wDA12_EntityDirectionRelativeToPlayer
     cp   [hl]
     ld   a,$01
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
 .jr_00_5EF1:
     ld   c,$08
     call call_00_2588_Entity_NudgeXVelocityTowardC
@@ -871,7 +871,7 @@ call_02_5f01_EntityAction_SafariSam_Unk0:
     ret  nz
     call call_00_2922_Entity_DecrementMiscTimer
     ld   a,$01
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_5f39_EntityAction_SafariSam_Unk2:
@@ -906,7 +906,7 @@ call_02_5f69_EntityAction_GhostKnight_Unk0:
     ld   [wDCD4_GhostKnightDamageCounter2],a
     call call_02_5F9B_GhostKnight_unk
     ld   a,$01
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_5f78_EntityAction_GhostKnight_Unk1:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
@@ -914,7 +914,7 @@ call_02_5f78_EntityAction_GhostKnight_Unk1:
     call nz,call_00_290d_Entity_SetMiscTimer
     call call_00_2922_Entity_DecrementMiscTimer
     ld   a,$02
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
     ld   a,[hl]
     and  a,$0F
     ld   c,SPAWN_CHILD_ENTITY_GHOST_KNIGHT_PROJECTILE
@@ -1034,7 +1034,7 @@ call_02_613f_EntityAction_Hand_Unk0:
     call call_00_28c8_Entity_SetXVelocity
     call call_00_251c_Entity_MoveXByFacingMomentum_BoundsChecked
     ld   a,$01
-    jp   nz,call_02_72ac_SetEntityAction
+    jp   nz,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_614d_EntityAction_Hand_Unk1:
@@ -1046,14 +1046,14 @@ call_02_614d_EntityAction_Hand_Unk1:
     call call_00_28d2_Entity_GetYVelocity
     bit  7,a
     ld   a,$02
-    jp   nz,call_02_72ac_SetEntityAction
+    jp   nz,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6163_EntityAction_Hand_Unk2:
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     call call_00_2766_Entity_ClampYToSpawnFloor
     ld   a,$03
-    jp   nc,call_02_72ac_SetEntityAction
+    jp   nc,call_02_72ac_Entity_SetAction
     ret  
     
 call_02_616f_EntityAction_Hand_Unk3:
@@ -1088,7 +1088,7 @@ call_02_616f_EntityAction_Hand_Unk3:
     ld   a,SFX_SMALL_BANG
     call call_00_0ff5_QueueSFX
     ld   a,$04
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_61b2_EntityAction_Hand_Unk5:
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
@@ -1117,7 +1117,7 @@ call_02_61c6_EntityAction_Bee_Unk0:
     ld   c,$30
     call call_00_28dc_Entity_SetYVelocity
     ld   a,$01
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_61ee_EntityAction_Bee_Unk1:
     call call_00_251c_Entity_MoveXByFacingMomentum_BoundsChecked
@@ -1139,7 +1139,7 @@ call_02_61ee_EntityAction_Bee_Unk1:
     call call_00_2962_Entity_GetActionId
     ld   a,c
     cp   [hl]
-    jp   nz,call_02_72ac_SetEntityAction
+    jp   nz,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6214_EntityAction_Raft_ResetAndWait:
@@ -1150,7 +1150,7 @@ call_02_6214_EntityAction_Raft_ResetAndWait:
 ; Nudges the raft downward by $28 pixels (placing it into the river).
 ; Sets a countdown timer (Timer1A = $28).
 ; In its idle loop: every 4 frames it slowly drifts upward (bc=$FFFF → add -1 to Y).
-; When the timer expires, it switches the raft into the next action (via call_02_72ac_SetEntityAction).
+; When the timer expires, it switches the raft into the next action (via call_02_72ac_Entity_SetAction).
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_00_6239
     call call_00_2826_Entity_ResetToInitialXPos
@@ -1173,7 +1173,7 @@ call_02_6214_EntityAction_Raft_ResetAndWait:
     call call_00_250d_Entity_MoveY
     call call_00_2922_Entity_DecrementMiscTimer
     ld   a,$01
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_624e_EntityAction_Raft_MoveRightAndCarryPlayer:
@@ -1214,11 +1214,11 @@ call_02_624e_EntityAction_Raft_MoveRightAndCarryPlayer:
     jr   c,.jr_00_628A
 .jr_00_6285:
     ld   a,$00
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 .jr_00_628A:
     call call_00_2617_Entity_ClampXToBounds
     ld   a,$02
-    jp   nc,call_02_72ac_SetEntityAction
+    jp   nc,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6293_EntityAction_Raft_DriftDown:
@@ -1243,7 +1243,7 @@ call_02_6293_EntityAction_Raft_DriftDown:
     call call_00_250d_Entity_MoveY
     call call_00_2922_Entity_DecrementMiscTimer
     ld   a,$00
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_62bc_EntityAction_Snake_Unk0:
@@ -1274,7 +1274,7 @@ call_02_62bc_EntityAction_Snake_Unk0:
     ld   a,[wDA11_EntityXDistFromPlayer]
     cp   a,$40
     ld   a,$01
-    jp   c,call_02_72ac_SetEntityAction
+    jp   c,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_62f9_EntityAction_Snake_Unk1:
@@ -1290,7 +1290,7 @@ call_02_62f9_EntityAction_Snake_Unk1:
 .jr_00_630D:
     call call_00_3792_PrepareRelativeEntitySpawn
     ld   a,$02
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_6315_EntityAction_Snake_Unk2:
     ld   c,$08
@@ -1330,7 +1330,7 @@ call_02_634c_EntityAction_RaStatue_Unk0:
     call call_00_2826_Entity_ResetToInitialXPos
     call call_00_27e4_Entity_ResetToInitialYPos
     ld   a,$01
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_6361_EntityAction_RaStatue_Unk1:
     ld   de,.data_02_6367
@@ -1349,7 +1349,7 @@ call_02_6399_EntityAction_RaStatue_Unk3:
     call call_00_24ee_Entity_ApplyYVelocity_Subpixel
     call call_00_2922_Entity_DecrementMiscTimer
     ld   a,$00
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
     ret
     
 call_02_63a8_EntityAction_BreakableBlock_Unk0:
@@ -1364,7 +1364,7 @@ call_02_63a8_EntityAction_BreakableBlock_Unk0:
     ld   [hl],$00
     call call_00_2962_Entity_GetActionId
     inc  a
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_63c0_EntityAction_BreakableBlock_Unk3:
     ld   a,SFX_LOUD_BANG
@@ -1385,7 +1385,7 @@ call_02_63db_EntityAction_EnemyCactus_Unk0:
     ld   hl,wD80D_PlayerFacingDirection
     cp   [hl]
     ld   a,$01
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_63f0_EntityAction_EnemyCactus_Unk1:
@@ -1397,7 +1397,7 @@ call_02_63f0_EntityAction_EnemyCactus_Unk1:
 .jr_00_63FD:
     call call_00_2922_Entity_DecrementMiscTimer
     ld   a,$02
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
 
 call_02_6405_EnemyCactus_unk:
     call call_00_2a68_Entity_ComputeXDistanceFromPlayer
@@ -1405,7 +1405,7 @@ call_02_6405_EnemyCactus_unk:
     ld   hl,wD80D_PlayerFacingDirection
     cp   [hl]
     ld   a,$00
-    jp   nz,call_02_72ac_SetEntityAction
+    jp   nz,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6415_EntityAction_EnemyCactus_Unk4:
@@ -1417,7 +1417,7 @@ call_02_6415_EntityAction_EnemyCactus_Unk4:
     call call_00_2766_Entity_ClampYToSpawnFloor
     ret  c
     ld   a,$03
-    call call_02_72ac_SetEntityAction
+    call call_02_72ac_Entity_SetAction
     jr   call_02_6405_EnemyCactus_unk
 
 call_02_642e_EntityAction_Rock_Unk0:
@@ -1439,7 +1439,7 @@ call_02_642e_EntityAction_Rock_Unk0:
 .jr_00_6450:
     call call_00_2922_Entity_DecrementMiscTimer
     ld   a,$01
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6459_EntityAction_Rock_Unk1:
@@ -1497,7 +1497,7 @@ call_02_6491_EntityAction_HardHat_Walk:
     call call_00_2958_Entity_SetFacingDirection
 .jr_00_64C8:
     ld   a,$01
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_64cd_EntityAction_HardHat_Jump:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
@@ -1509,7 +1509,7 @@ call_02_64cd_EntityAction_HardHat_Jump:
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     call call_00_2766_Entity_ClampYToSpawnFloor
     ld   a,$00
-    jp   nc,call_02_72ac_SetEntityAction
+    jp   nc,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_64e9_EntityAction_Bat_Unk0:
@@ -1522,7 +1522,7 @@ call_02_64e9_EntityAction_Bat_Unk0:
     ld   a,[wDA11_EntityXDistFromPlayer]
     cp   a,$10
     ld   a,$01
-    jp   c,call_02_72ac_SetEntityAction
+    jp   c,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6502_EntityAction_Bat_Unk2:
@@ -1544,7 +1544,7 @@ call_02_6502_EntityAction_Bat_Unk2:
     call call_00_28f1_Entity_CheckIfYVelocityIsZero
     bit  7,a
     ld   a,$03
-    jp   nz,call_02_72ac_SetEntityAction
+    jp   nz,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_652e_EntityAction_Bat_Unk3:
@@ -1552,7 +1552,7 @@ call_02_652e_EntityAction_Bat_Unk3:
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     call call_00_2780_Entity_IsBelowCameraBottom
     ld   a,$00
-    jp   nc,call_02_72ac_SetEntityAction
+    jp   nc,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_653d_EntityAction_Door1_Unk1:
@@ -1566,13 +1566,13 @@ call_02_6549_EntityAction_Door1_Unk2:
     ld   c,$00
     call call_00_2299_Entity_SetListState
     ld   a,$03
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_6553_EntityAction_Door2_Unk0:
     ld   c,$02
     call call_00_2299_Entity_SetListState
     ld   a,$01
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_655d_EntityAction_Door2_Unk3:
     call call_00_2a5d_Entity_CheckAnimationEnded
@@ -1587,7 +1587,7 @@ call_02_6569_EntityAction_FanLift_Unk0:
     ld   c,$02
     call call_00_2299_Entity_SetListState
     ld   a,$01
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_6577_EntityAction_FanLift_Unk2:
     call call_00_2917_Entity_CheckMiscTimerZero
@@ -1605,7 +1605,7 @@ call_02_6577_EntityAction_FanLift_Unk2:
     ld   c,$00
     call call_00_2299_Entity_SetListState
     ld   a,$03
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_6597_EntityAction_MechLeft_Unk0:
     ld   c,ENTITY_FACING_LEFT
@@ -1619,7 +1619,7 @@ call_02_659d_EntityAction_AnimeDisappearingFloor_Unk0:
     ret  c
     farcall call_03_57f8_ClearCollisionForEntity
     ld   a,$01
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_65b3_EntityAction_Onswitch2_Unk1:
     ld   a,[wDB6C_CurrentMapId]
@@ -1631,7 +1631,7 @@ call_02_65b3_EntityAction_Onswitch2_Unk1:
     ld   c,$00
     call call_00_2299_Entity_SetListState
     ld   a,$00
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_65c9_EntityAction_BlueBeamBarrier_Unk0:
     call call_00_22d4_Entity_CheckTriggerFlag
@@ -1639,7 +1639,7 @@ call_02_65c9_EntityAction_BlueBeamBarrier_Unk0:
     ld   c,$01
     call call_00_2299_Entity_SetListState
     ld   a,$01
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_65d7_EntityAction_AnimeRisingPlatform_Update:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
@@ -1673,7 +1673,7 @@ call_02_659d_EntityAction_OnSwitch_Unk0:
     ld   c,$01
     call call_00_2299_Entity_SetListState
     ld   a,$01
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_6617_EntityAction_OnSwitch_Unk1:
     call call_00_22d4_Entity_CheckTriggerFlag
@@ -1681,7 +1681,7 @@ call_02_6617_EntityAction_OnSwitch_Unk1:
     ld   c,$00
     call call_00_2299_Entity_SetListState
     ld   a,$00
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_6617_EntityAction_OffSwitch_Unk0:
     call call_00_22d4_Entity_CheckTriggerFlag
@@ -1689,7 +1689,7 @@ call_02_6617_EntityAction_OffSwitch_Unk0:
     ld   c,$01
     call call_00_2299_Entity_SetListState
     ld   a,$01
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_6633_EntityAction_OffSwitch_Unk1:
     call call_00_22d4_Entity_CheckTriggerFlag
@@ -1697,7 +1697,7 @@ call_02_6633_EntityAction_OffSwitch_Unk1:
     ld   c,$00
     call call_00_2299_Entity_SetListState
     ld   a,$00
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_6641_EntityAction_SailorToonGirl_Unk0:
     ld   c,$10
@@ -1712,7 +1712,7 @@ call_02_6641_EntityAction_SailorToonGirl_Unk0:
     jr   c,.jr_00_6662
     cp   a,$40
     ld   a,$04
-    jp   nc,call_02_72ac_SetEntityAction
+    jp   nc,call_02_72ac_Entity_SetAction
     ret  
 .jr_00_6662:
     call call_00_2917_Entity_CheckMiscTimerZero
@@ -1731,7 +1731,7 @@ call_02_6641_EntityAction_SailorToonGirl_Unk0:
     cp   a,$04
     call z,call_00_242d_Entity_FaceAwayFromPlayer
     pop  af
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 .data_02_667e:
     db   $01, $06, $06, $01, $04, $01, $04, $06, $04
 
@@ -1745,7 +1745,7 @@ call_02_668d_EntityAction_SailorToonGirl_Unk3:
     ret  c
     call call_00_2a5d_Entity_CheckAnimationEnded
     ld   a,$04
-    jp   nz,call_02_72ac_SetEntityAction
+    jp   nz,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_669d_EntityAction_SailorToonGirl_Unk5:
@@ -1760,7 +1760,7 @@ call_02_669d_EntityAction_SailorToonGirl_Unk5:
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     call call_00_2766_Entity_ClampYToSpawnFloor
     ld   a,$00
-    jp   nc,call_02_72ac_SetEntityAction
+    jp   nc,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_66bb_EntityAction_BigSilverRobot_Unk0:
@@ -1769,7 +1769,7 @@ call_02_66bb_EntityAction_BigSilverRobot_Unk0:
     ld   a,[wDA11_EntityXDistFromPlayer]
     cp   a,$38
     ld   a,$01
-    jp   c,call_02_72ac_SetEntityAction
+    jp   c,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_66cc_EntityAction_BigSilverRobot_Unk1:
@@ -1781,7 +1781,7 @@ call_02_66cc_EntityAction_BigSilverRobot_Unk1:
     xor  a,$20
     ld   [hl],a
     ld   a,$02
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_66e0_EntityAction_BigSilverRobot_Unk2:
     call call_00_2a5d_Entity_CheckAnimationEnded
@@ -1790,7 +1790,7 @@ call_02_66e0_EntityAction_BigSilverRobot_Unk2:
     xor  a,$20
     ld   [hl],a
     ld   a,$01
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_66ef_EntityAction_BigSilverRobot_Unk3:
     call call_00_2a5d_Entity_CheckAnimationEnded
@@ -1824,7 +1824,7 @@ call_02_66f6_EntityAction_SmallBlueRobot_Unk0:
     ld   c,$30
     call call_00_28dc_Entity_SetYVelocity
     ld   a,$01
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_6732_EntityAction_SmallBlueRobot_Unk1:
     ld   c,$02
@@ -1833,7 +1833,7 @@ call_02_6732_EntityAction_SmallBlueRobot_Unk1:
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     call call_00_2766_Entity_ClampYToSpawnFloor
     ld   a,$00
-    jp   nc,call_02_72ac_SetEntityAction
+    jp   nc,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6746_EntityAction_Secbot_Unk0:
@@ -2056,7 +2056,7 @@ call_02_68ed_EntityAction_Grenade_Unk1:
     ret  c
     call call_00_2922_Entity_DecrementMiscTimer
     ld   a,$02
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
     ld   l,[hl]
     ld   h,$00
     ld   de,.data_02_6924
@@ -2102,7 +2102,7 @@ call_02_6947_EntityAction_MadBomber_Unk0:
     and  a
     ret  nz
     ld   a,$04
-    call call_02_72ac_SetEntityAction
+    call call_02_72ac_Entity_SetAction
     farcall call_03_5671_HandleEntityHit
     ret  
 
@@ -2119,7 +2119,7 @@ call_02_6971_EntityAction_Bomb_Unk0:
     ld   a,c
     cp   a,$02
     ld   a,$01
-    jp   nz,call_02_72ac_SetEntityAction
+    jp   nz,call_02_72ac_Entity_SetAction
     
 call_02_697e: ; unreferenced function?
     ld   a,l
@@ -2184,7 +2184,7 @@ call_02_69af_EntityAction_Bomb_Unk1:
     ld   a,SFX_BOMB
     call call_00_0ff5_QueueSFX
     ld   a,$02
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 .data_02_69fc:    
     db   $10, $f0, $08, $f8, $10, $f0, $04, $fc
     
@@ -2194,7 +2194,7 @@ call_02_6a04_EntityAction_Bomb_Unk2:
     ret  nz
     call call_00_2922_Entity_DecrementMiscTimer
     ld   a,$04
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6a13_EntityAction_Bomb_Unk3:
@@ -2272,7 +2272,7 @@ call_02_6a91_EntityAction_WaterTowerTank_Unk0:
     ld   c,$02
     call call_00_2299_Entity_SetListState
     ld   a,$01
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_6ab4_EntityAction_WaterTowerTank_Unk1:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
@@ -2284,7 +2284,7 @@ call_02_6ab4_EntityAction_WaterTowerTank_Unk1:
     ld   a,SFX_SMALL_BANG
     call call_00_0ff5_QueueSFX
     ld   a,$02
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_6acd_EntityAction_Convict_Unk0:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
@@ -2328,7 +2328,7 @@ call_02_6b03_EntityAction_Spider_Unk0:
     sub  a,$02
     ld   [hl],a
     ld   a,$01
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6b20_EntityAction_Spider_Unk1:
@@ -2340,7 +2340,7 @@ call_02_6b20_EntityAction_Spider_Unk1:
     ld   [hl],a
     cp   c
     ld   a,$02
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6b35_EntityAction_Spider_Unk2:
@@ -2355,7 +2355,7 @@ call_02_6b35_EntityAction_Spider_Unk2:
     call call_00_251c_Entity_MoveXByFacingMomentum_BoundsChecked
     call call_00_2922_Entity_DecrementMiscTimer
     ld   a,$00
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6b53_EntityAction_StrayCat_Unk0:
@@ -2366,7 +2366,7 @@ call_02_6b53_EntityAction_StrayCat_Unk0:
     ld   a,[wDA11_EntityXDistFromPlayer]
     cp   a,$28
     ld   a,$01
-    jp   c,call_02_72ac_SetEntityAction
+    jp   c,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6b69_EntityAction_YellowGoon_Unk0:
@@ -2384,14 +2384,14 @@ call_02_6b69_EntityAction_YellowGoon_Unk0:
     call call_00_2922_Entity_DecrementMiscTimer
     jr   z,.jr_00_6B8B
     ld   a,$01
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 .jr_00_6B8B:
     call call_00_2917_Entity_CheckMiscTimerZero
     ld   [hl],$03
     call call_00_2722_Entity_IsPlayerInsideBounds
     call nz,call_00_2410_Entity_FaceTowardsPlayer
     ld   a,$02
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_6b9b_EntityAction_Rat_Unk0:
     ld   c,$10
@@ -2413,7 +2413,7 @@ call_02_6ba3_EntityAction_ChomperTV_Unk0:
     sub  a,$02
     ld   [hl],a
     ld   a,$01
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6bc8_EntityAction_ChomperTV_Unk2:
@@ -2436,7 +2436,7 @@ call_02_6be4_EntityAction_ChomperTV_Unk1:
     call call_00_2917_Entity_CheckMiscTimerZero
     cp   c
     ld   a,$00
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
     call call_00_2917_Entity_CheckMiscTimerZero
     inc  a
     ld   [hl],a
@@ -2448,7 +2448,7 @@ call_02_6bfb_EntityAction_CrumblingFloor_Unk0:
     ld   hl,wDA00_CurrentEntityAddrLo
     cp   [hl]
     ld   a,$01
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6c08_EntityAction_CrumblingFloor_Unk2:
@@ -2477,7 +2477,7 @@ call_02_6c1d_EntityAction_GextremeSportsElf_Unk0:
     ld   a,[wDA11_EntityXDistFromPlayer]
     cp   a,$40
     ld   a,$02
-    jp   c,call_02_72ac_SetEntityAction
+    jp   c,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6c4c_EntityAction_GextremeSportsElf_Unk2:
@@ -2489,7 +2489,7 @@ call_02_6c4c_EntityAction_GextremeSportsElf_Unk2:
     call call_00_28be_Entity_GetXVelocity
     cp   a,$28
     ld   a,$03
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6c64_EntityAction_GextremeSportsElf_Unk3:
@@ -2497,7 +2497,7 @@ call_02_6c64_EntityAction_GextremeSportsElf_Unk3:
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     call call_00_2766_Entity_ClampYToSpawnFloor
     ld   a,$00
-    jp   nc,call_02_72ac_SetEntityAction
+    jp   nc,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6c73_EntityAction_GextremeSportsElf_Unk4:
@@ -2525,9 +2525,9 @@ call_02_6c73_EntityAction_GextremeSportsElf_Unk4:
     ld   a,[hl]
     and  a
     ld   a,$00
-    jp   nz,call_02_72ac_SetEntityAction
+    jp   nz,call_02_72ac_Entity_SetAction
     ld   a,$05
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 .jr_00_6CAC:
     call call_00_251c_Entity_MoveXByFacingMomentum_BoundsChecked
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
@@ -2597,7 +2597,7 @@ call_02_6cdd_EntityAction_BirdProjectile_Update:
     ld   c,$20
     jp   nz,call_00_28dc_Entity_SetYVelocity
     ld   a,$01
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 .data_02_6d31:
     db   $00, $00, $56, $00, $46, $00        ;; 02:6d2f ????????
     db   $36, $00
@@ -2614,12 +2614,12 @@ call_02_6d3b_EntityAction_RockHard_Unk2:
     ld   a,SFX_LOUD_BANG
     call call_00_0ff5_QueueSFX
     ld   a,$03
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_6d49_EntityAction_RockHard_Unk5:
     call call_00_2a5d_Entity_CheckAnimationEnded
     ld   a,$06
-    jp   nz,call_02_72ac_SetEntityAction
+    jp   nz,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6d52_EntityAction_RockHard_Unk6:
@@ -2643,7 +2643,7 @@ call_02_6d6d_EntityAction_BrainOfOz_Unk0:
     inc  [hl]
     cp   a,$0A
     ld   a,$02
-    call z,call_02_72ac_SetEntityAction
+    call z,call_02_72ac_Entity_SetAction
     ld   a,$02
     ld   [wDCDA_BrainOfOzAndRezCounter],a
 .jr_00_6D82:
@@ -2676,7 +2676,7 @@ call_02_6d85_EntityAction_BrainOfOz_Unk2:
     ld   c,[hl]
     call call_00_290d_Entity_SetMiscTimer
     ld   a,$03
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 .data_02_6db7:
     db   TIMER_AMOUNT_BRAINOFOZ1, TIMER_AMOUNT_BRAINOFOZ2, TIMER_AMOUNT_BRAINOFOZ3
 
@@ -2690,11 +2690,11 @@ call_02_6dba_EntityAction_BrainOfOz_Unk3:
     ld   a,$01
     ld   [wDCD1_BrainOfOzFlag],a
     ld   a,$02
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 .jr_00_6DD2:
     and  a,$07
     ld   a,$04
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6dda_EntityAction_BrainOfOz_Unk4:
@@ -2722,7 +2722,7 @@ call_02_6dee_EntityAction_BrainOfOz_Unk7:
     dec  l
     ld   [hl],e
     ld   a,$08
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_6e09_EntityAction_BrainOfOz_Unk8:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
@@ -2796,7 +2796,7 @@ call_02_6e88_EntityAction_Cannon_Unk0:
     ld   c,TIMER_AMOUNT_CANNON
     call call_00_290d_Entity_SetMiscTimer
     ld   a,$01
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_6ea8_EntityAction_Cannon_Unk2:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
@@ -2804,7 +2804,7 @@ call_02_6ea8_EntityAction_Cannon_Unk2:
     call nz,call_00_0ff5_QueueSFX
     call call_00_2922_Entity_DecrementMiscTimer
     ld   a,$04
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6eb9_EntityAction_Cannon_Unk3:
@@ -2868,7 +2868,7 @@ call_02_6f0f_EntityAction_Rez_Unk0:
     inc  [hl]
     cp   a,$0A
     ld   a,$02
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6f29_EntityAction_Rez_Unk2:
@@ -2881,7 +2881,7 @@ call_02_6f29_EntityAction_Rez_Unk2:
 call_02_6f35_EntityAction_Rez_Unk3:
     call call_02_7002_Rez_unk2
     ld   a,$04
-    jp   nc,call_02_72ac_SetEntityAction
+    jp   nc,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6f3e_EntityAction_Rez_Unk5:
@@ -2893,7 +2893,7 @@ call_02_6f3e_EntityAction_Rez_Unk5:
     ld   c,TIMER_AMOUNT_0_FRAMES
     call call_00_290d_Entity_SetMiscTimer
     ld   a,$06
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 
 call_02_6f54_EntityAction_Rez_Unk6:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
@@ -2902,7 +2902,7 @@ call_02_6f54_EntityAction_Rez_Unk6:
     inc  [hl]
     cp   a,$0A
     ld   a,$08
-    jp   z,call_02_72ac_SetEntityAction
+    jp   z,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6f64_EntityAction_Rez_Unk8:
@@ -2930,7 +2930,7 @@ call_02_6f64_EntityAction_Rez_Unk8:
     ld   c,ENTITY_CHANNEL_Z_REZ_PROJECTILE
     call call_00_29ce_Entity_FindSlotById
     ld   a,$00
-    jp   nz,call_02_72ac_SetEntityAction
+    jp   nz,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6f9e_EntityAction_Rez_Unk9:
@@ -2939,7 +2939,7 @@ call_02_6f9e_EntityAction_Rez_Unk9:
 call_02_6fa1_EntityAction_Rez_Unk10:
     call call_02_7002_Rez_unk2
     ld   a,$0B
-    jp   nc,call_02_72ac_SetEntityAction
+    jp   nc,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_6faa_EntityAction_Rez_Unk11:
@@ -3015,7 +3015,7 @@ call_02_701a_EntityAction_Meteor_Update:
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     call call_00_2766_Entity_ClampYToSpawnFloor
     ld   a,$02
-    jp   nc,call_02_72ac_SetEntityAction
+    jp   nc,call_02_72ac_Entity_SetAction
     ret  
 
 call_02_702e_EntityAction_RezProjectile_Update:
@@ -3064,7 +3064,7 @@ call_02_702e_EntityAction_RezProjectile_Update:
     ld   a,SFX_SMALL_BANG
     call call_00_0ff5_QueueSFX
     ld   a,$01
-    jp   call_02_72ac_SetEntityAction
+    jp   call_02_72ac_Entity_SetAction
 .data_02_707f:
     db   $30, $28, $30, $28, $20, $30, $20, $30        ;; 02:707f ????????
     db   $40, $10, $40, $10, $50, $08, $50, $08        ;; 02:7087 ????????

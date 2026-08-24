@@ -529,7 +529,7 @@ call_00_0150_Init:
     call call_00_04fb_ResetAudioAndVideoState          ;; 00:03f4 $cd $fb $04
     farcall call_03_647c_InitPlayerPositionAndLevel
     call call_00_1056_BgMap_LoadFull                   ;; 00:0402 $cd $56 $10
-    farcall call_02_708f_InitEntitiesAndSpawnPlayer
+    farcall call_02_708f_Entities_InitAndSpawnAll
     call call_00_0513_Screen_PresentAndDrawEntities    ;; 00:0410 $cd $13 $05
     xor  A, A                                          ;; 00:0413 $af
     ld   [wDB6A_WarpFlags], A                          ;; 00:0414 $ea $6a $db
@@ -541,7 +541,7 @@ call_00_0150_Init:
     call call_00_0595_PlayMusicBasedOnLevel            ;; 00:0421 $cd $95 $05
     call call_00_04fb_ResetAudioAndVideoState          ;; 00:0424 $cd $fb $04
     call call_00_1056_BgMap_LoadFull                   ;; 00:0427 $cd $56 $10
-    farcall call_02_7142_RestoreEntityTable
+    farcall call_02_7142_Entities_RestoreIdTable
     farcall call_03_68d9_AssignAllEntityPalettes
     call call_00_0513_Screen_PresentAndDrawEntities    ;; 00:0440 $cd $13 $05
 .jp_00_0443_MainGameplayLoop:
@@ -579,7 +579,7 @@ call_00_0150_Init:
     call call_00_0fa2_SetupMusic                       ;; 00:049d $cd $a2 $0f
     ld   A, SFX_EMPTY                                  ;; 00:04a0 $3e $00
     call call_00_0fd7_PlaySFX                          ;; 00:04a2 $cd $d7 $0f
-    farcall call_02_7132_BackupEntityTable
+    farcall call_02_7132_Entities_BackupIdTable
     ld   A, [wDC1E_CurrentLevelID]                     ;; 00:04b0 $fa $1e $dc
     and  A, A                                          ;; 00:04b3 $a7
     ld   A, MENU_PAUSE_IN_GEX_CAVE                     ;; 00:04b4 $3e $0b
@@ -598,7 +598,7 @@ call_00_0150_Init:
 .jr_00_04d8_SkipPauseCheck:
     call call_00_05fd_Player_CheckEatFlyInput          ;; 00:04d8 $cd $fd $05
     call call_00_05c7_LevelTimer_Tick                  ;; 00:04db $cd $c7 $05
-    farcall call_02_7152_UpdateAllEntities
+    farcall call_02_7152_Entities_UpdateAll
     call call_00_11c8_BgMap_LoadDirtyRegions           ;; 00:04e9 $cd $c8 $11
     call call_00_0fc8_PlayQueuedSFX                    ;; 00:04ec $cd $c8 $0f
     call call_00_150f_Map_CheckEdgeTransition          ;; 00:04ef $cd $0f $15
@@ -2415,7 +2415,7 @@ call_00_0e3b_ResetVideoState:
     ld   [wDC72_AnimFrameCounter], A                   ;; 00:0e4b $ea $72 $dc
     ld   [wDBE3_Menu_AnimateFlag], A                   ;; 00:0e4e $ea $e3 $db
     ld   [wDD6B], A                                    ;; 00:0e51 $ea $6b $dd
-    farcall call_02_7123_ClearEntitySlotsExcludingPlayer
+    farcall call_02_7123_Entities_InitNPCSlots
     jp   call_00_0b92_WaitForInterrupt                 ;; 00:0e5f $c3 $92 $0b
 
 call_00_0e62_ClearShadowOamAndResetScroll:

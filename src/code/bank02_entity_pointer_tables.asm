@@ -1,4 +1,4 @@
-data_02_4000:
+data_02_4000_EntityActionJumpTable:
    dw   .data_02_40e4 ; ENTITY_GEX
    dw   .data_02_42c4 ; ENTITY_BONUS_COIN
    dw   .data_02_42cc ; ENTITY_FLY_COIN_SPAWN

@@ -118,7 +118,7 @@ wD700_EntityFlags:
 ; ENTITY_LIST_FLAG_ABSENT, and call_00_2b94_Entity_MarkNeverRespawn is what writes it.
 ;
 ; The low nibble (ENTITY_LIST_STATE_MASK) is a spawn action id: the spawner passes
-; it straight to call_02_72ac_SetEntityAction, so an entry can be brought back in a
+; it straight to call_02_72ac_Entity_SetAction, so an entry can be brought back in a
 ; different state from the one it was first placed in. That is how a pressed tv
 ; button stays pressed and a collected remote stays collected across a map change -
 ; see call_00_21f6_Entity_MarkTVButtonPressed and
@@ -152,9 +152,13 @@ wD80E_PlayerXPosition:
 wD810_PlayerYPosition:
     ds 2                                               ;; d810
     ds 14                                              ;; d811
+; The seven non-player slots. Two labels point into this area because the code
+; does not agree on where "not the player" starts: the slot clearers and the
+; sprite builder begin at wD820, while the id searches in bank00_entity_utils.asm
+; begin at wD840 and never look at slot 1
 wD820_EntityMemoryAfterPlayer:
     ds 32                                              ;; d820
-wD840_EntityMemoryAfterPlayer: ; why does some code use this and not wDB20? maybe wD820 is reserved for a particular entity
+wD840_EntityMemoryAfterPlayer:
     ds 32                                              ;; d840
     ds 32 
     ds 32 
@@ -712,9 +716,16 @@ wDBF9_XPositionInMap:
     ds 2                                               ;; dbf9
 wDBFB_YPositionInMap:
     ds 2                                               ;; dbfb
-wDBFD_XPositionRelated:
+wDBFD_BgMap_PrevColumn:
+; The camera position as it was on the previous frame, in blocks rather than
+; pixels - the two positions above shifted right three places.
+; call_02_7337_MapScroll_CheckHorizontal and call_02_7305_MapScroll_CheckVertical
+; read the old value, overwrite it with the new one and raise a MAP_SCROLL_* bit
+; when the two differ, which is the whole scroll-detection mechanism: the strip
+; loader never looks at pixels, only at whether the block coordinate ticked over.
+; gex2's wD6F1_BgMap_PrevColumn and wD6F3_BgMap_PrevRow
     ds 2                                               ;; dbfd
-wDBFF_YPositionRelated:
+wDBFF_BgMap_PrevRow:
     ds 2                                               ;; dbff
 
 ; ------------------------------------------------------------------
@@ -795,8 +806,8 @@ wDC1F_CurrentBgCollisionType:
 wDC20_BgMapLoadingFlags:
 ; Which edges the camera has uncovered since the last vblank, plus the busy bit.
 ; MAP_SCROLL_UP / MAP_SCROLL_DOWN ask for a row, MAP_SCROLL_LEFT /
-; MAP_SCROLL_RIGHT ask for a column; call_02_7305_CheckVerticalMapScroll and
-; call_02_7337_CheckHorizontalMapScroll raise them, call_00_11c8_BgMap_LoadDirtyRegions
+; MAP_SCROLL_RIGHT ask for a column; call_02_7305_MapScroll_CheckVertical and
+; call_02_7337_MapScroll_CheckHorizontal raise them, call_00_11c8_BgMap_LoadDirtyRegions
 ; services them and sets MAP_PENDING_VRAM_TRANSFER, and
 ; call_00_0b9f_VBlank_UpdateVRAM clears the whole byte after the
 ; vblank flush. Same bit assignments as gex2's wD6F9_BgMap_LoadingFlags
@@ -850,6 +861,11 @@ wDC29_SkipMapWindowUpdateFlag: ; if set to 1, don't update the player window map
     ds 1                                               ;; dc29
 
 wDC2A_MapBoundaryIndex:
+; Which of the map's boundary records is in force. The value
+; MAP_WRAP_BOUNDARY_INDEX means the map wraps around horizontally, and
+; call_02_7337_MapScroll_CheckHorizontal is the only code that cares: it turns the
+; step across the seam - MAP_WRAP_LAST_COLUMN to column 0, or back - into an
+; ordinary one-column scroll instead of a jump across the whole map
     ds 1                                               ;; dc2a
 
 ; ------------------------------------------------------------------
@@ -1074,7 +1090,7 @@ wDC83_PlayerIdleTimer:
 ; Entity collision related
 ; ------------------------------------------------------------------
 ; Horizontal movement the player did not ask for - moving platforms, walkways
-; and the like. Both are cleared at the top of call_02_7152_UpdateAllEntities and
+; and the like. Both are cleared at the top of call_02_7152_Entities_UpdateAll and
 ; both are summed into the answer from call_03_4b37_BgCollision_GetPredictedXDelta,
 ; so between them they are what gex2 keeps in wD75C_PlayerXDeltaExtra
 ; ------------------------------------------------------------------
@@ -1162,7 +1178,14 @@ wDC97_TileTypeAboveGexsHead:
 ; one tile row above his head, where the column scan starts
     ds 1                                               ;; dc97
 
-wDC98:
+wDC98_Player_DamageKnockbackX:
+; Which way Gex is thrown when something hurts him: $01 for right, $FF for left,
+; written by call_03_4cea_CollisionHandler_DamagePlayer as the opposite of the
+; direction the entity was on. call_02_7152_Entities_UpdateAll copies it into
+; wDC84_PlayerXDeltaExtra for as long as he is in one of the take-damage actions,
+; so the knockback is applied a pixel at a time rather than as one shove.
+;
+; Only the first of these three bytes has a known use
     ds 3                                               ;; dc98
 
 wDC9B_Player_SwimmingRelated3:
@@ -1193,6 +1216,14 @@ wDCA6_Player_SnowboardingRelated5:
     ds 1                                               ;; dca6
 
 wDCA7_Player_UpdateFlag:
+; Nonzero while Gex is under his own control. Clearing it makes
+; call_02_7152_Entities_UpdateAll skip the whole player half of the frame - the
+; tile pushes, the platform he is riding, and call_02_4f32_Player_UpdateMain - and
+; makes the collision and sprite passes in bank 3 leave him out too, while the
+; entity loop and the map window carry on as normal.
+;
+; That is exactly what a cutscene needs: call_00_1ea0_Cutscene_LoadAndRun clears
+; it to hand Gex to the script, and gives him back when the script ends
     ds 1                                               ;; dca7
 
 ; ------------------------------------------------------------------

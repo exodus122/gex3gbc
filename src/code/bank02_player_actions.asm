@@ -264,7 +264,7 @@ call_02_4989_PlayerAction_Unk19:
     ld   a,SFX_UNK0B
     call call_00_0ff5_QueueSFX
     ld   a,$14
-    call call_02_72ac_SetEntityAction
+    call call_02_72ac_Entity_SetAction
 
 call_02_49a8_PlayerAction_EnterIdle:
     ld   a,[wDC8E_InitialYVelocity]

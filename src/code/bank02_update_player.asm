@@ -304,7 +304,7 @@ call_02_4f32_Player_UpdateMain:
     ld   A, [HL]                                       ;; 02:4fd4 $7e
     ld   [HL], $ff                                     ;; 02:4fd5 $36 $ff
     cp   A, $ff                                        ;; 02:4fd7 $fe $ff
-    call NZ, call_02_72ac_SetEntityAction                              ;; 02:4fd9 $c4 $ac $72
+    call NZ, call_02_72ac_Entity_SetAction                              ;; 02:4fd9 $c4 $ac $72
     ld   HL, wD802_Player_ActionFunc                                     ;; 02:4fdc $21 $02 $d8
     ld   A, [HL+]                                      ;; 02:4fdf $2a
     ld   H, [HL]                                       ;; 02:4fe0 $66
@@ -320,7 +320,7 @@ call_02_4f32_Player_UpdateMain:
     call call_02_5047_CachePlayerTileCoords                                  ;; 02:4ff0 $cd $47 $50
     ld   HL, wD805_Player_ActionState                                     ;; 02:4ff3 $21 $05 $d8
     res  4, [HL]                                       ;; 02:4ff6 $cb $a6
-    jp   call_02_724d_Entity_UpdateSpriteFields                                  ;; 02:4ff8 $c3 $4d $72
+    jp   call_02_724d_Entity_TickAction                                  ;; 02:4ff8 $c3 $4d $72
 
 call_02_4ffb_DecTimerEveryCycle:
 ; Decrements a timer in [HL] every wDCA8_FlyPowerup_FrameCounter frames. Resets wDCA8_FlyPowerup_FrameCounter to 3C when it wraps.

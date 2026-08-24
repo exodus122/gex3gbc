@@ -119,7 +119,7 @@ call_03_4ce1_CollisionHandler_GenericEnemy:
     jp   NZ, call_03_5671_HandleEntityHit                                ;; 03:4ce7 $c2 $71 $56
 call_03_4cea_CollisionHandler_DamagePlayer:
 ; Reads player action ID. If certain actions (09, 29, 36) → skip. Otherwise, if not 45, calls HandleGenericHitResponse.
-; Then calculates player vs entity X difference, stores facing direction in wDC98.
+; Then calculates player vs entity X difference, stores facing direction in wDC98_Player_DamageKnockbackX.
 ; Depending on level ID (07, 08), sets a return bank (player action variant).
 ; Switches player action by calling into banked routine.
 ; This is basically a player transformation / state-change trigger.
@@ -143,7 +143,7 @@ call_03_4cea_CollisionHandler_DamagePlayer:
     jr   C, .jr_03_4d15                                ;; 03:4d11 $38 $02
     ld   A, $01                                        ;; 03:4d13 $3e $01
 .jr_03_4d15:
-    ld   [wDC98], A                                    ;; 03:4d15 $ea $98 $dc
+    ld   [wDC98_Player_DamageKnockbackX], A                                    ;; 03:4d15 $ea $98 $dc
     ld   A, [wDB6C_CurrentMapId]                                    ;; 03:4d18 $fa $6c $db
     cp   A, MAP_GEXTREME_SPORTS1                                        ;; 03:4d1b $fe $07
     ld   A, PLAYERACTION_SNOWBOARDING_TAKE_DAMAGE                                        ;; 03:4d1d $3e $29
@@ -194,7 +194,7 @@ call_03_4d44_CollisionHandler_DamagePlayerUnused:
     jr   c,.jr_00_4D78
     ld   a,$01
 .jr_00_4D78:
-    ld   [wDC98],a
+    ld   [wDC98_Player_DamageKnockbackX],a
     ld   a,[wDB6C_CurrentMapId]
     cp   a,MAP_GEXTREME_SPORTS1
     ld   a,PLAYERACTION_SNOWBOARDING_TAKE_DAMAGE
@@ -339,7 +339,7 @@ call_03_4e4b_CollisionHandler_IceSculpture:
     ld   C, A                                          ;; 03:4e63 $4f
     call call_00_2299_Entity_SetListState                                  ;; 03:4e64 $cd $99 $22
     pop  AF                                            ;; 03:4e67 $f1
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     pop  AF                                            ;; 03:4e73 $f1
     cp   A, $02                                        ;; 03:4e74 $fe $02
     ret  NZ                                            ;; 03:4e76 $c0
@@ -426,7 +426,7 @@ call_03_4e89_CollisionHandler_EvilSantaProjectile:
     ret                                                ;; 03:4ee9 $c9
 .jr_03_4eea:
     ld   A, $06                                        ;; 03:4eea $3e $06
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     jp   call_03_4cea_CollisionHandler_DamagePlayer                                   ;; 03:4ef7 $c3 $ea $4c
 .data_03_4efa:
     db   $00, $01, $02, $03, $04, $05, $06, $07        ;; 03:4efa ???.????
@@ -447,7 +447,7 @@ call_03_4f23_CollisionHandler_HolidayTV_Elf:
     cp   A, PLAYER_ATTACKED_ENTITY                                        ;; 03:4f27 $fe $01
     jp   NZ, call_03_4cea_CollisionHandler_DamagePlayer                               ;; 03:4f29 $c2 $ea $4c
     ld   A, $04                                        ;; 03:4f2c $3e $04
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     call call_00_230f_Entity_GetParameterIntoC                                  ;; 03:4f39 $cd $0f $23
     ld   B, $00                                        ;; 03:4f3c $06 $00
     ld   HL, wDCD5_ElfHealth1                                     ;; 03:4f3e $21 $d5 $dc
@@ -529,7 +529,7 @@ call_03_4fad_CollisionHandler_Hand:
     cp   a,$00
     ret  nz
     ld   a,$01
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ret  
     
 call_03_4fca_CollisionHandler_LostArk:
@@ -587,7 +587,7 @@ call_03_500d_CollisionHandler_Coffin:
     cp   a,PLAYER_ATTACKED_ENTITY
     ret  nz
     ld   a,$01
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ret  
    
 call_03_5028_CollisionHandler_Cactus:
@@ -622,7 +622,7 @@ call_03_5028_CollisionHandler_Cactus:
     cp   a,$28
     ret  nc
     ld   a,$05
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ret  
 
 call_03_5069_CollisionHandler_PlayingCard:
@@ -659,11 +659,11 @@ call_03_5085_CollisionHandler_HardHat:
     cp   a,$01
     jp   z,call_03_5671_HandleEntityHit
     ld   a,$02
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ret  
 .jr_00_50A8:
     ld   a,$01
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ret  
 
 call_03_50b6_CollisionHandler_AlienCultureTube:
@@ -721,7 +721,7 @@ call_03_50f4_CollisionHandler_OnSwitch2:
     ld   c,$01
     call call_00_2299_Entity_SetListState
     ld   a,$01
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     jp   call_00_22e0_Entity_IncrementTriggerFlag
     
 call_03_5116_CollisionHandler_Door:
@@ -755,7 +755,7 @@ call_03_5116_CollisionHandler_Door:
     ld   a,SFX_DOOR1
     call call_00_0ff5_QueueSFX
     ld   a,$01
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ret  
 
 call_03_5156_CollisionHandler_Door2:
@@ -786,7 +786,7 @@ call_03_5156_CollisionHandler_Door2:
     ld   a,SFX_DOOR1
     call call_00_0ff5_QueueSFX
     ld   a,$03
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ret  
     
 call_03_5196_CollisionHandler_Secbot:
@@ -802,7 +802,7 @@ call_03_5196_CollisionHandler_Secbot:
     cp   a,$00
     jp   nz,call_00_22ef_Entity_SetTriggerActive
     ld   a,$02
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ret  
     
 call_03_51b8_CollisionHandler_SailorToonGirl:
@@ -824,7 +824,7 @@ call_03_51b8_CollisionHandler_SailorToonGirl:
     ld   c,$02
     jp   z,call_00_2299_Entity_SetListState
     ld   a,$03
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ret  
 .jr_00_51E3:
     call call_00_22ef_Entity_SetTriggerActive
@@ -834,7 +834,7 @@ call_03_51b8_CollisionHandler_SailorToonGirl:
     call call_00_2958_Entity_SetFacingDirection
     call call_00_2c67_Particle_InitBurst
     ld   a,$07
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ret  
     
 call_03_5201_CollisionHandler_BigSilverRobot:
@@ -850,7 +850,7 @@ call_03_5201_CollisionHandler_BigSilverRobot:
     jr   z,.jr_00_5222
     call call_03_4cea_CollisionHandler_DamagePlayer
     ld   a,$02
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     jp   call_00_2410_Entity_FaceTowardsPlayer
 .jr_00_5222:
     call call_00_2410_Entity_FaceTowardsPlayer
@@ -979,7 +979,7 @@ call_03_52da_CollisionHandler_ChomperTV:
     cp   a,$03
     ret  z
     ld   a,$02
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ret  
     
 call_03_52fa_CollisionHandler_Bomb:
@@ -995,7 +995,7 @@ call_03_52fa_CollisionHandler_Bomb:
     cp   a,PLAYER_ATTACKED_ENTITY
     ret  nz
     ld   a,$03
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ret  
     
 call_03_531a_CollisionHandler_WaterTowerStand:
@@ -1029,7 +1029,7 @@ call_03_532f_CollisionHandler_GextremeSports_Elf:
     cp   a,PLAYER_ATTACKED_ENTITY
     jp   nz,call_03_4cea_CollisionHandler_DamagePlayer
     ld   a,$04
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     call call_00_230f_Entity_GetParameterIntoC
     ld   b,$00
     ld   hl,wDCD5_ElfHealth1
@@ -1095,7 +1095,7 @@ call_03_538e_CollisionHandler_Bell:
     ld   [wDCD2_FreestandingRemoteHitFlags],a
 .jr_00_53B0:
     ld   a,$01
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ld   c,$02
     jp   call_00_2299_Entity_SetListState
 
@@ -1118,7 +1118,7 @@ call_03_53c2_CollisionHandler_RockHard:
     and  a
     ret  nz
     ld   a,$01
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     jp   call_03_4cea_CollisionHandler_DamagePlayer
     
 call_03_53eb_CollisionHandler_Cannon:
@@ -1132,7 +1132,7 @@ call_03_53eb_CollisionHandler_Cannon:
     cp   a,PLAYER_ATTACKED_ENTITY
     ret  nz
     ld   a,$03
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ret  
     
 call_03_5406_CollisionHandler_BrainOfOz:
@@ -1197,7 +1197,7 @@ call_03_5406_CollisionHandler_BrainOfOz:
     cp   a,$07
     ret  z
     ld   a,$06
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ret  
     
 call_03_5469_CollisionHandler_BrainOfOzProjectile:
@@ -1235,7 +1235,7 @@ call_03_5483_CollisionHandler_Meteor:
 .jr_03_5497:
     call call_00_27cb_Entity_SetYToAboveCameraTop
     ld   a,$01
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ret                                          ;; 03:5482 $c9
     
 call_03_54a8_CollisionHandler_Rez:
@@ -1270,7 +1270,7 @@ call_03_54a8_CollisionHandler_Rez:
     ld   c,$09
 .jr_00_54E1:
     ld   a,c
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ret  
     
 call_03_54ee_CollisionHandler_RaStatueProjectile:
@@ -1279,7 +1279,7 @@ call_03_54ee_CollisionHandler_RaStatueProjectile:
     ret  nc
     call call_03_4cea_CollisionHandler_DamagePlayer
     ld   a,$00
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ret  
 
 call_03_54f9_InitializeEntityCooldownTimer: ; unreferenced function?
@@ -1626,7 +1626,7 @@ call_03_5671_HandleEntityHit:
     pop  AF                                            ;; 03:56a5 $f1
 .jr_03_56a6:
     and  A, $3f                                        ;; 03:56a6 $e6 $3f
-    farcall call_02_72ac_SetEntityAction
+    farcall call_02_72ac_Entity_SetAction
     ld   A, SFX_ENEMY_KILLED                                        ;; 03:56b3 $3e $10
     jp   call_00_0ff5_QueueSFX                                  ;; 03:56b5 $c3 $f5 $0f
 .jr_03_56b8:
