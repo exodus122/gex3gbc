@@ -404,7 +404,7 @@ call_00_3180_Level_MarkPressedTVButtons:
 .jr_00_31a3:
     push BC                                           ;; 00:31a3 $c5
     push BC                                           ;; 00:31a4 $c5
-    farcall call_01_4ab9_CountSetBitsInFlags
+    farcall call_01_4ab9_CountAllCollectedObjectives
     pop  BC                                           ;; 00:31b0 $c1
     ld   HL, .data_00_31cd_HubTVUnlockThresholds      ;; 00:31b1 $21 $cd $31
     add  HL, BC                                       ;; 00:31b4 $09

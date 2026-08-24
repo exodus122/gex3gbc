@@ -291,7 +291,7 @@ call_02_5a83_EntityAction_TVButton_unk4:
     bit  7, [HL]                                       ;; 02:5a91 $cb $7e
     jr   Z, .jr_02_5aaa                                ;; 02:5a93 $28 $15
     push HL                                            ;; 02:5a95 $e5
-    farcall call_01_4ae7_CountLevelsWithFlag4
+    farcall call_01_4ae7_CountLevelsWithBonusCoin
     pop  HL                                            ;; 02:5aa1 $e1
     ld   C, [HL]                                       ;; 02:5aa2 $4e
     res  7, C                                          ;; 02:5aa3 $cb $b9
@@ -300,7 +300,7 @@ call_02_5a83_EntityAction_TVButton_unk4:
     jr   .jr_02_5aca                                   ;; 02:5aa8 $18 $20
 .jr_02_5aaa:
     push HL                                            ;; 02:5aaa $e5
-    farcall call_01_4ab9_CountSetBitsInFlags
+    farcall call_01_4ab9_CountAllCollectedObjectives
     pop  HL                                            ;; 02:5ab6 $e1
     cp   A, [HL]                                       ;; 02:5ab7 $be
     jr   NC, .jr_02_5aca                               ;; 02:5ab8 $30 $10
@@ -350,7 +350,7 @@ call_02_5af8_EntityAction_TVRemote_unk4:
     bit  7, [HL]                                       ;; 02:5b06 $cb $7e
     jr   Z, .jr_02_5b1f                                ;; 02:5b08 $28 $15
     push HL                                            ;; 02:5b0a $e5
-    farcall call_01_4ae7_CountLevelsWithFlag4
+    farcall call_01_4ae7_CountLevelsWithBonusCoin
     pop  HL                                            ;; 02:5b16 $e1
     ld   C, [HL]                                       ;; 02:5b17 $4e
     res  7, C                                          ;; 02:5b18 $cb $b9
@@ -359,7 +359,7 @@ call_02_5af8_EntityAction_TVRemote_unk4:
     jr   .jr_02_5b6e                                   ;; 02:5b1d $18 $4f
 .jr_02_5b1f:
     push HL                                            ;; 02:5b1f $e5
-    farcall call_01_4ab9_CountSetBitsInFlags
+    farcall call_01_4ab9_CountAllCollectedObjectives
     pop  HL                                            ;; 02:5b2b $e1
     cp   A, [HL]                                       ;; 02:5b2c $be
     jr   NC, .jr_02_5b6e                               ;; 02:5b2d $30 $3f

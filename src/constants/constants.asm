@@ -488,7 +488,7 @@ DEF FLY_POWERUP_SECONDS          EQU $14
 DEF FRAMES_PER_SECOND            EQU $3c
 
 ; ------------------------------------------------------------------
-; Menu results. call_01_4000_MenuHandler_LoadAndProcess returns one of these in
+; Menu results. call_01_4000_MenuLoad returns one of these in
 ; A, and the outer game loop branches on it
 ; ------------------------------------------------------------------
 DEF MENU_RESULT_START_GAME       EQU $10 ; title screen: begin a new game
@@ -956,6 +956,108 @@ DEF MENU_WELL_DONE                        EQU $1B
 ; Password validity
 DEF PASSWORD_INVALID                      EQU $00
 DEF PASSWORD_VALID                        EQU $20
+
+; ==================================================================
+; The menu engine - code/bank01_menus.asm
+; ==================================================================
+; A menu is DATA. call_01_4000_MenuLoad takes a MENU_* id, looks up a record in
+; data_01_53c6_MenuTypeRecords, and runs the script that record points at; the script
+; is a list of commands that stage graphics and text into two WRAM planes, which are
+; then HDMA'd to VRAM in one go. Almost nothing about a particular screen is in code
+DEF MENUTYPE_RECORD_SIZE         EQU $10 ; stride in data_01_53c6_MenuTypeRecords
+DEF MENUTYPE_COPY_BYTES          EQU $0c ; how much of it is copied to wDB92; the last
+                                         ; four bytes of every record are dead
+; wDB94_MenuType_Flags - how the screen behaves once it is built
+DEF MENU_FLAG_GRID_INPUT         EQU $01 ; free 2-D cursor: the password keyboard
+DEF MENU_FLAG_HOLD               EQU $02 ; show for MENU_HOLD_FRAMES, ignore input
+DEF MENU_FLAG_HOLD_SKIPPABLE     EQU $04 ; ...for longer, but B cuts it short
+DEF MENU_FLAG_WAIT_RELEASE       EQU $08 ; return as soon as no button is held
+DEF MENU_FLAG_PAGED              EQU $10 ; left/right page through the totals screens
+DEF MENU_HOLD_FRAMES             EQU 300
+DEF MENU_HOLD_SKIPPABLE_FRAMES   EQU 720
+DEF MENU_TOTALS_PAGES            EQU 7
+DEF MENU_LCDC                    EQU $d3 ; what call_01_43f0_Menu_BuildScreen sets.
+                                         ; Byte +8 of every menu record is also $d3
+                                         ; and nothing reads it - see the file header
+
+; A script is a stream of commands, MENUSCRIPT_END terminated. One command is an
+; opcode byte then one or more MENUCMD_PARAM_BYTES parameter blocks
+DEF MENUSCRIPT_END               EQU $ff
+DEF MENUCMD_DESCRIPTOR_SIZE      EQU $08 ; stride in data_01_512e_MenuCmd_Descriptors
+DEF MENUCMD_DESCRIPTOR_COPY_BYTES EQU $06 ; ...of which six are used
+DEF MENUCMD_PARAM_BYTES          EQU $07
+DEF MENUCMD_HANDLER_BASE         EQU $e0 ; a source-pointer high byte at or above this
+                                         ; is a sub-handler index, not an address
+DEF MENUCMD_OPTION_ROW_MASK      EQU $0f ; wDBA9: which selectable row this command owns
+DEF MENUCMD_OPTION_ACTION_MASK   EQU $f0 ; ...and the MENU_RESULT_* it returns
+; wDBAA_MenuCmd_Flags. NOTE the bit assignments are not gex2's - last-block is $20
+; here where gex2 uses $80, and $80 means something else entirely
+DEF MENUCMD_FLAG_CLEAR_BUFFER    EQU $01 ; blank the staging tiles first
+DEF MENUCMD_FLAG_DRAW_TEXT       EQU $02 ; run the text renderer over this block
+DEF MENUCMD_FLAG_TRANSPOSED      EQU $04 ; fill down-then-across instead of across-then-down
+DEF MENUCMD_FLAG_LAST_BLOCK      EQU $20 ; no further parameter block follows
+DEF MENUCMD_FLAG_NO_TILE_FILL    EQU $40 ; skip the tilemap fill entirely
+DEF MENUCMD_FLAG_UPLOAD_TILES    EQU $80 ; HDMA the staging buffer to VRAM afterwards
+DEF MENUCMD_ATTR_TILESET_ROW     EQU $ff ; wDBA3: no constant attribute - pull a row from
+                                         ; the secondary tileset instead
+DEF MENU_CHAINED_NONE            EQU $ff ; wDBDD: no follow-on script
+
+; The two screen planes, wD400_ScreenDraw_TileIds and wD578_ScreenDraw_PaletteIds
+DEF SCREEN_ATTR_PLANE_OFFSET     EQU $178 ; distance between them, = SCREEN_TILEMAP_BYTES
+DEF SCREEN_FILL_STEP_ROWS        EQU $1401 ; D = 20 (one row down), E = 1 (one column across)
+DEF SCREEN_FILL_STEP_COLUMNS     EQU $0114 ; the same pair swapped, for a transposed fill
+
+; The selection cursor, rebuilt into shadow OAM every frame by call_01_4bb8_Menu_DrawCursor
+DEF MENU_CURSOR_NONE             EQU $ff ; wDBC7: this screen has no cursor
+DEF MENU_CURSOR_PASSWORD         EQU $01 ; ...or it is the password keyboard's
+DEF MENU_CURSOR_TILE             EQU $fc
+DEF MENU_CURSOR_BLINK_MASK       EQU $10 ; bit 4 of the frame counter, so 16 on 16 off
+DEF MENU_CURSOR_ATTR_BRIGHT      EQU $03
+DEF MENU_CURSOR_ATTR_DIM         EQU $02
+DEF SPRITE_RECORD_END            EQU $ff ; terminator in a menu sprite script
+
+; Text. Strings live in BANK_1C_TEXT and are copied into wDADD_MenuTextBuffer
+DEF TEXT_TERMINATOR              EQU $80 ; bit 7 ends a line; a following $00 ends the string
+DEF TEXT_SPACE                   EQU $20 ; the only place the wrapper may break a line
+DEF TEXT_AUTO_ALIGN              EQU $fe ; in pen X: centre. In pen Y: distribute vertically
+DEF ASCII_ZERO                   EQU $30
+DEF TEXT_GLYPH_COUNT             EQU $47 ; entries in a font's width table, $00..$46
+
+; Save-progress counting - wDC5C_ProgressFlags, one byte per level
+DEF OBJECTIVES_PER_LEVEL         EQU $04 ; the low nibble
+DEF MAIN_LEVEL_COUNT             EQU $07 ; levels before the bonus stages
+
+; ------------------------------------------------------------------
+; Passwords
+; ------------------------------------------------------------------
+; PASSWORD_CELL_COUNT cells of PASSWORD_BITS_PER_CELL bits each is
+; PASSWORD_TOTAL_BITS, which is exactly the size of the payload: four header bytes
+; and 58 progress bits. Nothing is wasted, which is why every bit walk counts to $5a
+DEF PASSWORD_CELL_COUNT          EQU $12 ; 18 boxes, a PASSWORD_GRID_* grid
+DEF PASSWORD_GRID_COLUMNS        EQU $06
+DEF PASSWORD_GRID_ROWS           EQU $03
+DEF PASSWORD_KEY_COLUMNS         EQU $10 ; the on-screen keyboard is 16 x 2
+DEF PASSWORD_KEY_ROWS            EQU $02
+DEF PASSWORD_BITS_PER_CELL       EQU $05
+DEF PASSWORD_TOTAL_BITS          EQU $5a ; PASSWORD_CELL_COUNT * PASSWORD_BITS_PER_CELL
+DEF PASSWORD_CELL_MASK_START     EQU $10 ; the destination walk runs $10 $08 $04 $02 $01
+DEF PASSWORD_KEY_BLANK           EQU $20 ; an empty cell. Shares its value with
+                                         ; PASSWORD_VALID by coincidence only
+DEF PASSWORD_PAYLOAD_BYTES       EQU $0c ; wDB72..wDB7D
+DEF PASSWORD_CHECKSUM_BYTES      EQU $0b ; ...all but the checksum byte itself
+DEF PASSWORD_CHECKSUM_XOR        EQU $b6
+DEF PASSWORD_CELL_TILES          EQU $04 ; each cell is 2x2 tiles
+DEF PASSWORD_CELL_TILE_BASE      EQU $98 ; VRAM tile id of cell 0
+DEF PASSWORD_GLYPH_BYTES         EQU $40 ; PASSWORD_CELL_TILES * TILE_SIZE_BYTES
+
+; Two addresses that look like bank 1 labels and are not. Menu string pointers are
+; dereferenced by call_00_0835_Text_LoadStringToBuffer with BANK_1C_TEXT paged in, so
+; these are bank $1C addresses that happen to fall inside bank 1's code
+DEF MENUTEXT_COUNTER_STRINGS     EQU $4e97
+DEF MENUTEXT_COLLECTED_SUFFIX    EQU $4ac3
+
+DEF REMOTE_MARKER_TILE_TAKEN     EQU $e4 ; the 2x2 mission marker on the select screen
+DEF REMOTE_MARKER_TILE_MISSING   EQU $e8
 
 ; Sound Effects
 DEF SFX_EMPTY                              EQU $00

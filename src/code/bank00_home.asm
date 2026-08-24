@@ -338,7 +338,7 @@ call_00_0150_Init:
     ldh  [rLCDC], A                                    ;; 00:0256 $e0 $40
     ei                                                 ;; 00:0258 $fb
     call call_00_0b92_WaitForInterrupt                 ;; 00:0259 $cd $92 $0b
-    farcall call_01_4f7e_SeedTileLookupTable
+    farcall call_01_4f7e_Password_ClearEntryGrid
 ; ==================================================================
 ; The outer game loop, $0267-$04FA.
 ;
@@ -358,7 +358,7 @@ call_00_0150_Init:
 ;                           built from that
 ;   .jp_00_0314_LoadNewMap  enter a level. WARP_NEW_LEVEL means the previous
 ;                           level chose where to go next, so
-;                           call_01_435e_DetermineNextMapId runs first. Then the
+;                           call_01_435e_MenuLoad_AfterLevel runs first. Then the
 ;                           map pointers, health, the level's menu and palette,
 ;                           the collectible and entity tables, the music and the
 ;                           level's cutscene
@@ -396,20 +396,20 @@ call_00_0150_Init:
     ld   A, SFX_EMPTY                                  ;; 00:026c $3e $00
     call call_00_0fd7_PlaySFX                          ;; 00:026e $cd $d7 $0f
     ld   A, MENU_OPENING_CREDITS_1                     ;; 00:0271 $3e $11
-    farcall call_01_4000_MenuHandler_LoadAndProcess
+    farcall call_01_4000_MenuLoad
     ld   A, MENU_OPENING_CREDITS_2                     ;; 00:027e $3e $12
-    farcall call_01_4000_MenuHandler_LoadAndProcess
+    farcall call_01_4000_MenuLoad
     ld   A, MENU_EIDOS_INTERACTIVE                     ;; 00:028b $3e $14
-    farcall call_01_4000_MenuHandler_LoadAndProcess
+    farcall call_01_4000_MenuLoad
     ld   A, MENU_OPENING_CRYSTAL_DYNAMICS              ;; 00:0298 $3e $13
-    farcall call_01_4000_MenuHandler_LoadAndProcess
+    farcall call_01_4000_MenuLoad
     ld   A, MENU_DAVID_A_PALMER                        ;; 00:02a5 $3e $0f
-    farcall call_01_4000_MenuHandler_LoadAndProcess
+    farcall call_01_4000_MenuLoad
 .jp_00_02b2_LoadMainMenu:
     ld   A, SONG_UNK01                                 ;; 00:02b2 $3e $01
     call call_00_0fa2_SetupMusic                       ;; 00:02b4 $cd $a2 $0f
     ld   A, MENU_TITLE_SCREEN                          ;; 00:02b7 $3e $00
-    farcall call_01_4000_MenuHandler_LoadAndProcess
+    farcall call_01_4000_MenuLoad
     cp   A, MENU_RESULT_PASSWORD_ACCEPTED              ;; 00:02c4 $fe $20
     jr   Z, .jr_00_02ed                                ;; 00:02c6 $28 $25
     cp   A, MENU_RESULT_START_GAME                     ;; 00:02c8 $fe $10
@@ -427,7 +427,7 @@ call_00_0150_Init:
     ld   [HL+], A                                      ;; 00:02de $22
     dec  B                                             ;; 00:02df $05
     jr   NZ, .jr_00_02de                               ;; 00:02e0 $20 $fc
-    farcall call_01_4f8c_BuildPasswordBitfieldAndChecksum
+    farcall call_01_4f8c_Password_BuildPayload
 .jr_00_02ed:
     xor  A, A                                          ;; 00:02ed $af
     ld   [wDB6C_CurrentMapId], A                       ;; 00:02ee $ea $6c $db
@@ -448,13 +448,13 @@ call_00_0150_Init:
     ld   A, [wDB6A_WarpFlags]                          ;; 00:0314 $fa $6a $db
     and  A, WARP_NEW_LEVEL                             ;; 00:0317 $e6 $10
     jr   Z, .jr_00_0326                                ;; 00:0319 $28 $0b
-    farcall call_01_435e_DetermineNextMapId
+    farcall call_01_435e_MenuLoad_AfterLevel
 .jr_00_0326:
     farcall call_03_6c89_MapData_LoadForCurrentMap
     ld   A, [wDC4F_PawCoinExtraHealth]                 ;; 00:0331 $fa $4f $dc
     add  A, PLAYER_BASE_HEALTH                         ;; 00:0334 $c6 $04
     ld   [wDC50_Player_Health], A                      ;; 00:0336 $ea $50 $dc
-    farcall call_01_432b_SetLevelMenuAndPalette
+    farcall call_01_432b_MenuLoad_MissionSelect
     call call_00_0e3b_ResetVideoState                  ;; 00:0344 $cd $3b $0e
     call call_00_2f85_CollectibleList_LoadForCurrentLevel       ;; 00:0347 $cd $85 $2f
     call call_00_2ff8_Level_InitEntitiesAndState       ;; 00:034a $cd $f8 $2f
@@ -565,7 +565,7 @@ call_00_0150_Init:
     ld   HL, wDC4E_LivesRemaining                      ;; 00:046d $21 $4e $dc
     dec  [HL]                                          ;; 00:0470 $35
     jp   NZ, .jp_00_0357_RespawnAfterDeath             ;; 00:0471 $c2 $57 $03
-    farcall call_01_42fd_LoadMenu_GameOver
+    farcall call_01_42fd_MenuLoad_GameOver
     cp   A, MENU_RESULT_CONTINUE                       ;; 00:047f $fe $40
     jp   Z, .jp_00_02cc_LoadMainMenuAfterGameOver      ;; 00:0481 $ca $cc $02
     jp   .jp_00_02b2_LoadMainMenu                      ;; 00:0484 $c3 $b2 $02
@@ -586,7 +586,7 @@ call_00_0150_Init:
     jr   Z, .jr_00_04ba_PausedInGexCave                ;; 00:04b6 $28 $02
     ld   A, MENU_PAUSE_IN_LEVEL                        ;; 00:04b8 $3e $0d
 .jr_00_04ba_PausedInGexCave:
-    farcall call_01_4000_MenuHandler_LoadAndProcess
+    farcall call_01_4000_MenuLoad
     cp   A, MENU_RESULT_CONFIRM_QUIT                   ;; 00:04c5 $fe $60
     jp   NZ, .jp_00_0421_Unpaused                      ;; 00:04c7 $c2 $21 $04
     ld   A, [wDC1E_CurrentLevelID]                     ;; 00:04ca $fa $1e $dc
@@ -1120,7 +1120,7 @@ call_00_0777_GetPointerFromTable:
 jp_00_0781_Screen_LoadFullscreenImage:
 ; Loads one fullscreen menu image - title screens, credits, the password grid -
 ; from the eight-byte record at wDBB1_ScreenDraw_HasPaletteIdMap that
-; call_01_47b1_LoadMenuConfigData filled in. Entered with a `jp`, and returns
+; call_01_47b1_MenuCmd_LoadFullscreenImage filled in. Entered with a `jp`, and returns
 ; through call_00_0f08_RestoreBank to whoever called that.
 ;
 ; The tile graphics go out through wC000_BgMapTileIds, which is free while a menu
@@ -1264,14 +1264,14 @@ call_00_0835_Text_LoadStringToBuffer:
 ; Copies one string out of BANK_1C_TEXT into wDADD_MenuTextBuffer and repoints
 ; the menu's string pointer at the copy.
 ;
-; wDBA7_MenuCommandBuffer2_Unk3 holds the address of a pointer table;
+; wDBA7_MenuCmd_SrcPtr holds the address of a pointer table;
 ; wDBF8_TextStringIndex picks the entry. The string runs until a byte with bit 7
 ; set - which is copied too, as the terminator - and a zero is written after it.
 ; The pointer pair is then overwritten with wDADD_MenuTextBuffer, so the menu
 ; renderer reads the WRAM copy from here on
     ld   A, BANK_1C_TEXT                               ;; 00:0835 $3e $1c
     call call_00_0eee_SwitchBank                       ;; 00:0837 $cd $ee $0e
-    ld   HL, wDBA7_MenuCommandBuffer2_Unk3             ;; 00:083a $21 $a7 $db
+    ld   HL, wDBA7_MenuCmd_SrcPtr             ;; 00:083a $21 $a7 $db
     ld   A, [HL+]                                      ;; 00:083d $2a
     ld   D, [HL]                                       ;; 00:083e $56
     ld   E, A                                          ;; 00:083f $5f
@@ -1294,9 +1294,9 @@ call_00_0835_Text_LoadStringToBuffer:
     ld   [DE], A                                       ;; 00:0856 $12
     ld   HL, wDADD_MenuTextBuffer                      ;; 00:0857 $21 $dd $da
     ld   A, L                                          ;; 00:085a $7d
-    ld   [wDBA7_MenuCommandBuffer2_Unk3], A            ;; 00:085b $ea $a7 $db
+    ld   [wDBA7_MenuCmd_SrcPtr], A            ;; 00:085b $ea $a7 $db
     ld   A, H                                          ;; 00:085e $7c
-    ld   [wDBA8_MenuCommandBuffer2_Unk4], A            ;; 00:085f $ea $a8 $db
+    ld   [wDBA8_MenuCmd_SrcPtrHi], A            ;; 00:085f $ea $a8 $db
     jp   call_00_0f08_RestoreBank                      ;; 00:0862 $c3 $08 $0f
 
 call_00_0865_Text_AppendStringToBuffer:
@@ -1741,7 +1741,7 @@ data_00_0b19_TvUnlockRequirements:
 ;
 ; Bit 7 changes what the low bits mean: set, they are a count of levels whose
 ; progress flag 4 is set, compared against
-; call_01_4ae7_CountLevelsWithFlag4; clear, they are a plain remote total
+; call_01_4ae7_CountLevelsWithBonusCoin; clear, they are a plain remote total
     db   $00, $01, $02, $05, $09, $0d, $12, $83        ;; 00:0b19 .???????
     db   $87, $0e, $13, $17                            ;; 00:0b21 .???????
 

@@ -502,7 +502,7 @@ wDB6A_WarpFlags:
 ; bit 6 (40) =
 ; bit 5 (20) = WARP_TIME_UP - the bonus stage countdown expired
 ; bit 4 (10) = WARP_NEW_LEVEL - leave the level (entering a tv, minibosses defeated,
-;              bonus tv remote collected). call_01_435e_DetermineNextMapId picks where to
+;              bonus tv remote collected). call_01_435e_MenuLoad_AfterLevel picks where to
 ; bit 3 (08) =
 ; bit 2 (04) = WARP_CHANGE_MAP - a door or a map edge chose another map in this level
 ; bit 1 (02) = WARP_DIED - the death animation finished
@@ -560,60 +560,64 @@ wDB91_PasswordCompletionFlag:
 ; Menu Type data
 wDB92_MenuTypeDataPointer:
     ds 2                                               ;; db92
-wDB94_MenuTypeData_Unk2:
+wDB94_MenuType_Flags:
     ds 1                                               ;; db94
-wDB95_MenuTypeData_Unk3:
+wDB95_MenuType_OptionCount:
     ds 1                                               ;; db95
-wDB96_MenuTypeData_Unk4:
+wDB96_MenuType_CursorBaseX:
     ds 1                                               ;; db96
-wDB97_MenuTypeData_Unk5:
+wDB97_MenuType_CursorBaseY:
     ds 1                                               ;; db97
-wDB98_MenuTypeData_Unk6:
+wDB98_MenuType_CursorStepX:
     ds 1                                               ;; db98
-wDB99_MenuTypeData_Unk7:
-    ds 2                                               ;; db99
-wDB9B_MenuTypeData_Unk9:
+wDB99_MenuType_CursorStepY:
+    ds 1                                               ;; db99
+wDB9A_MenuType_Lcdc:
+; $d3 in all 29 menu records and never read. call_01_43f0_Menu_BuildScreen sets
+; MENU_LCDC directly instead, so a menu cannot in fact choose its own LCDC
+    ds 1                                               ;; db9a
+wDB9B_MenuType_PaletteId:
     ds 1                                               ;; db9b
-wDB9C_MenuDynamicHandlerPtr:
+wDB9C_MenuType_OnSelectionChanged:
     ds 2                                               ;; db9c
 
-wDB9E_MenuCommandBuffer_Unk0:
+wDB9E_MenuCmd_WidthTiles:
     ds 1                                               ;; db9e
-wDB9F_MenuCommandBuffer_Unk1:
+wDB9F_MenuCmd_HeightTiles:
     ds 1                                               ;; db9f
-wDBA0_MenuCommandBuffer_Unk2:
+wDBA0_MenuCmd_DestTileX:
     ds 1                                               ;; dba0
-wDBA1_MenuCommandBuffer_Unk3:
+wDBA1_MenuCmd_DestTileY:
     ds 1                                               ;; dba1
-wDBA2_MenuCommandBuffer_Unk4:
+wDBA2_MenuCmd_FirstTileId:
     ds 1                                               ;; dba2
-wDBA3_MenuCommandBuffer_Unk5:
+wDBA3_MenuCmd_AttrByte:
     ds 1                                               ;; dba3
-wDBA4_MenuCommandBuffer2_Unk0:
+wDBA4_Text_PenX:
     ds 1                                               ;; dba4
-wDBA5_MenuCommandBuffer2_Unk1:
+wDBA5_Text_PenY:
     ds 1                                               ;; dba5
-wDBA6_MenuCommandBuffer2_Unk2:
+wDBA6_MenuCmd_Arg2:
     ds 1                                               ;; dba6
-wDBA7_MenuCommandBuffer2_Unk3:
+wDBA7_MenuCmd_SrcPtr:
     ds 1                                               ;; dba7
-wDBA8_MenuCommandBuffer2_Unk4:
+wDBA8_MenuCmd_SrcPtrHi:
     ds 1                                               ;; dba8
-wDBA9_MenuCommandBuffer2_Unk5:
+wDBA9_MenuCmd_OptionSlot:
     ds 1                                               ;; dba9
-wDBAA_MenuCommandBuffer2_Unk6:
+wDBAA_MenuCmd_Flags:
     ds 1                                               ;; dbaa
-wDBAB_MenuCommandBuffer3_Unk0:
+wDBAB_Font_GlyphBase:
     ds 2                                               ;; dbab
-wDBAD_MenuCommandBuffer3_Unk2:
+wDBAD_Font_WidthTable:
     ds 2                                               ;; dbad
-wDBAF_MenuCommandBuffer3_Unk4:
+wDBAF_Font_GlyphWidthCols:
     ds 1                                               ;; dbaf
-wDBB0_MenuCommandBuffer3_Unk5:
+wDBB0_Font_GlyphHeightPx:
     ds 1                                               ;; dbb0
 ; ------------------------------------------------------------------
 ; The 8-byte record that describes one fullscreen image, copied here by
-; call_01_47b1_LoadMenuConfigData and consumed by
+; call_01_47b1_MenuCmd_LoadFullscreenImage and consumed by
 ; jp_00_0781_Screen_LoadFullscreenImage. gex2's equivalent is the
 ; wD6A5_ScreenDraw_TileDataBank block behind
 ; call_00_07c3_Screen_LoadTilesAndTilemap
@@ -635,55 +639,91 @@ wDBB5_ScreenDraw_TileDataPtr:
 wDBB7_ScreenDraw_TileDataSize:
 ; in bytes. Anything past SCREEN_TILE_CHUNK_BYTES is uploaded as a second pass
     ds 2                                               ;; dbb7
-wDBB9_MenuUnknownPtr:
+wDBB9_MenuScript_Ptr:
     ds 2                                               ;; dbb9
-wDBBB:
+; ------------------------------------------------------------------
+; The text renderer's working state - code/bank01_menus.asm. Everything from here to
+; wDBC9 is written by call_01_4875_Text_Render and the routines under it, and none of
+; it survives a command
+; ------------------------------------------------------------------
+wDBBB_Text_DestPtr:
+; where the next glyph's pixels go inside wC000_BgMapTileIds
     ds 1                                               ;; dbbb
-wDBBC:
+wDBBC_Text_DestPtrHi:
     ds 1                                               ;; dbbc
-wDBBD:
+wDBBD_Text_GlyphPtr:
+; and where they are read from, inside the current font's bitmaps
     ds 1                                               ;; dbbd
-wDBBE:
+wDBBE_Text_GlyphPtrHi:
     ds 1                                               ;; dbbe
-wDBBF:
+; ------------------------------------------------------------------
+; The selection cursor's sprite record, in the exact format
+; call_01_4c45_Menu_BuildSpriteBlock reads out of ROM - which is why three entries of
+; data_01_5b61_SpriteScriptTable point HERE instead of at a table.
+; call_01_46d4_MenuCmd_DrawCursorSprite fills it in once when a script declares the
+; cursor, and call_01_4bb8_Menu_DrawCursor rewrites the position half every frame.
+; gex2's wD6B9 block, byte for byte
+; ------------------------------------------------------------------
+wDBBF_MenuCursor_OamSlot:
     ds 1                                               ;; dbbf
-wDBC0:
+wDBC0_MenuCursor_Y:
     ds 1                                               ;; dbc0
-wDBC1:
+wDBC1_MenuCursor_X:
     ds 1                                               ;; dbc1
-wDBC2:
+wDBC2_MenuCursor_Tile:
     ds 1                                               ;; dbc2
-wDBC3:
+wDBC3_MenuCursor_Attr:
     ds 1                                               ;; dbc3
-wDBC4:
+wDBC4_MenuCursor_WidthTiles:
     ds 1                                               ;; dbc4
-wDBC5:
+wDBC5_MenuCursor_HeightTiles:
     ds 1                                               ;; dbc5
-wDBC6:
+wDBC6_MenuCursor_RecordEnd:
+; SPRITE_RECORD_END - the record is one rectangle and stops here
     ds 1                                               ;; dbc6
-wDBC7:
+wDBC7_Menu_CursorSpriteId:
+; which cursor this screen uses: MENU_CURSOR_NONE, MENU_CURSOR_PASSWORD, or an
+; image id
     ds 1                                               ;; dbc7
-wDBC8:
+wDBC8_Text_ShiftCount:
+; 8 minus the pen's sub-tile column - how far left a glyph row has to be shifted so
+; it lands where the pen is
     ds 1                                               ;; dbc8
-wDBC9:
+wDBC9_Text_GlyphAdvance:
+; the current glyph's width, from the font's width table
     ds 1                                               ;; dbc9
-wDBCA:
+wDBCA_MenuCmd_Id:
+; the opcode call_01_446b_MenuScript_RunCommand is executing
     ds 1                                               ;; dbca
-wDBCB:
+wDBCB_Menu_OptionActions:
+; One byte per selectable row: the MENU_RESULT_* that row returns. Written by the
+; SCRIPT, through the option nibbles of wDBA9_MenuCmd_OptionSlot, and read back by
+; call_01_4000_MenuLoad when the player commits. Sixteen rows fit; no menu uses more
+; than a handful
     ds 16                                              ;; dbcb
-wDBDB:
+wDBDB_Menu_OamSlot:
+; running OAM slot for the menu sprite builders
     ds 1                                               ;; dbdb
-wDBDC:
+wDBDC_Menu_BlinkCounter:
+; ticked once per frame by the idle loop; MENU_CURSOR_BLINK_MASK of it is what makes
+; the password cursor flash
     ds 1                                               ;; dbdc
-wDBDD:
+wDBDD_Menu_ChainedScript:
+; a second script to run after this one, or MENU_CHAINED_NONE. Set by
+; call_01_47aa_MenuCmd_SetChainedScript, consumed by call_01_43f0_Menu_BuildScreen
     ds 1                                               ;; dbdd
-wDBDE:
+wDBDE_Menu_HideSpritesDelay:
+; frames until the sprite group below is erased again. Any button press cuts it to
+; its last frame
     ds 1                                               ;; dbde
-wDBDF:
+wDBDF_Menu_HideSpritesGroup:
+; which data_01_5b61_SpriteScriptTable entry that erase applies to
     ds 2                                               ;; dbdf
-wDBE1:
+wDBE1_Text_RequestedX:
+; pen X for the next line, or TEXT_AUTO_ALIGN to centre it
     ds 1                                               ;; dbe1
-wDBE2:
+wDBE2_Text_LineAdvance:
+; pixels between one line's pen Y and the next
     ds 1                                               ;; dbe2
 wDBE3_Menu_AnimateFlag: ; set to 1 when a menu with animates sprites is open
     ds 1                                               ;; dbe3
