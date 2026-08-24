@@ -456,8 +456,8 @@ call_00_0150_Init:
     ld   [wDC50_Player_Health], A                      ;; 00:0336 $ea $50 $dc
     farcall call_01_432b_SetLevelMenuAndPalette
     call call_00_0e3b_ResetVideoState                  ;; 00:0344 $cd $3b $0e
-    call call_00_2f85_LoadAndSortCollectibleData       ;; 00:0347 $cd $85 $2f
-    call call_00_2ff8_InitLevelEntitiesAndConfig       ;; 00:034a $cd $f8 $2f
+    call call_00_2f85_CollectibleList_LoadForCurrentLevel       ;; 00:0347 $cd $85 $2f
+    call call_00_2ff8_Level_InitEntitiesAndState       ;; 00:034a $cd $f8 $2f
     call call_00_0595_PlayMusicBasedOnLevel            ;; 00:034d $cd $95 $05
     call call_00_1ea0_Cutscene_LoadAndRun              ;; 00:0350 $cd $a0 $1e
     xor  A, A                                          ;; 00:0353 $af
@@ -478,8 +478,8 @@ call_00_0150_Init:
     ld   A, PLAYERACTION_SPAWN                         ;; 00:0380 $3e $00
     ld   [wDC78_PlayerPendingActionId], A              ;; 00:0382 $ea $78 $dc
     call call_00_0e3b_ResetVideoState                  ;; 00:0385 $cd $3b $0e
-    call call_00_2f85_LoadAndSortCollectibleData       ;; 00:0388 $cd $85 $2f
-    call call_00_2ff8_InitLevelEntitiesAndConfig       ;; 00:038b $cd $f8 $2f
+    call call_00_2f85_CollectibleList_LoadForCurrentLevel       ;; 00:0388 $cd $85 $2f
+    call call_00_2ff8_Level_InitEntitiesAndState       ;; 00:038b $cd $f8 $2f
 .jp_00_038e_LoadMap:
     farcall call_03_6c89_LoadMapDataPtrs
     ld   A, [wDC1E_CurrentLevelID]                     ;; 00:0399 $fa $1e $dc
@@ -602,7 +602,7 @@ call_00_0150_Init:
     call call_00_11c8_BgMap_LoadDirtyRegions           ;; 00:04e9 $cd $c8 $11
     call call_00_0fc8_PlayQueuedSFX                    ;; 00:04ec $cd $c8 $0f
     call call_00_150f_Map_CheckEdgeTransition          ;; 00:04ef $cd $0f $15
-    call call_00_35fa_WaitForLineThenSpawnEntity       ;; 00:04f2 $cd $fa $35
+    call call_00_35fa_EntitySpawn_SpawnUntilScanline       ;; 00:04f2 $cd $fa $35
     call call_00_08f8_StageNextGfxTransfer             ;; 00:04f5 $cd $f8 $08
     jp   .jp_00_0443_MainGameplayLoop                  ;; 00:04f8 $c3 $43 $04
 

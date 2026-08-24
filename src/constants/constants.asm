@@ -689,15 +689,15 @@ DEF ENTITY_FIELD_SPRITE_IDS_PTR             EQU $0B ; ptr to sprite data (in ent
 DEF ENTITY_FIELD_FACING_DIRECTION           EQU $0D
 DEF ENTITY_FIELD_XPOS                       EQU $0E
 DEF ENTITY_FIELD_YPOS                       EQU $10
-DEF ENTITY_FIELD_WIDTH                      EQU $12 ; set to [1] into data_00_3258
-DEF ENTITY_FIELD_HEIGHT                     EQU $13 ; set to [2] into data_00_3258
-DEF ENTITY_FIELD_COLLISION_TYPE             EQU $14 ; set to [3] into data_00_3258
+DEF ENTITY_FIELD_WIDTH                      EQU $12 ; set to [1] into data_00_3258_EntityAttributeTable
+DEF ENTITY_FIELD_HEIGHT                     EQU $13 ; set to [2] into data_00_3258_EntityAttributeTable
+DEF ENTITY_FIELD_COLLISION_TYPE             EQU $14 ; set to [3] into data_00_3258_EntityAttributeTable
 DEF ENTITY_FIELD_COOLDOWN_TIMER             EQU $15 ; defaults to 0, but might get set to $3c (same value as gex's cooldown timer)
 DEF ENTITY_FIELD_DAMAGE_STATE               EQU $16 ; stores current health or other damage states
 DEF ENTITY_FIELD_SPRITE_BANK                EQU $17
 DEF ENTITY_FIELD_UNK18                      EQU $18 ; seems unused
 DEF ENTITY_FIELD_MISC_FLAGS                 EQU $19 ; only used by moving platforms, skating elf health, and sec bot?
-                                                    ; initially set to data_00_3258[entity_id*8][5]
+                                                    ; initially set to data_00_3258_EntityAttributeTable[entity_id*8][5]
 DEF ENTITY_FIELD_MISC_TIMER                 EQU $1A ; timer which can be used for various purposes
 DEF ENTITY_FIELD_XVEL                       EQU $1B
 DEF ENTITY_FIELD_XVEL_RELATED               EQU $1C ; subpixel accumulator: the low nibble carries the
@@ -785,6 +785,60 @@ DEF ENTITY_LIST_STATE_MASK      EQU $0F ; the respawn action id
 ; What a defeated entity's list entry is left as when it drops a fly coin:
 ; still placed, and marked to come back as the coin rather than as itself
 DEF ENTITY_LIST_FLAGS_DEFEATED  EQU ENTITY_LIST_FLAG_PLACED | ENTITY_LIST_FLAG_FLY_COIN
+
+; ------------------------------------------------------------------
+; The level's entity list - code/bank00_entity_load.asm
+; ------------------------------------------------------------------
+; One $10-byte record per placed object, in a data bank named by
+; wDC16_EntityListBank / wDC17_EntityListBankOffset, terminated by ENTITY_LIST_END
+; in the id byte. The list index is 1-based, because index 0 is the cursor's
+; "nothing yet" value and wD700_EntityFlags reserves its own byte 0 to match
+DEF ENTITY_SPAWN_RECORD_SIZE     EQU $10
+DEF ENTITY_SPAWN_RECORD_ID       EQU $00 ; an ENTITY_* id, or ENTITY_LIST_END
+DEF ENTITY_SPAWN_RECORD_XPOS     EQU $01 ; 16-bit world X
+DEF ENTITY_SPAWN_RECORD_YPOS     EQU $03 ; 16-bit world Y
+DEF ENTITY_SPAWN_RECORD_BOUNDS   EQU $05 ; four 16-bit values: the room rectangle,
+                                         ; tested against the camera limits and then
+                                         ; copied into the slot's own bounds
+DEF ENTITY_SPAWN_RECORD_PARAM    EQU $0D ; a free byte; only the paw coins read it
+DEF ENTITY_SPAWN_RECORD_MAP_ID   EQU $0F ; which map of the level this object is on
+DEF ENTITY_LIST_END              EQU $FF
+DEF ENTITY_LIST_FIRST_INDEX      EQU $01
+DEF ENTITY_LIST_ACTION_MASK      EQU $0F ; low nibble of wD700_EntityFlags: the
+                                         ; action the entry spawns into
+DEF ENTITY_SPAWN_SCANLINE_LIMIT  EQU $80 ; keep spawning until rLY passes this
+DEF ENTITY_SLOT_INDEX_MASK       EQU $07 ; slot number out of a rotated slot address
+DEF ENTITY_BOUNDS_INDEX_MASK     EQU $70 ; and the same number scaled to the $10-byte
+                                         ; stride of wDA1C_EntityBoundingBoxXMax
+
+; The per-entity-type template applied to a slot when it spawns, eight bytes per
+; ENTITY_* id, in data_00_3258_EntityAttributeTable
+DEF ENTITY_ATTR_RECORD_SIZE      EQU $08
+DEF ENTITY_ATTR_IS_NPC           EQU $00 ; 0 for ENTITY_GEX, 1 for everything else
+DEF ENTITY_ATTR_WIDTH            EQU $01
+DEF ENTITY_ATTR_HEIGHT           EQU $02
+DEF ENTITY_ATTR_COLLISION_TYPE   EQU $03
+DEF ENTITY_ATTR_DAMAGE_STATE     EQU $04 ; health plus one; the spawn decrements it
+DEF ENTITY_ATTR_MISC_FLAGS       EQU $05 ; $00 in every record
+DEF ENTITY_ATTR_UNUSED           EQU $06 ; $FF in every record, never read
+DEF ENTITY_ATTR_DEFEAT_FLAGS     EQU $07 ; what happens when the entity dies
+DEF ENTITY_DEFEAT_FLAG_DROPS_COLLECTIBLE_BIT EQU 6 ; counts towards the level total
+DEF ENTITY_DEFEAT_FLAG_PARTICLES_BIT         EQU 7 ; spawn a particle burst
+DEF ENTITY_DEFEAT_FLAGS_NONE     EQU $FF ; clear the slot, drop nothing
+
+; ------------------------------------------------------------------
+; Level setup - code/bank00_level_init.asm
+; ------------------------------------------------------------------
+DEF COLLECTIBLE_RECORD_SIZE      EQU 3    ; grid X, grid Y, map id
+DEF COLLECTIBLE_LIST_END         EQU $FF
+DEF COLLECTIBLE_COLUMNS_ON_SCREEN EQU $0B ; eleven 16-pixel cells - one more than the
+                                          ; screen is wide, so the per-column counts
+                                          ; cover a collectible entering from the edge
+DEF TV_BUTTONS_PER_LEVEL         EQU 3
+DEF PROGRESS_BONUS_COIN_TAKEN_BIT EQU 4   ; bit of wDC5C_ProgressFlags[level]
+DEF ELF_HEALTH_MAX               EQU 2
+DEF BONUS_STAGE_SECONDS_GEXTREME EQU $3c
+DEF BONUS_STAGE_SECONDS_MARSUPIAL EQU $69
 
 ; Respawn action ids written into the low nibble from outside the entity, so that
 ; scenery the player has already dealt with comes back in the state it was left in
@@ -1298,6 +1352,23 @@ DEF OAM_CULL_Y                   EQU $F0
 ; The sprite hardware puts (0,0) off the top left of the screen
 DEF OAM_X_BIAS                   EQU $08
 DEF OAM_Y_BIAS                   EQU $10
+
+; ------------------------------------------------------------------
+; Gex's own OAM build - code/bank00_player_sprites.asm
+; ------------------------------------------------------------------
+; Gex is not drawn from bank 3's shape tables like everything else. His frames are
+; per-map lists of pieces in the graphics banks, and the four flip variants of the
+; build loop mirror a piece by negating its offset and then backing it off by its
+; own size, so the mirrored rectangle covers the same pixels as the unmirrored one
+DEF PLAYER_SPRITE_XFLIP_WIDTH    EQU $08 ; one OBJ wide
+DEF PLAYER_SPRITE_YFLIP_HEIGHT   EQU $30 ; three OBJs tall - Gex's frames are built
+                                         ; in columns of three 8x16 pieces
+DEF PLAYER_SPRITE_TILE_STRIDE    EQU 2   ; 8x16 mode, so tiles come in pairs
+DEF PLAYER_DAMAGE_FLASH_MASK     EQU $07 ; blink one frame in eight while hurt
+DEF PLAYER_FLY_OAM_TILE          EQU $32
+DEF PLAYER_FLY_OAM_ATTRIBUTES    EQU OAMF_BANK1
+DEF PLAYER_FLY_ORBIT_MASK        EQU $0F ; 16 steps in data_00_2f14_FlyOrbitOffsets
+DEF PLAYER_FLY_ORBIT_Y_BIAS      EQU $20
 
 ; Two bytes per slot in wDA9C_EntityScreenPos, so the slot base swaps down to an
 ; even index into it

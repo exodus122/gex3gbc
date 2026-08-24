@@ -70,22 +70,42 @@ wCFC0_BgMap_TempScratchColumnAttributes:
 ; Column strip, GBC attribute bytes
     ds 64                                              ;; cfc0
 
-wD000_CollectibleUnusedMemory: ; seems unused?
+; ------------------------------------------------------------------
+; The current level's collectibles, built once by
+; call_00_2f85_CollectibleList_LoadForCurrentLevel and read every frame by
+; call_03_615d_Collectible_BuildSprites.
+;
+; Positions are in 16x16 grid cells, not pixels, which is why 128 entries per level
+; is enough and why the draw multiplies by 16 with a `swap`. The three parallel
+; arrays are indexed together; the two lookup tables below them are indexed by camera
+; column instead, and exist so the draw never walks the list.
+;
+; gex2's equivalents are wC400_Collectible_GridX / wC500_Collectible_GridY /
+; wC600_Collectible_ScanStartByColumn / wC700_Collectible_ScanCountByColumn. gex3
+; adds the map id, because a gex3 level is many maps
+; ------------------------------------------------------------------
+wD000_CollectibleUnusedMemory:
+; Never written and never read - the load pass fills from wD080 up
     ds 128                                             ;; d000
-wD080_CollectibleMapNumbers: ; Collectible Map numbers
+wD080_Collectible_MapIds:
+; Which map of the level each collectible belongs to. The draw skips any entry whose
+; id is not wDB6C_CurrentMapId
     ds 128                                             ;; d080
-wD100_CollectibleXPositions:
+wD100_Collectible_GridX:
+; Grid column, ascending - the lists are authored sorted, which is what makes the
+; per-column index below correct. COLLECTIBLE_LIST_END marks the end
     ds 128                                             ;; d100
-wD180_CollectibleYPositions: ; Y coords are replaced by FF when collected
+wD180_Collectible_GridY:
+; Grid row. Set to COLLECTIBLE_TAKEN when picked up, which is also how a collected
+; item stays collected for the rest of the level
     ds 128
-wD200_CollectiblesOrderedByX:
-;Scans through wD100 (X table).
-; Collectibles are sorted by X coordinate.
-; Writes the indices (offsets back into wD100/wD180/wD000_CollectibleUnusedMemory) into wD200.
+wD200_Collectible_ScanStartByColumn:
+; For each of the 256 camera columns, the index of the first collectible at or beyond
+; it - a lower bound the draw starts scanning from
     ds 256                                             ;; d200
-wD300_CollectibleBucketLookupTable:
-; Groups collectibles into spatial buckets (~11 X units wide).
-; So wD300 = quick lookup of "which collectibles live in this horizontal slice."
+wD300_Collectible_ScanCountByColumn:
+; And how many entries from there fall within COLLECTIBLE_COLUMNS_ON_SCREEN. Zero
+; here means the draw returns immediately, which is the common case
     ds 256                                             ;; d300
 
 wD400_ScreenDraw_TileIds:
@@ -96,7 +116,7 @@ wD578_ScreenDraw_PaletteIds:
 wD700_EntityFlags:
 ; One byte per entry in the level's entity list - the persistent, per-list-entry
 ; state that survives an entity leaving its slot, and the thing that decides
-; whether call_00_3618_HandleEntitySpawn is allowed to place that entry at all.
+; whether call_00_3618_EntitySpawn_SpawnNextFromList is allowed to place that entry at all.
 ; Indexed by the 1-based list index, so wD700 itself is never a real entry.
 ;
 ; The byte is split in two. The high nibble is flags:
@@ -256,7 +276,7 @@ wDA1A_CameraPos_Bottom:
 ; from here. Unlike gex2, which stores one byte per bound in block units and
 ; multiplies by 32 on every read, gex3 stores all four as 16-bit pixel positions
 ; already scaled, by the spawn-record copy inside
-; call_00_3618_HandleEntitySpawn.
+; call_00_3618_EntitySpawn_SpawnNextFromList.
 ;
 ; Note the Y pair: larger Y is lower on the screen, so wDA20 - the one the "move
 ; down until you stop" helpers clamp against - is the FLOOR and therefore the
@@ -981,9 +1001,19 @@ wDC51_Player_CurrentFly:
 ; wD742_Player_CurrentFly does
     ds 1                                               ;; dc51
 
-wDC52_GexSpriteRelated:
+wDC52_Player_OamTileId:
+; The running tile number call_00_2ce2_Player_BuildSprites hands out to Gex's OBJs.
+; Zeroed at the top of the build and stepped by PLAYER_SPRITE_TILE_STRIDE per piece,
+; so a frame's pieces always take consecutive tile pairs out of the page
+; call_00_098f_CopyPlayerGfxToVRAM filled. A piece record does not carry a tile
+; number of its own
     ds 1                                               ;; dc52
-wDC53_GexSpriteRelated2:
+wDC53_Player_OamAttributes:
+; wD80D_PlayerFacingDirection OR wDC7A_PlayerClimbingOrSwimmingRelated, and it does
+; two jobs at once: it is OR'd into every one of Gex's OAM attribute bytes, and its
+; OAMB_XFLIP / OAMB_YFLIP bits choose which of the four mirrored copies of the draw
+; loop runs. Same bit, both meanings - the attribute flips the tile and the loop
+; moves the piece to where the flipped tile belongs
     ds 1                                               ;; dc53
 
 wDC54_CachedTileXCoord:

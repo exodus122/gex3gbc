@@ -2127,7 +2127,7 @@ call_00_2b8b_Entity_MarkDefeated:
 ;   set     call_00_2ba9_Entity_MarkRespawnAsFlyCoin - comes back as a coin
 ;
 ; Both are jumps, not calls, so this routine never returns on its own
-    call call_00_35e8_GetEntityCollisionFlags         ;; 00:2b8b $cd $e8 $35
+    call call_00_35e8_Entity_GetCollisionFlags        ;; 00:2b8b $cd $e8 $35
     bit  6, A                                         ;; 00:2b8e $cb $77
     jr   Z, call_00_2b94_Entity_MarkNeverRespawn      ;; 00:2b90 $28 $02
     jr   call_00_2ba9_Entity_MarkRespawnAsFlyCoin     ;; 00:2b92 $18 $15
@@ -2189,7 +2189,7 @@ call_00_2bbe_Entity_TurnIntoFlyCoin:
 ;
 ; The palette copy is why the coin looks right immediately rather than a frame
 ; late. gex2 has nothing like this - a defeated gex2 enemy simply ends
-    call call_00_35e8_GetEntityCollisionFlags         ;; 00:2bbe $cd $e8 $35
+    call call_00_35e8_Entity_GetCollisionFlags        ;; 00:2bbe $cd $e8 $35
     cp   A, $ff                                       ;; 00:2bc1 $fe $ff
     jr   Z, call_00_2b7a_Entity_DeactivateAndMarkNeverRespawn ;; 00:2bc3 $28 $b5
     bit  6, A                                         ;; 00:2bc5 $cb $77
@@ -2220,11 +2220,11 @@ call_00_2bbe_Entity_TurnIntoFlyCoin:
 
 call_00_2c09_Entity_SpawnGoalCounter:
 ; Adds 6 to the child-entity index in A and jumps into
-; call_00_3792_PrepareRelativeEntitySpawn, so the six SPAWN_CHILD_ENTITY_* slots
+; call_00_3792_EntitySpawn_SpawnChild, so the six SPAWN_CHILD_ENTITY_* slots
 ; below that offset stay available for ordinary projectiles
     add  A, $06                                       ;; 00:2c09 $c6 $06
     ld   C, A                                         ;; 00:2c0b $4f
-    jp   call_00_3792_PrepareRelativeEntitySpawn      ;; 00:2c0c $c3 $92 $37
+    jp   call_00_3792_EntitySpawn_SpawnChild          ;; 00:2c0c $c3 $92 $37
 
 call_00_2c0f_Entity_AssignPaletteId:
 ; wDAAE_EntityPaletteIds for this slot = C: which of the eight-byte palettes in
@@ -2371,3 +2371,34 @@ call_00_2c89_Particle_UpdateBurst:
     pop  AF                                           ;; 00:2cbc $f1
     and  A, A                                         ;; 00:2cbd $a7
     ret                                               ;; 00:2cbe $c9
+
+call_00_2cbf_Entity_LoadMapPalettes:
+; Loads the sixteen palette bytes this map uses for its entities into
+; wDD2A_EntityPalettes, from where call_03_687c_AssignEntityPalette hands them out.
+;
+; Two hops in BANK_7F_ENTITY_PALETTES: data_7f_4000 turns the map id into a palette
+; set id, and data_7f_4040 turns that into a pointer. The same data_7f_4000 lookup
+; starts call_00_2ce2_Player_BuildSprites, which goes to data_7f_403d instead - one
+; table of set ids, two tables of what a set contains.
+;
+; Called by bank 3's palette code on a level load, and again whenever the map's
+; palette needs re-applying. gex2's nearest equivalent is
+; call_0b_5f57_Entity_LoadGBCPalette, which loads one entity's palette on demand
+; rather than the map's whole set up front
+    ld   A, BANK_7F_ENTITY_PALETTES                   ;; 00:2cbf $3e $7f
+    call call_00_0eee_SwitchBank                      ;; 00:2cc1 $cd $ee $0e
+    ld   HL, wDB6C_CurrentMapId                       ;; 00:2cc4 $21 $6c $db
+    ld   E, [HL]                                      ;; 00:2cc7 $5e
+    ld   D, $00                                       ;; 00:2cc8 $16 $00
+    ld   HL, data_7f_4000                             ;; 00:2cca $21 $00 $40
+    add  HL, DE                                       ;; 00:2ccd $19
+    ld   E, [HL]                                      ;; 00:2cce $5e
+    ld   HL, data_7f_4040                             ;; 00:2ccf $21 $40 $40
+    add  HL, DE                                       ;; 00:2cd2 $19
+    ld   A, [HL+]                                     ;; 00:2cd3 $2a
+    ld   H, [HL]                                      ;; 00:2cd4 $66
+    ld   L, A                                         ;; 00:2cd5 $6f
+    ld   DE, wDD2A_EntityPalettes                     ;; 00:2cd6 $11 $2a $dd
+    ld   BC, $10                                      ;; 00:2cd9 $01 $10 $00
+    call call_00_076e_MemCopy                         ;; 00:2cdc $cd $6e $07
+    jp   call_00_0f08_RestoreBank                     ;; 00:2cdf $c3 $08 $0f

@@ -160,7 +160,7 @@ call_02_598f_EntityAction_FlyTV_SpawnFly:
     call call_00_2b10_Entity_FindDuplicateInstance
     pop  bc
     ld   c,b
-    call z,call_00_3792_PrepareRelativeEntitySpawn
+    call z,call_00_3792_EntitySpawn_SpawnChild
     ld   a,$03
     jp   call_02_72ac_Entity_SetAction
     
@@ -522,7 +522,7 @@ call_02_5c74_EntityAction_EvilSanta_PrepareThrow:
     call call_00_2a5d_Entity_CheckAnimationEnded                                  ;; 02:5c74 $cd $5d $2a
     ret  Z                                             ;; 02:5c77 $c8
     ld   C, SPAWN_CHILD_ENTITY_EVIL_SANTA_PROJECTILE                                        ;; 02:5c78 $0e $05
-    call call_00_3792_PrepareRelativeEntitySpawn                                  ;; 02:5c7a $cd $92 $37
+    call call_00_3792_EntitySpawn_SpawnChild                                  ;; 02:5c7a $cd $92 $37
     ld   A, $03                                        ;; 02:5c7d $3e $03
     jp   call_02_72ac_Entity_SetAction                                  ;; 02:5c7f $c3 $ac $72
 
@@ -877,7 +877,7 @@ call_02_5f01_EntityAction_SafariSam_Unk0:
 call_02_5f39_EntityAction_SafariSam_Unk2:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ld   c,SPAWN_CHILD_ENTITY_SAFARI_SAM_PROJECTILE
-    call nz,call_00_3792_PrepareRelativeEntitySpawn
+    call nz,call_00_3792_EntitySpawn_SpawnChild
     ret  
 
 call_02_5f42_EntityAction_SafariSam_Unk3:
@@ -918,7 +918,7 @@ call_02_5f78_EntityAction_GhostKnight_Unk1:
     ld   a,[hl]
     and  a,$0F
     ld   c,SPAWN_CHILD_ENTITY_GHOST_KNIGHT_PROJECTILE
-    jp   z,call_00_3792_PrepareRelativeEntitySpawn
+    jp   z,call_00_3792_EntitySpawn_SpawnChild
     ret  
 
 call_02_5f91_EntityAction_GhostKnight_Unk3:
@@ -1288,7 +1288,7 @@ call_02_62f9_EntityAction_Snake_Unk1:
     jr   z,.jr_00_630D
     ld   c,SPAWN_CHILD_ENTITY_SNAKE_LEFT_PROJECTILE
 .jr_00_630D:
-    call call_00_3792_PrepareRelativeEntitySpawn
+    call call_00_3792_EntitySpawn_SpawnChild
     ld   a,$02
     jp   call_02_72ac_Entity_SetAction
 
@@ -1849,7 +1849,7 @@ call_02_6746_EntityAction_Secbot_Unk0:
     ret  nz
     call call_00_2922_Entity_DecrementMiscTimer
     ld   c,SPAWN_CHILD_ENTITY_SECBOT_PROJECTILE
-    jp   nz,call_00_3792_PrepareRelativeEntitySpawn
+    jp   nz,call_00_3792_EntitySpawn_SpawnChild
     ret  
 
 call_02_6768_EntityAction_Secbot_Unk1:
@@ -1874,7 +1874,7 @@ call_02_6768_EntityAction_Secbot_Unk1:
     ret  z
     and  a,$3F
     ld   c,SPAWN_CHILD_ENTITY_SECBOT_PROJECTILE
-    jp   z,call_00_3792_PrepareRelativeEntitySpawn
+    jp   z,call_00_3792_EntitySpawn_SpawnChild
     ret  
 
 call_02_679b_EntityAction_SecbotProjectile_Update:
@@ -2091,7 +2091,7 @@ call_02_6928_EntityAction_Grenade_Unk2:
 call_02_693f_EntityAction_MadBomber_Unk2:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ld   c,SPAWN_CHILD_ENTITY_BOMB
-    call nz,call_00_3792_PrepareRelativeEntitySpawn
+    call nz,call_00_3792_EntitySpawn_SpawnChild
 call_02_6947_EntityAction_MadBomber_Unk0:
     ld   hl,wDCD0_MadBomberFlag
     ld   a,[hl]
@@ -2294,7 +2294,7 @@ call_02_6acd_EntityAction_Convict_Unk0:
 call_02_6ad4_EntityAction_Convict_Unk2:    
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ld   c,SPAWN_CHILD_ENTITY_CONVICT_PROJECTILE
-    jp   nz,call_00_3792_PrepareRelativeEntitySpawn
+    jp   nz,call_00_3792_EntitySpawn_SpawnChild
     ret  
 
 call_02_6add_EntityAction_ConvictProjectile_Update:
@@ -2552,7 +2552,7 @@ call_02_6cbb_EntityAction_Bird_Update:
     call call_00_2b10_Entity_FindDuplicateInstance
     ret  nz
     ld   c,SPAWN_CHILD_ENTITY_BIRD_PROJECTILE
-    jp   call_00_3792_PrepareRelativeEntitySpawn
+    jp   call_00_3792_EntitySpawn_SpawnChild
 
 call_02_6cdd_EntityAction_BirdProjectile_Update:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
@@ -2707,7 +2707,7 @@ call_02_6ddd_EntityAction_BrainOfOz_Unk5:
     ld   a,SFX_BRAIN_OF_OZ
     call call_00_0ff5_QueueSFX
     ld   c,SPAWN_CHILD_ENTITY_BRAIN_OF_OZ_PROJECTILE
-    jp   call_00_3792_PrepareRelativeEntitySpawn
+    jp   call_00_3792_EntitySpawn_SpawnChild
 
 call_02_6dee_EntityAction_BrainOfOz_Unk7:
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
@@ -2811,7 +2811,7 @@ call_02_6eb9_EntityAction_Cannon_Unk3:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ret  z
     ld   c,SPAWN_CHILD_ENTITY_CANNON_PROJECTILE
-    call call_00_3792_PrepareRelativeEntitySpawn
+    call call_00_3792_EntitySpawn_SpawnChild
     ld   a,SFX_CANNON
     jp   call_00_0ff5_QueueSFX
 
@@ -2846,7 +2846,7 @@ call_02_6ec7_EntityAction_CannonProjectile_Update:
     ld   a,SFX_SMALL_BANG
     call call_00_0ff5_QueueSFX
     ld   c,SPAWN_CHILD_ENTITY_CANNON_PROJECTILE_2
-    call call_00_3792_PrepareRelativeEntitySpawn
+    call call_00_3792_EntitySpawn_SpawnChild
     jp   call_00_2b7a_Entity_DeactivateAndMarkNeverRespawn
 
 call_02_6f07_EntityAction_CannonProjectile2_Update:
@@ -2923,9 +2923,9 @@ call_02_6f64_EntityAction_Rez_Unk8:
     ld   a,[wDCDA_BrainOfOzAndRezCounter]
     ld   c,SPAWN_CHILD_ENTITY_REZ_PROJECTILE
     and  a,$01
-    jp   z,call_00_3792_PrepareRelativeEntitySpawn
+    jp   z,call_00_3792_EntitySpawn_SpawnChild
     ld   c,SPAWN_CHILD_ENTITY_REZ_PROJECTILE_2
-    jp   call_00_3792_PrepareRelativeEntitySpawn
+    jp   call_00_3792_EntitySpawn_SpawnChild
 .jr_00_6F93:
     ld   c,ENTITY_CHANNEL_Z_REZ_PROJECTILE
     call call_00_29ce_Entity_FindSlotById

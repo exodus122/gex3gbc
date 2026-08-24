@@ -118,7 +118,7 @@ call_02_708f_Entities_InitAndSpawnAll:
 ; The third is the spawn loop. In a bonus stage it first plants
 ; SPAWN_CHILD_ENTITY_STAGE_TIMER and ticks it once by hand so the countdown is
 ; already drawn on the first frame. Then it resets the entity counter and calls
-; call_00_360c_SpawnEntityOnceImmediate until wDAB8_EntityCounter is back to 1,
+; call_00_360c_EntitySpawn_SpawnNext until wDAB8_EntityCounter is back to 1,
 ; which is the spawner's way of saying it has wrapped past the end of the level's
 ; entity list - so "spawn everything that fits" is written as "keep going until the
 ; counter comes back round".
@@ -170,7 +170,7 @@ call_02_708f_Entities_InitAndSpawnAll:
     xor  A, A                                         ;; 02:70f6 $af
     ld   [wDA00_CurrentEntityAddrLo], A               ;; 02:70f7 $ea $00 $da
     ld   C, SPAWN_CHILD_ENTITY_STAGE_TIMER            ;; 02:70fa $0e $19
-    call call_00_3792_PrepareRelativeEntitySpawn      ;; 02:70fc $cd $92 $37
+    call call_00_3792_EntitySpawn_SpawnChild      ;; 02:70fc $cd $92 $37
     ld   C, ENTITY_BONUS_STAGE_TIMER                  ;; 02:70ff $0e $1b
     call call_00_29ce_Entity_FindSlotById             ;; 02:7101 $cd $ce $29
     jr   NZ, .jr_02_7115                              ;; 02:7104 $20 $0f
@@ -178,9 +178,9 @@ call_02_708f_Entities_InitAndSpawnAll:
     ld   [wDA00_CurrentEntityAddrLo], A               ;; 02:7107 $ea $00 $da
     farcall call_02_5bb3_EntityAction_UpdateBonusStageTimer
 .jr_02_7115:
-    call call_00_3252_ResetEntityCounter              ;; 02:7115 $cd $52 $32
+    call call_00_3252_EntityList_RewindCursor              ;; 02:7115 $cd $52 $32
 .jr_02_7118:
-    call call_00_360c_SpawnEntityOnceImmediate        ;; 02:7118 $cd $0c $36
+    call call_00_360c_EntitySpawn_SpawnNext        ;; 02:7118 $cd $0c $36
     ld   A, [wDAB8_EntityCounter]                     ;; 02:711b $fa $b8 $da
     cp   A, $01                                       ;; 02:711e $fe $01
     jr   NZ, .jr_02_7118                              ;; 02:7120 $20 $f6

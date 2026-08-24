@@ -1,809 +1,131 @@
-call_00_2cbf_LoadEntityPalettes:
-    ld   A, BANK_7F_ENTITY_PALETTES                                        ;; 00:2cbf $3e $7f
-    call call_00_0eee_SwitchBank                                  ;; 00:2cc1 $cd $ee $0e
-    ld   HL, wDB6C_CurrentMapId                                     ;; 00:2cc4 $21 $6c $db
-    ld   E, [HL]                                       ;; 00:2cc7 $5e
-    ld   D, $00                                        ;; 00:2cc8 $16 $00
-    ld   HL, data_7f_4000                                     ;; 00:2cca $21 $00 $40
-    add  HL, DE                                        ;; 00:2ccd $19
-    ld   E, [HL]                                       ;; 00:2cce $5e
-    ld   HL, data_7f_4040                                     ;; 00:2ccf $21 $40 $40
-    add  HL, DE                                        ;; 00:2cd2 $19
-    ld   A, [HL+]                                      ;; 00:2cd3 $2a
-    ld   H, [HL]                                       ;; 00:2cd4 $66
-    ld   L, A                                          ;; 00:2cd5 $6f
-    ld   DE, wDD2A_EntityPalettes                                     ;; 00:2cd6 $11 $2a $dd
-    ld   BC, $10                                       ;; 00:2cd9 $01 $10 $00
-    call call_00_076e_MemCopy                                  ;; 00:2cdc $cd $6e $07
-    jp   call_00_0f08_RestoreBank                                  ;; 00:2cdf $c3 $08 $0f
+; ==================================================================
+; Bank 0. The spawner. One entity is placed per call, and there is no separate "is
+; this entity due yet" pass - walking the list IS the streaming system.
+;
+; Every level has a flat list of $10-byte records in a data bank (see the
+; ENTITY_SPAWN_RECORD_* constants). wDAB8_EntityCounter is a cursor into that list,
+; 1-based, and call_00_3618_EntitySpawn_SpawnNextFromList considers exactly one
+; record per call before returning. Most calls do nothing, and that is normal:
+;
+;   no free slot        all seven NPC slots are occupied
+;   list terminator     rewind the cursor and stop for this call
+;   flag already clear  the entry has been taken or defeated
+;   already placed      ENTITY_LIST_FLAG_PLACED is set
+;   wrong map           the record's map id is not the map on screen
+;   out of the room     the record's room rectangle is outside the camera limits
+;
+; A rejected entry is not retried immediately; the cursor has already moved on and it
+; comes back round on the next pass.
+;
+; Two tables decide what a placed entity becomes. The list record says WHERE it is -
+; position, room rectangle, map. data_00_3258_EntityAttributeTable says what its TYPE
+; is - size, collision type, health, and what it drops when it dies. Nothing about an
+; entity's behaviour is in the list; nothing about its placement is in the table.
+;
+; Three bases into one table
+; --------------------------
+; The attribute table is read at three different labels, one byte apart:
+;
+;   data_00_3258_EntityAttributeTable                 record base + 0
+;   data_00_3259_EntityAttributeTable_WidthBase       record base + 1
+;   data_00_325f_EntityAttributeTable_FlagsBase       record base + 7
+;
+; All three index by id * ENTITY_ATTR_RECORD_SIZE. A reader that wants field +N of
+; every record indexes from base + N and skips the arithmetic, which is why the
+; ENTITY_GEX row below is written as three separate `db` runs with the extra labels
+; between them, and why every later row looks shifted.
+;
+; Who calls what
+; --------------
+; call_00_35fa_EntitySpawn_SpawnUntilScanline and call_00_360c_EntitySpawn_SpawnNext
+; are bank wrappers - they page in the entity list bank, call the worker, and page
+; back. The first keeps calling until the raster passes
+; ENTITY_SPAWN_SCANLINE_LIMIT, which is the per-frame time budget; the second does
+; exactly one and is what the level-entry loop in bank 2 hammers until the cursor
+; wraps. call_00_3792_EntitySpawn_SpawnChild is the same kind of wrapper around
+; call_00_37a0_EntitySpawn_SpawnChildEntity.
+;
+; ------------------------------------------------------------------
+; Notes for anyone reading this next to gex2's bank0A_entity_load.asm
+; ------------------------------------------------------------------
+; Same design, one entity per call, driven off the same two tables, and the child
+; spawner is close to instruction-for-instruction. What differs:
+;
+;   the cursor       gex2 keeps a POINTER, wD336_CurrentEntityToLoadPtr, and a
+;                    separate wD338_EntityLoadingFlag as the list index. gex3 keeps
+;                    only wDAB8_EntityCounter and multiplies it out each time, which
+;                    is slower but survives a bank switch
+;   the room test    gex2 asks call_00_350c_Entity_CheckIfOnScreen whether the entry
+;                    is visible. gex3 compares the record's own room rectangle
+;                    against the camera's scroll limits, and checks a map id first -
+;                    because a gex3 level is many maps and gex2's is one
+;   the parameters   gex2's attribute record leads with a mask byte that scatters the
+;                    list entry's three free bytes into entity fields $18..$1F. gex3
+;                    has no such mechanism: its records carry one free byte at
+;                    ENTITY_SPAWN_RECORD_PARAM and only the paw coins read it. What
+;                    gex3 gained instead is the low nibble of wD700_EntityFlags,
+;                    which names the action the entry spawns into
+;   the list flags   gex2's flag byte is a three-value enum. gex3's is a bitfield,
+;                    so one entry can be present, placed, and marked-as-fly-coin at
+;                    once - see ENTITY_LIST_FLAG_* in constants.asm
+;   the entity data  gex2 INCBINs the level lists into this same file. gex3's live in
+;                    their own data banks, reached through wDC16_EntityListBank
+; ==================================================================
 
-call_00_2ce2_Entity_DrawGex:
-; This is a complex sprite/OAM population routine. It:
-; Sets wDAC2_PlayerGfx_TileCount=1 and combines the player’s facing direction with a state byte (wDC7A_PlayerClimbingOrSwimmingRelated) into wDC53_GexSpriteRelated2.
-; Switches banks to retrieve sprite graphics metadata based on the current level (wDB6C_CurrentMapId).
-; Computes the address of Gex’s sprite frame data (using offsets and increments).
-; Reads sprite tiles, positions, and attributes, adjusting for the player’s position 
-; relative to the map (wDBF9, wDBFB, wD80E, wD810).
-; Handles flipped and mirrored variants depending on direction bits (bits 5 and 6 in wDC53_GexSpriteRelated2).
-; Writes formatted sprite entries (X, Y, tile index, attributes) into a buffer at D9xx.
-; Optionally writes extra entries if a certain flag (wDC51_Player_CurrentFly) is set, using offsets from data_00_2f14.
-; Updates wDC6F_Oam_WriteOffset with the new buffer pointer and restores the previous ROM bank.
-; Usage:
-; Populates the hardware sprite list for Gex’s current animation frame, handling mirroring, flipping, 
-; and level-specific offsets.
-    ld   A, $01                                        ;; 00:2ce2 $3e $01
-    ld   [wDAC2_PlayerGfx_TileCount], A                                    ;; 00:2ce4 $ea $c2 $da
-    ld   A, [wD80D_PlayerFacingDirection]                                    ;; 00:2ce7 $fa $0d $d8
-    ld   HL, wDC7A_PlayerClimbingOrSwimmingRelated                                     ;; 00:2cea $21 $7a $dc
-    or   A, [HL]                                       ;; 00:2ced $b6
-    ld   [wDC53_GexSpriteRelated2], A                                    ;; 00:2cee $ea $53 $dc
-    ld   A, BANK_7F_ENTITY_PALETTES                                        ;; 00:2cf1 $3e $7f
-    call call_00_0eee_SwitchBank                                  ;; 00:2cf3 $cd $ee $0e
-    ld   HL, wDB6C_CurrentMapId                                     ;; 00:2cf6 $21 $6c $db
-    ld   E, [HL]                                       ;; 00:2cf9 $5e
-    ld   D, $00                                        ;; 00:2cfa $16 $00
-    ld   HL, data_7f_4000                                     ;; 00:2cfc $21 $00 $40
-    add  HL, DE                                        ;; 00:2cff $19
-    ld   E, [HL]                                       ;; 00:2d00 $5e
-    ld   HL, data_7f_403d                                     ;; 00:2d01 $21 $3d $40
-    add  HL, DE                                        ;; 00:2d04 $19
-    ld   A, [HL+]                                      ;; 00:2d05 $2a
-    ld   [wDABF_PlayerGfx_SrcBank], A                                    ;; 00:2d06 $ea $bf $da
-    ld   A, [HL+]                                      ;; 00:2d09 $2a
-    ld   H, [HL]                                       ;; 00:2d0a $66
-    ld   L, A                                          ;; 00:2d0b $6f
-    ld   A, [wD80A_Player_SpriteId]                                    ;; 00:2d0c $fa $0a $d8
-    ld   E, A                                          ;; 00:2d0f $5f
-    ld   D, $00                                        ;; 00:2d10 $16 $00
-    add  HL, DE                                        ;; 00:2d12 $19
-    add  HL, DE                                        ;; 00:2d13 $19
-    add  HL, DE                                        ;; 00:2d14 $19
-    ld   C, [HL]                                       ;; 00:2d15 $4e
-    inc  HL                                            ;; 00:2d16 $23
-    ld   A, [HL+]                                      ;; 00:2d17 $2a
-    ld   H, [HL]                                       ;; 00:2d18 $66
-    ld   L, A                                          ;; 00:2d19 $6f
-    push HL                                            ;; 00:2d1a $e5
-    ld   A, [wDABF_PlayerGfx_SrcBank]                                    ;; 00:2d1b $fa $bf $da
-    add  A, C                                          ;; 00:2d1e $81
-    ld   [wDABF_PlayerGfx_SrcBank], A                                    ;; 00:2d1f $ea $bf $da
-    call call_00_0f08_RestoreBank                                  ;; 00:2d22 $cd $08 $0f
-    ld   A, [wDABF_PlayerGfx_SrcBank]                                    ;; 00:2d25 $fa $bf $da
-    call call_00_0eee_SwitchBank                                  ;; 00:2d28 $cd $ee $0e
-    pop  HL                                            ;; 00:2d2b $e1
-    ld   A, [HL+]                                      ;; 00:2d2c $2a
-    ld   [wDAC2_PlayerGfx_TileCount], A                                    ;; 00:2d2d $ea $c2 $da
-    inc  HL                                            ;; 00:2d30 $23
-    inc  HL                                            ;; 00:2d31 $23
-    ld   A, [HL+]                                      ;; 00:2d32 $2a
-    ld   [wDAC0_PlayerGfx_SrcAddr], A                                    ;; 00:2d33 $ea $c0 $da
-    ld   A, [HL+]                                      ;; 00:2d36 $2a
-    ld   [wDAC0_PlayerGfx_SrcAddr+1], A                                    ;; 00:2d37 $ea $c1 $da
-    xor  A, A                                          ;; 00:2d3a $af
-    ld   [wDC52_GexSpriteRelated], A                                    ;; 00:2d3b $ea $52 $dc
-    ld   A, [wDC6F_Oam_WriteOffset]                                    ;; 00:2d3e $fa $6f $dc
-    ld   E, A                                          ;; 00:2d41 $5f
-    ld   D, $d9                                        ;; 00:2d42 $16 $d9
-    ld   A, [wDC53_GexSpriteRelated2]                                    ;; 00:2d44 $fa $53 $dc
-    bit  6, A                                          ;; 00:2d47 $cb $77
-    jp   NZ, .jp_00_2e0b                               ;; 00:2d49 $c2 $0b $2e
-    bit  5, A                                          ;; 00:2d4c $cb $6f
-    jp   NZ, .jp_00_2dac                               ;; 00:2d4e $c2 $ac $2d
-    ld   A, [wDBF9_XPositionInMap]                                    ;; 00:2d51 $fa $f9 $db
-    ld   C, A                                          ;; 00:2d54 $4f
-    ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2d55 $fa $0e $d8
-    sub  A, C                                          ;; 00:2d58 $91
-    add  A, $08                                        ;; 00:2d59 $c6 $08
-    ld   [wDC90_Player_ScreenX], A                                    ;; 00:2d5b $ea $90 $dc
-    ld   C, A                                          ;; 00:2d5e $4f
-    ld   A, [wDBFB_YPositionInMap]                                    ;; 00:2d5f $fa $fb $db
-    ld   B, A                                          ;; 00:2d62 $47
-    ld   A, [wD810_PlayerYPosition]                                    ;; 00:2d63 $fa $10 $d8
-    sub  A, B                                          ;; 00:2d66 $90
-    add  A, $10                                        ;; 00:2d67 $c6 $10
-    ld   [wDC91_Player_ScreenY], A                                    ;; 00:2d69 $ea $91 $dc
-    add  A, $10                                        ;; 00:2d6c $c6 $10
-    ld   B, A                                          ;; 00:2d6e $47
-    ld   A, [wDC88_CurrentEntity_UnkVerticalOffset]                                    ;; 00:2d6f $fa $88 $dc
-    add  A, B                                          ;; 00:2d72 $80
-    ld   B, A                                          ;; 00:2d73 $47
-    call call_00_2f00_PlayerIsDead                                  ;; 00:2d74 $cd $00 $2f
-    jr   NZ, .jr_00_2d87                               ;; 00:2d77 $20 $0e
-    ld   A, [wDC7E_Player_DamageCooldownTimer]                                    ;; 00:2d79 $fa $7e $dc
-    and  A, A                                          ;; 00:2d7c $a7
-    jr   Z, .jr_00_2d87                                ;; 00:2d7d $28 $08
-    ld   A, [wDC71_VBlankFrameCounter]                                    ;; 00:2d7f $fa $71 $dc
-    and  A, $07                                        ;; 00:2d82 $e6 $07
-    jp   NZ, .jp_00_2ece                               ;; 00:2d84 $c2 $ce $2e
-.jr_00_2d87:
-    ld   A, [wDAC2_PlayerGfx_TileCount]                                    ;; 00:2d87 $fa $c2 $da
-.jr_00_2d8a:
-    push AF                                            ;; 00:2d8a $f5
-    ld   A, [HL+]                                      ;; 00:2d8b $2a
-    add  A, B                                          ;; 00:2d8c $80
-    ld   [DE], A                                       ;; 00:2d8d $12
-    inc  E                                             ;; 00:2d8e $1c
-    ld   A, [HL+]                                      ;; 00:2d8f $2a
-    add  A, C                                          ;; 00:2d90 $81
-    ld   [DE], A                                       ;; 00:2d91 $12
-    inc  E                                             ;; 00:2d92 $1c
-    ld   A, [wDC52_GexSpriteRelated]                                    ;; 00:2d93 $fa $52 $dc
-    ld   [DE], A                                       ;; 00:2d96 $12
-    add  A, $02                                        ;; 00:2d97 $c6 $02
-    ld   [wDC52_GexSpriteRelated], A                                    ;; 00:2d99 $ea $52 $dc
-    inc  E                                             ;; 00:2d9c $1c
-    ld   A, [wDC53_GexSpriteRelated2]                                    ;; 00:2d9d $fa $53 $dc
-    or   A, [HL]                                       ;; 00:2da0 $b6
-    ld   [DE], A                                       ;; 00:2da1 $12
-    inc  E                                             ;; 00:2da2 $1c
-    inc  HL                                            ;; 00:2da3 $23
-    inc  HL                                            ;; 00:2da4 $23
-    pop  AF                                            ;; 00:2da5 $f1
-    dec  A                                             ;; 00:2da6 $3d
-    jr   NZ, .jr_00_2d8a                               ;; 00:2da7 $20 $e1
-    jp   .jp_00_2ece                                   ;; 00:2da9 $c3 $ce $2e
-.jp_00_2dac:
-    ld   A, [wDBF9_XPositionInMap]                                    ;; 00:2dac $fa $f9 $db
-    ld   C, A                                          ;; 00:2daf $4f
-    ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2db0 $fa $0e $d8
-    sub  A, C                                          ;; 00:2db3 $91
-    add  A, $08                                        ;; 00:2db4 $c6 $08
-    ld   [wDC90_Player_ScreenX], A                                    ;; 00:2db6 $ea $90 $dc
-    ld   C, A                                          ;; 00:2db9 $4f
-    ld   A, [wDBFB_YPositionInMap]                                    ;; 00:2dba $fa $fb $db
-    ld   B, A                                          ;; 00:2dbd $47
-    ld   A, [wD810_PlayerYPosition]                                    ;; 00:2dbe $fa $10 $d8
-    sub  A, B                                          ;; 00:2dc1 $90
-    add  A, $10                                        ;; 00:2dc2 $c6 $10
-    ld   [wDC91_Player_ScreenY], A                                    ;; 00:2dc4 $ea $91 $dc
-    add  A, $10                                        ;; 00:2dc7 $c6 $10
-    ld   B, A                                          ;; 00:2dc9 $47
-    ld   A, [wDC88_CurrentEntity_UnkVerticalOffset]                                    ;; 00:2dca $fa $88 $dc
-    add  A, B                                          ;; 00:2dcd $80
-    ld   B, A                                          ;; 00:2dce $47
-    call call_00_2f00_PlayerIsDead                                  ;; 00:2dcf $cd $00 $2f
-    jr   NZ, .jr_00_2de2                               ;; 00:2dd2 $20 $0e
-    ld   A, [wDC7E_Player_DamageCooldownTimer]                                    ;; 00:2dd4 $fa $7e $dc
-    and  A, A                                          ;; 00:2dd7 $a7
-    jr   Z, .jr_00_2de2                                ;; 00:2dd8 $28 $08
-    ld   A, [wDC71_VBlankFrameCounter]                                    ;; 00:2dda $fa $71 $dc
-    and  A, $07                                        ;; 00:2ddd $e6 $07
-    jp   NZ, .jp_00_2ece                               ;; 00:2ddf $c2 $ce $2e
-.jr_00_2de2:
-    ld   A, [wDAC2_PlayerGfx_TileCount]                                    ;; 00:2de2 $fa $c2 $da
-.jr_00_2de5:
-    push AF                                            ;; 00:2de5 $f5
-    ld   A, [HL+]                                      ;; 00:2de6 $2a
-    add  A, B                                          ;; 00:2de7 $80
-    ld   [DE], A                                       ;; 00:2de8 $12
-    inc  E                                             ;; 00:2de9 $1c
-    ld   A, [HL+]                                      ;; 00:2dea $2a
-    cpl                                                ;; 00:2deb $2f
-    inc  A                                             ;; 00:2dec $3c
-    sub  A, $08                                        ;; 00:2ded $d6 $08
-    add  A, C                                          ;; 00:2def $81
-    ld   [DE], A                                       ;; 00:2df0 $12
-    inc  E                                             ;; 00:2df1 $1c
-    ld   A, [wDC52_GexSpriteRelated]                                    ;; 00:2df2 $fa $52 $dc
-    ld   [DE], A                                       ;; 00:2df5 $12
-    add  A, $02                                        ;; 00:2df6 $c6 $02
-    ld   [wDC52_GexSpriteRelated], A                                    ;; 00:2df8 $ea $52 $dc
-    inc  E                                             ;; 00:2dfb $1c
-    ld   A, [wDC53_GexSpriteRelated2]                                    ;; 00:2dfc $fa $53 $dc
-    or   A, [HL]                                       ;; 00:2dff $b6
-    ld   [DE], A                                       ;; 00:2e00 $12
-    inc  E                                             ;; 00:2e01 $1c
-    inc  HL                                            ;; 00:2e02 $23
-    inc  HL                                            ;; 00:2e03 $23
-    pop  AF                                            ;; 00:2e04 $f1
-    dec  A                                             ;; 00:2e05 $3d
-    jr   NZ, .jr_00_2de5                               ;; 00:2e06 $20 $dd
-    jp   .jp_00_2ece                                   ;; 00:2e08 $c3 $ce $2e
-.jp_00_2e0b:
-    bit  5, A                                          ;; 00:2e0b $cb $6f
-    jp   NZ, .jp_00_2e6f                               ;; 00:2e0d $c2 $6f $2e
-    ld   A, [wDBF9_XPositionInMap]                                    ;; 00:2e10 $fa $f9 $db
-    ld   C, A                                          ;; 00:2e13 $4f
-    ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2e14 $fa $0e $d8
-    sub  A, C                                          ;; 00:2e17 $91
-    add  A, $08                                        ;; 00:2e18 $c6 $08
-    ld   [wDC90_Player_ScreenX], A                                    ;; 00:2e1a $ea $90 $dc
-    ld   C, A                                          ;; 00:2e1d $4f
-    ld   A, [wDBFB_YPositionInMap]                                    ;; 00:2e1e $fa $fb $db
-    ld   B, A                                          ;; 00:2e21 $47
-    ld   A, [wD810_PlayerYPosition]                                    ;; 00:2e22 $fa $10 $d8
-    sub  A, B                                          ;; 00:2e25 $90
-    add  A, $10                                        ;; 00:2e26 $c6 $10
-    ld   [wDC91_Player_ScreenY], A                                    ;; 00:2e28 $ea $91 $dc
-    add  A, $10                                        ;; 00:2e2b $c6 $10
-    ld   B, A                                          ;; 00:2e2d $47
-    ld   A, [wDC88_CurrentEntity_UnkVerticalOffset]                                    ;; 00:2e2e $fa $88 $dc
-    add  A, B                                          ;; 00:2e31 $80
-    ld   B, A                                          ;; 00:2e32 $47
-    call call_00_2f00_PlayerIsDead                                  ;; 00:2e33 $cd $00 $2f
-    jr   NZ, .jr_00_2e46                               ;; 00:2e36 $20 $0e
-    ld   A, [wDC7E_Player_DamageCooldownTimer]                                    ;; 00:2e38 $fa $7e $dc
-    and  A, A                                          ;; 00:2e3b $a7
-    jr   Z, .jr_00_2e46                                ;; 00:2e3c $28 $08
-    ld   A, [wDC71_VBlankFrameCounter]                                    ;; 00:2e3e $fa $71 $dc
-    and  A, $07                                        ;; 00:2e41 $e6 $07
-    jp   NZ, .jp_00_2ece                               ;; 00:2e43 $c2 $ce $2e
-.jr_00_2e46:
-    ld   A, [wDAC2_PlayerGfx_TileCount]                                    ;; 00:2e46 $fa $c2 $da
-.jr_00_2e49:
-    push AF                                            ;; 00:2e49 $f5
-    ld   A, [HL+]                                      ;; 00:2e4a $2a
-    cpl                                                ;; 00:2e4b $2f
-    inc  A                                             ;; 00:2e4c $3c
-    sub  A, $30                                        ;; 00:2e4d $d6 $30
-    add  A, B                                          ;; 00:2e4f $80
-    ld   [DE], A                                       ;; 00:2e50 $12
-    inc  E                                             ;; 00:2e51 $1c
-    ld   A, [HL+]                                      ;; 00:2e52 $2a
-    add  A, C                                          ;; 00:2e53 $81
-    ld   [DE], A                                       ;; 00:2e54 $12
-    inc  E                                             ;; 00:2e55 $1c
-    ld   A, [wDC52_GexSpriteRelated]                                    ;; 00:2e56 $fa $52 $dc
-    ld   [DE], A                                       ;; 00:2e59 $12
-    add  A, $02                                        ;; 00:2e5a $c6 $02
-    ld   [wDC52_GexSpriteRelated], A                                    ;; 00:2e5c $ea $52 $dc
-    inc  E                                             ;; 00:2e5f $1c
-    ld   A, [wDC53_GexSpriteRelated2]                                    ;; 00:2e60 $fa $53 $dc
-    or   A, [HL]                                       ;; 00:2e63 $b6
-    ld   [DE], A                                       ;; 00:2e64 $12
-    inc  E                                             ;; 00:2e65 $1c
-    inc  HL                                            ;; 00:2e66 $23
-    inc  HL                                            ;; 00:2e67 $23
-    pop  AF                                            ;; 00:2e68 $f1
-    dec  A                                             ;; 00:2e69 $3d
-    jr   NZ, .jr_00_2e49                               ;; 00:2e6a $20 $dd
-    jp   .jp_00_2ece                                   ;; 00:2e6c $c3 $ce $2e
-.jp_00_2e6f:
-    ld   A, [wDBF9_XPositionInMap]                                    ;; 00:2e6f $fa $f9 $db
-    ld   C, A                                          ;; 00:2e72 $4f
-    ld   A, [wD80E_PlayerXPosition]                                    ;; 00:2e73 $fa $0e $d8
-    sub  A, C                                          ;; 00:2e76 $91
-    add  A, $08                                        ;; 00:2e77 $c6 $08
-    ld   [wDC90_Player_ScreenX], A                                    ;; 00:2e79 $ea $90 $dc
-    ld   C, A                                          ;; 00:2e7c $4f
-    ld   A, [wDBFB_YPositionInMap]                                    ;; 00:2e7d $fa $fb $db
-    ld   B, A                                          ;; 00:2e80 $47
-    ld   A, [wD810_PlayerYPosition]                                    ;; 00:2e81 $fa $10 $d8
-    sub  A, B                                          ;; 00:2e84 $90
-    add  A, $10                                        ;; 00:2e85 $c6 $10
-    ld   [wDC91_Player_ScreenY], A                                    ;; 00:2e87 $ea $91 $dc
-    add  A, $10                                        ;; 00:2e8a $c6 $10
-    ld   B, A                                          ;; 00:2e8c $47
-    ld   A, [wDC88_CurrentEntity_UnkVerticalOffset]                                    ;; 00:2e8d $fa $88 $dc
-    add  A, B                                          ;; 00:2e90 $80
-    ld   B, A                                          ;; 00:2e91 $47
-    call call_00_2f00_PlayerIsDead                                  ;; 00:2e92 $cd $00 $2f
-    jr   NZ, .jr_00_2ea4                               ;; 00:2e95 $20 $0d
-    ld   A, [wDC7E_Player_DamageCooldownTimer]                                    ;; 00:2e97 $fa $7e $dc
-    and  A, A                                          ;; 00:2e9a $a7
-    jr   Z, .jr_00_2ea4                                ;; 00:2e9b $28 $07
-    ld   A, [wDC71_VBlankFrameCounter]                                    ;; 00:2e9d $fa $71 $dc
-    and  A, $07                                        ;; 00:2ea0 $e6 $07
-    jr   NZ, .jp_00_2ece                               ;; 00:2ea2 $20 $2a
-.jr_00_2ea4:
-    ld   A, [wDAC2_PlayerGfx_TileCount]                                    ;; 00:2ea4 $fa $c2 $da
-.jr_00_2ea7:
-    push AF                                            ;; 00:2ea7 $f5
-    ld   A, [HL+]                                      ;; 00:2ea8 $2a
-    cpl                                                ;; 00:2ea9 $2f
-    inc  A                                             ;; 00:2eaa $3c
-    sub  A, $30                                        ;; 00:2eab $d6 $30
-    add  A, B                                          ;; 00:2ead $80
-    ld   [DE], A                                       ;; 00:2eae $12
-    inc  E                                             ;; 00:2eaf $1c
-    ld   A, [HL+]                                      ;; 00:2eb0 $2a
-    cpl                                                ;; 00:2eb1 $2f
-    inc  A                                             ;; 00:2eb2 $3c
-    sub  A, $08                                        ;; 00:2eb3 $d6 $08
-    add  A, C                                          ;; 00:2eb5 $81
-    ld   [DE], A                                       ;; 00:2eb6 $12
-    inc  E                                             ;; 00:2eb7 $1c
-    ld   A, [wDC52_GexSpriteRelated]                                    ;; 00:2eb8 $fa $52 $dc
-    ld   [DE], A                                       ;; 00:2ebb $12
-    add  A, $02                                        ;; 00:2ebc $c6 $02
-    ld   [wDC52_GexSpriteRelated], A                                    ;; 00:2ebe $ea $52 $dc
-    inc  E                                             ;; 00:2ec1 $1c
-    ld   A, [wDC53_GexSpriteRelated2]                                    ;; 00:2ec2 $fa $53 $dc
-    or   A, [HL]                                       ;; 00:2ec5 $b6
-    ld   [DE], A                                       ;; 00:2ec6 $12
-    inc  E                                             ;; 00:2ec7 $1c
-    inc  HL                                            ;; 00:2ec8 $23
-    inc  HL                                            ;; 00:2ec9 $23
-    pop  AF                                            ;; 00:2eca $f1
-    dec  A                                             ;; 00:2ecb $3d
-    jr   NZ, .jr_00_2ea7                               ;; 00:2ecc $20 $d9
-.jp_00_2ece:
-    ld   A, [wDC51_Player_CurrentFly]                                    ;; 00:2ece $fa $51 $dc
-    and  A, A                                          ;; 00:2ed1 $a7
-    jr   Z, .jr_00_2ef9                                ;; 00:2ed2 $28 $25
-    ld   A, [wDC71_VBlankFrameCounter]                                    ;; 00:2ed4 $fa $71 $dc
-    rrca                                               ;; 00:2ed7 $0f
-    and  A, $0f                                        ;; 00:2ed8 $e6 $0f
-    add  A, A                                          ;; 00:2eda $87
-    ld   L, A                                          ;; 00:2edb $6f
-    ld   H, $00                                        ;; 00:2edc $26 $00
-    ld   BC, data_00_2f14                                     ;; 00:2ede $01 $14 $2f
-    add  HL, BC                                        ;; 00:2ee1 $09
-    ld   A, [wDC91_Player_ScreenY]                                    ;; 00:2ee2 $fa $91 $dc
-    add  A, [HL]                                       ;; 00:2ee5 $86
-    sub  A, $20                                        ;; 00:2ee6 $d6 $20
-    ld   [DE], A                                       ;; 00:2ee8 $12
-    inc  E                                             ;; 00:2ee9 $1c
-    inc  HL                                            ;; 00:2eea $23
-    ld   A, [wDC90_Player_ScreenX]                                    ;; 00:2eeb $fa $90 $dc
-    add  A, [HL]                                       ;; 00:2eee $86
-    ld   [DE], A                                       ;; 00:2eef $12
-    inc  E                                             ;; 00:2ef0 $1c
-    ld   A, $32                                        ;; 00:2ef1 $3e $32
-    ld   [DE], A                                       ;; 00:2ef3 $12
-    inc  E                                             ;; 00:2ef4 $1c
-    ld   A, $08                                        ;; 00:2ef5 $3e $08
-    ld   [DE], A                                       ;; 00:2ef7 $12
-    inc  E                                             ;; 00:2ef8 $1c
-.jr_00_2ef9:
-    ld   A, E                                          ;; 00:2ef9 $7b
-    ld   [wDC6F_Oam_WriteOffset], A                                    ;; 00:2efa $ea $6f $dc
-    jp   call_00_0f08_RestoreBank                                  ;; 00:2efd $c3 $08 $0f
+call_00_3252_EntityList_RewindCursor:
+; Points wDAB8_EntityCounter back at the first list entry. Called at level setup, and
+; again by the spawner itself whenever it walks off the end of the list, which is
+; what makes the walk cyclic rather than one-shot.
+;
+; Bank 2's level-entry loop uses the rewind as a signal: it calls
+; call_00_360c_EntitySpawn_SpawnNext over and over and stops when the counter is back
+; to ENTITY_LIST_FIRST_INDEX, so "spawn everything that fits" is written as "keep
+; going until the cursor comes round". gex2's
+; call_0a_4000_EntityList_LoadForCurrentLevel, which reloads a pointer instead
+    ld   A, ENTITY_LIST_FIRST_INDEX                   ;; 00:3252 $3e $01
+    ld   [wDAB8_EntityCounter], A                     ;; 00:3254 $ea $b8 $da
+    ret                                               ;; 00:3257 $c9
 
-call_00_2f00_PlayerIsDead:
-; Checks if the player is dead based on the current state flags.
-    push HL                                            ;; 00:2f00 $e5
-    push DE                                            ;; 00:2f01 $d5
-    push BC                                            ;; 00:2f02 $c5
-    farcall call_02_5541_Player_GetActionStates
-    pop  BC                                            ;; 00:2f0e $c1
-    pop  DE                                            ;; 00:2f0f $d1
-    pop  HL                                            ;; 00:2f10 $e1
-    and  A, PLAYER_STATE_DEAD_MASK                                        ;; 00:2f11 $e6 $08
-    ret                                                ;; 00:2f13 $c9
-
-data_00_2f14:
-    db   $00, $fe, $fe, $fc, $fc, $fe, $fc, $00        ;; 00:2f14 ????????
-    db   $fa, $02, $fc, $04, $fe, $02, $00, $04        ;; 00:2f1c ????????
-    db   $00, $02, $fe, $00, $fe, $fe, $fc, $fc        ;; 00:2f24 ????????
-    db   $fa, $fa, $fc, $f8, $fe, $fa, $00, $fc        ;; 00:2f2c ????????
-
-call_00_2f34_CountActiveEntities:
-; Count Enabled Entities
-; Behavior: Switches to the entity palette list bank, iterates through the list (step $0003), 
-; counts active entries (!= 0), switches back and iterates entity list comparing IDs against data_00_325F. 
-; Increments counter C for each Entity meeting bit-6 set criteria.
-; Purpose: Counts entities present for the current map.
-    ld   a,[wDC19_CollectibleListBank]
-    call call_00_0eee_SwitchBank
-    ld   hl,wDC1A_CollectibleListBankOffset
-    ldi  a,[hl]
-    ld   h,[hl]
-    ld   l,a
-    inc  hl
-    ld   de,$0003
-    ld   c,$FF
-.jr_00_2F46:
-    ld   a,[hl]
-    add  hl,de
-    inc  c
-    and  a
-    jr   nz,.jr_00_2F46
-    push bc
-    call call_00_0f08_RestoreBank
-    ld   a,[wDC16_EntityListBank]
-    call call_00_0eee_SwitchBank
-    ld   hl,wDC17_EntityListBankOffset
-    ldi  a,[hl]
-    ld   h,[hl]
-    ld   l,a
-    pop  bc
-.jr_00_2F5D:
-    ld   a,[hl]
-    cp   a,$FF
-    jr   z,.jr_00_2F7E
-    push hl
-    ld   l,a
-    ld   h,$00
-    add  hl,hl
-    add  hl,hl
-    add  hl,hl
-    ld   de,data_00_325F
-    add  hl,de
-    ld   a,[hl]
-    cp   a,$FF
-    jr   z,.jr_00_2F77
-    bit  6,a
-    jr   z,.jr_00_2F77
-    inc  c
-.jr_00_2F77:
-    pop  hl
-    ld   de,$0010
-    add  hl,de
-    jr   .jr_00_2F5D
-.jr_00_2F7E:
-    ld   a,c
-    push af
-    call call_00_0f08_RestoreBank
-    pop  af
-    ret  
-
-call_00_2f85_LoadAndSortCollectibleData:
-; Behavior: Clears collectible state tables (wD100_CollectibleXPositions–wD2FF), loads entries from the 
-; collectible list bank into working memory, sorts/organizes them (wD200_CollectiblesOrderedByX, wD300_CollectibleBucketLookupTable), 
-; then returns to original bank.
-; Purpose: Initializes and sorts collectible positions for the current level.
-    xor  A, A                                          ;; 00:2f85 $af
-    ld   [wDC68_CollectibleAmount], A                                    ;; 00:2f86 $ea $68 $dc
-    ld   A, [wDC19_CollectibleListBank]                                    ;; 00:2f89 $fa $19 $dc
-    call call_00_0eee_SwitchBank                                  ;; 00:2f8c $cd $ee $0e
-    ld   L, LOW(wD100_CollectibleXPositions)                                        ;; 00:2f8f $2e $00
-.jr_00_2f91:
-    ld   H, HIGH(wD100_CollectibleXPositions)                                        ;; 00:2f91 $26 $d1
-    ld   A, $ff                                        ;; 00:2f93 $3e $ff
-    bit  7, L                                          ;; 00:2f95 $cb $7d
-    jr   Z, .jr_00_2f9a                                ;; 00:2f97 $28 $01
-    xor  A, A                                          ;; 00:2f99 $af
-.jr_00_2f9a:
-    ld   [HL], A                                       ;; 00:2f9a $77
-    inc  H                                             ;; 00:2f9b $24
-    ld   [HL], $00                                     ;; 00:2f9c $36 $00
-    dec  H                                             ;; 00:2f9e $25
-    inc  L                                             ;; 00:2f9f $2c
-    jr   NZ, .jr_00_2f91                               ;; 00:2fa0 $20 $ef
-    ld   HL, wDC1A_CollectibleListBankOffset                                     ;; 00:2fa2 $21 $1a $dc
-    ld   A, [HL+]                                      ;; 00:2fa5 $2a
-    ld   H, [HL]                                       ;; 00:2fa6 $66
-    ld   L, A                                          ;; 00:2fa7 $6f
-    ld   E, LOW(wD100_CollectibleXPositions)                                        ;; 00:2fa8 $1e $00
-.jr_00_2faa:
-    ld   D, HIGH(wD100_CollectibleXPositions)                                        ;; 00:2faa $16 $d1
-    ld   A, [HL+]                                      ;; 00:2fac $2a
-    ld   [DE], A                                       ;; 00:2fad $12
-    set  7, E                                          ;; 00:2fae $cb $fb
-    ld   A, [HL+]                                      ;; 00:2fb0 $2a
-    ld   [DE], A                                       ;; 00:2fb1 $12
-    push AF                                            ;; 00:2fb2 $f5
-    ld   D, HIGH(wD000_CollectibleUnusedMemory)                                        ;; 00:2fb3 $16 $d0
-    ld   A, [HL+]                                      ;; 00:2fb5 $2a
-    ld   [DE], A                                       ;; 00:2fb6 $12
-    pop  AF                                            ;; 00:2fb7 $f1
-    res  7, E                                          ;; 00:2fb8 $cb $bb
-    inc  E                                             ;; 00:2fba $1c
-    and  A, A                                          ;; 00:2fbb $a7
-    jr   NZ, .jr_00_2faa                               ;; 00:2fbc $20 $ec
-    ld   DE, wD200_CollectiblesOrderedByX                                     ;; 00:2fbe $11 $00 $d2
-.jr_00_2fc1:
-    ld   HL, wD100_CollectibleXPositions                                     ;; 00:2fc1 $21 $00 $d1
-.jr_00_2fc4:
-    ld   A, [HL+]                                      ;; 00:2fc4 $2a
-    cp   A, $ff                                        ;; 00:2fc5 $fe $ff
-    jr   Z, .jr_00_2fcc                                ;; 00:2fc7 $28 $03
-    cp   A, E                                          ;; 00:2fc9 $bb
-    jr   C, .jr_00_2fc4                                ;; 00:2fca $38 $f8
-.jr_00_2fcc:
-    ld   A, L                                          ;; 00:2fcc $7d
-    dec  A                                             ;; 00:2fcd $3d
-    ld   [DE], A                                       ;; 00:2fce $12
-    inc  E                                             ;; 00:2fcf $1c
-    jr   NZ, .jr_00_2fc1                               ;; 00:2fd0 $20 $ef
-    ld   E, LOW(wD200_CollectiblesOrderedByX)                                        ;; 00:2fd2 $1e $00
-.jr_00_2fd4:
-    ld   D, HIGH(wD200_CollectiblesOrderedByX)                                        ;; 00:2fd4 $16 $d2
-    ld   A, [DE]                                       ;; 00:2fd6 $1a
-    ld   L, A                                          ;; 00:2fd7 $6f
-    ld   H, HIGH(wD100_CollectibleXPositions)                                        ;; 00:2fd8 $26 $d1
-    ld   B, $00                                        ;; 00:2fda $06 $00
-    ld   C, $ff                                        ;; 00:2fdc $0e $ff
-    ld   A, E                                          ;; 00:2fde $7b
-    add  A, $0b                                        ;; 00:2fdf $c6 $0b
-    jr   C, .jr_00_2fe4                                ;; 00:2fe1 $38 $01
-    ld   C, A                                          ;; 00:2fe3 $4f
-.jr_00_2fe4:
-    inc  B                                             ;; 00:2fe4 $04
-    ld   A, [HL+]                                      ;; 00:2fe5 $2a
-    cp   A, $ff                                        ;; 00:2fe6 $fe $ff
-    jr   Z, .jr_00_2fed                                ;; 00:2fe8 $28 $03
-    cp   A, C                                          ;; 00:2fea $b9
-    jr   C, .jr_00_2fe4                                ;; 00:2feb $38 $f7
-.jr_00_2fed:
-    ld   D, HIGH(wD300_CollectibleBucketLookupTable)                                        ;; 00:2fed $16 $d3
-    ld   A, B                                          ;; 00:2fef $78
-    dec  A                                             ;; 00:2ff0 $3d
-    ld   [DE], A                                       ;; 00:2ff1 $12
-    inc  E                                             ;; 00:2ff2 $1c
-    jr   NZ, .jr_00_2fd4                               ;; 00:2ff3 $20 $df
-    jp   call_00_0f08_RestoreBank                                  ;; 00:2ff5 $c3 $08 $0f
-
-call_00_2ff8_InitLevelEntitiesAndConfig:
-; Initialize Level State
-; Behavior: Switches to the entity list bank, resets wDAB8_EntityCounter counter, clears a large block 
-; of level state variables (wDCC5_BloodCoolerCounter–wDCDA_BrainOfOzAndRezCounter), copies level-specific configuration tables 
-; (.data_00_30ba and .data_00_317a) into RAM, sets default timers (wDCD5_ElfHealth1–wDCD9_ElfHealth5), adjusts 
-; special-case values for level 07/08, and calls setup routines 3180, 31d9, 320d, and 3252.
-; Purpose: Sets up all entity, collectible, and configuration state for a new level.
-    ld   A, [wDC16_EntityListBank]                                    ;; 00:2ff8 $fa $16 $dc
-    call call_00_0eee_SwitchBank                                  ;; 00:2ffb $cd $ee $0e
-    call call_00_3252_ResetEntityCounter                                  ;; 00:2ffe $cd $52 $32
-    ld   HL, wDC17_EntityListBankOffset                                     ;; 00:3001 $21 $17 $dc
-    ld   A, [HL+]                                      ;; 00:3004 $2a
-    ld   H, [HL]                                       ;; 00:3005 $66
-    ld   L, A                                          ;; 00:3006 $6f
-    ld   A, [HL]                                       ;; 00:3007 $7e
-    cp   A, $ff                                        ;; 00:3008 $fe $ff
-    jr   Z, .jr_00_3021                                ;; 00:300a $28 $15
-.jr_00_300c:
-    push HL                                            ;; 00:300c $e5
-    ld   HL, wDAB8_EntityCounter                                     ;; 00:300d $21 $b8 $da
-    ld   A, [HL]                                       ;; 00:3010 $7e
-    inc  [HL]                                          ;; 00:3011 $34
-    ld   L, A                                          ;; 00:3012 $6f
-    ld   H, HIGH(wD700_EntityFlags)                                        ;; 00:3013 $26 $d7
-    ld   [HL], ENTITY_LIST_FLAG_PRESENT                                     ;; 00:3015 $36 $80
-    pop  HL                                            ;; 00:3017 $e1
-    ld   DE, $10                                       ;; 00:3018 $11 $10 $00
-    add  HL, DE                                        ;; 00:301b $19
-    ld   A, [HL]                                       ;; 00:301c $7e
-    cp   A, $ff                                        ;; 00:301d $fe $ff
-    jr   NZ, .jr_00_300c                               ;; 00:301f $20 $eb
-.jr_00_3021:
-    xor  A, A                                          ;; 00:3021 $af
-    ld   [wDCC5_BloodCoolerCounter], A                                    ;; 00:3022 $ea $c5 $dc
-    ld   [wDCC3_IceSculptureCounter], A                                    ;; 00:3025 $ea $c3 $dc
-    ld   [wDCC6_LostArkCounter], A                                    ;; 00:3028 $ea $c6 $dc
-    ld   [wDCC7_RaStaffCounter], A                                    ;; 00:302b $ea $c7 $dc
-    ld   [wDCC8_ElfCounter], A                                    ;; 00:302e $ea $c8 $dc
-    ld   [wDCC9_AlienCultureTubeCounter], A                                    ;; 00:3031 $ea $c9 $dc
-    ld   [wDCCA_StrayCatCounter], A                                    ;; 00:3034 $ea $ca $dc
-    ld   [wDCCB_MechCounter], A                                    ;; 00:3037 $ea $cb $dc
-    ld   [wDCCC_BellCounter], A                                    ;; 00:303a $ea $cc $dc
-    ld   [wDCCD_ConvictCounter], A                                    ;; 00:303d $ea $cd $dc
-    ld   [wDCCE_BombCounter], A                                    ;; 00:3040 $ea $ce $dc
-    ld   [wDCCF_PlayingCardCounter], A                                    ;; 00:3043 $ea $cf $dc
-    ld   [wDCD0_MadBomberFlag], A                                    ;; 00:3046 $ea $d0 $dc
-    ld   [wDCD1_BrainOfOzFlag], A                                    ;; 00:3049 $ea $d1 $dc
-    ld   [wDCD2_FreestandingRemoteHitFlags], A                                    ;; 00:304c $ea $d2 $dc
-    ld   [wDCDA_BrainOfOzAndRezCounter], A                                    ;; 00:304f $ea $da $dc
-    ld   HL, wDC1E_CurrentLevelID                                     ;; 00:3052 $21 $1e $dc
-    ld   L, [HL]                                       ;; 00:3055 $6e
-    ld   H, $00                                        ;; 00:3056 $26 $00
-    add  HL, HL                                        ;; 00:3058 $29
-    add  HL, HL                                        ;; 00:3059 $29
-    add  HL, HL                                        ;; 00:305a $29
-    add  HL, HL                                        ;; 00:305b $29
-    ld   DE, .data_00_30ba_LevelTriggerInitialData                                     ;; 00:305c $11 $ba $30
-    add  HL, DE                                        ;; 00:305f $19
-    ld   DE, wDCB1_LevelTriggerBuffer                                     ;; 00:3060 $11 $b1 $dc
-    ld   BC, $10                                       ;; 00:3063 $01 $10 $00
-    call call_00_076e_MemCopy                                  ;; 00:3066 $cd $6e $07
-    ld   HL, .data_00_317a_ElevatorEntityInitialData                                     ;; 00:3069 $21 $7a $31
-    ld   DE, wDCE2_ElevatorEntityUnkData                                     ;; 00:306c $11 $e2 $dc
-    ld   BC, $06                                       ;; 00:306f $01 $06 $00
-    call call_00_076e_MemCopy                                  ;; 00:3072 $cd $6e $07
-    ld   A, $02                                        ;; 00:3075 $3e $02
-    ld   [wDCD5_ElfHealth1], A                                    ;; 00:3077 $ea $d5 $dc
-    ld   [wDCD6_ElfHealth2], A                                    ;; 00:307a $ea $d6 $dc
-    ld   [wDCD7_ElfHealth3], A                                    ;; 00:307d $ea $d7 $dc
-    ld   [wDCD8_ElfHealth4], A                                    ;; 00:3080 $ea $d8 $dc
-    ld   [wDCD9_ElfHealth5], A                                    ;; 00:3083 $ea $d9 $dc
-    ld   HL, wDB6D_InBonusStage                                     ;; 00:3086 $21 $6d $db
-    ld   [HL], $00                                     ;; 00:3089 $36 $00
-    ld   A, [wDC1E_CurrentLevelID]                                    ;; 00:308b $fa $1e $dc
-    cp   A, LEVEL_GEXTREME_SPORTS                                        ;; 00:308e $fe $07
-    jr   Z, .jr_00_3096_InBonusStage                                ;; 00:3090 $28 $04
-    cp   A, LEVEL_MARSUPIAL_MADNESS                                        ;; 00:3092 $fe $08
-    jr   NZ, .jr_00_30ab                               ;; 00:3094 $20 $15
-.jr_00_3096_InBonusStage:
-    ld   [HL], $01                                     ;; 00:3096 $36 $01
-    ld   A, [wDC1E_CurrentLevelID]                                    ;; 00:3098 $fa $1e $dc
-    cp   A, LEVEL_GEXTREME_SPORTS                                        ;; 00:309b $fe $07
-    ld   A, $3c                                        ;; 00:309d $3e $3c
-    jr   Z, .jr_00_30a3                                ;; 00:309f $28 $02
-    ld   A, $69                                        ;; 00:30a1 $3e $69
-.jr_00_30a3:
-    ld   [wDB6E_LevelTimer_SecondsRemaining], A                                    ;; 00:30a3 $ea $6e $db
-    ld   A, $3c                                        ;; 00:30a6 $3e $3c
-    ld   [wDB6F_LevelTimer_FrameCounter], A                                    ;; 00:30a8 $ea $6f $db
-.jr_00_30ab:
-    call call_00_3180_MarkInitialLevelEntities                                  ;; 00:30ab $cd $80 $31
-    call call_00_31d9_CheckAndClearBonusCoinEntityFlags                                  ;; 00:30ae $cd $d9 $31
-    call call_00_320d_CheckAndClearPawCoinEntityFlags                                  ;; 00:30b1 $cd $0d $32
-    call call_00_3252_ResetEntityCounter                                  ;; 00:30b4 $cd $52 $32
-    jp   call_00_0f08_RestoreBank                                  ;; 00:30b7 $c3 $08 $0f
-.data_00_30ba_LevelTriggerInitialData:
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:30ba ........
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:30c2 ........
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:30ca ........
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:30d2 ........
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:30da ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:30e2 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:30ea ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:30f2 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:30fa ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:3102 ????????
-    db   $00, $01, $00, $00, $01, $00, $00, $00        ;; 00:310a ???????? ; anime channel
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:3112 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:311a ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:3122 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:312a ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:3132 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:313a ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:3142 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:314a ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:3152 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:315a ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:3162 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:316a ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:3172 ????????
-.data_00_317a_ElevatorEntityInitialData:
-    db   $98, $02, $58, $01, $d8, $01                  ;; 00:317a ......
-
-call_00_3180_MarkInitialLevelEntities:
-; Mark Starting Entities for Level
-; Behavior: If level number ≠ 0, looks up a bitmask table (.data_00_31c1+level) and, 
-; for each bit set, calls FindAndMarkEntityInList. For level 0, performs a banked 
-; call comparison loop using call_01_4ab9_CountSetBitsInFlags and thresholds in .data_00_31cd.
-; Purpose: Ensures certain entities are flagged or activated when the level begins.
-    ld   A, [wDC1E_CurrentLevelID]                                    ;; 00:3180 $fa $1e $dc
-    and  A, A                                          ;; 00:3183 $a7
-    jr   Z, .jr_00_31a0                                ;; 00:3184 $28 $1a
-    ld   L, A                                          ;; 00:3186 $6f
-    ld   H, $00                                        ;; 00:3187 $26 $00
-    ld   DE, .data_00_31c1                                     ;; 00:3189 $11 $c1 $31
-    add  HL, DE                                        ;; 00:318c $19
-    ld   B, [HL]                                       ;; 00:318d $46
-    ld   C, $01                                        ;; 00:318e $0e $01
-.jr_00_3190:
-    push BC                                            ;; 00:3190 $c5
-    bit  0, B                                          ;; 00:3191 $cb $40
-    call NZ, call_00_21f6_Entity_MarkTVButtonPressed                              ;; 00:3193 $c4 $f6 $21
-    pop  BC                                            ;; 00:3196 $c1
-    rr   B                                             ;; 00:3197 $cb $18
-    inc  C                                             ;; 00:3199 $0c
-    ld   A, C                                          ;; 00:319a $79
-    cp   A, $04                                        ;; 00:319b $fe $04
-    jr   C, .jr_00_3190                                ;; 00:319d $38 $f1
-    ret                                                ;; 00:319f $c9
-.jr_00_31a0:
-    ld   BC, $01                                       ;; 00:31a0 $01 $01 $00
-.jr_00_31a3:
-    push BC                                            ;; 00:31a3 $c5
-    push BC                                            ;; 00:31a4 $c5
-    farcall call_01_4ab9_CountSetBitsInFlags
-    pop  BC                                            ;; 00:31b0 $c1
-    ld   HL, .data_00_31cd                                     ;; 00:31b1 $21 $cd $31
-    add  HL, BC                                        ;; 00:31b4 $09
-    cp   A, [HL]                                       ;; 00:31b5 $be
-    call NC, call_00_21f6_Entity_MarkTVButtonPressed                              ;; 00:31b6 $d4 $f6 $21
-    pop  BC                                            ;; 00:31b9 $c1
-    inc  C                                             ;; 00:31ba $0c
-    ld   A, C                                          ;; 00:31bb $79
-    cp   A, $0c                                        ;; 00:31bc $fe $0c
-    jr   C, .jr_00_31a3                                ;; 00:31be $38 $e3
-    ret                                                ;; 00:31c0 $c9
-.data_00_31c1:
-    db   $00, $00, $01, $04, $05, $00, $00, $00        ;; 00:31c1 ?.??????
-    db   $00, $00, $00, $00
-.data_00_31cd:
-    db   $00, $00, $00, $00        ;; 00:31c9 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00        ;; 00:31d1 ????????
-
-call_00_31d9_CheckAndClearBonusCoinEntityFlags:
-; Handle Level Flag 4 Special Entity
-; Behavior: Uses level number + wDC5C_ProgressFlags as a flag table, checks bit-4; if set, 
-; searches entity list for type 01 and clears a RAM byte (wD7??) to zero.
-; Purpose: Disables or resets a specific entity type when a special flag is set.
-    ld   HL, wDC1E_CurrentLevelID                                     ;; 00:31d9 $21 $1e $dc
-    ld   L, [HL]                                       ;; 00:31dc $6e
-    ld   H, $00                                        ;; 00:31dd $26 $00
-    ld   DE, wDC5C_ProgressFlags                                     ;; 00:31df $11 $5c $dc
-    add  HL, DE                                        ;; 00:31e2 $19
-    bit  4, [HL]                                       ;; 00:31e3 $cb $66
-    ret  Z                                             ;; 00:31e5 $c8
-    ld   A, [wDC16_EntityListBank]                                    ;; 00:31e6 $fa $16 $dc
-    call call_00_0eee_SwitchBank                                  ;; 00:31e9 $cd $ee $0e
-    ld   HL, wDC17_EntityListBankOffset                                     ;; 00:31ec $21 $17 $dc
-    ld   A, [HL+]                                      ;; 00:31ef $2a
-    ld   H, [HL]                                       ;; 00:31f0 $66
-    ld   L, A                                          ;; 00:31f1 $6f
-    ld   DE, $10                                       ;; 00:31f2 $11 $10 $00
-    ld   C, $01                                        ;; 00:31f5 $0e $01
-    ld   A, [HL]                                       ;; 00:31f7 $7e
-.jr_00_31f8:
-    cp   A, ENTITY_BONUS_COIN                                        ;; 00:31f8 $fe $01
-    jr   Z, .jr_00_3206                                ;; 00:31fa $28 $0a
-    add  HL, DE                                        ;; 00:31fc $19
-    inc  C                                             ;; 00:31fd $0c
-    ld   A, [HL]                                       ;; 00:31fe $7e
-    cp   A, $ff                                        ;; 00:31ff $fe $ff
-    jr   NZ, .jr_00_31f8                               ;; 00:3201 $20 $f5
-    jp   call_00_0f08_RestoreBank                                  ;; 00:3203 $c3 $08 $0f
-.jr_00_3206:
-    ld   B, HIGH(wD700_EntityFlags)                                        ;; 00:3206 $06 $d7
-    xor  A, A                                          ;; 00:3208 $af
-    ld   [BC], A                                       ;; 00:3209 $02
-    jp   call_00_0f08_RestoreBank                                  ;; 00:320a $c3 $08 $0f
-
-call_00_320d_CheckAndClearPawCoinEntityFlags:
-; Mask Entity Flags by Level Setting
-; Behavior: Gets a bitmask (C) from wDC5C_ProgressFlags + level, scans the entity list for type 03. 
-; For each, uses its 13th byte as an index into .data_00_324e (00,20,40,80), ANDs with C; if nonzero, 
-; clears the corresponding entry in RAM (wD7xx).
-; Purpose: Applies level-specific masking to entity type 3 spawns.
-    ld   A, [wDC16_EntityListBank]                                    ;; 00:320d $fa $16 $dc
-    call call_00_0eee_SwitchBank                                  ;; 00:3210 $cd $ee $0e
-    ld   HL, wDC1E_CurrentLevelID                                     ;; 00:3213 $21 $1e $dc
-    ld   L, [HL]                                       ;; 00:3216 $6e
-    ld   H, $00                                        ;; 00:3217 $26 $00
-    ld   DE, wDC5C_ProgressFlags                                     ;; 00:3219 $11 $5c $dc
-    add  HL, DE                                        ;; 00:321c $19
-    ld   C, [HL]                                       ;; 00:321d $4e
-    ld   HL, wDC17_EntityListBankOffset                                     ;; 00:321e $21 $17 $dc
-    ld   A, [HL+]                                      ;; 00:3221 $2a
-    ld   H, [HL]                                       ;; 00:3222 $66
-    ld   L, A                                          ;; 00:3223 $6f
-    ld   B, $01                                        ;; 00:3224 $06 $01
-.jr_00_3226:
-    push HL                                            ;; 00:3226 $e5
-    ld   A, [HL]                                       ;; 00:3227 $7e
-    cp   A, ENTITY_PAW_COIN                                        ;; 00:3228 $fe $03
-    jr   NZ, .jr_00_3240                               ;; 00:322a $20 $14
-    ld   DE, $0d                                       ;; 00:322c $11 $0d $00
-    add  HL, DE                                        ;; 00:322f $19
-    ld   L, [HL]                                       ;; 00:3230 $6e
-    ld   H, $00                                        ;; 00:3231 $26 $00
-    ld   DE, .data_00_324e                                     ;; 00:3233 $11 $4e $32
-    add  HL, DE                                        ;; 00:3236 $19
-    ld   A, [HL]                                       ;; 00:3237 $7e
-    and  A, C                                          ;; 00:3238 $a1
-    jr   Z, .jr_00_3240                                ;; 00:3239 $28 $05
-    ld   H, HIGH(wD700_EntityFlags)                                        ;; 00:323b $26 $d7
-    ld   L, B                                          ;; 00:323d $68
-    ld   [HL], $00                                     ;; 00:323e $36 $00
-.jr_00_3240:
-    inc  B                                             ;; 00:3240 $04
-    pop  HL                                            ;; 00:3241 $e1
-    ld   DE, $10                                       ;; 00:3242 $11 $10 $00
-    add  HL, DE                                        ;; 00:3245 $19
-    ld   A, [HL]                                       ;; 00:3246 $7e
-    cp   A, $ff                                        ;; 00:3247 $fe $ff
-    jr   NZ, .jr_00_3226                               ;; 00:3249 $20 $db
-    jp   call_00_0f08_RestoreBank                                  ;; 00:324b $c3 $08 $0f
-.data_00_324e:
-    db   $00, $20, $40, $80                            ;; 00:324e ?...
-
-call_00_3252_ResetEntityCounter:
-; Reset Entity Counter
-; Behavior: Simply sets wDAB8_EntityCounter = 1 and returns.
-; Purpose: Initializes the entity counter used by other routines.
-    ld   A, $01                                        ;; 00:3252 $3e $01
-    ld   [wDAB8_EntityCounter], A                                    ;; 00:3254 $ea $b8 $da
-    ret                                                ;; 00:3257 $c9
-
-; this table contains collision initialization data for each entity
-; 8 byte entries for each entity:
-; 0 = probably used to distinguish player (0) and other entities (1)
-; 1 = width
-; 2 = height
-; 3 = collision type
-; 4 = ENTITY_FIELD_DAMAGE_STATE (also used for health + 1)
-; 5 = extra flags default value (always 00)
-; 6 = always FF, appears unused?
-; 7 = flags used for collision detection (call_00_35e8_GetEntityCollisionFlags)
-;     bit 0 (01) = ?
-;     bit 1 (02) = ?
-;     bit 2 (04) = ?
-;     bit 3 (08) = ?
-;     bit 4 (10) = ?
-;     bit 5 (20) = ?
-;     bit 6 (40) = ?
-;     bit 7 (80) = spawn particles
-;     $ff = clear entity immediately without spawning collectible
-data_00_3258:                                                      ; 00:3258 ???????? ; ENTITY_GEX
+; ------------------------------------------------------------------
+; The per-entity-type template, ENTITY_ATTR_RECORD_SIZE bytes per ENTITY_* id, in
+; entity id order - so a row's position IS its id. 114 rows.
+;
+;   +0  ENTITY_ATTR_IS_NPC          0 for ENTITY_GEX, 1 for everything else
+;   +1  ENTITY_ATTR_WIDTH           into ENTITY_FIELD_WIDTH
+;   +2  ENTITY_ATTR_HEIGHT          into ENTITY_FIELD_HEIGHT
+;   +3  ENTITY_ATTR_COLLISION_TYPE  into ENTITY_FIELD_COLLISION_TYPE
+;   +4  ENTITY_ATTR_DAMAGE_STATE    health plus one; the spawn decrements it
+;   +5  ENTITY_ATTR_MISC_FLAGS      $00 in all 114 rows
+;   +6  ENTITY_ATTR_UNUSED          $FF in all 114 rows, never read
+;   +7  ENTITY_ATTR_DEFEAT_FLAGS    what the entity leaves behind when it dies
+;
+; THREE READERS, AT THREE BASES, one byte apart - see the file header. The spawn
+; reads from data_00_3258_EntityAttributeTable and takes +0 then +1..+7; the child
+; spawn reads from data_00_3259_EntityAttributeTable_WidthBase because it only wants
+; +1 onwards; call_00_35e8_Entity_GetCollisionFlags reads from
+; data_00_325f_EntityAttributeTable_FlagsBase because it only wants +7. That is why
+; the ENTITY_GEX row below is broken into three `db` runs with the extra labels
+; between them, and why every later row looks shifted by one.
+;
+; THE DEFEAT FLAGS are the interesting field. What is certain:
+;
+;   $FF                     64 rows. Clear the slot and drop nothing - flies,
+;                           projectiles, platforms, doors, scenery
+;   bit 7, PARTICLES        35 rows. Spawn a particle burst
+;   bit 6, DROPS_COLLECTIBLE 20 rows. Counts towards the level total, which is what
+;                           call_00_2f34_CountLevelCollectibleTotal is adding up when
+;                           it tests this bit
+;
+; The low nibble takes the values 0-7 and $0A and tracks what kind of thing dies:
+; every ordinary defeatable enemy is $C3 or $C4, the three coin types are all $81,
+; the fly TVs are $01, and the bosses each have their own. It looks like an index
+; rather than a bitfield, but nothing here proves that - the readers outside this
+; file are the ones to check
+data_00_3258_EntityAttributeTable:                                                      ; 00:3258 ???????? ; ENTITY_GEX
     db   $00
-data_00_3259:
+data_00_3259_EntityAttributeTable_WidthBase:
     db   $00, $00, COLLISION_TYPE_NONE, $00, $00, $00
-data_00_325F:
+data_00_325f_EntityAttributeTable_FlagsBase:
     db   $ff        
     db   $01, $0c, $0c, COLLISION_TYPE_BONUS_COIN, $02, $00, $ff, $81 ; 00:3260 ......?? ; ENTITY_BONUS_COIN
     db   $01, $0c, $0c, COLLISION_TYPE_FLY_COIN, $02, $00, $ff, $81 ; 00:3268 ......?. ; ENTITY_FLY_COIN_SPAWN
@@ -919,572 +241,621 @@ data_00_325F:
     db   $01, $0c, $0c, COLLISION_TYPE_METEOR, $02, $00, $ff, $82 ; 00:35d8 ???????? ; ENTITY_CHANNEL_Z_METEOR
     db   $01, $0a, $0a, COLLISION_TYPE_GENERIC_ENEMY, $02, $00, $ff, $81 ; 00:35e0 ???????? ; ENTITY_CHANNEL_Z_REZ_PROJECTILE
 
-call_00_35e8_GetEntityCollisionFlags:
-; loads index*[7] into data_00_3258 table
-; Follows a chain of lookups based on the current entity address (wDA00_CurrentEntityAddrLo) to compute an index into data_00_325F.
-; Shifts HL left three times (x8), adds the table base, and returns the byte at that location.
-; Usage: Fetches an entity-type ID or pointer index for the active entity.
-    ld   HL, wDA00_CurrentEntityAddrLo                                     ;; 00:35e8 $21 $00 $da
-    ld   L, [HL]                                       ;; 00:35eb $6e
-    ld   H, HIGH(wD800_EntityMemory)                                        ;; 00:35ec $26 $d8
-    ld   L, [HL]                                       ;; 00:35ee $6e
-    ld   H, $00                                        ;; 00:35ef $26 $00
-    add  HL, HL                                        ;; 00:35f1 $29
-    add  HL, HL                                        ;; 00:35f2 $29
-    add  HL, HL                                        ;; 00:35f3 $29
-    ld   DE, data_00_325F                                     ;; 00:35f4 $11 $5f $32
-    add  HL, DE                                        ;; 00:35f7 $19
-    ld   A, [HL]                                       ;; 00:35f8 $7e
-    ret                                                ;; 00:35f9 $c9
+call_00_35e8_Entity_GetCollisionFlags:
+; Returns in A the ENTITY_ATTR_DEFEAT_FLAGS byte for the entity currently being
+; processed - what it drops and what it leaves behind when it dies.
+;
+; Two hops: wDA00_CurrentEntityAddrLo names the slot, byte ENTITY_FIELD_ENTITY_ID of
+; that slot names the type, and the type indexes
+; data_00_325f_EntityAttributeTable_FlagsBase. That base is already field +7 of a
+; record, so multiplying the id by ENTITY_ATTR_RECORD_SIZE is the whole address
+; calculation
+    ld   HL, wDA00_CurrentEntityAddrLo                ;; 00:35e8 $21 $00 $da
+    ld   L, [HL]                                      ;; 00:35eb $6e
+    ld   H, HIGH(wD800_EntityMemory)                  ;; 00:35ec $26 $d8
+    ld   L, [HL]                                      ;; 00:35ee $6e
+    ld   H, $00                                       ;; 00:35ef $26 $00
+    add  HL, HL                                       ;; 00:35f1 $29
+    add  HL, HL                                       ;; 00:35f2 $29
+    add  HL, HL                                       ;; 00:35f3 $29
+    ld   DE, data_00_325f_EntityAttributeTable_FlagsBase ;; 00:35f4 $11 $5f $32
+    add  HL, DE                                       ;; 00:35f7 $19
+    ld   A, [HL]                                      ;; 00:35f8 $7e
+    ret                                               ;; 00:35f9 $c9
 
-call_00_35fa_WaitForLineThenSpawnEntity:
-; Switches to the current entity list bank, then repeatedly calls 
-; call_00_3618_HandleEntitySpawn until the LCD Y-register (rLY) is ≥ $80.
-; Once the scanline threshold is reached, switches back to the previous bank.
-; Usage: Synchronizes spawning/updating entities with the LCD scanline timing to avoid VRAM conflicts.
-    ld   A, [wDC16_EntityListBank]                                    ;; 00:35fa $fa $16 $dc
-    call call_00_0eee_SwitchBank                                  ;; 00:35fd $cd $ee $0e
+call_00_35fa_EntitySpawn_SpawnUntilScanline:
+; Spawns as many entities as fit in the time left, then restores the bank.
+;
+; Calls the worker in a loop until rLY has passed ENTITY_SPAWN_SCANLINE_LIMIT, so the
+; budget is "however many we can do before the raster is halfway down the screen".
+; Since each call places at most one entity and usually places none, this is how a
+; freshly scrolled-into room fills up over a few frames rather than all at once
+    ld   A, [wDC16_EntityListBank]                    ;; 00:35fa $fa $16 $dc
+    call call_00_0eee_SwitchBank                      ;; 00:35fd $cd $ee $0e
 .jr_00_3600:
-    call call_00_3618_HandleEntitySpawn                                  ;; 00:3600 $cd $18 $36
-    ldh  A, [rLY]                                      ;; 00:3603 $f0 $44
-    cp   A, $80                                        ;; 00:3605 $fe $80
-    jr   C, .jr_00_3600                                ;; 00:3607 $38 $f7
-    jp   call_00_0f08_RestoreBank                                  ;; 00:3609 $c3 $08 $0f
+    call call_00_3618_EntitySpawn_SpawnNextFromList   ;; 00:3600 $cd $18 $36
+    ldh  A, [rLY]                                     ;; 00:3603 $f0 $44
+    cp   A, ENTITY_SPAWN_SCANLINE_LIMIT               ;; 00:3605 $fe $80
+    jr   C, .jr_00_3600                               ;; 00:3607 $38 $f7
+    jp   call_00_0f08_RestoreBank                     ;; 00:3609 $c3 $08 $0f
 
-call_00_360c_SpawnEntityOnceImmediate:
-; Similar to 35FA but calls 3618 once without waiting for the scanline, then switches banks back.
-; Usage: Quickly spawns or processes one entity entry without frame timing checks.
-    ld   A, [wDC16_EntityListBank]                                    ;; 00:360c $fa $16 $dc
-    call call_00_0eee_SwitchBank                                  ;; 00:360f $cd $ee $0e
-    call call_00_3618_HandleEntitySpawn                                  ;; 00:3612 $cd $18 $36
-    jp   call_00_0f08_RestoreBank                                  ;; 00:3615 $c3 $08 $0f
+call_00_360c_EntitySpawn_SpawnNext:
+; One spawn attempt with the entity list bank paged in, no time check. The form the
+; level-entry loop in bank 2 uses, where the caller controls how many attempts to
+; make rather than the raster
+    ld   A, [wDC16_EntityListBank]                    ;; 00:360c $fa $16 $dc
+    call call_00_0eee_SwitchBank                      ;; 00:360f $cd $ee $0e
+    call call_00_3618_EntitySpawn_SpawnNextFromList   ;; 00:3612 $cd $18 $36
+    jp   call_00_0f08_RestoreBank                     ;; 00:3615 $c3 $08 $0f
 
-call_00_3618_HandleEntitySpawn:
-; Finds a free entity slot.
-; If none free, resets the entity counter (3252).
-; If a slot is found:
-; Calculates an offset into the entity spawn table using wDAB8_EntityCounter and the bank offset.
-; Checks for $FF sentinel and level ID match.
-; Performs collision-distance checks against player position (wDA14_CameraPos_Left–wDA1A_CameraPos_Bottom+1).
-; If within range, copies multiple fields from the spawn table into working entity memory (wDA24_EntityInitialXPos, wDA1C_EntityBoundingBoxXMax, etc.).
-; Sets up animation/state data, calls alt-bank functions to finish initialization.
-; Usage: Core routine that validates and copies entity-spawn data into live entity RAM.
-    call call_00_2afc_Entity_FindFreeSlot                                  ;; 00:3618 $cd $fc $2a
-    jr   NZ, .jr_00_3641                               ;; 00:361b $20 $24
-    ld   HL, wDC17_EntityListBankOffset                                     ;; 00:361d $21 $17 $dc
-    ld   A, [HL+]                                      ;; 00:3620 $2a
-    ld   H, [HL]                                       ;; 00:3621 $66
-    ld   L, A                                          ;; 00:3622 $6f
-    ld   DE, hFFF0                                     ;; 00:3623 $11 $f0 $ff
-    add  HL, DE                                        ;; 00:3626 $19
-    ld   E, L                                          ;; 00:3627 $5d
-    ld   D, H                                          ;; 00:3628 $54
-    ld   HL, wDAB8_EntityCounter                                     ;; 00:3629 $21 $b8 $da
-    ld   L, [HL]                                       ;; 00:362c $6e
-    ld   H, $00                                        ;; 00:362d $26 $00
-    add  HL, HL                                        ;; 00:362f $29
-    add  HL, HL                                        ;; 00:3630 $29
-    add  HL, HL                                        ;; 00:3631 $29
-    add  HL, HL                                        ;; 00:3632 $29
-    add  HL, DE                                        ;; 00:3633 $19
-    ld   E, L                                          ;; 00:3634 $5d
-    ld   D, H                                          ;; 00:3635 $54
-    ld   A, [DE]                                       ;; 00:3636 $1a
-    cp   A, $ff                                        ;; 00:3637 $fe $ff
-    jp   Z, call_00_3252_ResetEntityCounter                               ;; 00:3639 $ca $52 $32
-    ld   HL, wDAB8_EntityCounter                                     ;; 00:363c $21 $b8 $da
-    inc  [HL]                                          ;; 00:363f $34
-    ret                                                ;; 00:3640 $c9
+call_00_3618_EntitySpawn_SpawnNextFromList:
+; Considers one entity list record and places it if everything checks out. The heart
+; of the file; the bail-out cases are listed in the file header.
+;
+; With no free slot it does nothing but advance the cursor - and note that even that
+; path has to check for the terminator, so an empty run of the list still costs the
+; pointer arithmetic. The `ld DE, -ENTITY_SPAWN_RECORD_SIZE` before the multiply is
+; the 1-based cursor being turned into a 0-based offset.
+;
+; Once a record survives, the checks in order are: id is not ENTITY_LIST_END, the
+; entry's wD700_EntityFlags byte is non-zero and not already PLACED, the record's map
+; id matches wDB6C_CurrentMapId, and the record's room rectangle lies inside the
+; camera limits in wDA14_CameraPos_Left and friends. ENTITY_LIST_FLAG_FLY_COIN is
+; handled here too: an entry carrying it spawns as ENTITY_FLY_COIN_SPAWN rather than
+; as the type the list names, which is how a defeated enemy leaves a coin behind that
+; is still tied to its own list entry.
+;
+; Then the slot is filled from both sources - position and bounds from the record,
+; size and collision and health from the attribute table - the entry is marked
+; PLACED, and ENTITY_LIST_ACTION_MASK picks the action it starts in. gex2's
+; call_0a_7a7c_EntitySpawn_SpawnNextFromList
+    call call_00_2afc_Entity_FindFreeSlot             ;; 00:3618 $cd $fc $2a
+    jr   NZ, .jr_00_3641                              ;; 00:361b $20 $24
+    ld   HL, wDC17_EntityListBankOffset               ;; 00:361d $21 $17 $dc
+    ld   A, [HL+]                                     ;; 00:3620 $2a
+    ld   H, [HL]                                      ;; 00:3621 $66
+    ld   L, A                                         ;; 00:3622 $6f
+    ld   DE, -ENTITY_SPAWN_RECORD_SIZE                ;; 00:3623 $11 $f0 $ff
+    add  HL, DE                                       ;; 00:3626 $19
+    ld   E, L                                         ;; 00:3627 $5d
+    ld   D, H                                         ;; 00:3628 $54
+    ld   HL, wDAB8_EntityCounter                      ;; 00:3629 $21 $b8 $da
+    ld   L, [HL]                                      ;; 00:362c $6e
+    ld   H, $00                                       ;; 00:362d $26 $00
+    add  HL, HL                                       ;; 00:362f $29
+    add  HL, HL                                       ;; 00:3630 $29
+    add  HL, HL                                       ;; 00:3631 $29
+    add  HL, HL                                       ;; 00:3632 $29
+    add  HL, DE                                       ;; 00:3633 $19
+    ld   E, L                                         ;; 00:3634 $5d
+    ld   D, H                                         ;; 00:3635 $54
+    ld   A, [DE]                                      ;; 00:3636 $1a
+    cp   A, ENTITY_LIST_END                           ;; 00:3637 $fe $ff
+    jp   Z, call_00_3252_EntityList_RewindCursor      ;; 00:3639 $ca $52 $32
+    ld   HL, wDAB8_EntityCounter                      ;; 00:363c $21 $b8 $da
+    inc  [HL]                                         ;; 00:363f $34
+    ret                                               ;; 00:3640 $c9
 .jr_00_3641:
-    ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 00:3641 $ea $00 $da
-    rlca                                               ;; 00:3644 $07
-    rlca                                               ;; 00:3645 $07
-    rlca                                               ;; 00:3646 $07
-    ld   [wDAB9_NextAvailableEntitySlot], A                                    ;; 00:3647 $ea $b9 $da
-    ld   HL, wDC17_EntityListBankOffset                                     ;; 00:364a $21 $17 $dc
-    ld   A, [HL+]                                      ;; 00:364d $2a
-    ld   H, [HL]                                       ;; 00:364e $66
-    ld   L, A                                          ;; 00:364f $6f
-    ld   DE, hFFF0                                     ;; 00:3650 $11 $f0 $ff
-    add  HL, DE                                        ;; 00:3653 $19
-    ld   E, L                                          ;; 00:3654 $5d
-    ld   D, H                                          ;; 00:3655 $54
-    ld   HL, wDAB8_EntityCounter                                     ;; 00:3656 $21 $b8 $da
-    ld   L, [HL]                                       ;; 00:3659 $6e
-    ld   H, $00                                        ;; 00:365a $26 $00
-    add  HL, HL                                        ;; 00:365c $29
-    add  HL, HL                                        ;; 00:365d $29
-    add  HL, HL                                        ;; 00:365e $29
-    add  HL, HL                                        ;; 00:365f $29
-    add  HL, DE                                        ;; 00:3660 $19
-    ld   E, L                                          ;; 00:3661 $5d
-    ld   D, H                                          ;; 00:3662 $54
-    ld   A, [DE]                                       ;; 00:3663 $1a
-    cp   A, $ff                                        ;; 00:3664 $fe $ff
-    jp   Z, call_00_3252_ResetEntityCounter                               ;; 00:3666 $ca $52 $32
-    ld   [wDABB_CurrentEntityId], A                                    ;; 00:3669 $ea $bb $da
-    ld   HL, wDAB8_EntityCounter                                     ;; 00:366c $21 $b8 $da
-    ld   C, [HL]                                       ;; 00:366f $4e
-    inc  [HL]                                          ;; 00:3670 $34
-    ld   B, HIGH(wD700_EntityFlags)                                        ;; 00:3671 $06 $d7
-    ld   A, [BC]                                       ;; 00:3673 $0a
-    and  A, A                                          ;; 00:3674 $a7
-    ret  Z                                             ;; 00:3675 $c8
-    bit  6, A                                          ;; 00:3676 $cb $77
-    ret  NZ                                            ;; 00:3678 $c0
-    ld   [wDABC_CurrentEntityFlags], A                                    ;; 00:3679 $ea $bc $da
-    bit  4, A                                          ;; 00:367c $cb $67
-    jr   Z, .jr_00_3685                                ;; 00:367e $28 $05
-    ld   A, $02                                        ;; 00:3680 $3e $02
-    ld   [wDABB_CurrentEntityId], A                                    ;; 00:3682 $ea $bb $da
+    ld   [wDA00_CurrentEntityAddrLo], A               ;; 00:3641 $ea $00 $da
+    rlca                                              ;; 00:3644 $07
+    rlca                                              ;; 00:3645 $07
+    rlca                                              ;; 00:3646 $07
+    ld   [wDAB9_NextAvailableEntitySlot], A           ;; 00:3647 $ea $b9 $da
+    ld   HL, wDC17_EntityListBankOffset               ;; 00:364a $21 $17 $dc
+    ld   A, [HL+]                                     ;; 00:364d $2a
+    ld   H, [HL]                                      ;; 00:364e $66
+    ld   L, A                                         ;; 00:364f $6f
+    ld   DE, -ENTITY_SPAWN_RECORD_SIZE                ;; 00:3650 $11 $f0 $ff
+    add  HL, DE                                       ;; 00:3653 $19
+    ld   E, L                                         ;; 00:3654 $5d
+    ld   D, H                                         ;; 00:3655 $54
+    ld   HL, wDAB8_EntityCounter                      ;; 00:3656 $21 $b8 $da
+    ld   L, [HL]                                      ;; 00:3659 $6e
+    ld   H, $00                                       ;; 00:365a $26 $00
+    add  HL, HL                                       ;; 00:365c $29
+    add  HL, HL                                       ;; 00:365d $29
+    add  HL, HL                                       ;; 00:365e $29
+    add  HL, HL                                       ;; 00:365f $29
+    add  HL, DE                                       ;; 00:3660 $19
+    ld   E, L                                         ;; 00:3661 $5d
+    ld   D, H                                         ;; 00:3662 $54
+    ld   A, [DE]                                      ;; 00:3663 $1a
+    cp   A, ENTITY_LIST_END                           ;; 00:3664 $fe $ff
+    jp   Z, call_00_3252_EntityList_RewindCursor      ;; 00:3666 $ca $52 $32
+    ld   [wDABB_CurrentEntityId], A                   ;; 00:3669 $ea $bb $da
+    ld   HL, wDAB8_EntityCounter                      ;; 00:366c $21 $b8 $da
+    ld   C, [HL]                                      ;; 00:366f $4e
+    inc  [HL]                                         ;; 00:3670 $34
+    ld   B, HIGH(wD700_EntityFlags)                   ;; 00:3671 $06 $d7
+    ld   A, [BC]                                      ;; 00:3673 $0a
+    and  A, A                                         ;; 00:3674 $a7
+    ret  Z                                            ;; 00:3675 $c8
+    bit  ENTITY_LIST_FLAG_PLACED_BIT, A               ;; 00:3676 $cb $77
+    ret  NZ                                           ;; 00:3678 $c0
+    ld   [wDABC_CurrentEntityFlags], A                ;; 00:3679 $ea $bc $da
+    bit  ENTITY_LIST_FLAG_FLY_COIN_BIT, A             ;; 00:367c $cb $67
+    jr   Z, .jr_00_3685                               ;; 00:367e $28 $05
+    ld   A, ENTITY_FLY_COIN_SPAWN                     ;; 00:3680 $3e $02
+    ld   [wDABB_CurrentEntityId], A                   ;; 00:3682 $ea $bb $da
 .jr_00_3685:
-    ld   A, C                                          ;; 00:3685 $79
-    ld   [wDABA_EntityCounterRelated], A                                    ;; 00:3686 $ea $ba $da
-    ld   HL, $0f                                       ;; 00:3689 $21 $0f $00
-    add  HL, DE                                        ;; 00:368c $19
-    ld   A, [wDB6C_CurrentMapId]                                    ;; 00:368d $fa $6c $db
-    cp   A, [HL]                                       ;; 00:3690 $be
-    ret  NZ                                            ;; 00:3691 $c0
-    inc  DE                                            ;; 00:3692 $13
-    ld   HL, $04                                       ;; 00:3693 $21 $04 $00
-    add  HL, DE                                        ;; 00:3696 $19
-    ld   C, L                                          ;; 00:3697 $4d
-    ld   B, H                                          ;; 00:3698 $44
-    ld   HL, wDA14_CameraPos_Left                                     ;; 00:3699 $21 $14 $da
-    ld   A, [BC]                                       ;; 00:369c $0a
-    sub  A, [HL]                                       ;; 00:369d $96
-    inc  HL                                            ;; 00:369e $23
-    inc  BC                                            ;; 00:369f $03
-    ld   A, [BC]                                       ;; 00:36a0 $0a
-    sbc  A, [HL]                                       ;; 00:36a1 $9e
-    ret  C                                             ;; 00:36a2 $d8
-    inc  BC                                            ;; 00:36a3 $03
-    ld   L, C                                          ;; 00:36a4 $69
-    ld   H, B                                          ;; 00:36a5 $60
-    ld   A, [wDA16_CameraPos_Right]                                    ;; 00:36a6 $fa $16 $da
-    sub  A, [HL]                                       ;; 00:36a9 $96
-    inc  HL                                            ;; 00:36aa $23
-    ld   A, [wDA16_CameraPos_Right+1]                                    ;; 00:36ab $fa $17 $da
-    sbc  A, [HL]                                       ;; 00:36ae $9e
-    ret  C                                             ;; 00:36af $d8
-    inc  HL                                            ;; 00:36b0 $23
-    ld   C, L                                          ;; 00:36b1 $4d
-    ld   B, H                                          ;; 00:36b2 $44
-    ld   HL, wDA18_CameraPos_Top                                     ;; 00:36b3 $21 $18 $da
-    ld   A, [BC]                                       ;; 00:36b6 $0a
-    sub  A, [HL]                                       ;; 00:36b7 $96
-    inc  HL                                            ;; 00:36b8 $23
-    inc  BC                                            ;; 00:36b9 $03
-    ld   A, [BC]                                       ;; 00:36ba $0a
-    sbc  A, [HL]                                       ;; 00:36bb $9e
-    ret  C                                             ;; 00:36bc $d8
-    inc  BC                                            ;; 00:36bd $03
-    ld   L, C                                          ;; 00:36be $69
-    ld   H, B                                          ;; 00:36bf $60
-    ld   A, [wDA1A_CameraPos_Bottom]                                    ;; 00:36c0 $fa $1a $da
-    sub  A, [HL]                                       ;; 00:36c3 $96
-    inc  HL                                            ;; 00:36c4 $23
-    ld   A, [wDA1A_CameraPos_Bottom+1]                                    ;; 00:36c5 $fa $1b $da
-    sbc  A, [HL]                                       ;; 00:36c8 $9e
-    ret  C                                             ;; 00:36c9 $d8
-    ld   HL, wDAB9_NextAvailableEntitySlot                                     ;; 00:36ca $21 $b9 $da
-    ld   L, [HL]                                       ;; 00:36cd $6e
-    ld   H, $00                                        ;; 00:36ce $26 $00
-    add  HL, HL                                        ;; 00:36d0 $29
-    add  HL, HL                                        ;; 00:36d1 $29
-    add  HL, HL                                        ;; 00:36d2 $29
-    add  HL, HL                                        ;; 00:36d3 $29
-    ld   BC, wDA24_EntityInitialXPos                                     ;; 00:36d4 $01 $24 $da
-    add  HL, BC                                        ;; 00:36d7 $09
-    ld   C, L                                          ;; 00:36d8 $4d
-    ld   B, H                                          ;; 00:36d9 $44
+    ld   A, C                                         ;; 00:3685 $79
+    ld   [wDABA_EntityCounterRelated], A              ;; 00:3686 $ea $ba $da
+    ld   HL, ENTITY_SPAWN_RECORD_MAP_ID               ;; 00:3689 $21 $0f $00
+    add  HL, DE                                       ;; 00:368c $19
+    ld   A, [wDB6C_CurrentMapId]                      ;; 00:368d $fa $6c $db
+    cp   A, [HL]                                      ;; 00:3690 $be
+    ret  NZ                                           ;; 00:3691 $c0
+    inc  DE                                           ;; 00:3692 $13
+    ld   HL, ENTITY_SPAWN_RECORD_BOUNDS - ENTITY_SPAWN_RECORD_XPOS ;; 00:3693 $21 $04 $00
+    add  HL, DE                                       ;; 00:3696 $19
+    ld   C, L                                         ;; 00:3697 $4d
+    ld   B, H                                         ;; 00:3698 $44
+    ld   HL, wDA14_CameraPos_Left                     ;; 00:3699 $21 $14 $da
+    ld   A, [BC]                                      ;; 00:369c $0a
+    sub  A, [HL]                                      ;; 00:369d $96
+    inc  HL                                           ;; 00:369e $23
+    inc  BC                                           ;; 00:369f $03
+    ld   A, [BC]                                      ;; 00:36a0 $0a
+    sbc  A, [HL]                                      ;; 00:36a1 $9e
+    ret  C                                            ;; 00:36a2 $d8
+    inc  BC                                           ;; 00:36a3 $03
+    ld   L, C                                         ;; 00:36a4 $69
+    ld   H, B                                         ;; 00:36a5 $60
+    ld   A, [wDA16_CameraPos_Right]                   ;; 00:36a6 $fa $16 $da
+    sub  A, [HL]                                      ;; 00:36a9 $96
+    inc  HL                                           ;; 00:36aa $23
+    ld   A, [wDA16_CameraPos_Right+1]                 ;; 00:36ab $fa $17 $da
+    sbc  A, [HL]                                      ;; 00:36ae $9e
+    ret  C                                            ;; 00:36af $d8
+    inc  HL                                           ;; 00:36b0 $23
+    ld   C, L                                         ;; 00:36b1 $4d
+    ld   B, H                                         ;; 00:36b2 $44
+    ld   HL, wDA18_CameraPos_Top                      ;; 00:36b3 $21 $18 $da
+    ld   A, [BC]                                      ;; 00:36b6 $0a
+    sub  A, [HL]                                      ;; 00:36b7 $96
+    inc  HL                                           ;; 00:36b8 $23
+    inc  BC                                           ;; 00:36b9 $03
+    ld   A, [BC]                                      ;; 00:36ba $0a
+    sbc  A, [HL]                                      ;; 00:36bb $9e
+    ret  C                                            ;; 00:36bc $d8
+    inc  BC                                           ;; 00:36bd $03
+    ld   L, C                                         ;; 00:36be $69
+    ld   H, B                                         ;; 00:36bf $60
+    ld   A, [wDA1A_CameraPos_Bottom]                  ;; 00:36c0 $fa $1a $da
+    sub  A, [HL]                                      ;; 00:36c3 $96
+    inc  HL                                           ;; 00:36c4 $23
+    ld   A, [wDA1A_CameraPos_Bottom+1]                ;; 00:36c5 $fa $1b $da
+    sbc  A, [HL]                                      ;; 00:36c8 $9e
+    ret  C                                            ;; 00:36c9 $d8
+    ld   HL, wDAB9_NextAvailableEntitySlot            ;; 00:36ca $21 $b9 $da
+    ld   L, [HL]                                      ;; 00:36cd $6e
+    ld   H, $00                                       ;; 00:36ce $26 $00
+    add  HL, HL                                       ;; 00:36d0 $29
+    add  HL, HL                                       ;; 00:36d1 $29
+    add  HL, HL                                       ;; 00:36d2 $29
+    add  HL, HL                                       ;; 00:36d3 $29
+    ld   BC, wDA24_EntityInitialXPos                  ;; 00:36d4 $01 $24 $da
+    add  HL, BC                                       ;; 00:36d7 $09
+    ld   C, L                                         ;; 00:36d8 $4d
+    ld   B, H                                         ;; 00:36d9 $44
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
-    ld   A, [DE]                                       ;; 00:36e2 $1a
-    ld   [HL+], A                                      ;; 00:36e3 $22
-    ld   [BC], A                                       ;; 00:36e4 $02
-    inc  BC                                            ;; 00:36e5 $03
-    inc  DE                                            ;; 00:36e6 $13
-    ld   A, [DE]                                       ;; 00:36e7 $1a
-    ld   [HL+], A                                      ;; 00:36e8 $22
-    ld   [BC], A                                       ;; 00:36e9 $02
-    inc  BC                                            ;; 00:36ea $03
-    inc  DE                                            ;; 00:36eb $13
-    ld   A, [DE]                                       ;; 00:36ec $1a
-    ld   [HL+], A                                      ;; 00:36ed $22
-    ld   [BC], A                                       ;; 00:36ee $02
-    inc  BC                                            ;; 00:36ef $03
-    inc  DE                                            ;; 00:36f0 $13
-    ld   A, [DE]                                       ;; 00:36f1 $1a
-    ld   [HL], A                                       ;; 00:36f2 $77
-    ld   [BC], A                                       ;; 00:36f3 $02
-    inc  DE                                            ;; 00:36f4 $13
-    ld   HL, wDAB9_NextAvailableEntitySlot                                     ;; 00:36f5 $21 $b9 $da
-    ld   L, [HL]                                       ;; 00:36f8 $6e
-    ld   H, $00                                        ;; 00:36f9 $26 $00
-    add  HL, HL                                        ;; 00:36fb $29
-    add  HL, HL                                        ;; 00:36fc $29
-    add  HL, HL                                        ;; 00:36fd $29
-    add  HL, HL                                        ;; 00:36fe $29
-    ld   BC, wDA1C_EntityBoundingBoxXMax                                     ;; 00:36ff $01 $1c $da
-    add  HL, BC                                        ;; 00:3702 $09
-    ld   A, [DE]                                       ;; 00:3703 $1a
-    ld   [HL+], A                                      ;; 00:3704 $22
-    inc  DE                                            ;; 00:3705 $13
-    ld   A, [DE]                                       ;; 00:3706 $1a
-    ld   [HL+], A                                      ;; 00:3707 $22
-    inc  DE                                            ;; 00:3708 $13
-    ld   A, [DE]                                       ;; 00:3709 $1a
-    ld   [HL+], A                                      ;; 00:370a $22
-    inc  DE                                            ;; 00:370b $13
-    ld   A, [DE]                                       ;; 00:370c $1a
-    ld   [HL+], A                                      ;; 00:370d $22
-    inc  DE                                            ;; 00:370e $13
-    ld   A, [DE]                                       ;; 00:370f $1a
-    ld   [HL+], A                                      ;; 00:3710 $22
-    inc  DE                                            ;; 00:3711 $13
-    ld   A, [DE]                                       ;; 00:3712 $1a
-    ld   [HL+], A                                      ;; 00:3713 $22
-    inc  DE                                            ;; 00:3714 $13
-    ld   A, [DE]                                       ;; 00:3715 $1a
-    ld   [HL+], A                                      ;; 00:3716 $22
-    inc  DE                                            ;; 00:3717 $13
-    ld   A, [DE]                                       ;; 00:3718 $1a
-    ld   [HL], A                                       ;; 00:3719 $77
-    ld   HL, wDABB_CurrentEntityId                                     ;; 00:371a $21 $bb $da
-    ld   L, [HL]                                       ;; 00:371d $6e
-    ld   H, $00                                        ;; 00:371e $26 $00
-    add  HL, HL                                        ;; 00:3720 $29
-    add  HL, HL                                        ;; 00:3721 $29
-    add  HL, HL                                        ;; 00:3722 $29
-    ld   BC, data_00_3258                                     ;; 00:3723 $01 $58 $32
-    add  HL, BC                                        ;; 00:3726 $09
-    ld   A, [HL+]                                      ;; 00:3727 $2a
+    ld   A, [DE]                                      ;; 00:36e2 $1a
+    ld   [HL+], A                                     ;; 00:36e3 $22
+    ld   [BC], A                                      ;; 00:36e4 $02
+    inc  BC                                           ;; 00:36e5 $03
+    inc  DE                                           ;; 00:36e6 $13
+    ld   A, [DE]                                      ;; 00:36e7 $1a
+    ld   [HL+], A                                     ;; 00:36e8 $22
+    ld   [BC], A                                      ;; 00:36e9 $02
+    inc  BC                                           ;; 00:36ea $03
+    inc  DE                                           ;; 00:36eb $13
+    ld   A, [DE]                                      ;; 00:36ec $1a
+    ld   [HL+], A                                     ;; 00:36ed $22
+    ld   [BC], A                                      ;; 00:36ee $02
+    inc  BC                                           ;; 00:36ef $03
+    inc  DE                                           ;; 00:36f0 $13
+    ld   A, [DE]                                      ;; 00:36f1 $1a
+    ld   [HL], A                                      ;; 00:36f2 $77
+    ld   [BC], A                                      ;; 00:36f3 $02
+    inc  DE                                           ;; 00:36f4 $13
+    ld   HL, wDAB9_NextAvailableEntitySlot            ;; 00:36f5 $21 $b9 $da
+    ld   L, [HL]                                      ;; 00:36f8 $6e
+    ld   H, $00                                       ;; 00:36f9 $26 $00
+    add  HL, HL                                       ;; 00:36fb $29
+    add  HL, HL                                       ;; 00:36fc $29
+    add  HL, HL                                       ;; 00:36fd $29
+    add  HL, HL                                       ;; 00:36fe $29
+    ld   BC, wDA1C_EntityBoundingBoxXMax              ;; 00:36ff $01 $1c $da
+    add  HL, BC                                       ;; 00:3702 $09
+    ld   A, [DE]                                      ;; 00:3703 $1a
+    ld   [HL+], A                                     ;; 00:3704 $22
+    inc  DE                                           ;; 00:3705 $13
+    ld   A, [DE]                                      ;; 00:3706 $1a
+    ld   [HL+], A                                     ;; 00:3707 $22
+    inc  DE                                           ;; 00:3708 $13
+    ld   A, [DE]                                      ;; 00:3709 $1a
+    ld   [HL+], A                                     ;; 00:370a $22
+    inc  DE                                           ;; 00:370b $13
+    ld   A, [DE]                                      ;; 00:370c $1a
+    ld   [HL+], A                                     ;; 00:370d $22
+    inc  DE                                           ;; 00:370e $13
+    ld   A, [DE]                                      ;; 00:370f $1a
+    ld   [HL+], A                                     ;; 00:3710 $22
+    inc  DE                                           ;; 00:3711 $13
+    ld   A, [DE]                                      ;; 00:3712 $1a
+    ld   [HL+], A                                     ;; 00:3713 $22
+    inc  DE                                           ;; 00:3714 $13
+    ld   A, [DE]                                      ;; 00:3715 $1a
+    ld   [HL+], A                                     ;; 00:3716 $22
+    inc  DE                                           ;; 00:3717 $13
+    ld   A, [DE]                                      ;; 00:3718 $1a
+    ld   [HL], A                                      ;; 00:3719 $77
+    ld   HL, wDABB_CurrentEntityId                    ;; 00:371a $21 $bb $da
+    ld   L, [HL]                                      ;; 00:371d $6e
+    ld   H, $00                                       ;; 00:371e $26 $00
+    add  HL, HL                                       ;; 00:3720 $29
+    add  HL, HL                                       ;; 00:3721 $29
+    add  HL, HL                                       ;; 00:3722 $29
+    ld   BC, data_00_3258_EntityAttributeTable        ;; 00:3723 $01 $58 $32
+    add  HL, BC                                       ;; 00:3726 $09
+    ld   A, [HL+]                                     ;; 00:3727 $2a
     LOAD_OBJ_FIELD_TO_DE_ALT ENTITY_FIELD_ENTITY_ID
-    ld   A, [wDABB_CurrentEntityId]                                    ;; 00:3730 $fa $bb $da
-    ld   [DE], A                                       ;; 00:3733 $12
-    ld   A, E                                          ;; 00:3734 $7b
-    xor  A, $12                                        ;; 00:3735 $ee $12
-    ld   E, A                                          ;; 00:3737 $5f
-    ld   A, [HL+]                                      ;; 00:3738 $2a
-    ld   [DE], A                                       ;; 00:3739 $12
-    inc  E                                             ;; 00:373a $1c
-    ld   A, [HL+]                                      ;; 00:373b $2a
-    ld   [DE], A                                       ;; 00:373c $12
-    inc  E                                             ;; 00:373d $1c
-    ld   A, [HL+]                                      ;; 00:373e $2a
-    ld   [DE], A                                       ;; 00:373f $12
-    inc  E                                             ;; 00:3740 $1c
-    xor  A, A                                          ;; 00:3741 $af
-    ld   [DE], A                                       ;; 00:3742 $12
-    inc  E                                             ;; 00:3743 $1c
-    ld   A, [HL+]                                      ;; 00:3744 $2a
-    dec  A                                             ;; 00:3745 $3d
-    ld   [DE], A                                       ;; 00:3746 $12
-    inc  E                                             ;; 00:3747 $1c
-    inc  E                                             ;; 00:3748 $1c
-    xor  A, A                                          ;; 00:3749 $af
-    ld   [DE], A                                       ;; 00:374a $12
-    inc  E                                             ;; 00:374b $1c
-    ld   A, [HL]                                       ;; 00:374c $7e
-    ld   [DE], A                                       ;; 00:374d $12
-    inc  E                                             ;; 00:374e $1c
-    xor  A, A                                          ;; 00:374f $af
-    ld   [DE], A                                       ;; 00:3750 $12
-    inc  E                                             ;; 00:3751 $1c
-    ld   [DE], A                                       ;; 00:3752 $12
-    inc  E                                             ;; 00:3753 $1c
-    ld   [DE], A                                       ;; 00:3754 $12
-    inc  E                                             ;; 00:3755 $1c
-    ld   [DE], A                                       ;; 00:3756 $12
-    inc  E                                             ;; 00:3757 $1c
-    ld   [DE], A                                       ;; 00:3758 $12
-    inc  E                                             ;; 00:3759 $1c
-    ld   [DE], A                                       ;; 00:375a $12
-    ld   A, E                                          ;; 00:375b $7b
-    xor  A, $12                                        ;; 00:375c $ee $12
-    ld   E, A                                          ;; 00:375e $5f
-    ld   A, $00                                        ;; 00:375f $3e $00
-    ld   [DE], A                                       ;; 00:3761 $12
-    ld   HL, wDAB9_NextAvailableEntitySlot                                     ;; 00:3762 $21 $b9 $da
-    ld   L, [HL]                                       ;; 00:3765 $6e
-    ld   H, $00                                        ;; 00:3766 $26 $00
-    ld   DE, wDA01_EntityListIndexesForCurrentEntities                                     ;; 00:3768 $11 $01 $da
-    add  HL, DE                                        ;; 00:376b $19
-    ld   A, [wDABA_EntityCounterRelated]                                    ;; 00:376c $fa $ba $da
-    ld   [HL], A                                       ;; 00:376f $77
-    ld   L, A                                          ;; 00:3770 $6f
-    ld   H, HIGH(wD700_EntityFlags)                                        ;; 00:3771 $26 $d7
-    ld   A, [wDABC_CurrentEntityFlags]                                    ;; 00:3773 $fa $bc $da
-    or   A, $40                                        ;; 00:3776 $f6 $40
-    ld   [HL], A                                       ;; 00:3778 $77
-    and  A, $0f                                        ;; 00:3779 $e6 $0f
+    ld   A, [wDABB_CurrentEntityId]                   ;; 00:3730 $fa $bb $da
+    ld   [DE], A                                      ;; 00:3733 $12
+    ld   A, E                                         ;; 00:3734 $7b
+    xor  A, $12                                       ;; 00:3735 $ee $12
+    ld   E, A                                         ;; 00:3737 $5f
+    ld   A, [HL+]                                     ;; 00:3738 $2a
+    ld   [DE], A                                      ;; 00:3739 $12
+    inc  E                                            ;; 00:373a $1c
+    ld   A, [HL+]                                     ;; 00:373b $2a
+    ld   [DE], A                                      ;; 00:373c $12
+    inc  E                                            ;; 00:373d $1c
+    ld   A, [HL+]                                     ;; 00:373e $2a
+    ld   [DE], A                                      ;; 00:373f $12
+    inc  E                                            ;; 00:3740 $1c
+    xor  A, A                                         ;; 00:3741 $af
+    ld   [DE], A                                      ;; 00:3742 $12
+    inc  E                                            ;; 00:3743 $1c
+    ld   A, [HL+]                                     ;; 00:3744 $2a
+    dec  A                                            ;; 00:3745 $3d
+    ld   [DE], A                                      ;; 00:3746 $12
+    inc  E                                            ;; 00:3747 $1c
+    inc  E                                            ;; 00:3748 $1c
+    xor  A, A                                         ;; 00:3749 $af
+    ld   [DE], A                                      ;; 00:374a $12
+    inc  E                                            ;; 00:374b $1c
+    ld   A, [HL]                                      ;; 00:374c $7e
+    ld   [DE], A                                      ;; 00:374d $12
+    inc  E                                            ;; 00:374e $1c
+    xor  A, A                                         ;; 00:374f $af
+    ld   [DE], A                                      ;; 00:3750 $12
+    inc  E                                            ;; 00:3751 $1c
+    ld   [DE], A                                      ;; 00:3752 $12
+    inc  E                                            ;; 00:3753 $1c
+    ld   [DE], A                                      ;; 00:3754 $12
+    inc  E                                            ;; 00:3755 $1c
+    ld   [DE], A                                      ;; 00:3756 $12
+    inc  E                                            ;; 00:3757 $1c
+    ld   [DE], A                                      ;; 00:3758 $12
+    inc  E                                            ;; 00:3759 $1c
+    ld   [DE], A                                      ;; 00:375a $12
+    ld   A, E                                         ;; 00:375b $7b
+    xor  A, $12                                       ;; 00:375c $ee $12
+    ld   E, A                                         ;; 00:375e $5f
+    ld   A, $00                                       ;; 00:375f $3e $00
+    ld   [DE], A                                      ;; 00:3761 $12
+    ld   HL, wDAB9_NextAvailableEntitySlot            ;; 00:3762 $21 $b9 $da
+    ld   L, [HL]                                      ;; 00:3765 $6e
+    ld   H, $00                                       ;; 00:3766 $26 $00
+    ld   DE, wDA01_EntityListIndexesForCurrentEntities ;; 00:3768 $11 $01 $da
+    add  HL, DE                                       ;; 00:376b $19
+    ld   A, [wDABA_EntityCounterRelated]              ;; 00:376c $fa $ba $da
+    ld   [HL], A                                      ;; 00:376f $77
+    ld   L, A                                         ;; 00:3770 $6f
+    ld   H, HIGH(wD700_EntityFlags)                   ;; 00:3771 $26 $d7
+    ld   A, [wDABC_CurrentEntityFlags]                ;; 00:3773 $fa $bc $da
+    or   A, ENTITY_LIST_FLAG_PLACED                   ;; 00:3776 $f6 $40
+    ld   [HL], A                                      ;; 00:3778 $77
+    and  A, ENTITY_LIST_ACTION_MASK                   ;; 00:3779 $e6 $0f
     farcall call_02_72ac_Entity_SetAction
     farcall call_03_687c_AssignEntityPalette
-    ret                                                ;; 00:3791 $c9
+    ret                                               ;; 00:3791 $c9
 
-call_00_3792_PrepareRelativeEntitySpawn:
-; Switches to the entity list bank, then calls 37A0 with BC preserved.
-; After execution, restores bank.
-; Usage: Prepares to spawn an entity relative to another entity or dynamic offset.
-    push BC                                            ;; 00:3792 $c5
-    ld   A, [wDC16_EntityListBank]                                    ;; 00:3793 $fa $16 $dc
-    call call_00_0eee_SwitchBank                                  ;; 00:3796 $cd $ee $0e
-    pop  BC                                            ;; 00:3799 $c1
-    call call_00_37a0_SpawnEntityRelative                                  ;; 00:379a $cd $a0 $37
-    jp   call_00_0f08_RestoreBank                                  ;; 00:379d $c3 $08 $0f
+call_00_3792_EntitySpawn_SpawnChild:
+; The banked entry point for spawning a child entity: pages in the entity list bank
+; around the worker below, preserving C, which is the SPAWN_CHILD_ENTITY_* index.
+; This is the one the action code in bank 2 calls, twenty-odd times over
+    push BC                                           ;; 00:3792 $c5
+    ld   A, [wDC16_EntityListBank]                    ;; 00:3793 $fa $16 $dc
+    call call_00_0eee_SwitchBank                      ;; 00:3796 $cd $ee $0e
+    pop  BC                                           ;; 00:3799 $c1
+    call call_00_37a0_EntitySpawn_SpawnChildEntity    ;; 00:379a $cd $a0 $37
+    jp   call_00_0f08_RestoreBank                     ;; 00:379d $c3 $08 $0f
 
-call_00_37a0_SpawnEntityRelative:
-; Finds a free slot.
-; Calls a banked routine (call_03_59c6_Entity_SpriteIgnoresFacing) to fetch spawn data.
-; Derives offsets using the current entity address.
-; Reads a table (.data_00_38b6_EntityChildSpawnData) and copies positional deltas.
-; Depending on a flag in wDCE9_EntitySpawnPosOffsetFlag, adds or subtracts position offsets.
-; Writes adjusted coordinates and state values into live entity memory.
-; Calls 2a03_ResetEntityTempSlot and finalizes setup with banked calls.
-; Usage: Spawns a new entity at a position relative to the parent entity, 
-; handling direction and mirroring.
-    call call_00_2afc_Entity_FindFreeSlot                                  ;; 00:37a0 $cd $fc $2a
-    ret  Z                                             ;; 00:37a3 $c8
-    push DE                                            ;; 00:37a4 $d5
+call_00_37a0_EntitySpawn_SpawnChildEntity:
+; Spawns one entity at an offset from the entity currently being processed - a
+; projectile leaving a gun, a fly leaving a TV, a boss's separate head.
+;
+; C selects a row of .data_00_38b6_EntityChildSpawnData, which carries the signed X
+; and Y offsets and the child's ENTITY_* id. The child first inherits the parent's
+; facing byte, and then two things decide the sign of the X offset: if bank 3 says
+; this sprite ignores facing - wDCE9_EntitySpawnPosOffsetFlag, set from
+; call_03_59c6_Entity_SpriteIgnoresFacing - the offset is added as written, and
+; otherwise it is subtracted when ENTITY_FACING_LEFT_BIT is set. So one row serves
+; both ways a parent can face. Y is always added.
+;
+; The child's fields come from data_00_3259_EntityAttributeTable_WidthBase - the
+; width base, so the copy starts at ENTITY_ATTR_WIDTH and runs forward - and the rest
+; of its slot is zeroed by hand. ENTITY_FIELD_PARENT is set to the parent's list
+; index, which is how a projectile can still be traced back to the enemy that fired
+; it after that enemy is gone.
+;
+; The parent's slot address is saved on the stack and put back at the end, because
+; everything in between runs with wDA00_CurrentEntityAddrLo pointing at the CHILD -
+; the action set-up and the palette assignment both read it. The last thing it does
+; is copy the parent's room bounds into the child's, so a projectile inherits the
+; room it was fired in. gex2's call_0a_7b9a_EntitySpawn_SpawnChildEntity
+    call call_00_2afc_Entity_FindFreeSlot             ;; 00:37a0 $cd $fc $2a
+    ret  Z                                            ;; 00:37a3 $c8
+    push DE                                           ;; 00:37a4 $d5
     farcall call_03_59c6_Entity_SpriteIgnoresFacing
-    ld   [wDCE9_EntitySpawnPosOffsetFlag], A                                    ;; 00:37b0 $ea $e9 $dc
-    ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 00:37b3 $fa $00 $da
-    rlca                                               ;; 00:37b6 $07
-    rlca                                               ;; 00:37b7 $07
-    rlca                                               ;; 00:37b8 $07
-    and  A, $07                                        ;; 00:37b9 $e6 $07
-    ld   L, A                                          ;; 00:37bb $6f
-    ld   H, $00                                        ;; 00:37bc $26 $00
-    ld   DE, wDA01_EntityListIndexesForCurrentEntities                                     ;; 00:37be $11 $01 $da
-    add  HL, DE                                        ;; 00:37c1 $19
-    ld   A, [HL]                                       ;; 00:37c2 $7e
-    ld   [wDCE8_CurrentEntity_ParentListIndex], A                                    ;; 00:37c3 $ea $e8 $dc
-    pop  DE                                            ;; 00:37c6 $d1
-    ld   L, C                                          ;; 00:37c7 $69
-    ld   H, $00                                        ;; 00:37c8 $26 $00
-    add  HL, HL                                        ;; 00:37ca $29
-    add  HL, HL                                        ;; 00:37cb $29
-    add  HL, HL                                        ;; 00:37cc $29
-    ld   BC, .data_00_38b6_EntityChildSpawnData                                     ;; 00:37cd $01 $b6 $38
-    add  HL, BC                                        ;; 00:37d0 $09
-    ld   A, [HL+]                                      ;; 00:37d1 $2a
-    ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 00:37d2 $fa $00 $da
-    push AF                                            ;; 00:37d5 $f5
-    or   A, ENTITY_FIELD_FACING_DIRECTION                                        ;; 00:37d6 $f6 $0d
-    ld   C, A                                          ;; 00:37d8 $4f
-    ld   B, HIGH(wD800_EntityMemory)                                        ;; 00:37d9 $06 $d8
-    ld   A, D                                          ;; 00:37db $7a
-    ld   [wDA00_CurrentEntityAddrLo], A                                    ;; 00:37dc $ea $00 $da
-    or   A, ENTITY_FIELD_FACING_DIRECTION                                        ;; 00:37df $f6 $0d
-    ld   E, A                                          ;; 00:37e1 $5f
-    ld   D, B                                          ;; 00:37e2 $50
-    ld   A, [BC]                                       ;; 00:37e3 $0a
-    ld   [DE], A                                       ;; 00:37e4 $12
-    ld   A, [wDCE9_EntitySpawnPosOffsetFlag]                                    ;; 00:37e5 $fa $e9 $dc
-    and  A, A                                          ;; 00:37e8 $a7
-    jr   NZ, .jr_00_37f0                               ;; 00:37e9 $20 $05
-    ld   A, [DE]                                       ;; 00:37eb $1a
-    bit  5, A                                          ;; 00:37ec $cb $6f
-    jr   NZ, .jr_00_37fd                               ;; 00:37ee $20 $0d
+    ld   [wDCE9_EntitySpawnPosOffsetFlag], A          ;; 00:37b0 $ea $e9 $dc
+    ld   A, [wDA00_CurrentEntityAddrLo]               ;; 00:37b3 $fa $00 $da
+    rlca                                              ;; 00:37b6 $07
+    rlca                                              ;; 00:37b7 $07
+    rlca                                              ;; 00:37b8 $07
+    and  A, ENTITY_SLOT_INDEX_MASK                    ;; 00:37b9 $e6 $07
+    ld   L, A                                         ;; 00:37bb $6f
+    ld   H, $00                                       ;; 00:37bc $26 $00
+    ld   DE, wDA01_EntityListIndexesForCurrentEntities ;; 00:37be $11 $01 $da
+    add  HL, DE                                       ;; 00:37c1 $19
+    ld   A, [HL]                                      ;; 00:37c2 $7e
+    ld   [wDCE8_CurrentEntity_ParentListIndex], A     ;; 00:37c3 $ea $e8 $dc
+    pop  DE                                           ;; 00:37c6 $d1
+    ld   L, C                                         ;; 00:37c7 $69
+    ld   H, $00                                       ;; 00:37c8 $26 $00
+    add  HL, HL                                       ;; 00:37ca $29
+    add  HL, HL                                       ;; 00:37cb $29
+    add  HL, HL                                       ;; 00:37cc $29
+    ld   BC, .data_00_38b6_EntityChildSpawnData       ;; 00:37cd $01 $b6 $38
+    add  HL, BC                                       ;; 00:37d0 $09
+    ld   A, [HL+]                                     ;; 00:37d1 $2a
+    ld   A, [wDA00_CurrentEntityAddrLo]               ;; 00:37d2 $fa $00 $da
+    push AF                                           ;; 00:37d5 $f5
+    or   A, ENTITY_FIELD_FACING_DIRECTION             ;; 00:37d6 $f6 $0d
+    ld   C, A                                         ;; 00:37d8 $4f
+    ld   B, HIGH(wD800_EntityMemory)                  ;; 00:37d9 $06 $d8
+    ld   A, D                                         ;; 00:37db $7a
+    ld   [wDA00_CurrentEntityAddrLo], A               ;; 00:37dc $ea $00 $da
+    or   A, ENTITY_FIELD_FACING_DIRECTION             ;; 00:37df $f6 $0d
+    ld   E, A                                         ;; 00:37e1 $5f
+    ld   D, B                                         ;; 00:37e2 $50
+    ld   A, [BC]                                      ;; 00:37e3 $0a
+    ld   [DE], A                                      ;; 00:37e4 $12
+    ld   A, [wDCE9_EntitySpawnPosOffsetFlag]          ;; 00:37e5 $fa $e9 $dc
+    and  A, A                                         ;; 00:37e8 $a7
+    jr   NZ, .jr_00_37f0                              ;; 00:37e9 $20 $05
+    ld   A, [DE]                                      ;; 00:37eb $1a
+    bit  ENTITY_FACING_LEFT_BIT, A                    ;; 00:37ec $cb $6f
+    jr   NZ, .jr_00_37fd                              ;; 00:37ee $20 $0d
 .jr_00_37f0:
-    inc  C                                             ;; 00:37f0 $0c
-    inc  E                                             ;; 00:37f1 $1c
-    ld   A, [BC]                                       ;; 00:37f2 $0a ; load parent entity x position (lo)
-    add  A, [HL]                                       ;; 00:37f3 $86 ; add offset from table below
-    ld   [DE], A                                       ;; 00:37f4 $12 ; set new entity x position (lo)
-    inc  BC                                            ;; 00:37f5 $03
-    inc  DE                                            ;; 00:37f6 $13
-    inc  HL                                            ;; 00:37f7 $23
-    ld   A, [BC]                                       ;; 00:37f8 $0a ; load parent entity x position (hi)
-    adc  A, [HL]                                       ;; 00:37f9 $8e ; add different offset from table below
-    ld   [DE], A                                       ;; 00:37fa $12 ; set new entity x position (hi)
-    jr   .jr_00_3808                                   ;; 00:37fb $18 $0b
+    inc  C                                            ;; 00:37f0 $0c
+    inc  E                                            ;; 00:37f1 $1c
+    ld   A, [BC]                                      ;; 00:37f2 $0a ; load parent entity x position (lo)
+    add  A, [HL]                                      ;; 00:37f3 $86 ; add offset from table below
+    ld   [DE], A                                      ;; 00:37f4 $12 ; set new entity x position (lo)
+    inc  BC                                           ;; 00:37f5 $03
+    inc  DE                                           ;; 00:37f6 $13
+    inc  HL                                           ;; 00:37f7 $23
+    ld   A, [BC]                                      ;; 00:37f8 $0a ; load parent entity x position (hi)
+    adc  A, [HL]                                      ;; 00:37f9 $8e ; add different offset from table below
+    ld   [DE], A                                      ;; 00:37fa $12 ; set new entity x position (hi)
+    jr   .jr_00_3808                                  ;; 00:37fb $18 $0b
 .jr_00_37fd:
-    inc  C                                             ;; 00:37fd $0c
-    inc  E                                             ;; 00:37fe $1c
-    ld   A, [BC]                                       ;; 00:37ff $0a
-    sub  A, [HL]                                       ;; 00:3800 $96 ; same as above but subtracts instead of adds
-    ld   [DE], A                                       ;; 00:3801 $12
-    inc  BC                                            ;; 00:3802 $03
-    inc  DE                                            ;; 00:3803 $13
-    inc  HL                                            ;; 00:3804 $23
-    ld   A, [BC]                                       ;; 00:3805 $0a
-    sbc  A, [HL]                                       ;; 00:3806 $9e
-    ld   [DE], A                                       ;; 00:3807 $12
+    inc  C                                            ;; 00:37fd $0c
+    inc  E                                            ;; 00:37fe $1c
+    ld   A, [BC]                                      ;; 00:37ff $0a
+    sub  A, [HL]                                      ;; 00:3800 $96 ; same as above but subtracts instead of adds
+    ld   [DE], A                                      ;; 00:3801 $12
+    inc  BC                                           ;; 00:3802 $03
+    inc  DE                                           ;; 00:3803 $13
+    inc  HL                                           ;; 00:3804 $23
+    ld   A, [BC]                                      ;; 00:3805 $0a
+    sbc  A, [HL]                                      ;; 00:3806 $9e
+    ld   [DE], A                                      ;; 00:3807 $12
 .jr_00_3808:
-    inc  C                                             ;; 00:3808 $0c
-    inc  E                                             ;; 00:3809 $1c
-    inc  HL                                            ;; 00:380a $23
-    ld   A, [BC]                                       ;; 00:380b $0a
-    add  A, [HL]                                       ;; 00:380c $86
-    ld   [DE], A                                       ;; 00:380d $12 ; same thing as above but for y position lo
-    inc  BC                                            ;; 00:380e $03
-    inc  DE                                            ;; 00:380f $13
-    inc  HL                                            ;; 00:3810 $23
-    ld   A, [BC]                                       ;; 00:3811 $0a ; now hl points to entity id in table below
-    adc  A, [HL]                                       ;; 00:3812 $8e
-    ld   [DE], A                                       ;; 00:3813 $12 ;
-    inc  HL                                            ;; 00:3814 $23
-    ld   A, E                                          ;; 00:3815 $7b
-    xor  A, $11                                        ;; 00:3816 $ee $11
-    ld   E, A                                          ;; 00:3818 $5f
-    ld   A, [HL+]                                      ;; 00:3819 $2a
-    ld   [DE], A                                       ;; 00:381a $12
-    ld   L, A                                          ;; 00:381b $6f
-    ld   H, $00                                        ;; 00:381c $26 $00
-    add  HL, HL                                        ;; 00:381e $29
-    add  HL, HL                                        ;; 00:381f $29
-    add  HL, HL                                        ;; 00:3820 $29
-    ld   BC, data_00_3259                              ;; 00:3821 $01 $59 $32
-    add  HL, BC                                        ;; 00:3824 $09
-    ld   A, E                                          ;; 00:3825 $7b
-    xor  A, $12                                        ;; 00:3826 $ee $12
-    ld   E, A                                          ;; 00:3828 $5f
-    ld   A, [HL+]                                      ;; 00:3829 $2a
-    ld   [DE], A                                       ;; 00:382a $12
-    inc  E                                             ;; 00:382b $1c ; ENTITY_FIELD_HEIGHT
-    ld   A, [HL+]                                      ;; 00:382c $2a
-    ld   [DE], A                                       ;; 00:382d $12
-    inc  E                                             ;; 00:382e $1c ; ENTITY_FIELD_COLLISION_TYPE
-    ld   A, [HL+]                                      ;; 00:382f $2a
-    ld   [DE], A                                       ;; 00:3830 $12
-    inc  E                                             ;; 00:3831 $1c ; ENTITY_FIELD_COOLDOWN_TIMER
-    xor  A, A                                          ;; 00:3832 $af
-    ld   [DE], A                                       ;; 00:3833 $12
-    inc  E                                             ;; 00:3834 $1c ; ENTITY_FIELD_DAMAGE_STATE
-    ld   A, [HL+]                                      ;; 00:3835 $2a
-    dec  A                                             ;; 00:3836 $3d
-    ld   [DE], A                                       ;; 00:3837 $12
-    inc  E                                             ;; 00:3838 $1c ; ENTITY_FIELD_SPRITE_BANK
-    inc  E                                             ;; 00:3839 $1c ; ENTITY_FIELD_UNK18
-    xor  A, A                                          ;; 00:383a $af
-    ld   [DE], A                                       ;; 00:383b $12
-    inc  E                                             ;; 00:383c $1c ; ENTITY_FIELD_MISC_FLAGS
-    ld   A, [HL+]                                      ;; 00:383d $2a
-    ld   [DE], A                                       ;; 00:383e $12
-    inc  E                                             ;; 00:383f $1c ; ENTITY_FIELD_MISC_TIMER
-    xor  A, A                                          ;; 00:3840 $af
-    ld   [DE], A                                       ;; 00:3841 $12
-    inc  E                                             ;; 00:3842 $1c ; ENTITY_FIELD_XVEL
-    ld   [DE], A                                       ;; 00:3843 $12
-    inc  E                                             ;; 00:3844 $1c ; ENTITY_FIELD_XVEL_RELATED
-    ld   [DE], A                                       ;; 00:3845 $12
-    inc  E                                             ;; 00:3846 $1c ; ENTITY_FIELD_YVEL
-    ld   [DE], A                                       ;; 00:3847 $12
-    inc  E                                             ;; 00:3848 $1c ; ENTITY_FIELD_YVEL_RELATED
-    ld   [DE], A                                       ;; 00:3849 $12
-    inc  E                                             ;; 00:384a $1c ; ENTITY_FIELD_PARENT
-    ld   A, [wDCE8_CurrentEntity_ParentListIndex]                                    ;; 00:384b $fa $e8 $dc
-    ld   [DE], A                                       ;; 00:384e $12 
-    call call_00_2a03_Entity_ResetEntityListIndex                                  ;; 00:384f $cd $03 $2a
-    xor  A, A                                          ;; 00:3852 $af
+    inc  C                                            ;; 00:3808 $0c
+    inc  E                                            ;; 00:3809 $1c
+    inc  HL                                           ;; 00:380a $23
+    ld   A, [BC]                                      ;; 00:380b $0a
+    add  A, [HL]                                      ;; 00:380c $86
+    ld   [DE], A                                      ;; 00:380d $12 ; same thing as above but for y position lo
+    inc  BC                                           ;; 00:380e $03
+    inc  DE                                           ;; 00:380f $13
+    inc  HL                                           ;; 00:3810 $23
+    ld   A, [BC]                                      ;; 00:3811 $0a ; now hl points to entity id in table below
+    adc  A, [HL]                                      ;; 00:3812 $8e
+    ld   [DE], A                                      ;; 00:3813 $12 ;
+    inc  HL                                           ;; 00:3814 $23
+    ld   A, E                                         ;; 00:3815 $7b
+    xor  A, $11                                       ;; 00:3816 $ee $11
+    ld   E, A                                         ;; 00:3818 $5f
+    ld   A, [HL+]                                     ;; 00:3819 $2a
+    ld   [DE], A                                      ;; 00:381a $12
+    ld   L, A                                         ;; 00:381b $6f
+    ld   H, $00                                       ;; 00:381c $26 $00
+    add  HL, HL                                       ;; 00:381e $29
+    add  HL, HL                                       ;; 00:381f $29
+    add  HL, HL                                       ;; 00:3820 $29
+    ld   BC, data_00_3259_EntityAttributeTable_WidthBase ;; 00:3821 $01 $59 $32
+    add  HL, BC                                       ;; 00:3824 $09
+    ld   A, E                                         ;; 00:3825 $7b
+    xor  A, $12                                       ;; 00:3826 $ee $12
+    ld   E, A                                         ;; 00:3828 $5f
+    ld   A, [HL+]                                     ;; 00:3829 $2a
+    ld   [DE], A                                      ;; 00:382a $12
+    inc  E                                            ;; 00:382b $1c ; ENTITY_FIELD_HEIGHT
+    ld   A, [HL+]                                     ;; 00:382c $2a
+    ld   [DE], A                                      ;; 00:382d $12
+    inc  E                                            ;; 00:382e $1c ; ENTITY_FIELD_COLLISION_TYPE
+    ld   A, [HL+]                                     ;; 00:382f $2a
+    ld   [DE], A                                      ;; 00:3830 $12
+    inc  E                                            ;; 00:3831 $1c ; ENTITY_FIELD_COOLDOWN_TIMER
+    xor  A, A                                         ;; 00:3832 $af
+    ld   [DE], A                                      ;; 00:3833 $12
+    inc  E                                            ;; 00:3834 $1c ; ENTITY_FIELD_DAMAGE_STATE
+    ld   A, [HL+]                                     ;; 00:3835 $2a
+    dec  A                                            ;; 00:3836 $3d
+    ld   [DE], A                                      ;; 00:3837 $12
+    inc  E                                            ;; 00:3838 $1c ; ENTITY_FIELD_SPRITE_BANK
+    inc  E                                            ;; 00:3839 $1c ; ENTITY_FIELD_UNK18
+    xor  A, A                                         ;; 00:383a $af
+    ld   [DE], A                                      ;; 00:383b $12
+    inc  E                                            ;; 00:383c $1c ; ENTITY_FIELD_MISC_FLAGS
+    ld   A, [HL+]                                     ;; 00:383d $2a
+    ld   [DE], A                                      ;; 00:383e $12
+    inc  E                                            ;; 00:383f $1c ; ENTITY_FIELD_MISC_TIMER
+    xor  A, A                                         ;; 00:3840 $af
+    ld   [DE], A                                      ;; 00:3841 $12
+    inc  E                                            ;; 00:3842 $1c ; ENTITY_FIELD_XVEL
+    ld   [DE], A                                      ;; 00:3843 $12
+    inc  E                                            ;; 00:3844 $1c ; ENTITY_FIELD_XVEL_RELATED
+    ld   [DE], A                                      ;; 00:3845 $12
+    inc  E                                            ;; 00:3846 $1c ; ENTITY_FIELD_YVEL
+    ld   [DE], A                                      ;; 00:3847 $12
+    inc  E                                            ;; 00:3848 $1c ; ENTITY_FIELD_YVEL_RELATED
+    ld   [DE], A                                      ;; 00:3849 $12
+    inc  E                                            ;; 00:384a $1c ; ENTITY_FIELD_PARENT
+    ld   A, [wDCE8_CurrentEntity_ParentListIndex]     ;; 00:384b $fa $e8 $dc
+    ld   [DE], A                                      ;; 00:384e $12 
+    call call_00_2a03_Entity_ResetEntityListIndex     ;; 00:384f $cd $03 $2a
+    xor  A, A                                         ;; 00:3852 $af
     farcall call_02_72ac_Entity_SetAction
     farcall call_03_687c_AssignEntityPalette
-    pop  AF                                            ;; 00:3869 $f1
-    ld   HL, wDA00_CurrentEntityAddrLo                                     ;; 00:386a $21 $00 $da
-    ld   C, [HL]                                       ;; 00:386d $4e
-    ld   [HL], A                                       ;; 00:386e $77
-    rrca                                               ;; 00:386f $0f
-    and  A, $70                                        ;; 00:3870 $e6 $70
-    ld   L, A                                          ;; 00:3872 $6f
-    ld   H, $00                                        ;; 00:3873 $26 $00
-    ld   DE, wDA1C_EntityBoundingBoxXMax                                     ;; 00:3875 $11 $1c $da
-    add  HL, DE                                        ;; 00:3878 $19
-    ld   E, L                                          ;; 00:3879 $5d
-    ld   D, H                                          ;; 00:387a $54
-    ld   A, C                                          ;; 00:387b $79
-    rrca                                               ;; 00:387c $0f
-    and  A, $70                                        ;; 00:387d $e6 $70
-    ld   L, A                                          ;; 00:387f $6f
-    ld   H, $00                                        ;; 00:3880 $26 $00
-    ld   BC, wDA1C_EntityBoundingBoxXMax                                     ;; 00:3882 $01 $1c $da
-    add  HL, BC                                        ;; 00:3885 $09
-    ld   A, [DE]                                       ;; 00:3886 $1a
-    ld   [HL+], A                                      ;; 00:3887 $22
-    inc  DE                                            ;; 00:3888 $13
-    ld   A, [DE]                                       ;; 00:3889 $1a
-    ld   [HL+], A                                      ;; 00:388a $22
-    inc  DE                                            ;; 00:388b $13
-    ld   A, [DE]                                       ;; 00:388c $1a
-    ld   [HL+], A                                      ;; 00:388d $22
-    inc  DE                                            ;; 00:388e $13
-    ld   A, [DE]                                       ;; 00:388f $1a
-    ld   [HL+], A                                      ;; 00:3890 $22
-    inc  DE                                            ;; 00:3891 $13
-    ld   A, [DE]                                       ;; 00:3892 $1a
-    ld   [HL+], A                                      ;; 00:3893 $22
-    inc  DE                                            ;; 00:3894 $13
-    ld   A, [DE]                                       ;; 00:3895 $1a
-    ld   [HL+], A                                      ;; 00:3896 $22
-    inc  DE                                            ;; 00:3897 $13
-    ld   A, [DE]                                       ;; 00:3898 $1a
-    ld   [HL+], A                                      ;; 00:3899 $22
-    inc  DE                                            ;; 00:389a $13
-    ld   A, [DE]                                       ;; 00:389b $1a
-    ld   [HL+], A                                      ;; 00:389c $22
-    inc  DE                                            ;; 00:389d $13
-    ld   A, [DE]                                       ;; 00:389e $1a
-    ld   [HL+], A                                      ;; 00:389f $22
-    inc  DE                                            ;; 00:38a0 $13
-    ld   A, [DE]                                       ;; 00:38a1 $1a
-    ld   [HL+], A                                      ;; 00:38a2 $22
-    inc  DE                                            ;; 00:38a3 $13
-    ld   A, [DE]                                       ;; 00:38a4 $1a
-    ld   [HL+], A                                      ;; 00:38a5 $22
-    inc  DE                                            ;; 00:38a6 $13
-    ld   A, [DE]                                       ;; 00:38a7 $1a
-    ld   [HL+], A                                      ;; 00:38a8 $22
-    inc  DE                                            ;; 00:38a9 $13
-    ld   A, [DE]                                       ;; 00:38aa $1a
-    ld   [HL+], A                                      ;; 00:38ab $22
-    inc  DE                                            ;; 00:38ac $13
-    ld   A, [DE]                                       ;; 00:38ad $1a
-    ld   [HL+], A                                      ;; 00:38ae $22
-    inc  DE                                            ;; 00:38af $13
-    ld   A, [DE]                                       ;; 00:38b0 $1a
-    ld   [HL+], A                                      ;; 00:38b1 $22
-    inc  DE                                            ;; 00:38b2 $13
-    ld   A, [DE]                                       ;; 00:38b3 $1a
-    ld   [HL], A                                       ;; 00:38b4 $77
-    ret                                                ;; 00:38b5 $c9
+    pop  AF                                           ;; 00:3869 $f1
+    ld   HL, wDA00_CurrentEntityAddrLo                ;; 00:386a $21 $00 $da
+    ld   C, [HL]                                      ;; 00:386d $4e
+    ld   [HL], A                                      ;; 00:386e $77
+    rrca                                              ;; 00:386f $0f
+    and  A, ENTITY_BOUNDS_INDEX_MASK                  ;; 00:3870 $e6 $70
+    ld   L, A                                         ;; 00:3872 $6f
+    ld   H, $00                                       ;; 00:3873 $26 $00
+    ld   DE, wDA1C_EntityBoundingBoxXMax              ;; 00:3875 $11 $1c $da
+    add  HL, DE                                       ;; 00:3878 $19
+    ld   E, L                                         ;; 00:3879 $5d
+    ld   D, H                                         ;; 00:387a $54
+    ld   A, C                                         ;; 00:387b $79
+    rrca                                              ;; 00:387c $0f
+    and  A, ENTITY_BOUNDS_INDEX_MASK                  ;; 00:387d $e6 $70
+    ld   L, A                                         ;; 00:387f $6f
+    ld   H, $00                                       ;; 00:3880 $26 $00
+    ld   BC, wDA1C_EntityBoundingBoxXMax              ;; 00:3882 $01 $1c $da
+    add  HL, BC                                       ;; 00:3885 $09
+    ld   A, [DE]                                      ;; 00:3886 $1a
+    ld   [HL+], A                                     ;; 00:3887 $22
+    inc  DE                                           ;; 00:3888 $13
+    ld   A, [DE]                                      ;; 00:3889 $1a
+    ld   [HL+], A                                     ;; 00:388a $22
+    inc  DE                                           ;; 00:388b $13
+    ld   A, [DE]                                      ;; 00:388c $1a
+    ld   [HL+], A                                     ;; 00:388d $22
+    inc  DE                                           ;; 00:388e $13
+    ld   A, [DE]                                      ;; 00:388f $1a
+    ld   [HL+], A                                     ;; 00:3890 $22
+    inc  DE                                           ;; 00:3891 $13
+    ld   A, [DE]                                      ;; 00:3892 $1a
+    ld   [HL+], A                                     ;; 00:3893 $22
+    inc  DE                                           ;; 00:3894 $13
+    ld   A, [DE]                                      ;; 00:3895 $1a
+    ld   [HL+], A                                     ;; 00:3896 $22
+    inc  DE                                           ;; 00:3897 $13
+    ld   A, [DE]                                      ;; 00:3898 $1a
+    ld   [HL+], A                                     ;; 00:3899 $22
+    inc  DE                                           ;; 00:389a $13
+    ld   A, [DE]                                      ;; 00:389b $1a
+    ld   [HL+], A                                     ;; 00:389c $22
+    inc  DE                                           ;; 00:389d $13
+    ld   A, [DE]                                      ;; 00:389e $1a
+    ld   [HL+], A                                     ;; 00:389f $22
+    inc  DE                                           ;; 00:38a0 $13
+    ld   A, [DE]                                      ;; 00:38a1 $1a
+    ld   [HL+], A                                     ;; 00:38a2 $22
+    inc  DE                                           ;; 00:38a3 $13
+    ld   A, [DE]                                      ;; 00:38a4 $1a
+    ld   [HL+], A                                     ;; 00:38a5 $22
+    inc  DE                                           ;; 00:38a6 $13
+    ld   A, [DE]                                      ;; 00:38a7 $1a
+    ld   [HL+], A                                     ;; 00:38a8 $22
+    inc  DE                                           ;; 00:38a9 $13
+    ld   A, [DE]                                      ;; 00:38aa $1a
+    ld   [HL+], A                                     ;; 00:38ab $22
+    inc  DE                                           ;; 00:38ac $13
+    ld   A, [DE]                                      ;; 00:38ad $1a
+    ld   [HL+], A                                     ;; 00:38ae $22
+    inc  DE                                           ;; 00:38af $13
+    ld   A, [DE]                                      ;; 00:38b0 $1a
+    ld   [HL+], A                                     ;; 00:38b1 $22
+    inc  DE                                           ;; 00:38b2 $13
+    ld   A, [DE]                                      ;; 00:38b3 $1a
+    ld   [HL], A                                      ;; 00:38b4 $77
+    ret                                               ;; 00:38b5 $c9
 .data_00_38b6_EntityChildSpawnData:
-    EntityChildSpawnData $01, $0000, -$0020, ENTITY_FLY_1
-    EntityChildSpawnData $01, $0000, -$0020, ENTITY_FLY_2
-    EntityChildSpawnData $01, $0000, -$0020, ENTITY_FLY_3
-    EntityChildSpawnData $01, $0000, -$0020, ENTITY_FLY_4
-    EntityChildSpawnData $01, $0000, -$0020, ENTITY_FLY_5
-    EntityChildSpawnData $01, -$000D, -$0003, ENTITY_HOLIDAY_TV_EVIL_SANTA_PROJECTILE
-    EntityChildSpawnData $01, $000E, -$0005, ENTITY_MYSTERY_TV_SAFARI_SAM_PROJECTILE
-    EntityChildSpawnData $01, $0000, $0000, ENTITY_GOAL_COUNTER_1
-    EntityChildSpawnData $01, $0000, $0000, ENTITY_GOAL_COUNTER_2
-    EntityChildSpawnData $01, $0000, $0000, ENTITY_GOAL_COUNTER_3
-    EntityChildSpawnData $01, $0000, $0000, ENTITY_GOAL_COUNTER_4
-    EntityChildSpawnData $01, $0000, $0000, ENTITY_GOAL_COUNTER_5
-    EntityChildSpawnData $01, $0000, $0000, ENTITY_GOAL_COUNTER_6
-    EntityChildSpawnData $01, $0000, $0000, ENTITY_GOAL_COUNTER_7
-    EntityChildSpawnData $01, $0007, $0007, ENTITY_TUT_TV_SNAKE_RIGHT_PROJECTILE
-    EntityChildSpawnData $01, $0007, $0007, ENTITY_TUT_TV_SNAKE_LEFT_PROJECTILE
-    EntityChildSpawnData $01, $000C, $0000, ENTITY_ANIME_CHANNEL_SECBOT_PROJECTILE
-    EntityChildSpawnData $00, $0000, $0000, ENTITY_UNK0E
-    EntityChildSpawnData $00, $0000, $0000, ENTITY_UNK0F
-    EntityChildSpawnData $00, $0000, $0000, ENTITY_UNK10
-    EntityChildSpawnData $00, $0000, $0008, ENTITY_SUPERHERO_SHOW_CONVICT_PROJECTILE
-    EntityChildSpawnData $00, -$0010, $0004, ENTITY_SUPERHERO_SHOW_BOMB
-    EntityChildSpawnData $00, $0001, -$0010, ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE
-    EntityChildSpawnData $00, $0000, $0000, ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2
-    EntityChildSpawnData $00, $0000, $0008, ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE
-    EntityChildSpawnData $00, $0000, $0000, ENTITY_BONUS_STAGE_TIMER
-    EntityChildSpawnData $01, $0000, $0000, ENTITY_ANIME_CHANNEL_SECBOT_PROJECTILE
-    EntityChildSpawnData $01, $0004, -$000E, ENTITY_MYSTERY_TV_GHOST_KNIGHT_PROJECTILE
-    EntityChildSpawnData $00, -$0001, $000B, ENTITY_MARSUPIAL_MADNESS_BIRD_PROJECTILE
-    EntityChildSpawnData $00, -$0040, $0050, ENTITY_CHANNEL_Z_REZ_PROJECTILE
-    EntityChildSpawnData $00, $0040, $0050, ENTITY_CHANNEL_Z_REZ_PROJECTILE
-    db   $00, $00
-    EntityChildSpawnData $00, $0000, $0000, ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2
-    EntityChildSpawnData $00, $0000, $0008, ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE
-    EntityChildSpawnData $00, $0000, $0000, ENTITY_BONUS_STAGE_TIMER
-    EntityChildSpawnData $01, $0000, $0000, ENTITY_ANIME_CHANNEL_SECBOT_PROJECTILE
-    EntityChildSpawnData $01, $0004, -$000E, ENTITY_MYSTERY_TV_GHOST_KNIGHT_PROJECTILE
-    EntityChildSpawnData $00, -$0001, $000B, ENTITY_MARSUPIAL_MADNESS_BIRD_PROJECTILE
-    EntityChildSpawnData $00, -$0040, $0050, ENTITY_CHANNEL_Z_REZ_PROJECTILE
-    EntityChildSpawnData $00, $0040, $0050, ENTITY_CHANNEL_Z_REZ_PROJECTILE
+; One record per SPAWN_CHILD_ENTITY_* id, ENTITY_ATTR_RECORD_SIZE bytes each:
+;
+;   +0     read and thrown away. The `ld A, [HL+]` that fetches it exists only to
+;          step HL past it - the value never reaches anything. It is $00 or $01 in
+;          the data, so it looks like a direction flag that was replaced by the
+;          ENTITY_FACING_LEFT test and left behind
+;   +1 +2  signed X offset from the parent
+;   +3 +4  signed Y offset, always added
+;   +5     the child's ENTITY_* id
+;   +6 +7  padding, never read
+;
+; The first 31 records are the ones SPAWN_CHILD_ENTITY_* names. What follows them is
+; two loose bytes and then a second copy of the last eight records, sitting at an
+; offset no index reaches - dead data at the very end of bank 0.
+;
+; gex2's .data_0a_7c92_EntityChildSpawnData is the same table without the direction
+; flag: there the parent's facing alone decides the sign
+    EntityChildSpawnData $01, $0000, -$0020, ENTITY_FLY_1                              ; SPAWN_CHILD_ENTITY_FLY_1
+    EntityChildSpawnData $01, $0000, -$0020, ENTITY_FLY_2                              ; SPAWN_CHILD_ENTITY_FLY_2
+    EntityChildSpawnData $01, $0000, -$0020, ENTITY_FLY_3                              ; SPAWN_CHILD_ENTITY_FLY_3
+    EntityChildSpawnData $01, $0000, -$0020, ENTITY_FLY_4                              ; SPAWN_CHILD_ENTITY_FLY_4
+    EntityChildSpawnData $01, $0000, -$0020, ENTITY_FLY_5                              ; SPAWN_CHILD_ENTITY_FLY_5
+    EntityChildSpawnData $01, -$000D, -$0003, ENTITY_HOLIDAY_TV_EVIL_SANTA_PROJECTILE  ; SPAWN_CHILD_ENTITY_EVIL_SANTA_PROJECTILE
+    EntityChildSpawnData $01, $000E, -$0005, ENTITY_MYSTERY_TV_SAFARI_SAM_PROJECTILE   ; SPAWN_CHILD_ENTITY_SAFARI_SAM_PROJECTILE
+    EntityChildSpawnData $01, $0000, $0000, ENTITY_GOAL_COUNTER_1                      ; SPAWN_CHILD_ENTITY_GOAL_COUNTER_1
+    EntityChildSpawnData $01, $0000, $0000, ENTITY_GOAL_COUNTER_2                      ; SPAWN_CHILD_ENTITY_GOAL_COUNTER_2
+    EntityChildSpawnData $01, $0000, $0000, ENTITY_GOAL_COUNTER_3                      ; SPAWN_CHILD_ENTITY_GOAL_COUNTER_3
+    EntityChildSpawnData $01, $0000, $0000, ENTITY_GOAL_COUNTER_4                      ; SPAWN_CHILD_ENTITY_GOAL_COUNTER_4
+    EntityChildSpawnData $01, $0000, $0000, ENTITY_GOAL_COUNTER_5                      ; SPAWN_CHILD_ENTITY_GOAL_COUNTER_5
+    EntityChildSpawnData $01, $0000, $0000, ENTITY_GOAL_COUNTER_6                      ; SPAWN_CHILD_ENTITY_GOAL_COUNTER_6
+    EntityChildSpawnData $01, $0000, $0000, ENTITY_GOAL_COUNTER_7                      ; SPAWN_CHILD_ENTITY_GOAL_COUNTER_7
+    EntityChildSpawnData $01, $0007, $0007, ENTITY_TUT_TV_SNAKE_RIGHT_PROJECTILE       ; SPAWN_CHILD_ENTITY_SNAKE_RIGHT_PROJECTILE
+    EntityChildSpawnData $01, $0007, $0007, ENTITY_TUT_TV_SNAKE_LEFT_PROJECTILE        ; SPAWN_CHILD_ENTITY_SNAKE_LEFT_PROJECTILE
+    EntityChildSpawnData $01, $000C, $0000, ENTITY_ANIME_CHANNEL_SECBOT_PROJECTILE     ; SPAWN_CHILD_ENTITY_SECBOT_PROJECTILE
+    EntityChildSpawnData $00, $0000, $0000, ENTITY_UNK0E                               ; SPAWN_CHILD_ENTITY_UNK0E
+    EntityChildSpawnData $00, $0000, $0000, ENTITY_UNK0F                               ; SPAWN_CHILD_ENTITY_UNK0F
+    EntityChildSpawnData $00, $0000, $0000, ENTITY_UNK10                               ; SPAWN_CHILD_ENTITY_UNK10
+    EntityChildSpawnData $00, $0000, $0008, ENTITY_SUPERHERO_SHOW_CONVICT_PROJECTILE   ; SPAWN_CHILD_ENTITY_CONVICT_PROJECTILE
+    EntityChildSpawnData $00, -$0010, $0004, ENTITY_SUPERHERO_SHOW_BOMB                ; SPAWN_CHILD_ENTITY_BOMB
+    EntityChildSpawnData $00, $0001, -$0010, ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE     ; SPAWN_CHILD_ENTITY_CANNON_PROJECTILE
+    EntityChildSpawnData $00, $0000, $0000, ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2    ; SPAWN_CHILD_ENTITY_CANNON_PROJECTILE_2
+    EntityChildSpawnData $00, $0000, $0008, ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE ; SPAWN_CHILD_ENTITY_BRAIN_OF_OZ_PROJECTILE
+    EntityChildSpawnData $00, $0000, $0000, ENTITY_BONUS_STAGE_TIMER                   ; SPAWN_CHILD_ENTITY_STAGE_TIMER
+    EntityChildSpawnData $01, $0000, $0000, ENTITY_ANIME_CHANNEL_SECBOT_PROJECTILE     ; SPAWN_CHILD_ENTITY_SECBOT_PROJECTILE_2
+    EntityChildSpawnData $01, $0004, -$000E, ENTITY_MYSTERY_TV_GHOST_KNIGHT_PROJECTILE ; SPAWN_CHILD_ENTITY_GHOST_KNIGHT_PROJECTILE
+    EntityChildSpawnData $00, -$0001, $000B, ENTITY_MARSUPIAL_MADNESS_BIRD_PROJECTILE  ; SPAWN_CHILD_ENTITY_BIRD_PROJECTILE
+    EntityChildSpawnData $00, -$0040, $0050, ENTITY_CHANNEL_Z_REZ_PROJECTILE           ; SPAWN_CHILD_ENTITY_REZ_PROJECTILE
+    EntityChildSpawnData $00, $0040, $0050, ENTITY_CHANNEL_Z_REZ_PROJECTILE            ; SPAWN_CHILD_ENTITY_REZ_PROJECTILE_2
+    db   $00, $00                                                                      ; two stray bytes - the rows below are a copy of
+                                                                                       ; the last eight, at an offset nothing indexes
+    EntityChildSpawnData $00, $0000, $0000, ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2    ; unreachable
+    EntityChildSpawnData $00, $0000, $0008, ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE ; unreachable
+    EntityChildSpawnData $00, $0000, $0000, ENTITY_BONUS_STAGE_TIMER                   ; unreachable
+    EntityChildSpawnData $01, $0000, $0000, ENTITY_ANIME_CHANNEL_SECBOT_PROJECTILE     ; unreachable
+    EntityChildSpawnData $01, $0004, -$000E, ENTITY_MYSTERY_TV_GHOST_KNIGHT_PROJECTILE ; unreachable
+    EntityChildSpawnData $00, -$0001, $000B, ENTITY_MARSUPIAL_MADNESS_BIRD_PROJECTILE  ; unreachable
+    EntityChildSpawnData $00, -$0040, $0050, ENTITY_CHANNEL_Z_REZ_PROJECTILE           ; unreachable
+    EntityChildSpawnData $00, $0040, $0050, ENTITY_CHANNEL_Z_REZ_PROJECTILE            ; unreachable

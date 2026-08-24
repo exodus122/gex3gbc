@@ -80,7 +80,7 @@
 ;                    and only for top-down maps
 ;   the player       both games give Gex his own builder rather than a shape. gex2's
 ;                    is in this file (call_03_5ca8_Player_BuildSprites); gex3's is
-;                    call_00_2ce2_Entity_DrawGex, over in bank 0
+;                    call_00_2ce2_Player_BuildSprites, over in bank 0
 ;   the HUD          gex2 builds its status row as eight OAM sprites, in this file.
 ;                    gex3's HUD is not sprites at all - it is tiles written into the
 ;                    window tilemap by bank03_hud_graphics.asm, so nothing about it
@@ -779,7 +779,7 @@ call_03_5ec1_OAM_BuildFrame:
 ; below it - and then takes one of two routes.
 ;
 ; The ordinary route is three sweeps of the eight slots: the entities flagged
-; SPRITE_DESC_DRAW_FIRST, then Gex through call_00_2ce2_Entity_DrawGex, then
+; SPRITE_DESC_DRAW_FIRST, then Gex through call_00_2ce2_Player_BuildSprites, then
 ; everything else. Slot order within a sweep, so nothing is sorted.
 ;
 ; The top-down route (.jr_03_5f35, taken when the map's collision type is
@@ -820,7 +820,7 @@ call_03_5ec1_OAM_BuildFrame:
     jr   NZ, .jr_03_5eda                              ;; 03:5ef2 $20 $e6
     ld   A, [wDCA7_Player_UpdateFlag]                 ;; 03:5ef4 $fa $a7 $dc
     and  A, A                                         ;; 03:5ef7 $a7
-    call NZ, call_00_2ce2_Entity_DrawGex              ;; 03:5ef8 $c4 $e2 $2c
+    call NZ, call_00_2ce2_Player_BuildSprites              ;; 03:5ef8 $c4 $e2 $2c
     ld   A, LOW(wD820_EntityMemoryAfterPlayer)        ;; 03:5efb $3e $20
 .jr_03_5efd:
     ld   [wDA00_CurrentEntityAddrLo], A               ;; 03:5efd $ea $00 $da
@@ -941,7 +941,7 @@ call_03_5ec1_OAM_BuildFrame:
 .jr_03_5fb2:
     ld   A, [wDCA7_Player_UpdateFlag]                 ;; 03:5fb2 $fa $a7 $dc
     and  A, A                                         ;; 03:5fb5 $a7
-    call NZ, call_00_2ce2_Entity_DrawGex              ;; 03:5fb6 $c4 $e2 $2c
+    call NZ, call_00_2ce2_Player_BuildSprites              ;; 03:5fb6 $c4 $e2 $2c
 .jr_03_5fb9:
     pop  HL                                           ;; 03:5fb9 $e1
     pop  BC                                           ;; 03:5fba $c1

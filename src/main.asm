@@ -10,6 +10,8 @@ INCLUDE "code/bank00_home.asm"
 INCLUDE "code/bank00_bg_map.asm"
 INCLUDE "code/bank00_cutscenes.asm"
 INCLUDE "code/bank00_entity_utils.asm"
+INCLUDE "code/bank00_player_sprites.asm"
+INCLUDE "code/bank00_level_init.asm"
 INCLUDE "code/bank00_entity_load.asm"
 
 SECTION "bank01", ROMX[$4000], BANK[$01]

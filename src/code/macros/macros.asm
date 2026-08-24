@@ -109,3 +109,94 @@ ENDM
 MACRO oam_piece ; Y offset, X offset, tile, OAMF_* bits
     db   \1, \2, \3, \4
 ENDM
+
+; ------------------------------------------------------------------
+; Gex's OAM build - see code/bank00_player_sprites.asm
+; ------------------------------------------------------------------
+; Where Gex is on screen this frame, and whether he should be drawn at all. Leaves
+; B = the Y origin for his pieces and C = the X origin, and jumps away to the
+; shared tail when the damage flash is in its blank phase.
+;
+; \1 is 1 for the last of the four flip variants, which is close enough to the tail
+; to reach it with a `jr`
+MACRO player_oam_origin
+    ld   A, [wDBF9_XPositionInMap]
+    ld   C, A
+    ld   A, [wD80E_PlayerXPosition]
+    sub  A, C
+    add  A, OAM_X_BIAS
+    ld   [wDC90_Player_ScreenX], A
+    ld   C, A
+    ld   A, [wDBFB_YPositionInMap]
+    ld   B, A
+    ld   A, [wD810_PlayerYPosition]
+    sub  A, B
+    add  A, OAM_Y_BIAS
+    ld   [wDC91_Player_ScreenY], A
+    add  A, OAM_Y_BIAS
+    ld   B, A
+    ld   A, [wDC88_CurrentEntity_UnkVerticalOffset]
+    add  A, B
+    ld   B, A
+    call call_00_2f00_Player_IsDead
+    jr   NZ, .draw\@
+    ld   A, [wDC7E_Player_DamageCooldownTimer]
+    and  A, A
+    jr   Z, .draw\@
+    ld   A, [wDC71_VBlankFrameCounter]
+    and  A, PLAYER_DAMAGE_FLASH_MASK
+IF \1
+    jr   NZ, .jp_00_2ece
+ELSE
+    jp   NZ, .jp_00_2ece
+ENDC
+.draw\@:
+    ld   A, [wDAC2_PlayerGfx_TileCount]
+ENDM
+
+; One OBJ per iteration, walking the frame list at HL: a Y offset, an X offset, then
+; a byte of extra attributes and a byte the build skips.
+;
+; \1 mirrors vertically and \2 horizontally - `cpl / inc A` is the two's complement
+; negate, and the subtraction that follows it moves the piece back by its own size so
+; the mirrored rectangle lands where the unmirrored one did. \3 is 1 for the last
+; variant, which falls through to the tail instead of jumping to it
+MACRO player_oam_pieces
+.piece\@:
+    push AF
+    ld   A, [HL+]
+IF \1
+    cpl
+    inc  A
+    sub  A, PLAYER_SPRITE_YFLIP_HEIGHT
+ENDC
+    add  A, B
+    ld   [DE], A
+    inc  E
+    ld   A, [HL+]
+IF \2
+    cpl
+    inc  A
+    sub  A, PLAYER_SPRITE_XFLIP_WIDTH
+ENDC
+    add  A, C
+    ld   [DE], A
+    inc  E
+    ld   A, [wDC52_Player_OamTileId]
+    ld   [DE], A
+    add  A, PLAYER_SPRITE_TILE_STRIDE
+    ld   [wDC52_Player_OamTileId], A
+    inc  E
+    ld   A, [wDC53_Player_OamAttributes]
+    or   A, [HL]
+    ld   [DE], A
+    inc  E
+    inc  HL
+    inc  HL
+    pop  AF
+    dec  A
+    jr   NZ, .piece\@
+IF !\3
+    jp   .jp_00_2ece
+ENDC
+ENDM

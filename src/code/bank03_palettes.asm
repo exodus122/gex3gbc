@@ -11,7 +11,7 @@ call_03_6567_LoadFlyPalettes:
     jr   NZ, .jr_03_6583                               ;; 03:656e $20 $13
     ld   A, [wDC51_Player_CurrentFly]                  ;; 03:6570 $fa $51 $dc
     and  A, A                                          ;; 03:6573 $a7
-    jp   Z, call_00_2cbf_LoadEntityPalettes            ;; 03:6574 $ca $bf $2c
+    jp   Z, call_00_2cbf_Entity_LoadMapPalettes            ;; 03:6574 $ca $bf $2c
     dec  A                                             ;; 03:6577 $3d
     ld   L, A                                          ;; 03:6578 $6f
     ld   H, $00                                        ;; 03:6579 $26 $00
@@ -45,7 +45,7 @@ call_03_65c6_LoadBgPalettes:
 ; Purpose: Loads either level palettes or menu palettes depending on C.
 ; Behavior:
 ; If C is zero, loads map and entity palettes via call_00_05af_BgPalettes_LoadForMap 
-; and call_00_2cbf_LoadEntityPalettes.
+; and call_00_2cbf_Entity_LoadMapPalettes.
 ; If bit 7 of C is set, returns immediately.
 ; Else, uses C as index into .data_03_65f1_MenuPalettes to copy 0x40 bytes to wDCEA_BgPalettes, 
 ; then loads a default set from .data_03_6803_palette.
@@ -53,7 +53,7 @@ call_03_65c6_LoadBgPalettes:
     dec  C                                             ;; 03:65c7 $0d
     jr   NZ, .jr_03_65d1                               ;; 03:65c8 $20 $07
     call call_00_05af_BgPalettes_LoadForMap            ;; 03:65ca $cd $af $05
-    call call_00_2cbf_LoadEntityPalettes               ;; 03:65cd $cd $bf $2c
+    call call_00_2cbf_Entity_LoadMapPalettes               ;; 03:65cd $cd $bf $2c
     ret                                                ;; 03:65d0 $c9
 .jr_03_65d1:
     bit  7, C                                          ;; 03:65d1 $cb $79
@@ -105,7 +105,7 @@ call_03_6833:
     add  hl,hl
     add  hl,hl
     add  hl,hl
-    ld   de,data_00_3259
+    ld   de,data_00_3259_EntityAttributeTable_WidthBase
     add  hl,de
     ldi  a,[hl]
     push hl

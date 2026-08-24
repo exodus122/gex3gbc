@@ -1612,7 +1612,7 @@ call_03_5671_HandleEntityHit:
     jr   NC, .jr_03_56b8                               ;; 03:5687 $30 $2f
 .jr_03_5689:
     ld   [HL], $00                                     ;; 03:5689 $36 $00
-    call call_00_35e8_GetEntityCollisionFlags                                  ;; 03:568b $cd $e8 $35
+    call call_00_35e8_Entity_GetCollisionFlags                                  ;; 03:568b $cd $e8 $35
     cp   A, $ff                                        ;; 03:568e $fe $ff
     jp   Z, call_00_2b7a_Entity_DeactivateAndMarkNeverRespawn                                 ;; 03:5690 $ca $7a $2b
     bit  7, A                                          ;; 03:5693 $cb $7f

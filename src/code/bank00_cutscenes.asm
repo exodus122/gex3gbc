@@ -210,7 +210,7 @@ call_00_1ea0_Cutscene_LoadAndRun:
     call call_00_217f_Cutscene_UpdateMovement                                  ;; 00:1f45 $cd $7f $21
     farcall call_02_7152_Entities_UpdateAll
     call call_00_11c8_BgMap_LoadDirtyRegions                                  ;; 00:1f53 $cd $c8 $11
-    call call_00_35fa_WaitForLineThenSpawnEntity                                  ;; 00:1f56 $cd $fa $35
+    call call_00_35fa_EntitySpawn_SpawnUntilScanline                                  ;; 00:1f56 $cd $fa $35
     call call_00_08f8_StageNextGfxTransfer                                  ;; 00:1f59 $cd $f8 $08
     ld   HL, wDCDE_Cutscene_MoveFramesRemaining                                     ;; 00:1f5c $21 $de $dc
     ld   A, [HL]                                       ;; 00:1f5f $7e
@@ -244,7 +244,7 @@ call_00_1ea0_Cutscene_LoadAndRun:
     call call_00_0b92_WaitForInterrupt                                  ;; 00:1f7b $cd $92 $0b
     farcall call_02_7152_Entities_UpdateAll
     call call_00_11c8_BgMap_LoadDirtyRegions                                  ;; 00:1f89 $cd $c8 $11
-    call call_00_35fa_WaitForLineThenSpawnEntity                                  ;; 00:1f8c $cd $fa $35
+    call call_00_35fa_EntitySpawn_SpawnUntilScanline                                  ;; 00:1f8c $cd $fa $35
     call call_00_08f8_StageNextGfxTransfer                                  ;; 00:1f8f $cd $f8 $08
     ld   A, [wDAD7_RawInputs]                                    ;; 00:1f92 $fa $d7 $da
     and  A, A                                          ;; 00:1f95 $a7
