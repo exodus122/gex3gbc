@@ -286,3 +286,22 @@ MACRO player_frame ; bank offset from the set's base bank, address within that b
     db   \1
     dw   \2
 ENDM
+
+; ------------------------------------------------------------------
+; Gex's animation frames - see data/sprite_data/bankXX_frames.asm
+; ------------------------------------------------------------------
+; A frame header. The two middle bytes are stored for every frame in the game and read
+; by nothing; they are small numbers in the right range for a size but they do not
+; match the frame's piece extents, so what they meant is unknown
+MACRO player_frame_header ; piece count, unread, unread, tile data
+    db   \1, \2, \3
+    dw   \4
+ENDM
+
+; One 8x16 OBJ of a frame. The offsets are relative to Gex's screen position and are
+; mirrored by the build for the flipped variants. The attribute byte is OR'd into
+; wDC53_Player_OamAttributes, and the only bit any frame in the game sets is palette 1.
+; The fourth byte is $00 in all 11005 pieces and is stepped over without being read
+MACRO player_piece ; Y offset, X offset, OBJ palette
+    db   \1, \2, \3, 0
+ENDM

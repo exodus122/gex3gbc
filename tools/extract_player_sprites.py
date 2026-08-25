@@ -57,6 +57,7 @@ HEADER_SIZE         = 5        # a frame header: count, two unread bytes, dw til
 PIECE_SIZE          = 4        # a piece record: Y, X, attributes, unread
 PIECE_TILE_BYTES    = 32       # one 8x16 OBJ is two 16-byte tiles
 PAL_BLOCK           = 0x40
+PAD_TILES_MIN       = 16       # blank tiles a sheet may add to reach a decent shape
 BANK_SIZE           = 0x4000
 BANK_BASE           = 0x4000
 
@@ -189,14 +190,156 @@ def indices_to_tiles(grid, cols, rows_):
     return bytes(out)
 
 
-def sheet_rows(tile_count):
-    """Rows of tiles in the sheet: the tallest even divisor up to 16, so that whole
-    8x16 pieces stay inside one column and the image is not absurdly wide."""
+def sheet_shape(tile_count):
+    """Pick a near-square sheet for this many tiles, padding to fill the rectangle.
+
+    Tile counts like 886 = 2 x 443 have no useful factorisation, so an exact rectangle
+    would be 3544x16 pixels. A few blank tiles buy a sensible shape instead. Rows are
+    kept even so an 8x16 piece never straddles a column, and the padding goes at the
+    END, where column-major order puts it - which is what lets main.asm INCBIN just the
+    real prefix and leave the blanks out of the ROM.
+    """
+    budget = max(PAD_TILES_MIN, tile_count // 32)
+    best = None
+    for rows_ in range(2, 65, 2):
+        cols = -(-tile_count // rows_)                  # ceil
+        waste = cols * rows_ - tile_count
+        if waste > budget:
+            continue
+        aspect = max(cols, rows_) / min(cols, rows_)
+        key = (round(aspect, 3), waste)
+        if best is None or key < best[0]:
+            best = (key, cols, rows_)
+    if best is None:                                    # no padding fits the budget
+        rows_ = sheet_rows_exact(tile_count)
+        return tile_count // rows_, rows_
+    return best[1], best[2]
+
+
+def sheet_rows_exact(tile_count):
     best = 2
     for h in range(2, 17, 2):
         if tile_count % h == 0:
             best = h
     return best
+
+
+
+# ---------------------------------------------------------------------------
+# previews: the frames assembled, in their real colours. These are for looking
+# at - the build never reads them. See the note in write_previews.
+
+FONT = {c: r for c, r in zip('0123456789abcdef', [
+    (0b111, 0b101, 0b101, 0b101, 0b111), (0b010, 0b110, 0b010, 0b010, 0b111),
+    (0b111, 0b001, 0b111, 0b100, 0b111), (0b111, 0b001, 0b111, 0b001, 0b111),
+    (0b101, 0b101, 0b111, 0b001, 0b001), (0b111, 0b100, 0b111, 0b001, 0b111),
+    (0b111, 0b100, 0b111, 0b101, 0b111), (0b111, 0b001, 0b001, 0b001, 0b001),
+    (0b111, 0b101, 0b111, 0b101, 0b111), (0b111, 0b101, 0b111, 0b001, 0b111),
+    (0b111, 0b101, 0b111, 0b101, 0b101), (0b110, 0b101, 0b110, 0b101, 0b110),
+    (0b111, 0b100, 0b100, 0b100, 0b111), (0b110, 0b101, 0b101, 0b101, 0b110),
+    (0b111, 0b100, 0b111, 0b100, 0b111), (0b111, 0b100, 0b111, 0b100, 0b100)])}
+
+
+def png_write_rgb(path, width, height, rows):
+    raw = bytearray()
+    for y in range(height):
+        raw.append(0)
+        for r, g, b in rows[y]:
+            raw += bytes((r, g, b, 0xFF))
+
+    def chunk(tag, payload):
+        return (struct.pack('>I', len(payload)) + tag + payload
+                + struct.pack('>I', zlib.crc32(tag + payload) & 0xFFFFFFFF))
+
+    with open(path, 'wb') as fh:
+        fh.write(b'\x89PNG\r\n\x1a\n')
+        fh.write(chunk(b'IHDR', struct.pack('>IIBBBBB', width, height, 8, 6, 0, 0, 0)))
+        fh.write(chunk(b'IDAT', zlib.compress(bytes(raw), 9)))
+        fh.write(chunk(b'IEND', b''))
+
+
+def cgb_rgb(word):
+    """BGR555 as the Game Boy Color stores it, widened to 8 bits per channel."""
+    return tuple(((word >> s) & 31) << 3 | ((word >> s) & 31) >> 2 for s in (0, 5, 10))
+
+
+def write_previews(out_dir, rom, sets, banks, set_names, columns=16):
+    """One contact sheet per graphics set: every frame assembled from its pieces,
+    in the OBJ palettes bank $7F gives that set, aligned on Gex's origin so the
+    animation reads across the grid.
+
+    This is the layout the sheets in src/gfx CANNOT have. Three things rule it out
+    there: the ROM's tile order is the artist's piece order and has nothing to do with
+    position, pieces overlap each other in 1552 of the 1660 frames so no image can hold
+    both, and 88% of pieces sit at offsets that are not multiples of 8 so they would
+    not land on tile boundaries anyway. A preview can ignore all of that because
+    nothing has to read it back.
+    """
+    os.makedirs(out_dir, exist_ok=True)
+    index = bytes(rom[BANK_INDEX * BANK_SIZE:(BANK_INDEX + 1) * BANK_SIZE])
+    written = []
+
+    for set_id, (_, _, pal_ptr) in enumerate(sets):
+        frames = sorted((f for b in banks.values() if b['set'] == set_id
+                         for f in b['frames']), key=lambda f: f['sid'])
+        if not frames:
+            continue
+        tiles_of = {id(f): b['tiles'][f['tiles'] - b['tile_base']:
+                                      f['tiles'] - b['tile_base'] + PIECE_TILE_BYTES * f['pieces']]
+                    for b in banks.values() if b['set'] == set_id for f in b['frames']}
+
+        pal = []
+        for n in range(8):
+            at = pal_ptr - BANK_BASE + 2 * n
+            pal.append(cgb_rgb(index[at] | (index[at + 1] << 8)))
+
+        xs = [s8(p[1]) for f in frames for p in f['piece']]
+        ys = [s8(p[0]) for f in frames for p in f['piece']]
+        x0, y0 = min(xs), min(ys)
+        cw, ch = max(xs) + 8 - x0 + 2, max(ys) + 16 - y0 + 2
+        rows_n = -(-len(frames) // columns)
+        W, H = cw * columns, ch * rows_n
+        tint = ((0xF2, 0xF2, 0xF4), (0xE6, 0xE6, 0xEA))
+        img = [[tint[0]] * W for _ in range(H)]
+        for cy in range(rows_n):
+            for cx in range(columns):
+                shade = tint[(cx + cy) & 1]
+                for y in range(cy * ch, min((cy + 1) * ch, H)):
+                    for x in range(cx * cw, min((cx + 1) * cw, W)):
+                        img[y][x] = shade
+
+        for n, f in enumerate(frames):
+            ox = (n % columns) * cw + 1 - x0
+            oy = (n // columns) * ch + 1 - y0
+            blob = tiles_of[id(f)]
+            for i, (py, px, attr, _) in enumerate(f['piece']):
+                base = pal[1] if attr else pal[0]
+                colours = [pal[attr * 4 + k] for k in range(4)]
+                for half in range(2):
+                    tile = blob[(i * 2 + half) * 16:(i * 2 + half) * 16 + 16]
+                    for ty in range(8):
+                        lo, hi = tile[ty * 2], tile[ty * 2 + 1]
+                        for tx in range(8):
+                            bit = 7 - tx
+                            v = (((hi >> bit) & 1) << 1) | ((lo >> bit) & 1)
+                            if v == 0:
+                                continue                 # OBJ colour 0 is transparent
+                            Y, X = oy + s8(py) + half * 8 + ty, ox + s8(px) + tx
+                            if 0 <= Y < H and 0 <= X < W:
+                                img[Y][X] = colours[v]
+            label = f"{f['sid']:02x}"
+            lx, ly = (n % columns) * cw + 1, (n // columns) * ch + 1
+            for ci, ch_ in enumerate(label):
+                for ry in range(5):
+                    bits = FONT[ch_][ry]
+                    for rx in range(3):
+                        if (bits >> (2 - rx)) & 1 and ly + ry < H and lx + ci * 4 + rx < W:
+                            img[ly + ry][lx + ci * 4 + rx] = (0x88, 0x88, 0x99)
+
+        name = f"set{set_id}_{set_names[set_id].replace('PLAYER_GFX_SET_', '').lower()}.png"
+        png_write_rgb(os.path.join(out_dir, name), W, H, img)
+        written.append((name, len(frames), W, H))
+    return written
 
 
 # ---------------------------------------------------------------------------
@@ -315,6 +458,9 @@ def emit_frames_asm(bk, info, set_names):
         f"${info['tile_base']:04x} to ${info['tiles_end'] - 1:04x}, which main.asm",
         '; INCBINs straight after this file. Both halves are in sprite-id order.',
         ';',
+        '; The sheet is padded with blank tiles to reach a square-ish shape. They sit at',
+        "; the end, so main.asm's INCBIN takes a length and leaves them out of the ROM.",
+        ';',
         '; A frame is reached from data/sprite_data/bank7F.asm, which documents the',
         "; lookup and the format; code/bank00_player_sprites.asm is what walks it.",
         '; ==================================================================',
@@ -356,7 +502,10 @@ def main_asm_block(banks, sets):
         info = banks[bk]
         L.append(f'SECTION "bank{bk:02x}", ROMX[$4000], BANK[${bk:02x}]')
         L.append(f'INCLUDE "data/sprite_data/bank{bk:02x}_frames.asm"')
-        L.append(f'    INCBIN ".gfx/player_sprites/{png_name(bk, info)[:-4]}.bin"')
+        n = len(info['tiles'])
+        tail = (f', 0, ${n:04x}{"":<6}; {n // 16} tiles, without the sheet\'s blank '
+                f'padding' if info['pad'] else '')
+        L.append(f'    INCBIN ".gfx/player_sprites/{png_name(bk, info)[:-4]}.bin"{tail}')
     return '\n'.join(L)
 
 
@@ -404,7 +553,7 @@ def relink_bank7f(text, banks, sets):
     return '\n'.join(out), n, skipped
 
 
-def rgbgfx_check(png_path, expect):
+def rgbgfx_check(png_path, expect, pad_bytes):
     exe = shutil.which('rgbgfx')
     if not exe:
         return None
@@ -413,7 +562,8 @@ def rgbgfx_check(png_path, expect):
     try:
         subprocess.run([exe, '--columns', '-o', tmp_path, png_path],
                        check=True, capture_output=True)
-        return open(tmp_path, 'rb').read() == expect
+        got = open(tmp_path, 'rb').read()
+        return got[:len(expect)] == expect and got[len(expect):] == bytes(pad_bytes)
     finally:
         os.unlink(tmp_path)
 
@@ -439,6 +589,10 @@ def main():
     ap.add_argument('--patch-main', action='store_true', help='rewrite the bank $62-$7e section of main.asm')
     ap.add_argument('--patch-makefile', action='store_true', help='add the rgbgfx --columns rule')
     ap.add_argument('--skip-rgbgfx', action='store_true', help='do not round-trip through rgbgfx')
+    ap.add_argument('--preview', nargs='?', const=os.path.join('docs', 'player_frames'),
+                    default=None, metavar='DIR',
+                    help='also render assembled contact sheets, in colour, for looking '
+                         'at (default DIR: docs/player_frames). The build never reads these')
     args = ap.parse_args()
 
     repo = find_repo(args.repo)
@@ -449,11 +603,18 @@ def main():
     print(f"repo {repo}\nrom  {rom_path} ({len(rom)} bytes)\n")
 
     sets, banks = parse(rom)
-    set_names = {}
     ctext = open(os.path.join(repo, 'src/constants/constants.asm'), encoding='utf-8').read()
+    # PLAYER_GFX_SET_SIZE and _PALETTE_FIELD share the prefix and would shadow sets 5
+    # and 3, so take only the run of DEFs whose values ascend 0, 1, 2 ... in file order
+    set_names, want = {}, 0
+    for m in re.finditer(r'^DEF (PLAYER_GFX_SET_\w+)\s+EQU (\d+)\b', ctext, re.M):
+        if int(m.group(2)) == want:
+            set_names[want] = m.group(1)
+            want += 1
+            if want == SET_COUNT:
+                break
     for n in range(SET_COUNT):
-        m = re.search(rf'^DEF (PLAYER_GFX_SET_\w+)\s+EQU {n}\s*(?:;|$)', ctext, re.M)
-        set_names[n] = m.group(1) if m else f'graphics set {n}'
+        set_names.setdefault(n, f'graphics set {n}')
 
     total_frames = sum(len(b['frames']) for b in banks.values())
     total_tiles = sum(len(b['tiles']) // 16 for b in banks.values())
@@ -465,13 +626,15 @@ def main():
     for bk in sorted(banks):
         info = banks[bk]
         n_tiles = len(info['tiles']) // 16
-        rows_ = sheet_rows(n_tiles)
-        cols = n_tiles // rows_
-        assert cols * rows_ == n_tiles
+        cols, rows_ = sheet_shape(n_tiles)
+        pad = cols * rows_ - n_tiles
+        assert pad >= 0
+        padded = info['tiles'] + bytes(16 * pad)
 
-        grid = tiles_to_indices(info['tiles'], cols, rows_)
-        assert indices_to_tiles(grid, cols, rows_) == info['tiles'], \
+        grid = tiles_to_indices(padded, cols, rows_)
+        assert indices_to_tiles(grid, cols, rows_) == padded, \
             f'bank ${bk:02x}: the tile/pixel conversion does not round-trip'
+        info['pad'] = pad
 
         asm = emit_frames_asm(bk, info, set_names)
         rebuilt = assemble_frames(bk, info) + info['tiles']
@@ -484,7 +647,8 @@ def main():
             print(f"  bank ${bk:02x}: REBUILD DIFFERS at ${BANK_BASE + d:04x}")
         planned.append((bk, info, asm, grid, cols, rows_))
         print(f"  bank ${bk:02x}: {len(info['frames']):3d} frames, {n_tiles:3d} tiles "
-              f"-> {cols * 8}x{rows_ * 8} px sheet   rebuild {'OK' if ok else 'FAILED'}")
+              f"-> {cols * 8}x{rows_ * 8} px sheet (+{pad:2d} blank)   "
+              f"rebuild {'OK' if ok else 'FAILED'}")
 
     if failures:
         sys.exit(f"\n{failures} bank(s) did not reassemble to the ROM - nothing written")
@@ -516,10 +680,18 @@ def main():
         print("! rgbgfx is not on PATH, so the sheets were not round-tripped through it")
     else:
         bad = [f"${bk:02x}" for bk, info, *_ in planned
-               if not rgbgfx_check(os.path.join(gfx_dir, png_name(bk, info)), info['tiles'])]
+               if not rgbgfx_check(os.path.join(gfx_dir, png_name(bk, info)),
+                                   info['tiles'], 16 * info['pad'])]
         if bad:
             sys.exit(f"rgbgfx did not reproduce the tile data for bank(s) {', '.join(bad)}")
         print(f"rgbgfx --columns reproduces all {len(planned)} banks byte for byte")
+
+    # ---- previews ----
+    if args.preview and not args.dry_run:
+        out_dir = os.path.join(repo, args.preview)
+        for name, n, w, h in write_previews(out_dir, rom, sets, banks, set_names):
+            print(f"  preview {name:<34} {n:3d} frames  {w}x{h}")
+        print(f"wrote contact sheets to {args.preview}")
 
     # ---- constants and macros ----
     consts_path = os.path.join(repo, 'src/constants/constants.asm')
@@ -570,17 +742,31 @@ def main():
 
     if args.patch_main and not args.dry_run:
         path = os.path.join(repo, MAIN)
-        text = open(path, encoding='utf-8').read()
+        lines = open(path, encoding='utf-8').read().split('\n')
         lo, hi = min(banks), max(banks)
-        pat = re.compile(
-            rf'SECTION "bank{lo:02x}", ROMX\[\$4000\], BANK\[\${lo:02x}\].*?'
-            rf'(?:INCBIN|INCLUDE) "[^"]*bank_?0?{hi:02x}[^"]*"[^\n]*\n?',
-            re.S | re.I)
-        if not pat.search(text):
-            print(f"! could not find the bank ${lo:02x}-${hi:02x} block in main.asm; patch it by hand")
+        sec = re.compile(r'\s*SECTION\s+"[^"]*",\s*ROMX\[\$4000\],\s*BANK\[\$([0-9a-fA-F]{2})\]')
+
+        start = next((i for i, l in enumerate(lines)
+                      if (m := sec.match(l)) and int(m.group(1), 16) == lo), None)
+        if start is None:
+            print(f"! main.asm has no SECTION for bank ${lo:02x}; place the block by hand")
         else:
-            open(path, 'w', encoding='utf-8').write(pat.sub(block + '\n', text, count=1))
-            print(f"patched {MAIN}")
+            # the block runs to the first section that is not one of ours, so a second
+            # run replaces exactly what the first one wrote
+            end = len(lines)
+            for i in range(start + 1, len(lines)):
+                m = sec.match(lines[i])
+                if m and not (lo <= int(m.group(1), 16) <= hi):
+                    end = i
+                    break
+            seen = {int(m.group(1), 16) for l in lines[start:end] if (m := sec.match(l))}
+            if seen != set(banks):
+                print(f"! the bank ${lo:02x}-${hi:02x} run in main.asm covers "
+                      f"{len(seen)} banks, not {len(banks)}; place the block by hand")
+            else:
+                lines[start:end] = block.split('\n')
+                open(path, 'w', encoding='utf-8').write('\n'.join(lines))
+                print(f"patched {MAIN} ({end - start} lines replaced)")
 
     if args.patch_makefile and not args.dry_run:
         path = os.path.join(repo, MAKEFILE)

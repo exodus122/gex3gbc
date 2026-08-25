@@ -1704,3 +1704,15 @@ DEF PLAYER_STATE_CLIMBING_MASK  EQU $80
 ; Entity Action Ids
 DEF ENTITYACTION_PENGUIN_WALK_OR_RUN             EQU $00
 DEF ENTITYACTION_PENGUIN_JUMP                    EQU $01
+
+; ------------------------------------------------------------------
+; A frame piece's attribute byte - data/sprite_data/bankXX_frames.asm
+; ------------------------------------------------------------------
+; call_00_2ce2_Player_BuildSprites ORs this byte into wDC53_Player_OamAttributes on its
+; way into OAM, so a piece can raise any OAM attribute bit. Across all 11005 pieces in
+; the game the only value other than zero is 1, the CGB OBJ palette number - so what
+; the byte does in practice is pick which of Gex's two palettes the piece draws with
+DEF PLAYER_PIECE_PAL0            EQU 0    ; his body colours, the same in every set
+DEF PLAYER_PIECE_PAL1            EQU 1    ; his per-theme colours, and the only thing
+                                          ; that differs between the sets' palettes
+DEF PLAYER_FRAME_PIECE_TILE_BYTES EQU 32  ; an 8x16 OBJ, so two 16-byte tiles

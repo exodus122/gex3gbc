@@ -1065,62 +1065,91 @@ SECTION "bank60", ROMX[$4000], BANK[$60]
 SECTION "bank61", ROMX[$4000], BANK[$61]
 
 SECTION "bank62", ROMX[$4000], BANK[$62]
-INCBIN "data/sprite_data/bank_062.bin"
+INCLUDE "data/sprite_data/bank62_frames.asm"
+    INCBIN ".gfx/player_sprites/image_062_4840.bin", 0, $3740      ; 884 tiles, without the sheet's blank padding
 SECTION "bank63", ROMX[$4000], BANK[$63]
-INCBIN "data/sprite_data/bank_063.bin"
+INCLUDE "data/sprite_data/bank63_frames.asm"
+    INCBIN ".gfx/player_sprites/image_063_4870.bin", 0, $3740      ; 884 tiles, without the sheet's blank padding
 SECTION "bank64", ROMX[$4000], BANK[$64]
-INCBIN "data/sprite_data/bank_064.bin"
+INCLUDE "data/sprite_data/bank64_frames.asm"
+    INCBIN ".gfx/player_sprites/image_064_4880.bin", 0, $3760      ; 886 tiles, without the sheet's blank padding
 SECTION "bank65", ROMX[$4000], BANK[$65]
-INCBIN "data/sprite_data/bank_065.bin"
+INCLUDE "data/sprite_data/bank65_frames.asm"
+    INCBIN ".gfx/player_sprites/image_065_41e0.bin", 0, $0c60      ; 198 tiles, without the sheet's blank padding
 SECTION "bank66", ROMX[$4000], BANK[$66]
-INCBIN "data/sprite_data/bank_066.bin"
+INCLUDE "data/sprite_data/bank66_frames.asm"
+    INCBIN ".gfx/player_sprites/image_066_4530.bin", 0, $2300      ; 560 tiles, without the sheet's blank padding
 SECTION "bank67", ROMX[$4000], BANK[$67]
-INCBIN "data/sprite_data/bank_067.bin"
+INCLUDE "data/sprite_data/bank67_frames.asm"
+    INCBIN ".gfx/player_sprites/image_067_47f0.bin", 0, $37a0      ; 890 tiles, without the sheet's blank padding
 SECTION "bank68", ROMX[$4000], BANK[$68]
-INCBIN "data/sprite_data/bank_068.bin"
+INCLUDE "data/sprite_data/bank68_frames.asm"
+    INCBIN ".gfx/player_sprites/image_068_4820.bin", 0, $3760      ; 886 tiles, without the sheet's blank padding
 SECTION "bank69", ROMX[$4000], BANK[$69]
-INCBIN "data/sprite_data/bank_069.bin"
+INCLUDE "data/sprite_data/bank69_frames.asm"
+    INCBIN ".gfx/player_sprites/image_069_4820.bin", 0, $3740      ; 884 tiles, without the sheet's blank padding
 SECTION "bank6a", ROMX[$4000], BANK[$6a]
-INCBIN "data/sprite_data/bank_06a.bin"
+INCLUDE "data/sprite_data/bank6a_frames.asm"
+    INCBIN ".gfx/player_sprites/image_06a_4820.bin", 0, $36e0      ; 878 tiles, without the sheet's blank padding
 SECTION "bank6b", ROMX[$4000], BANK[$6b]
-INCBIN "data/sprite_data/bank_06b.bin"
+INCLUDE "data/sprite_data/bank6b_frames.asm"
+    INCBIN ".gfx/player_sprites/image_06b_40b0.bin"
 SECTION "bank6c", ROMX[$4000], BANK[$6c]
-INCBIN "data/sprite_data/bank_06c.bin"
+INCLUDE "data/sprite_data/bank6c_frames.asm"
+    INCBIN ".gfx/player_sprites/image_06c_4830.bin", 0, $37c0      ; 892 tiles, without the sheet's blank padding
 SECTION "bank6d", ROMX[$4000], BANK[$6d]
-INCBIN "data/sprite_data/bank_06d.bin"
+INCLUDE "data/sprite_data/bank6d_frames.asm"
+    INCBIN ".gfx/player_sprites/image_06d_42d0.bin", 0, $12e0      ; 302 tiles, without the sheet's blank padding
 SECTION "bank6e", ROMX[$4000], BANK[$6e]
-INCBIN "data/sprite_data/bank_06e.bin"
+INCLUDE "data/sprite_data/bank6e_frames.asm"
+    INCBIN ".gfx/player_sprites/image_06e_4800.bin", 0, $3780      ; 888 tiles, without the sheet's blank padding
 SECTION "bank6f", ROMX[$4000], BANK[$6f]
-INCBIN "data/sprite_data/bank_06f.bin"
+INCLUDE "data/sprite_data/bank6f_frames.asm"
+    INCBIN ".gfx/player_sprites/image_06f_4830.bin", 0, $3700      ; 880 tiles, without the sheet's blank padding
 SECTION "bank70", ROMX[$4000], BANK[$70]
-INCBIN "data/sprite_data/bank_070.bin"
+INCLUDE "data/sprite_data/bank70_frames.asm"
+    INCBIN ".gfx/player_sprites/image_070_4850.bin", 0, $3740      ; 884 tiles, without the sheet's blank padding
 SECTION "bank71", ROMX[$4000], BANK[$71]
-INCBIN "data/sprite_data/bank_071.bin"
+INCLUDE "data/sprite_data/bank71_frames.asm"
+    INCBIN ".gfx/player_sprites/image_071_46c0.bin", 0, $2e60      ; 742 tiles, without the sheet's blank padding
 SECTION "bank72", ROMX[$4000], BANK[$72]
-INCBIN "data/sprite_data/bank_072.bin"
+INCLUDE "data/sprite_data/bank72_frames.asm"
+    INCBIN ".gfx/player_sprites/image_072_4800.bin", 0, $3780      ; 888 tiles, without the sheet's blank padding
 SECTION "bank73", ROMX[$4000], BANK[$73]
-INCBIN "data/sprite_data/bank_073.bin"
+INCLUDE "data/sprite_data/bank73_frames.asm"
+    INCBIN ".gfx/player_sprites/image_073_4830.bin", 0, $37a0      ; 890 tiles, without the sheet's blank padding
 SECTION "bank74", ROMX[$4000], BANK[$74]
-INCBIN "data/sprite_data/bank_074.bin"
+INCLUDE "data/sprite_data/bank74_frames.asm"
+    INCBIN ".gfx/player_sprites/image_074_4840.bin", 0, $3720      ; 882 tiles, without the sheet's blank padding
 SECTION "bank75", ROMX[$4000], BANK[$75]
-INCBIN "data/sprite_data/bank_075.bin"
+INCLUDE "data/sprite_data/bank75_frames.asm"
+    INCBIN ".gfx/player_sprites/image_075_41c0.bin", 0, $0b40      ; 180 tiles, without the sheet's blank padding
 SECTION "bank76", ROMX[$4000], BANK[$76]
-INCBIN "data/sprite_data/bank_076.bin"
+INCLUDE "data/sprite_data/bank76_frames.asm"
+    INCBIN ".gfx/player_sprites/image_076_4830.bin", 0, $3780      ; 888 tiles, without the sheet's blank padding
 SECTION "bank77", ROMX[$4000], BANK[$77]
-INCBIN "data/sprite_data/bank_077.bin"
+INCLUDE "data/sprite_data/bank77_frames.asm"
+    INCBIN ".gfx/player_sprites/image_077_4860.bin", 0, $3780      ; 888 tiles, without the sheet's blank padding
 SECTION "bank78", ROMX[$4000], BANK[$78]
-INCBIN "data/sprite_data/bank_078.bin"
+INCLUDE "data/sprite_data/bank78_frames.asm"
+    INCBIN ".gfx/player_sprites/image_078_4750.bin", 0, $3040      ; 772 tiles, without the sheet's blank padding
 SECTION "bank79", ROMX[$4000], BANK[$79]
-INCBIN "data/sprite_data/bank_079.bin"
+INCLUDE "data/sprite_data/bank79_frames.asm"
+    INCBIN ".gfx/player_sprites/image_079_4810.bin", 0, $3720      ; 882 tiles, without the sheet's blank padding
 SECTION "bank7a", ROMX[$4000], BANK[$7a]
-INCBIN "data/sprite_data/bank_07a.bin"
+INCLUDE "data/sprite_data/bank7a_frames.asm"
+    INCBIN ".gfx/player_sprites/image_07a_4860.bin", 0, $3760      ; 886 tiles, without the sheet's blank padding
 SECTION "bank7b", ROMX[$4000], BANK[$7b]
-INCBIN "data/sprite_data/bank_07b.bin"
+INCLUDE "data/sprite_data/bank7b_frames.asm"
+    INCBIN ".gfx/player_sprites/image_07b_4630.bin", 0, $26e0      ; 622 tiles, without the sheet's blank padding
 SECTION "bank7c", ROMX[$4000], BANK[$7c]
-INCBIN "data/sprite_data/bank_07c.bin"
+INCLUDE "data/sprite_data/bank7c_frames.asm"
+    INCBIN ".gfx/player_sprites/image_07c_4850.bin", 0, $3720      ; 882 tiles, without the sheet's blank padding
 SECTION "bank7d", ROMX[$4000], BANK[$7d]
-INCBIN "data/sprite_data/bank_07d.bin"
+INCLUDE "data/sprite_data/bank7d_frames.asm"
+    INCBIN ".gfx/player_sprites/image_07d_4890.bin", 0, $3720      ; 882 tiles, without the sheet's blank padding
 SECTION "bank7e", ROMX[$4000], BANK[$7e]
-INCBIN "data/sprite_data/bank_07e.bin"
+INCLUDE "data/sprite_data/bank7e_frames.asm"
+    INCBIN ".gfx/player_sprites/image_07e_4850.bin", 0, $35a0      ; 858 tiles, without the sheet's blank padding
 SECTION "bank7f", ROMX[$4000], BANK[$7f]
 INCLUDE "data/sprite_data/bank7F.asm"
