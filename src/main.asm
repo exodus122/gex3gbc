@@ -18,7 +18,12 @@ SECTION "bank01", ROMX[$4000], BANK[$01]
 INCLUDE "code/menus/bank01_menu_load.asm"
 INCLUDE "code/menus/bank01_menu_script.asm"
 INCLUDE "code/menus/bank01_text_render.asm"
-INCLUDE "code/bank01_menus.asm"
+INCLUDE "code/menus/bank01_menu_sprites.asm"
+INCLUDE "code/menus/bank01_menu_password.asm"
+INCLUDE "code/menus/bank01_menu_tables.asm"
+INCLUDE "code/menus/bank01_menu_scripts.asm"
+INCLUDE "code/menus/bank01_sprite_scripts.asm"
+INCLUDE "code/menus/bank01_menu_gfx.asm"
 
 SECTION "bank02", ROMX[$4000], BANK[$02]
 INCLUDE "code/bank02_entity_pointer_tables.asm"

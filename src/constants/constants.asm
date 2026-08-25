@@ -1083,9 +1083,8 @@ DEF PASSWORD_CELL_TILES          EQU $04 ; each cell is 2x2 tiles
 DEF PASSWORD_CELL_TILE_BASE      EQU $98 ; VRAM tile id of cell 0
 DEF PASSWORD_GLYPH_BYTES         EQU $40 ; PASSWORD_CELL_TILES * TILE_SIZE_BYTES
 
-; Two addresses that look like bank 1 labels and are not. Menu string pointers are
-; dereferenced by call_00_0835_Text_LoadStringToBuffer with BANK_1C_TEXT paged in, so
-; these are bank $1C addresses that happen to fall inside bank 1's code
+; Menu string pointers are dereferenced by call_00_0835_Text_LoadStringToBuffer 
+; with BANK_1C_TEXT paged in, so these are bank $1C addresses
 DEF MENUTEXT_COUNTER_STRINGS     EQU $4e97
 DEF MENUTEXT_COLLECTED_SUFFIX    EQU $4ac3
 

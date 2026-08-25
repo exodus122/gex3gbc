@@ -748,7 +748,8 @@
 01:4de3 call_01_4de3_Password_GetCellTileIndex
 01:4df4 call_01_4df4_Text_CharToGlyphIndex
 01:4dfd call_01_4df4_Text_CharToGlyphIndex.data_01_4dfd_CharToGlyph
-01:4e97 data_01_4e97_Padding
+01:4efd call_01_4efd
+01:4f06 call_01_4efd.data_01_4f06
 01:4f27 call_01_4f27_Menu_ClearScreenBuffers
 01:4f51 call_01_4f51_Menu_UploadBgAttrMap
 01:4f5c call_01_4f5c_Menu_UploadBgTileMap
