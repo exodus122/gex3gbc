@@ -2376,24 +2376,38 @@ call_00_2cbf_Entity_LoadMapPalettes:
 ; Loads the sixteen palette bytes this map uses for its entities into
 ; wDD2A_EntityPalettes, from where call_03_687c_AssignEntityPalette hands them out.
 ;
-; Two hops in BANK_7F_ENTITY_PALETTES: data_7f_4000 turns the map id into a palette
-; set id, and data_7f_4040 turns that into a pointer. The same data_7f_4000 lookup
-; starts call_00_2ce2_Player_BuildSprites, which goes to data_7f_403d instead - one
-; table of set ids, two tables of what a set contains.
+; Two hops in BANK_7F_PLAYER_GFX_INDEX. data_7f_4000_PlayerGfx_SetByMap gives this map's
+; graphics set as a byte offset, and adding that offset to
+; data_7f_4040_PlayerGfx_SetPalettes gives the pointer.
 ;
-; Called by bank 3's palette code on a level load, and again whenever the map's
-; palette needs re-applying. gex2's nearest equivalent is
-; call_0b_5f57_Entity_LoadGBCPalette, which loads one entity's palette on demand
-; rather than the map's whole set up front
-    ld   A, BANK_7F_ENTITY_PALETTES                   ;; 00:2cbf $3e $7f
+; data_7f_4040 is not a table of its own - it is the palette field of record 0 of
+; data_7f_403d_PlayerGfx_SetTable, PLAYER_GFX_SET_PALETTE_FIELD bytes in, used as the
+; base of a strided read over that one table. call_00_2ce2_Player_BuildSprites does the
+; identical lookup from data_7f_403d and comes away with the frame directory instead.
+;
+; The sixteen bytes are OBJ palettes 0 and 1. Palette 0 is Gex, and it is byte for byte
+; the same in all PLAYER_GFX_SET_COUNT sets, so this call restores his colours as much
+; as it loads the map's - which is exactly what
+; call_03_6567_FlyPowerup_LoadPalette wants when a fly power-up runs out. Palette 1 is
+; entity slot 1's default, and call_03_687c_AssignEntityPalette overwrites it as soon
+; as something occupies that slot.
+;
+; Called on a map load, and then on every frame Gex is carrying no fly, because
+; call_03_6567_FlyPowerup_LoadPalette tail-jumps here rather than keeping a copy of the
+; colours it is about to overwrite. So the bank switch, the two table lookups and the
+; sixteen-byte copy run at 60Hz for most of the game.
+;
+; gex2's nearest equivalent is call_0b_5f57_Entity_LoadGBCPalette, which loads one
+; entity's palette on demand rather than the map's whole set up front
+    ld   A, BANK_7F_PLAYER_GFX_INDEX                   ;; 00:2cbf $3e $7f
     call call_00_0eee_SwitchBank                      ;; 00:2cc1 $cd $ee $0e
     ld   HL, wDB6C_CurrentMapId                       ;; 00:2cc4 $21 $6c $db
     ld   E, [HL]                                      ;; 00:2cc7 $5e
     ld   D, $00                                       ;; 00:2cc8 $16 $00
-    ld   HL, data_7f_4000                             ;; 00:2cca $21 $00 $40
+    ld   HL, data_7f_4000_PlayerGfx_SetByMap                             ;; 00:2cca $21 $00 $40
     add  HL, DE                                       ;; 00:2ccd $19
     ld   E, [HL]                                      ;; 00:2cce $5e
-    ld   HL, data_7f_4040                             ;; 00:2ccf $21 $40 $40
+    ld   HL, data_7f_4040_PlayerGfx_SetPalettes                             ;; 00:2ccf $21 $40 $40
     add  HL, DE                                       ;; 00:2cd2 $19
     ld   A, [HL+]                                     ;; 00:2cd3 $2a
     ld   H, [HL]                                      ;; 00:2cd4 $66

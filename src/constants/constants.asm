@@ -71,7 +71,10 @@ DEF Bank4d_Tileset            EQU $4d ; GexCave, AnimeChannel, GextremeSports
 DEF Bank4e_Tileset            EQU $4e ; GexCave
 DEF Bank4f_Tileset            EQU $4f ; WesternStation, WWGexWrestling, ChannelZ
 
-DEF BANK_7F_ENTITY_PALETTES   EQU $7f ; entity sprite and palette data
+DEF BANK_7F_PLAYER_GFX_INDEX  EQU $7f ; no graphics of its own: the map -> graphics set
+                                      ; -> frame directory index for banks $62-$7e,
+                                      ; and each set's OBJ palettes. See
+                                      ; data/sprite_data/bank7F.asm
 
 ; Inputs (defined in hardware.inc)
 ; DEF PADF_DOWN   EQU $80
@@ -507,6 +510,37 @@ DEF OAM_DMA_ROUTINE_SIZE         EQU $0a   ; bytes copied to hFF80_OamDmaRoutine
 DEF CGB_PALETTE_RAM_SIZE         EQU $40   ; 8 palettes x 4 colours x 2 bytes
 DEF BG_PALETTE_BYTES             EQU $40   ; one map's worth, copied to wDCEA_BgPalettes
 DEF CGB_PALETTE_SIZE             EQU $08   ; one palette - four colours, two bytes each
+DEF OBJ_PALETTE_BYTES            EQU $40   ; all eight OBJ palettes. Bank $7F reserves
+                                           ; this much per graphics set but fills only
+                                           ; the first CGB_PALETTE_SIZE * 2 bytes
+DEF CGB_COLOR_UNUSED             EQU $7c1f ; full red + full blue. The marker left in
+                                           ; every palette slot nobody filled in - it
+                                           ; appears nowhere else in the ROM
+
+; ------------------------------------------------------------------
+; Gex's graphics, indexed by bank $7F - see data/sprite_data/bank7F.asm and
+; code/bank00_player_sprites.asm
+; ------------------------------------------------------------------
+; A graphics set is one level theme's worth of Gex: a base bank, a frame directory and
+; a pair of OBJ palettes. Several maps, and sometimes several levels, share one
+DEF PLAYER_GFX_SET_COUNT             EQU 9
+DEF PLAYER_GFX_SET_SIZE              EQU 5    ; base bank, dw frames, dw palettes
+DEF PLAYER_GFX_SET_PALETTE_FIELD     EQU 3    ; the offset data_7f_4040_PlayerGfx_SetPalettes is data_7f_403d_PlayerGfx_SetTable plus
+
+DEF PLAYER_GFX_SET_GEX_CAVE          EQU 0
+DEF PLAYER_GFX_SET_HOLIDAY_TV        EQU 1
+DEF PLAYER_GFX_SET_MYSTERY_TV        EQU 2
+DEF PLAYER_GFX_SET_TUT_TV            EQU 3
+DEF PLAYER_GFX_SET_SUPERHERO_SHOW    EQU 4
+DEF PLAYER_GFX_SET_GEXTREME_SPORTS1  EQU 5    ; one map each, and far fewer frames than
+DEF PLAYER_GFX_SET_WESTERN_STATION   EQU 6
+DEF PLAYER_GFX_SET_MARSUPIAL_MADNESS1 EQU 7   ; any of the others
+DEF PLAYER_GFX_SET_ANIME_CHANNEL     EQU 8
+
+; A frame directory entry, and the frame header it points at
+DEF PLAYER_FRAME_ENTRY_SIZE          EQU 3    ; bank offset, dw address
+DEF PLAYER_FRAME_HEADER_SIZE         EQU 5    ; piece count, two unread bytes, dw tiles
+DEF PLAYER_FRAME_PIECE_SIZE          EQU 4    ; Y offset, X offset, attributes, unread
 
 ; ------------------------------------------------------------------
 ; Menu palettes - code/bank03_palettes.asm

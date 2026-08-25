@@ -633,10 +633,12 @@ call_00_0513_Screen_PresentAndDrawEntities:
 ; Makes a freshly built screen visible. Called after a map load and after a menu
 ; closes, and it blocks until everything it queued has actually reached VRAM.
 ;
-; First it resolves Gex's tile graphics for this map. BANK_7F_ENTITY_PALETTES
-; holds a per-map index (data_7f_4000) into a table of sprite banks and frame
-; tables (data_7f_403d); wD80A_Player_SpriteId then picks a three-byte record
-; from that table giving a bank offset and a pointer to the tile data. Those
+; First it resolves Gex's tile graphics for this map, with the same three lookups
+; call_00_2ce2_Player_BuildSprites uses and the same instructions:
+; BANK_7F_PLAYER_GFX_INDEX turns the map id into a graphics set
+; (data_7f_4000_PlayerGfx_SetByMap), the set into a base bank and a frame directory
+; (data_7f_403d_PlayerGfx_SetTable), and wD80A_Player_SpriteId into one
+; PLAYER_FRAME_ENTRY_SIZE record of that directory. Those
 ; become wDABF_PlayerGfx_SrcBank / wDAC0_PlayerGfx_SrcAddr /
 ; wDAC2_PlayerGfx_TileCount, i.e. the GFX_XFER_PLAYER_GFX parameters, and the
 ; bit is raised.
@@ -651,15 +653,15 @@ call_00_0513_Screen_PresentAndDrawEntities:
 ;
 ; That flag is gex3's whole transition effect. gex2's
 ; call_00_0521_Screen_PresentAndFadeIn ends with a DMG palette fade instead
-    ld   A, BANK_7F_ENTITY_PALETTES                    ;; 00:0513 $3e $7f
+    ld   A, BANK_7F_PLAYER_GFX_INDEX                    ;; 00:0513 $3e $7f
     call call_00_0eee_SwitchBank                       ;; 00:0515 $cd $ee $0e
     ld   HL, wDB6C_CurrentMapId                        ;; 00:0518 $21 $6c $db
     ld   E, [HL]                                       ;; 00:051b $5e
     ld   D, $00                                        ;; 00:051c $16 $00
-    ld   HL, data_7f_4000                              ;; 00:051e $21 $00 $40
+    ld   HL, data_7f_4000_PlayerGfx_SetByMap                              ;; 00:051e $21 $00 $40
     add  HL, DE                                        ;; 00:0521 $19
     ld   E, [HL]                                       ;; 00:0522 $5e
-    ld   HL, data_7f_403d                              ;; 00:0523 $21 $3d $40
+    ld   HL, data_7f_403d_PlayerGfx_SetTable                              ;; 00:0523 $21 $3d $40
     add  HL, DE                                        ;; 00:0526 $19
     ld   A, [HL+]                                      ;; 00:0527 $2a
     ld   [wDABF_PlayerGfx_SrcBank], A                  ;; 00:0528 $ea $bf $da

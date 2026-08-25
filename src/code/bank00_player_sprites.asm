@@ -13,20 +13,33 @@
 ;
 ; Finding the frame
 ; -----------------
-; Three indirections, all keyed by the current map and the current sprite id:
+; Three indirections, all keyed by the current map and the current sprite id, all in
+; BANK_7F_PLAYER_GFX_INDEX. That file documents them in full; in short:
 ;
-;   data_7f_4000[map]            a graphics-set id for this map
-;   data_7f_403d[set]            bank, then pointer, to that set's frame directory
-;   directory[sprite id * 3]     a bank offset, then a pointer, to one frame
+;   data_7f_4000_PlayerGfx_SetByMap[map]
+;                     which graphics set this map draws Gex with, stored as a byte
+;                     offset into the next table rather than as a set number - which is
+;                     why the value goes into DE unscaled
+;   data_7f_403d_PlayerGfx_SetTable + offset
+;                     the set's base bank, then a pointer to its frame directory
+;   directory[sprite id * PLAYER_FRAME_ENTRY_SIZE]
+;                     how many banks past the base bank the frame lives, then its
+;                     address in that bank
 ;
 ; and the frame itself is
 ;
 ;   +0     piece count, into wDAC2_PlayerGfx_TileCount
-;   +1 +2  skipped
+;   +1 +2  skipped. Their values track the sprite's size in pixels, but nothing reads
+;          them
 ;   +3 +4  where the frame's tiles live, into wDAC0_PlayerGfx_SrcAddr for the VRAM
 ;          copy that call_00_098f_CopyPlayerGfxToVRAM does separately
-;   +5...  four bytes per piece: Y offset, X offset, extra attribute bits, and a
-;          fourth byte the build steps over without reading
+;   +5...  PLAYER_FRAME_PIECE_SIZE bytes per piece: Y offset, X offset, extra attribute
+;          bits, and a fourth byte the build steps over without reading
+;
+; A piece is one 8x16 OBJ, so it is 32 bytes of tile data, and a frame's pieces are
+; contiguous from +3+4. That is why the piece count can also drive the HDMA: it is a
+; count of OBJs here and a count of 32-byte tile pairs there, and both are the same
+; number.
 ;
 ; Note what is NOT in a piece: its tile number. That is wDC52_Player_OamTileId, a
 ; counter that starts at zero and steps by two, so a frame's pieces always take
@@ -77,7 +90,7 @@ call_00_2ce2_Player_BuildSprites:
 ;
 ; Runs in three parts. First the frame lookup: the facing and climb bytes are merged
 ; into wDC53_Player_OamAttributes, the map's graphics set is found in bank
-; BANK_7F_ENTITY_PALETTES, and the frame's own bank is paged in - note the bank
+; BANK_7F_PLAYER_GFX_INDEX, and the frame's own bank is paged in - note the bank
 ; dance, RestoreBank then SwitchBank, because the directory and the frame it names
 ; are in different banks.
 ;
@@ -100,15 +113,15 @@ call_00_2ce2_Player_BuildSprites:
     ld   HL, wDC7A_PlayerClimbingOrSwimmingRelated    ;; 00:2cea $21 $7a $dc
     or   A, [HL]                                      ;; 00:2ced $b6
     ld   [wDC53_Player_OamAttributes], A              ;; 00:2cee $ea $53 $dc
-    ld   A, BANK_7F_ENTITY_PALETTES                   ;; 00:2cf1 $3e $7f
+    ld   A, BANK_7F_PLAYER_GFX_INDEX                   ;; 00:2cf1 $3e $7f
     call call_00_0eee_SwitchBank                      ;; 00:2cf3 $cd $ee $0e
     ld   HL, wDB6C_CurrentMapId                       ;; 00:2cf6 $21 $6c $db
     ld   E, [HL]                                      ;; 00:2cf9 $5e
     ld   D, $00                                       ;; 00:2cfa $16 $00
-    ld   HL, data_7f_4000                             ;; 00:2cfc $21 $00 $40
+    ld   HL, data_7f_4000_PlayerGfx_SetByMap                             ;; 00:2cfc $21 $00 $40
     add  HL, DE                                       ;; 00:2cff $19
     ld   E, [HL]                                      ;; 00:2d00 $5e
-    ld   HL, data_7f_403d                             ;; 00:2d01 $21 $3d $40
+    ld   HL, data_7f_403d_PlayerGfx_SetTable                             ;; 00:2d01 $21 $3d $40
     add  HL, DE                                       ;; 00:2d04 $19
     ld   A, [HL+]                                     ;; 00:2d05 $2a
     ld   [wDABF_PlayerGfx_SrcBank], A                 ;; 00:2d06 $ea $bf $da

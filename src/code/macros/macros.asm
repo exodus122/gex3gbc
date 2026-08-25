@@ -260,3 +260,29 @@ ENDM
 MACRO sprite_rect ; Y, X, tile, OAM attributes, width in tiles, height in tiles
     db   \1, \2, \3, \4, \5, \6
 ENDM
+
+; ------------------------------------------------------------------
+; Bank $7F - the index to Gex's graphics. See data/sprite_data/bank7F.asm
+; ------------------------------------------------------------------
+; One row of data_7f_4000_PlayerGfx_SetByMap. The byte actually stored is a BYTE
+; OFFSET into data_7f_403d_PlayerGfx_SetTable, not a set number: all three readers add
+; it to the table base with no shift in between. The scale is applied here so the rows
+; can read as set names
+MACRO map_gfx_set ; PLAYER_GFX_SET_*
+    db   \1 * PLAYER_GFX_SET_SIZE
+ENDM
+
+; One record of data_7f_403d_PlayerGfx_SetTable. Record 0 is written out longhand in
+; the file, because data_7f_4040_PlayerGfx_SetPalettes labels its third byte
+MACRO player_gfx_set ; base bank, frame directory, OBJ palette block
+    db   \1
+    dw   \2
+    dw   \3
+ENDM
+
+; One entry of a frame directory, indexed by wD80A_Player_SpriteId. The bank offset is
+; added to the set's base bank, which is why a frame can live several banks past it
+MACRO player_frame ; bank offset from the set's base bank, address within that bank
+    db   \1
+    dw   \2
+ENDM
