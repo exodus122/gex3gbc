@@ -149,7 +149,7 @@ call_02_708f_Entities_InitAndSpawnAll:
     ld   [wDC8D_Player_FloorSnapVelocity], A          ;; 02:70c2 $ea $8d $dc
     ld   [wDC8E_InitialYVelocity], A                  ;; 02:70c5 $ea $8e $dc
     ld   [wDC8F_FallDistanceCounter], A               ;; 02:70c8 $ea $8f $dc
-    ld   [wDC88_CurrentEntity_UnkVerticalOffset], A   ;; 02:70cb $ea $88 $dc
+    ld   [wDC88_Player_HopYOffset], A   ;; 02:70cb $ea $88 $dc
     ld   [wDC80_ButtonBlockingFlags], A               ;; 02:70ce $ea $80 $dc
 .jr_02_70d1:
     xor  A, A                                         ;; 02:70d1 $af

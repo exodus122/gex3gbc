@@ -135,7 +135,7 @@ MACRO player_oam_origin
     ld   [wDC91_Player_ScreenY], A
     add  A, OAM_Y_BIAS
     ld   B, A
-    ld   A, [wDC88_CurrentEntity_UnkVerticalOffset]
+    ld   A, [wDC88_Player_HopYOffset]
     add  A, B
     ld   B, A
     call call_00_2f00_Player_IsDead

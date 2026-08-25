@@ -92,7 +92,7 @@
 ;                  (UpdateFacing, ApplyXMovement, ApplyYVelocity and RequestAction),
 ;                  because on a BG_COLLISION_TYPE_TOPDOWN map the d-pad drives a
 ;                  direction index rather than a facing, and "gravity" becomes a
-;                  hop offset in wDC88_CurrentEntity_UnkVerticalOffset
+;                  hop offset in wDC88_Player_HopYOffset
 ;   action offset  every side-scrolling action has a top-down twin
 ;                  PLAYERACTION_TOPDOWN higher, and
 ;                  call_02_54f9_Player_RequestAction adds that offset on the way
@@ -866,8 +866,9 @@ call_02_51cb_Player_MoveLeftAgainstEntity:
 ; kept up to date with his.
 ;
 ; A comes in holding the entity's slot base. If the slot's
-; ENTITY_FIELD_COLLISION_TYPE has bit 7 set the entity does not take part and the
-; move is dropped. Otherwise the ordinary clamped move runs, and afterwards the gap
+; ENTITY_FIELD_COLLISION_TYPE carries COLLISION_TYPE_FLAG_IMMOVABLE the entity does
+; not take part and the move is dropped - which is every platform in the game, so
+; the rest of this routine is dead in practice. Otherwise the ordinary clamped move runs, and afterwards the gap
 ; between Gex and the entity is measured and written back into the entity's
 ; ENTITY_FIELD_X_VELOCITY pair - which is how a pushed block keeps its distance instead of
 ; drifting into him.
@@ -957,7 +958,8 @@ call_02_5204_Player_MoveRightClampedToMap:
     ret                                               ;; 02:5237 $c9
 
 call_02_5238_Player_MoveRightAgainstEntity:
-; The mirror of call_02_51cb_Player_MoveLeftAgainstEntity. The one asymmetry is the
+; The mirror of call_02_51cb_Player_MoveLeftAgainstEntity, including its
+; COLLISION_TYPE_FLAG_IMMOVABLE early out. The one asymmetry is the
 ; `inc E` on the entity's width - the right-hand gap is measured one pixel wider,
 ; which is what stops Gex and a block he is pushing rightward from overlapping by a
 ; pixel
@@ -1020,7 +1022,7 @@ call_02_5267_Player_ApplyYVelocity:
 ; the two vehicle maps.
 ;
 ; The top-down path is short and does something different: the same gravity step,
-; but the delta is accumulated into wDC88_CurrentEntity_UnkVerticalOffset instead of
+; but the delta is accumulated into wDC88_Player_HopYOffset instead of
 ; moving him, so on a top-down map a jump is a visual hop above a position that
 ; never actually leaves the ground.
 ;
@@ -1155,7 +1157,7 @@ call_02_5267_Player_ApplyYVelocity:
     jr   Z, .jr_02_5366                               ;; 02:5362 $28 $02
     or   A, PLAYER_YDELTA_SIGN_EXTEND                 ;; 02:5364 $f6 $f0
 .jr_02_5366:
-    ld   HL, wDC88_CurrentEntity_UnkVerticalOffset    ;; 02:5366 $21 $88 $dc
+    ld   HL, wDC88_Player_HopYOffset    ;; 02:5366 $21 $88 $dc
     add  A, [HL]                                      ;; 02:5369 $86
     bit  7, A                                         ;; 02:536a $cb $7f
     jr   NZ, .jr_02_5372                              ;; 02:536c $20 $04

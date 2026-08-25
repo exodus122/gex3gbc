@@ -1233,7 +1233,23 @@ wDC87_PlayerXMaxVelocity: ; if freeze this, gex can run faster
 ; The speed the current action is ramping toward. gex2's wD75E_PlayerXSpeed
     ds 1                                               ;; dc87
 
-wDC88_CurrentEntity_UnkVerticalOffset:
+wDC88_Player_HopYOffset:
+; A signed vertical offset added to Gex's world Y everywhere he is drawn or tested,
+; without ever moving him. It is how a top-down map does a jump: the gravity tail
+; of call_02_5267_Player_ApplyYVelocity accumulates the fall step in here instead
+; of into wD810_PlayerYPosition, so on a BG_COLLISION_TYPE_TOPDOWN map Gex hops
+; visually above a position that never leaves the ground. On a sidescrolling map
+; nothing writes it and it stays at zero.
+;
+; Four places read it back, and they agree that the offset is part of where he is:
+; the player sprite macro, call_03_550e_Entity_CheckPlayerInteraction, and both
+; platform handlers in bank 3. call_03_57e6_ResolveCollision_Reset zeroes it on a
+; landing, which is what ends the hop.
+;
+; Previously named wDC88_CurrentEntity_UnkVerticalOffset, which had the owner
+; wrong - it belongs to the player, not to the entity being processed.
+;
+; gex2 has no equivalent; every gex2 map is a sidescroller
     ds 1                                               ;; dc88
 
 wDC89_BgCollision_TopDownDirection:

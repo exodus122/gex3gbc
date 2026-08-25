@@ -699,6 +699,14 @@ DEF ENTITY_FIELD_PENDING_ACTION             EQU $04
 ; ACTION_STATE and SPRITE_FLAGS bytes, so the gex2 names below carry a different
 ; prefix but mean the same thing
 DEF ENTITY_FIELD_ACTION_STATE_FLAGS         EQU $05
+    DEF ACTION_STATE_NO_COLLISION_BIT      EQU 0 ; supplied by byte 2 of the action's
+                                                 ; data block. Set means
+                                                 ; call_03_4c38_UpdateEntityCollision_Dispatch
+                                                 ; skips the entity entirely, so an entity is
+                                                 ; intangible for the length of that ACTION
+                                                 ; without changing collision type. Used by Rez,
+                                                 ; the ghost knight and the two remotes for
+                                                 ; their intro actions. gex2 has no equivalent
     DEF ACTION_STATE_UNK80_BIT             EQU 7
     DEF ACTION_STATE_UNK20_BIT             EQU 5
     DEF ACTION_STATE_IS_FIRST_FRAME_BIT    EQU 4
@@ -722,6 +730,7 @@ DEF ENTITY_FIELD_ACTION_STATE_FLAGS         EQU $05
     DEF ACTION_STATE_ANIM_ENDED            EQU $04
     DEF ACTION_STATE_LOOP_LAST_FRAME       EQU $08
     DEF ACTION_STATE_ID_CHANGED            EQU $02
+    DEF ACTION_STATE_NO_COLLISION          EQU $01
 DEF ENTITY_FIELD_SPRITE_FRAME_COUNTER_MAX   EQU $06 ; how many frames to use this sprite
 DEF ENTITY_FIELD_SPRITE_FRAME_COUNTER       EQU $07 ; counter for the above
     DEF SPRITE_FRAME_COUNTER_HOLD          EQU $FF ; hold this frame forever - how an entity
@@ -1243,7 +1252,24 @@ DEF COLLISION_TYPE_REZ                       EQU $32
 DEF COLLISION_TYPE_TV_BUTTON                 EQU $33
 DEF COLLISION_TYPE_RA_STATUE_PROJECTILE      EQU $34
 DEF COLLISION_TYPE_ROCK_HARD                 EQU $35
-DEF COLLISION_TYPE_UNK_PLATFORM_FLAG         EQU $80
+; A flag OR'd into ENTITY_FIELD_COLLISION_TYPE on top of one of the types above,
+; and the only one there is. It says the entity cannot be shoved: with it set,
+; call_02_51cb_Player_MoveLeftAgainstEntity and its mirror drop the whole
+; horizontal move rather than walking Gex forward and dragging the entity after
+; him, so the thing acts as a solid wall.
+;
+; call_03_4c38_UpdateEntityCollision_Dispatch strips it back off with `res 7, L`
+; before indexing the handler table, which has no row for it.
+;
+; Every one of the 14 COLLISION_TYPE_PLATFORM entities in
+; data_00_3258_EntityAttributeTable carries it and nothing else does, and nothing
+; assigns a platform type at runtime - so in the shipped game the push-along
+; branch of those two routines never actually runs.
+;
+; gex2 spells the same idea COLLISION_TYPE_PLATFORM ($80), where bit 7 means a
+; hard stop and clear means a soft one; gex2 does leave it clear on the tv buttons
+; and push blocks Gex is meant to shove around
+DEF COLLISION_TYPE_FLAG_IMMOVABLE         EQU $80 ; cannot be pushed by the player
 
 ; Bg Collision Types
 DEF BG_COLLISION_TYPE_SIDESCROLLER  EQU $00

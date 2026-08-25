@@ -1656,9 +1656,9 @@ call_00_298a_Entity_GetMiscFlags:
 
 call_00_2995_Entity_GetActionId_Copy:
 ; Byte-for-byte the same routine as call_00_2962_Entity_GetActionId - the assembler
-; laid the same four instructions down twice. Only
-; call_03_4fad_CollisionHandler_Hand reaches this copy; everything else calls
-; the one at $2962
+; laid the same four instructions down twice. Only bank03_entity_collision.asm
+; reaches this copy, from the Hand, Brain of Oz and Rez handlers; everything else
+; in the game calls the one at $2962
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_ACTION_ID
     ld   a,[hl]
     ret  

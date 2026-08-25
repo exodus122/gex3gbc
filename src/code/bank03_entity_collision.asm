@@ -1,9 +1,127 @@
-; This file handles collisions between the player and other entities.
+; ==================================================================
+; ENTITY COLLISION
+;
+; Gex against everything else - enemies, coins, collectibles, switches, doors,
+; platforms. Entity-against-entity collision does not exist as a system; only the
+; player is ever tested, which is why every routine here talks about "the player"
+; implicitly. The one exception is bolted onto a boss handler - see
+; call_03_5406_CollisionHandler_BrainOfOz.
+;
+; Two levels of lookup:
+;
+;   COLLISION_TYPE (ENTITY_FIELD_COLLISION_TYPE, $14) picks a handler out of
+;   .data_03_4c63_EntityCollisionJumpTable. It is a property of the entity
+;   *instance*: data_00_3258_EntityAttributeTable gives each entity type a default
+;   when it spawns, and a few actions rewrite it mid-life through
+;   call_00_288c_Entity_SetCollisionType, so the same entity can be inert on one
+;   frame and lethal on the next
+;
+;   ENTITY_INTERACT_* flags (.data_03_55ff_EntityInteractionFlagsTable, keyed by
+;   entity TYPE rather than by collision type) say whether an attack or a stomp is
+;   possible at all
+;
+; Almost every handler opens with call_03_550e_Entity_CheckPlayerInteraction,
+; which does the box test once and reports back not just "did we touch" but
+; *how*: PLAYER_TOUCHED_ENTITY, PLAYER_ATTACKED_ENTITY or PLAYER_STOMPED_ENTITY.
+; Reading a handler is mostly a matter of reading its three cases.
+;
+; Two shared routines do the work behind almost all of them:
+;
+;   call_03_4cea_CollisionHandler_DamagePlayer  Gex loses a hit point and is
+;       knocked back. Handlers `jp` here for the touch case
+;   call_03_5671_HandleEntityHit                the ENTITY loses a hit point, and
+;       dies when it runs out. Handlers `call` here for the attack/stomp case
+;
+; Everything is measured in WORLD coordinates - ENTITY_FIELD_WORLD_X/Y against
+; wD80E_PlayerXPosition / wD810_PlayerYPosition - so nothing here depends on where
+; the camera happens to be.
+;
+; Platforms are the exception: they do not use the shared test at all, because
+; they care about which side Gex approached from and how fast. They live at the
+; bottom of the file and maintain wDC7B_Player_EntityStoodOnLo and
+; wDC7D_Player_PushedMovingPlatformLo, which is what the player code in bank 2
+; reads to be carried or blocked.
+;
+; ------------------------------------------------------------------
+; Notes for anyone reading this next to gex2's bank03_entity_collision.asm
+; ------------------------------------------------------------------
+; The two files have the same skeleton - a jump table of per-type handlers, one
+; shared box test that classifies the contact three ways, an interaction-flags
+; table keyed by entity type, and a pair of platform routines that bypass all of
+; it. Several routines line up almost instruction for instruction. What changed:
+;
+;   coordinates   gex2 tests SCREEN positions (ENTITY_FIELD_SCREEN_X/Y against
+;                 wD212/wD213), so an entity that is not on screen cannot be
+;                 touched. gex3 tests WORLD positions in 16 bits, and the extra
+;                 precision is why every comparison here is a sub/sbc pair
+;   when it runs  gex2 tail-calls its dispatcher from inside the sprite builder,
+;                 so an entity that is not drawn is never tested - its cheap way
+;                 of culling offscreen collision. gex3 gives collision a sweep of
+;                 its own at the end of call_03_5ec1_OAM_BuildFrame, over every
+;                 occupied slot whether it was drawn or not
+;   the box       gex2 hands each handler the collision box in DE. gex3 hands
+;                 over nothing: the shared test reads ENTITY_FIELD_COLLISION_WIDTH
+;                 and _HEIGHT itself, and the handlers that roll their own hitbox
+;                 read them again. Both treat the two bytes as HALF extents
+;   damage        gex2's handlers call a two-line wrapper that ends in
+;                 Player_TakeDamage. gex3's call_03_4cea_CollisionHandler_DamagePlayer
+;                 also writes wDC98_Player_DamageKnockbackX and requests one of
+;                 three take-damage actions depending on the map, because Gex can
+;                 be on a snowboard or a kangaroo
+;   attacking     gex2 asks what action the player is in (tail spin, karate kick,
+;                 a climbing spin). gex3 reads the one-shot flag
+;                 wDC7F_Player_IsAttacking and CLEARS it on the entity it
+;                 connects with, so one tail spin can only ever hit one thing
+;   enemy health  gex2 keeps a hit counter in whichever MISC field an enemy
+;                 happens to use, and each handler decrements its own. gex3 has
+;                 ENTITY_FIELD_DAMAGE_STATE on every entity and one routine,
+;                 call_03_5671_HandleEntityHit, that spends it - plus
+;                 ENTITY_FIELD_COOLDOWN_TIMER, hit invulnerability the entity gets
+;                 for free. gex2 has no equivalent of either
+;   what dying    gex2's enemies turn into their own death burst through
+;   looks like    Entity_ParticleBurstInit. gex3 looks up
+;                 ENTITY_ATTR_DEFEAT_FLAGS and can send the entity to a death
+;                 ACTION instead, or leave a fly coin behind
+;   invincibility gex2 reports the touch and lets the damage wrapper drop it. gex3
+;                 checks Player_IsInvincible inside the box test, so during the
+;                 flicker after a hit a touch is reported as no contact at all
+;   counters      gex3 has a whole class of handler gex2 does not: collect N of a
+;                 thing, bump a counter, and call
+;                 call_00_2c09_Entity_SpawnGoalCounter to put a pip on the HUD.
+;                 A dozen of the handlers below are that shape
+;   platforms     gex2 splits them three ways (stationary, moving, one-way). gex3
+;                 has one COLLISION_TYPE_PLATFORM handler that covers all of it,
+;                 plus a landing-only twin for tv buttons - the same relationship
+;                 gex2's one-way platform has to its stationary one
+; ==================================================================
 
 call_03_4c38_UpdateEntityCollision_Dispatch:
-; Main dispatcher: checks if collisions enabled (wDCA7_Player_UpdateFlag).
-; Reads per-entity collision type/index, decrements a cooldown if nonzero.
-; Uses jump table .data_03_4c63_EntityCollisionJumpTable to call the right handler.
+; Entry point for all entity-player collision. Called once per occupied slot from
+; the sweep at the end of call_03_5ec1_OAM_BuildFrame, after every position for
+; the frame has been settled.
+;
+; Three things happen before the dispatch:
+;
+;   1. Nothing runs at all while Gex is not under his own control
+;      (wDCA7_Player_UpdateFlag = 0, which is what a cutscene clears).
+;   2. ENTITY_FIELD_COOLDOWN_TIMER is aged by one. This is the only place it ticks
+;      down, and it is the entity's own invulnerability window - see
+;      call_03_5671_HandleEntityHit, which arms it, and
+;      call_03_550e_Entity_CheckPlayerInteraction, which refuses to report contact
+;      while it is running.
+;   3. ACTION_STATE_NO_COLLISION in the entity's ENTITY_FIELD_ACTION_STATE_FLAGS
+;      skips the entity entirely. That bit comes from byte 2 of the action's data
+;      block, so it is a property of the ACTION rather than of the entity - which
+;      is how Rez, the ghost knight and the two remotes are intangible during
+;      their intro actions without changing collision type.
+;
+; `res 7, L` then strips COLLISION_TYPE_FLAG_IMMOVABLE ($80) off the type before
+; it is used as an index; the table has no row for it. That bit is not for this
+; routine - call_02_51cb_Player_MoveLeftAgainstEntity reads it off the field to
+; decide whether the thing Gex is walking into can be shoved along or is solid.
+;
+; Unlike gex2 this leaves nothing in the registers for the handler: the collision
+; box is read again by whoever needs it
     ld   A, [wDCA7_Player_UpdateFlag]                                    ;; 03:4c38 $fa $a7 $dc
     and  A, A                                          ;; 03:4c3b $a7
     ret  Z                                             ;; 03:4c3c $c8
@@ -11,18 +129,18 @@ call_03_4c38_UpdateEntityCollision_Dispatch:
     ld   A, [HL]                                       ;; 03:4c45 $7e
     and  A, A                                          ;; 03:4c46 $a7
     jr   Z, .jr_03_4c4a                                ;; 03:4c47 $28 $01
-    dec  [HL]                                          ;; 03:4c49 $35 ; if instance+15 is not 0, decrement it
+    dec  [HL]                                          ;; 03:4c49 $35 ; the entity's hit invulnerability
 .jr_03_4c4a:
     ld   A, L                                          ;; 03:4c4a $7d
-    xor  A, $10                                        ;; 03:4c4b $ee $10
+    xor  A, $10                                        ;; 03:4c4b $ee $10 ; $15 -> $05 ACTION_STATE_FLAGS
     ld   L, A                                          ;; 03:4c4d $6f
-    bit  0, [HL]                                       ;; 03:4c4e $cb $46
-    ret  NZ                                            ;; 03:4c50 $c0 ; return if bit 0 of instance+05 is set
+    bit  ACTION_STATE_NO_COLLISION_BIT, [HL]           ;; 03:4c4e $cb $46
+    ret  NZ                                            ;; 03:4c50 $c0 ; this action is intangible
     ld   A, L                                          ;; 03:4c51 $7d
-    xor  A, $11                                        ;; 03:4c52 $ee $11
+    xor  A, $11                                        ;; 03:4c52 $ee $11 ; $05 -> $14 COLLISION_TYPE
     ld   L, A                                          ;; 03:4c54 $6f
-    ld   L, [HL]                                       ;; 03:4c55 $6e ; l = instance+14
-    res  7, L                                          ;; 03:4c56 $cb $bd ; unset bit 0 in instance+14
+    ld   L, [HL]                                       ;; 03:4c55 $6e
+    res  7, L                                          ;; 03:4c56 $cb $bd ; drop COLLISION_TYPE_FLAG_IMMOVABLE
     ld   H, $00                                        ;; 03:4c58 $26 $00
     add  HL, HL                                        ;; 03:4c5a $29
     ld   BC, .data_03_4c63_EntityCollisionJumpTable    ;; 03:4c5b $01 $63 $4c
@@ -32,97 +150,133 @@ call_03_4c38_UpdateEntityCollision_Dispatch:
     ld   L, A                                          ;; 03:4c61 $6f
     jp   HL                                            ;; 03:4c62 $e9 ; load collision routine and jump
 .data_03_4c63_EntityCollisionJumpTable:
-    dw   call_03_4ccf_CollisionHandler_None ; 00
-    dw   call_03_56c1_CollisionHandler_Platform ; 01
-    dw   call_03_4cd0_CollisionHandler_InvulnerableEnemy ; 02
-    dw   call_03_4cd7_CollisionHandler_Projectile ; 03
-    dw   call_03_4ce1_CollisionHandler_GenericEnemy ; 04
-    dw   call_03_4d38_CollisionHandler_GenericEnemyUnused ; 05 ; unused?
-    dw   call_03_4d44_CollisionHandler_DamagePlayerUnused ; 06 ; unused?
-    dw   call_03_4d9b_CollisionHandler_BonusCoin ; 07
-    dw   call_03_4db3_CollisionHandler_FlyCoin ; 08
-    dw   call_03_4dc2_CollisionHandler_PawCoin ; 09
-    dw   call_03_4e04_CollisionHandler_Fly ; 0A
-    dw   call_03_4e31_CollisionHandler_FlyTV ; 0B
-    dw   call_03_4e4b_CollisionHandler_IceSculpture ; 0C
-    dw   call_03_4e89_CollisionHandler_EvilSantaProjectile ; 0D
-    dw   call_03_4f23_CollisionHandler_HolidayTV_Elf ; 0E
-    dw   call_03_4f60_CollisionHandler_BloodCooler ; 0F
-    dw   call_03_4f8c_CollisionHandler_MagicSword ; 10
-    dw   call_03_4f98_CollisionHandler_GhostKnight ; 11
-    dw   call_03_4fad_CollisionHandler_Hand ; 12
-    dw   call_03_4fca_CollisionHandler_LostArk ; 13
-    dw   call_03_4ff1_CollisionHandler_RaStaff ; 14
-    dw   call_03_500d_CollisionHandler_Coffin ; 15
-    dw   call_03_50b6_CollisionHandler_AlienCultureTube ; 16
-    dw   call_03_50e0_CollisionHandler_OnSwitch ; 17
-    dw   call_03_50ea_CollisionHandler_OffSwitch ; 18
-    dw   call_03_50f4_CollisionHandler_OnSwitch2 ; 19
-    dw   call_03_5116_CollisionHandler_Door ; 1A
-    dw   call_03_5156_CollisionHandler_Door2 ; 1B
-    dw   call_03_5196_CollisionHandler_Secbot ; 1C
-    dw   call_03_51b8_CollisionHandler_SailorToonGirl ; 1D
-    dw   call_03_5201_CollisionHandler_BigSilverRobot ; 1E
-    dw   call_03_5231_CollisionHandler_Mech ; 1F
-    dw   call_03_5274_CollisionHandler_PlanetOBlast ; 20
-    dw   call_03_528c_CollisionHandler_StrayCat ; 21
-    dw   call_03_52aa_CollisionHandler_Convict ; 22
-    dw   call_03_52c8_CollisionHandler_YellowGoon ; 23
-    dw   call_03_52da_CollisionHandler_ChomperTV ; 24
-    dw   call_03_52fa_CollisionHandler_Bomb ; 25
-    dw   call_03_531a_CollisionHandler_WaterTowerStand ; 26
-    dw   call_03_532f_CollisionHandler_GextremeSports_Elf ; 27
-    dw   call_03_537a_CollisionHandler_BonusTimeCoin ; 28
-    dw   call_03_538e_CollisionHandler_Bell ; 29
-    dw   call_03_53eb_CollisionHandler_Cannon ; 2A
-    dw   call_03_5406_CollisionHandler_BrainOfOz ; 2B
-    dw   call_03_5469_CollisionHandler_BrainOfOzProjectile ; 2C
-    dw   call_03_5473_CollisionHandler_FreestandingRemote ; 2D
-    dw   call_03_5028_CollisionHandler_Cactus ; 2E
-    dw   call_03_5069_CollisionHandler_PlayingCard ; 2F
-    dw   call_03_5085_CollisionHandler_HardHat ; 30
-    dw   call_03_5483_CollisionHandler_Meteor ; 31
-    dw   call_03_54a8_CollisionHandler_Rez ; 32
-    dw   call_03_581a_CollisionHandler_TVButton ; 33
-    dw   call_03_54ee_CollisionHandler_RaStatueProjectile ; 34
-    dw   call_03_53c2_CollisionHandler_RockHard ; 35
+; One handler address per COLLISION_TYPE_*, in value order. The two "_UNUSED"
+; rows are dead: neither value appears in data_00_3258_EntityAttributeTable nor in
+; any call_00_288c_Entity_SetCollisionType call.
+;
+; Most rows belong to exactly one entity type, which is why the names read like a
+; cast list. The three that do not are COLLISION_TYPE_NONE (every invisible
+; bookkeeping entity), COLLISION_TYPE_PLATFORM (fourteen kinds of thing to stand
+; on) and COLLISION_TYPE_GENERIC_ENEMY (eighteen ordinary enemies)
+    dw   call_03_4ccf_CollisionHandler_None                   ; COLLISION_TYPE_NONE
+    dw   call_03_56c1_CollisionHandler_Platform               ; COLLISION_TYPE_PLATFORM
+    dw   call_03_4cd0_CollisionHandler_InvulnerableEnemy      ; COLLISION_TYPE_INVULNERABLE_ENEMY
+    dw   call_03_4cd7_CollisionHandler_Projectile             ; COLLISION_TYPE_PROJECTILE
+    dw   call_03_4ce1_CollisionHandler_GenericEnemy           ; COLLISION_TYPE_GENERIC_ENEMY
+    dw   call_03_4d38_CollisionHandler_GenericEnemyUnused     ; COLLISION_TYPE_GENERIC_ENEMY_UNUSED (never assigned)
+    dw   call_03_4d44_CollisionHandler_DamagePlayerUnused     ; COLLISION_TYPE_DAMAGE_PLAYER_UNUSED (never assigned)
+    dw   call_03_4d9b_CollisionHandler_BonusCoin              ; COLLISION_TYPE_BONUS_COIN
+    dw   call_03_4db3_CollisionHandler_FlyCoin                ; COLLISION_TYPE_FLY_COIN
+    dw   call_03_4dc2_CollisionHandler_PawCoin                ; COLLISION_TYPE_PAW_COIN
+    dw   call_03_4e04_CollisionHandler_Fly                    ; COLLISION_TYPE_FLY
+    dw   call_03_4e31_CollisionHandler_FlyTV                  ; COLLISION_TYPE_FLY_TV
+    dw   call_03_4e4b_CollisionHandler_IceSculpture           ; COLLISION_TYPE_ICE_SCULPTURE
+    dw   call_03_4e89_CollisionHandler_EvilSantaProjectile    ; COLLISION_TYPE_EVIL_SANTA_PROJECTILE
+    dw   call_03_4f23_CollisionHandler_HolidayTV_Elf          ; COLLISION_TYPE_ELF
+    dw   call_03_4f60_CollisionHandler_BloodCooler            ; COLLISION_TYPE_BLOOD_COOLER
+    dw   call_03_4f8c_CollisionHandler_MagicSword             ; COLLISION_TYPE_MAGIC_SWORD
+    dw   call_03_4f98_CollisionHandler_GhostKnight            ; COLLISION_TYPE_GHOST_KNIGHT
+    dw   call_03_4fad_CollisionHandler_Hand                   ; COLLISION_TYPE_HAND
+    dw   call_03_4fca_CollisionHandler_LostArk                ; COLLISION_TYPE_LOST_ARK
+    dw   call_03_4ff1_CollisionHandler_RaStaff                ; COLLISION_TYPE_RA_STAFF
+    dw   call_03_500d_CollisionHandler_Coffin                 ; COLLISION_TYPE_COFFIN
+    dw   call_03_50b6_CollisionHandler_AlienCultureTube       ; COLLISION_TYPE_ALIEN_CULTURE_TUBE
+    dw   call_03_50e0_CollisionHandler_OnSwitch               ; COLLISION_TYPE_ON_SWITCH
+    dw   call_03_50ea_CollisionHandler_OffSwitch              ; COLLISION_TYPE_OFF_SWITCH
+    dw   call_03_50f4_CollisionHandler_OnSwitch2              ; COLLISION_TYPE_ON_SWITCH_2
+    dw   call_03_5116_CollisionHandler_Door                   ; COLLISION_TYPE_DOOR
+    dw   call_03_5156_CollisionHandler_Door2                  ; COLLISION_TYPE_DOOR_2
+    dw   call_03_5196_CollisionHandler_Secbot                 ; COLLISION_TYPE_SECBOT
+    dw   call_03_51b8_CollisionHandler_SailorToonGirl         ; COLLISION_TYPE_SAILOR_TOON_GIRL
+    dw   call_03_5201_CollisionHandler_BigSilverRobot         ; COLLISION_TYPE_BIG_SILVER_ROBOT
+    dw   call_03_5231_CollisionHandler_Mech                   ; COLLISION_TYPE_MECH
+    dw   call_03_5274_CollisionHandler_PlanetOBlast           ; COLLISION_TYPE_PLANET_O_BLAST
+    dw   call_03_528c_CollisionHandler_StrayCat               ; COLLISION_TYPE_STRAY_CAT
+    dw   call_03_52aa_CollisionHandler_Convict                ; COLLISION_TYPE_CONVICT
+    dw   call_03_52c8_CollisionHandler_YellowGoon             ; COLLISION_TYPE_YELLOW_GOON
+    dw   call_03_52da_CollisionHandler_ChomperTV              ; COLLISION_TYPE_CHOMPER_TV
+    dw   call_03_52fa_CollisionHandler_Bomb                   ; COLLISION_TYPE_BOMB
+    dw   call_03_531a_CollisionHandler_WaterTowerStand        ; COLLISION_TYPE_WATER_TOWER_STAND
+    dw   call_03_532f_CollisionHandler_GextremeSports_Elf     ; COLLISION_TYPE_GEXTREME_SPORTS_ELF
+    dw   call_03_537a_CollisionHandler_BonusTimeCoin          ; COLLISION_TYPE_BONUS_TIME_COIN
+    dw   call_03_538e_CollisionHandler_Bell                   ; COLLISION_TYPE_BELL
+    dw   call_03_53eb_CollisionHandler_Cannon                 ; COLLISION_TYPE_CANNON
+    dw   call_03_5406_CollisionHandler_BrainOfOz              ; COLLISION_TYPE_BRAIN_OF_OZ
+    dw   call_03_5469_CollisionHandler_BrainOfOzProjectile    ; COLLISION_TYPE_BRAIN_OF_OZ_PROJECTILE
+    dw   call_03_5473_CollisionHandler_FreestandingRemote     ; COLLISION_TYPE_FREESTANDING_REMOTE
+    dw   call_03_5028_CollisionHandler_Cactus                 ; COLLISION_TYPE_CACTUS
+    dw   call_03_5069_CollisionHandler_PlayingCard            ; COLLISION_TYPE_PLAYING_CARD
+    dw   call_03_5085_CollisionHandler_HardHat                ; COLLISION_TYPE_HARD_HAT
+    dw   call_03_5483_CollisionHandler_Meteor                 ; COLLISION_TYPE_METEOR
+    dw   call_03_54a8_CollisionHandler_Rez                    ; COLLISION_TYPE_REZ
+    dw   call_03_581a_CollisionHandler_TVButton               ; COLLISION_TYPE_TV_BUTTON
+    dw   call_03_54ee_CollisionHandler_RaStatueProjectile     ; COLLISION_TYPE_RA_STATUE_PROJECTILE
+    dw   call_03_53c2_CollisionHandler_RockHard               ; COLLISION_TYPE_ROCK_HARD
 
 call_03_4ccf_CollisionHandler_None:
-; Does nothing, just returns.
-; Acts as a "null" collision handler.
+; The default for anything Gex cannot interact with - the goal counters, the bonus
+; stage timer, the invisible spawner entities - and what
+; call_00_288a_Entity_SetCollisionTypeNone writes over an entity that has just
+; been defeated but is still playing its death animation
     ret                                                ;; 03:4ccf $c9
 
 call_03_4cd0_CollisionHandler_InvulnerableEnemy:
-; Checks for player-entity interaction.
-; If collision is detected (carry set), jumps to call_00_06f6_Player_TakeDamage (probably a generic "hit" or interaction response).
-; Otherwise returns.
+; ENTITY_MYSTERY_TV_FISH, the only user. It has no ENTITY_INTERACT_ATTACK or
+; _STOMP flag, so the box test can only ever report a touch - which is why this
+; damages Gex on carry without bothering to look at A.
+;
+; Note it goes straight to Player_TakeDamage rather than through
+; call_03_4cea_CollisionHandler_DamagePlayer, so the fish costs a hit point but
+; produces no knockback and no take-damage animation
     call call_03_550e_Entity_CheckPlayerInteraction
     jp   c,call_00_06f6_Player_TakeDamage
     ret  
 
 call_03_4cd7_CollisionHandler_Projectile:
-; Calls CheckPlayerEntityInteraction.
-; If no collision → return. If collision → calls call_03_4cea_CollisionHandler_DamagePlayer (special interaction routine), 
-; then clears the entity from memory.
+; The shots that are spent on contact: Safari Sam's, both snake projectiles and
+; the secbot's. Damages Gex the full way - knockback and take-damage action - and
+; then frees the slot, so the shot vanishes on the frame it lands.
+;
+; Entity_DeactivateSelf leaves the list entry alone, so the parent is free to fire
+; again
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     call call_03_4cea_CollisionHandler_DamagePlayer
     jp   call_00_2b80_Entity_DeactivateSelf
 
 call_03_4ce1_CollisionHandler_GenericEnemy:
-; Calls CheckPlayerEntityInteraction.
-; If collision and A!=0, jumps to HandleEntityHit.
-; If A==0, falls into call_03_4cea_CollisionHandler_DamagePlayer.
+; The ordinary enemy, and by far the most used type - eighteen entity types share
+; it, from the Holiday TV penguin to Rez's own projectiles.
+;
+; Touch hurts Gex; anything else spends one of the entity's hit points through
+; HandleEntityHit. Note the fall-through: with no `ret` between them, the touch
+; case runs straight into call_03_4cea_CollisionHandler_DamagePlayer below rather
+; than jumping to it
     call call_03_550e_Entity_CheckPlayerInteraction                                  ;; 03:4ce1 $cd $0e $55
     ret  NC                                            ;; 03:4ce4 $d0
     cp   A, PLAYER_TOUCHED_ENTITY                                        ;; 03:4ce5 $fe $00
     jp   NZ, call_03_5671_HandleEntityHit                                ;; 03:4ce7 $c2 $71 $56
 call_03_4cea_CollisionHandler_DamagePlayer:
-; Reads player action ID. If certain actions (09, 29, 36) → skip. Otherwise, if not 45, calls HandleGenericHitResponse.
-; Then calculates player vs entity X difference, stores facing direction in wDC98_Player_DamageKnockbackX.
-; Depending on level ID (07, 08), sets a return bank (player action variant).
-; Switches player action by calling into banked routine.
-; This is basically a player transformation / state-change trigger.
+; "Gex just got hurt" - the shared damage path, reached by a `jp` from most of the
+; handlers in this file as well as by falling out of the one above.
+;
+; Three things happen, and only the first is conditional:
+;
+;   1. Player_TakeDamage, unless he is ALREADY in one of the four take-damage
+;      actions. So being hit again while reeling costs nothing.
+;   2. wDC98_Player_DamageKnockbackX = $01 or $FF, the side AWAY from the entity,
+;      worked out from a 16-bit compare of the two world X positions.
+;      call_02_7152_Entities_UpdateAll feeds that into wDC84_PlayerXDeltaExtra for
+;      as long as the take-damage action runs, so the knockback plays out a pixel
+;      at a time.
+;   3. The take-damage action itself, picked by which map this is:
+;      PLAYERACTION_SNOWBOARDING_TAKE_DAMAGE on MAP_GEXTREME_SPORTS1,
+;      PLAYERACTION_KANGAROO_TAKE_DAMAGE on MAP_MARSUPIAL_MADNESS1, and the plain
+;      PLAYERACTION_TAKE_DAMAGE everywhere else. Player_RequestAction adds
+;      PLAYERACTION_TOPDOWN on top of that for a top-down map.
+;
+; Steps 2 and 3 run even when step 1 was skipped, so a second hit re-aims the
+; knockback and restarts the animation
     ld   A, [wD801_Player_ActionId]                                    ;; 03:4cea $fa $01 $d8
     cp   A, PLAYERACTION_TAKE_DAMAGE                                        ;; 03:4ced $fe $09
     jr   Z, .jr_03_4cfe                                ;; 03:4cef $28 $0d
@@ -158,7 +312,13 @@ call_03_4cea_CollisionHandler_DamagePlayer:
     ret                                                ;; 03:4d37 $c9
 
 call_03_4d38_CollisionHandler_GenericEnemyUnused:
-; If collision, checks A. If zero, deal damage to player. Otherwise, goes to entity hit handler.
+; COLLISION_TYPE_GENERIC_ENEMY_UNUSED. No entity type in
+; data_00_3258_EntityAttributeTable carries it and nothing assigns it at runtime,
+; so this handler is dead.
+;
+; It is the generic enemy above with the fall-through spelled out as a `jp`, and
+; with the touch case going straight to Player_TakeDamage instead of through the
+; knockback path - so it would hurt without staggering
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_TOUCHED_ENTITY
@@ -166,9 +326,13 @@ call_03_4d38_CollisionHandler_GenericEnemyUnused:
     jp   call_03_5671_HandleEntityHit
 
 call_03_4d44_CollisionHandler_DamagePlayerUnused:
-; Excludes some player actions (09, 29, 36, 45).
-; On collision: if A==01, goes to entity hit handler. Otherwise sets timer, 
-; calculates relative position, sets facing direction, and triggers action change (like 4cea).
+; COLLISION_TYPE_DAMAGE_PLAYER_UNUSED, also never assigned to anything.
+;
+; Close to call_03_4cea_CollisionHandler_DamagePlayer, with two differences: the
+; four take-damage actions make it return outright rather than just skipping the
+; damage, and it arms wDC7E_Player_DamageCooldownTimer itself instead of leaving
+; that to Player_TakeDamage. An attack is handed to HandleEntityHit first, so
+; unlike $4cea this one is a complete handler rather than a tail
     ld   a,[wD801_Player_ActionId]
     cp   a,PLAYERACTION_TAKE_DAMAGE
     ret  z
@@ -209,7 +373,15 @@ call_03_4d44_CollisionHandler_DamagePlayerUnused:
     ret  
 
 call_03_4d9b_CollisionHandler_BonusCoin:
-; If collision: sets per-level progress bit (bit4 of level data), plays sound 02, then handles entity hit.
+; ENTITY_BONUS_COIN, one per level. Sets PROGRESS_BONUS_COIN_TAKEN_BIT in this
+; level's byte of wDC5C_ProgressFlags - which is save data, so the coin stays
+; taken - plays SFX_ITEM_PICKUP, and then goes through HandleEntityHit rather than
+; deactivating itself.
+;
+; That is deliberate. The coin's ENTITY_ATTR_DAMAGE_STATE is $02, which the spawn
+; turns into a health of 1, so the first hit is fatal - and routing through
+; HandleEntityHit is what lets its ENTITY_ATTR_DEFEAT_FLAGS ($81) pick the burst
+; and the pickup animation
     call call_03_550e_Entity_CheckPlayerInteraction                                  ;; 03:4d9b $cd $0e $55
     ret  NC                                            ;; 03:4d9e $d0
     ld   HL, wDC1E_CurrentLevelID                                     ;; 03:4d9f $21 $1e $dc
@@ -223,7 +395,10 @@ call_03_4d9b_CollisionHandler_BonusCoin:
     jp   call_03_5671_HandleEntityHit                                    ;; 03:4db0 $c3 $71 $56
 
 call_03_4db3_CollisionHandler_FlyCoin:
-; If collision: calls IncrementProgressCounter, plays sound 02, then handles entity hit.
+; ENTITY_FLY_COIN_SPAWN, the ordinary collectible. Bumps wDC68_CollectibleAmount
+; through Player_ObtainedCollectible - which is where the 50-coin extra life and
+; the 100-coin level-complete flag are paid out - and then dies the same way the
+; bonus coin does
     call call_03_550e_Entity_CheckPlayerInteraction                                  ;; 03:4db3 $cd $0e $55
     ret  NC                                            ;; 03:4db6 $d0
     call call_00_0723_Player_ObtainedCollectible                                  ;; 03:4db7 $cd $23 $07
@@ -232,12 +407,17 @@ call_03_4db3_CollisionHandler_FlyCoin:
     jp   call_03_5671_HandleEntityHit                                    ;; 03:4dbf $c3 $71 $56
 
 call_03_4dc2_CollisionHandler_PawCoin:
-; If collision:
-; Looks up a flag mask (00, 20, 40, 80).
-; ORs it into level data, increments wDCAF_PawCoinCounter.
-; Every 4 collected, increments wDC4F_PawCoinExtraHealth (if <4), resets counter, sets flag in wDB69_HUDDirtyFlags.
-; Plays sound 02, then handles entity hit.
-; This is basically a collectible counter with milestones.
+; ENTITY_PAW_COIN. Four per level, and the entity's spawn parameter (0-3) says
+; which one this is: .data_03_4e00 turns it into a bit mask that is OR'd into this
+; level's wDC5C_ProgressFlags byte, so collecting the same paw coin twice cannot
+; count twice across saves.
+;
+; wDCAF_PawCoinCounter counts them within the run. Every fourth one raises
+; wDC4F_PawCoinExtraHealth - a permanent extra health point, capped at four -
+; resets the counter, and marks the health part of the status bar dirty.
+;
+; The `sub A, $04 / jr NZ` is an equality test that leaves A at zero on the match,
+; which is why the counter reset below is a plain `xor A`
     call call_03_550e_Entity_CheckPlayerInteraction                                  ;; 03:4dc2 $cd $0e $55
     ret  NC                                            ;; 03:4dc5 $d0
     call call_00_230f_Entity_GetParameterIntoC                                  ;; 03:4dc6 $cd $0f $23
@@ -272,12 +452,23 @@ call_03_4dc2_CollisionHandler_PawCoin:
     call call_00_0ff5_QueueSFX                                  ;; 03:4dfa $cd $f5 $0f
     jp   call_03_5671_HandleEntityHit                                    ;; 03:4dfd $c3 $71 $56
 .data_03_4e00:
+; Which bit of wDC5C_ProgressFlags[level] each of the four paw coins owns, indexed
+; by the entity's spawn parameter. Bits 5-7; bits 0-4 belong to the remotes, the
+; all-collectibles flag and the bonus coin
     db   $00, $20, $40, $80
 
 call_03_4e04_CollisionHandler_Fly:
-; If collision: gets entity ID, looks up a state value in .data_03_4e2c, calls call_00_0624_Player_SwapFlyPowerup.
-; Modifies entity graphics/status, then clears the entity.
-; Looks like a pickup that triggers a phase/state change.
+; ENTITY_FLY_1 through ENTITY_FLY_5, the power-up flies that come out of a fly TV.
+;
+; The entity id says which fly this is, and .data_03_4e2c turns that into a
+; FLY_POWERUP_* id for Player_SwapFlyPowerup. Remember what swapping does: the
+; argument becomes the fly Gex is now CARRYING, and it is the fly being displaced
+; whose effect fires. Eating a fly cashes in the previous one.
+;
+; It then reaches through ENTITY_FIELD_PARENT into the fly TV's own
+; wD700_EntityFlags entry and rewrites the low nibble to 3 - the action the TV
+; respawns in - keeping the flags nibble. So the TV stays open after the player
+; leaves the room and comes back
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     call call_00_293a_Entity_GetId
@@ -297,11 +488,20 @@ call_03_4e04_CollisionHandler_Fly:
     ld   [hl],a
     jp   call_00_2b80_Entity_DeactivateSelf
 .data_03_4e2c:
+; FLY_POWERUP_* by fly entity id, indexed by (id - ENTITY_FLY_1):
+; FLY_POWERUP_HEALTH, _EXTRA_LIFE, _1, _5, _2
     db   $03, $04, $01, $05, $02
 
 call_03_4e31_CollisionHandler_FlyTV:
-; If entity action ID==0 and collision detected with A==01: plays sound 03, 
-; handles entity hit, then sets entity status low nibble to 02.
+; The five fly TVs. ENTITY_INTERACT_ATTACK only, so they cannot hurt Gex and
+; cannot be stomped open - the tail spin is the only way in.
+;
+; Action $00 is the closed TV; the guard means a TV that is already open ignores
+; further hits. On a hit it plays SFX_FLY_TV and spends the TV's one hit point.
+; HandleEntityHit reads ENTITY_ATTR_DEFEAT_FLAGS ($01) and sends it to action $01,
+; the opening animation, whose data block carries a pending action of $02 - so
+; when that animation ends the TV moves itself to FlyTV_SpawnFly and the fly comes
+; out. List state 2 records all of that for a revisit
     call call_00_2962_Entity_GetActionId
     cp   a,$00
     ret  nz
@@ -316,13 +516,20 @@ call_03_4e31_CollisionHandler_FlyTV:
     jp   call_00_2299_Entity_SetListState
 
 call_03_4e4b_CollisionHandler_IceSculpture:
-; If entity action ID<2 and collision A==01:
-; Plays sound 19, increments action ID, updates entity status nibble.
-; Loads new entity data (via banked routine).
-; If new action ID==2, increments wDCC3_IceSculptureCounter.
-; When wDCC3_IceSculptureCounter==5, triggers PlaySound_1E.
-; Then dispatches new offset action.
-; Basically a multi-stage collectible or progress item (like 5 items → trigger special event).
+; ENTITY_HOLIDAY_TV_ICE_SCULPTURE - five of them in the level, and the first of
+; the "collect N of these" handlers.
+;
+; Each sculpture takes two hits: action $00 -> $01 -> $02, driven straight from
+; here rather than by the entity's own action code. The action id doubles as the
+; list state, so a half-broken sculpture is still half-broken when the player
+; comes back.
+;
+; Reaching action $02 - fully broken - bumps wDCC3_IceSculptureCounter, and the
+; fifth one plays SFX_REMOTE through Entity_PlayRemoteSFX. Either way the running
+; total goes to Entity_SpawnGoalCounter, which puts the pips on screen.
+;
+; The two `push AF` are because Entity_SetListState and Entity_SetAction both want
+; the new action id and neither preserves it
     call call_00_2962_Entity_GetActionId                                  ;; 03:4e4b $cd $62 $29
     cp   A, $02                                        ;; 03:4e4e $fe $02
     ret  NC                                            ;; 03:4e50 $d0
@@ -353,12 +560,25 @@ call_03_4e4b_CollisionHandler_IceSculpture:
     jp   call_00_2c09_Entity_SpawnGoalCounter                                  ;; 03:4e86 $c3 $09 $2c
 
 call_03_4e89_CollisionHandler_EvilSantaProjectile:
-; Rejects if entity "inactive" (bit 7 of property set) or action ≥ 5.
-; If collision and result A==01:
-; - Negates a property byte (EntityGet1D), does distance check, looks up a value in 
-;   .data_03_4efa (a table of progression values), writes it to entity state.
-; If collision A!=01:
-; - Loads new entity data from bank 6, then triggers a player action change.
+; The snowball Evil Santa throws, and the most involved handler in the file
+; because the snowball can be volleyed back at him.
+;
+; Two guards: the snowball is inert while its Y velocity is negative, and while it
+; is in action $05 or above (the states it uses once it has been returned or has
+; landed).
+;
+; A TOUCH or a STOMP is the ordinary case: action $06, then the shared damage path.
+;
+; An ATTACK sends it back. It negates the Y velocity in place - Entity_GetYVelocity
+; leaves HL on the field, which is what makes the `cpl / inc A / ld [HL], A` work -
+; then looks for Santa. With no Santa loaded there is nowhere to send it, so the
+; snowball just frees its slot.
+;
+; With Santa loaded it measures the 16-bit gap between them, takes the absolute
+; value, clamps it to $A0 and divides by four to index .data_03_4efa, which turns
+; that distance into an X velocity. Sign it toward Santa and the snowball arrives
+; at him rather than sailing past - so the return speed is chosen by how far away
+; he is standing
     call call_00_28d2_Entity_GetYVelocity                                  ;; 03:4e89 $cd $d2 $28
     bit  7, A                                          ;; 03:4e8c $cb $7f
     ret  NZ                                            ;; 03:4e8e $c0
@@ -429,6 +649,9 @@ call_03_4e89_CollisionHandler_EvilSantaProjectile:
     farcall call_02_72ac_Entity_SetAction
     jp   call_03_4cea_CollisionHandler_DamagePlayer                                   ;; 03:4ef7 $c3 $ea $4c
 .data_03_4efa:
+; Return speed by distance, indexed by (clamped distance to Santa) >> 2. Almost
+; the identity - it rises by one per step and skips a value every twelfth entry,
+; so a snowball thrown from further away comes back proportionally faster
     db   $00, $01, $02, $03, $04, $05, $06, $07        ;; 03:4efa ???.????
     db   $08, $09, $0a, $0b, $0d, $0e, $0f, $10        ;; 03:4f02 ????????
     db   $11, $12, $13, $14, $15, $16, $17, $18        ;; 03:4f0a ????????
@@ -437,11 +660,20 @@ call_03_4e89_CollisionHandler_EvilSantaProjectile:
     db   $2b                                           ;; 03:4f22 ?
 
 call_03_4f23_CollisionHandler_HolidayTV_Elf:
-; On collision:
-; - If A!=01 → trigger player action change.
-; - If A==01: loads new entity data (bank 4), decrements per-entity counter (wDCD5_ElfHealth1), 
-;   clears entity when it hits 0, increments wDCC8_ElfCounter, dispatches offset action.
-; - If all counters zero → play sound 1E.
+; ENTITY_HOLIDAY_TV_SKATING_ELF. Touch hurts. An attack puts the elf into action
+; $04 and takes one off its health.
+;
+; The health is not in the entity - it is wDCD5_ElfHealth1 and the four bytes
+; after it, indexed by the elf's spawn parameter, so it survives the elf being
+; despawned and respawned as the player skates past. That is also why nothing here
+; calls HandleEntityHit: the elf's ENTITY_ATTR_DAMAGE_STATE is $00, which the
+; spawn turns into $FF, and $FF means invulnerable. Reaching zero makes the elf
+; harmless (COLLISION_TYPE_NONE), retires its list entry, and bumps
+; wDCC8_ElfCounter for the goal display.
+;
+; The last three lines are the "all of them" test - if the first two health bytes
+; are both zero it plays SFX_REMOTE. Note that only tests two of the five, unlike
+; call_03_532f_CollisionHandler_GextremeSports_Elf below, which walks all five
     call call_03_550e_Entity_CheckPlayerInteraction                                  ;; 03:4f23 $cd $0e $55
     ret  NC                                            ;; 03:4f26 $d0
     cp   A, PLAYER_ATTACKED_ENTITY                                        ;; 03:4f27 $fe $01
@@ -471,11 +703,11 @@ call_03_4f23_CollisionHandler_HolidayTV_Elf:
     jp   call_00_21ef_Entity_PlayRemoteSFX                                  ;; 03:4f5d $c3 $ef $21
 
 call_03_4f60_CollisionHandler_BloodCooler:
-; Only for entities in action 00.
-; If collision with A==01:
-; - Handles entity hit, plays sound 19, sets entity status, increments wDCC5_BloodCoolerCounter.
-; - When wDCC5_BloodCoolerCounter==3, plays sound 1E.
-; - Dispatches offset action.
+; ENTITY_MYSTERY_TV_BLOOD_COOLER, three per level. ENTITY_INTERACT_ATTACK only.
+;
+; One hit each: action $00 is the intact cooler, HandleEntityHit breaks it, and
+; list state 1 records that for a revisit. wDCC5_BloodCoolerCounter counts them
+; and the third plays SFX_REMOTE
     call call_00_2962_Entity_GetActionId
     cp   a,$00
     ret  nz
@@ -498,7 +730,11 @@ call_03_4f60_CollisionHandler_BloodCooler:
     jp   call_00_2c09_Entity_SpawnGoalCounter
 
 call_03_4f8c_CollisionHandler_MagicSword:
-; On any collision: plays sound 1E with parameter 3, then handles entity hit.
+; ENTITY_MYSTERY_TV_MAGIC_SWORD, a one-off pickup. Any contact takes it: plays
+; SFX_REMOTE with trigger 3 and spends its hit point.
+;
+; Entity_PlayRemoteSFX does two things despite the name - it plays the sound AND
+; marks tv button C as pressed, which is how a collected item unlocks the tv
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     ld   c,$03
@@ -506,9 +742,11 @@ call_03_4f8c_CollisionHandler_MagicSword:
     jp   call_03_5671_HandleEntityHit
 
 call_03_4f98_CollisionHandler_GhostKnight:
-; On collision:
-; - If A!=01 → trigger player action change.
-; - If A==01: handle entity hit, check action ID, and if 05 → mark entity slot active.
+; ENTITY_MYSTERY_TV_GHOST_KNIGHT. Touch hurts; an attack spends a hit point.
+;
+; The extra test at the end is the kill: action $05 is the state the knight is put
+; into when HandleEntityHit runs it out of health, so seeing it means this hit was
+; the last one, and the trigger goes up for whatever the level was waiting on
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
@@ -520,7 +758,11 @@ call_03_4f98_CollisionHandler_GhostKnight:
     ret  
 
 call_03_4fad_CollisionHandler_Hand:
-; On collision A==01: if entity’s action ID is 00, loads new entity data (bank 1).
+; ENTITY_TUT_TV_HAND, the mummy hand that comes out of the sand. Touch hurts; an
+; attack in action $00 - dormant, still buried - sends it to action $01.
+;
+; It has no HandleEntityHit call, so the hand cannot be destroyed: whipping it only
+; wakes it up
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
@@ -533,11 +775,11 @@ call_03_4fad_CollisionHandler_Hand:
     ret  
     
 call_03_4fca_CollisionHandler_LostArk:
-; For action 00 only.
-; On collision A==02:
-; Handle entity hit, set status nibble 04, increment wDCC6_LostArkCounter.
-; On 3rd collected, play sound 1E.
-; Dispatch offset action.
+; ENTITY_TUT_TV_LOST_ARK, three per level, and ENTITY_INTERACT_STOMP only - the
+; one collectible in the game that has to be jumped on rather than whipped.
+;
+; Action $00 is the unopened ark. List state 4 records it as taken;
+; wDCC6_LostArkCounter counts them and the third plays SFX_REMOTE
     call call_00_2962_Entity_GetActionId
     cp   a,$00
     ret  nz
@@ -558,10 +800,9 @@ call_03_4fca_CollisionHandler_LostArk:
     jp   call_00_2c09_Entity_SpawnGoalCounter
     
 call_03_4ff1_CollisionHandler_RaStaff:
-; On collision A==01:
-; - Handle entity hit, increment wDCC7_RaStaffCounter.
-; - On 3rd collected, play sound 1E.
-; - Dispatch offset action.
+; ENTITY_TUT_TV_RA_STAFF, three per level, attack only. Same shape as the ark
+; above without the action guard or the list state, so the staff relies on
+; HandleEntityHit alone to remove itself
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
@@ -577,8 +818,9 @@ call_03_4ff1_CollisionHandler_RaStaff:
     jp   call_00_2c09_Entity_SpawnGoalCounter
     
 call_03_500d_CollisionHandler_Coffin:
-; For action 00 only.
-; On collision A==01: transforms entity via bank 1 loader.
+; ENTITY_TUT_TV_COFFIN. Attack only, action $00 only, and all it does is send the
+; coffin to action $01 - the open one, which is where whatever was inside comes
+; out. No damage either way
     call call_00_2962_Entity_GetActionId
     cp   a,$00
     ret  nz
@@ -591,10 +833,23 @@ call_03_500d_CollisionHandler_Coffin:
     ret  
    
 call_03_5028_CollisionHandler_Cactus:
-; Collision logic depends on nearby flags (wDCA9_FlyPowerup2_Timer–wDCAB_FlyPowerup5_Timer).
-; Sometimes triggers entity hit if action ID < 5.
-; Otherwise, for action 05, can trigger a player action change.
-; If action < 4 and player within 0x28 in X vector → loads new entity data (bank 5).
+; ENTITY_WESTERN_STATION_ENEMY_CACTUS - the cactus that springs up out of the
+; ground. Three rules, and the routine runs all three every frame rather than
+; returning early.
+;
+; WHO CAN HURT WHOM. A touch, or an attack with no fly power-up running, means the
+; cactus is the dangerous one - but only in action $05, the sprung state. Attacking
+; it WITH a power-up running (any of the three timers at
+; wDCA9_FlyPowerup2_Timer) spends a hit point instead, and only in actions below
+; $05. So an unpowered tail spin does nothing at all.
+;
+; WHEN IT SPRINGS. The tail at .jr_00_504C runs whatever happened above: in
+; actions below $04 it measures the distance to Gex and jumps to action $05 the
+; moment he is within $28. That is the only thing that triggers the cactus, so it
+; is proximity rather than contact.
+;
+; The `ldi a,[hl] / or [hl] / inc hl / or [hl]` idiom is "is any fly power-up
+; running", and it appears in three handlers in this file
     call call_03_550e_Entity_CheckPlayerInteraction
     jr   nc,.jr_00_504C
     cp   a,PLAYER_TOUCHED_ENTITY
@@ -626,10 +881,9 @@ call_03_5028_CollisionHandler_Cactus:
     ret  
 
 call_03_5069_CollisionHandler_PlayingCard:
-; On collision where A!=00:
-; - Handle entity hit, increment wDCCF_PlayingCardCounter.
-; - On 5th collected, play sound 1E.
-; - Dispatch offset action.
+; ENTITY_WESTERN_STATION_PLAYING_CARD, five per level. Attack or stomp, either
+; works - a touch does nothing. wDCCF_PlayingCardCounter counts them and the fifth
+; plays SFX_REMOTE
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_TOUCHED_ENTITY
@@ -645,10 +899,16 @@ call_03_5069_CollisionHandler_PlayingCard:
     jp   call_00_2c09_Entity_SpawnGoalCounter
 
 call_03_5085_CollisionHandler_HardHat:
-; If the collision type isn’t "01", the player takes damage.
-; If it is type 01:
-;    HardHat is only vulnerable while it is jumping (action 1)
-;    Otherwise it switches to the crouch down action (action 2)
+; ENTITY_WESTERN_STATION_HARD_HAT - the miner who ducks under his helmet.
+;
+; Touch hurts. What an attack does depends on what he is doing:
+;
+;   action $01  jumping, and the only state he is vulnerable in - HandleEntityHit
+;   action $02  already ducked - the hit pops him back up into $01
+;   otherwise   he ducks, into $02, and the hit is wasted
+;
+; So the fight is a timing puzzle: whip him while he is up, or all you do is make
+; him hide
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
@@ -667,11 +927,10 @@ call_03_5085_CollisionHandler_HardHat:
     ret  
 
 call_03_50b6_CollisionHandler_AlienCultureTube:
-; For action 00 only.
-; On collision A==01:
-; - Handle entity hit, mark slot active, set status, increment wDCC9_AlienCultureTubeCounter.
-; - On 3rd collected, play sound 1E.
-; - Dispatch offset action.
+; ENTITY_ANIME_CHANNEL_ALIEN_CULTURE_TUBE, three per level, attack only. Breaking
+; one raises its level trigger as well as counting it, so a tube can be wired to a
+; door; wDCC9_AlienCultureTubeCounter is the goal display and the third plays
+; SFX_REMOTE
     call call_00_2962_Entity_GetActionId
     cp   a,$00
     ret  nz
@@ -693,7 +952,10 @@ call_03_50b6_CollisionHandler_AlienCultureTube:
     jp   call_00_2c09_Entity_SpawnGoalCounter
 
 call_03_50e0_CollisionHandler_OnSwitch:
-; On collision A==01: marks entity slot active.
+; ENTITY_ANIME_CHANNEL_ON_SWITCH. A whip sets this entity's slot in
+; wDCB1_LevelTriggerBuffer - the sixteen-byte scratchpad a level uses to wire
+; switches to doors, indexed by the entity's spawn parameter. Nothing is damaged
+; and nothing is consumed, so the switch can be thrown as often as you like
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
@@ -701,7 +963,8 @@ call_03_50e0_CollisionHandler_OnSwitch:
     ret  
     
 call_03_50ea_CollisionHandler_OffSwitch:
-    ; On collision A==01: clears entity slot.
+; ENTITY_ANIME_CHANNEL_OFF_SWITCH, the mirror of the one above: a whip clears the
+; trigger slot instead of setting it
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
@@ -709,8 +972,14 @@ call_03_50ea_CollisionHandler_OffSwitch:
     ret  
     
 call_03_50f4_CollisionHandler_OnSwitch2:
-; For action 00 only.
-; On collision A==01: sets entity status, loads new data (bank 1), increments entity slot.
+; ENTITY_ANIME_CHANNEL_ON_SWITCH2, the one-shot switch. Action $00 is the unthrown
+; one, so it can only fire once; throwing it records list state 1 (so it stays
+; thrown on a revisit), moves it to action $01, and INCREMENTS its trigger slot
+; rather than setting it.
+;
+; That is the difference from the plain on-switch, and it is what lets a door
+; count several switches - see the `cp a,$02` in
+; call_02_659d_EntityAction_AnimeDisappearingFloor_Unk0
     call call_00_2962_Entity_GetActionId
     cp   a,$00
     ret  nz
@@ -725,10 +994,17 @@ call_03_50f4_CollisionHandler_OnSwitch2:
     jp   call_00_22e0_Entity_IncrementTriggerFlag
     
 call_03_5116_CollisionHandler_Door:
-; For action 00 only.
-; On collision: requires certain global flags (wDABE_CollisionFlags, wDC81_Player_EffectiveInputs) and player action between 01–02.
-; Checks entity slot flag; plays sound 1B if not set, else sound 18.
-; Loads new entity data (bank 1).
+; ENTITY_ANIME_CHANNEL_DOOR. Not a collision so much as a "press up to enter"
+; prompt, and it wants four things at once: the door closed (action $00), Gex
+; overlapping it, Gex on the ground (BGCOLL_NO_COLLISION_BIT in
+; wDABE_CollisionFlags), UP held, and his action between PLAYERACTION_IDLE and
+; PLAYERACTION_WALK - so he has to be standing still.
+;
+; Then the lock. A spawn parameter of $FF means the door is not wired to anything
+; and opens freely. Otherwise its trigger slot has to be set; when it is not, the
+; door plays SFX_DOOR2 - the rattle - and returns without opening.
+;
+; Opening is SFX_DOOR1 and action $01
     call call_00_2962_Entity_GetActionId
     cp   a,$00
     ret  nz
@@ -759,7 +1035,9 @@ call_03_5116_CollisionHandler_Door:
     ret  
 
 call_03_5156_CollisionHandler_Door2:
-; Same as above, but for action 02, and loads bank 3 data.
+; ENTITY_ANIME_CHANNEL_DOOR2. The same routine again for the far side of a door
+; pair: it waits in action $02 rather than $00, and opens into $03. Every other
+; line is identical to the one above
     call call_00_2962_Entity_GetActionId
     cp   a,$02
     ret  nz
@@ -790,9 +1068,11 @@ call_03_5156_CollisionHandler_Door2:
     ret  
     
 call_03_5196_CollisionHandler_Secbot:
-; On collision:
-; - If A!=01 → trigger action change.
-; - If A==01: entity hit handler, then if action ID==0 → transform to bank2 data; else mark slot active.
+; ENTITY_ANIME_CHANNEL_SECBOT. Touch hurts; an attack spends a hit point and then
+; reads the action back to see what that left it in. Action $00 means it is still
+; standing and gets knocked into $02; anything else raises its level trigger -
+; which covers the death action $04 HandleEntityHit gives it, and also,
+; incidentally, a survived hit landed while it was already in $02
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
@@ -806,11 +1086,17 @@ call_03_5196_CollisionHandler_Secbot:
     ret  
     
 call_03_51b8_CollisionHandler_SailorToonGirl:
-; On collision:
-; - If A!=01 → trigger action change.
-; - If A==01:
-;   - If action==2 → activate slot, reset state, init particle burst, transform to bank7 data.
-;   - Else → entity hit handler, then either update status or transform to bank3 data.
+; ENTITY_ANIME_CHANNEL_SAILOR_TOON_GIRL. Touch hurts. An attack has two outcomes
+; depending on whether she has already been beaten down to action $02:
+;
+;   not yet     spend a hit point; if that leaves her in $02 record it as list
+;               state 2, otherwise knock her into action $03
+;   action $02  the finish: raise her trigger, blank the collision type, reset the
+;               facing, start a burst and send her to action $07
+;
+; ENTITY_FACING_RIGHT is passed to Entity_SetCollisionType as well as to
+; Entity_SetFacingDirection - the two constants happen to share the value $00, so
+; the first call is really "make her harmless"
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
@@ -838,9 +1124,13 @@ call_03_51b8_CollisionHandler_SailorToonGirl:
     ret  
     
 call_03_5201_CollisionHandler_BigSilverRobot:
-; Skips if action ID = 3.
-; If player collides and interaction = 1 → handle entity hit, then if action = 3 → set slot active.
-; If interaction ≠ 1 → trigger player action change, load new entity data (bank 2), face player left.
+; ENTITY_ANIME_CHANNEL_BIG_SILVER_ROBOT. Action $03 is its beaten state and is
+; skipped entirely.
+;
+; An attack turns it to face Gex first and then spends a hit point, so the robot
+; always dies facing him; if that leaves it in $03 its trigger goes up. A touch
+; damages Gex, knocks the robot into action $02 and turns it to face him as well -
+; so walking into it is what makes it round on you
     call call_00_2962_Entity_GetActionId
     cp   a,$03
     ret  z
@@ -861,12 +1151,17 @@ call_03_5201_CollisionHandler_BigSilverRobot:
     ret  
     
 call_03_5231_CollisionHandler_Mech:
-; If collision →
-; - If interaction ≠ 1 → player action change.
-; - If = 1 and wDCA9_FlyPowerup2_Timer–wDCAB_FlyPowerup5_Timer flags are set:
-;   - Handle entity hit, increment wDCCB_MechCounter.
-;   - Every 4th, play sound 1E, then dispatch offset action.
-; Special case for levels $29/$2A only.
+; The two Anime Channel mechs. Touch hurts. An attack does nothing at all unless a
+; fly power-up is running - the same three-timer test the cactus uses - which is
+; what makes the mechs the level's power-up gate.
+;
+; A hit that lands spends a hit point and, if that left the mech in action $01,
+; increments its trigger slot. On the two MAP_ANIME_CHANNEL rooms that have a
+; goal display it also counts toward wDCCB_MechCounter, with the fourth playing
+; SFX_REMOTE.
+;
+; The five instructions after the final `jp` are unreachable - a leftover copy of
+; a plain touch-damage handler
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
@@ -903,8 +1198,10 @@ call_03_5231_CollisionHandler_Mech:
     ret  
     
 call_03_5274_CollisionHandler_PlanetOBlast:
-; On collision, only if interaction = 2.
-; Handles entity hit, if action=1 → play sound 1E (#2), clear entity slot.
+; ENTITY_ANIME_CHANNEL_PLANET_O_BLAST_WEAPON, and ENTITY_INTERACT_STOMP only - it
+; has to be landed on. Spends a hit point, and if that left it in action $01 plays
+; SFX_REMOTE and CLEARS its trigger slot, which is the one place in this file a
+; pickup turns a trigger off rather than on
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_STOMPED_ENTITY
@@ -918,9 +1215,9 @@ call_03_5274_CollisionHandler_PlanetOBlast:
     jp   call_00_22ff_Entity_SetTriggerInactive
     
 call_03_528c_CollisionHandler_StrayCat:
-; On collision, if interaction ≠ 0 → handle entity hit, increment wDCCA_StrayCatCounter.
-; Every 3rd → play sound 1E (#2).
-; Always dispatch offset action.
+; ENTITY_SUPERHERO_SHOW_STRAY_CAT, three per level. Touch hurts; an attack or a
+; stomp - it is one of the few enemies that can be jumped on - spends a hit point
+; and counts toward wDCCA_StrayCatCounter, with the third playing SFX_REMOTE
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_TOUCHED_ENTITY
@@ -936,10 +1233,8 @@ call_03_528c_CollisionHandler_StrayCat:
     jp   call_00_2c09_Entity_SpawnGoalCounter
     
 call_03_52aa_CollisionHandler_Convict:
-; On collision (interaction=1):
-; Handle entity hit, increment wDCCD_ConvictCounter.
-; Every 5th → play sound 1E (#3).
-; Dispatch offset action.
+; ENTITY_SUPERHERO_SHOW_CONVICT, five per level. Touch hurts, attack counts, and
+; the fifth plays SFX_REMOTE. Structurally the stray cat above without the stomp
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
@@ -955,9 +1250,11 @@ call_03_52aa_CollisionHandler_Convict:
     jp   call_00_2c09_Entity_SpawnGoalCounter
     
 call_03_52c8_CollisionHandler_YellowGoon:
-; On collision (interaction=1):
-; - If entity facing doesn’t match stored direction → handle entity hit.
-; - Else → just player action change.
+; ENTITY_SUPERHERO_SHOW_YELLOW_GOON, and the only enemy in the game with a back.
+;
+; Entity_IsFacingPlayer returns Z when the goon is looking at Gex, and that case
+; is routed to the damage path - so whipping him from the front hurts YOU. Come at
+; him from behind and the same attack spends a hit point instead
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
@@ -967,9 +1264,8 @@ call_03_52c8_CollisionHandler_YellowGoon:
     jp   call_03_5671_HandleEntityHit
     
 call_03_52da_CollisionHandler_ChomperTV:
-; On collision (interaction=1):
-; - Handle entity hit.
-; - If action ≠ 3 → load new entity data (bank 2).
+; ENTITY_SUPERHERO_SHOW_CHOMPER_TV. Touch hurts; an attack spends a hit point and
+; then knocks it into action $02 unless it is already in $03, its beaten state
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
@@ -983,8 +1279,12 @@ call_03_52da_CollisionHandler_ChomperTV:
     ret  
     
 call_03_52fa_CollisionHandler_Bomb:
-; If entity is action=4 → special hit handler.
-; If action=2 and collision=1 → load new data (bank 3).
+; ENTITY_SUPERHERO_SHOW_BOMB. Which of two handlers runs depends on the fuse:
+;
+;   action $04  already lit and lethal - hand the whole thing to the generic
+;               enemy handler, so it hurts on contact and can be destroyed
+;   action $02  unlit; an attack lights it, into action $03
+;   otherwise   nothing
     call call_00_2962_Entity_GetActionId
     cp   a,$04
     jp   z,call_03_4ce1_CollisionHandler_GenericEnemy
@@ -999,8 +1299,10 @@ call_03_52fa_CollisionHandler_Bomb:
     ret  
     
 call_03_531a_CollisionHandler_WaterTowerStand:
-; On collision (interaction=1):
-; - If wDCA9_FlyPowerup2_Timer–wDCAB_FlyPowerup5_Timer flags set → handle entity hit, then set slot active.
+; ENTITY_SUPERHERO_SHOW_WATER_TOWER_STAND - the legs holding up the water tower.
+; It cannot hurt Gex, and it can only be cut down with a fly power-up running (the
+; same three-timer test as the cactus and the mechs). Spending its hit point
+; raises its trigger, which is what drops the tank
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
@@ -1015,12 +1317,16 @@ call_03_531a_CollisionHandler_WaterTowerStand:
     jp   call_00_22ef_Entity_SetTriggerActive
     
 call_03_532f_CollisionHandler_GextremeSports_Elf:
-; Works for actions < 4 only.
-; On collision (interaction=1):
-; - Loads new data (bank 4).
-; - Decrements entity counter wDCD5_ElfHealth1.
-; - If zero → clear entity, increment wDCC8_ElfCounter, dispatch action.
-; - If all counters = 0 → set wDCD2_FreestandingRemoteHitFlags=1 (event flag).
+; ENTITY_GEXTREME_SPORTS_ELF, the snowboarding level's elves. Almost the same
+; routine as call_03_4f23_CollisionHandler_HolidayTV_Elf - the same shared health
+; bytes at wDCD5_ElfHealth1, the same action $04 on a hit, the same
+; wDCC8_ElfCounter - with two changes:
+;
+;   it only runs in actions below $04, so an elf already reeling ignores further
+;   hits
+;   the "all of them beaten" test walks all five health bytes rather than two, and
+;   sets wDCD2_FreestandingRemoteHitFlags instead of playing a sound - the level's
+;   remote is what appears
     call call_00_2962_Entity_GetActionId
     cp   a,$04
     ret  nc
@@ -1060,9 +1366,9 @@ call_03_532f_CollisionHandler_GextremeSports_Elf:
     ret  
     
 call_03_537a_CollisionHandler_BonusTimeCoin:
-; On collision (interaction=1):
-; - Adds parameter to wDB6E_LevelTimer_SecondsRemaining.
-; - Handles entity hit.
+; ENTITY_GEXTREME_SPORTS_BONUS_TIME_COIN. Attack only. Adds the entity's spawn
+; parameter to wDB6E_LevelTimer_SecondsRemaining, so how much time each coin is
+; worth is level data rather than code, and then takes the coin
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
@@ -1074,9 +1380,12 @@ call_03_537a_CollisionHandler_BonusTimeCoin:
     jp   call_03_5671_HandleEntityHit
     
 call_03_538e_CollisionHandler_Bell:
-; On collision (interaction=1):
-; - If action=0 → increment wDCCC_BellCounter, dispatch action, set wDCD2_FreestandingRemoteHitFlags=1 when =7.
-; - Always load new data (bank 1), set status nibble=2.
+; ENTITY_MARSUPIAL_MADNESS_BELL, seven of them, attack only.
+;
+; Only a bell in action $00 counts: it bumps wDCCC_BellCounter, updates the goal
+; display, and the seventh sets wDCD2_FreestandingRemoteHitFlags to bring out the
+; remote. Every hit, counted or not, still rings it - action $01 and list state 2 -
+; so a bell already struck animates again without scoring twice
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
@@ -1100,9 +1409,16 @@ call_03_538e_CollisionHandler_Bell:
     jp   call_00_2299_Entity_SetListState
 
 call_03_53c2_CollisionHandler_RockHard:
-; For actions < 5.
-; If action=3: only transform if wDC88_CurrentEntity_UnkVerticalOffset=0.
-; Else, collision (interaction=1) → handle entity hit.
+; ENTITY_WW_GEX_WRESTLING_ROCK_HARD, the wrestling boss. Actions $05 and up are
+; his defeat sequence and are ignored.
+;
+; Action $03 is his body slam, and it is the one state where HE hurts GEX - but
+; only once he has actually come down, which is what the wDC88_Player_HopYOffset
+; test is: zero means the hop is over. Landing the slam sends him to action $01
+; and damages Gex.
+;
+; In every other action an attack spends one of his hit points and a touch does
+; nothing, so the fight is "whip him while he is not slamming"
     call call_00_2962_Entity_GetActionId
     cp   a,$05
     ret  nc
@@ -1114,7 +1430,7 @@ call_03_53c2_CollisionHandler_RockHard:
     jp   z,call_03_5671_HandleEntityHit
     ret  
 .jr_00_53D6:
-    ld   a,[wDC88_CurrentEntity_UnkVerticalOffset]
+    ld   a,[wDC88_Player_HopYOffset]
     and  a
     ret  nz
     ld   a,$01
@@ -1122,8 +1438,9 @@ call_03_53c2_CollisionHandler_RockHard:
     jp   call_03_4cea_CollisionHandler_DamagePlayer
     
 call_03_53eb_CollisionHandler_Cannon:
-; For action=2 only.
-; On collision (interaction=1): loads new data (bank 3).
+; ENTITY_LIZARD_OF_OZ_CANNON. Attack only, action $02 only - the loaded cannon -
+; and all it does is fire it, by moving it to action $03. The cannonball it
+; produces is what actually hurts the boss; see the handler below
     call call_00_2962_Entity_GetActionId
     cp   a,$02
     ret  nz
@@ -1136,10 +1453,21 @@ call_03_53eb_CollisionHandler_Cannon:
     ret  
     
 call_03_5406_CollisionHandler_BrainOfOz:
-; Complex distance check against another entity.
-; If player is within a 0x0C–0x18 box both X and Y:
-; - Handle entity hit.
-; - If action≠7 → transform to bank 6.
+; ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ, and the one place in either game where an
+; entity is tested against another ENTITY rather than against Gex.
+;
+; It starts by running the generic enemy handler, so touching the brain hurts and
+; a tail spin scores an ordinary hit. Then, in actions below $06, it looks for a
+; live ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE, checks that it is still travelling
+; (bit 7 of its Y velocity), and measures the brain against it in both axes with
+; the same +$0C / < $18 pattern used everywhere in this file - a 24 by 24 box.
+;
+; A cannonball inside that box is a real hit: HandleEntityHit, and then action $06
+; unless the brain is already in $07. So the cannon is how the boss is beaten, and
+; this handler - not the cannonball's - is where that is decided.
+;
+; The `or a,$1D` and `xor a,$13` walk L from the cannonball's slot base to its
+; Y_VELOCITY and then to its WORLD_X, with DE pointing at the brain's own
     call call_03_4ce1_CollisionHandler_GenericEnemy
     call call_00_2995_Entity_GetActionId_Copy
     cp   a,$06
@@ -1201,14 +1529,22 @@ call_03_5406_CollisionHandler_BrainOfOz:
     ret  
     
 call_03_5469_CollisionHandler_BrainOfOzProjectile:
-; On collision (any interaction): player action change, clear entity.
+; ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE. Any contact damages Gex and retires
+; the shot for good - Entity_DeactivateAndMarkNeverRespawn, not the plain
+; Deactivate the other projectiles use, so a shot the boss has spent does not come
+; back when the room reloads
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     call call_03_4cea_CollisionHandler_DamagePlayer
     jp   call_00_2b7a_Entity_DeactivateAndMarkNeverRespawn
 
 call_03_5473_CollisionHandler_FreestandingRemote:
-; On collision (interaction=1): set wDCD2_FreestandingRemoteHitFlags=0x81 (event flag).
+; ENTITY_FREESTANDING_REMOTE - the remote sitting in the open at the end of a
+; level. Attack only, and all it does is set wDCD2_FreestandingRemoteHitFlags to
+; $81; the remote's own action code watches that byte and writes the progress
+; flags.
+;
+; The Entity_GetActionId call above it is dead - A is overwritten on the next line
     call call_03_550e_Entity_CheckPlayerInteraction                                  ;; 03:5473 $cd $0e $55
     ret  NC                                            ;; 03:5476 $d0
     cp   A, PLAYER_ATTACKED_ENTITY                                        ;; 03:5477 $fe $01
@@ -1219,9 +1555,12 @@ call_03_5473_CollisionHandler_FreestandingRemote:
     ret                                                ;; 03:5482 $c9
     
 call_03_5483_CollisionHandler_Meteor:
-; On collision (interaction=0):
-; - If action=0 → set Y from map, load new entity data (bank 1).
-; - If action=1 → player action change.
+; ENTITY_CHANNEL_Z_METEOR. Touch only, and the action decides which way it goes:
+;
+;   action $00  the meteor is parked above the camera waiting for its turn -
+;               Entity_SetYToAboveCameraTop puts it back at the top of the screen
+;               and starts it falling, into action $01
+;   action $01  falling, and now it hurts
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_TOUCHED_ENTITY
@@ -1239,11 +1578,20 @@ call_03_5483_CollisionHandler_Meteor:
     ret                                          ;; 03:5482 $c9
     
 call_03_54a8_CollisionHandler_Rez:
-; For actions < 3.
-; - On collision (interaction=1):
-; - Handle entity hit, zero out byte at offset 15.
-; - Get entity property, decide an action (03/06/09/0C → action3 else → action9).
-; - Transform via that action.
+; ENTITY_CHANNEL_Z_REZ, the final boss. Only actions below $03 can be hit at all;
+; his intro action is additionally marked ACTION_STATE_NO_COLLISION, so the
+; dispatcher never even reaches this routine during it.
+;
+; Touch hurts. An attack spends a hit point and then zeroes
+; ENTITY_FIELD_COOLDOWN_TIMER, undoing the invulnerability window HandleEntityHit
+; had just armed - so Rez, alone among everything in the game, can be hit again
+; immediately.
+;
+; What he does next comes from the health that is left: the multiples of three
+; ($03, $06, $09, $0C) send him to action $03 and everything else to action $09.
+; Action $0A is the one exception - that is the death HandleEntityHit has just
+; given him (ENTITY_ATTR_DEFEAT_FLAGS is $8A), so the routine returns rather than
+; choosing anything else
     call call_00_2995_Entity_GetActionId_Copy
     cp   a,$03
     ret  nc
@@ -1274,7 +1622,9 @@ call_03_54a8_CollisionHandler_Rez:
     ret  
     
 call_03_54ee_CollisionHandler_RaStatueProjectile:
-; On collision: always triggers player action change, then transforms to bank0.
+; The two Ra statue projectiles. Any contact damages Gex and then resets the shot
+; to action $00 rather than freeing its slot - the statue fires the same entity
+; over and over, so recycling it is cheaper than a respawn
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     call call_03_4cea_CollisionHandler_DamagePlayer
@@ -1282,26 +1632,61 @@ call_03_54ee_CollisionHandler_RaStatueProjectile:
     farcall call_02_72ac_Entity_SetAction
     ret  
 
-call_03_54f9_InitializeEntityCooldownTimer: ; unreferenced function?
-; Writes 0x3C to byte at offset 15.
+call_03_54f9_InitializeEntityCooldownTimer:
+; Arms the current entity's post-hit invulnerability window by hand.
+;
+; Nothing calls it. HandleEntityHit writes the same value inline, which is
+; presumably what this was factored out of
     LOAD_OBJ_FIELD_TO_HL_ALT ENTITY_FIELD_COOLDOWN_TIMER
     ld   [hl],TIMER_AMOUNT_60_FRAMES
     ret  
 
 call_03_550e_Entity_CheckPlayerInteraction:
-; Returns interaction result in A and sets Carry if an interaction occurred.
-; Crouching shifts the effective collision box down, letting the player avoid some entities they'd otherwise hit.
+; The shared box test, called by nearly every handler as its first act. Everything
+; is in world coordinates and 16 bits wide, which is why each comparison is a
+; sub/sbc pair with the high byte checked for zero.
 ;
-; Return format:
-;   Carry = 0 → No interaction (entity inactive, cooldown, etc.)
-;   Carry = 1 → Interaction happened, with type encoded in A:
-;       A = 0 → Player touched entity
-;       A = 1 → Player attacked the entity (with tail spin)
-;       A = 2 → Player stomped the entity
+; Returns carry clear when there is no contact. On contact it returns carry set
+; and, in A, *how* Gex made it:
 ;
-; Implementation note:
-;   The routine uses A=$FF then `add A,n` to set carry via overflow and
-;   simultaneously return (A = n-1) as the interaction type.
+;   PLAYER_TOUCHED_ENTITY   ($00) he ran into it
+;   PLAYER_ATTACKED_ENTITY  ($01) he was tail spinning
+;   PLAYER_STOMPED_ENTITY   ($02) he landed on it from above
+;
+; The order of the tests matters as much as the tests themselves:
+;
+;   1. COOLDOWN. An entity whose ENTITY_FIELD_COOLDOWN_TIMER is still running
+;      reports no contact at all - it can neither be hit nor hurt Gex. That is
+;      the whole of enemy hit invulnerability, and it is why a handler can call
+;      HandleEntityHit without any state of its own.
+;   2. The entity's ENTITY_INTERACT_* flags are cached in
+;      wDC58_CurrentEntityInteractionFlags for the two tests further down.
+;   3. VERTICAL: |entityY - playerY| <= ENTITY_FIELD_COLLISION_HEIGHT. The
+;      player's tested Y is his world Y plus wDC88_Player_HopYOffset, and plus a
+;      further 8 while he is in PLAYERACTION_CROUCH_LOOK_DOWN - which is what lets
+;      ducking take him under something he would otherwise walk into.
+;   4. A LOOSE HORIZONTAL box: |dx| <= width + 8, the 8 being Gex's own half
+;      width.
+;   5. ATTACK, if ENTITY_INTERACT_ATTACK is set and wDC7F_Player_IsAttacking is
+;      raised. It CLEARS that flag on the way out, so one tail spin connects with
+;      exactly one entity - the first one this sweep reaches, in slot order.
+;   6. A TIGHT HORIZONTAL box, reached only when no attack registered: |dx| <=
+;      width, with Gex's 8 pixels taken back off. An attack therefore has 8 pixels
+;      more reach on each side than a touch or a stomp does.
+;   7. STOMP, if ENTITY_INTERACT_STOMP is set, Gex is in one of the four jump
+;      actions (two on foot, two on the snowboard) and his Y velocity is downward.
+;      This is also where the bounce happens - it rewrites wDC8C_PlayerYVelocity
+;      to PLAYER_JUMP_VELOCITY itself, so no handler has to.
+;   8. Otherwise TOUCH - but only if Player_IsInvincible says he can be hurt.
+;      During the flicker after a hit a touch is reported as no contact, which is
+;      how gex3 stops a handler acting on a hit it did not actually land.
+;
+; ENTITY_INTERACT_TOUCH (bit 0) is never tested, here or anywhere else - it is
+; documentation only. Whether a touch does anything is up to the handler.
+;
+; The `ld A,$FF / add A,n` endings load the result and set carry in two
+; instructions, at the cost of the operand reading one higher than the value
+; actually returned
     LOAD_OBJ_FIELD_TO_BC ENTITY_FIELD_COOLDOWN_TIMER
     ld   A, [BC]                                       ;; 03:5516 $0a
     and  A, A                                          ;; 03:5517 $a7
@@ -1324,7 +1709,7 @@ call_03_550e_Entity_CheckPlayerInteraction:
     ld   DE, $08                                       ;; 03:553e $11 $08 $00
 .jr_03_5541:
     add  HL, DE                                        ;; 03:5541 $19
-    ld   A, [wDC88_CurrentEntity_UnkVerticalOffset]                                    ;; 03:5542 $fa $88 $dc
+    ld   A, [wDC88_Player_HopYOffset]                                    ;; 03:5542 $fa $88 $dc
     ld   E, A                                          ;; 03:5545 $5f
     ld   D, $00                                        ;; 03:5546 $16 $00
     bit  7, A                                          ;; 03:5548 $cb $7f
@@ -1445,18 +1830,21 @@ call_03_550e_Entity_CheckPlayerInteraction:
     add  A, $01                                        ;; 03:55fa $c6 $01
     ret                                                ;; 03:55fc $c9
 .jr_03_55fd_ReturnNoInteraction:
-; Just xor A and ret.
-; Acts as the "failed collision / no interaction" exit for call_03_550e.
+; The shared "nothing happened" exit: A = 0 and carry clear, which is what every
+; caller's `ret nc` is looking at
     xor  A, A                                          ;; 03:55fd $af
     ret                                                ;; 03:55fe $c9
 .data_03_55ff_EntityInteractionFlagsTable:
-; What it is:
-; A lookup table of bytes, indexed by entity type or subtype.
-; Each value is stored in wDC58_CurrentEntityInteractionFlags and influences behavior bits:
-; - Bit 0 (01) → can be interacted with by touching?
-; - Bit 1 (02) → can be hit with tailspin?
-; - Bit 2 (04) → can be stomped?
-; Others may map to more cases.
+; One flags byte per entity TYPE, in ENTITY_* order, saying which kinds of contact
+; that type reacts to. Read only by call_03_550e_Entity_CheckPlayerInteraction,
+; which caches it in wDC58_CurrentEntityInteractionFlags:
+;   bit 0 ($01) ENTITY_INTERACT_TOUCH  - never tested; documentation only
+;   bit 1 ($02) ENTITY_INTERACT_ATTACK - a tail spin connects
+;   bit 2 ($04) ENTITY_INTERACT_STOMP  - landing on it connects, and bounces Gex
+;
+; An entity with neither ATTACK nor STOMP can still report a touch, so
+; ENTITY_INTERACT_NONE means "reports touches and nothing else" rather than "is
+; not tested"
     db   ENTITY_INTERACT_NONE ; ENTITY_GEX
     db   ENTITY_INTERACT_TOUCH | ENTITY_INTERACT_ATTACK ; ENTITY_BONUS_COIN
     db   ENTITY_INTERACT_TOUCH | ENTITY_INTERACT_ATTACK ; ENTITY_FLY_COIN_SPAWN
@@ -1573,30 +1961,35 @@ call_03_550e_Entity_CheckPlayerInteraction:
     db   ENTITY_INTERACT_TOUCH ; ENTITY_CHANNEL_Z_REZ_PROJECTILE
 
 call_03_5671_HandleEntityHit:
-; Input:
-;   ENTITY_FIELD_DAMAGE_STATE = hit type / HP+1
-;   ENTITY_FIELD_COOLDOWN_TIMER prevents repeated hits
+; "The entity just took a hit" - the counterpart to
+; call_03_4cea_CollisionHandler_DamagePlayer, and the only routine that spends
+; ENTITY_FIELD_DAMAGE_STATE. Handlers `call` it for the attack and stomp cases;
+; a few entity actions in bank 2 farcall it as well.
 ;
-; Behavior:
-;   If cooldown != 0           → return
-;   If hit = FF or hit = 00    → return (no hit)
-;   If hit = 01                → kill entity
-;   If hit > 01                → damage entity (decrement HP)
+; DAMAGE_STATE is health PLUS ONE, so the values mean:
 ;
-; Kill path:
-;   - Clear hit field
-;   - Get collision flags
-;   - If flags == FF: deactivate entity
-;   - If flags.bit7 set:
-;         remove collision, reset facing, spawn burst particles
-;   - Set new entity action via action table
-;   - Play SFX_ENEMY_KILLED
+;   $FF     invulnerable - never takes a hit
+;   $00     already dead
+;   $01     this hit kills it
+;   >$01    this hit wounds it: store one less, arm ENTITY_FIELD_COOLDOWN_TIMER
+;           for TIMER_AMOUNT_60_FRAMES, and play SFX_ENEMY_DAMAGED
 ;
-; Damage path:
-;   - Store (hit - 1)
-;   - Set 60-frame cooldown
-;   - Play SFX_ENEMY_DAMAGED
-; ----------------------------------------------
+; The cooldown is what makes the wound case safe to call every frame - see
+; Entity_CheckPlayerInteraction, which reports no contact while it is running, and
+; the dispatcher, which is what ages it.
+;
+; The kill path asks ENTITY_ATTR_DEFEAT_FLAGS what this type leaves behind:
+;
+;   $FF          nothing at all - free the slot and retire the list entry
+;   bit 7 set    a visible death: blank the collision type, reset the facing and
+;                start a particle burst
+;   low 6 bits   the ACTION the entity dies into, whether or not bit 7 was set
+;
+; That last line is where gex3 differs most from gex2. gex2 rewrites a defeated
+; enemy into a generic burst entity; gex3 sends it to a death action of its own,
+; so an enemy can have a scripted death - and bit 6, which
+; call_00_2b8b_Entity_MarkDefeated reads separately, decides whether it leaves a
+; fly coin behind
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_COOLDOWN_TIMER
     ld   A, [HL]                                       ;; 03:5679 $7e
     and  A, A                                          ;; 03:567a $a7
@@ -1637,17 +2030,37 @@ call_03_5671_HandleEntityHit:
     jp   call_00_0ff5_QueueSFX                                  ;; 03:56be $c3 $f5 $0f
 
 call_03_56c1_CollisionHandler_Platform:
-; Early exit if the player’s ActionId is in certain states 
-; (1A, 2E, 3B, 1B = probably cutscenes, knockback, death, or other "don’t collide" states).
-; Otherwise, it takes the player’s Y position + vertical offset (wDC88_CurrentEntity_UnkVerticalOffset, which looks like a 
-; per-frame Y delta or velocity), then compares against the current entity’s bounding box 
-; stored at $D8xx (using wDA00_CurrentEntityAddrLo).
-; Performs bounding-box intersection checks for both vertical and horizontal overlap.
-; Splits into several cases depending on whether the player is above, below, or inside the entity.
-; If overlap is valid, it calls into call_03_58a9_ComputeCollisionOffset for fine-grained offset adjustment and then either:
-; Jumps to call_03_580b_RegisterSecondaryCollision (registers the entity as the active collision target),
-; Or to call_03_57f8_ClearCollisionForEntity (clear/ignore collision).
-; Role: The main "does the player collide with this entity?" function.
+; Everything Gex can stand on: rafts, elevators, rising and sideways platforms,
+; breakable blocks, the water tower tank. One handler covers what gex2 splits
+; between its stationary, moving and one-way platform handlers.
+;
+; None of the shared box test is used. A platform does not "hit" Gex, it carries
+; him or blocks him, and which one it is depends on the side he arrived from and
+; how fast he was going. The four death-in-pit actions are dropped up front,
+; because a falling corpse must not land on anything.
+;
+; The vertical convention here is not the one the shared test uses: this compares
+; against the platform's own ENTITY_FIELD_WORLD_Y and treats
+; ENTITY_FIELD_COLLISION_HEIGHT as the reach above and below it, and it measures
+; Gex from his FEET - world Y plus wDC88_Player_HopYOffset plus $10.
+;
+; Three outcomes, and every path ends in one of them:
+;
+;   .jr_00_577C   he is well above the platform: the LANDING test. Inside the full
+;                 width, the gap between the top edge and his feet under $10, and
+;                 then predictive - this frame's fall step (Y velocity / 16) added
+;                 to the gap. Negative means he would pass through the surface
+;                 before the next frame, under $02 means he is already resting on
+;                 it, and either counts as standing.
+;   .jr_00_571F   he overlaps it vertically: the SIDE-PUSH test. Work out which
+;                 side he is on and how far outside the full width he is, reject
+;                 anything more than 8 pixels away, then ask
+;                 call_03_58a9_ComputeCollisionOffset whether the platform's step
+;                 and his own close that gap this frame.
+;   otherwise     no contact.
+;
+; The `ldd a,[hl]` in both vertical branches reads COLLISION_HEIGHT and leaves HL
+; on COLLISION_WIDTH, which is what the branches below it expect
     ld   a,[wD801_Player_ActionId]
     cp   a,PLAYERACTION_DEATH_IN_PIT_ALT
     jp   z,call_03_57f8_ClearCollisionForEntity
@@ -1657,7 +2070,7 @@ call_03_56c1_CollisionHandler_Platform:
     jp   z,call_03_57f8_ClearCollisionForEntity
     cp   a,PLAYERACTION_DEATH_IN_PIT
     jp   z,call_03_57f8_ClearCollisionForEntity
-    ld   a,[wDC88_CurrentEntity_UnkVerticalOffset]
+    ld   a,[wDC88_Player_HopYOffset]
     ld   e,a
     ld   d,$00
     bit  7,a
@@ -1789,7 +2202,7 @@ call_03_56c1_CollisionHandler_Platform:
     ld   a,[hl]
     sbc  a,$00
     ld   b,a
-    ld   a,[wDC88_CurrentEntity_UnkVerticalOffset]
+    ld   a,[wDC88_Player_HopYOffset]
     ld   e,a
     ld   d,$00
     bit  7,a
@@ -1833,14 +2246,14 @@ call_03_56c1_CollisionHandler_Platform:
     jr   call_03_57f8_ClearCollisionForEntity
 
 call_03_57e6_ResolveCollision_Reset:
-; Clears wDC88_CurrentEntity_UnkVerticalOffset (the player’s vertical delta).
-; Stores the current entity ID (wDA00_CurrentEntityAddrLo) into wDC7B_Player_EntityStoodOnLo.
-; If that ID was already in wDC7D_Player_PushedMovingPlatformLo, resets it to zero.
-; Role: This looks like a collision resolution / reset routine. 
-; It wipes motion and registers the colliding entity as "current collision", 
-; while clearing old records.
+; "Gex is standing on this one." Zeroes wDC88_Player_HopYOffset - the landing ends
+; the hop - claims wDC7B_Player_EntityStoodOnLo, and releases
+; wDC7D_Player_PushedMovingPlatformLo if it named this same entity, so he is never
+; recorded as shoving something he is standing on.
+;
+; gex2's .jr_03_533f inside call_03_5314_Platform_LandingCheck
     xor  A, A                                          ;; 03:57e6 $af
-    ld   [wDC88_CurrentEntity_UnkVerticalOffset], A                                    ;; 03:57e7 $ea $88 $dc
+    ld   [wDC88_Player_HopYOffset], A                                    ;; 03:57e7 $ea $88 $dc
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:57ea $fa $00 $da
     ld   [wDC7B_Player_EntityStoodOnLo], A                                    ;; 03:57ed $ea $7b $dc
     ld   HL, wDC7D_Player_PushedMovingPlatformLo                                     ;; 03:57f0 $21 $7d $dc
@@ -1850,10 +2263,12 @@ call_03_57e6_ResolveCollision_Reset:
     ret                                                ;; 03:57f7 $c9
 
 call_03_57f8_ClearCollisionForEntity:
-; Compares the current entity ID to the two "last touched entity" slots (wDC7B_Player_EntityStoodOnLo and wDC7D_Player_PushedMovingPlatformLo).
-; If it matches, clears those slots.
-; Effectively means: "This entity is no longer colliding with the player, remove it from tracking."
-; Role: Collision cleanup when no intersection occurs.
+; "No contact with this one." Releases both links, but only if they still name
+; THIS entity - another platform may legitimately own them.
+;
+; Several actions in bank 2 farcall it directly: a disappearing floor or a
+; crumbling block calls it as it vanishes, so Gex stops being carried by something
+; that is no longer there. gex2's call_03_534d_Platform_ClearPlayerInteraction
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:57f8 $fa $00 $da
     ld   HL, wDC7B_Player_EntityStoodOnLo                                     ;; 03:57fb $21 $7b $dc
     cp   A, [HL]                                       ;; 03:57fe $be
@@ -1867,9 +2282,12 @@ call_03_57f8_ClearCollisionForEntity:
     ret                                                ;; 03:580a $c9
 
 call_03_580b_RegisterSecondaryCollision:
-; Marks the current entity as the "secondary" collision slot (wDC7D_Player_PushedMovingPlatformLo).
-; If it was in wDC7B_Player_EntityStoodOnLo, clears that first.
-; Role: Assigns the entity as the active secondary collision candidate.
+; "Gex is walking into the side of this one." Releases wDC7B if he was standing on
+; this same entity, then claims wDC7D_Player_PushedMovingPlatformLo - the link
+; call_02_51cb_Player_MoveLeftAgainstEntity reads to stop him walking through it,
+; or to drag it along with him.
+;
+; gex2's call_03_5360_Platform_SetPushInteraction
     ld   a,[wDA00_CurrentEntityAddrLo]
     ld   hl,wDC7B_Player_EntityStoodOnLo
     cp   [hl]
@@ -1880,12 +2298,16 @@ call_03_580b_RegisterSecondaryCollision:
     ret  
 
 call_03_581a_CollisionHandler_TVButton:
-; Skips entirely if the player is in the same "ignore" action IDs.
-; Uses the entity’s width/height at $D8xx+12/+13 to test bounding-box intersection against the player.
-; Again compares Y offset + vertical delta (wDC88_CurrentEntity_UnkVerticalOffset).
-; If all checks pass, adjusts by camera scroll (wDC8C_PlayerYVelocity >> 4) and then calls into 57e6 (collision hit) or 57f8 (miss).
-; Role: This is a simplified AABB collision test between the player and an entity. 
-; It’s likely for a different type of entity (maybe platforms, triggers, or zones).
+; ENTITY_TV_BUTTON - the pad in front of a tv that Gex has to stand on.
+;
+; The platform handler above with the side-push half removed: land on it from
+; above and it carries you, approach it from anywhere else and it is not there.
+; Same death-action guards, same top-edge-minus-height, same predictive landing
+; test, and it shares all three outcome routines.
+;
+; That is exactly the relationship gex2's call_03_5304_CollisionHandler_OneWayPlatform
+; has to its stationary platform handler, except that gex2 shares the landing code
+; and gex3 has a second copy of it
     ld   A, [wD801_Player_ActionId]                                    ;; 03:581a $fa $01 $d8
     cp   A, PLAYERACTION_DEATH_IN_PIT_ALT                                        ;; 03:581d $fe $1a
     jp   Z, call_03_57f8_ClearCollisionForEntity                                 ;; 03:581f $ca $f8 $57
@@ -1926,7 +2348,7 @@ call_03_581a_CollisionHandler_TVButton:
     ld   A, [HL]                                       ;; 03:585c $7e
     sbc  A, $00                                        ;; 03:585d $de $00
     ld   B, A                                          ;; 03:585f $47
-    ld   A, [wDC88_CurrentEntity_UnkVerticalOffset]                                    ;; 03:5860 $fa $88 $dc
+    ld   A, [wDC88_Player_HopYOffset]                                    ;; 03:5860 $fa $88 $dc
     ld   E, A                                          ;; 03:5863 $5f
     ld   D, $00                                        ;; 03:5864 $16 $00
     bit  7, A                                          ;; 03:5866 $cb $7f
@@ -1970,12 +2392,20 @@ call_03_581a_CollisionHandler_TVButton:
     jp   call_03_57f8_ClearCollisionForEntity                                    ;; 03:58a6 $c3 $f8 $57
 
 call_03_58a9_ComputeCollisionOffset:
-; Loads the entity’s parameter at $D8xx+1B.
-; Flips it if the entity’s direction byte ($D8xx+19) has bit 7 set (sign extension trick).
-; Combines this with wDC84_PlayerXDeltaExtra–wDC86_PlayerXVelocity (looks like camera or scroll deltas).
-; Then checks wD80D_PlayerFacingDirection, and if bit 5 is set, flips the result.
-; Role: This is a collision offset calculator: adjusts collision testing 
-; depending on entity properties (size/offset) and player facing direction.
+; Gathers the three numbers the platform's side-push test needs - how fast the two
+; are closing on each other this frame.
+;
+;   B = the platform's ENTITY_FIELD_X_VELOCITY, negated when bit 7 of its
+;       ENTITY_FIELD_MISC_FLAGS says it is travelling left. Platforms keep their
+;       direction in that flag, so the velocity byte itself is a magnitude
+;   D = wDC84_PlayerXDeltaExtra plus wDC85_PlayerXDeltaExtra2, everything else
+;       carrying or shoving Gex this frame
+;   E = wDC86_PlayerXVelocity, his own walking step, NEGATED when he is facing
+;       left, so the caller can combine both sides without caring about direction
+;
+; gex2's call_03_5427_MovingPlatform_GetRelativeXSpeed does the same job with one
+; extra byte instead of two, and reads the platform's direction from the sign of
+; the velocity rather than from a flag
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_X_VELOCITY
     ld   b,[hl]
     dec  l
