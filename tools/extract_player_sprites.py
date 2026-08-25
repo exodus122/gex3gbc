@@ -26,12 +26,20 @@ bytes that are about to be emitted - macros expanded, PNG decoded back to tiles 
 compared to the ROM. With rgbgfx on PATH the PNGs are additionally round-tripped
 through it, which is what the build will actually do.
 
+It also goes the other way. --preview renders each frame assembled, in colour, into
+docs/player_frames; --import reads those sheets back into the packed ones. The packed
+sheets stay the source of truth, because a composite cannot say which piece owns which
+pixel - 201,519 opaque pixels fall inside two or more pieces' 8x16 boxes - so import
+takes ownership from the tile data that is already there and only moves the colours.
+
 Usage:
     python3 tools/extract_player_sprites.py                # write, and print the
                                                            # main.asm / Makefile text
     python3 tools/extract_player_sprites.py --dry-run      # verify only
     python3 tools/extract_player_sprites.py --patch-main --patch-makefile
     python3 tools/extract_player_sprites.py --no-relink    # leave bank7F.asm alone
+    python3 tools/extract_player_sprites.py --preview      # contact sheets to look at
+    python3 tools/extract_player_sprites.py --import       # edited sheets -> src/gfx
 """
 
 import argparse
@@ -135,31 +143,17 @@ def png_write(path, width_px, height_px, indices):
 
 
 def png_read_indices(path):
-    """Read back a PNG this script wrote; returns (w, h, indices[y][x])."""
-    data = open(path, 'rb').read()
-    pos, idat = 8, b''
-    width = height = 0
-    while pos < len(data):
-        length, tag = struct.unpack('>I4s', data[pos:pos + 8])
-        body = data[pos + 8:pos + 8 + length]
-        if tag == b'IHDR':
-            width, height, depth, ctype = struct.unpack('>IIBB', body[:10])
-            assert (depth, ctype) == (8, 6), 'expected 8-bit RGBA'
-        elif tag == b'IDAT':
-            idat += body
-        elif tag == b'IEND':
-            break
-        pos += 12 + length
-    raw = zlib.decompress(idat)
-    stride, back = width * 4, {c: i for i, c in enumerate(RAMP)}
-    rows, prev, p = [], bytearray(stride), 0
-    for _ in range(height):
-        ftype = raw[p]; p += 1
-        line = bytearray(raw[p:p + stride]); p += stride
-        assert ftype == 0, 'this script only writes unfiltered rows'
-        rows.append([back[tuple(line[x * 4:x * 4 + 3])] for x in range(width)])
-        prev = line
-    return width, height, rows
+    """A packed sheet back to palette indices, by matching the grey ramp."""
+    width, height, rows = png_read_rgba(path)
+    back = {c: i for i, c in enumerate(RAMP)}
+    out = []
+    for y in range(height):
+        try:
+            out.append([back[px[:3]] for px in rows[y]])
+        except KeyError as exc:
+            raise SystemExit(f"{path} row {y}: colour {exc.args[0]} is not one of the "
+                             f"four greys a packed sheet may use")
+    return width, height, out
 
 
 def tiles_to_indices(tiles, cols, rows_):
@@ -240,12 +234,91 @@ FONT = {c: r for c, r in zip('0123456789abcdef', [
     (0b111, 0b100, 0b111, 0b100, 0b111), (0b111, 0b100, 0b111, 0b100, 0b100)])}
 
 
+
+PREVIEW_MARGIN = 7          # a strip above each cell for its id, which no piece can reach
+PREVIEW_COLUMNS = 16
+
+
+def preview_layout(banks, set_id, columns=PREVIEW_COLUMNS):
+    """Where every frame of a set sits in its contact sheet.
+
+    Extraction and import both call this, so a sheet is always read back on the same
+    grid it was drawn on. Cells are sized to the whole set's extent and aligned on
+    Gex's origin, which is what makes the animation hold still across the grid.
+    """
+    frames = sorted((f for b in banks.values() if b['set'] == set_id
+                     for f in b['frames']), key=lambda f: f['sid'])
+    if not frames:
+        return None
+    xs = [s8(p[1]) for f in frames for p in f['piece']]
+    ys = [s8(p[0]) for f in frames for p in f['piece']]
+    x0, y0 = min(xs), min(ys)
+    cw = max(xs) + 8 - x0 + 2
+    ch = max(ys) + 16 - y0 + 2 + PREVIEW_MARGIN
+    rows_n = -(-len(frames) // columns)
+    return dict(frames=frames, cw=cw, ch=ch, x0=x0, y0=y0, columns=columns,
+                W=cw * columns, H=ch * rows_n)
+
+
+def frame_origin(lay, n):
+    """Top-left of frame n's sprite area, already offset so a piece at (y0,x0) lands there."""
+    return ((n % lay['columns']) * lay['cw'] + 1 - lay['x0'],
+            (n // lay['columns']) * lay['ch'] + 1 + PREVIEW_MARGIN - lay['y0'])
+
+
+def frame_tiles(banks, f):
+    for b in banks.values():
+        for g in b['frames']:
+            if g is f:
+                at = f['tiles'] - b['tile_base']
+                return b['tiles'][at:at + PIECE_TILE_BYTES * f['pieces']]
+    raise KeyError('frame not found')
+
+
+def piece_grid(blob, i):
+    """Piece i as a 16x8 grid of palette indices."""
+    g = [[0] * 8 for _ in range(16)]
+    for half in range(2):
+        tile = blob[(i * 2 + half) * 16:(i * 2 + half) * 16 + 16]
+        for y in range(8):
+            lo, hi = tile[y * 2], tile[y * 2 + 1]
+            for x in range(8):
+                bit = 7 - x
+                g[half * 8 + y][x] = (((hi >> bit) & 1) << 1) | ((lo >> bit) & 1)
+    return g
+
+
+def grid_to_piece(g):
+    """The inverse: a 16x8 grid of indices back to 32 bytes of 8x16 tile data."""
+    out = bytearray()
+    for half in range(2):
+        for y in range(8):
+            lo = hi = 0
+            for x in range(8):
+                v = g[half * 8 + y][x]
+                lo = (lo << 1) | (v & 1)
+                hi = (hi << 1) | ((v >> 1) & 1)
+            out += bytes((lo, hi))
+    return bytes(out)
+
+
+def set_palettes(rom, pal_ptr):
+    index = rom[BANK_INDEX * BANK_SIZE:(BANK_INDEX + 1) * BANK_SIZE]
+    out = []
+    for n in range(2):
+        out.append([cgb_rgb(index[pal_ptr - BANK_BASE + 8 * n + 2 * k]
+                            | (index[pal_ptr - BANK_BASE + 8 * n + 2 * k + 1] << 8))
+                    for k in range(4)])
+    return out
+
+
 def png_write_rgb(path, width, height, rows):
+    """rows of (r, g, b) or (r, g, b, a) tuples, written as 8-bit RGBA."""
     raw = bytearray()
     for y in range(height):
         raw.append(0)
-        for r, g, b in rows[y]:
-            raw += bytes((r, g, b, 0xFF))
+        for px in rows[y]:
+            raw += bytes(px) if len(px) == 4 else bytes(px) + b'\xff'
 
     def chunk(tag, payload):
         return (struct.pack('>I', len(payload)) + tag + payload
@@ -258,88 +331,223 @@ def png_write_rgb(path, width, height, rows):
         fh.write(chunk(b'IEND', b''))
 
 
+def png_read_rgba(path):
+    """Any 8-bit RGBA PNG, filters included - an editor will not write them unfiltered."""
+    data = open(path, 'rb').read()
+    pos, idat, width, height = 8, b'', 0, 0
+    while pos < len(data):
+        length, tag = struct.unpack('>I4s', data[pos:pos + 8])
+        body = data[pos + 8:pos + 8 + length]
+        if tag == b'IHDR':
+            width, height, depth, ctype = struct.unpack('>IIBB', body[:10])
+            if (depth, ctype) != (8, 6):
+                raise SystemExit(f"{path}: needs to be 8-bit RGBA, got depth {depth} "
+                                 f"colour type {ctype} - re-export with alpha")
+        elif tag == b'IDAT':
+            idat += body
+        elif tag == b'IEND':
+            break
+        pos += 12 + length
+    raw = zlib.decompress(idat)
+    stride, bpp = width * 4, 4
+    rows, prev, p = [], bytearray(stride), 0
+    for _ in range(height):
+        ftype = raw[p]; p += 1
+        line = bytearray(raw[p:p + stride]); p += stride
+        for x in range(stride):
+            a = line[x - bpp] if x >= bpp else 0
+            b = prev[x]
+            c = prev[x - bpp] if x >= bpp else 0
+            if ftype == 1:   line[x] = (line[x] + a) & 0xFF
+            elif ftype == 2: line[x] = (line[x] + b) & 0xFF
+            elif ftype == 3: line[x] = (line[x] + (a + b) // 2) & 0xFF
+            elif ftype == 4:
+                pp = a + b - c
+                pa, pb, pc = abs(pp - a), abs(pp - b), abs(pp - c)
+                line[x] = (line[x] + (a if (pa <= pb and pa <= pc)
+                                      else (b if pb <= pc else c))) & 0xFF
+        rows.append([tuple(line[x * 4:x * 4 + 4]) for x in range(width)])
+        prev = line
+    return width, height, rows
+
+
 def cgb_rgb(word):
     """BGR555 as the Game Boy Color stores it, widened to 8 bits per channel."""
     return tuple(((word >> s) & 31) << 3 | ((word >> s) & 31) >> 2 for s in (0, 5, 10))
 
 
-def write_previews(out_dir, rom, sets, banks, set_names, columns=16):
-    """One contact sheet per graphics set: every frame assembled from its pieces,
-    in the OBJ palettes bank $7F gives that set, aligned on Gex's origin so the
-    animation reads across the grid.
+def write_previews(out_dir, rom, sets, banks, set_names, columns=PREVIEW_COLUMNS):
+    """One contact sheet per graphics set: every frame assembled from its pieces, in the
+    OBJ palettes bank $7F gives that set.
 
-    This is the layout the sheets in src/gfx CANNOT have. Three things rule it out
-    there: the ROM's tile order is the artist's piece order and has nothing to do with
-    position, pieces overlap each other in 1552 of the 1660 frames so no image can hold
-    both, and 88% of pieces sit at offsets that are not multiples of 8 so they would
-    not land on tile boundaries anyway. A preview can ignore all of that because
-    nothing has to read it back.
+    Transparent pixels are written with alpha 0, which is what makes the sheet
+    importable again - see import_previews. The id label lives in a PREVIEW_MARGIN
+    strip above each cell that no piece box can reach, so reading a cell back never
+    picks up the label.
+
+    src/gfx sheets cannot have this layout: the ROM's tile order is the artist's piece
+    order rather than anything positional, and 201,519 opaque pixels fall inside two or
+    more pieces' boxes, so an image alone cannot say which piece owns them. That is
+    exactly why import needs the packed sheet as well as this one.
     """
     os.makedirs(out_dir, exist_ok=True)
-    index = bytes(rom[BANK_INDEX * BANK_SIZE:(BANK_INDEX + 1) * BANK_SIZE])
     written = []
-
     for set_id, (_, _, pal_ptr) in enumerate(sets):
-        frames = sorted((f for b in banks.values() if b['set'] == set_id
-                         for f in b['frames']), key=lambda f: f['sid'])
-        if not frames:
+        lay = preview_layout(banks, set_id, columns)
+        if lay is None:
             continue
-        tiles_of = {id(f): b['tiles'][f['tiles'] - b['tile_base']:
-                                      f['tiles'] - b['tile_base'] + PIECE_TILE_BYTES * f['pieces']]
-                    for b in banks.values() if b['set'] == set_id for f in b['frames']}
+        pals = set_palettes(rom, pal_ptr)
+        W, H = lay['W'], lay['H']
+        img = [[(0, 0, 0, 0)] * W for _ in range(H)]
 
-        pal = []
-        for n in range(8):
-            at = pal_ptr - BANK_BASE + 2 * n
-            pal.append(cgb_rgb(index[at] | (index[at + 1] << 8)))
-
-        xs = [s8(p[1]) for f in frames for p in f['piece']]
-        ys = [s8(p[0]) for f in frames for p in f['piece']]
-        x0, y0 = min(xs), min(ys)
-        cw, ch = max(xs) + 8 - x0 + 2, max(ys) + 16 - y0 + 2
-        rows_n = -(-len(frames) // columns)
-        W, H = cw * columns, ch * rows_n
-        tint = ((0xF2, 0xF2, 0xF4), (0xE6, 0xE6, 0xEA))
-        img = [[tint[0]] * W for _ in range(H)]
-        for cy in range(rows_n):
-            for cx in range(columns):
-                shade = tint[(cx + cy) & 1]
-                for y in range(cy * ch, min((cy + 1) * ch, H)):
-                    for x in range(cx * cw, min((cx + 1) * cw, W)):
-                        img[y][x] = shade
-
-        for n, f in enumerate(frames):
-            ox = (n % columns) * cw + 1 - x0
-            oy = (n // columns) * ch + 1 - y0
-            blob = tiles_of[id(f)]
-            for i, (py, px, attr, _) in enumerate(f['piece']):
-                base = pal[1] if attr else pal[0]
-                colours = [pal[attr * 4 + k] for k in range(4)]
-                for half in range(2):
-                    tile = blob[(i * 2 + half) * 16:(i * 2 + half) * 16 + 16]
-                    for ty in range(8):
-                        lo, hi = tile[ty * 2], tile[ty * 2 + 1]
-                        for tx in range(8):
-                            bit = 7 - tx
-                            v = (((hi >> bit) & 1) << 1) | ((lo >> bit) & 1)
-                            if v == 0:
-                                continue                 # OBJ colour 0 is transparent
-                            Y, X = oy + s8(py) + half * 8 + ty, ox + s8(px) + tx
-                            if 0 <= Y < H and 0 <= X < W:
-                                img[Y][X] = colours[v]
-            label = f"{f['sid']:02x}"
-            lx, ly = (n % columns) * cw + 1, (n // columns) * ch + 1
+        # cell separators and the id label, both inside the margin strip
+        for n in range(len(lay['frames'])):
+            cx, cy = (n % columns) * lay['cw'], (n // columns) * lay['ch']
+            for x in range(cx, min(cx + lay['cw'], W)):
+                img[cy][x] = (0xD8, 0xD8, 0xE0, 0xFF)
+            label = f"{lay['frames'][n]['sid']:02x}"
             for ci, ch_ in enumerate(label):
                 for ry in range(5):
                     bits = FONT[ch_][ry]
                     for rx in range(3):
-                        if (bits >> (2 - rx)) & 1 and ly + ry < H and lx + ci * 4 + rx < W:
-                            img[ly + ry][lx + ci * 4 + rx] = (0x88, 0x88, 0x99)
+                        if (bits >> (2 - rx)) & 1:
+                            y, x = cy + 1 + ry, cx + 1 + ci * 4 + rx
+                            if y < H and x < W:
+                                img[y][x] = (0x88, 0x88, 0x99, 0xFF)
+
+        for n, f in enumerate(lay['frames']):
+            ox, oy = frame_origin(lay, n)
+            blob = frame_tiles(banks, f)
+            for i, (py, px, attr, _) in enumerate(f['piece']):
+                colours = pals[1 if attr else 0]
+                g = piece_grid(blob, i)
+                for dy in range(16):
+                    for dx in range(8):
+                        v = g[dy][dx]
+                        if v == 0:
+                            continue                     # OBJ colour 0 is transparent
+                        Y, X = oy + s8(py) + dy, ox + s8(px) + dx
+                        if 0 <= Y < H and 0 <= X < W:
+                            img[Y][X] = colours[v] + (0xFF,)
 
         name = f"set{set_id}_{set_names[set_id].replace('PLAYER_GFX_SET_', '').lower()}.png"
         png_write_rgb(os.path.join(out_dir, name), W, H, img)
-        written.append((name, len(frames), W, H))
+        written.append((name, len(lay['frames']), W, H))
     return written
+
+
+def import_previews(preview_dir, rom, sets, banks, set_names, columns=PREVIEW_COLUMNS):
+    """Read edited contact sheets back into the packed tile data.
+
+    A composite cannot say which piece owns a pixel, so ownership comes from the tile
+    data that is already there: a piece keeps exactly the pixels it is currently opaque
+    at and picks up its new colour from the sheet. A pixel whose colour has not changed
+    keeps its existing palette index, so an untouched sheet imports back to identical
+    bytes even where a palette holds the same colour twice.
+
+    Newly painted pixels - transparent before, opaque now - go to the covering piece
+    whose centre is nearest. Anything painted outside every piece's box would need a new
+    piece in the frame table, so it is reported rather than quietly dropped.
+
+    Returns {bank: new tile bytes} for the banks that changed, plus a list of warnings.
+    """
+    where = {}                                          # frame -> (bank, offset in tiles)
+    for bk, b in banks.items():
+        for f in b['frames']:
+            where[f['addr'], bk] = (bk, f['tiles'] - b['tile_base'])
+    tiles = {bk: bytearray(b['tiles']) for bk, b in banks.items()}
+    touched, warnings = {}, []
+
+    for set_id, (_, _, pal_ptr) in enumerate(sets):
+        lay = preview_layout(banks, set_id, columns)
+        if lay is None:
+            continue
+        name = f"set{set_id}_{set_names[set_id].replace('PLAYER_GFX_SET_', '').lower()}.png"
+        path = os.path.join(preview_dir, name)
+        if not os.path.isfile(path):
+            warnings.append(f"{name}: not found - set {set_id} left alone")
+            continue
+        W, H, img = png_read_rgba(path)
+        if (W, H) != (lay['W'], lay['H']):
+            warnings.append(f"{name}: is {W}x{H}, expected {lay['W']}x{lay['H']}; "
+                            f"a resized sheet cannot be imported")
+            continue
+        pals = set_palettes(rom, pal_ptr)
+        # reversed() so the LOWEST index wins when a palette repeats a colour
+        rev = [{c: k for k, c in reversed(list(enumerate(p))) if k} for p in pals]
+
+        for n, f in enumerate(lay['frames']):
+            ox, oy = frame_origin(lay, n)
+            bk, at = where[f['addr'], next(k for k in banks
+                                           if f in banks[k]['frames'])]
+            blob = bytes(tiles[bk][at:at + PIECE_TILE_BYTES * f['pieces']])
+            grids = [piece_grid(blob, i) for i in range(f['pieces'])]
+            pos = [(s8(p[0]), s8(p[1])) for p in f['piece']]
+
+            def at_px(y, x):
+                Y, X = oy + y, ox + x
+                return img[Y][X] if 0 <= Y < H and 0 <= X < W else (0, 0, 0, 0)
+
+            owner, boxed = {}, set()
+            for i, g in enumerate(grids):
+                for dy in range(16):
+                    for dx in range(8):
+                        key = (pos[i][0] + dy, pos[i][1] + dx)
+                        boxed.add(key)
+                        if g[dy][dx]:
+                            owner[key] = i
+
+            for key in boxed - set(owner):               # newly painted, inside a box
+                if at_px(*key)[3] == 0:
+                    continue
+                covers = [j for j, (qy, qx) in enumerate(pos)
+                          if 0 <= key[0] - qy < 16 and 0 <= key[1] - qx < 8]
+                owner[key] = min(covers, key=lambda j: (pos[j][0] + 8 - key[0]) ** 2
+                                 + (pos[j][1] + 4 - key[1]) ** 2)
+
+            for i, g in enumerate(grids):
+                pal = 1 if f['piece'][i][2] else 0
+                for dy in range(16):
+                    for dx in range(8):
+                        key = (pos[i][0] + dy, pos[i][1] + dx)
+                        if owner.get(key) != i:
+                            g[dy][dx] = 0
+                            continue
+                        px = at_px(*key)
+                        if px[3] == 0:
+                            g[dy][dx] = 0
+                            continue
+                        rgb = px[:3]
+                        if g[dy][dx] and pals[pal][g[dy][dx]] == rgb:
+                            continue                     # unchanged, keep the index
+                        if rgb in rev[pal]:
+                            g[dy][dx] = rev[pal][rgb]
+                        else:
+                            warnings.append(
+                                f"{name}: frame ${f['sid']:02x} pixel ({ox + key[1]},"
+                                f"{oy + key[0]}) is #{rgb[0]:02x}{rgb[1]:02x}{rgb[2]:02x}, "
+                                f"not a colour of OBJ palette {pal} - left as it was")
+
+            # anything painted in this cell but outside every piece box is unrepresentable
+            stray = 0
+            for y in range(PREVIEW_MARGIN + 1, lay['ch']):
+                for x in range(1, lay['cw']):
+                    gy = (n // columns) * lay['ch'] + y
+                    gx = (n % columns) * lay['cw'] + x
+                    if img[gy][gx][3] and (gy - oy, gx - ox) not in boxed:
+                        stray += 1
+            if stray:
+                warnings.append(f"{name}: frame ${f['sid']:02x} has {stray} painted pixel(s) "
+                                f"outside every piece - that needs a new player_piece in "
+                                f"bank{bk:02x}_frames.asm, so they were dropped")
+
+            new = b''.join(grid_to_piece(g) for g in grids)
+            if new != blob:
+                tiles[bk][at:at + len(new)] = new
+                touched[bk] = touched.get(bk, 0) + 1
+
+    return ({bk: bytes(tiles[bk]) for bk in touched},
+            {bk: touched[bk] for bk in touched}, warnings)
 
 
 # ---------------------------------------------------------------------------
@@ -568,6 +776,52 @@ def rgbgfx_check(png_path, expect, pad_bytes):
         os.unlink(tmp_path)
 
 
+def run_import(repo, rom, sets, banks, set_names, args):
+    """--import: edited contact sheets -> the packed sheets the build reads."""
+    gfx_dir = os.path.join(repo, GFX_SUBDIR)
+    prev_dir = os.path.join(repo, args.import_dir)
+    if not os.path.isdir(prev_dir):
+        sys.exit(f"no contact sheets in {args.import_dir} - run with --preview first")
+
+    # the packed sheets are the ownership reference, so they have to agree with the ROM
+    shapes, stale = {}, []
+    for bk, info in banks.items():
+        n_tiles = len(info['tiles']) // 16
+        cols, rows_ = sheet_shape(n_tiles)
+        shapes[bk] = (cols, rows_)
+        path = os.path.join(gfx_dir, png_name(bk, info))
+        if not os.path.isfile(path):
+            sys.exit(f"{path} is missing - run the extract first")
+        w, h, grid = png_read_indices(path)
+        if (w, h) != (cols * 8, rows_ * 8) or \
+                indices_to_tiles(grid, cols, rows_)[:len(info['tiles'])] != info['tiles']:
+            stale.append(f"${bk:02x}")
+    if stale:
+        sys.exit(f"the packed sheet(s) for bank(s) {', '.join(stale)} do not match "
+                 f"rom.gb.\nrom.gb has to be current for import to know which piece owns "
+                 f"which pixel - run make, then try again")
+    print(f"packed sheets agree with {os.path.basename(args.rom or 'rom.gb')}\n")
+
+    new_tiles, counts, warnings = import_previews(prev_dir, rom, sets, banks, set_names)
+    for w_ in warnings:
+        print(f"  ! {w_}")
+    if not new_tiles:
+        print("\nno pixels changed - the contact sheets import back to the bytes "
+              "already in src/gfx")
+        return
+    if args.dry_run:
+        print(f"\n--dry-run: {sum(counts.values())} frame(s) across {len(new_tiles)} "
+              f"bank(s) would change; nothing written")
+        return
+    for bk, blob in sorted(new_tiles.items()):
+        cols, rows_ = shapes[bk]
+        pad = cols * rows_ - len(blob) // 16
+        grid = tiles_to_indices(blob + bytes(16 * pad), cols, rows_)
+        png_write(os.path.join(gfx_dir, png_name(bk, banks[bk])), cols * 8, rows_ * 8, grid)
+        print(f"  bank ${bk:02x}: {counts[bk]} frame(s) rewritten")
+    print(f"\nupdated {len(new_tiles)} packed sheet(s) - run make to fold them into the ROM")
+
+
 def find_repo(start):
     here = os.path.abspath(start)
     while True:
@@ -589,6 +843,11 @@ def main():
     ap.add_argument('--patch-main', action='store_true', help='rewrite the bank $62-$7e section of main.asm')
     ap.add_argument('--patch-makefile', action='store_true', help='add the rgbgfx --columns rule')
     ap.add_argument('--skip-rgbgfx', action='store_true', help='do not round-trip through rgbgfx')
+    ap.add_argument('--import', nargs='?', dest='import_dir',
+                    const=os.path.join('docs', 'player_frames'),
+                    default=None, metavar='DIR',
+                    help='the other direction: read edited contact sheets from DIR back '
+                         'into the packed sheets in src/gfx. Nothing else is written')
     ap.add_argument('--preview', nargs='?', const=os.path.join('docs', 'player_frames'),
                     default=None, metavar='DIR',
                     help='also render assembled contact sheets, in colour, for looking '
@@ -615,6 +874,9 @@ def main():
                 break
     for n in range(SET_COUNT):
         set_names.setdefault(n, f'graphics set {n}')
+
+    if args.import_dir:
+        return run_import(repo, rom, sets, banks, set_names, args)
 
     total_frames = sum(len(b['frames']) for b in banks.values())
     total_tiles = sum(len(b['tiles']) // 16 for b in banks.values())
