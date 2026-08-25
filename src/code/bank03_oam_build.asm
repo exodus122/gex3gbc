@@ -887,10 +887,10 @@ call_03_5ec1_OAM_BuildFrame:
 .jr_03_5f67:
     push HL                                           ;; 03:5f67 $e5
     ld   A, [HL+]                                     ;; 03:5f68 $2a
-    or   A, ENTITY_FIELD_YPOS                         ;; 03:5f69 $f6 $10
+    or   A, ENTITY_FIELD_WORLD_Y                         ;; 03:5f69 $f6 $10
     ld   E, A                                         ;; 03:5f6b $5f
     ld   A, [HL]                                      ;; 03:5f6c $7e
-    or   A, ENTITY_FIELD_YPOS                         ;; 03:5f6d $f6 $10
+    or   A, ENTITY_FIELD_WORLD_Y                         ;; 03:5f6d $f6 $10
     ld   L, A                                         ;; 03:5f6f $6f
     ld   H, D                                         ;; 03:5f70 $62
     ld   A, [DE]                                      ;; 03:5f71 $1a
@@ -990,7 +990,7 @@ call_03_5fc2_Entity_BuildSprites:
     ld   A, [HL]                                      ;; 03:5fda $7e
     or   A, E                                         ;; 03:5fdb $b3
     ld   [wDAB6_Oam_Attributes], A                    ;; 03:5fdc $ea $b6 $da
-    LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_WORLD_X
     ld   HL, wDBF9_XPositionInMap                     ;; 03:5fe7 $21 $f9 $db
     ld   A, [DE]                                      ;; 03:5fea $1a
     sub  A, [HL]                                      ;; 03:5feb $96

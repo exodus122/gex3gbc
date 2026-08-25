@@ -53,7 +53,7 @@ call_02_585f_EntityAction_MovePlatformHorizontally:
     jr   nz,.jr_00_589E
     ld   bc,$FFFF
 .jr_00_589E:
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ld   a,c
     add  [hl]
     ldi  [hl],a
@@ -98,7 +98,7 @@ call_02_58bd_EntityAction_MovePlatformVertically:
     jr   nz,.jr_00_58FC
     ld   bc,$FFFF
 .jr_00_58FC:
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
     ld   a,c
     add  [hl]
     ldi  [hl],a
@@ -125,7 +125,7 @@ call_02_5918_EntityAction_Fly_Update:
     ld   c,l
     ld   b,h
     call call_00_2835_Entity_GetInitialXPos
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ld   a,[bc]
     add  e
     ldi  [hl],a
@@ -135,7 +135,7 @@ call_02_5918_EntityAction_Fly_Update:
     ld   [hl],a
     inc  bc
     call call_00_27f3_Entity_GetInitialYPos
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
     ld   a,[bc]
     add  e
     ldi  [hl],a
@@ -424,7 +424,7 @@ call_02_5b9a_EntityAction_UpdateGoalCounter:
     ret                                                ;; 02:5bb2 $c9
 
 call_02_5bb3_EntityAction_UpdateBonusStageTimer:
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ld   a,[wDBF9_XPositionInMap]
     add  a,$50
     ldi  [hl],a
@@ -592,7 +592,7 @@ call_02_5d02_LoadEvilSantaPalette:
     db   $00, $00, $00, $00, $1f, $00, $ff, $7f        ;; 02:5d08 ........
 
 call_02_5d10_EntityAction_EvilSantaProjectile_Init:
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ld   A, [wD80E_PlayerXPosition]                                    ;; 02:5d18 $fa $0e $d8
     sub  A, [HL]                                       ;; 02:5d1b $96
     ld   E, A                                          ;; 02:5d1c $5f
@@ -649,7 +649,7 @@ call_02_5d80_EntityAction_EvilSantaProjectile_UpdateTrajectory:
     call call_00_24ee_Entity_ApplyYVelocity_Subpixel                                  ;; 02:5d83 $cd $ee $24
     call call_00_28d2_Entity_GetYVelocity                                  ;; 02:5d86 $cd $d2 $28
     ld   C, A                                          ;; 02:5d89 $4f
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
     ld   A, [HL]                                       ;; 02:5d92 $7e
     sub  A, $88                                        ;; 02:5d93 $d6 $88
     jp   NC, call_00_2b80_Entity_DeactivateSelf                              ;; 02:5d95 $d2 $80 $2b
@@ -939,7 +939,7 @@ call_02_5F9B_GhostKnight_unk:
     add  hl,hl
     ld   de,.data_02_5fc7
     add  hl,de
-    LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_WORLD_X
     ld   b,$04
 .jr_00_5FB8:
     ldi  a,[hl]
@@ -1063,7 +1063,7 @@ call_02_616f_EntityAction_Hand_Unk3:
     call call_00_0ff5_QueueSFX
     ld   c,$10
     call call_00_28dc_Entity_SetYVelocity
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ldi  a,[hl]
     sub  a,$B0
     ld   e,a
@@ -1194,7 +1194,7 @@ call_02_624e_EntityAction_Raft_MoveRightAndCarryPlayer:
     ld   bc,$0001
     call call_00_24df_Entity_MoveX
     call call_00_26c9_Entity_CarryOrPushPlayerX
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ldi  a,[hl]
     ld   d,[hl]
     ld   e,a
@@ -1905,7 +1905,7 @@ call_02_67c2_EntityAction_Elevator_Update:
     add  hl,hl
     ld   de,wDCE2_ElevatorEntityUnkData
     add  hl,de
-    LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_YPOS
+    LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_WORLD_Y
     ldi  a,[hl]
     ld   [de],a
     inc  e
@@ -1924,7 +1924,7 @@ call_02_67c2_EntityAction_Elevator_Update:
     ldi  a,[hl]
     cp   c
     jr   nz,.jr_00_6805
-    LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_WORLD_X
     ld   a,[de]
     sub  [hl]
     ld   b,a
@@ -1962,7 +1962,7 @@ call_02_67c2_EntityAction_Elevator_Update:
     add  hl,hl
     ld   de,wDCE2_ElevatorEntityUnkData
     add  hl,de
-    LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_YPOS
+    LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_WORLD_Y
     ld   a,[de]
     ldi  [hl],a
     inc  e
@@ -1983,7 +1983,7 @@ call_02_67c2_EntityAction_Elevator_Update:
     ld   hl,wD801_Player_ActionId
     cp   [hl]
     jp   nz,call_02_54f9_Player_RequestAction
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ld   a,[wD80E_PlayerXPosition]
     sub  [hl]
     ld   e,a
@@ -2002,7 +2002,7 @@ call_02_67c2_EntityAction_Elevator_Update:
     
 call_02_688E_Elevator_unk:
     ld   hl,.data_02_68A9
-    LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_WORLD_X
     ld   c,$FF
 .jr_00_689B:
     inc  c
@@ -2131,7 +2131,7 @@ call_02_697e: ; unreferenced function?
     add  hl,hl
     ld   de,.data_02_699f
     add  hl,de
-    LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_WORLD_X
     ldi  a,[hl]
     ld   [de],a
     inc  e
@@ -2166,7 +2166,7 @@ call_02_69af_EntityAction_Bomb_Unk1:
 .jr_00_69CB:
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     ld   de,$0068
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
     ldi  a,[hl]
     sub  e
     ld   a,[hl]
@@ -2200,7 +2200,7 @@ call_02_6a04_EntityAction_Bomb_Unk2:
 call_02_6a13_EntityAction_Bomb_Unk3:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_00_6A38
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ld   a,[hl]
     ld   hl,.data_02_6a40
     ld   b,$05
@@ -2238,7 +2238,7 @@ call_02_6a4c_EntityAction_Bomb_Unk4:
     ld   a,c
     cp   a,$04
     ret  nc
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ld   a,[hl]
     sub  a,$60
     add  a,$0A
@@ -2582,7 +2582,7 @@ call_02_6cdd_EntityAction_BirdProjectile_Update:
     ld   a,[hl]
     adc  d
     ld   d,a
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
     ldi  a,[hl]
     sub  e
     ld   a,[hl]
@@ -2712,7 +2712,7 @@ call_02_6ddd_EntityAction_BrainOfOz_Unk5:
 call_02_6dee_EntityAction_BrainOfOz_Unk7:
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     ld   de,$0068
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
     ldi  a,[hl]
     sub  e
     ld   a,[hl]
@@ -2775,7 +2775,7 @@ call_02_6e44_EntityAction_BrainOfOzProjectile_Update:
     call call_00_24c0_Entity_ApplyXVelocity_Subpixel
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     ld   de,$0088
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
     ldi  a,[hl]
     sub  e
     ld   a,[hl]
@@ -2788,7 +2788,7 @@ call_02_6e88_EntityAction_Cannon_Unk0:
     bit  0,[hl]
     ret  z
     ld   [hl],$00
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ld   de,$0078
     ld   [hl],e
     inc  l
@@ -2833,7 +2833,7 @@ call_02_6ec7_EntityAction_CannonProjectile_Update:
     bit  7,[hl]
     ret  z
     ld   de,$0038
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
     ldi  a,[hl]
     sub  e
     ld   a,[hl]
@@ -2976,7 +2976,7 @@ call_02_6FD3_Rez_unk:
     ld   [hl],a
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     ld   de,$0024
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
     ldi  a,[hl]
     sub  e
     ld   a,[hl]
@@ -2994,7 +2994,7 @@ call_02_6FD3_Rez_unk:
 call_02_7002_Rez_unk2:
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     ld   de,$0058
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
     ldi  a,[hl]
     sub  e
     ld   a,[hl]
@@ -3052,7 +3052,7 @@ call_02_702e_EntityAction_RezProjectile_Update:
     bit  7,a
     ret  z
     ld   de,$0070
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
     ldi  a,[hl]
     sub  e
     ld   a,[hl]

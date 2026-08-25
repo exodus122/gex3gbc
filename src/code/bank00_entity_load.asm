@@ -91,8 +91,8 @@ call_00_3252_EntityList_RewindCursor:
 ; entity id order - so a row's position IS its id. 114 rows.
 ;
 ;   +0  ENTITY_ATTR_IS_NPC          0 for ENTITY_GEX, 1 for everything else
-;   +1  ENTITY_ATTR_WIDTH           into ENTITY_FIELD_WIDTH
-;   +2  ENTITY_ATTR_HEIGHT          into ENTITY_FIELD_HEIGHT
+;   +1  ENTITY_ATTR_WIDTH           into ENTITY_FIELD_COLLISION_WIDTH
+;   +2  ENTITY_ATTR_HEIGHT          into ENTITY_FIELD_COLLISION_HEIGHT
 ;   +3  ENTITY_ATTR_COLLISION_TYPE  into ENTITY_FIELD_COLLISION_TYPE
 ;   +4  ENTITY_ATTR_DAMAGE_STATE    health plus one; the spawn decrements it
 ;   +5  ENTITY_ATTR_MISC_FLAGS      $00 in all 114 rows
@@ -438,7 +438,7 @@ call_00_3618_EntitySpawn_SpawnNextFromList:
     add  HL, BC                                       ;; 00:36d7 $09
     ld   C, L                                         ;; 00:36d8 $4d
     ld   B, H                                         ;; 00:36d9 $44
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ld   A, [DE]                                      ;; 00:36e2 $1a
     ld   [HL+], A                                     ;; 00:36e3 $22
     ld   [BC], A                                      ;; 00:36e4 $02
@@ -695,7 +695,7 @@ call_00_37a0_EntitySpawn_SpawnChildEntity:
     ld   E, A                                         ;; 00:3828 $5f
     ld   A, [HL+]                                     ;; 00:3829 $2a
     ld   [DE], A                                      ;; 00:382a $12
-    inc  E                                            ;; 00:382b $1c ; ENTITY_FIELD_HEIGHT
+    inc  E                                            ;; 00:382b $1c ; ENTITY_FIELD_COLLISION_HEIGHT
     ld   A, [HL+]                                     ;; 00:382c $2a
     ld   [DE], A                                      ;; 00:382d $12
     inc  E                                            ;; 00:382e $1c ; ENTITY_FIELD_COLLISION_TYPE
@@ -718,13 +718,13 @@ call_00_37a0_EntitySpawn_SpawnChildEntity:
     inc  E                                            ;; 00:383f $1c ; ENTITY_FIELD_MISC_TIMER
     xor  A, A                                         ;; 00:3840 $af
     ld   [DE], A                                      ;; 00:3841 $12
-    inc  E                                            ;; 00:3842 $1c ; ENTITY_FIELD_XVEL
+    inc  E                                            ;; 00:3842 $1c ; ENTITY_FIELD_X_VELOCITY
     ld   [DE], A                                      ;; 00:3843 $12
-    inc  E                                            ;; 00:3844 $1c ; ENTITY_FIELD_XVEL_RELATED
+    inc  E                                            ;; 00:3844 $1c ; ENTITY_FIELD_X_SUBPIXEL
     ld   [DE], A                                      ;; 00:3845 $12
-    inc  E                                            ;; 00:3846 $1c ; ENTITY_FIELD_YVEL
+    inc  E                                            ;; 00:3846 $1c ; ENTITY_FIELD_Y_VELOCITY
     ld   [DE], A                                      ;; 00:3847 $12
-    inc  E                                            ;; 00:3848 $1c ; ENTITY_FIELD_YVEL_RELATED
+    inc  E                                            ;; 00:3848 $1c ; ENTITY_FIELD_Y_SUBPIXEL
     ld   [DE], A                                      ;; 00:3849 $12
     inc  E                                            ;; 00:384a $1c ; ENTITY_FIELD_PARENT
     ld   A, [wDCE8_CurrentEntity_ParentListIndex]     ;; 00:384b $fa $e8 $dc

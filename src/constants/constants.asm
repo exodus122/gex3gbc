@@ -653,8 +653,7 @@ DEF ENTITY_SLOT_BASE_MASK                              EQU $E0
 DEF ENTITY_FIELD_ENTITY_ID                  EQU $00
 DEF ENTITY_FIELD_ACTION_ID                  EQU $01
 DEF ENTITY_FIELD_ACTION_FUNC                EQU $02
-; Not sprite flags, despite the name it carried for a long time: this is the
-; action to switch to when the current animation runs out. Bit 7 says there is one,
+; The action to switch to when the current animation runs out. Bit 7 says there is one,
 ; the low bits are its id, and call_02_724d_Entity_TickAction consumes both on the
 ; wrap frame. gex2 keeps the same two pieces in the top of its ACTION_STATE byte
 DEF ENTITY_FIELD_PENDING_ACTION             EQU $04
@@ -686,7 +685,7 @@ DEF ENTITY_FIELD_ACTION_STATE_FLAGS         EQU $05
     DEF ACTION_STATE_UNK80                 EQU $80
     DEF ACTION_STATE_UNK20                 EQU $20
     DEF ACTION_STATE_IS_FIRST_FRAME        EQU $10
-    DEF ACTION_STATE_ANIM_ENDED                 EQU $04
+    DEF ACTION_STATE_ANIM_ENDED            EQU $04
     DEF ACTION_STATE_LOOP_LAST_FRAME       EQU $08
     DEF ACTION_STATE_ID_CHANGED            EQU $02
 DEF ENTITY_FIELD_SPRITE_FRAME_COUNTER_MAX   EQU $06 ; how many frames to use this sprite
@@ -698,10 +697,10 @@ DEF ENTITY_FIELD_SPRITE_COUNTER             EQU $09 ; counter for above
 DEF ENTITY_FIELD_SPRITE_ID                  EQU $0A ; current sprite id
 DEF ENTITY_FIELD_SPRITE_IDS_PTR             EQU $0B ; ptr to sprite data (in entity_animation_data.asm)
 DEF ENTITY_FIELD_FACING_DIRECTION           EQU $0D
-DEF ENTITY_FIELD_XPOS                       EQU $0E
-DEF ENTITY_FIELD_YPOS                       EQU $10
-DEF ENTITY_FIELD_WIDTH                      EQU $12 ; set to [1] into data_00_3258_EntityAttributeTable
-DEF ENTITY_FIELD_HEIGHT                     EQU $13 ; set to [2] into data_00_3258_EntityAttributeTable
+DEF ENTITY_FIELD_WORLD_X                    EQU $0E ; position in the map
+DEF ENTITY_FIELD_WORLD_Y                    EQU $10 ; position in the map
+DEF ENTITY_FIELD_COLLISION_WIDTH            EQU $12 ; set to [1] into data_00_3258_EntityAttributeTable
+DEF ENTITY_FIELD_COLLISION_HEIGHT           EQU $13 ; set to [2] into data_00_3258_EntityAttributeTable
 DEF ENTITY_FIELD_COLLISION_TYPE             EQU $14 ; set to [3] into data_00_3258_EntityAttributeTable
 DEF ENTITY_FIELD_COOLDOWN_TIMER             EQU $15 ; defaults to 0, but might get set to $3c (same value as gex's cooldown timer)
 DEF ENTITY_FIELD_DAMAGE_STATE               EQU $16 ; stores current health or other damage states
@@ -710,11 +709,11 @@ DEF ENTITY_FIELD_UNK18                      EQU $18 ; seems unused
 DEF ENTITY_FIELD_MISC_FLAGS                 EQU $19 ; only used by moving platforms, skating elf health, and sec bot?
                                                     ; initially set to data_00_3258_EntityAttributeTable[entity_id*8][5]
 DEF ENTITY_FIELD_MISC_TIMER                 EQU $1A ; timer which can be used for various purposes
-DEF ENTITY_FIELD_XVEL                       EQU $1B
-DEF ENTITY_FIELD_XVEL_RELATED               EQU $1C ; subpixel accumulator: the low nibble carries the
+DEF ENTITY_FIELD_X_VELOCITY                 EQU $1B
+DEF ENTITY_FIELD_X_SUBPIXEL                 EQU $1C ; subpixel accumulator: the low nibble carries the
                                                     ; fraction of a pixel XVEL has not paid out yet
-DEF ENTITY_FIELD_YVEL                       EQU $1D
-DEF ENTITY_FIELD_YVEL_RELATED               EQU $1E ; the same accumulator for YVEL. Only the facing-based
+DEF ENTITY_FIELD_Y_VELOCITY                 EQU $1D
+DEF ENTITY_FIELD_Y_SUBPIXEL                 EQU $1E ; the same accumulator for YVEL. Only the facing-based
                                                     ; mover call_00_25cb_Entity_MoveYByFacingSpeed uses it;
                                                     ; call_00_24ee_Entity_ApplyYVelocity_Subpixel accumulates
                                                     ; into $1E's neighbour instead, so most entities leave

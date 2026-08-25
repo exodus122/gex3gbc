@@ -133,7 +133,7 @@ call_03_4cea_CollisionHandler_DamagePlayer:
     cp   A, PLAYERACTION_TOPDOWN_TAKE_DAMAGE                                        ;; 03:4cf9 $fe $45
     call NZ, call_00_06f6_Player_TakeDamage                              ;; 03:4cfb $c4 $f6 $06
 .jr_03_4cfe:
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ld   A, [wD80E_PlayerXPosition]                                    ;; 03:4d06 $fa $0e $d8
     sub  A, [HL]                                       ;; 03:4d09 $96
     inc  HL                                            ;; 03:4d0a $23
@@ -184,7 +184,7 @@ call_03_4d44_CollisionHandler_DamagePlayerUnused:
     jp   z,call_03_5671_HandleEntityHit
     ld   a,TIMER_AMOUNT_60_FRAMES
     ld   [wDC7E_Player_DamageCooldownTimer],a
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ld   a,[wD80E_PlayerXPosition]
     sub  [hl]
     inc  hl
@@ -377,10 +377,10 @@ call_03_4e89_CollisionHandler_EvilSantaProjectile:
     call call_00_29ce_Entity_FindSlotById                                  ;; 03:4ea5 $cd $ce $29
     jp   NZ, call_00_2b80_Entity_DeactivateSelf                              ;; 03:4ea8 $c2 $80 $2b
     ld   A, L                                          ;; 03:4eab $7d
-    or   A, ENTITY_FIELD_XPOS                                        ;; 03:4eac $f6 $0e
+    or   A, ENTITY_FIELD_WORLD_X                                        ;; 03:4eac $f6 $0e
     ld   L, A                                          ;; 03:4eae $6f
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:4eaf $fa $00 $da
-    or   A, ENTITY_FIELD_XPOS                                        ;; 03:4eb2 $f6 $0e
+    or   A, ENTITY_FIELD_WORLD_X                                        ;; 03:4eb2 $f6 $0e
     ld   E, A                                          ;; 03:4eb4 $5f
     ld   D, HIGH(wD800_EntityMemory)                                        ;; 03:4eb5 $16 $d8
     ld   A, [DE]                                       ;; 03:4eb7 $1a
@@ -1155,7 +1155,7 @@ call_03_5406_CollisionHandler_BrainOfOz:
     ld   a,l
     xor  a,$13
     ld   l,a
-    LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_WORLD_X
     ld   a,[de]
     sub  [hl]
     ld   c,a
@@ -1333,7 +1333,7 @@ call_03_550e_Entity_CheckPlayerInteraction:
 .jr_03_554d:
     add  HL, DE                                        ;; 03:554d $19
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:554e $fa $00 $da
-    or   A, ENTITY_FIELD_YPOS                                        ;; 03:5551 $f6 $10
+    or   A, ENTITY_FIELD_WORLD_Y                                        ;; 03:5551 $f6 $10
     ld   C, A                                          ;; 03:5553 $4f
     ld   A, [BC]                                       ;; 03:5554 $0a
     sub  A, L                                          ;; 03:5555 $95
@@ -1345,19 +1345,19 @@ call_03_550e_Entity_CheckPlayerInteraction:
     ld   A, C                                          ;; 03:555b $79
     xor  A, $02                                        ;; 03:555c $ee $02
     ld   C, A                                          ;; 03:555e $4f
-    ld   A, [BC]                                       ;; 03:555f $0a ; loads ENTITY_FIELD_HEIGHT
+    ld   A, [BC]                                       ;; 03:555f $0a ; loads ENTITY_FIELD_COLLISION_HEIGHT
     add  A, E                                          ;; 03:5560 $83
     ld   E, A                                          ;; 03:5561 $5f
     ld   A, $00                                        ;; 03:5562 $3e $00
     adc  A, D                                          ;; 03:5564 $8a
     jp   NZ, .jr_03_55fd_ReturnNoInteraction                                ;; 03:5565 $c2 $fd $55
-    ld   A, [BC]                                       ;; 03:5568 $0a ; loads ENTITY_FIELD_HEIGHT
+    ld   A, [BC]                                       ;; 03:5568 $0a ; loads ENTITY_FIELD_COLLISION_HEIGHT
     add  A, A                                          ;; 03:5569 $87
     cp   A, E                                          ;; 03:556a $bb
     jp   C, .jr_03_55fd_ReturnNoInteraction                                 ;; 03:556b $da $fd $55
     ld   HL, wD80E_PlayerXPosition                                     ;; 03:556e $21 $0e $d8
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:5571 $fa $00 $da
-    or   A, ENTITY_FIELD_XPOS                                        ;; 03:5574 $f6 $0e
+    or   A, ENTITY_FIELD_WORLD_X                                        ;; 03:5574 $f6 $0e
     ld   C, A                                          ;; 03:5576 $4f
     ld   A, [BC]                                       ;; 03:5577 $0a
     sub  A, [HL]                                       ;; 03:5578 $96
@@ -1370,14 +1370,14 @@ call_03_550e_Entity_CheckPlayerInteraction:
     ld   A, C                                          ;; 03:557f $79
     xor  A, $1d                                        ;; 03:5580 $ee $1d
     ld   C, A                                          ;; 03:5582 $4f
-    ld   A, [BC]                                       ;; 03:5583 $0a ; loads ENTITY_FIELD_WIDTH
+    ld   A, [BC]                                       ;; 03:5583 $0a ; loads ENTITY_FIELD_COLLISION_WIDTH
     add  A, $08                                        ;; 03:5584 $c6 $08
     add  A, E                                          ;; 03:5586 $83
     ld   E, A                                          ;; 03:5587 $5f
     ld   A, $00                                        ;; 03:5588 $3e $00
     adc  A, D                                          ;; 03:558a $8a
     jr   NZ, .jr_03_55fd_ReturnNoInteraction                                ;; 03:558b $20 $70
-    ld   A, [BC]                                       ;; 03:558d $0a ; loads ENTITY_FIELD_WIDTH
+    ld   A, [BC]                                       ;; 03:558d $0a ; loads ENTITY_FIELD_COLLISION_WIDTH
     add  A, $08                                        ;; 03:558e $c6 $08
     add  A, A                                          ;; 03:5590 $87
     cp   A, E                                          ;; 03:5591 $bb
@@ -1395,7 +1395,7 @@ call_03_550e_Entity_CheckPlayerInteraction:
 .jr_03_55a9:
     ld   HL, wD80E_PlayerXPosition                                     ;; 03:55a9 $21 $0e $d8
     ld   A, [wDA00_CurrentEntityAddrLo]                                    ;; 03:55ac $fa $00 $da
-    or   A, ENTITY_FIELD_XPOS                                        ;; 03:55af $f6 $0e
+    or   A, ENTITY_FIELD_WORLD_X                                        ;; 03:55af $f6 $0e
     ld   C, A                                          ;; 03:55b1 $4f
     ld   A, [BC]                                       ;; 03:55b2 $0a
     sub  A, [HL]                                       ;; 03:55b3 $96
@@ -1670,7 +1670,7 @@ call_03_56c1_CollisionHandler_Platform:
     ld   a,[wD810_PlayerYPosition+1]
     adc  d
     ld   d,a
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
     ld   a,e
     sub  [hl]
     ld   e,a
@@ -1895,7 +1895,7 @@ call_03_581a_CollisionHandler_TVButton:
     jp   Z, call_03_57f8_ClearCollisionForEntity                                 ;; 03:5829 $ca $f8 $57
     cp   A, PLAYERACTION_DEATH_IN_PIT                                        ;; 03:582c $fe $1b
     jp   Z, call_03_57f8_ClearCollisionForEntity                                 ;; 03:582e $ca $f8 $57
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WIDTH
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_COLLISION_WIDTH
     ld   A, [HL+]                                      ;; 03:5839 $2a
     ld   C, A                                          ;; 03:583a $4f
     ld   B, [HL]                                       ;; 03:583b $46
@@ -1976,7 +1976,7 @@ call_03_58a9_ComputeCollisionOffset:
 ; Then checks wD80D_PlayerFacingDirection, and if bit 5 is set, flips the result.
 ; Role: This is a collision offset calculator: adjusts collision testing 
 ; depending on entity properties (size/offset) and player facing direction.
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XVEL
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_X_VELOCITY
     ld   b,[hl]
     dec  l
     dec  l

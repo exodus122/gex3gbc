@@ -28,8 +28,8 @@
 ; Subpixel movement
 ; -----------------
 ; Velocities are 1/16 of a pixel per frame and live in a single signed byte. A
-; mover adds the velocity into an accumulator field (ENTITY_FIELD_XVEL_RELATED for
-; X, ENTITY_FIELD_YVEL_RELATED for Y), keeps the low nibble as the unpaid fraction,
+; mover adds the velocity into an accumulator field (ENTITY_FIELD_X_SUBPIXEL for
+; X, ENTITY_FIELD_Y_SUBPIXEL for Y), keeps the low nibble as the unpaid fraction,
 ; and arithmetic-shifts the rest right four times to get whole pixels. The
 ; sign-extension that follows every one of those shifts is always spelled
 ;
@@ -406,8 +406,8 @@ call_00_230f_Entity_GetParameterIntoC:
 call_00_233e_Entity_MoveAlongArcTable:
 ; Flies the entity along a canned quarter-circle instead of integrating a velocity.
 ;
-; ENTITY_FIELD_XVEL is reused as a step counter: it advances one per frame and
-; wraps at $2E, and on the wrap it bumps ENTITY_FIELD_XVEL_RELATED - the quadrant -
+; ENTITY_FIELD_X_VELOCITY is reused as a step counter: it advances one per frame and
+; wraps at $2E, and on the wrap it bumps ENTITY_FIELD_X_SUBPIXEL - the quadrant -
 ; and clears bit 2 of it, so the quadrant cycles 0,1,2,3,0,... The quadrant then
 ; decides how the (dx, dy) pair read out of .data_00_23b4_ArcTable is signed:
 ;
@@ -418,7 +418,7 @@ call_00_233e_Entity_MoveAlongArcTable:
 ; the path is absolute and cannot drift - the entity traces the same loop forever.
 ; That also means anything else that writes XPOS or YPOS while this is running will
 ; be undone on the next frame
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XVEL
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_X_VELOCITY
     inc  [hl]
     ld   a,[hl]
     sub  a,$2E
@@ -493,7 +493,7 @@ call_00_233e_Entity_MoveAlongArcTable:
     push hl
     pop  bc
     pop  de
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ld   a,e
     ldi  [hl],a
     ld   a,d
@@ -524,13 +524,13 @@ call_00_2410_Entity_FaceTowardsPlayer:
 ; Points the entity at Gex: ENTITY_FACING_LEFT if he is to the left, otherwise
 ; ENTITY_FACING_RIGHT.
 ;
-; The `xor $02` on L is the trick worth noticing - L is at ENTITY_FIELD_XPOS + 1
+; The `xor $02` on L is the trick worth noticing - L is at ENTITY_FIELD_WORLD_X + 1
 ; ($0F) by then, and $0F xor $02 = $0D = ENTITY_FIELD_FACING_DIRECTION, so it walks
 ; to the facing byte without reloading HL. The same idiom appears a dozen times
 ; below with different constants.
 ;
 ; Instruction-for-instruction gex2's call_00_36bd_Entity_FaceTowardsPlayer
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ld   c,ENTITY_RIGHT_OF_GEX
     ld   a,[wD80E_PlayerXPosition]
     sub  [hl]
@@ -549,7 +549,7 @@ call_00_2410_Entity_FaceTowardsPlayer:
 call_00_242d_Entity_FaceAwayFromPlayer:
 ; The same routine with the two facing constants swapped. gex2's
 ; call_00_36da_Entity_FaceAwayFromPlayer
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ld   c,ENTITY_LEFT_OF_GEX
     ld   a,[wD80E_PlayerXPosition]
     sub  [hl]
@@ -576,7 +576,7 @@ call_00_244a_Entity_ApplyGravityAndMoveY_Clamped:
 ; subpixel accumulator - the fraction is simply discarded each frame.
 ;
 ; gex2's call_00_30af_Entity_ApplyGravityAndMoveY_Clamped, same instructions
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YVEL
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_Y_VELOCITY
     ld   A, [HL]                                      ;; 00:2452 $7e
     sub  A, ENTITY_GRAVITY_PER_FRAME                  ;; 00:2453 $d6 $02
     bit  7, A                                         ;; 00:2455 $cb $7f
@@ -615,7 +615,7 @@ call_00_2475_Entity_ApplyGravityMoveY_WithFloorCollision:
 ; That convention is why so many bank 2 hop actions are literally "call this,
 ; ret c". gex2's equivalent is call_00_30da_Entity_ApplyGravityMoveY_WithFloorCollision,
 ; which clamps to Entity_GetMinYBound instead
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YVEL
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_Y_VELOCITY
     ld   a,[hl]
     sub  a,ENTITY_GRAVITY_PER_FRAME
     bit  $7,a
@@ -644,7 +644,7 @@ call_00_2475_Entity_ApplyGravityMoveY_WithFloorCollision:
     adc  b
     ld   [hl],a
     call call_00_27f3_Entity_GetInitialYPos
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
     ld   a,e
     sub  [hl]
     inc  hl
@@ -662,13 +662,13 @@ call_00_2475_Entity_ApplyGravityMoveY_WithFloorCollision:
     ret  
 
 call_00_24c0_Entity_ApplyXVelocity_Subpixel:
-; The plain X mover. Adds XVEL into the ENTITY_FIELD_XVEL_RELATED accumulator,
+; The plain X mover. Adds XVEL into the ENTITY_FIELD_X_SUBPIXEL accumulator,
 ; keeps the low nibble there as the unpaid fraction, shifts the rest into whole
 ; pixels, sign-extends into B and falls through into call_00_24df_Entity_MoveX.
 ;
 ; gex2 does both axes at once in call_00_3559_Entity_ApplyVelocityXY_SubpixelBoth;
 ; gex3 split it in two so an action can move on one axis only
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XVEL
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_X_VELOCITY
     ld   A, [HL+]                                     ;; 00:24c8 $2a
     add  A, [HL]                                      ;; 00:24c9 $86
     ld   C, A                                         ;; 00:24ca $4f
@@ -685,8 +685,8 @@ call_00_24c0_Entity_ApplyXVelocity_Subpixel:
     adc  A, $00                                       ;; 00:24dc $ce $00
     ld   B, A                                         ;; 00:24de $47
 call_00_24df_Entity_MoveX:
-; Adds the signed 16-bit BC to ENTITY_FIELD_XPOS. gex2's call_00_37c9_Entity_MoveX
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+; Adds the signed 16-bit BC to ENTITY_FIELD_WORLD_X. gex2's call_00_37c9_Entity_MoveX
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ld   A, [HL]                                      ;; 00:24e7 $7e
     add  A, C                                         ;; 00:24e8 $81
     ld   [HL+], A                                     ;; 00:24e9 $22
@@ -699,7 +699,7 @@ call_00_24ee_Entity_ApplyYVelocity_Subpixel:
 ; The Y twin of call_00_24c0_Entity_ApplyXVelocity_Subpixel, accumulating into the
 ; byte after YVEL and falling through into call_00_250d_Entity_MoveY. No clamping
 ; and no floor check - this is for things that are steered rather than dropped
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YVEL
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_Y_VELOCITY
     ld   A, [HL+]                                     ;; 00:24f6 $2a
     add  A, [HL]                                      ;; 00:24f7 $86
     ld   C, A                                         ;; 00:24f8 $4f
@@ -716,8 +716,8 @@ call_00_24ee_Entity_ApplyYVelocity_Subpixel:
     adc  A, $00                                       ;; 00:250a $ce $00
     ld   B, A                                         ;; 00:250c $47
 call_00_250d_Entity_MoveY:
-; Adds the signed 16-bit BC to ENTITY_FIELD_YPOS. gex2's call_00_37d8_Entity_MoveY
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YPOS
+; Adds the signed 16-bit BC to ENTITY_FIELD_WORLD_Y. gex2's call_00_37d8_Entity_MoveY
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
     ld   A, [HL]                                      ;; 00:2515 $7e
     add  A, C                                         ;; 00:2516 $81
     ld   [HL+], A                                     ;; 00:2517 $22
@@ -780,14 +780,14 @@ call_00_254a_Entity_MoveXByFacingSpeed:
 ; call_00_3251_Entity_UpdateFacingMomentumAndMoveX
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_FACING_DIRECTION
     ld   C, [HL]                                      ;; 00:2552 $4e
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XVEL
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_X_VELOCITY
     ld   A, [HL+]                                     ;; 00:255b $2a
     bit  5, C                                         ;; 00:255c $cb $69
     jr   Z, .jr_00_2562                               ;; 00:255e $28 $02
     cpl                                               ;; 00:2560 $2f
     inc  A                                            ;; 00:2561 $3c
 .jr_00_2562:
-    add  A, [HL]                                      ;; 00:2562 $86 ; ENTITY_FIELD_XVEL_RELATED
+    add  A, [HL]                                      ;; 00:2562 $86 ; ENTITY_FIELD_X_SUBPIXEL
     ld   C, A                                         ;; 00:2563 $4f
     and  A, ENTITY_SUBPIXEL_MASK                      ;; 00:2564 $e6 $0f
     ld   [HL], A                                      ;; 00:2566 $77
@@ -819,7 +819,7 @@ call_00_2588_Entity_NudgeXVelocityTowardC:
 ; Moves XVEL one step toward C and returns the comparison of the new value against
 ; C, so Z means "arrived". One unit per frame, which is what gives the acceleration
 ; its ramp. gex2's call_00_32e1_Entity_NudgeXVelocityTowardC
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XVEL
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_X_VELOCITY
     ld   A, [HL]                                      ;; 00:2590 $7e
     cp   A, C                                         ;; 00:2591 $b9
     ret  Z                                            ;; 00:2592 $c8
@@ -884,7 +884,7 @@ call_00_25cb_Entity_MoveYByFacingSpeed:
 ; The Y counterpart of call_00_254a_Entity_MoveXByFacingSpeed: moves Y by YVEL in
 ; the direction
 ; ENTITY_FACING_VERTICAL_FLIP says, accumulating the fraction in
-; ENTITY_FIELD_YVEL_RELATED, and returns the new 16-bit Y in DE.
+; ENTITY_FIELD_Y_SUBPIXEL, and returns the new 16-bit Y in DE.
 ;
 ; This is the only routine in the game that uses that accumulator byte, which is
 ; why it was long assumed to be unused. The two `xor` walks on L are $0D -> $1D
@@ -930,7 +930,7 @@ call_00_25cb_Entity_MoveYByFacingSpeed:
 call_00_2602_Entity_NudgeYVelocityTowardC:
 ; One step of YVEL toward C, Z when it arrives. gex2's
 ; call_00_3316_Entity_NudgeYVelocityTowardC_Signed
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YVEL
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_Y_VELOCITY
     ld   a,[hl]
     cp   c
     ret  z
@@ -955,14 +955,14 @@ call_00_2617_Entity_ClampXToBounds:
 ; Returns A = 0 with Z set when it clamped, and plain carry when the entity was
 ; inside and nothing happened
     call call_00_2857_Entity_GetMinXBound
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ldi  a,[hl]
     sub  e
     ldd  a,[hl]
     sbc  d
     jr   c,.jr_00_2639
     call call_00_2846_Entity_GetMaxXBound
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ldi  a,[hl]
     sub  e
     ldd  a,[hl]
@@ -1031,7 +1031,7 @@ call_00_2678_Entity_GetXPosPlusOffset:
 ; BC = this entity's 16-bit X plus the signed offset already in BC, and HL left
 ; pointing at the X field so the caller can write the result back. Only used by
 ; call_00_2645_Entity_MoveXClampedToBounds above
-    LOAD_OBJ_FIELD_TO_HL_ALT ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL_ALT ENTITY_FIELD_WORLD_X
     ldi  a,[hl]
     add  c
     ld   c,a
@@ -1086,7 +1086,7 @@ call_00_2687_Entity_MoveYClampedToBounds:
 call_00_26ba_Entity_GetYPosPlusOffset:
 ; BC = this entity's 16-bit Y plus the signed offset in BC, HL left at the Y field.
 ; The Y twin of call_00_2678_Entity_GetXPosPlusOffset
-    LOAD_OBJ_FIELD_TO_HL_ALT ENTITY_FIELD_YPOS
+    LOAD_OBJ_FIELD_TO_HL_ALT ENTITY_FIELD_WORLD_Y
     ldi  a,[hl]
     add  c
     ld   c,a
@@ -1106,7 +1106,7 @@ call_00_26c9_Entity_CarryOrPushPlayerX:
 ;
 ; gex2 does the same two things in call_00_35d5_Entity_MoveXAndPushPlayer, with the
 ; carry delta going to wD75C_PlayerXDeltaExtra
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XVEL
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_X_VELOCITY
     ld   c,[hl]
     xor  a,$02
     ld   l,a
@@ -1136,12 +1136,12 @@ call_00_26f1_Entity_PushPlayerX:
 ; names this slot, which is what stops two blocks fighting over him.
 ;
 ; If he is to the right of the entity's leading edge he is placed at that edge plus
-; ENTITY_FIELD_WIDTH; otherwise control drops into
+; ENTITY_FIELD_COLLISION_WIDTH; otherwise control drops into
 ; call_00_2714_Entity_PushPlayerXLeft for the other side
     ld   hl,wDC7D_Player_PushedMovingPlatformLo
     cp   [hl]
     ret  nz
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WIDTH
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_COLLISION_WIDTH
     ld   a,[wD80E_PlayerXPosition]
     sub  e
     ld   a,[wD80E_PlayerXPosition+1]
@@ -1172,7 +1172,7 @@ call_00_2722_Entity_IsPlayerInsideBounds:
 ; "Is Gex on top of me?" - A = 1 with Z clear when he is, A = 0 otherwise.
 ;
 ; Two tests. First the vertical one, done entirely in 16-bit arithmetic on the
-; difference between the entity's Y and Gex's: the entity's ENTITY_FIELD_HEIGHT
+; difference between the entity's Y and Gex's: the entity's ENTITY_FIELD_COLLISION_HEIGHT
 ; (reached with `xor $02` off the Y field) is added to the difference and the
 ; result must be positive and within twice the height, which is a tolerance band
 ; rather than an exact overlap. Then the horizontal one, against the entity's X
@@ -1182,7 +1182,7 @@ call_00_2722_Entity_IsPlayerInsideBounds:
 ; around the entity rather than a bounding-box test
     ld   HL, wD810_PlayerYPosition                    ;; 00:2722 $21 $10 $d8
     ld   A, [wDA00_CurrentEntityAddrLo]               ;; 00:2725 $fa $00 $da
-    or   A, ENTITY_FIELD_YPOS                         ;; 00:2728 $f6 $10
+    or   A, ENTITY_FIELD_WORLD_Y                         ;; 00:2728 $f6 $10
     ld   C, A                                         ;; 00:272a $4f
     ld   B, HIGH(wD800_EntityMemory)                  ;; 00:272b $06 $d8
     ld   A, [BC]                                      ;; 00:272d $0a
@@ -1237,7 +1237,7 @@ call_00_2766_Entity_ClampYToSpawnFloor:
 ; call_00_3125_Entity_SetYFloorToCurrentPos / call_00_3137_Entity_ClampYToStoredFloor,
 ; which remember a floor in a field instead of using the spawn position
     call call_00_27f3_Entity_GetInitialYPos           ;; 00:2766 $cd $f3 $27
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
     ld   A, [HL+]                                     ;; 00:2771 $2a
     sub  A, E                                         ;; 00:2772 $93
     ld   A, [HL]                                      ;; 00:2773 $7e
@@ -1266,7 +1266,7 @@ call_00_2780_Entity_IsBelowCameraBottom:
     add  hl,de
     ld   e,l
     ld   d,h
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
     ldi  a,[hl]
     sub  e
     ld   a,[hl]
@@ -1282,7 +1282,7 @@ call_00_2799_Entity_SetYFromXDistanceFromSpawn:
 ; spawn position it cannot drift. Used for the things that arc away and down when
 ; they are knocked loose
     call call_00_2835_Entity_GetInitialXPos
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ldi  a,[hl]
     sub  e
     ld   e,a
@@ -1303,7 +1303,7 @@ call_00_2799_Entity_SetYFromXDistanceFromSpawn:
     call call_00_27f3_Entity_GetInitialYPos
     pop  hl
     add  hl,de
-    LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_YPOS
+    LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_WORLD_Y
     ld   a,l
     ld   [de],a
     inc  e
@@ -1315,7 +1315,7 @@ call_00_27cb_Entity_SetYToAboveCameraTop:
 ; Places the entity ENTITY_ABOVE_CAMERA_MARGIN pixels above the top of the visible
 ; map, clamping to zero if that underflows. This is a setter, not a test - it is
 ; how an entity is parked just off the top of the screen before it drops in
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
     ld   a,[wDBFB_YPositionInMap]
     sub  a,ENTITY_ABOVE_CAMERA_MARGIN
     ldi  [hl],a
@@ -1331,7 +1331,7 @@ call_00_27cb_Entity_SetYToAboveCameraTop:
 call_00_27e4_Entity_ResetToInitialYPos:
 ; Puts YPOS back to the spawn Y
     call call_00_27f3_Entity_GetInitialYPos
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
     ld   a,e
     ldi  [hl],a
     ld   [hl],d
@@ -1394,7 +1394,7 @@ call_00_2815_Entity_GetMinYBound:
 call_00_2826_Entity_ResetToInitialXPos:
 ; Puts XPOS back to the spawn X
     call call_00_2835_Entity_GetInitialXPos
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ld   a,e
     ldi  [hl],a
     ld   [hl],d
@@ -1511,39 +1511,39 @@ call_00_28b4_Entity_GetDamageState:
     ret  
 
 call_00_28be_Entity_GetXVelocity:
-; A = ENTITY_FIELD_XVEL
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XVEL
+; A = ENTITY_FIELD_X_VELOCITY
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_X_VELOCITY
     ld   A, [HL]
     ret  
 
 call_00_28c8_Entity_SetXVelocity:
-; ENTITY_FIELD_XVEL = C. gex2's call_00_3350_Entity_SetXVelocity
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XVEL
+; ENTITY_FIELD_X_VELOCITY = C. gex2's call_00_3350_Entity_SetXVelocity
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_X_VELOCITY
     ld   [HL], C
     ret  
 
 call_00_28d2_Entity_GetYVelocity:
-; A = ENTITY_FIELD_YVEL
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YVEL
+; A = ENTITY_FIELD_Y_VELOCITY
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_Y_VELOCITY
     ld   A, [HL]
     ret  
 
 call_00_28dc_Entity_SetYVelocity:
-; ENTITY_FIELD_YVEL = C. gex2's call_00_335a_Entity_SetYVelocity
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YVEL
+; ENTITY_FIELD_Y_VELOCITY = C. gex2's call_00_335a_Entity_SetYVelocity
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_Y_VELOCITY
     ld   [HL], C
     ret  
 
 call_00_28e6_Entity_CheckIfXVelocityIsZero:
 ; Z when XVEL is zero. gex2's call_00_333a_Entity_CheckIfXVelocityIsZero
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XVEL
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_X_VELOCITY
     ld   a,[hl]
     and  a
     ret  
 
 call_00_28f1_Entity_CheckIfYVelocityIsZero:
 ; Z when YVEL is zero. gex2's call_00_3345_Entity_CheckIfYVelocityIsZero
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_YVEL
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_Y_VELOCITY
     ld   a,[hl]
     and  a
     ret  
@@ -1602,14 +1602,14 @@ call_00_293a_Entity_GetId:
     ret  
 
 call_00_2944_Entity_SetWidth:
-; ENTITY_FIELD_WIDTH = C. gex2's call_00_382f_Entity_SetWidth
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WIDTH
+; ENTITY_FIELD_COLLISION_WIDTH = C. gex2's call_00_382f_Entity_SetWidth
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_COLLISION_WIDTH
     ld   [HL], C                                      ;; 00:294c $71
     ret                                               ;; 00:294d $c9
 
 call_00_294e_Entity_SetHeight:
-; ENTITY_FIELD_HEIGHT = C
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_HEIGHT
+; ENTITY_FIELD_COLLISION_HEIGHT = C
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_COLLISION_HEIGHT
     ld   [HL], C                                      ;; 00:2956 $71
     ret                                               ;; 00:2957 $c9
 
@@ -1868,7 +1868,7 @@ call_00_2a68_Entity_ComputeXDistanceFromPlayer:
 ; facing constants - that is what lets call_00_29ac_Entity_IsFacingPlayer compare
 ; them directly
     ld   C, ENTITY_LEFT_OF_GEX                        ;; 00:2a68 $0e $00
-    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_XPOS
+    LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ld   A, [wD80E_PlayerXPosition]                   ;; 00:2a72 $fa $0e $d8
     sub  A, [HL]                                      ;; 00:2a75 $96
     ld   E, A                                         ;; 00:2a76 $5f

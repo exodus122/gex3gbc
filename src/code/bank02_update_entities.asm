@@ -334,10 +334,10 @@ call_02_7152_Entities_UpdateAll:
     ld   H, HIGH(wD800_EntityMemory)                  ;; 02:71c3 $26 $d8
     ld   A, [wDC7B_Player_EntityStoodOnLo]            ;; 02:71c5 $fa $7b $dc
     and  A, ENTITY_SLOT_BASE_MASK                     ;; 02:71c8 $e6 $e0
-    or   A, ENTITY_FIELD_YPOS                         ;; 02:71ca $f6 $10
+    or   A, ENTITY_FIELD_WORLD_Y                         ;; 02:71ca $f6 $10
     ld   L, A                                         ;; 02:71cc $6f
     ld   A, [HL+]                                     ;; 02:71cd $2a
-    sub  A, ENTITY_FIELD_YPOS                         ;; 02:71ce $d6 $10
+    sub  A, ENTITY_FIELD_WORLD_Y                         ;; 02:71ce $d6 $10
     ld   E, A                                         ;; 02:71d0 $5f
     ld   A, [HL]                                      ;; 02:71d1 $7e
     sbc  A, $00                                       ;; 02:71d2 $de $00

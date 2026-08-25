@@ -869,11 +869,11 @@ call_02_51cb_Player_MoveLeftAgainstEntity:
 ; ENTITY_FIELD_COLLISION_TYPE has bit 7 set the entity does not take part and the
 ; move is dropped. Otherwise the ordinary clamped move runs, and afterwards the gap
 ; between Gex and the entity is measured and written back into the entity's
-; ENTITY_FIELD_XVEL pair - which is how a pushed block keeps its distance instead of
+; ENTITY_FIELD_X_VELOCITY pair - which is how a pushed block keeps its distance instead of
 ; drifting into him.
 ;
-; The `xor $1c` walks L from ENTITY_FIELD_XVEL ($12 after the two decrements) to
-; ENTITY_FIELD_XPOS ($0E)
+; The `xor $1c` walks L from ENTITY_FIELD_X_VELOCITY ($12 after the two decrements) to
+; ENTITY_FIELD_WORLD_X ($0E)
     or   A, ENTITY_FIELD_COLLISION_TYPE               ;; 02:51cb $f6 $14
     ld   L, A                                         ;; 02:51cd $6f
     ld   H, HIGH(wD800_EntityMemory)                  ;; 02:51ce $26 $d8
