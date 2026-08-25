@@ -29,12 +29,16 @@
 ; and the frame itself is
 ;
 ;   +0     piece count, into wDAC2_PlayerGfx_TileCount
-;   +1 +2  skipped. Their values track the sprite's size in pixels, but nothing reads
-;          them
+;   +1 +2  skipped, and read by nothing anywhere. Small numbers - 3 to 41 and 4 to 48
+;          across the game - but they do not match the frame's piece extents, so what
+;          they described is unknown
 ;   +3 +4  where the frame's tiles live, into wDAC0_PlayerGfx_SrcAddr for the VRAM
 ;          copy that call_00_098f_CopyPlayerGfxToVRAM does separately
-;   +5...  PLAYER_FRAME_PIECE_SIZE bytes per piece: Y offset, X offset, extra attribute
-;          bits, and a fourth byte the build steps over without reading
+;   +5...  PLAYER_FRAME_PIECE_SIZE bytes per piece: Y offset, X offset, attribute bits
+;          OR'd into wDC53_Player_OamAttributes, and a fourth byte the build steps over
+;          without reading. That fourth byte is $00 in all 11005 pieces in the game, and
+;          the attribute byte is only ever PLAYER_PIECE_PAL0 or PLAYER_PIECE_PAL1 - so
+;          in practice it picks which of Gex's two OBJ palettes the piece draws with
 ;
 ; A piece is one 8x16 OBJ, so it is 32 bytes of tile data, and a frame's pieces are
 ; contiguous from +3+4. That is why the piece count can also drive the HDMA: it is a

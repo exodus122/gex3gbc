@@ -82,7 +82,9 @@
 ; why a single count drives two unrelated pieces of hardware. A frame's header is
 ;
 ;   +0     piece count      -> wDAC2_PlayerGfx_TileCount
-;   +1 +2  not read by anything; the values track the sprite's size in pixels
+;   +1 +2  read by nothing. They are small - 3 to 41 and 4 to 48 across the game -
+;          which is the right range for a width and a height in pixels, but they do
+;          not match the frame's own piece extents, so what they described is unknown
 ;   +3 +4  tile source      -> wDAC0_PlayerGfx_SrcAddr
 ;   +5...  PLAYER_FRAME_PIECE_SIZE bytes per piece
 ;
@@ -108,9 +110,14 @@
 ;               call_03_6567_FlyPowerup_LoadPalette tints while he carries a fly, and
 ;               putting it back is why that routine jumps here on every frame he does
 ;               not
-;   palette 1   differs per set, and is the only per-set colour in the file. It is the
-;               default for entity slot 1; call_03_687c_AssignEntityPalette overwrites
-;               it as soon as something occupies that slot
+;   palette 1   Gex's SECOND palette, and the only per-set colour in the file. A
+;               piece's attribute byte is OR'd into wDC53_Player_OamAttributes on the
+;               way into OAM, and across all 11005 pieces in the game the only value
+;               other than zero is 1 - the CGB OBJ palette number. About 40% of his
+;               pieces select it, which is how one silhouette gets a per-theme
+;               recolour. Note that OBJ palette 1 is also what
+;               call_03_687c_AssignEntityPalette hands to entity slot 1, so an entity
+;               in that slot draws over it
 ;
 ; ------------------------------------------------------------------
 ; Notes for anyone reading this next to gex2
@@ -1973,8 +1980,8 @@ data_7f_5132_PlayerFrames_AnimeChannel:
 
 data_7f_53f9_MapObjPalettes_GexCave:
 ; OBJ palettes for Gex Cave 1-4, WW Gex Wrestling 1, Lizard of Oz 1, Channel Z 1-5
-    dw   $56b5, $0000, $0320, $035a                                    ; palette 0 - Gex
-    dw   CGB_COLOR_UNUSED, $7fff, CGB_COLOR_UNUSED, CGB_COLOR_UNUSED   ; palette 1 - entity slot 1's default
+    dw   $56b5, $0000, $0320, $035a                                    ; palette 0 - Gex's body
+    dw   CGB_COLOR_UNUSED, $7fff, CGB_COLOR_UNUSED, CGB_COLOR_UNUSED   ; palette 1 - the pieces that set PLAYER_PIECE_PAL1
 ; Palettes 2-7. Never read: call_00_2cbf_Entity_LoadMapPalettes stops after
 ; CGB_PALETTE_SIZE * 2 bytes, and every block in the file has the same six
 ; unfilled palettes here
@@ -1984,64 +1991,64 @@ data_7f_53f9_MapObjPalettes_GexCave:
 
 data_7f_5439_MapObjPalettes_HolidayTV:
 ; OBJ palettes for Holiday TV 1-4, Gextreme Sports 2-4
-    dw   $56b5, $0000, $0320, $035a                                    ; palette 0 - Gex
-    dw   CGB_COLOR_UNUSED, $7fff, $0000, $7d8a                         ; palette 1 - entity slot 1's default
+    dw   $56b5, $0000, $0320, $035a                                    ; palette 0 - Gex's body
+    dw   CGB_COLOR_UNUSED, $7fff, $0000, $7d8a                         ; palette 1 - the pieces that set PLAYER_PIECE_PAL1
     REPT (OBJ_PALETTE_BYTES - CGB_PALETTE_SIZE * 2) / 2
     dw   CGB_COLOR_UNUSED
     ENDR
 
 data_7f_5479_MapObjPalettes_MysteryTV:
 ; OBJ palettes for Mystery TV 1-10
-    dw   $56b5, $0000, $0320, $035a                                    ; palette 0 - Gex
-    dw   CGB_COLOR_UNUSED, $7fff, $0180, $0000                         ; palette 1 - entity slot 1's default
+    dw   $56b5, $0000, $0320, $035a                                    ; palette 0 - Gex's body
+    dw   CGB_COLOR_UNUSED, $7fff, $0180, $0000                         ; palette 1 - the pieces that set PLAYER_PIECE_PAL1
     REPT (OBJ_PALETTE_BYTES - CGB_PALETTE_SIZE * 2) / 2
     dw   CGB_COLOR_UNUSED
     ENDR
 
 data_7f_54b9_MapObjPalettes_TutTV:
 ; OBJ palettes for Tut TV 1-7
-    dw   $56b5, $0000, $0320, $035a                                    ; palette 0 - Gex
-    dw   CGB_COLOR_UNUSED, $03ff, $0000, $7ca0                         ; palette 1 - entity slot 1's default
+    dw   $56b5, $0000, $0320, $035a                                    ; palette 0 - Gex's body
+    dw   CGB_COLOR_UNUSED, $03ff, $0000, $7ca0                         ; palette 1 - the pieces that set PLAYER_PIECE_PAL1
     REPT (OBJ_PALETTE_BYTES - CGB_PALETTE_SIZE * 2) / 2
     dw   CGB_COLOR_UNUSED
     ENDR
 
 data_7f_54f9_MapObjPalettes_SuperheroShow:
 ; OBJ palettes for Superhero Show 1-6
-    dw   $56b5, $0000, $0320, $035a                                    ; palette 0 - Gex
-    dw   CGB_COLOR_UNUSED, $0000, $211f, $7d6b                         ; palette 1 - entity slot 1's default
+    dw   $56b5, $0000, $0320, $035a                                    ; palette 0 - Gex's body
+    dw   CGB_COLOR_UNUSED, $0000, $211f, $7d6b                         ; palette 1 - the pieces that set PLAYER_PIECE_PAL1
     REPT (OBJ_PALETTE_BYTES - CGB_PALETTE_SIZE * 2) / 2
     dw   CGB_COLOR_UNUSED
     ENDR
 
 data_7f_5539_MapObjPalettes_GextremeSports1:
 ; OBJ palettes for Gextreme Sports 1
-    dw   $56b5, $0000, $0320, $035a                                    ; palette 0 - Gex
-    dw   CGB_COLOR_UNUSED, $7fff, $0000, $7d8a                         ; palette 1 - entity slot 1's default
+    dw   $56b5, $0000, $0320, $035a                                    ; palette 0 - Gex's body
+    dw   CGB_COLOR_UNUSED, $7fff, $0000, $7d8a                         ; palette 1 - the pieces that set PLAYER_PIECE_PAL1
     REPT (OBJ_PALETTE_BYTES - CGB_PALETTE_SIZE * 2) / 2
     dw   CGB_COLOR_UNUSED
     ENDR
 
 data_7f_5579_MapObjPalettes_WesternStation:
 ; OBJ palettes for Western Station 1-9
-    dw   $56b5, $0000, $0320, $035a                                    ; palette 0 - Gex
-    dw   CGB_COLOR_UNUSED, $0174, $0000, $001f                         ; palette 1 - entity slot 1's default
+    dw   $56b5, $0000, $0320, $035a                                    ; palette 0 - Gex's body
+    dw   CGB_COLOR_UNUSED, $0174, $0000, $001f                         ; palette 1 - the pieces that set PLAYER_PIECE_PAL1
     REPT (OBJ_PALETTE_BYTES - CGB_PALETTE_SIZE * 2) / 2
     dw   CGB_COLOR_UNUSED
     ENDR
 
 data_7f_55b9_MapObjPalettes_MarsupialMadness1:
 ; OBJ palettes for Marsupial Madness 1
-    dw   $56b5, $0000, $0320, $035a                                    ; palette 0 - Gex
-    dw   CGB_COLOR_UNUSED, $0000, $0151, $027b                         ; palette 1 - entity slot 1's default
+    dw   $56b5, $0000, $0320, $035a                                    ; palette 0 - Gex's body
+    dw   CGB_COLOR_UNUSED, $0000, $0151, $027b                         ; palette 1 - the pieces that set PLAYER_PIECE_PAL1
     REPT (OBJ_PALETTE_BYTES - CGB_PALETTE_SIZE * 2) / 2
     dw   CGB_COLOR_UNUSED
     ENDR
 
 data_7f_55f9_MapObjPalettes_AnimeChannel:
 ; OBJ palettes for Anime Channel 1-9
-    dw   $56b5, $0000, $0320, $035a                                    ; palette 0 - Gex
-    dw   CGB_COLOR_UNUSED, $7e0f, $0000, $7f7a                         ; palette 1 - entity slot 1's default
+    dw   $56b5, $0000, $0320, $035a                                    ; palette 0 - Gex's body
+    dw   CGB_COLOR_UNUSED, $7e0f, $0000, $7f7a                         ; palette 1 - the pieces that set PLAYER_PIECE_PAL1
     REPT (OBJ_PALETTE_BYTES - CGB_PALETTE_SIZE * 2) / 2
     dw   CGB_COLOR_UNUSED
     ENDR
