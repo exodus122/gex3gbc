@@ -94,34 +94,34 @@ data_02_4000_EntityActionJumpTable:
    dw   .data_02_44a0_EntityActions_TutTVRaStatueProjectile ; ENTITY_TUT_TV_RA_STATUE_DIAGONAL_PROJECTILE
    dw   .data_02_44b0_EntityActions_TutTVBreakableBlock ; ENTITY_TUT_TV_BREAKABLE_BLOCK
    dw   .data_02_44c0_EntityActions_TutTVCoffin ; ENTITY_TUT_TV_COFFIN
-   dw   .data_02_44cc ; ENTITY_WESTERN_STATION_ENEMY_CACTUS
-   dw   .data_02_44e8 ; ENTITY_WESTERN_STATION_CACTUS
-   dw   .data_02_44ec ; ENTITY_WESTERN_STATION_ROCK_PLATFORM
-   dw   .data_02_44fc ; ENTITY_WESTERN_STATION_HARD_HAT
-   dw   .data_02_4510 ; ENTITY_WESTERN_STATION_PLAYING_CARD
-   dw   .data_02_4518 ; ENTITY_WESTERN_STATION_BAT
-   dw   .data_02_452c ; ENTITY_WESTERN_STATION_RISING_PLATFORM
-   dw   .data_02_4530 ; ENTITY_ANIME_CHANNEL_DOOR
-   dw   .data_02_4540 ; ENTITY_ANIME_CHANNEL_DOOR2
-   dw   .data_02_4550 ; ENTITY_ANIME_CHANNEL_FAN_LIFT
-   dw   .data_02_4560 ; ENTITY_ANIME_CHANNEL_MECH_FACING_RIGHT
-   dw   .data_02_4568 ; ENTITY_ANIME_CHANNEL_MECH_FACING_LEFT
-   dw   .data_02_4570 ; ENTITY_ANIME_CHANNEL_DISAPPEARING_FLOOR
-   dw   .data_02_4578 ; ENTITY_ANIME_CHANNEL_ON_SWITCH2
-   dw   .data_02_4580 ; ENTITY_ANIME_CHANNEL_ALIEN_CULTURE_TUBE
-   dw   .data_02_458c ; ENTITY_ANIME_CHANNEL_BLUE_BEAM_BARRIER
-   dw   .data_02_4594 ; ENTITY_ANIME_CHANNEL_RISING_PLATFORM
-   dw   .data_02_4598 ; ENTITY_ANIME_CHANNEL_ON_SWITCH
-   dw   .data_02_45a0 ; ENTITY_ANIME_CHANNEL_OFF_SWITCH
-   dw   .data_02_45a8 ; ENTITY_ANIME_CHANNEL_SAILOR_TOON_GIRL
-   dw   .data_02_45c8 ; ENTITY_ANIME_CHANNEL_BIG_SILVER_ROBOT
-   dw   .data_02_45d8 ; ENTITY_ANIME_CHANNEL_SMALL_BLUE_ROBOT
-   dw   .data_02_45e4 ; ENTITY_ANIME_CHANNEL_SECBOT
-   dw   .data_02_45f8 ; ENTITY_ANIME_CHANNEL_SECBOT_PROJECTILE
-   dw   .data_02_45fc ; ENTITY_ANIME_CHANNEL_ELEVATOR
-   dw   .data_02_4600 ; ENTITY_ANIME_CHANNEL_FIRE_WALL_ENEMY
-   dw   .data_02_4604 ; ENTITY_ANIME_CHANNEL_GRENADE
-   dw   .data_02_4610 ; ENTITY_ANIME_CHANNEL_PLANET_O_BLAST_WEAPON
+   dw   .data_02_44cc_EntityActions_WesternStationEnemyCactus ; ENTITY_WESTERN_STATION_ENEMY_CACTUS
+   dw   .data_02_44e8_EntityActions_WesternStationCactus ; ENTITY_WESTERN_STATION_CACTUS
+   dw   .data_02_44ec_EntityActions_WesternStationRockPlatform ; ENTITY_WESTERN_STATION_ROCK_PLATFORM
+   dw   .data_02_44fc_EntityActions_WesternStationHardHat ; ENTITY_WESTERN_STATION_HARD_HAT
+   dw   .data_02_4510_EntityActions_WesternStationPlayingCard ; ENTITY_WESTERN_STATION_PLAYING_CARD
+   dw   .data_02_4518_EntityActions_WesternStationBat ; ENTITY_WESTERN_STATION_BAT
+   dw   .data_02_452c_EntityActions_WesternStationRisingPlatform ; ENTITY_WESTERN_STATION_RISING_PLATFORM
+   dw   .data_02_4530_EntityActions_AnimeChannelDoor ; ENTITY_ANIME_CHANNEL_DOOR
+   dw   .data_02_4540_EntityActions_AnimeChannelDoor2 ; ENTITY_ANIME_CHANNEL_DOOR2
+   dw   .data_02_4550_EntityActions_AnimeChannelFanLift ; ENTITY_ANIME_CHANNEL_FAN_LIFT
+   dw   .data_02_4560_EntityActions_AnimeChannelMechFacingRight ; ENTITY_ANIME_CHANNEL_MECH_FACING_RIGHT
+   dw   .data_02_4568_EntityActions_AnimeChannelMechFacingLeft ; ENTITY_ANIME_CHANNEL_MECH_FACING_LEFT
+   dw   .data_02_4570_EntityActions_AnimeChannelDisappearingFloor ; ENTITY_ANIME_CHANNEL_DISAPPEARING_FLOOR
+   dw   .data_02_4578_EntityActions_AnimeChannelOnSwitch2 ; ENTITY_ANIME_CHANNEL_ON_SWITCH2
+   dw   .data_02_4580_EntityActions_AnimeChannelAlienCultureTube ; ENTITY_ANIME_CHANNEL_ALIEN_CULTURE_TUBE
+   dw   .data_02_458c_EntityActions_AnimeChannelBlueBeamBarrier ; ENTITY_ANIME_CHANNEL_BLUE_BEAM_BARRIER
+   dw   .data_02_4594_EntityActions_AnimeChannelRisingPlatform ; ENTITY_ANIME_CHANNEL_RISING_PLATFORM
+   dw   .data_02_4598_EntityActions_AnimeChannelOnSwitch ; ENTITY_ANIME_CHANNEL_ON_SWITCH
+   dw   .data_02_45a0_EntityActions_AnimeChannelOffSwitch ; ENTITY_ANIME_CHANNEL_OFF_SWITCH
+   dw   .data_02_45a8_EntityActions_AnimeChannelSailorToonGirl ; ENTITY_ANIME_CHANNEL_SAILOR_TOON_GIRL
+   dw   .data_02_45c8_EntityActions_AnimeChannelBigSilverRobot ; ENTITY_ANIME_CHANNEL_BIG_SILVER_ROBOT
+   dw   .data_02_45d8_EntityActions_AnimeChannelSmallBlueRobot ; ENTITY_ANIME_CHANNEL_SMALL_BLUE_ROBOT
+   dw   .data_02_45e4_EntityActions_AnimeChannelSecbot ; ENTITY_ANIME_CHANNEL_SECBOT
+   dw   .data_02_45f8_EntityActions_AnimeChannelSecbotProjectile ; ENTITY_ANIME_CHANNEL_SECBOT_PROJECTILE
+   dw   .data_02_45fc_EntityActions_AnimeChannelElevator ; ENTITY_ANIME_CHANNEL_ELEVATOR
+   dw   .data_02_4600_EntityActions_AnimeChannelFireWallEnemy ; ENTITY_ANIME_CHANNEL_FIRE_WALL_ENEMY
+   dw   .data_02_4604_EntityActions_AnimeChannelGrenade ; ENTITY_ANIME_CHANNEL_GRENADE
+   dw   .data_02_4610_EntityActions_AnimeChannelPlanetOBlastWeapon ; ENTITY_ANIME_CHANNEL_PLANET_O_BLAST_WEAPON
    dw   .data_02_4618 ; ENTITY_SUPERHERO_SHOW_MAD_BOMBER
    dw   .data_02_4630 ; ENTITY_SUPERHERO_SHOW_BOMB
    dw   .data_02_4644 ; ENTITY_SUPERHERO_SHOW_WATER_TOWER_TANK
@@ -467,117 +467,125 @@ data_02_4000_EntityActionJumpTable:
     dw   call_02_582e_EntityAction_None, data_02_7945                               ; action $00 - closed
     dw   call_02_582e_EntityAction_None, data_02_794b                               ; action $01 - opening - chains to $02
     dw   call_02_63d3_EntityAction_Coffin_Opened, data_02_7952                      ; action $02 - open: raise the trigger
-.data_02_44cc:
-    dw   call_02_63db_EntityAction_EnemyCactus_Unk0, data_02_7958
-    dw   call_02_63f0_EntityAction_EnemyCactus_Unk1, data_02_7961
-    dw   call_02_582e_EntityAction_None, data_02_796a
-    dw   call_02_582e_EntityAction_None, data_02_7971
-    dw   call_02_6415_EntityAction_EnemyCactus_Unk4, data_02_7979
-    dw   call_02_582e_EntityAction_None, data_02_7980
-    dw   call_02_582f_EntityAction_DestroyWithoutParticles, data_02_7986
-.data_02_44e8:
+
+; ------------------------------------------------------------------
+; WESTERN STATION
+; ------------------------------------------------------------------
+.data_02_44cc_EntityActions_WesternStationEnemyCactus:            ;; ENTITY_WESTERN_STATION_ENEMY_CACTUS
+    dw   call_02_63db_EntityAction_EnemyCactus_Frozen, data_02_7958                 ; action $00 - frozen while Gex is watching
+    dw   call_02_63f0_EntityAction_EnemyCactus_Turn, data_02_7961                   ; action $01 - turn to face him, hold 60 frames
+    dw   call_02_582e_EntityAction_None, data_02_796a                               ; action $02 - wind-up - chains to $03
+    dw   call_02_582e_EntityAction_None, data_02_7971                               ; action $03 - crouch - chains to $04
+    dw   call_02_6415_EntityAction_EnemyCactus_Hop, data_02_7979                    ; action $04 - one hop, then back to $03
+    dw   call_02_582e_EntityAction_None, data_02_7980                               ; action $05 - spikes out: the only dangerous state - chains to $00
+    dw   call_02_582f_EntityAction_DestroyWithoutParticles, data_02_7986            ; action $06 - defeated
+.data_02_44e8_EntityActions_WesternStationCactus:                 ;; ENTITY_WESTERN_STATION_CACTUS
     dw   call_02_582e_EntityAction_None, data_02_798c
-.data_02_44ec:
-    dw   call_02_642e_EntityAction_Rock_Unk0, data_02_7992
-    dw   call_02_6459_EntityAction_Rock_Unk1, data_02_7998
-    dw   call_02_646f_EntityAction_Rock_Unk2, data_02_79a5
-    dw   call_02_647b_EntityAction_Rock_Unk3, data_02_79ab
-.data_02_44fc:
-    dw   call_02_6491_EntityAction_HardHat_Walk, data_02_79b8
-    dw   call_02_64cd_EntityAction_HardHat_Jump, data_02_79c3
-    dw   call_02_582e_EntityAction_None, data_02_79c9
-    dw   call_02_582e_EntityAction_None, data_02_79de
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_4510:
-    dw   call_02_582e_EntityAction_None, data_02_79e4
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_4518:
-    dw   call_02_64e9_EntityAction_Bat_Unk0, data_02_79f3
-    dw   call_02_582e_EntityAction_None, data_02_79f9
-    dw   call_02_6502_EntityAction_Bat_Unk2, data_02_7a06
-    dw   call_02_652e_EntityAction_Bat_Unk3, data_02_7a0c
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_452c:
+.data_02_44ec_EntityActions_WesternStationRockPlatform:           ;; ENTITY_WESTERN_STATION_ROCK_PLATFORM
+    dw   call_02_642e_EntityAction_Rock_Solid, data_02_7992                         ; action $00 - intact; standing on it starts the fuse
+    dw   call_02_6459_EntityAction_Rock_Crumble, data_02_7998                       ; action $01 - crumble, shrinking the hitbox - chains to $02
+    dw   call_02_646f_EntityAction_Rock_Gone, data_02_79a5                          ; action $02 - gone from the collision map - chains to $03
+    dw   call_02_647b_EntityAction_Rock_Reform, data_02_79ab                        ; action $03 - reform, growing the hitbox - chains back to $00
+.data_02_44fc_EntityActions_WesternStationHardHat:                ;; ENTITY_WESTERN_STATION_HARD_HAT
+    dw   call_02_6491_EntityAction_HardHat_Walk, data_02_79b8                       ; action $00 - amble, or run away and jump when cornered
+    dw   call_02_64cd_EntityAction_HardHat_Jump, data_02_79c3                       ; action $01 - the jump - the only state a hit lands in
+    dw   call_02_582e_EntityAction_None, data_02_79c9                               ; action $02 - ducked under the helmet - chains to $00
+    dw   call_02_582e_EntityAction_None, data_02_79de                               ; action $03 - ducked, short - chains to $00
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $04 - defeated
+.data_02_4510_EntityActions_WesternStationPlayingCard:            ;; ENTITY_WESTERN_STATION_PLAYING_CARD
+    dw   call_02_582e_EntityAction_None, data_02_79e4                               ; action $00 - spinning
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $01 - taken
+.data_02_4518_EntityActions_WesternStationBat:                    ;; ENTITY_WESTERN_STATION_BAT
+    dw   call_02_64e9_EntityAction_Bat_Hanging, data_02_79f3                        ; action $00 - hanging; resets to the perch
+    dw   call_02_582e_EntityAction_None, data_02_79f9                               ; action $01 - release - chains to $02
+    dw   call_02_6502_EntityAction_Bat_Swoop, data_02_7a06                          ; action $02 - swoop at Gex while the climb lasts
+    dw   call_02_652e_EntityAction_Bat_Dive, data_02_7a0c                           ; action $03 - dive until off the bottom of the camera
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $04 - defeated
+.data_02_452c_EntityActions_WesternStationRisingPlatform:         ;; ENTITY_WESTERN_STATION_RISING_PLATFORM
     dw   call_02_58bd_EntityAction_MovePlatformVertically, data_02_7a12
-.data_02_4530:
-    dw   call_02_582e_EntityAction_None, data_02_7a18
-    dw   call_02_653d_EntityAction_Door1_Unk1, data_02_7a1e
-    dw   call_02_6549_EntityAction_Door1_Unk2, data_02_7a26
-    dw   call_02_582e_EntityAction_None, data_02_7a2c
-.data_02_4540:
-    dw   call_02_6553_EntityAction_Door2_Unk0, data_02_7a34
-    dw   call_02_582e_EntityAction_None, data_02_7a3a
-    dw   call_02_582e_EntityAction_None, data_02_7a42
-    dw   call_02_655d_EntityAction_Door2_Unk3, data_02_7a48
-.data_02_4550:
-    dw   call_02_6569_EntityAction_FanLift_Unk0, data_02_7a50
-    dw   call_02_582e_EntityAction_None, data_02_7a56
-    dw   call_02_6577_EntityAction_FanLift_Unk2, data_02_7a61
-    dw   call_02_582e_EntityAction_None, data_02_7a7a
-.data_02_4560:
-    dw   call_02_659c_EntityAction_MechRight_Unk0, data_02_7a85
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_4568:
-    dw   call_02_6597_EntityAction_MechLeft_Unk0, data_02_7a85
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_4570:
-    dw   call_02_659d_EntityAction_AnimeDisappearingFloor_Unk0, data_02_7a91
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_4578:
-    dw   call_02_582e_EntityAction_None, data_02_7a97
-    dw   call_02_65b3_EntityAction_Onswitch2_Unk1, data_02_7a9d
-.data_02_4580:
-    dw   call_02_582e_EntityAction_None, data_02_7aa3
-    dw   call_02_582e_EntityAction_None, data_02_7aac
-    dw   call_02_582e_EntityAction_None, data_02_7ab3
-.data_02_458c:
-    dw   call_02_65c9_EntityAction_BlueBeamBarrier_Unk0, data_02_7ab9
-    dw   call_02_582e_EntityAction_None, data_02_7ac2
-.data_02_4594:
+
+; ------------------------------------------------------------------
+; ANIME CHANNEL
+; ------------------------------------------------------------------
+.data_02_4530_EntityActions_AnimeChannelDoor:                     ;; ENTITY_ANIME_CHANNEL_DOOR
+    dw   call_02_582e_EntityAction_None, data_02_7a18                               ; action $00 - closed
+    dw   call_02_653d_EntityAction_Door1_Opening, data_02_7a1e                      ; action $01 - opening; takes Gex through - list state 2
+    dw   call_02_6549_EntityAction_Door1_CloseAfterReturn, data_02_7a26             ; action $02 - spawned open on the return - go to $03
+    dw   call_02_582e_EntityAction_None, data_02_7a2c                               ; action $03 - closing - chains back to $00
+.data_02_4540_EntityActions_AnimeChannelDoor2:                    ;; ENTITY_ANIME_CHANNEL_DOOR2
+    dw   call_02_6553_EntityAction_Door2_ArriveAndClose, data_02_7a34               ; action $00 - open: Gex just arrived - list state 2, go to $01
+    dw   call_02_582e_EntityAction_None, data_02_7a3a                               ; action $01 - closing - chains to $02
+    dw   call_02_582e_EntityAction_None, data_02_7a42                               ; action $02 - closed, waiting for UP
+    dw   call_02_655d_EntityAction_Door2_Opening, data_02_7a48                      ; action $03 - opening; takes Gex through - list state 0
+.data_02_4550_EntityActions_AnimeChannelFanLift:                  ;; ENTITY_ANIME_CHANNEL_FAN_LIFT
+    dw   call_02_6569_EntityAction_FanLift_WaitForTrigger, data_02_7a50             ; action $00 - off, waiting for the trigger
+    dw   call_02_582e_EntityAction_None, data_02_7a56                               ; action $01 - spin-up - chains to $02
+    dw   call_02_6577_EntityAction_FanLift_Blow, data_02_7a61                       ; action $02 - blowing, until the trigger drops
+    dw   call_02_582e_EntityAction_None, data_02_7a7a                               ; action $03 - spin-down - chains back to $00
+.data_02_4560_EntityActions_AnimeChannelMechFacingRight:          ;; ENTITY_ANIME_CHANNEL_MECH_FACING_RIGHT
+    dw   call_02_659c_EntityAction_MechRight_Idle, data_02_7a85                     ; action $00 - idle
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $01 - defeated
+.data_02_4568_EntityActions_AnimeChannelMechFacingLeft:           ;; ENTITY_ANIME_CHANNEL_MECH_FACING_LEFT
+    dw   call_02_6597_EntityAction_MechLeft_HoldFacingLeft, data_02_7a85            ; action $00 - idle, re-facing left each frame
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $01 - defeated
+.data_02_4570_EntityActions_AnimeChannelDisappearingFloor:        ;; ENTITY_ANIME_CHANNEL_DISAPPEARING_FLOOR
+    dw   call_02_659d_EntityAction_AnimeDisappearingFloor_WaitForSwitches, data_02_7a91; action $00 - solid until two switches are thrown
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $01 - gone
+.data_02_4578_EntityActions_AnimeChannelOnSwitch2:                ;; ENTITY_ANIME_CHANNEL_ON_SWITCH2
+    dw   call_02_582e_EntityAction_None, data_02_7a97                               ; action $00 - unthrown
+    dw   call_02_65b3_EntityAction_Onswitch2_Thrown, data_02_7a9d                   ; action $01 - thrown (resets only on MAP_ANIME_CHANNEL4)
+.data_02_4580_EntityActions_AnimeChannelAlienCultureTube:         ;; ENTITY_ANIME_CHANNEL_ALIEN_CULTURE_TUBE
+    dw   call_02_582e_EntityAction_None, data_02_7aa3                               ; action $00 - intact
+    dw   call_02_582e_EntityAction_None, data_02_7aac                               ; action $01 - breaking - chains to $02
+    dw   call_02_582e_EntityAction_None, data_02_7ab3                               ; action $02 - broken
+.data_02_458c_EntityActions_AnimeChannelBlueBeamBarrier:          ;; ENTITY_ANIME_CHANNEL_BLUE_BEAM_BARRIER
+    dw   call_02_65c9_EntityAction_BlueBeamBarrier_Solid, data_02_7ab9              ; action $00 - beam up: a solid wall
+    dw   call_02_582e_EntityAction_None, data_02_7ac2                               ; action $01 - beam off
+.data_02_4594_EntityActions_AnimeChannelRisingPlatform:           ;; ENTITY_ANIME_CHANNEL_RISING_PLATFORM
     dw   call_02_65d7_EntityAction_AnimeRisingPlatform_Update, data_02_7ac8
-.data_02_4598:
-    dw   call_02_659d_EntityAction_OnSwitch_Unk0, data_02_7ace
-    dw   call_02_6617_EntityAction_OnSwitch_Unk1, data_02_7ad4
-.data_02_45a0:
-    dw   call_02_6617_EntityAction_OffSwitch_Unk0, data_02_7ada
-    dw   call_02_6633_EntityAction_OffSwitch_Unk1, data_02_7ae0
-.data_02_45a8:
-    dw   call_02_6641_EntityAction_SailorToonGirl_Unk0, data_02_7ae6
-    dw   call_02_582e_EntityAction_None, data_02_7aef
-    dw   call_02_6687_EntityAction_SailorToonGirl_Unk2, data_02_7afb
-    dw   call_02_668d_EntityAction_SailorToonGirl_Unk3, data_02_7b07
-    dw   call_02_582e_EntityAction_None, data_02_7b0d
-    dw   call_02_669d_EntityAction_SailorToonGirl_Unk5, data_02_7b14
-    dw   call_02_582e_EntityAction_None, data_02_7b1c
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_45c8:
-    dw   call_02_66bb_EntityAction_BigSilverRobot_Unk0, data_02_7b22
-    dw   call_02_66cc_EntityAction_BigSilverRobot_Unk1, data_02_7b28
-    dw   call_02_66e0_EntityAction_BigSilverRobot_Unk2, data_02_7b33
-    dw   call_02_66ef_EntityAction_BigSilverRobot_Unk3, data_02_7b5a
-.data_02_45d8:
-    dw   call_02_66f6_EntityAction_SmallBlueRobot_Unk0, data_02_7b6a
-    dw   call_02_6732_EntityAction_SmallBlueRobot_Unk1, data_02_7b77
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_45e4:
-    dw   call_02_6746_EntityAction_Secbot_Unk0, data_02_7b80
-    dw   call_02_6768_EntityAction_Secbot_Unk1, data_02_7b89
-    dw   call_02_582e_EntityAction_None, data_02_7b8f
-    dw   call_02_582e_EntityAction_None, data_02_7b98
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_45f8:
+.data_02_4598_EntityActions_AnimeChannelOnSwitch:                 ;; ENTITY_ANIME_CHANNEL_ON_SWITCH
+    dw   call_02_6609_EntityAction_OnSwitch_Unthrown, data_02_7ace                  ; action $00 - unthrown
+    dw   call_02_6617_EntityAction_OnSwitch_Thrown, data_02_7ad4                    ; action $01 - thrown
+.data_02_45a0_EntityActions_AnimeChannelOffSwitch:                ;; ENTITY_ANIME_CHANNEL_OFF_SWITCH
+    dw   call_02_6625_EntityAction_OffSwitch_Unthrown, data_02_7ada                 ; action $00 - unthrown
+    dw   call_02_6633_EntityAction_OffSwitch_Thrown, data_02_7ae0                   ; action $01 - thrown
+.data_02_45a8_EntityActions_AnimeChannelSailorToonGirl:           ;; ENTITY_ANIME_CHANNEL_SAILOR_TOON_GIRL
+    dw   call_02_6641_EntityAction_SailorToonGirl_Patrol, data_02_7ae6              ; action $00 - patrol, and pick a move from the list
+    dw   call_02_582e_EntityAction_None, data_02_7aef                               ; action $01 - kick - chains back to $00
+    dw   call_02_6687_EntityAction_SailorToonGirl_Stunned, data_02_7afb             ; action $02 - beaten down; one more hit finishes her
+    dw   call_02_668d_EntityAction_SailorToonGirl_Knockdown, data_02_7b07           ; action $03 - knocked down - goes to $04
+    dw   call_02_582e_EntityAction_None, data_02_7b0d                               ; action $04 - crouch - chains to $05
+    dw   call_02_669d_EntityAction_SailorToonGirl_Leap, data_02_7b14                ; action $05 - the leap, back to $00 on landing
+    dw   call_02_582e_EntityAction_None, data_02_7b1c                               ; action $06 - pose - chains back to $00
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $07 - defeated
+.data_02_45c8_EntityActions_AnimeChannelBigSilverRobot:           ;; ENTITY_ANIME_CHANNEL_BIG_SILVER_ROBOT
+    dw   call_02_66bb_EntityAction_BigSilverRobot_Watch, data_02_7b22               ; action $00 - watch for Gex
+    dw   call_02_66cc_EntityAction_BigSilverRobot_Charge, data_02_7b28              ; action $01 - charge until the patrol bound
+    dw   call_02_66e0_EntityAction_BigSilverRobot_Recover, data_02_7b33             ; action $02 - recover, then charge back
+    dw   call_02_66ef_EntityAction_BigSilverRobot_Death, data_02_7b5a               ; action $03 - death
+.data_02_45d8_EntityActions_AnimeChannelSmallBlueRobot:           ;; ENTITY_ANIME_CHANNEL_SMALL_BLUE_ROBOT
+    dw   call_02_66f6_EntityAction_SmallBlueRobot_WalkOrRun, data_02_7b6a           ; action $00 - amble, or run away and jump when cornered
+    dw   call_02_6732_EntityAction_SmallBlueRobot_Jump, data_02_7b77                ; action $01 - the jump
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $02 - defeated
+.data_02_45e4_EntityActions_AnimeChannelSecbot:                   ;; ENTITY_ANIME_CHANNEL_SECBOT
+    dw   call_02_6746_EntityAction_Secbot_Patrol, data_02_7b80                      ; action $00 - ground patrol, one shot per pass
+    dw   call_02_6768_EntityAction_Secbot_Hover, data_02_7b89                       ; action $01 - airborne: rise $50, then patrol fast and fire every 64 frames
+    dw   call_02_582e_EntityAction_None, data_02_7b8f                               ; action $02 - hit while standing - chains to $01
+    dw   call_02_582e_EntityAction_None, data_02_7b98                               ; action $03 - chains back to $00
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $04 - defeated
+.data_02_45f8_EntityActions_AnimeChannelSecbotProjectile:         ;; ENTITY_ANIME_CHANNEL_SECBOT_PROJECTILE
     dw   call_02_679b_EntityAction_SecbotProjectile_Update, data_02_7ba1
-.data_02_45fc:
+.data_02_45fc_EntityActions_AnimeChannelElevator:                 ;; ENTITY_ANIME_CHANNEL_ELEVATOR
     dw   call_02_67c2_EntityAction_Elevator_Update, data_02_7ba7
-.data_02_4600:
+.data_02_4600_EntityActions_AnimeChannelFireWallEnemy:            ;; ENTITY_ANIME_CHANNEL_FIRE_WALL_ENEMY
     dw   call_02_68af_EntityAction_FireWallEnemy_Update, data_02_7bad
-.data_02_4604:
-    dw   call_02_68b2_EntityAction_Grenade_Unk0, data_02_7bb8
-    dw   call_02_68ed_EntityAction_Grenade_Unk1, data_02_7bbe
-    dw   call_02_6928_EntityAction_Grenade_Unk2, data_02_7bcd
-.data_02_4610:
-    dw   call_02_582e_EntityAction_None, data_02_7bd8
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
+.data_02_4604_EntityActions_AnimeChannelGrenade:                  ;; ENTITY_ANIME_CHANNEL_GRENADE
+    dw   call_02_68b2_EntityAction_Grenade_Reset, data_02_7bb8                      ; action $00 - reset above the spawn point, four bounces armed
+    dw   call_02_68ed_EntityAction_Grenade_Bounce, data_02_7bbe                     ; action $01 - bounce, each one lower
+    dw   call_02_6928_EntityAction_Grenade_Explode, data_02_7bcd                    ; action $02 - explode - chains back to $00
+.data_02_4610_EntityActions_AnimeChannelPlanetOBlastWeapon:       ;; ENTITY_ANIME_CHANNEL_PLANET_O_BLAST_WEAPON
+    dw   call_02_582e_EntityAction_None, data_02_7bd8                               ; action $00 - idle
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $01 - taken
 .data_02_4618:
     dw   call_02_6947_EntityAction_MadBomber_Unk0, data_02_7be3
     dw   call_02_6947_EntityAction_MadBomber_Unk0, data_02_7bf8

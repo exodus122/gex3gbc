@@ -1853,7 +1853,50 @@ call_02_63d3_EntityAction_Coffin_Opened:
     ld   c,$02
     jp   call_00_2299_Entity_SetListState
 
-call_02_63db_EntityAction_EnemyCactus_Unk0:
+; ==================================================================
+; WESTERN STATION
+;
+; Seven entity types. The interesting pair are the cactus, which is the only
+; enemy in the game that watches which way GEX is facing, and the rock platform,
+; which is the only one that uses ENTITY_FIELD_COLLISION_HEIGHT as an animation
+; channel.
+;
+; ENTITY_WESTERN_STATION_CACTUS ($3A) is a single row of
+; call_02_582e_EntityAction_None with a 30-frame block - scenery, and probably the
+; leftover the constants file marks "unused?". ENTITY_WESTERN_STATION_PLAYING_CARD
+; is two rows, an idle spin and a Destroy that ENTITY_ATTR_DEFEAT_FLAGS $81
+; selects. ENTITY_WESTERN_STATION_RISING_PLATFORM is one row pointing at the
+; shared call_02_58bd_EntityAction_MovePlatformVertically
+; ==================================================================
+
+; ------------------------------------------------------------------
+; THE ENEMY CACTUS creeps up on Gex while his back is turned and freezes when he
+; looks at it.
+;
+; Both halves of that are one comparison: wDA12_EntityDirectionRelativeToPlayer
+; against wD80D_PlayerFacingDirection. The two use the same constant values, so
+; equal means "the cactus is on the side Gex is facing AWAY from" - it is behind
+; him. Action $00 leaves only when that is true; call_02_6405 below returns to $00
+; the moment it stops being true.
+;
+;   $00 Frozen  still, and only wakes when Gex turns his back
+;   $01 Turn    face him, hold for 60 frames
+;   $02 -       wind-up, chains to $03
+;   $03 -       crouch, chains to $04
+;   $04 Hop     one hop; on landing go back to $03 and re-test whether he is
+;               looking, so the hopping repeats on its own
+;   $05 -       the spikes out, and the ONLY state in which it can hurt Gex
+;   $06 DestroyWithoutParticles
+;
+; Nothing here selects $05 - call_03_5028_CollisionHandler_Cactus does, from any
+; action below $04, as soon as Gex is within $28. data_02_7980 then holds the
+; spikes for 30 frames and chains back to $00. That same handler is also the only
+; way to damage it, and only while a fly power-up is running
+; ------------------------------------------------------------------
+
+call_02_63db_EntityAction_EnemyCactus_Frozen:
+; Action $00. The XVEL is set here rather than in the hop, so the speed is already
+; loaded by the time action $04 runs
     ld   c,$28
     call call_00_28c8_Entity_SetXVelocity
     call call_00_2a68_Entity_ComputeXDistanceFromPlayer
@@ -1861,10 +1904,11 @@ call_02_63db_EntityAction_EnemyCactus_Unk0:
     ld   hl,wD80D_PlayerFacingDirection
     cp   [hl]
     ld   a,$01
-    jp   z,call_02_72ac_Entity_SetAction
-    ret  
+    jp   z,call_02_72ac_Entity_SetAction               ; his back is turned
+    ret
 
-call_02_63f0_EntityAction_EnemyCactus_Unk1:
+call_02_63f0_EntityAction_EnemyCactus_Turn:
+; Action $01. One second of facing him before the wind-up starts
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_00_63FD
     ld   c,TIMER_AMOUNT_60_FRAMES
@@ -1873,52 +1917,82 @@ call_02_63f0_EntityAction_EnemyCactus_Unk1:
 .jr_00_63FD:
     call call_00_2922_Entity_DecrementMiscTimer
     ld   a,$02
-    jp   z,call_02_72ac_Entity_SetAction
+    jp   z,call_02_72ac_Entity_SetAction               ; -> the wind-up
 
-call_02_6405_EnemyCactus_unk:
+call_02_6405_EnemyCactus_FreezeIfWatched:
+; The mirror of the test in action $00, and only reached by falling out of the hop
+; below. NOT equal means Gex is now looking this way, and the cactus drops back to
+; $00 and stops
     call call_00_2a68_Entity_ComputeXDistanceFromPlayer
     ld   a,[wDA12_EntityDirectionRelativeToPlayer]
     ld   hl,wD80D_PlayerFacingDirection
     cp   [hl]
     ld   a,$00
-    jp   nz,call_02_72ac_Entity_SetAction
-    ret  
+    jp   nz,call_02_72ac_Entity_SetAction              ; caught in the act
+    ret
 
-call_02_6415_EntityAction_EnemyCactus_Unk4:
+call_02_6415_EntityAction_EnemyCactus_Hop:
+; Action $04. Landing puts it back into the crouch and then immediately asks
+; whether Gex is watching, so a cactus behind him hops $03 -> $04 -> $03 -> $04
+; without ever passing through $00 again. The `jr` into the routine above rather
+; than a `jp` is only because it is 11 bytes away
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ld   c,$20
     call nz,call_00_28dc_Entity_SetYVelocity
     call call_00_251c_Entity_MoveXByFacingMomentum_BoundsChecked
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     call call_00_2766_Entity_ClampYToSpawnFloor
-    ret  c
+    ret  c                                             ; still in the air
     ld   a,$03
-    call call_02_72ac_Entity_SetAction
-    jr   call_02_6405_EnemyCactus_unk
+    call call_02_72ac_Entity_SetAction                 ; back to the crouch
+    jr   call_02_6405_EnemyCactus_FreezeIfWatched
 
-call_02_642e_EntityAction_Rock_Unk0:
+; ------------------------------------------------------------------
+; THE ROCK PLATFORM crumbles under Gex and comes back.
+;
+; It is the only entity here that animates its COLLISION_HEIGHT: actions $01 and
+; $03 look the height up by ENTITY_FIELD_SPRITE_COUNTER, so the box shrinks and
+; grows in step with the sprite the animation is already showing rather than
+; needing a timer of its own. The two tables are each other reversed.
+;
+;   $00 Solid    intact. Standing on it arms the countdown
+;   $01 Crumble  height $10 down to $02 over eight frames, chains to $02
+;   $02 Gone     drop out of the collision map, chains to $03 after 120 frames
+;   $03 Reform   height $02 back up to $10, chains back to $00
+;
+; How long you get is the entity's spawn parameter, so different rocks in the same
+; room can be set to different fuses
+; ------------------------------------------------------------------
+
+call_02_642e_EntityAction_Rock_Solid:
+; Action $00. Two phases in one routine: while the timer is zero it is waiting to
+; be stood on, and once it is non-zero it is counting down. wDC7B_Player_EntityStoodOnLo
+; holds the slot base of whatever Gex is standing on, which is compared straight
+; against this entity's own
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_00_643D
     ld   c,TIMER_AMOUNT_0_FRAMES
     call call_00_290d_Entity_SetMiscTimer
     ld   c,$10
-    call call_00_294e_Entity_SetHeight
+    call call_00_294e_Entity_SetHeight                 ; full height
 .jr_00_643D:
     call call_00_2917_Entity_CheckMiscTimerZero
-    jr   nz,.jr_00_6450
+    jr   nz,.jr_00_6450                                ; already counting down
     ld   a,[wDC7B_Player_EntityStoodOnLo]
     ld   hl,wDA00_CurrentEntityAddrLo
     cp   [hl]
-    ret  nz
-    call call_00_230f_Entity_GetParameterIntoC
+    ret  nz                                            ; nobody on it
+    call call_00_230f_Entity_GetParameterIntoC         ; this rock's own fuse
     jp   call_00_290d_Entity_SetMiscTimer
 .jr_00_6450:
     call call_00_2922_Entity_DecrementMiscTimer
     ld   a,$01
-    jp   z,call_02_72ac_Entity_SetAction
-    ret  
+    jp   z,call_02_72ac_Entity_SetAction               ; -> Crumble
+    ret
 
-call_02_6459_EntityAction_Rock_Unk1:
+call_02_6459_EntityAction_Rock_Crumble:
+; Action $01. The height follows the animation frame, so nothing here needs to know
+; how long the crumble takes - data_02_7998's own pending action ends it
     call call_00_296c_Entity_GetSpriteCounter
     ld   l,a
     ld   h,$00
@@ -1927,13 +2001,17 @@ call_02_6459_EntityAction_Rock_Unk1:
     ld   c,[hl]
     jp   call_00_294e_Entity_SetHeight
 .data_02_6467:
+; Collision height per animation frame, shrinking
     db   $10, $0e, $0c, $0a, $08, $06, $04, $02
 
-call_02_646f_EntityAction_Rock_Unk2:
+call_02_646f_EntityAction_Rock_Gone:
+; Action $02. Removing it from the BG collision map is what actually drops Gex -
+; the height above only shrinks the box
     farcall call_03_57f8_ClearCollisionForEntity
-    ret  
+    ret
 
-call_02_647b_EntityAction_Rock_Unk3:
+call_02_647b_EntityAction_Rock_Reform:
+; Action $03. The same trick as Crumble with the table the other way round
     call call_00_296c_Entity_GetSpriteCounter
     ld   l,a
     ld   h,$00
@@ -1942,10 +2020,22 @@ call_02_647b_EntityAction_Rock_Unk3:
     ld   c,[hl]
     jp   call_00_294e_Entity_SetHeight
 .data_02_6489:
+; Collision height per animation frame, growing
     db   $02, $04, $06, $08, $0a, $0c, $0e, $10
 
+; ------------------------------------------------------------------
+; THE HARD HAT is the penguin's routine again, threshold for threshold: amble at
+; $04 beyond $30, turn away and run at $1E inside it, and jump when either the run
+; hits the end of the patrol or Gex closes to within $20.
+;
+; What makes him a different fight is his collision handler rather than his
+; movement. call_03_5085_CollisionHandler_HardHat only lets a hit land while he is
+; in action $01 - in the air - and a hit at any other time just ducks him into
+; action $02 under the helmet. Actions $02 and $03 have no code: their data blocks
+; carry pending action $00 and time the duck out on their own
+; ------------------------------------------------------------------
+
 call_02_6491_EntityAction_HardHat_Walk:
-; If HardHat gets close enough to the player (<48 px), it speeds up and eventually transitions to the Jump action.
     call call_00_2722_Entity_IsPlayerInsideBounds
     jr   z,.jr_00_64A0
     call call_00_2a68_Entity_ComputeXDistanceFromPlayer
@@ -1954,28 +2044,29 @@ call_02_6491_EntityAction_HardHat_Walk:
     jr   c,.jr_00_64A8
 .jr_00_64A0:
     ld   c,$04
-    call call_00_2588_Entity_NudgeXVelocityTowardC
+    call call_00_2588_Entity_NudgeXVelocityTowardC     ; far away - amble
     jp   call_00_251c_Entity_MoveXByFacingMomentum_BoundsChecked
 .jr_00_64A8:
     ld   a,[wDA12_EntityDirectionRelativeToPlayer]
-    xor  a,$20
+    xor  a,$20                                         ; face away from Gex
     ld   c,a
     call call_00_2958_Entity_SetFacingDirection
     ld   c,$1E
     call call_00_2588_Entity_NudgeXVelocityTowardC
     call call_00_251c_Entity_MoveXByFacingMomentum_BoundsChecked
-    jr   nz,.jr_00_64C8
+    jr   nz,.jr_00_64C8                                ; cornered - jump
     ld   a,[wDA11_EntityXDistFromPlayer]
     cp   a,$20
-    ret  nc
+    ret  nc                                            ; still has room to run
     ld   hl,wDA12_EntityDirectionRelativeToPlayer
     ld   c,[hl]
-    call call_00_2958_Entity_SetFacingDirection
+    call call_00_2958_Entity_SetFacingDirection        ; turn back and jump over him
 .jr_00_64C8:
     ld   a,$01
     jp   call_02_72ac_Entity_SetAction
 
 call_02_64cd_EntityAction_HardHat_Jump:
+; Action $01, and the only state he can be hit in
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ld   c,$20
     call nz,call_00_28dc_Entity_SetYVelocity
@@ -1985,29 +2076,49 @@ call_02_64cd_EntityAction_HardHat_Jump:
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     call call_00_2766_Entity_ClampYToSpawnFloor
     ld   a,$00
-    jp   nc,call_02_72ac_Entity_SetAction
-    ret  
+    jp   nc,call_02_72ac_Entity_SetAction              ; landed -> Walk
+    ret
 
-call_02_64e9_EntityAction_Bat_Unk0:
+; ------------------------------------------------------------------
+; THE BAT hangs from the ceiling, drops on Gex and flies off the bottom of the
+; screen, and the loop closes by putting it back on its perch rather than by
+; respawning it - action $00 resets X and Y to the spawn position on its first
+; frame.
+;
+;   $00 Hanging  reset to the perch; drop when Gex is within $10
+;   $01 -        the release, chains to $02
+;   $02 Swoop    fly at him while the climb lasts
+;   $03 Dive     keep going until it is off the bottom of the camera, then $00
+;   $04 Destroy
+;
+; Note action $02 sets a LITERAL velocity by facing ($10 or $F0) rather than using
+; the facing-aware mover, which is why it uses Entity_ApplyXVelocity_Subpixel and
+; not Entity_MoveXByFacingSpeed - the bat is not on a patrol and must not turn
+; round at a bound
+; ------------------------------------------------------------------
+
+call_02_64e9_EntityAction_Bat_Hanging:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_00_64F4
-    call call_00_2826_Entity_ResetToInitialXPos
+    call call_00_2826_Entity_ResetToInitialXPos        ; back on the perch
     call call_00_27e4_Entity_ResetToInitialYPos
 .jr_00_64F4:
     call call_00_2a68_Entity_ComputeXDistanceFromPlayer
     ld   a,[wDA11_EntityXDistFromPlayer]
     cp   a,$10
     ld   a,$01
-    jp   c,call_02_72ac_Entity_SetAction
-    ret  
+    jp   c,call_02_72ac_Entity_SetAction               ; he is underneath -> drop
+    ret
 
-call_02_6502_EntityAction_Bat_Unk2:
+call_02_6502_EntityAction_Bat_Swoop:
+; Action $02, entered from data_02_79f9's pending action. Gravity is fighting the
+; $20 launch, so the swoop ends the frame the velocity turns negative
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_00_651D
     call call_00_2410_Entity_FaceTowardsPlayer
     call call_00_2976_Entity_GetFacingDirection
     ld   c,$10
-    cp   a,$00
+    cp   a,$00                                         ; ENTITY_FACING_RIGHT
     jr   z,.jr_00_6515
     ld   c,$F0
 .jr_00_6515:
@@ -2020,52 +2131,118 @@ call_02_6502_EntityAction_Bat_Unk2:
     call call_00_28f1_Entity_CheckIfYVelocityIsZero
     bit  7,a
     ld   a,$03
-    jp   nz,call_02_72ac_Entity_SetAction
-    ret  
+    jp   nz,call_02_72ac_Entity_SetAction              ; now descending -> Dive
+    ret
 
-call_02_652e_EntityAction_Bat_Unk3:
+call_02_652e_EntityAction_Bat_Dive:
+; Action $03. No floor check at all - it falls straight past the level and the
+; camera test is what recycles it
     call call_00_24c0_Entity_ApplyXVelocity_Subpixel
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     call call_00_2780_Entity_IsBelowCameraBottom
     ld   a,$00
-    jp   nc,call_02_72ac_Entity_SetAction
-    ret  
+    jp   nc,call_02_72ac_Entity_SetAction              ; off screen -> Hanging
+    ret
 
-call_02_653d_EntityAction_Door1_Unk1:
+
+; ==================================================================
+; ANIME CHANNEL
+;
+; The biggest section in this file, and the one level built around wiring rather
+; than around enemies. Nine of its entity types do nothing but read or write
+; wDCB1_LevelTriggerBuffer - the sixteen-byte per-level scratchpad indexed by an
+; entity's spawn parameter - so a switch, a broken tube or a beaten mech can open a
+; door somewhere else in the room.
+;
+; The four routines that make that work are in bank00_entity_utils.asm:
+; Entity_CheckTriggerFlag reads this entity's slot, Entity_SetTriggerActive sets
+; it, and Entity_SetListState writes the low nibble of this entity's
+; wD700_EntityFlags byte - which is the action the entry will SPAWN INTO next time
+; the room is entered. That is why so many routines here pair "set list state N"
+; with "set action M": one is what happens now, the other is what happens on a
+; revisit.
+;
+; ENTITY_ANIME_CHANNEL_ALIEN_CULTURE_TUBE has no code - three
+; call_02_582e_EntityAction_None rows, with
+; call_03_50b6_CollisionHandler_AlienCultureTube stepping it and
+; ENTITY_ATTR_DEFEAT_FLAGS $01 choosing action $01, whose pending action carries it
+; to $02. ENTITY_ANIME_CHANNEL_PLANET_O_BLAST_WEAPON is an idle plus a Destroy
+; ==================================================================
+
+; ------------------------------------------------------------------
+; THE DOOR PAIR. ENTITY_ANIME_CHANNEL_DOOR is the door Gex walks INTO and
+; ENTITY_ANIME_CHANNEL_DOOR2 the one he comes OUT of, and the two four-row tables
+; are the same four states rotated by two.
+;
+; Both collision handlers - call_03_5116_CollisionHandler_Door and
+; call_03_5156_CollisionHandler_Door2 - want Gex standing still on the ground with
+; UP held, and check the door's trigger slot unless its spawn parameter is $FF.
+; Door opens into action $01, Door2 into action $03.
+;
+; call_00_1bbc_CheckForDoorAndEnter.jr_00_1bce is the local entry point that
+; actually moves Gex to the other end, and it is called from the middle of the
+; opening animation - on the frame it wraps - rather than from the handler
+; ------------------------------------------------------------------
+
+call_02_653d_EntityAction_Door1_Opening:
+; Door action $01. List state 2 is the door's state for the return trip: coming
+; back into this room spawns it in action $02 below, standing open
     call call_00_2a5d_Entity_CheckAnimationEnded
     ret  z
-    call call_00_1bbc_CheckForDoorAndEnter.jr_00_1bce
+    call call_00_1bbc_CheckForDoorAndEnter.jr_00_1bce  ; take Gex through
     ld   c,$02
     jp   call_00_2299_Entity_SetListState
 
-call_02_6549_EntityAction_Door1_Unk2:
+call_02_6549_EntityAction_Door1_CloseAfterReturn:
+; Door action $02, only ever reached by spawning into it. Puts the list state back
+; to $00 - closed - and runs the closing animation, which chains to $00 itself
     ld   c,$00
     call call_00_2299_Entity_SetListState
     ld   a,$03
-    jp   call_02_72ac_Entity_SetAction
+    jp   call_02_72ac_Entity_SetAction                 ; -> the closing frames
 
-call_02_6553_EntityAction_Door2_Unk0:
+call_02_6553_EntityAction_Door2_ArriveAndClose:
+; Door2 action $00. This is the door Gex has just stepped out of: it starts open,
+; records list state 2 so a revisit finds it shut, and shuts itself
     ld   c,$02
     call call_00_2299_Entity_SetListState
     ld   a,$01
-    jp   call_02_72ac_Entity_SetAction
+    jp   call_02_72ac_Entity_SetAction                 ; -> the closing frames
 
-call_02_655d_EntityAction_Door2_Unk3:
+call_02_655d_EntityAction_Door2_Opening:
+; Door2 action $03, the mirror of Door1's $01
     call call_00_2a5d_Entity_CheckAnimationEnded
     ret  z
     call call_00_1bbc_CheckForDoorAndEnter.jr_00_1bce
     ld   c,$00
     jp   call_00_2299_Entity_SetListState
 
-call_02_6569_EntityAction_FanLift_Unk0:
+; ------------------------------------------------------------------
+; THE FAN LIFT is the updraft, not the fan: its attribute row is
+; COLLISION_TYPE_NONE with zero width and height, so it never touches anything.
+; What it does is exist while its trigger is set, and
+; call_02_4a52_PlayerAction_BlownUpwards is what carries Gex.
+;
+;   $00 WaitForTrigger  off. Turns on when the trigger goes up
+;   $01 -               spin-up, chains to $02
+;   $02 Blow            running. Turns off when the trigger goes down
+;   $03 -               spin-down, chains back to $00
+; ------------------------------------------------------------------
+
+call_02_6569_EntityAction_FanLift_WaitForTrigger:
     call call_00_22d4_Entity_CheckTriggerFlag
     ret  z
     ld   c,$02
-    call call_00_2299_Entity_SetListState
+    call call_00_2299_Entity_SetListState              ; spawn running on a revisit
     ld   a,$01
     jp   call_02_72ac_Entity_SetAction
 
-call_02_6577_EntityAction_FanLift_Unk2:
+call_02_6577_EntityAction_FanLift_Blow:
+; Action $02. The first half is the flicker: Entity_CheckMiscTimerZero leaves HL on
+; MISC_TIMER and A holding it, the timer is bumped, and it is ANDed with the frame
+; counter and masked to $1F. On any frame where that is non-zero the facing byte is
+; flipped, which mirrors the sprite - so the draught shimmers on a pattern rather
+; than on a period
     call call_00_2917_Entity_CheckMiscTimerZero
     inc  [hl]
     ld   hl,wDC71_VBlankFrameCounter
@@ -2074,30 +2251,58 @@ call_02_6577_EntityAction_FanLift_Unk2:
     jr   z,.jr_00_6589
     call call_00_2976_Entity_GetFacingDirection
     xor  a,$20
-    ld   [hl],a
+    ld   [hl],a                                        ; mirror the sprite
 .jr_00_6589:
     call call_00_22d4_Entity_CheckTriggerFlag
-    ret  nz
+    ret  nz                                            ; still switched on
     ld   c,$00
     call call_00_2299_Entity_SetListState
     ld   a,$03
-    jp   call_02_72ac_Entity_SetAction
+    jp   call_02_72ac_Entity_SetAction                 ; -> spin down
 
-call_02_6597_EntityAction_MechLeft_Unk0:
+; ------------------------------------------------------------------
+; THE MECHS do not move at all. Both are one row of code plus a Destroy, and the
+; only difference between them is that the left-facing one re-asserts its facing
+; every frame before falling into the right-facing one's `ret`.
+;
+; They are the level's power-up gate: call_03_5231_CollisionHandler_Mech ignores an
+; attack completely unless a fly power-up timer is running, and a mech that dies
+; raises its trigger slot.
+;
+; data_02_7a85 is two blocks the disassembly did not split - a second six-byte
+; block for sprite $3f follows it at $7a8b, and nothing references it. Both mech
+; tables point at $7a85, so the right-facing sprite is used for both
+; ------------------------------------------------------------------
+
+call_02_6597_EntityAction_MechLeft_HoldFacingLeft:
     ld   c,ENTITY_FACING_LEFT
     call call_00_2958_Entity_SetFacingDirection
-call_02_659c_EntityAction_MechRight_Unk0:
-    ret  
+call_02_659c_EntityAction_MechRight_Idle:
+    ret
 
-call_02_659d_EntityAction_AnimeDisappearingFloor_Unk0:
+; ------------------------------------------------------------------
+; THE DISAPPEARING FLOOR is the one entity that reads a trigger as a COUNT rather
+; than as a flag. `cp a,$02 / ret c` means two switches, and
+; call_03_50f4_CollisionHandler_OnSwitch2 is the switch type that INCREMENTS its
+; slot rather than setting it - which is the whole reason that variant exists.
+;
+; Once both are thrown the floor drops out of the BG collision map and goes to
+; action $01, its Destroy row
+; ------------------------------------------------------------------
+
+call_02_659d_EntityAction_AnimeDisappearingFloor_WaitForSwitches:
     call call_00_22d4_Entity_CheckTriggerFlag
     cp   a,$02
-    ret  c
+    ret  c                                             ; fewer than two switches
     farcall call_03_57f8_ClearCollisionForEntity
     ld   a,$01
     jp   call_02_72ac_Entity_SetAction
 
-call_02_65b3_EntityAction_Onswitch2_Unk1:
+call_02_65b3_EntityAction_Onswitch2_Thrown:
+; ENTITY_ANIME_CHANNEL_ON_SWITCH2, action $01 - the thrown pose. The one-shot
+; switch normally stays thrown forever; this is the exception, and it is hard-wired
+; to a single room. On MAP_ANIME_CHANNEL4, if the count has fallen back to exactly
+; one, the switch resets itself to $00 and can be thrown again
     ld   a,[wDB6C_CurrentMapId]
     cp   a,MAP_ANIME_CHANNEL4
     ret  nz
@@ -2107,43 +2312,69 @@ call_02_65b3_EntityAction_Onswitch2_Unk1:
     ld   c,$00
     call call_00_2299_Entity_SetListState
     ld   a,$00
-    jp   call_02_72ac_Entity_SetAction
+    jp   call_02_72ac_Entity_SetAction                 ; ready again
 
-call_02_65c9_EntityAction_BlueBeamBarrier_Unk0:
+call_02_65c9_EntityAction_BlueBeamBarrier_Solid:
+; ENTITY_ANIME_CHANNEL_BLUE_BEAM_BARRIER, action $00 - the beam is up. Its
+; attribute row is a $08 x $40 immovable platform, so a standing beam is a wall.
+; When its trigger goes up it switches to action $01, whose data block sets the
+; invisible flag, and records list state 1 so it stays down
     call call_00_22d4_Entity_CheckTriggerFlag
     ret  z
     ld   c,$01
     call call_00_2299_Entity_SetListState
     ld   a,$01
-    jp   call_02_72ac_Entity_SetAction
+    jp   call_02_72ac_Entity_SetAction                 ; beam off
 
 call_02_65d7_EntityAction_AnimeRisingPlatform_Update:
+; The pressure plate, and the only entity in the file that uses MISC_TIMER as a
+; position rather than a countdown: it holds how far the platform has been pushed
+; down, from $00 to $A7.
+;
+; Standing on anything ELSE (or nothing) lets it rise a pixel a frame until the
+; count reaches $A8; standing on THIS platform lets it sink a pixel every fourth
+; frame until the count is back to zero. So Gex's weight pushes it down and it
+; floats back up when he steps off - the timer and the height can never drift
+; apart because both move by one at a time
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ld   c,TIMER_AMOUNT_0_FRAMES
     call nz,call_00_290d_Entity_SetMiscTimer
     ld   a,[wDC7B_Player_EntityStoodOnLo]
     and  a
-    jr   z,.jr_00_65F8
+    jr   z,.jr_00_65F8                                 ; standing on nothing
     ld   hl,wDA00_CurrentEntityAddrLo
     cp   [hl]
-    jr   z,.jr_00_65F8
+    jr   z,.jr_00_65F8                                 ; standing on this one
     call call_00_2917_Entity_CheckMiscTimerZero
     cp   a,$A8
-    ret  nc
+    ret  nc                                            ; fully raised
     inc  [hl]
     ld   bc,$FFFF
-    jp   call_00_250d_Entity_MoveY
+    jp   call_00_250d_Entity_MoveY                     ; up one pixel
 .jr_00_65F8:
     ld   a,[wDC71_VBlankFrameCounter]
     and  a,$03
-    ret  nz
+    ret  nz                                            ; one frame in four
     call call_00_2917_Entity_CheckMiscTimerZero
-    ret  z
+    ret  z                                             ; fully lowered
     dec  [hl]
     ld   bc,$0001
-    jp   call_00_250d_Entity_MoveY
+    jp   call_00_250d_Entity_MoveY                     ; down one pixel
 
-call_02_659d_EntityAction_OnSwitch_Unk0:
+; ------------------------------------------------------------------
+; THE TWO SWITCHES. Four routines, and all four are the same six instructions -
+; read the trigger, write a list state, change action. The on-switch shows its
+; thrown pose while the trigger is set and the off-switch shows its thrown pose
+; while it is set too; what differs is what their COLLISION handlers do to the
+; trigger, not what these do with it. call_03_50e0_CollisionHandler_OnSwitch sets
+; the slot, call_03_50ea_CollisionHandler_OffSwitch clears it.
+;
+; The two "unthrown" labels used to carry the address of the routine above them -
+; the on-switch's was named $659d and the off-switch's $6617 - which is how a
+; disassembly copy-and-paste shows up. They are at $6609 and $6625
+; ------------------------------------------------------------------
+
+call_02_6609_EntityAction_OnSwitch_Unthrown:
     call call_00_22d4_Entity_CheckTriggerFlag
     ret  z
     ld   c,$01
@@ -2151,7 +2382,7 @@ call_02_659d_EntityAction_OnSwitch_Unk0:
     ld   a,$01
     jp   call_02_72ac_Entity_SetAction
 
-call_02_6617_EntityAction_OnSwitch_Unk1:
+call_02_6617_EntityAction_OnSwitch_Thrown:
     call call_00_22d4_Entity_CheckTriggerFlag
     ret  nz
     ld   c,$00
@@ -2159,7 +2390,7 @@ call_02_6617_EntityAction_OnSwitch_Unk1:
     ld   a,$00
     jp   call_02_72ac_Entity_SetAction
 
-call_02_6617_EntityAction_OffSwitch_Unk0:
+call_02_6625_EntityAction_OffSwitch_Unthrown:
     call call_00_22d4_Entity_CheckTriggerFlag
     ret  z
     ld   c,$01
@@ -2167,7 +2398,7 @@ call_02_6617_EntityAction_OffSwitch_Unk0:
     ld   a,$01
     jp   call_02_72ac_Entity_SetAction
 
-call_02_6633_EntityAction_OffSwitch_Unk1:
+call_02_6633_EntityAction_OffSwitch_Thrown:
     call call_00_22d4_Entity_CheckTriggerFlag
     ret  nz
     ld   c,$00
@@ -2175,7 +2406,29 @@ call_02_6633_EntityAction_OffSwitch_Unk1:
     ld   a,$00
     jp   call_02_72ac_Entity_SetAction
 
-call_02_6641_EntityAction_SailorToonGirl_Unk0:
+; ------------------------------------------------------------------
+; SAILOR TOON GIRL, and the only enemy in the file with a scripted move list.
+;
+; Action $00 paces. Once Gex is inside her bounds she turns to face him and then
+; splits on distance: past $40 she leaps ($04), inside $18 she picks her next move
+; out of .data_02_667e. That table is walked one entry per encounter and wraps at
+; nine, so the sequence is fixed and repeats - kick, pose, pose, kick, leap, kick,
+; leap, pose, leap - and she turns her back before every leap.
+;
+;   $00 Patrol     the routine above
+;   $01 -          the kick. Chains back to $00
+;   $02 Stunned    beaten down. Only gravity
+;   $03 Knockdown  the reeling hit, into $04 when the animation ends
+;   $04 -          crouch, chains to $05
+;   $05 Leap       the jump itself, back to $00 on landing
+;   $06 -          the pose. Chains back to $00
+;   $07 Destroy
+;
+; call_03_51b8_CollisionHandler_SailorToonGirl is what puts her into $03 and,
+; once she is sitting in $02, finishes her into $07
+; ------------------------------------------------------------------
+
+call_02_6641_EntityAction_SailorToonGirl_Patrol:
     ld   c,$10
     call call_00_28c8_Entity_SetXVelocity
     call call_00_251c_Entity_MoveXByFacingMomentum_BoundsChecked
@@ -2185,12 +2438,13 @@ call_02_6641_EntityAction_SailorToonGirl_Unk0:
     call call_00_2a68_Entity_ComputeXDistanceFromPlayer
     ld   a,[wDA11_EntityXDistFromPlayer]
     cp   a,$18
-    jr   c,.jr_00_6662
+    jr   c,.jr_00_6662                                 ; in range - pick a move
     cp   a,$40
     ld   a,$04
-    jp   nc,call_02_72ac_Entity_SetAction
-    ret  
+    jp   nc,call_02_72ac_Entity_SetAction              ; far - close the gap
+    ret
 .jr_00_6662:
+; MISC_TIMER is the cursor into the move list, wrapping at nine
     call call_00_2917_Entity_CheckMiscTimerZero
     inc  a
     cp   a,$09
@@ -2205,26 +2459,35 @@ call_02_6641_EntityAction_SailorToonGirl_Unk0:
     ld   a,[hl]
     push af
     cp   a,$04
-    call z,call_00_242d_Entity_FaceAwayFromPlayer
+    call z,call_00_242d_Entity_FaceAwayFromPlayer      ; leaps go backwards
     pop  af
     jp   call_02_72ac_Entity_SetAction
 .data_02_667e:
+; Her move list, one entry per time Gex comes inside $18. $01 kick, $04 leap away,
+; $06 pose
     db   $01, $06, $06, $01, $04, $01, $04, $06, $04
 
-call_02_6687_EntityAction_SailorToonGirl_Unk2:
+call_02_6687_EntityAction_SailorToonGirl_Stunned:
+; Action $02, the beaten pose. She still falls, but nothing else runs - and the
+; handler treats being in this action as "one more hit finishes her"
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     jp   call_00_2766_Entity_ClampYToSpawnFloor
 
-call_02_668d_EntityAction_SailorToonGirl_Unk3:
+call_02_668d_EntityAction_SailorToonGirl_Knockdown:
+; Action $03. Must be back on the ground AND have finished the animation before it
+; hands on, so a hit taken in mid-air plays out its fall first
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     call call_00_2766_Entity_ClampYToSpawnFloor
-    ret  c
+    ret  c                                             ; still airborne
     call call_00_2a5d_Entity_CheckAnimationEnded
     ld   a,$04
     jp   nz,call_02_72ac_Entity_SetAction
-    ret  
+    ret
 
-call_02_669d_EntityAction_SailorToonGirl_Unk5:
+call_02_669d_EntityAction_SailorToonGirl_Leap:
+; Action $05, entered from data_02_7b0d's pending action. Uses the facing set back
+; in Patrol, so a leap chosen off the move list carries her away from Gex and a
+; leap chosen by the distance test carries her toward him
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_00_66AC
     ld   c,$18
@@ -2236,44 +2499,65 @@ call_02_669d_EntityAction_SailorToonGirl_Unk5:
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     call call_00_2766_Entity_ClampYToSpawnFloor
     ld   a,$00
-    jp   nc,call_02_72ac_Entity_SetAction
-    ret  
+    jp   nc,call_02_72ac_Entity_SetAction              ; landed -> Patrol
+    ret
 
-call_02_66bb_EntityAction_BigSilverRobot_Unk0:
+; ------------------------------------------------------------------
+; THE BIG SILVER ROBOT charges in a straight line and turns round at the wall.
+;
+; Both $01 and $02 flip the facing byte by hand with `xor $20` on top of what
+; Entity_MoveXByFacingMomentum_BoundsChecked has already done, which cancels out -
+; so the robot keeps charging the SAME way after hitting a bound and only the long
+; 34-frame recovery in $02 breaks up the pattern.
+;
+; Action $03 is its death, and call_03_5201_CollisionHandler_BigSilverRobot skips
+; the whole handler while it is in that action. That handler also turns it to face
+; Gex before every hit, so it always dies facing him
+; ------------------------------------------------------------------
+
+call_02_66bb_EntityAction_BigSilverRobot_Watch:
     call call_00_2410_Entity_FaceTowardsPlayer
     call call_00_2a68_Entity_ComputeXDistanceFromPlayer
     ld   a,[wDA11_EntityXDistFromPlayer]
     cp   a,$38
     ld   a,$01
-    jp   c,call_02_72ac_Entity_SetAction
-    ret  
+    jp   c,call_02_72ac_Entity_SetAction               ; -> Charge
+    ret
 
-call_02_66cc_EntityAction_BigSilverRobot_Unk1:
+call_02_66cc_EntityAction_BigSilverRobot_Charge:
     ld   c,$10
     call call_00_28c8_Entity_SetXVelocity
     call call_00_251c_Entity_MoveXByFacingMomentum_BoundsChecked
-    ret  z
+    ret  z                                             ; still inside the patrol
     call call_00_2976_Entity_GetFacingDirection
     xor  a,$20
-    ld   [hl],a
+    ld   [hl],a                                        ; undo the mover's turn
     ld   a,$02
     jp   call_02_72ac_Entity_SetAction
 
-call_02_66e0_EntityAction_BigSilverRobot_Unk2:
+call_02_66e0_EntityAction_BigSilverRobot_Recover:
     call call_00_2a5d_Entity_CheckAnimationEnded
     ret  z
     call call_00_2976_Entity_GetFacingDirection
     xor  a,$20
     ld   [hl],a
     ld   a,$01
-    jp   call_02_72ac_Entity_SetAction
+    jp   call_02_72ac_Entity_SetAction                 ; charge back the other way
 
-call_02_66ef_EntityAction_BigSilverRobot_Unk3:
+call_02_66ef_EntityAction_BigSilverRobot_Death:
+; Action $03, from ENTITY_ATTR_DEFEAT_FLAGS $03 - no particles and no collectible,
+; so the eleven-frame animation is the whole death
     call call_00_2a5d_Entity_CheckAnimationEnded
     jp   nz,call_00_2b7a_Entity_DeactivateAndMarkNeverRespawn
-    ret  
+    ret
 
-call_02_66f6_EntityAction_SmallBlueRobot_Unk0:
+; ------------------------------------------------------------------
+; THE SMALL BLUE ROBOT is the penguin routine for the third time - amble beyond
+; $38, flee inside it, jump when cornered or when Gex closes to $28 - with slower
+; numbers and no floor-relative behaviour of its own
+; ------------------------------------------------------------------
+
+call_02_66f6_EntityAction_SmallBlueRobot_WalkOrRun:
     call call_00_2a68_Entity_ComputeXDistanceFromPlayer
     ld   a,[wDA11_EntityXDistFromPlayer]
     cp   a,$38
@@ -2283,26 +2567,26 @@ call_02_66f6_EntityAction_SmallBlueRobot_Unk0:
     jp   call_00_251c_Entity_MoveXByFacingMomentum_BoundsChecked
 .jr_00_6708:
     ld   a,[wDA12_EntityDirectionRelativeToPlayer]
-    xor  a,$20
+    xor  a,$20                                         ; face away from Gex
     ld   c,a
     call call_00_2958_Entity_SetFacingDirection
     ld   c,$10
     call call_00_2588_Entity_NudgeXVelocityTowardC
     call call_00_251c_Entity_MoveXByFacingMomentum_BoundsChecked
-    jr   nz,.jr_00_6728
+    jr   nz,.jr_00_6728                                ; cornered
     ld   a,[wDA11_EntityXDistFromPlayer]
     cp   a,$28
     ret  nc
     ld   hl,wDA12_EntityDirectionRelativeToPlayer
     ld   c,[hl]
-    call call_00_2958_Entity_SetFacingDirection
+    call call_00_2958_Entity_SetFacingDirection        ; turn back and jump over him
 .jr_00_6728:
     ld   c,$30
     call call_00_28dc_Entity_SetYVelocity
     ld   a,$01
     jp   call_02_72ac_Entity_SetAction
 
-call_02_6732_EntityAction_SmallBlueRobot_Unk1:
+call_02_6732_EntityAction_SmallBlueRobot_Jump:
     ld   c,$02
     call call_00_2588_Entity_NudgeXVelocityTowardC
     call call_00_251c_Entity_MoveXByFacingMomentum_BoundsChecked
@@ -2310,9 +2594,28 @@ call_02_6732_EntityAction_SmallBlueRobot_Unk1:
     call call_00_2766_Entity_ClampYToSpawnFloor
     ld   a,$00
     jp   nc,call_02_72ac_Entity_SetAction
-    ret  
+    ret
 
-call_02_6746_EntityAction_Secbot_Unk0:
+; ------------------------------------------------------------------
+; THE SECBOT patrols on the ground until it is hit, then rises eighty pixels and
+; patrols in the air at four times the speed. Getting hit makes it WORSE, which is
+; unusual here - call_03_5196_CollisionHandler_Secbot sends a secbot that survives
+; a hit in action $00 to action $02, and data_02_7b8f chains that on to $01.
+;
+; Both actions fire the same way - only while facing Gex - but they time it
+; differently, and both use the timer for something other than a countdown to a
+; state change:
+;
+;   $00 Patrol  the timer is reloaded with $02 every time it turns round, so it
+;               gets exactly one shot off per pass
+;   $01 Hover   the timer is reloaded with $C1 on a turn and a shot goes out every
+;               time the low six bits reach zero - every 64 frames
+;
+; ENTITY_FIELD_MISC_FLAGS is the rise counter in $01: it counts to $50 one pixel a
+; frame and then stops, so the climb happens once
+; ------------------------------------------------------------------
+
+call_02_6746_EntityAction_Secbot_Patrol:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ld   c,TIMER_AMOUNT_0_FRAMES
     call nz,call_00_290d_Entity_SetMiscTimer
@@ -2320,27 +2623,27 @@ call_02_6746_EntityAction_Secbot_Unk0:
     call call_00_28c8_Entity_SetXVelocity
     call call_00_251c_Entity_MoveXByFacingMomentum_BoundsChecked
     ld   c,TIMER_AMOUNT_SECBOT_2
-    call nz,call_00_290d_Entity_SetMiscTimer
+    call nz,call_00_290d_Entity_SetMiscTimer           ; just turned - arm a shot
     call call_00_29ac_Entity_IsFacingPlayer
     ret  nz
     call call_00_2922_Entity_DecrementMiscTimer
     ld   c,SPAWN_CHILD_ENTITY_SECBOT_PROJECTILE
     jp   nz,call_00_3792_EntitySpawn_SpawnChild
-    ret  
+    ret
 
-call_02_6768_EntityAction_Secbot_Unk1:
+call_02_6768_EntityAction_Secbot_Hover:
     call call_00_298a_Entity_GetMiscFlags
     cp   a,$50
-    jr   z,.jr_00_6776
+    jr   z,.jr_00_6776                                 ; finished climbing
     inc  [hl]
     ld   bc,$FFFF
-    call call_00_250d_Entity_MoveY
+    call call_00_250d_Entity_MoveY                     ; up one pixel a frame
 .jr_00_6776:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ld   c,TIMER_AMOUNT_0_FRAMES
     call nz,call_00_290d_Entity_SetMiscTimer
     ld   c,$10
-    call call_00_28c8_Entity_SetXVelocity
+    call call_00_28c8_Entity_SetXVelocity              ; four times the ground speed
     call call_00_251c_Entity_MoveXByFacingMomentum_BoundsChecked
     ld   c,TIMER_AMOUNT_SECBOT
     call nz,call_00_290d_Entity_SetMiscTimer
@@ -2350,15 +2653,17 @@ call_02_6768_EntityAction_Secbot_Unk1:
     ret  z
     and  a,$3F
     ld   c,SPAWN_CHILD_ENTITY_SECBOT_PROJECTILE
-    jp   z,call_00_3792_EntitySpawn_SpawnChild
-    ret  
+    jp   z,call_00_3792_EntitySpawn_SpawnChild         ; every 64 frames
+    ret
 
 call_02_679b_EntityAction_SecbotProjectile_Update:
+; The shot. It is given gravity and a floor clamp as well as a horizontal velocity,
+; so it drops as it travels and skids along the ground rather than flying straight
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_00_67B3
     call call_00_2976_Entity_GetFacingDirection
     ld   c,$18
-    cp   a,$00
+    cp   a,$00                                         ; ENTITY_FACING_RIGHT
     jr   z,.jr_00_67AB
     ld   c,$E8
 .jr_00_67AB:
@@ -2372,13 +2677,32 @@ call_02_679b_EntityAction_SecbotProjectile_Update:
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     jp   call_00_2766_Entity_ClampYToSpawnFloor
 
+; ------------------------------------------------------------------
+; THE ELEVATOR, the most table-driven entity in the file and the only one that
+; keeps state outside its own slot.
+;
+; There are three shafts in the level, at X $01A0, $0340 and $05C0
+; (.data_02_68A9). call_02_688e_Elevator_GetShaftIndex turns this entity's X into
+; an index 0-2, and the three words at wDCE2_ElevatorEntityUnkData remember each
+; shaft's height - so an elevator that scrolls off screen and respawns comes back
+; where it was left rather than at its spawn point.
+;
+; Where it should GO comes from .data_02_686a, which is keyed on the shaft's X and
+; on the trigger COUNT: with the count at $00 shaft 1 sits at Y $0298, at $01 the
+; three shafts go to $0158/$01D8/$0258, at $02 to $0108/$0158/$01D8. So throwing
+; switches raises every elevator in the level a floor at a time.
+;
+; It only moves while Gex is standing on it, and while moving it holds him in
+; PLAYERACTION_RIDING_ELEVATOR and drops him back to PLAYERACTION_IDLE on arrival
+; ------------------------------------------------------------------
+
 call_02_67c2_EntityAction_Elevator_Update:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_00_67DF
-    call call_02_688E_Elevator_unk
+    call call_02_688e_Elevator_GetShaftIndex
     ld   l,c
     ld   h,$00
-    add  hl,hl
+    add  hl,hl                                         ; two bytes per shaft
     ld   de,wDCE2_ElevatorEntityUnkData
     add  hl,de
     LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_WORLD_Y
@@ -2386,16 +2710,18 @@ call_02_67c2_EntityAction_Elevator_Update:
     ld   [de],a
     inc  e
     ld   a,[hl]
-    ld   [de],a
+    ld   [de],a                                        ; restore the remembered Y
 .jr_00_67DF:
     ld   a,[wDC7B_Player_EntityStoodOnLo]
     ld   hl,wDA00_CurrentEntityAddrLo
     cp   [hl]
-    ret  nz
+    ret  nz                                            ; nobody riding
     call call_00_22d4_Entity_CheckTriggerFlag
-    ld   c,a
+    ld   c,a                                           ; C = how many switches
     ld   hl,.data_02_686a
 .jr_00_67EE:
+; Walk the destination table looking for a record with this trigger count and this
+; shaft's X
     push hl
     ldi  a,[hl]
     cp   c
@@ -2409,16 +2735,17 @@ call_02_67c2_EntityAction_Elevator_Update:
     ld   a,[de]
     sbc  [hl]
     or   b
-    jr   z,.jr_00_6810
+    jr   z,.jr_00_6810                                 ; this record is ours
 .jr_00_6805:
     pop  hl
-    ld   de,$0005
+    ld   de,$0005                                      ; next five-byte record
     add  hl,de
     ld   a,[hl]
     cp   a,$FF
     jr   nz,.jr_00_67EE
-    ret  
+    ret                                                ; no destination - sit still
 .jr_00_6810:
+; HL is on the record's target Y. Compare it with where the elevator is now
     inc  de
     inc  hl
     ld   a,[de]
@@ -2429,10 +2756,11 @@ call_02_67c2_EntityAction_Elevator_Update:
     ld   a,[de]
     sbc  [hl]
     pop  hl
-    jr   c,.jr_00_6847
+    jr   c,.jr_00_6847                                 ; below the target - go down
     or   c
-    jr   nz,.jr_00_6842
-    call call_02_688E_Elevator_unk
+    jr   nz,.jr_00_6842                                ; above it - go up
+; Arrived. Write the height back to the shaft slot and let Gex stand up again
+    call call_02_688e_Elevator_GetShaftIndex
     ld   l,c
     ld   h,$00
     add  hl,hl
@@ -2448,13 +2776,15 @@ call_02_67c2_EntityAction_Elevator_Update:
     cp   a,PLAYERACTION_RIDING_ELEVATOR
     ld   a,PLAYERACTION_IDLE
     jp   z,call_02_54f9_Player_RequestAction
-    ret  
+    ret
 .jr_00_6842:
-    ld   bc,$FFFF
+    ld   bc,$FFFF                                      ; one pixel up
     jr   .jr_00_684A
 .jr_00_6847:
-    ld   bc,$0001
+    ld   bc,$0001                                      ; one pixel down
 .jr_00_684A:
+; Lock Gex into the riding action, then move - but only if he is exactly lined up
+; with the platform, which is what stops it dragging him through a wall
     ld   a,PLAYERACTION_RIDING_ELEVATOR
     ld   hl,wD801_Player_ActionId
     cp   [hl]
@@ -2468,15 +2798,23 @@ call_02_67c2_EntityAction_Elevator_Update:
     sbc  [hl]
     or   e
     jp   z,call_00_250d_Entity_MoveY
-    ret  
-.data_02_686a:    
-    db   $00, $a0, $01, $98, $02        ;; 02:6867 ????????
-    db   $01, $a0, $01, $58, $01, $01, $40, $03        ;; 02:686f ????????
-    db   $d8, $01, $01, $c0, $05, $58, $02, $02        ;; 02:6877 ????????
-    db   $a0, $01, $08, $01, $02, $40, $03, $58        ;; 02:687f ????????
+    ret
+.data_02_686a:
+; Seven five-byte records and an $FF terminator:
+;
+;   +0 trigger count   +1 shaft X (16-bit)   +3 target Y (16-bit)
+;
+; count $00 parks shaft 1 at the bottom; $01 and $02 each raise all three
+    db   $00, $a0, $01, $98, $02
+    db   $01, $a0, $01, $58, $01, $01, $40, $03
+    db   $d8, $01, $01, $c0, $05, $58, $02, $02
+    db   $a0, $01, $08, $01, $02, $40, $03, $58
     db   $01, $02, $c0, $05, $d8, $01, $ff
-    
-call_02_688E_Elevator_unk:
+
+call_02_688e_Elevator_GetShaftIndex:
+; Returns in C which of the three shafts this elevator is in, by matching its X
+; against the list below. There is no bounds check - an elevator placed at any
+; other X walks off the end of the table
     ld   hl,.data_02_68A9
     LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_WORLD_X
     ld   c,$FF
@@ -2493,14 +2831,33 @@ call_02_688E_Elevator_unk:
     inc  hl
     or   b
     jr   nz,.jr_00_689B
-    ret  
-.data_02_68A9:   
-    db   $a0, $01, $40, $03, $c0, $05        ;; 02:68a7 ????????
+    ret
+.data_02_68A9:
+; The three shaft X positions: $01A0, $0340, $05C0
+    db   $a0, $01, $40, $03, $c0, $05
 
 call_02_68af_EntityAction_FireWallEnemy_Update:
+; One instruction. call_00_233e_Entity_MoveAlongArcTable flies it round a canned
+; circle relative to its spawn position, so the whole behaviour is in that helper
+; and in ENTITY_FIELD_X_VELOCITY / X_SUBPIXEL, which it reuses as a step counter
+; and a quadrant
     jp   call_00_233e_Entity_MoveAlongArcTable
 
-call_02_68b2_EntityAction_Grenade_Unk0:
+; ------------------------------------------------------------------
+; THE GRENADE never stops. Its three actions loop forever - reset, bounce three
+; times, explode, reset - and it is scenery rather than an enemy that can be
+; beaten: its ENTITY_ATTR_DEFEAT_FLAGS are $FF.
+;
+; MISC_TIMER counts the bounces down from TIMER_AMOUNT_GRENADE ($04) and doubles as
+; the index into the bounce-height table, so each bounce is lower than the last
+; ------------------------------------------------------------------
+
+call_02_68b2_EntityAction_Grenade_Reset:
+; Action $00, and it runs only on its first frame. Puts the grenade back at its
+; spawn point offset by the low nibble of the frame counter horizontally and by its
+; own spawn parameter vertically - `ld b,$FF` makes that offset negative, so it
+; starts ABOVE the spawn line. The X jitter is what stops several grenades in a row
+; falling in step
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ret  z
     ld   hl,.data_02_68e5
@@ -2510,37 +2867,43 @@ call_02_68b2_EntityAction_Grenade_Unk0:
     and  a,$0F
     ld   c,a
     ld   b,$00
-    call call_00_24df_Entity_MoveX
+    call call_00_24df_Entity_MoveX                     ; jitter X by 0-15
     call call_00_27e4_Entity_ResetToInitialYPos
     call call_00_230f_Entity_GetParameterIntoC
     ld   b,$FF
-    call call_00_250d_Entity_MoveY
+    call call_00_250d_Entity_MoveY                     ; start this far above
     ld   c,TIMER_AMOUNT_GRENADE
-    call call_00_290d_Entity_SetMiscTimer
+    call call_00_290d_Entity_SetMiscTimer              ; four bounces
     ld   c,$00
     call call_00_28c8_Entity_SetXVelocity
     ld   c,$00
     call call_00_28dc_Entity_SetYVelocity
-    ret  
-.data_02_68e5:    
+    ret
+.data_02_68e5:
     db   $00, $00, $00, $00, $ff, $03, $ff, $7f
 
-call_02_68ed_EntityAction_Grenade_Unk1:
+call_02_68ed_EntityAction_Grenade_Bounce:
+; Action $01. Nothing happens until it lands - `ret c` covers the whole flight -
+; and then the timer both counts the bounce and picks how high the next one is.
+;
+; DecrementMiscTimer leaves HL on the timer, so `ld l,[hl]` reads the new count
+; straight into the table index. A new horizontal velocity is only chosen when the
+; grenade is not already moving sideways, from four candidates by the frame counter
     call call_00_24c0_Entity_ApplyXVelocity_Subpixel
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     call call_00_2766_Entity_ClampYToSpawnFloor
-    ret  c
+    ret  c                                             ; still in the air
     call call_00_2922_Entity_DecrementMiscTimer
     ld   a,$02
-    jp   z,call_02_72ac_Entity_SetAction
-    ld   l,[hl]
+    jp   z,call_02_72ac_Entity_SetAction               ; out of bounces -> Explode
+    ld   l,[hl]                                        ; HL still on MISC_TIMER
     ld   h,$00
     ld   de,.data_02_6924
     add  hl,de
     ld   c,[hl]
     call call_00_28dc_Entity_SetYVelocity
     call call_00_28e6_Entity_CheckIfXVelocityIsZero
-    ret  nz
+    ret  nz                                            ; already drifting
     ld   a,[wDC71_VBlankFrameCounter]
     swap a
     and  a,$03
@@ -2551,18 +2914,24 @@ call_02_68ed_EntityAction_Grenade_Unk1:
     ld   c,[hl]
     jp   call_00_28c8_Entity_SetXVelocity
 .data_02_6920:
+; Bounce directions: +8, -8, +4, -4
     db   $08, $f8, $04, $fc
 .data_02_6924:
+; Bounce height by bounces remaining - $30 for the first, then $28, then $20, then
+; nothing left
     db   $00, $20, $28, $30
 
-call_02_6928_EntityAction_Grenade_Unk2:
+call_02_6928_EntityAction_Grenade_Explode:
+; Action $02. Drops it eight pixels on the first frame so the blast sits on the
+; ground rather than at the sprite's centre, and holds the flash palette for the
+; six frames of data_02_7bcd, whose pending action starts the cycle over
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ld   bc,$0008
     call nz,call_00_250d_Entity_MoveY
     ld   hl,.data_02_6937
     jp   call_00_2c20_Entity_CopyPaletteToBuffer
 .data_02_6937:
-    db   $00, $00, $1b, $00, $5f, $02, $1f, $1b        ;; 02:6937 ????????
+    db   $00, $00, $1b, $00, $5f, $02, $1f, $1b
 
 call_02_693f_EntityAction_MadBomber_Unk2:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear

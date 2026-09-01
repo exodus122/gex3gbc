@@ -979,7 +979,7 @@ call_03_50f4_CollisionHandler_OnSwitch2:
 ;
 ; That is the difference from the plain on-switch, and it is what lets a door
 ; count several switches - see the `cp a,$02` in
-; call_02_659d_EntityAction_AnimeDisappearingFloor_Unk0
+; call_02_659d_EntityAction_AnimeDisappearingFloor_WaitForSwitches
     call call_00_2962_Entity_GetActionId
     cp   a,$00
     ret  nz
