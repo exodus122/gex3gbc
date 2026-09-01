@@ -122,24 +122,24 @@ data_02_4000_EntityActionJumpTable:
    dw   .data_02_4600_EntityActions_AnimeChannelFireWallEnemy ; ENTITY_ANIME_CHANNEL_FIRE_WALL_ENEMY
    dw   .data_02_4604_EntityActions_AnimeChannelGrenade ; ENTITY_ANIME_CHANNEL_GRENADE
    dw   .data_02_4610_EntityActions_AnimeChannelPlanetOBlastWeapon ; ENTITY_ANIME_CHANNEL_PLANET_O_BLAST_WEAPON
-   dw   .data_02_4618 ; ENTITY_SUPERHERO_SHOW_MAD_BOMBER
-   dw   .data_02_4630 ; ENTITY_SUPERHERO_SHOW_BOMB
-   dw   .data_02_4644 ; ENTITY_SUPERHERO_SHOW_WATER_TOWER_TANK
-   dw   .data_02_4650 ; ENTITY_SUPERHERO_SHOW_WATER_TOWER_STAND
-   dw   .data_02_4658 ; ENTITY_SUPERHERO_SHOW_CONVICT
-   dw   .data_02_4668 ; ENTITY_SUPERHERO_SHOW_SPIDER
-   dw   .data_02_4678 ; ENTITY_SUPERHERO_SHOW_STRAY_CAT
-   dw   .data_02_4690 ; ENTITY_SUPERHERO_SHOW_YELLOW_GOON
-   dw   .data_02_46a0 ; ENTITY_SUPERHERO_SHOW_RAT
-   dw   .data_02_46ac ; ENTITY_SUPERHERO_SHOW_CHOMPER_TV
-   dw   .data_02_46bc ; ENTITY_SUPERHERO_SHOW_CRUMBLING_FLOOR
-   dw   .data_02_46c8 ; ENTITY_SUPERHERO_SHOW_CONVICT_PROJECTILE
-   dw   .data_02_46cc ; ENTITY_GEXTREME_SPORTS_ELF
-   dw   .data_02_46e4 ; ENTITY_GEXTREME_SPORTS_BONUS_TIME_COIN
-   dw   .data_02_46ec ; ENTITY_MARSUPIAL_MADNESS_BELL
-   dw   .data_02_46f8 ; ENTITY_MARSUPIAL_MADNESS_BIRD
-   dw   .data_02_46fc ; ENTITY_MARSUPIAL_MADNESS_BIRD_PROJECTILE
-   dw   .data_02_4704 ; ENTITY_WW_GEX_WRESTLING_ROCK_HARD
+   dw   .data_02_4618_EntityActions_SuperheroShowMadBomber ; ENTITY_SUPERHERO_SHOW_MAD_BOMBER
+   dw   .data_02_4630_EntityActions_SuperheroShowBomb ; ENTITY_SUPERHERO_SHOW_BOMB
+   dw   .data_02_4644_EntityActions_SuperheroShowWaterTowerTank ; ENTITY_SUPERHERO_SHOW_WATER_TOWER_TANK
+   dw   .data_02_4650_EntityActions_SuperheroShowWaterTowerStand ; ENTITY_SUPERHERO_SHOW_WATER_TOWER_STAND
+   dw   .data_02_4658_EntityActions_SuperheroShowConvict ; ENTITY_SUPERHERO_SHOW_CONVICT
+   dw   .data_02_4668_EntityActions_SuperheroShowSpider ; ENTITY_SUPERHERO_SHOW_SPIDER
+   dw   .data_02_4678_EntityActions_SuperheroShowStrayCat ; ENTITY_SUPERHERO_SHOW_STRAY_CAT
+   dw   .data_02_4690_EntityActions_SuperheroShowYellowGoon ; ENTITY_SUPERHERO_SHOW_YELLOW_GOON
+   dw   .data_02_46a0_EntityActions_SuperheroShowRat ; ENTITY_SUPERHERO_SHOW_RAT
+   dw   .data_02_46ac_EntityActions_SuperheroShowChomperTV ; ENTITY_SUPERHERO_SHOW_CHOMPER_TV
+   dw   .data_02_46bc_EntityActions_SuperheroShowCrumblingFloor ; ENTITY_SUPERHERO_SHOW_CRUMBLING_FLOOR
+   dw   .data_02_46c8_EntityActions_SuperheroShowConvictProjectile ; ENTITY_SUPERHERO_SHOW_CONVICT_PROJECTILE
+   dw   .data_02_46cc_EntityActions_GextremeSportsElf ; ENTITY_GEXTREME_SPORTS_ELF
+   dw   .data_02_46e4_EntityActions_GextremeSportsBonusTimeCoin ; ENTITY_GEXTREME_SPORTS_BONUS_TIME_COIN
+   dw   .data_02_46ec_EntityActions_MarsupialMadnessBell ; ENTITY_MARSUPIAL_MADNESS_BELL
+   dw   .data_02_46f8_EntityActions_MarsupialMadnessBird ; ENTITY_MARSUPIAL_MADNESS_BIRD
+   dw   .data_02_46fc_EntityActions_MarsupialMadnessBirdProjectile ; ENTITY_MARSUPIAL_MADNESS_BIRD_PROJECTILE
+   dw   .data_02_4704_EntityActions_WWGexWrestlingRockHard ; ENTITY_WW_GEX_WRESTLING_ROCK_HARD
    dw   .data_02_4720 ; ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ
    dw   .data_02_4744 ; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE
    dw   .data_02_4748 ; ENTITY_LIZARD_OF_OZ_CANNON
@@ -586,90 +586,106 @@ data_02_4000_EntityActionJumpTable:
 .data_02_4610_EntityActions_AnimeChannelPlanetOBlastWeapon:       ;; ENTITY_ANIME_CHANNEL_PLANET_O_BLAST_WEAPON
     dw   call_02_582e_EntityAction_None, data_02_7bd8                               ; action $00 - idle
     dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $01 - taken
-.data_02_4618:
-    dw   call_02_6947_EntityAction_MadBomber_Unk0, data_02_7be3
-    dw   call_02_6947_EntityAction_MadBomber_Unk0, data_02_7bf8
-    dw   call_02_693f_EntityAction_MadBomber_Unk2, data_02_7c02
-    dw   call_02_6947_EntityAction_MadBomber_Unk0, data_02_7c0b
-    dw   call_02_582e_EntityAction_None, data_02_7c13
-    dw   call_02_6965_EntityAction_MadBomber_Unk5, data_02_7c19
-.data_02_4630:
-    dw   call_02_6971_EntityAction_Bomb_Unk0, data_02_7c1f
-    dw   call_02_69af_EntityAction_Bomb_Unk1, data_02_7c1f
-    dw   call_02_6a04_EntityAction_Bomb_Unk2, data_02_7c1f
-    dw   call_02_6a13_EntityAction_Bomb_Unk3, data_02_7c1f
-    dw   call_02_6a4c_EntityAction_Bomb_Unk4, data_02_7c27
-.data_02_4644:
-    dw   call_02_6a91_EntityAction_WaterTowerTank_Unk0, data_02_7c32
-    dw   call_02_6ab4_EntityAction_WaterTowerTank_Unk1, data_02_7c32
-    dw   call_02_582e_EntityAction_None, data_02_7c32
-.data_02_4650:
-    dw   call_02_582e_EntityAction_None, data_02_7c38
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_4658:
-    dw   call_02_6acd_EntityAction_Convict_Unk0, data_02_7c3e
-    dw   call_02_582e_EntityAction_None, data_02_7c51
-    dw   call_02_6ad4_EntityAction_Convict_Unk2, data_02_7c5e
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_4668:
-    dw   call_02_6b03_EntityAction_Spider_Unk0, data_02_7c6a
-    dw   call_02_6b20_EntityAction_Spider_Unk1, data_02_7c6a
-    dw   call_02_6b35_EntityAction_Spider_Unk2, data_02_7c6a
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_4678:
-    dw   call_02_6b53_EntityAction_StrayCat_Unk0, data_02_7c72
-    dw   call_02_582e_EntityAction_None, data_02_7c79
-    dw   call_02_582e_EntityAction_None, data_02_7c7f
-    dw   call_02_582e_EntityAction_None, data_02_7c8b
-    dw   call_02_582e_EntityAction_None, data_02_7c92
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_4690:
-    dw   call_02_6b69_EntityAction_YellowGoon_Unk0, data_02_7ca1
-    dw   call_02_582e_EntityAction_None, data_02_7caa
-    dw   call_02_582e_EntityAction_None, data_02_7cb4
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_46a0:
-    dw   call_02_6b9b_EntityAction_Rat_Unk0, data_02_7cc4
-    dw   call_02_582e_EntityAction_None, data_02_7ccd
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_46ac:
-    dw   call_02_6ba3_EntityAction_ChomperTV_Unk0, data_02_7cd6
-    dw   call_02_6be4_EntityAction_ChomperTV_Unk1, data_02_7cd6
-    dw   call_02_6bc8_EntityAction_ChomperTV_Unk2, data_02_7cdf
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_46bc:
-    dw   call_02_6bfb_EntityAction_CrumblingFloor_Unk0, data_02_7ce6
-    dw   call_02_582e_EntityAction_None, data_02_7cec
-    dw   call_02_6c08_EntityAction_CrumblingFloor_Unk2, data_02_7cf3
-.data_02_46c8:
+
+; ------------------------------------------------------------------
+; SUPERHERO SHOW
+; ------------------------------------------------------------------
+.data_02_4618_EntityActions_SuperheroShowMadBomber:               ;; ENTITY_SUPERHERO_SHOW_MAD_BOMBER
+    dw   call_02_6947_EntityAction_MadBomber_CheckForHit, data_02_7be3              ; action $00 - taunt - chains to $01
+    dw   call_02_6947_EntityAction_MadBomber_CheckForHit, data_02_7bf8              ; action $01 - wind up - chains to $02
+    dw   call_02_693f_EntityAction_MadBomber_ThrowBomb, data_02_7c02                ; action $02 - throw a bomb - chains to $03
+    dw   call_02_6947_EntityAction_MadBomber_CheckForHit, data_02_7c0b              ; action $03 - recover - chains back to $00
+    dw   call_02_582e_EntityAction_None, data_02_7c13                               ; action $04 - flinch, 60 frames - chains to $00
+    dw   call_02_6965_EntityAction_MadBomber_Death, data_02_7c19                    ; action $05 - death
+.data_02_4630_EntityActions_SuperheroShowBomb:                    ;; ENTITY_SUPERHERO_SHOW_BOMB
+    dw   call_02_6971_EntityAction_Bomb_InHand, data_02_7c1f                        ; action $00 - in his hands
+    dw   call_02_69af_EntityAction_Bomb_Thrown, data_02_7c1f                        ; action $01 - thrown: one of eight canned arcs
+    dw   call_02_6a04_EntityAction_Bomb_Fuse, data_02_7c1f                          ; action $02 - fuse burning on the ground
+    dw   call_02_6a13_EntityAction_Bomb_KickedBack, data_02_7c1f                    ; action $03 - whipped back at him; the fuse keeps running
+    dw   call_02_6a4c_EntityAction_Bomb_Explode, data_02_7c27                       ; action $04 - the blast, and the hit test on his perch
+.data_02_4644_EntityActions_SuperheroShowWaterTowerTank:          ;; ENTITY_SUPERHERO_SHOW_WATER_TOWER_TANK
+    dw   call_02_6a91_EntityAction_WaterTowerTank_Standing, data_02_7c32            ; action $00 - standing, $30 above the spawn line
+    dw   call_02_6ab4_EntityAction_WaterTowerTank_Falling, data_02_7c32             ; action $01 - falling once the legs are cut
+    dw   call_02_582e_EntityAction_None, data_02_7c32                               ; action $02 - at rest
+.data_02_4650_EntityActions_SuperheroShowWaterTowerStand:         ;; ENTITY_SUPERHERO_SHOW_WATER_TOWER_STAND
+    dw   call_02_582e_EntityAction_None, data_02_7c38                               ; action $00 - standing (needs a fly power-up to cut)
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $01 - cut - raises the tank's trigger
+.data_02_4658_EntityActions_SuperheroShowConvict:                 ;; ENTITY_SUPERHERO_SHOW_CONVICT
+    dw   call_02_6acd_EntityAction_Convict_Idle, data_02_7c3e                       ; action $00 - idle; faces Gex once - chains to $01
+    dw   call_02_582e_EntityAction_None, data_02_7c51                               ; action $01 - draw - chains to $02
+    dw   call_02_6ad4_EntityAction_Convict_Fire, data_02_7c5e                       ; action $02 - fire - chains back to $00
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $03 - defeated
+.data_02_4668_EntityActions_SuperheroShowSpider:                  ;; ENTITY_SUPERHERO_SHOW_SPIDER
+    dw   call_02_6b03_EntityAction_Spider_Descend, data_02_7c6a                     ; action $00 - descend the thread two pixels a frame
+    dw   call_02_6b20_EntityAction_Spider_Climb, data_02_7c6a                       ; action $01 - climb back one pixel a frame
+    dw   call_02_6b35_EntityAction_Spider_Charge, data_02_7c6a                      ; action $02 - charge along the ground for 8 frames
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $03 - defeated
+.data_02_4678_EntityActions_SuperheroShowStrayCat:                ;; ENTITY_SUPERHERO_SHOW_STRAY_CAT
+    dw   call_02_6b53_EntityAction_StrayCat_Prowl, data_02_7c72                     ; action $00 - prowl; reacts inside $28
+    dw   call_02_582e_EntityAction_None, data_02_7c79                               ; action $01 - freeze, 120 frames - chains to $02
+    dw   call_02_582e_EntityAction_None, data_02_7c7f                               ; action $02 - hiss - chains to $03
+    dw   call_02_582e_EntityAction_None, data_02_7c8b                               ; action $03 - chains to $04
+    dw   call_02_582e_EntityAction_None, data_02_7c92                               ; action $04 - chains back to $00
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $05 - defeated
+.data_02_4690_EntityActions_SuperheroShowYellowGoon:              ;; ENTITY_SUPERHERO_SHOW_YELLOW_GOON
+    dw   call_02_6b69_EntityAction_YellowGoon_Patrol, data_02_7ca1                  ; action $00 - patrol; short or long reaction by turn count
+    dw   call_02_582e_EntityAction_None, data_02_7caa                               ; action $01 - short reaction - chains to $00
+    dw   call_02_582e_EntityAction_None, data_02_7cb4                               ; action $02 - long reaction - chains to $00
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $03 - defeated
+.data_02_46a0_EntityActions_SuperheroShowRat:                     ;; ENTITY_SUPERHERO_SHOW_RAT
+    dw   call_02_6b9b_EntityAction_Rat_Scurry, data_02_7cc4                         ; action $00 - pace
+    dw   call_02_582e_EntityAction_None, data_02_7ccd                               ; action $01 - unused - chains to $00
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $02 - defeated
+.data_02_46ac_EntityActions_SuperheroShowChomperTV:               ;; ENTITY_SUPERHERO_SHOW_CHOMPER_TV
+    dw   call_02_6ba3_EntityAction_ChomperTV_Descend, data_02_7cd6                  ; action $00 - pace and sink
+    dw   call_02_6be4_EntityAction_ChomperTV_Climb, data_02_7cd6                    ; action $01 - climb back up
+    dw   call_02_6bc8_EntityAction_ChomperTV_Thrash, data_02_7cdf                   ; action $02 - thrash: pace fast, flicker facing, and climb
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $03 - defeated
+.data_02_46bc_EntityActions_SuperheroShowCrumblingFloor:          ;; ENTITY_SUPERHERO_SHOW_CRUMBLING_FLOOR
+    dw   call_02_6bfb_EntityAction_CrumblingFloor_Solid, data_02_7ce6               ; action $00 - solid until Gex stands on it
+    dw   call_02_582e_EntityAction_None, data_02_7cec                               ; action $01 - cracking - chains to $02
+    dw   call_02_6c08_EntityAction_CrumblingFloor_Fall, data_02_7cf3                ; action $02 - falls off the bottom of the screen
+.data_02_46c8_EntityActions_SuperheroShowConvictProjectile:       ;; ENTITY_SUPERHERO_SHOW_CONVICT_PROJECTILE
     dw   call_02_6add_EntityAction_ConvictProjectile_Update, data_02_7cf9
-.data_02_46cc:
-    dw   call_02_6c1d_EntityAction_GextremeSportsElf_Unk0, data_02_7d08
-    dw   call_02_6c1d_EntityAction_GextremeSportsElf_Unk0, data_02_7d17
-    dw   call_02_6c4c_EntityAction_GextremeSportsElf_Unk2, data_02_7d26
-    dw   call_02_6c64_EntityAction_GextremeSportsElf_Unk3, data_02_7d35
-    dw   call_02_6c73_EntityAction_GextremeSportsElf_Unk4, data_02_7d3b
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_46e4:
-    dw   call_02_582e_EntityAction_None, data_02_7d42
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_46ec:
-    dw   call_02_582e_EntityAction_None, data_02_7d4f
-    dw   call_02_582e_EntityAction_None, data_02_7d55
-    dw   call_02_582e_EntityAction_None, data_02_7d4f
-.data_02_46f8:
+
+; ------------------------------------------------------------------
+; GEXTREME SPORTS
+; ------------------------------------------------------------------
+.data_02_46cc_EntityActions_GextremeSportsElf:                    ;; ENTITY_GEXTREME_SPORTS_ELF
+    dw   call_02_6c1d_EntityAction_GextremeSportsElf_Skate, data_02_7d08            ; action $00 - skate, first half - chains to $01
+    dw   call_02_6c1d_EntityAction_GextremeSportsElf_Skate, data_02_7d17            ; action $01 - skate, second half - chains back to $00
+    dw   call_02_6c4c_EntityAction_GextremeSportsElf_PrepareJump, data_02_7d26      ; action $02 - accelerate to $28 and arm the jump
+    dw   call_02_6c64_EntityAction_GextremeSportsElf_Jump, data_02_7d35             ; action $03 - the jump
+    dw   call_02_6c73_EntityAction_GextremeSportsElf_Damaged, data_02_7d3b          ; action $04 - hit: skid to a bound, then live or die
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $05 - defeated
+.data_02_46e4_EntityActions_GextremeSportsBonusTimeCoin:          ;; ENTITY_GEXTREME_SPORTS_BONUS_TIME_COIN
+    dw   call_02_582e_EntityAction_None, data_02_7d42                               ; action $00 - spinning
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $01 - taken
+
+; ------------------------------------------------------------------
+; MARSUPIAL MADNESS
+; ------------------------------------------------------------------
+.data_02_46ec_EntityActions_MarsupialMadnessBell:                 ;; ENTITY_MARSUPIAL_MADNESS_BELL
+    dw   call_02_582e_EntityAction_None, data_02_7d4f                               ; action $00 - unrung
+    dw   call_02_582e_EntityAction_None, data_02_7d55                               ; action $01 - ringing - chains to $02
+    dw   call_02_582e_EntityAction_None, data_02_7d4f                               ; action $02 - rung
+.data_02_46f8_EntityActions_MarsupialMadnessBird:                 ;; ENTITY_MARSUPIAL_MADNESS_BIRD
     dw   call_02_6cbb_EntityAction_Bird_Update, data_02_7d65
-.data_02_46fc:
-    dw   call_02_6cdd_EntityAction_BirdProjectile_Update, data_02_7d73
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_4704:
-    dw   call_02_6d3a_EntityAction_RockHard_Unk0, data_02_7d9a
-    dw   call_02_6d39_EntityAction_RockHard_Unk1, data_02_7d7c
-    dw   call_02_6d3b_EntityAction_RockHard_Unk2, data_02_7da3
-    dw   call_02_582e_EntityAction_None, data_02_7db1
-    dw   call_02_582e_EntityAction_None, data_02_7db7
-    dw   call_02_6d49_EntityAction_RockHard_Unk5, data_02_7dc3
-    dw   call_02_6d52_EntityAction_RockHard_Unk6, data_02_7dcd
+.data_02_46fc_EntityActions_MarsupialMadnessBirdProjectile:       ;; ENTITY_MARSUPIAL_MADNESS_BIRD_PROJECTILE
+    dw   call_02_6cdd_EntityAction_BirdProjectile_Update, data_02_7d73              ; action $00 - falling and bouncing three times
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $01 - spent
+
+; ------------------------------------------------------------------
+; WW GEX WRESTLING
+; ------------------------------------------------------------------
+.data_02_4704_EntityActions_WWGexWrestlingRockHard:               ;; ENTITY_WW_GEX_WRESTLING_ROCK_HARD
+    dw   call_02_6d3a_EntityAction_RockHard_None, data_02_7d9a                      ; action $00 - ready - chains to $02
+    dw   call_02_6d39_EntityAction_RockHard_None, data_02_7d7c                      ; action $01 - long recovery - chains to $00
+    dw   call_02_6d3b_EntityAction_RockHard_Leap, data_02_7da3                      ; action $02 - run-up, then the slam
+    dw   call_02_582e_EntityAction_None, data_02_7db1                               ; action $03 - the body slam: the only state he hurts Gex - chains to $04
+    dw   call_02_582e_EntityAction_None, data_02_7db7                               ; action $04 - get up - chains back to $00
+    dw   call_02_6d49_EntityAction_RockHard_Collapse, data_02_7dc3                  ; action $05 - collapse
+    dw   call_02_6d52_EntityAction_RockHard_Defeated, data_02_7dcd                  ; action $06 - defeated: set the progress flag and warp out
 .data_02_4720:
     dw   call_02_6d6d_EntityAction_BrainOfOz_Unk0, data_02_7dd5
     dw   call_02_6d6d_EntityAction_BrainOfOz_Unk0, data_02_7ddb
