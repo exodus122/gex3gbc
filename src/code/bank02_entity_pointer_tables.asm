@@ -25,6 +25,12 @@
 ; there is no looking down on a top-down map. Everything else that differs between
 ; the two modes differs inside the shared routine, not here.
 ;
+; The per-type tables are named for the entity they belong to wherever that is
+; known - .data_02_4354_EntityActions_HolidayTVIceSculpture and so on - and the
+; rows carry the action id and a word on what that action is. Where two entity ids
+; share one table, both are named on it: the two snakes and the two Ra statue
+; shots each run one table and tell themselves apart with Entity_GetId.
+;
 ; gex2's equivalent is data_02_4000_EntityActionJumpTable in
 ; bank02_update_entities.asm, with the same two-level layout and the same four-byte
 ; rows. It has no second player block, because gex2 has no top-down maps
@@ -60,34 +66,34 @@ data_02_4000_EntityActionJumpTable:
    dw   .data_02_4340 ; ENTITY_GOAL_COUNTER_7
    dw   .data_02_4344 ; ENTITY_BONUS_STAGE_TIMER
    dw   .data_02_4348 ; ENTITY_FREESTANDING_REMOTE
-   dw   .data_02_4354 ; ENTITY_HOLIDAY_TV_ICE_SCULPTURE
-   dw   .data_02_4360 ; ENTITY_HOLIDAY_TV_EVIL_SANTA
-   dw   .data_02_437c ; ENTITY_HOLIDAY_TV_EVIL_SANTA_PROJECTILE
-   dw   .data_02_4398 ; ENTITY_HOLIDAY_TV_SKATING_ELF
-   dw   .data_02_43b0 ; ENTITY_HOLIDAY_TV_PENGUIN
-   dw   .data_02_43c0 ; ENTITY_MYSTERY_TV_REZLING
-   dw   .data_02_43d8 ; ENTITY_MYSTERY_TV_BLOOD_COOLER
-   dw   .data_02_43e0 ; ENTITY_MYSTERY_TV_FISH
-   dw   .data_02_43e8 ; ENTITY_MYSTERY_TV_MAGIC_SWORD
-   dw   .data_02_43f4 ; ENTITY_MYSTERY_TV_SAFARI_SAM
-   dw   .data_02_4408 ; ENTITY_MYSTERY_TV_SAFARI_SAM_PROJECTILE
-   dw   .data_02_440c ; ENTITY_MYSTERY_TV_GHOST_KNIGHT
-   dw   .data_02_4424 ; ENTITY_MYSTERY_TV_GHOST_KNIGHT_PROJECTILE
-   dw   .data_02_4428 ; ENTITY_TUT_TV_HAND
-   dw   .data_02_4440 ; ENTITY_TUT_TV_LOST_ARK
-   dw   .data_02_4454 ; ENTITY_TUT_TV_RISING_PLATFORM
-   dw   .data_02_4458 ; ENTITY_TUT_TV_SIDEWAYS_PLATFORM
-   dw   .data_02_445c ; ENTITY_TUT_TV_BEE
-   dw   .data_02_4470 ; ENTITY_TUT_TV_RAFT
-   dw   .data_02_447c ; ENTITY_TUT_TV_SNAKE_FACING_RIGHT
-   dw   .data_02_447c ; ENTITY_TUT_TV_SNAKE_FACING_LEFT
-   dw   .data_02_4490 ; ENTITY_TUT_TV_SNAKE_RIGHT_PROJECTILE
-   dw   .data_02_4494 ; ENTITY_TUT_TV_SNAKE_LEFT_PROJECTILE
-   dw   .data_02_4498 ; ENTITY_TUT_TV_RA_STAFF
-   dw   .data_02_44a0 ; ENTITY_TUT_TV_RA_STATUE_HORIZONTAL_PROJECTILE
-   dw   .data_02_44a0 ; ENTITY_TUT_TV_RA_STATUE_DIAGONAL_PROJECTILE
-   dw   .data_02_44b0 ; ENTITY_TUT_TV_BREAKABLE_BLOCK
-   dw   .data_02_44c0 ; ENTITY_TUT_TV_COFFIN
+   dw   .data_02_4354_EntityActions_HolidayTVIceSculpture ; ENTITY_HOLIDAY_TV_ICE_SCULPTURE
+   dw   .data_02_4360_EntityActions_HolidayTVEvilSanta ; ENTITY_HOLIDAY_TV_EVIL_SANTA
+   dw   .data_02_437c_EntityActions_HolidayTVEvilSantaProjectile ; ENTITY_HOLIDAY_TV_EVIL_SANTA_PROJECTILE
+   dw   .data_02_4398_EntityActions_HolidayTVSkatingElf ; ENTITY_HOLIDAY_TV_SKATING_ELF
+   dw   .data_02_43b0_EntityActions_HolidayTVPenguin ; ENTITY_HOLIDAY_TV_PENGUIN
+   dw   .data_02_43c0_EntityActions_MysteryTVRezling ; ENTITY_MYSTERY_TV_REZLING
+   dw   .data_02_43d8_EntityActions_MysteryTVBloodCooler ; ENTITY_MYSTERY_TV_BLOOD_COOLER
+   dw   .data_02_43e0_EntityActions_MysteryTVFish ; ENTITY_MYSTERY_TV_FISH
+   dw   .data_02_43e8_EntityActions_MysteryTVMagicSword ; ENTITY_MYSTERY_TV_MAGIC_SWORD
+   dw   .data_02_43f4_EntityActions_MysteryTVSafariSam ; ENTITY_MYSTERY_TV_SAFARI_SAM
+   dw   .data_02_4408_EntityActions_MysteryTVSafariSamProjectile ; ENTITY_MYSTERY_TV_SAFARI_SAM_PROJECTILE
+   dw   .data_02_440c_EntityActions_MysteryTVGhostKnight ; ENTITY_MYSTERY_TV_GHOST_KNIGHT
+   dw   .data_02_4424_EntityActions_MysteryTVGhostKnightProjectile ; ENTITY_MYSTERY_TV_GHOST_KNIGHT_PROJECTILE
+   dw   .data_02_4428_EntityActions_TutTVHand ; ENTITY_TUT_TV_HAND
+   dw   .data_02_4440_EntityActions_TutTVLostArk ; ENTITY_TUT_TV_LOST_ARK
+   dw   .data_02_4454_EntityActions_TutTVRisingPlatform ; ENTITY_TUT_TV_RISING_PLATFORM
+   dw   .data_02_4458_EntityActions_TutTVSidewaysPlatform ; ENTITY_TUT_TV_SIDEWAYS_PLATFORM
+   dw   .data_02_445c_EntityActions_TutTVBee ; ENTITY_TUT_TV_BEE
+   dw   .data_02_4470_EntityActions_TutTVRaft ; ENTITY_TUT_TV_RAFT
+   dw   .data_02_447c_EntityActions_TutTVSnake ; ENTITY_TUT_TV_SNAKE_FACING_RIGHT
+   dw   .data_02_447c_EntityActions_TutTVSnake ; ENTITY_TUT_TV_SNAKE_FACING_LEFT
+   dw   .data_02_4490_EntityActions_TutTVSnakeRightProjectile ; ENTITY_TUT_TV_SNAKE_RIGHT_PROJECTILE
+   dw   .data_02_4494_EntityActions_TutTVSnakeLeftProjectile ; ENTITY_TUT_TV_SNAKE_LEFT_PROJECTILE
+   dw   .data_02_4498_EntityActions_TutTVRaStaff ; ENTITY_TUT_TV_RA_STAFF
+   dw   .data_02_44a0_EntityActions_TutTVRaStatueProjectile ; ENTITY_TUT_TV_RA_STATUE_HORIZONTAL_PROJECTILE
+   dw   .data_02_44a0_EntityActions_TutTVRaStatueProjectile ; ENTITY_TUT_TV_RA_STATUE_DIAGONAL_PROJECTILE
+   dw   .data_02_44b0_EntityActions_TutTVBreakableBlock ; ENTITY_TUT_TV_BREAKABLE_BLOCK
+   dw   .data_02_44c0_EntityActions_TutTVCoffin ; ENTITY_TUT_TV_COFFIN
    dw   .data_02_44cc ; ENTITY_WESTERN_STATION_ENEMY_CACTUS
    dw   .data_02_44e8 ; ENTITY_WESTERN_STATION_CACTUS
    dw   .data_02_44ec ; ENTITY_WESTERN_STATION_ROCK_PLATFORM
@@ -330,126 +336,137 @@ data_02_4000_EntityActionJumpTable:
     dw   call_02_5bd4_EntityAction_FreestandingRemote_unk0, data_02_76a5
     dw   call_02_5bef_EntityAction_FreestandingRemote_unk1, data_02_764b
     dw   call_02_5bfa_EntityAction_FreestandingRemote_unk2, data_02_75c2
-.data_02_4354:
-    dw   call_02_582e_EntityAction_None, data_02_76ab
-    dw   call_02_582e_EntityAction_None, data_02_76b1
-    dw   call_02_582e_EntityAction_None, data_02_76b7
-.data_02_4360:
-    dw   call_02_5c43_EntityAction_EvilSanta_Init, data_02_76bd
-    dw   call_02_5c50_EntityAction_EvilSanta_Jumping, data_02_76c3
-    dw   call_02_5c74_EntityAction_EvilSanta_PrepareThrow, data_02_76ca
-    dw   call_02_582e_EntityAction_None, data_02_76d9
-    dw   call_02_5c82_EntityAction_EvilSanta_Stand, data_02_76df
-    dw   call_02_5ca5_EntityAction_EvilSanta_Damaged, data_02_76e5
-    dw   call_02_5cd0_EntityAction_EvilSanta_Death, data_02_76f2
-.data_02_437c:
-    dw   call_02_5d10_EntityAction_EvilSantaProjectile_Init, data_02_7701
-    dw   call_02_5d80_EntityAction_EvilSantaProjectile_UpdateTrajectory, data_02_7701
-    dw   call_02_5d80_EntityAction_EvilSantaProjectile_UpdateTrajectory, data_02_7707
-    dw   call_02_5d80_EntityAction_EvilSantaProjectile_UpdateTrajectory, data_02_770d
-    dw   call_02_5d80_EntityAction_EvilSantaProjectile_UpdateTrajectory, data_02_7713
-    dw   call_02_5dd7_EntityAction_EvilSantaProjectile_Destroy, data_02_7719
-    dw   call_02_5dd7_EntityAction_EvilSantaProjectile_Destroy, data_02_7721
-.data_02_4398:
-    dw   call_02_5dde_EntityAction_SkatingElf_Skate, data_02_7729
-    dw   call_02_5dde_EntityAction_SkatingElf_Skate, data_02_7738
-    dw   call_02_5e0d_EntityAction_SkatingElf_PrepareJump, data_02_7747
-    dw   call_02_5e25_EntityAction_SkatingElf_Jump, data_02_7756
-    dw   call_02_5e34_EntityAction_SkatingElf_Damaged, data_02_775c
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_43b0:
-    dw   call_02_5e7c_EntityAction_Penguin_WalkOrRun, data_02_7763
-    dw   call_02_5eb8_EntityAction_Penguin_Jump, data_02_776e
-    dw   call_02_582e_EntityAction_None, data_02_7774
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_43c0:
-    dw   call_02_5ecc_EntityAction_Rezling_Walk, data_02_777b
-    dw   call_02_5eda_EntityAction_Rezling_None, data_02_7788
-    dw   call_02_5edb_EntityAction_Rezling_None, data_02_7790
-    dw   call_02_5edc_EntityAction_Rezling_None, data_02_7796
-    dw   call_02_582e_EntityAction_None, data_02_779c
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_43d8:
-    dw   call_02_582e_EntityAction_None, data_02_77ad
-    dw   call_02_582e_EntityAction_None, data_02_77b6
-.data_02_43e0:
-    dw   call_02_5edd_EntityAction_Fish_Unk0, data_02_77bc
-    dw   call_02_5ef9_EntityAction_Fish_Unk1, data_02_77c5
-.data_02_43e8:
-    dw   call_02_582e_EntityAction_None, data_02_77cb
-    dw   call_02_582e_EntityAction_None, data_02_77d8
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_43f4:
-    dw   call_02_5f01_EntityAction_SafariSam_Unk0, data_02_77de
-    dw   call_02_582e_EntityAction_None, data_02_77f0
-    dw   call_02_5f39_EntityAction_SafariSam_Unk2, data_02_77fb
-    dw   call_02_5f42_EntityAction_SafariSam_Unk3, data_02_7806
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_4408:
+; ------------------------------------------------------------------
+; HOLIDAY TV
+; ------------------------------------------------------------------
+.data_02_4354_EntityActions_HolidayTVIceSculpture:                ;; ENTITY_HOLIDAY_TV_ICE_SCULPTURE
+    dw   call_02_582e_EntityAction_None, data_02_76ab                               ; action $00 - intact
+    dw   call_02_582e_EntityAction_None, data_02_76b1                               ; action $01 - cracked
+    dw   call_02_582e_EntityAction_None, data_02_76b7                               ; action $02 - shattered
+.data_02_4360_EntityActions_HolidayTVEvilSanta:                   ;; ENTITY_HOLIDAY_TV_EVIL_SANTA
+    dw   call_02_5c43_EntityAction_EvilSanta_Init, data_02_76bd                     ; action $00 - set health, load the palette, fall through to $01
+    dw   call_02_5c50_EntityAction_EvilSanta_Jumping, data_02_76c3                  ; action $01 - hop across, turn round on landing
+    dw   call_02_5c74_EntityAction_EvilSanta_PrepareThrow, data_02_76ca             ; action $02 - wind up and throw the snowball
+    dw   call_02_582e_EntityAction_None, data_02_76d9                               ; action $03 - the throw pose - chains to $04
+    dw   call_02_5c82_EntityAction_EvilSanta_Stand, data_02_76df                    ; action $04 - wait: take a hit, or jump again once the snowball is gone
+    dw   call_02_5ca5_EntityAction_EvilSanta_Damaged, data_02_76e5                  ; action $05 - flash - chains back to $01
+    dw   call_02_5cd0_EntityAction_EvilSanta_Death, data_02_76f2                    ; action $06 - launch backwards and expire
+.data_02_437c_EntityActions_HolidayTVEvilSantaProjectile:         ;; ENTITY_HOLIDAY_TV_EVIL_SANTA_PROJECTILE
+    dw   call_02_5d10_EntityAction_EvilSantaProjectile_Init, data_02_7701           ; action $00 - aim the throw from the distance to Gex
+    dw   call_02_5d80_EntityAction_EvilSantaProjectile_UpdateTrajectory, data_02_7701; action $01 - the arc, sprite 1
+    dw   call_02_5d80_EntityAction_EvilSantaProjectile_UpdateTrajectory, data_02_7707; action $02 - the arc, sprite 2
+    dw   call_02_5d80_EntityAction_EvilSantaProjectile_UpdateTrajectory, data_02_770d; action $03 - the arc, sprite 3
+    dw   call_02_5d80_EntityAction_EvilSantaProjectile_UpdateTrajectory, data_02_7713; action $04 - the arc, sprite 4
+    dw   call_02_5dd7_EntityAction_EvilSantaProjectile_Destroy, data_02_7719        ; action $05 - burst - returned into Santa
+    dw   call_02_5dd7_EntityAction_EvilSantaProjectile_Destroy, data_02_7721        ; action $06 - burst - hit Gex
+.data_02_4398_EntityActions_HolidayTVSkatingElf:                  ;; ENTITY_HOLIDAY_TV_SKATING_ELF
+    dw   call_02_5dde_EntityAction_SkatingElf_Skate, data_02_7729                   ; action $00 - skate, first half of the loop - chains to $01
+    dw   call_02_5dde_EntityAction_SkatingElf_Skate, data_02_7738                   ; action $01 - skate, second half - chains back to $00
+    dw   call_02_5e0d_EntityAction_SkatingElf_PrepareJump, data_02_7747             ; action $02 - accelerate to $28 and arm the jump
+    dw   call_02_5e25_EntityAction_SkatingElf_Jump, data_02_7756                    ; action $03 - the jump
+    dw   call_02_5e34_EntityAction_SkatingElf_Damaged, data_02_775c                 ; action $04 - hit: skid to the end of the patrol, then live or die
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $05 - defeated
+.data_02_43b0_EntityActions_HolidayTVPenguin:                     ;; ENTITY_HOLIDAY_TV_PENGUIN
+    dw   call_02_5e7c_EntityAction_Penguin_WalkOrRun, data_02_7763                  ; action $00 - amble, or run away and jump when cornered
+    dw   call_02_5eb8_EntityAction_Penguin_Jump, data_02_776e                       ; action $01 - the jump
+    dw   call_02_582e_EntityAction_None, data_02_7774                               ; action $02 - unreachable - defeat flags $C3 select $03 instead
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $03 - defeated
+
+; ------------------------------------------------------------------
+; MYSTERY TV
+; ------------------------------------------------------------------
+.data_02_43c0_EntityActions_MysteryTVRezling:                     ;; ENTITY_MYSTERY_TV_REZLING
+    dw   call_02_5ecc_EntityAction_Rezling_Walk, data_02_777b                       ; action $00 - walk straight at Gex
+    dw   call_02_5eda_EntityAction_Rezling_None, data_02_7788                       ; action $01 - unused hit reaction - chains to $02
+    dw   call_02_5edb_EntityAction_Rezling_None, data_02_7790                       ; action $02 - unused hit reaction
+    dw   call_02_5edc_EntityAction_Rezling_None, data_02_7796                       ; action $03 - death, from defeat flags $C3 - chains to $04
+    dw   call_02_582e_EntityAction_None, data_02_779c                               ; action $04 - death burst - chains to $05
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $05 - defeated
+.data_02_43d8_EntityActions_MysteryTVBloodCooler:                 ;; ENTITY_MYSTERY_TV_BLOOD_COOLER
+    dw   call_02_582e_EntityAction_None, data_02_77ad                               ; action $00 - intact
+    dw   call_02_582e_EntityAction_None, data_02_77b6                               ; action $01 - broken
+.data_02_43e0_EntityActions_MysteryTVFish:                        ;; ENTITY_MYSTERY_TV_FISH
+    dw   call_02_5edd_EntityAction_Fish_Cruise, data_02_77bc                        ; action $00 - cruise at $08
+    dw   call_02_5ef9_EntityAction_Fish_Lunge, data_02_77c5                         ; action $01 - lunge at $20 - chains back to $00
+.data_02_43e8_EntityActions_MysteryTVMagicSword:                  ;; ENTITY_MYSTERY_TV_MAGIC_SWORD
+    dw   call_02_582e_EntityAction_None, data_02_77cb                               ; action $00 - shimmer - chains to $01
+    dw   call_02_582e_EntityAction_None, data_02_77d8                               ; action $01 - still, 120 frames - chains back to $00
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $02 - taken
+.data_02_43f4_EntityActions_MysteryTVSafariSam:                   ;; ENTITY_MYSTERY_TV_SAFARI_SAM
+    dw   call_02_5f01_EntityAction_SafariSam_Patrol, data_02_77de                   ; action $00 - patrol and count down to a shot
+    dw   call_02_582e_EntityAction_None, data_02_77f0                               ; action $01 - raise the rifle - chains to $02
+    dw   call_02_5f39_EntityAction_SafariSam_Fire, data_02_77fb                     ; action $02 - fire, then the recoil chains back to $00
+    dw   call_02_5f42_EntityAction_SafariSam_Death, data_02_7806                    ; action $03 - death hop - chains to $04
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $04 - defeated
+.data_02_4408_EntityActions_MysteryTVSafariSamProjectile:         ;; ENTITY_MYSTERY_TV_SAFARI_SAM_PROJECTILE
     dw   call_02_5f50_EntityAction_SafariSamProjectile_Update, data_02_780c
-.data_02_440c:
-    dw   call_02_5f69_EntityAction_GhostKnight_Unk0, data_02_7812
-    dw   call_02_5f78_EntityAction_GhostKnight_Unk1, data_02_7818
-    dw   call_02_582e_EntityAction_None, data_02_7821
-    dw   call_02_5f91_EntityAction_GhostKnight_Unk3, data_02_782a
-    dw   call_02_582e_EntityAction_None, data_02_7830
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_4424:
+.data_02_440c_EntityActions_MysteryTVGhostKnight:                 ;; ENTITY_MYSTERY_TV_GHOST_KNIGHT
+    dw   call_02_5f69_EntityAction_GhostKnight_Init, data_02_7812                   ; action $00 - place at post 0
+    dw   call_02_5f78_EntityAction_GhostKnight_Attack, data_02_7818                 ; action $01 - fire a shot every 16 frames
+    dw   call_02_582e_EntityAction_None, data_02_7821                               ; action $02 - vanish - chains to $03
+    dw   call_02_5f91_EntityAction_GhostKnight_Relocate, data_02_782a               ; action $03 - step to the next post - chains to $04
+    dw   call_02_582e_EntityAction_None, data_02_7830                               ; action $04 - reappear - chains back to $01
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $05 - defeated
+.data_02_4424_EntityActions_MysteryTVGhostKnightProjectile:       ;; ENTITY_MYSTERY_TV_GHOST_KNIGHT_PROJECTILE
     dw   call_02_60c7_EntityAction_GhostKnightProjectile_Update, data_02_7838
-.data_02_4428:
-    dw   call_02_613f_EntityAction_Hand_Unk0, data_02_783e
-    dw   call_02_614d_EntityAction_Hand_Unk1, data_02_7849
-    dw   call_02_6163_EntityAction_Hand_Unk2, data_02_7852
-    dw   call_02_616f_EntityAction_Hand_Unk3, data_02_785b
-    dw   call_02_582e_EntityAction_None, data_02_7861
-    dw   call_02_61b2_EntityAction_Hand_Unk5, data_02_7867
-.data_02_4440:
-    dw   call_02_582e_EntityAction_None, data_02_7874
-    dw   call_02_582e_EntityAction_None, data_02_787a
-    dw   call_02_61b8_EntityAction_LostArk_Unk2, data_02_7883
-    dw   call_02_582e_EntityAction_None, data_02_7889
-    dw   call_02_582e_EntityAction_None, data_02_7895
-.data_02_4454:
+
+; ------------------------------------------------------------------
+; TUT TV
+; ------------------------------------------------------------------
+.data_02_4428_EntityActions_TutTVHand:                            ;; ENTITY_TUT_TV_HAND
+    dw   call_02_613f_EntityAction_Hand_Crawl, data_02_783e                         ; action $00 - crawl to the end of the patrol
+    dw   call_02_614d_EntityAction_Hand_Rise, data_02_7849                          ; action $01 - rise
+    dw   call_02_6163_EntityAction_Hand_Fall, data_02_7852                          ; action $02 - fall
+    dw   call_02_616f_EntityAction_Hand_Slam, data_02_785b                          ; action $03 - slam - may break a block
+    dw   call_02_582e_EntityAction_None, data_02_7861                               ; action $04 - rest - chains back to $00
+    dw   call_02_61b2_EntityAction_Hand_Settle, data_02_7867                        ; action $05 - unreachable
+.data_02_4440_EntityActions_TutTVLostArk:                         ;; ENTITY_TUT_TV_LOST_ARK
+    dw   call_02_582e_EntityAction_None, data_02_7874                               ; action $00 - closed
+    dw   call_02_582e_EntityAction_None, data_02_787a                               ; action $01 - opening - chains to $02
+    dw   call_02_61b8_EntityAction_LostArk_Flash, data_02_7883                      ; action $02 - the flash - chains to $03
+    dw   call_02_582e_EntityAction_None, data_02_7889                               ; action $03 - the burst - chains to $04
+    dw   call_02_582e_EntityAction_None, data_02_7895                               ; action $04 - emptied
+.data_02_4454_EntityActions_TutTVRisingPlatform:                  ;; ENTITY_TUT_TV_RISING_PLATFORM
     dw   call_02_58bd_EntityAction_MovePlatformVertically, data_02_789b
-.data_02_4458:
+.data_02_4458_EntityActions_TutTVSidewaysPlatform:                ;; ENTITY_TUT_TV_SIDEWAYS_PLATFORM
     dw   call_02_585f_EntityAction_MovePlatformHorizontally, data_02_789b
-.data_02_445c:
-    dw   call_02_61c6_EntityAction_Bee_Unk0, data_02_78a1
-    dw   call_02_61ee_EntityAction_Bee_Unk1, data_02_78a8
-    dw   call_02_61ee_EntityAction_Bee_Unk1, data_02_78ae
-    dw   call_02_61ee_EntityAction_Bee_Unk1, data_02_78b4
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_4470:
-    dw   call_02_6214_EntityAction_Raft_ResetAndWait, data_02_78ba
-    dw   call_02_624e_EntityAction_Raft_MoveRightAndCarryPlayer, data_02_78ba
-    dw   call_02_6293_EntityAction_Raft_DriftDown, data_02_78ba
-.data_02_447c:
-    dw   call_02_62bc_EntityAction_Snake_Unk0, data_02_78c0
-    dw   call_02_62f9_EntityAction_Snake_Unk1, data_02_78c6
-    dw   call_02_6315_EntityAction_Snake_Unk2, data_02_78ce
-    dw   call_02_582e_EntityAction_None, data_02_78db
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_4490:
+.data_02_445c_EntityActions_TutTVBee:                             ;; ENTITY_TUT_TV_BEE
+    dw   call_02_61c6_EntityAction_Bee_Hover, data_02_78a1                          ; action $00 - hover and watch for Gex
+    dw   call_02_61ee_EntityAction_Bee_Dive, data_02_78a8                           ; action $01 - dive, climbing
+    dw   call_02_61ee_EntityAction_Bee_Dive, data_02_78ae                           ; action $02 - dive, at the top of the arc
+    dw   call_02_61ee_EntityAction_Bee_Dive, data_02_78b4                           ; action $03 - dive, coming down
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $04 - defeated
+.data_02_4470_EntityActions_TutTVRaft:                            ;; ENTITY_TUT_TV_RAFT
+    dw   call_02_6214_EntityAction_Raft_ResetAndWait, data_02_78ba                  ; action $00 - reset and surface
+    dw   call_02_624e_EntityAction_Raft_MoveRightAndCarryPlayer, data_02_78ba       ; action $01 - ferry Gex right
+    dw   call_02_6293_EntityAction_Raft_DriftDown, data_02_78ba                     ; action $02 - sink, then back to $00
+.data_02_447c_EntityActions_TutTVSnake:                           ;; ENTITY_TUT_TV_SNAKE_FACING_RIGHT / _LEFT
+    dw   call_02_62bc_EntityAction_Snake_Coiled, data_02_78c0                       ; action $00 - coiled
+    dw   call_02_62f9_EntityAction_Snake_Strike, data_02_78c6                       ; action $01 - strike and spit
+    dw   call_02_6315_EntityAction_Snake_Recoil, data_02_78ce                       ; action $02 - recoil - chains back to $00
+    dw   call_02_582e_EntityAction_None, data_02_78db                               ; action $03 - death, from defeat flags $C3 - chains to $04
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $04 - defeated
+.data_02_4490_EntityActions_TutTVSnakeRightProjectile:            ;; ENTITY_TUT_TV_SNAKE_RIGHT_PROJECTILE
     dw   call_02_631a_EntityAction_SnakeRightProjectile_Update, data_02_78e1
-.data_02_4494:
+.data_02_4494_EntityActions_TutTVSnakeLeftProjectile:             ;; ENTITY_TUT_TV_SNAKE_LEFT_PROJECTILE
     dw   call_02_6333_EntityAction_SnakeLeftProjectile_Update, data_02_78e1
-.data_02_4498:
-    dw   call_02_582e_EntityAction_None, data_02_78e7
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_44a0:
-    dw   call_02_634c_EntityAction_RaStatue_Unk0, data_02_78f4
-    dw   call_02_6361_EntityAction_RaStatue_Unk1, data_02_78fa
-    dw   call_02_582e_EntityAction_None, data_02_7913
-    dw   call_02_6399_EntityAction_RaStatue_Unk3, data_02_7926
-.data_02_44b0:
-    dw   call_02_63a8_EntityAction_BreakableBlock_Unk0, data_02_792d
-    dw   call_02_63a8_EntityAction_BreakableBlock_Unk0, data_02_7933
-    dw   call_02_63a8_EntityAction_BreakableBlock_Unk0, data_02_7939
-    dw   call_02_63c0_EntityAction_BreakableBlock_Unk3, data_02_793f
-.data_02_44c0:
-    dw   call_02_582e_EntityAction_None, data_02_7945
-    dw   call_02_582e_EntityAction_None, data_02_794b
-    dw   call_02_63d3_EntityAction_Coffin_Unk2, data_02_7952
+.data_02_4498_EntityActions_TutTVRaStaff:                         ;; ENTITY_TUT_TV_RA_STAFF
+    dw   call_02_582e_EntityAction_None, data_02_78e7                               ; action $00 - idle
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $01 - taken
+.data_02_44a0_EntityActions_TutTVRaStatueProjectile:              ;; ENTITY_TUT_TV_RA_STATUE_HORIZONTAL_PROJECTILE / _DIAGONAL_
+    dw   call_02_634c_EntityAction_RaStatue_Reset, data_02_78f4                     ; action $00 - re-park at the statue
+    dw   call_02_6361_EntityAction_RaStatue_WaitForPlayer, data_02_78fa             ; action $01 - wait for Gex in the hotspot
+    dw   call_02_582e_EntityAction_None, data_02_7913                               ; action $02 - launch - chains to $03
+    dw   call_02_6399_EntityAction_RaStatue_Fly, data_02_7926                       ; action $03 - fly until the timer runs out, then back to $00
+.data_02_44b0_EntityActions_TutTVBreakableBlock:                  ;; ENTITY_TUT_TV_BREAKABLE_BLOCK
+    dw   call_02_63a8_EntityAction_BreakableBlock_TakeHit, data_02_792d             ; action $00 - undamaged
+    dw   call_02_63a8_EntityAction_BreakableBlock_TakeHit, data_02_7933             ; action $01 - one slam taken
+    dw   call_02_63a8_EntityAction_BreakableBlock_TakeHit, data_02_7939             ; action $02 - two slams taken
+    dw   call_02_63c0_EntityAction_BreakableBlock_Shatter, data_02_793f             ; action $03 - shatter
+.data_02_44c0_EntityActions_TutTVCoffin:                          ;; ENTITY_TUT_TV_COFFIN
+    dw   call_02_582e_EntityAction_None, data_02_7945                               ; action $00 - closed
+    dw   call_02_582e_EntityAction_None, data_02_794b                               ; action $01 - opening - chains to $02
+    dw   call_02_63d3_EntityAction_Coffin_Opened, data_02_7952                      ; action $02 - open: raise the trigger
 .data_02_44cc:
     dw   call_02_63db_EntityAction_EnemyCactus_Unk0, data_02_7958
     dw   call_02_63f0_EntityAction_EnemyCactus_Unk1, data_02_7961
