@@ -1731,6 +1731,7 @@
 02:7a61 data_02_7a61
 02:7a7a data_02_7a7a
 02:7a85 data_02_7a85
+02:7a8b data_02_7a8b_Orphan
 02:7a91 data_02_7a91
 02:7a97 data_02_7a97
 02:7a9d data_02_7a9d
@@ -1848,6 +1849,7 @@
 02:7ed1 data_02_7ed1
 02:7eda data_02_7eda
 02:7ee0 data_02_7ee0
+02:7eeb data_02_7eeb_Orphan
 03:4000 data_03_4000_TileCollisionFlags
 03:4100 image_003_4100_collision_tileset
 03:4400 image_003_4400
