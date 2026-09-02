@@ -551,7 +551,7 @@ call_01_470c_MenuCmd_SetCounterText:
     ld   HL, wDADD_MenuTextBuffer                     ;; 01:4714 $21 $dd $da
     bit  7, [HL]                                      ;; 01:4717 $cb $7e
     call NZ, call_01_4d49_Text_FormatByte             ;; 01:4719 $c4 $49 $4d
-    ld   HL, MENUTEXT_COUNTER_STRINGS                 ;; 01:471c $21 $97 $4e
+    ld   HL, Text_CounterStrings                      ;; 01:471c $21 $97 $4e
     jp   call_01_4cfa_Menu_SetScriptSrcPtr            ;; 01:471f $c3 $fa $4c
 
 call_01_4722_MenuCmd_GetCounterValue:
@@ -726,7 +726,7 @@ call_01_47b1_MenuCmd_LoadFullscreenImage:
     dw   .data_01_47f4, .data_01_47fc, .data_01_4804
 .data_01_47d4: ; MENU_IMAGE_DAVID_A_PALMER
     menu_fullscreen_image MENUIMG_PALETTE_LOOKUP, $06, $45e0, $4000, $05e0
-.data_01_47dc: ; MENU_IMAGE_UNK10 - only $100 bytes, so 16 tiles
+.data_01_47dc: ; MENU_IMAGE_LANGUAGE_SELECT - only $100 bytes, so 16 tiles
     menu_fullscreen_image MENUIMG_PALETTE_LOOKUP, $06, $48a6, $47a6, $0100
 .data_01_47e4: ; MENU_IMAGE_TITLE_SCREEN - the biggest, and one of two with a full map
     menu_fullscreen_image MENUIMG_PALETTE_MAP,    $06, $56fe, $4a1e, $0ce0
@@ -746,17 +746,19 @@ call_01_480c_MenuCmd_SetCollectedCountText:
 ; appended - the suffix string is written first and the number is dropped on top of
 ; its first byte.
 ;
-; Note the source operand MENUTEXT_COLLECTED_SUFFIX. As a raw number it is $4AC3, and
-; the disassembler resolved that to a label inside this file's own bit-counting loop;
-; it is really a bank $1C address and has nothing to do with bank 1
+; The suffix is Text_XOf4RemotesFound, whose English form is literally
+; "x of 4 remotes found" - the leading "x" is the placeholder this routine overwrites.
+; As a raw number its address is $4AC3, which the disassembler resolved to a label
+; inside this file's own bit-counting loop; it is a bank $1C address and has nothing
+; to do with bank 1
     ld   hl,wDADD_MenuTextBuffer
     ld   [hl],TEXT_TERMINATOR
-    ld   de,MENUTEXT_COLLECTED_SUFFIX
+    ld   de,Text_XOf4RemotesFound
     call call_00_0865_Text_AppendStringToBuffer
     call call_01_4acf_CountCollectedBitsForLevel
     add  a,ASCII_ZERO
     ld   [wDADD_MenuTextBuffer],a
-    ld   hl,MENUTEXT_COUNTER_STRINGS
+    ld   hl,Text_CounterStrings
     jp   call_01_4cfa_Menu_SetScriptSrcPtr
 
 call_01_4825_MenuCmd_NoOp2:

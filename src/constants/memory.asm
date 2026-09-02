@@ -778,9 +778,14 @@ wDBF7_GfxStream_ListPtrHi:
     ds 1                                               ;; dbf7
 
 wDBF8_TextStringIndex:
-; which string of a BANK_1C_TEXT pointer table the menu wants, used by
-; call_00_0835_Text_LoadStringToBuffer and
-; call_00_0865_Text_AppendStringToBuffer
+; THE LANGUAGE. Every text record in BANK_1C_TEXT is five pointers - English, French,
+; German, Spanish, Italian - and this picks one, in
+; call_00_0835_Text_LoadStringToBuffer and call_00_0865_Text_AppendStringToBuffer.
+;
+; NOTHING IN THE ROM WRITES IT. It is cleared with the rest of WRAM at boot and stays
+; $00, so the game is permanently English and about two thirds of bank $1C is
+; unreachable. MENU_LANGUAGE_SELECT is the screen that would have set it, and nothing
+; opens that either - see data/bank_01c_text.asm
     ds 1                                               ;; dbf8
 
 ; Map-related wRAM starts here

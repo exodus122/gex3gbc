@@ -115,40 +115,43 @@ call_01_4df4_Text_CharToGlyphIndex:
 ; renders as a space - including a real space ($20), which is why the wrapper has to
 ; test for TEXT_SPACE itself rather than looking at the glyph.
 ;
-; Reading the mapped entries back gives the font's own layout, and it is not
-; alphabetical:
+; Reading the mapped entries back gives the font's own layout:
 ;
 ;   $00      blank
-;   $01-$1a  lowercase a-z
+;   $01-$1a  the alphabet - reached from LOWER case ASCII
 ;   $1b-$24  digits 0-9
-;   $25-$38  UPPERCASE A-T
+;   $25-$38  accented vowels, five per diacritic - reached from UPPER case A-T
 ;   $39-$3a  ? !
-;   $3b-$3d  UPPERCASE U V W
+;   $3b-$3d  inverted !, sharp s, n-with-tilde - from U V W
 ;   $3e-$44  . , - / ( ) '
-;   $45-$46  UPPERCASE X Y
+;   $45-$46  trade mark and copyright signs - from X Y
 ;
-; So the capitals were laid out as far as T, punctuation was added after them, and
-; U-W and X-Y were bolted on twice more as the text needed them. TEXT_GLYPH_COUNT is
-; $47, exactly one past the last of those.
+; THE FONT HAS NO CAPITALS. Its $01-$1a glyphs are drawn as capital letters and lower
+; case ASCII is what selects them, which leaves the whole upper case range free for
+; the accented characters the French, German, Spanish and Italian text needs.
+; data/bank_01c_text.asm has the full character-by-character mapping and explains why
+; a string there reads "paVwort".
 ;
-; UPPERCASE Z HAS NO GLYPH. Code $5a maps to $00 like an unmapped character, so a
-; capital Z anywhere in the game's text would come out as a blank; no string in the
-; ROM contains one. Lowercase z is fine - it is glyph $1a.
+; Z is the one letter with no entry: $5a maps to $00 like an unmapped code, because no
+; accented character was assigned to it. That costs nothing - lower case z is glyph
+; $1a and is what every string uses.
 ;
-; gex2's .data_01_4f4c_CharToGlyph is a shorter table biased by $20 and has no
-; lowercase at all
+; TEXT_GLYPH_COUNT is $47, one past the last mapped glyph.
+;
+; gex2's .data_01_4f4c_CharToGlyph is a shorter table biased by $20 - gex2 is English
+; only, so its upper case range really is upper case
     db   $00, $00, $00, $00, $00, $00, $00, $00       ; $00-$07 control codes
     db   $00, $00, $00, $00, $00, $00, $00, $00       ; $08-$0f
     db   $00, $00, $00, $00, $00, $00, $00, $00       ; $10-$17
     db   $00, $00, $00, $00, $00, $00, $00, $00       ; $18-$1f
-    db   $00, $3a, $00, $00, $00, $00, $00, $44       ; $20 space ! " # $ % & '
+    db   $00, $3a, $00, $00, $00, $00, $00, $44       ; $20 space and ! and ' are the only mapped ones here
     db   $42, $43, $00, $00, $3f, $40, $3e, $41       ; $28 ( ) * + , - . /
     db   $1b, $1c, $1d, $1e, $1f, $20, $21, $22       ; $30 digits 0-7
     db   $23, $24, $00, $00, $00, $00, $00, $39       ; $38 8 9 : ; < = > ?
     db   $00, $25, $26, $27, $28, $29, $2a, $2b       ; $40 @, then A-G
     db   $2c, $2d, $2e, $2f, $30, $31, $32, $33       ; $48 H-O
-    db   $34, $35, $36, $37, $38, $3b, $3c, $3d       ; $50 P-T run out at $38; U V W jump to $3b
-    db   $45, $46, $00, $00, $00, $00, $00, $00       ; $58 X Y, then Z with NO glyph, then [ to _
+    db   $34, $35, $36, $37, $38, $3b, $3c, $3d       ; $50 P-T end the accents; U V W are inverted-!, sharp-s, n-tilde
+    db   $45, $46, $00, $00, $00, $00, $00, $00       ; $58 X Y are (tm) and (c); Z has NO glyph; then [ to _
     db   $00, $01, $02, $03, $04, $05, $06, $07       ; $60 `, then a-g
     db   $08, $09, $0a, $0b, $0c, $0d, $0e, $0f       ; $68 h-o
     db   $10, $11, $12, $13, $14, $15, $16, $17       ; $70 p-w

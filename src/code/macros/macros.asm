@@ -286,6 +286,23 @@ MACRO sprite_rect ; Y, X, tile, OAM attributes, width in tiles, height in tiles
 ENDM
 
 ; ------------------------------------------------------------------
+; Text records - see data/bank_01c_text.asm
+; ------------------------------------------------------------------
+; One string in five languages. call_00_0835_Text_LoadStringToBuffer indexes this
+; with wDBF8_TextStringIndex, which nothing ever sets, so entry 0 is the only one
+; this build can reach
+MACRO text_langs ; English, French, German, Spanish, Italian
+    dw   \1, \2, \3, \4, \5
+ENDM
+
+; The same record where every language shares one string - names, legal notices and
+; anything else that was never translated. Written out as five pointers all the same,
+; because the reader always takes five
+MACRO text_all_langs ; the one string
+    dw   \1, \1, \1, \1, \1
+ENDM
+
+; ------------------------------------------------------------------
 ; Bank $7F - the index to Gex's graphics. See data/sprite_data/bank7F.asm
 ; ------------------------------------------------------------------
 ; One row of data_7f_4000_PlayerGfx_SetByMap. The byte actually stored is a BYTE

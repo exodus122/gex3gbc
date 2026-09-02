@@ -158,22 +158,22 @@ call_01_4b43_MenuText_GetMapTextBlock:
 ; the rest is an array of ten-byte mission descriptions. The three accessors above are
 ; just +0, +$0A and +$14 into it.
 ;
-; THESE ARE BANK $1C ADDRESSES. They are stored as bare words, so the disassembler
-; reads them as bank 1 and any label it invents for them is wrong; the dereference
-; happens with BANK_1C_TEXT paged in. Sorting them shows the blocks laid out in level
-; order with no gaps, which is the check that the table has not been misread
-    dw   $4ea1                                        ; LEVEL_GEX_CAVE
-    dw   $4f69                                        ; LEVEL_HOLIDAY_TV
-    dw   $51f7                                        ; LEVEL_MYSTERY_TV
-    dw   $54ef                                        ; LEVEL_TUT_TV
-    dw   $57ba                                        ; LEVEL_WESTERN_STATION
-    dw   $5a5f                                        ; LEVEL_ANIME_CHANNEL
-    dw   $5d89                                        ; LEVEL_SUPERHERO_SHOW
-    dw   $6006                                        ; LEVEL_GEXTREME_SPORTS
-    dw   $614e                                        ; LEVEL_MARSUPIAL_MADNESS
-    dw   $62a4                                        ; LEVEL_WW_GEX_WRESTLING
-    dw   $64a5                                        ; LEVEL_LIZARD_OF_OZ
-    dw   $663e                                        ; LEVEL_CHANNEL_Z
+; THESE ARE BANK $1C ADDRESSES, stored as bare words - the dereference happens with
+; BANK_1C_TEXT paged in, so the disassembler read them as bank 1 and any label it
+; invented for them was wrong. They now name the real blocks in
+; data/bank_01c_text.asm, which is also where the block layout is documented
+    dw   MapText_GexCave                          ; LEVEL_GEX_CAVE
+    dw   MapText_HolidayTv                        ; LEVEL_HOLIDAY_TV
+    dw   MapText_MysteryTv                        ; LEVEL_MYSTERY_TV
+    dw   MapText_TutTv                            ; LEVEL_TUT_TV
+    dw   MapText_WesternStation                   ; LEVEL_WESTERN_STATION
+    dw   MapText_AnimeChannel                     ; LEVEL_ANIME_CHANNEL
+    dw   MapText_SuperheroShow                    ; LEVEL_SUPERHERO_SHOW
+    dw   MapText_GextremeSports                   ; LEVEL_GEXTREME_SPORTS
+    dw   MapText_MarsupialMadness                 ; LEVEL_MARSUPIAL_MADNESS
+    dw   MapText_WwGexWrestling                   ; LEVEL_WW_GEX_WRESTLING
+    dw   MapText_LizardOfOz                       ; LEVEL_LIZARD_OF_OZ
+    dw   MapText_ChannelZ                         ; LEVEL_CHANNEL_Z
 
 call_01_4b6b_Menu_TickHideSprites:
 ; Counts down wDBDE_Menu_HideSpritesDelay and, when it expires, erases the sprite

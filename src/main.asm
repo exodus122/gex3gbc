@@ -163,7 +163,7 @@ SECTION "bank1B", ROMX[$4000], BANK[$1B]
 
 SECTION "bank1C", ROMX[$4000], BANK[$1C]
 bank_01c_text:
-    INCBIN "data/bank_01c_text.bin"
+    INCLUDE "data/bank_01c_text.asm"
 
 SECTION "bank1d", ROMX[$4000], BANK[$1D]
 image_1d_4000:

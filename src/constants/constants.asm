@@ -982,7 +982,9 @@ DEF MENU_QUIT_GAME                        EQU $0C
 DEF MENU_PAUSE_IN_LEVEL                   EQU $0D
 DEF MENU_GO_TO_MAP                        EQU $0E
 DEF MENU_DAVID_A_PALMER                   EQU $0F
-DEF MENU_UNK10                            EQU $10 ; unused?
+DEF MENU_LANGUAGE_SELECT                  EQU $10 ; the cut language menu - it has a
+                                                   ; backdrop, five options and five
+                                                   ; strings, and no caller anywhere
 DEF MENU_OPENING_CREDITS_1                EQU $11
 DEF MENU_OPENING_CREDITS_2                EQU $12
 DEF MENU_OPENING_CRYSTAL_DYNAMICS         EQU $13
@@ -1118,7 +1120,7 @@ DEF MENU_COUNTER_LEVEL_COLLECTIBLE_TOTAL EQU $0b ; call_00_2f34_CountLevelCollec
 ; MENUCMD_SUB_FULLSCREEN_IMAGE: which still to load, indexing
 ; .data_01_47c6_FullscreenImages inside call_01_47b1_MenuCmd_LoadFullscreenImage
 DEF MENU_IMAGE_DAVID_A_PALMER    EQU $00
-DEF MENU_IMAGE_UNK10             EQU $01 ; the backdrop of the unreachable MENU_UNK10
+DEF MENU_IMAGE_LANGUAGE_SELECT   EQU $01 ; backdrop of MENU_LANGUAGE_SELECT
 DEF MENU_IMAGE_TITLE_SCREEN      EQU $02
 DEF MENU_IMAGE_CRYSTAL_DYNAMICS  EQU $03
 DEF MENU_IMAGE_EIDOS_INTERACTIVE EQU $04
@@ -1150,7 +1152,11 @@ DEF TEXT_TERMINATOR              EQU $80 ; bit 7 ends a line; a following $00 en
 DEF TEXT_SPACE                   EQU $20 ; the only place the wrapper may break a line
 DEF TEXT_AUTO_ALIGN              EQU $fe ; in pen X: centre. In pen Y: distribute vertically
 DEF ASCII_ZERO                   EQU $30
-DEF TEXT_GLYPH_COUNT             EQU $47 ; entries in a font's width table, $00..$46
+DEF TEXT_GLYPH_COUNT             EQU $47 ; entries in a font's width table, $00..$46.
+                                         ; Glyphs $01-$1A are the alphabet and lower
+                                         ; case ASCII reaches them; $25 up are accented
+                                         ; vowels and symbols reached through UPPER
+                                         ; case. See data/bank_01c_text.asm
 
 ; Save-progress counting - wDC5C_ProgressFlags, one byte per level
 DEF OBJECTIVES_PER_LEVEL         EQU $04 ; the low nibble
@@ -1179,10 +1185,9 @@ DEF PASSWORD_CELL_TILES          EQU $04 ; each cell is 2x2 tiles
 DEF PASSWORD_CELL_TILE_BASE      EQU $98 ; VRAM tile id of cell 0
 DEF PASSWORD_GLYPH_BYTES         EQU $40 ; PASSWORD_CELL_TILES * TILE_SIZE_BYTES
 
-; Menu string pointers are dereferenced by call_00_0835_Text_LoadStringToBuffer 
-; with BANK_1C_TEXT paged in, so these are bank $1C addresses
-DEF MENUTEXT_COUNTER_STRINGS     EQU $4e97
-DEF MENUTEXT_COLLECTED_SUFFIX    EQU $4ac3
+; The two bank $1C text records the code names directly rather than through a menu
+; script are now labels in data/bank_01c_text.asm - Text_CounterStrings and
+; Text_XOf4RemotesFound. The DEFs that used to hold their raw addresses are gone
 
 DEF REMOTE_MARKER_TILE_TAKEN     EQU $e4 ; the 2x2 mission marker on the select screen
 DEF REMOTE_MARKER_TILE_MISSING   EQU $e8
