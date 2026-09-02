@@ -1583,279 +1583,556 @@ wDE49_ParticleSlot8:
 ; Start of Audio wRAM section
 wDE5C_CurrentSong:
     ds 1                                               ;; de5c
-wDE5D_QueuedSoundEffect:
+wDE5D_QueuedSFX:
     ds 1                                               ;; de5d
-wDE5E_QueuedSoundEffectPriority:
+wDE5E_QueuedSFXPriority:
     ds 1                                               ;; de5e
-wDE5F_CurrentSoundEffectPriority:
+wDE5F_CurrentSFXPriority:
     ds 1                                               ;; de5f
-wDE60_AudioBankCurrent:
+wDE60_CurrentAudioBank:
     ds 1                                               ;; de60
     
 ; unused section?
     ds 159                                             ;; de61
 
-; Start of Bank 04-05 audio ram
-wDF00:
+; ------------------------------------------------------------------
+; SOUND DRIVER STATE
+;
+; Everything the driver in banks $04 and $05 owns. The first four blocks are one per
+; hardware channel, AUDIO_CH_SIZE bytes each and identical in layout - see the
+; AUDIO_CH_* constants for the offsets the code adds and subtracts.
+;
+; Unlike gex2 there is no second set of channels for sound effects. An effect takes a
+; hardware channel away from the music by clearing that channel's AUDIO_CHF_ENABLED and
+; hands it straight back when it ends, so nothing is ever saved or restored - compare
+; gex2's wDFD2_Audio_SavedMusicRegs
+; ------------------------------------------------------------------
+
+; --- channel 1, pulse A ---
+
+wDF00_Audio_Ch1_Flags:
+; AUDIO_CHF_ENABLED while the music may write this channel's registers, and
+; AUDIO_CHF_RUNNING while its pattern is still being read. A sound effect clears the
+; first and leaves the second, which is how the music keeps its place while inaudible
     ds 1                                               ;; df00
 
-wDF01:
+wDF01_Audio_Ch1_NoteTimer:
+; ticks left on the current note. Audio_RunSequence costs three instructions
+; a frame until it reaches zero
     ds 1                                               ;; df01
 
-wDF02:
+wDF02_Audio_Ch1_SeqPtrLo:
+; where this channel is in its pattern
     ds 1                                               ;; df02
 
-wDF03:
+wDF03_Audio_Ch1_SeqPtrHi:
     ds 1                                               ;; df03
 
-wDF04:
+wDF04_Audio_Ch1_NR14Shadow:
+; frequency high bits, plus AUDIO_NRX4_TRIGGER while a retrigger is
+; pending. Audio_StepPitchSlide treats this and the byte below as one 16-bit number, so a
+; slide can carry from one into the other
     ds 1                                               ;; df04
 
-wDF05:
-    ds 5                                               ;; df05
+wDF05_Audio_Ch1_NR13Shadow:
+; frequency low byte
+    ds 1                                               ;; df05
 
-wDF0A:
+    ds 1                                               ;; df06 (unused)
+
+wDF07_Audio_Ch1_NR11Shadow:
+; duty and length, taken from the instrument
+    ds 1                                               ;; df07
+
+wDF08_Audio_Ch1_NR12Shadow:
+; volume envelope register, kept in step with whatever the envelope last
+; wrote so that a retrigger does not lose the current volume
+    ds 1                                               ;; df08
+
+    ds 1                                               ;; df09 (unused)
+
+wDF0A_Audio_Ch1_EnvelopeTimer:
+; frames left on this volume-envelope step; zero once the envelope has
+; finished
     ds 1                                               ;; df0a
 
-wDF0B:
-    ds 2                                               ;; df0b
+wDF0B_Audio_Ch1_EnvelopePtrLo:
+; position in the instrument's volume envelope
+    ds 1                                               ;; df0b
 
-wDF0D:
+wDF0C_Audio_Ch1_EnvelopePtrHi:
+    ds 1                                               ;; df0c
+
+wDF0D_Audio_Ch1_PitchTimer:
+; frames left on this pitch-slide step
     ds 1                                               ;; df0d
 
-wDF0E:
-    ds 2                                               ;; df0e
+wDF0E_Audio_Ch1_PitchPtrLo:
+; position in the instrument's pitch slide
+    ds 1                                               ;; df0e
 
-wDF10:
+wDF0F_Audio_Ch1_PitchPtrHi:
+    ds 1                                               ;; df0f
+
+wDF10_Audio_Ch1_ArpTimer:
+; frames left on this arpeggio step
     ds 1                                               ;; df10
 
-wDF11:
+wDF11_Audio_Ch1_ArpPtrLo:
+; position in the instrument's arpeggio
     ds 1                                               ;; df11
 
-wDF12:
-    ds 2                                               ;; df12
+wDF12_Audio_Ch1_ArpPtrHi:
+    ds 1                                               ;; df12
 
-wDF14:
+wDF13_Audio_Ch1_LoopCounter:
+; repeats left in the pattern AUDIO_CMD_CALL_PATTERN entered
+    ds 1                                               ;; df13
+
+wDF14_Audio_Ch1_Transpose:
+; semitones added to every note this channel plays; set per pattern call and
+; cleared by Audio_ResetHardware
     ds 1                                               ;; df14
 
-wDF15:
-    ds 3                                               ;; df15
+wDF15_Audio_Ch1_LoopActive:
+; non-zero once LoopCounter has been loaded, so re-entering a pattern that is
+; already counting down does not restart the count
+    ds 1                                               ;; df15
 
-wDF18:
+wDF16_Audio_Ch1_ReturnPtrLo:
+; where AUDIO_CMD_END_PATTERN goes back to
+    ds 1                                               ;; df16
+
+wDF17_Audio_Ch1_ReturnPtrHi:
+    ds 1                                               ;; df17
+
+; --- channel 2, pulse B ---
+
+wDF18_Audio_Ch2_Flags:
+; AUDIO_CHF_ENABLED while the music may write this channel's registers, and
+; AUDIO_CHF_RUNNING while its pattern is still being read. A sound effect clears the
+; first and leaves the second, which is how the music keeps its place while inaudible
     ds 1                                               ;; df18
 
-wDF19:
+wDF19_Audio_Ch2_NoteTimer:
+; ticks left on the current note. Audio_RunSequence costs three instructions
+; a frame until it reaches zero
     ds 1                                               ;; df19
 
-wDF1A:
+wDF1A_Audio_Ch2_SeqPtrLo:
+; where this channel is in its pattern
     ds 1                                               ;; df1a
 
-wDF1B:
+wDF1B_Audio_Ch2_SeqPtrHi:
     ds 1                                               ;; df1b
 
-wDF1C:
+wDF1C_Audio_Ch2_NR24Shadow:
+; frequency high bits, plus AUDIO_NRX4_TRIGGER while a retrigger is
+; pending. Audio_StepPitchSlide treats this and the byte below as one 16-bit number, so a
+; slide can carry from one into the other
     ds 1                                               ;; df1c
 
-wDF1D:
-    ds 5                                               ;; df1d
+wDF1D_Audio_Ch2_NR23Shadow:
+; frequency low byte
+    ds 1                                               ;; df1d
 
-wDF22:
+    ds 1                                               ;; df1e (unused)
+
+wDF1F_Audio_Ch2_NR21Shadow:
+; duty and length, taken from the instrument
+    ds 1                                               ;; df1f
+
+wDF20_Audio_Ch2_NR22Shadow:
+; volume envelope register, kept in step with whatever the envelope last
+; wrote so that a retrigger does not lose the current volume
+    ds 1                                               ;; df20
+
+    ds 1                                               ;; df21 (unused)
+
+wDF22_Audio_Ch2_EnvelopeTimer:
+; frames left on this volume-envelope step; zero once the envelope has
+; finished
     ds 1                                               ;; df22
 
-wDF23:
-    ds 2                                               ;; df23
+wDF23_Audio_Ch2_EnvelopePtrLo:
+; position in the instrument's volume envelope
+    ds 1                                               ;; df23
 
-wDF25:
+wDF24_Audio_Ch2_EnvelopePtrHi:
+    ds 1                                               ;; df24
+
+wDF25_Audio_Ch2_PitchTimer:
+; frames left on this pitch-slide step
     ds 1                                               ;; df25
 
-wDF26:
-    ds 2                                               ;; df26
+wDF26_Audio_Ch2_PitchPtrLo:
+; position in the instrument's pitch slide
+    ds 1                                               ;; df26
 
-wDF28:
+wDF27_Audio_Ch2_PitchPtrHi:
+    ds 1                                               ;; df27
+
+wDF28_Audio_Ch2_ArpTimer:
+; frames left on this arpeggio step
     ds 1                                               ;; df28
 
-wDF29:
+wDF29_Audio_Ch2_ArpPtrLo:
+; position in the instrument's arpeggio
     ds 1                                               ;; df29
 
-wDF2A:
-    ds 2                                               ;; df2a
+wDF2A_Audio_Ch2_ArpPtrHi:
+    ds 1                                               ;; df2a
 
-wDF2C:
+wDF2B_Audio_Ch2_LoopCounter:
+; repeats left in the pattern AUDIO_CMD_CALL_PATTERN entered
+    ds 1                                               ;; df2b
+
+wDF2C_Audio_Ch2_Transpose:
+; semitones added to every note this channel plays; set per pattern call and
+; cleared by Audio_ResetHardware
     ds 1                                               ;; df2c
 
-wDF2D:
-    ds 3                                               ;; df2d
+wDF2D_Audio_Ch2_LoopActive:
+; non-zero once LoopCounter has been loaded, so re-entering a pattern that is
+; already counting down does not restart the count
+    ds 1                                               ;; df2d
 
-wDF30:
+wDF2E_Audio_Ch2_ReturnPtrLo:
+; where AUDIO_CMD_END_PATTERN goes back to
+    ds 1                                               ;; df2e
+
+wDF2F_Audio_Ch2_ReturnPtrHi:
+    ds 1                                               ;; df2f
+
+; --- channel 3, wave ---
+
+wDF30_Audio_Ch3_Flags:
+; AUDIO_CHF_ENABLED while the music may write this channel's registers, and
+; AUDIO_CHF_RUNNING while its pattern is still being read. A sound effect clears the
+; first and leaves the second, which is how the music keeps its place while inaudible
     ds 1                                               ;; df30
 
-wDF31:
+wDF31_Audio_Ch3_NoteTimer:
+; ticks left on the current note. Audio_RunSequence costs three instructions
+; a frame until it reaches zero
     ds 1                                               ;; df31
 
-wDF32:
+wDF32_Audio_Ch3_SeqPtrLo:
+; where this channel is in its pattern
     ds 1                                               ;; df32
 
-wDF33:
+wDF33_Audio_Ch3_SeqPtrHi:
     ds 1                                               ;; df33
 
-wDF34:
+wDF34_Audio_Ch3_NR34Shadow:
+; frequency high bits, plus AUDIO_NRX4_TRIGGER while a retrigger is
+; pending. Audio_StepPitchSlide treats this and the byte below as one 16-bit number, so a
+; slide can carry from one into the other
     ds 1                                               ;; df34
 
-wDF35:
-    ds 5                                               ;; df35
+wDF35_Audio_Ch3_NR33Shadow:
+; frequency low byte
+    ds 1                                               ;; df35
 
-wDF3A:
+    ds 1                                               ;; df36 (unused)
+
+wDF37_Audio_Ch3_NR31Shadow:
+; duty and length, taken from the instrument
+    ds 1                                               ;; df37
+
+wDF38_Audio_Ch3_NR32Shadow:
+; volume envelope register, kept in step with whatever the envelope last
+; wrote so that a retrigger does not lose the current volume
+    ds 1                                               ;; df38
+
+    ds 1                                               ;; df39 (unused)
+
+wDF3A_Audio_Ch3_EnvelopeTimer:
+; frames left on this volume-envelope step; zero once the envelope has
+; finished
     ds 1                                               ;; df3a
 
-wDF3B:
-    ds 2                                               ;; df3b
+wDF3B_Audio_Ch3_EnvelopePtrLo:
+; position in the instrument's volume envelope
+    ds 1                                               ;; df3b
 
-wDF3D:
+wDF3C_Audio_Ch3_EnvelopePtrHi:
+    ds 1                                               ;; df3c
+
+wDF3D_Audio_Ch3_PitchTimer:
+; frames left on this pitch-slide step
     ds 1                                               ;; df3d
 
-wDF3E:
-    ds 2                                               ;; df3e
+wDF3E_Audio_Ch3_PitchPtrLo:
+; position in the instrument's pitch slide
+    ds 1                                               ;; df3e
 
-wDF40:
+wDF3F_Audio_Ch3_PitchPtrHi:
+    ds 1                                               ;; df3f
+
+wDF40_Audio_Ch3_ArpTimer:
+; frames left on this arpeggio step
     ds 1                                               ;; df40
 
-wDF41:
+wDF41_Audio_Ch3_ArpPtrLo:
+; position in the instrument's arpeggio
     ds 1                                               ;; df41
 
-wDF42:
-    ds 2                                               ;; df42
+wDF42_Audio_Ch3_ArpPtrHi:
+    ds 1                                               ;; df42
 
-wDF44:
+wDF43_Audio_Ch3_LoopCounter:
+; repeats left in the pattern AUDIO_CMD_CALL_PATTERN entered
+    ds 1                                               ;; df43
+
+wDF44_Audio_Ch3_Transpose:
+; semitones added to every note this channel plays; set per pattern call and
+; cleared by Audio_ResetHardware
     ds 1                                               ;; df44
 
-wDF45:
-    ds 3                                               ;; df45
+wDF45_Audio_Ch3_LoopActive:
+; non-zero once LoopCounter has been loaded, so re-entering a pattern that is
+; already counting down does not restart the count
+    ds 1                                               ;; df45
 
-wDF48:
+wDF46_Audio_Ch3_ReturnPtrLo:
+; where AUDIO_CMD_END_PATTERN goes back to
+    ds 1                                               ;; df46
+
+wDF47_Audio_Ch3_ReturnPtrHi:
+    ds 1                                               ;; df47
+
+; --- channel 4, noise ---
+
+wDF48_Audio_Ch4_Flags:
+; AUDIO_CHF_ENABLED while the music may write this channel's registers, and
+; AUDIO_CHF_RUNNING while its pattern is still being read. A sound effect clears the
+; first and leaves the second, which is how the music keeps its place while inaudible
     ds 1                                               ;; df48
 
-wDF49:
+wDF49_Audio_Ch4_NoteTimer:
+; ticks left on the current note. Audio_RunSequence costs three instructions
+; a frame until it reaches zero
     ds 1                                               ;; df49
 
-wDF4A:
+wDF4A_Audio_Ch4_SeqPtrLo:
+; where this channel is in its pattern
     ds 1                                               ;; df4a
 
-wDF4B:
-    ds 2                                               ;; df4b
+wDF4B_Audio_Ch4_SeqPtrHi:
+    ds 1                                               ;; df4b
 
-wDF4D:
-    ds 5                                               ;; df4d
+wDF4C_Audio_Ch4_NR44Shadow:
+; frequency high bits, plus AUDIO_NRX4_TRIGGER while a retrigger is
+; pending. Audio_StepPitchSlide treats this and the byte below as one 16-bit number, so a
+; slide can carry from one into the other
+    ds 1                                               ;; df4c
 
-wDF52:
+wDF4D_Audio_Ch4_NR43Shadow:
+; the noise channel has no frequency - this holds the last rNR43 value
+; Audio_WriteChannelRegs copied out of wDF64_Audio_NoisePeriod
+    ds 1                                               ;; df4d
+
+    ds 1                                               ;; df4e (unused)
+
+wDF4F_Audio_Ch4_NR41Shadow:
+; duty and length, taken from the instrument
+    ds 1                                               ;; df4f
+
+wDF50_Audio_Ch4_NR42Shadow:
+; volume envelope register, kept in step with whatever the envelope last
+; wrote so that a retrigger does not lose the current volume
+    ds 1                                               ;; df50
+
+    ds 1                                               ;; df51 (unused)
+
+wDF52_Audio_Ch4_EnvelopeTimer:
+; frames left on this volume-envelope step; zero once the envelope has
+; finished
     ds 1                                               ;; df52
 
-wDF53:
-    ds 2                                               ;; df53
+wDF53_Audio_Ch4_EnvelopePtrLo:
+; position in the instrument's volume envelope
+    ds 1                                               ;; df53
 
-wDF55:
+wDF54_Audio_Ch4_EnvelopePtrHi:
+    ds 1                                               ;; df54
+
+wDF55_Audio_Ch4_PitchTimer:
+; frames left on this step of the noise-period sequence. Channel 4 runs
+; Audio_StepNoisePeriod over these three fields instead of a pitch slide
     ds 1                                               ;; df55
 
-wDF56:
+wDF56_Audio_Ch4_PitchPtrLo:
+; position in the noise-period sequence
     ds 1                                               ;; df56
 
-wDF57:
-    ds 5                                               ;; df57
+wDF57_Audio_Ch4_PitchPtrHi:
+    ds 1                                               ;; df57
 
-wDF5C:
+wDF58_Audio_Ch4_ArpTimer:
+; unused - Audio_UpdateMusic has no arpeggio pass for channel 4
+    ds 1                                               ;; df58
+
+wDF59_Audio_Ch4_ArpPtrLo:
+; unused
+    ds 1                                               ;; df59
+
+wDF5A_Audio_Ch4_ArpPtrHi:
+    ds 1                                               ;; df5a
+
+wDF5B_Audio_Ch4_LoopCounter:
+; repeats left in the pattern AUDIO_CMD_CALL_PATTERN entered
+    ds 1                                               ;; df5b
+
+wDF5C_Audio_Ch4_Transpose:
+; semitones added to every note this channel plays; set per pattern call and
+; cleared by Audio_ResetHardware
     ds 1                                               ;; df5c
 
-wDF5D:
-    ds 3                                               ;; df5d
+wDF5D_Audio_Ch4_LoopActive:
+; non-zero once LoopCounter has been loaded, so re-entering a pattern that is
+; already counting down does not restart the count
+    ds 1                                               ;; df5d
 
-wDF60:
+wDF5E_Audio_Ch4_ReturnPtrLo:
+; where AUDIO_CMD_END_PATTERN goes back to
+    ds 1                                               ;; df5e
+
+wDF5F_Audio_Ch4_ReturnPtrHi:
+    ds 1                                               ;; df5f
+
+; --- driver globals ---
+
+wDF60_Audio_NoteLengthTablePtrLo:
+; The note-length table the current song's low nibbles index. Set from the song record
+; and overridable per section by AUDIO_CMD_SET_NOTE_LENGTH_TABLE
     ds 1                                               ;; df60
 
-wDF61:
+wDF61_Audio_NoteLengthTablePtrHi:
     ds 1                                               ;; df61
 
-wDF62:
-    ds 2                                               ;; df62
+wDF62_Audio_ChannelResumePtrLo:
+; The address in Audio_UpdateMusic of the channel block currently being serviced.
+; Audio_ResumeChannel jumps here, which is how a pattern command hands control back and
+; gets the next byte read on the same tick
+    ds 1                                               ;; df62
 
-wDF64:
+wDF63_Audio_ChannelResumePtrHi:
+    ds 1                                               ;; df63
+
+wDF64_Audio_NoisePeriod:
+; The rNR43 value channel 4 will play, from AUDIO_CMD_SET_NOISE_PERIOD or from its
+; noise-period sequence. Audio_WriteChannelRegs copies it out and into
+; wDF4D_Audio_Ch4_NR43Shadow
     ds 1                                               ;; df64
 
-wDF65:
+wDF65_Audio_CurrentTranspose:
+; The AUDIO_CH_TRANSPOSE of the channel being serviced, copied here so
+; Audio_RunSequence can reach it without the channel block
     ds 1                                               ;; df65
 
-wDF66:
+wDF66_Audio_CurrentNoteByte:
+; The raw pattern byte of the note being started, kept whole so its
+; AUDIO_NOTE_INSTRUMENT_BANK bit survives the masking that follows
     ds 1                                               ;; df66
 
-wDF67:
+wDF67_Audio_Marker:
+; What AUDIO_CMD_SET_MARKER stores. Nothing in either bank reads it - it looks like a
+; sequencer annotation that was never given a runtime meaning
     ds 1                                               ;; df67
 
-wDF68:
+wDF68_Audio_Ch1_SfxPtrLo:
+; Where the sound effect on channel 1 is, or zero if there is none. Audio_UpdateMusic
+; tests the high byte to decide whether the music may touch the hardware, and
+; call_00_0ff5_QueueSFX ORs all four pairs together to ask whether anything is audible
     ds 1                                               ;; df68
 
-wDF69:
+wDF69_Audio_Ch1_SfxPtrHi:
     ds 1                                               ;; df69
 
-wDF6A:
+wDF6A_Audio_Ch1_SfxTimer:
+; frames left on the current row of channel 1's sound effect
     ds 1                                               ;; df6a
 
-wDF6B:
+wDF6B_Audio_Ch2_SfxPtrLo:
     ds 1                                               ;; df6b
 
-wDF6C:
+wDF6C_Audio_Ch2_SfxPtrHi:
     ds 1                                               ;; df6c
 
-wDF6D:
+wDF6D_Audio_Ch2_SfxTimer:
     ds 1                                               ;; df6d
 
-wDF6E:
+wDF6E_Audio_Ch3_SfxPtrLo:
     ds 1                                               ;; df6e
 
-wDF6F:
+wDF6F_Audio_Ch3_SfxPtrHi:
     ds 1                                               ;; df6f
 
-wDF70:
+wDF70_Audio_Ch3_SfxTimer:
     ds 1                                               ;; df70
 
-wDF71:
+wDF71_Audio_Ch4_SfxPtrLo:
     ds 1                                               ;; df71
 
-wDF72:
+wDF72_Audio_Ch4_SfxPtrHi:
     ds 1                                               ;; df72
 
-wDF73:
+wDF73_Audio_Ch4_SfxTimer:
     ds 1                                               ;; df73
 
-wDF74:
+wDF74_Audio_SfxOwnerChannelPtrLo:
+; The channel block Audio_UpdateSfx is working on, so Audio_StepSfxTrack can set
+; AUDIO_CHF_ENABLED again when the effect ends
     ds 1                                               ;; df74
 
-wDF75:
+wDF75_Audio_SfxOwnerChannelPtrHi:
     ds 1                                               ;; df75
 
-wDF76:
+wDF76_Audio_MusicEnabled:
+; Non-zero while Audio_UpdateMusic is allowed to run. Audio_StartSong sets it, and the
+; unused pause and stop vectors clear it. Sound effects ignore it entirely
     ds 1                                               ;; df76
 
-wDF77:
+wDF77_Audio_TempoAccumulator:
+; wDF78_Audio_TempoRate is added to this every frame and the music only advances on the
+; frames that carry out of the byte - a phase accumulator rather than a countdown
     ds 1                                               ;; df77
 
-wDF78:
+wDF78_Audio_TempoRate:
+; How much the accumulator gains per frame. $FF, which every song starts at, carries
+; every frame; AUDIO_CMD_SET_TEMPO and the unused $4021 vector change it
     ds 1                                               ;; df78
 
-wDF79:
+wDF79_Audio_PanningShadow:
+; What rNR51 should be while only music is playing. The five panning commands maintain
+; it, and Audio_StepSfxTrack puts it back when an effect ends
     ds 1                                               ;; df79
 
-wDF7A:
+wDF7A_Audio_SfxPanning:
+; wDF79 with the effect's own channel forced on, written to rNR51 on every tick of a
+; sound effect
     ds 1                                               ;; df7a
 
-wDF7B:
+wDF7B_Audio_ChannelIndex:
+; 0-3, the channel Audio_UpdateMusic is currently working on. gex2 keeps the same thing
+; in wDFB8_Audio_ChannelIndex
     ds 1                                               ;; df7b
 
-wDF7C:
+wDF7C_Audio_Ch1_CurrentNote:
+; The transposed note index channel 1 is playing, so its arpeggio has something to work
+; relative to. There is no channel 4 entry because channel 4 has no arpeggio
     ds 1                                               ;; df7c
 
-wDF7D:
+wDF7D_Audio_Ch2_CurrentNote:
     ds 1                                               ;; df7d
 
-wDF7E:
-    ds 130                                             ;; df7e
+wDF7E_Audio_Ch3_CurrentNote:
+    ds 1                                               ;; df7e
+
+; unused to the end of wram
+    ds 129                                             ;; df7f
 
 SECTION "hram", HRAM[$ff80]
 

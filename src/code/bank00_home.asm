@@ -178,7 +178,7 @@ entry:
     db   CART_COMPATIBLE_GBC                           ;; 00:0143
     db   $34, $46                                      ;; 00:0144 ??
     db   CART_INDICATOR_GB                             ;; 00:0146
-    db   CART_ROM_MBC5, CART_ROM_2048KB, CART_SRAM_NONE ;; 00:0147
+    db   CART_ROM_MBC5, CART_ROM_2048KB, CART_SRAM_NONE;; 00:0147
     db   CART_DEST_NON_JAPANESE, $33, $00              ;; 00:014a $01 $33 $00
     ds   $03                                           ;; 00:014d
 
@@ -324,15 +324,15 @@ call_00_0150_Init:
     ldh  [rIE], A                                      ;; 00:0232 $e0 $ff
     ld   A, BANK_04_AUDIO_CODE_1                       ;; 00:0234 $3e $04
     call call_00_0eee_SwitchBank                       ;; 00:0236 $cd $ee $0e
-    call call_04_4000_Audio                            ;; 00:0239 $cd $00 $40
+    call call_04_4000_Audio_Init                       ;; 00:0239 $cd $00 $40
     call call_00_0f08_RestoreBank                      ;; 00:023c $cd $08 $0f
     xor  A, A                                          ;; 00:023f $af
-    ld   [wDE60_AudioBankCurrent], A                   ;; 00:0240 $ea $60 $de
-    ld   [wDE5E_QueuedSoundEffectPriority], A          ;; 00:0243 $ea $5e $de
-    ld   [wDE5F_CurrentSoundEffectPriority], A         ;; 00:0246 $ea $5f $de
+    ld   [wDE60_CurrentAudioBank], A                   ;; 00:0240 $ea $60 $de
+    ld   [wDE5E_QueuedSFXPriority], A                  ;; 00:0243 $ea $5e $de
+    ld   [wDE5F_CurrentSFXPriority], A                 ;; 00:0246 $ea $5f $de
     ld   A, $ff                                        ;; 00:0249 $3e $ff
     ld   [wDE5C_CurrentSong], A                        ;; 00:024b $ea $5c $de
-    ld   [wDE5D_QueuedSoundEffect], A                  ;; 00:024e $ea $5d $de
+    ld   [wDE5D_QueuedSFX], A                          ;; 00:024e $ea $5d $de
     ld   A, LCDC_INIT                                  ;; 00:0251 $3e $c7
     ld   [wDAD8_LCDCValue], A                          ;; 00:0253 $ea $d8 $da
     ldh  [rLCDC], A                                    ;; 00:0256 $e0 $40
@@ -456,7 +456,7 @@ call_00_0150_Init:
     ld   [wDC50_Player_Health], A                      ;; 00:0336 $ea $50 $dc
     farcall call_01_432b_MenuLoad_MissionSelect
     call call_00_0e3b_ResetVideoState                  ;; 00:0344 $cd $3b $0e
-    call call_00_2f85_CollectibleList_LoadForCurrentLevel       ;; 00:0347 $cd $85 $2f
+    call call_00_2f85_CollectibleList_LoadForCurrentLevel;; 00:0347 $cd $85 $2f
     call call_00_2ff8_Level_InitEntitiesAndState       ;; 00:034a $cd $f8 $2f
     call call_00_0595_PlayMusicBasedOnLevel            ;; 00:034d $cd $95 $05
     call call_00_1ea0_Cutscene_LoadAndRun              ;; 00:0350 $cd $a0 $1e
@@ -478,7 +478,7 @@ call_00_0150_Init:
     ld   A, PLAYERACTION_SPAWN                         ;; 00:0380 $3e $00
     ld   [wDC78_PlayerPendingActionId], A              ;; 00:0382 $ea $78 $dc
     call call_00_0e3b_ResetVideoState                  ;; 00:0385 $cd $3b $0e
-    call call_00_2f85_CollectibleList_LoadForCurrentLevel       ;; 00:0388 $cd $85 $2f
+    call call_00_2f85_CollectibleList_LoadForCurrentLevel;; 00:0388 $cd $85 $2f
     call call_00_2ff8_Level_InitEntitiesAndState       ;; 00:038b $cd $f8 $2f
 .jp_00_038e_LoadMap:
     farcall call_03_6c89_MapData_LoadForCurrentMap
@@ -487,38 +487,38 @@ call_00_0150_Init:
     jr   NZ, .jr_00_03b6_NotInGextremeSports           ;; 00:039e $20 $16
     ld   A, [wDC78_PlayerPendingActionId]              ;; 00:03a0 $fa $78 $dc
     cp   A, PLAYERACTION_SPAWN                         ;; 00:03a3 $fe $00
-    ld   A, PLAYERACTION_SNOWBOARDING_SPAWN ; entered gextreme sports level ;; 00:03a5 $3e $23
+    ld   A, PLAYERACTION_SNOWBOARDING_SPAWN ; entered gextreme sports level;; 00:03a5 $3e $23
     jr   Z, .jr_00_03e8_SetPendingPlayerAction         ;; 00:03a7 $28 $3f
     ld   A, [wDB6C_CurrentMapId]                       ;; 00:03a9 $fa $6c $db
     cp   A, MAP_GEXTREME_SPORTS1                       ;; 00:03ac $fe $07
-    ld   A, PLAYERACTION_SNOWBOARDING_STAND_OR_WALK ; left gextreme sports house ;; 00:03ae $3e $24
+    ld   A, PLAYERACTION_SNOWBOARDING_STAND_OR_WALK ; left gextreme sports house;; 00:03ae $3e $24
     jr   Z, .jr_00_03e8_SetPendingPlayerAction         ;; 00:03b0 $28 $36
-    ld   A, PLAYERACTION_IDLE ; entered gextreme sports house ;; 00:03b2 $3e $01
+    ld   A, PLAYERACTION_IDLE ; entered gextreme sports house;; 00:03b2 $3e $01
     jr   .jr_00_03e8_SetPendingPlayerAction            ;; 00:03b4 $18 $32
 .jr_00_03b6_NotInGextremeSports:
     ld   A, [wDC1E_CurrentLevelID]                     ;; 00:03b6 $fa $1e $dc
     cp   A, LEVEL_MARSUPIAL_MADNESS                    ;; 00:03b9 $fe $08
-    ld   A, PLAYERACTION_KANGAROO_SPAWN ; entered marsupial madness ;; 00:03bb $3e $2f
+    ld   A, PLAYERACTION_KANGAROO_SPAWN ; entered marsupial madness;; 00:03bb $3e $2f
     jr   Z, .jr_00_03e8_SetPendingPlayerAction         ;; 00:03bd $28 $29
     ld   A, [wDC1F_CurrentBgCollisionType]             ;; 00:03bf $fa $1f $dc
     cp   A, BG_COLLISION_TYPE_TOPDOWN                  ;; 00:03c2 $fe $01
     jr   Z, .jr_00_03d6_InTopDownCollision             ;; 00:03c4 $28 $10
     ld   A, [wDC78_PlayerPendingActionId]              ;; 00:03c6 $fa $78 $dc
-    cp   A, PLAYERACTION_SPAWN ; entered sidescroller level ;; 00:03c9 $fe $00
+    cp   A, PLAYERACTION_SPAWN ; entered sidescroller level;; 00:03c9 $fe $00
     jr   Z, .jr_00_03e8_SetPendingPlayerAction         ;; 00:03cb $28 $1b
     ld   A, [wD801_Player_ActionId]                    ;; 00:03cd $fa $01 $d8
-    sub  A, PLAYERACTION_TOPDOWN                ;; 00:03d0 $d6 $3c
+    sub  A, PLAYERACTION_TOPDOWN                       ;; 00:03d0 $d6 $3c
     jr   C, .jr_00_03eb                                ;; 00:03d2 $38 $17
     jr   .jr_00_03e8_SetPendingPlayerAction            ;; 00:03d4 $18 $12
 .jr_00_03d6_InTopDownCollision:
     ld   A, [wDC78_PlayerPendingActionId]              ;; 00:03d6 $fa $78 $dc
     cp   A, PLAYERACTION_SPAWN                         ;; 00:03d9 $fe $00
-    ld   A, PLAYERACTION_TOPDOWN_SPAWN ; entered topdown collision map ;; 00:03db $3e $3c
+    ld   A, PLAYERACTION_TOPDOWN_SPAWN ; entered topdown collision map;; 00:03db $3e $3c
     jr   Z, .jr_00_03e8_SetPendingPlayerAction         ;; 00:03dd $28 $09
     ld   A, [wD801_Player_ActionId]                    ;; 00:03df $fa $01 $d8
     cp   A, PLAYERACTION_TOPDOWN_SPAWN                 ;; 00:03e2 $fe $3c
     jr   NC, .jr_00_03eb                               ;; 00:03e4 $30 $05
-    add  A, PLAYERACTION_TOPDOWN                ;; 00:03e6 $c6 $3c
+    add  A, PLAYERACTION_TOPDOWN                       ;; 00:03e6 $c6 $3c
 .jr_00_03e8_SetPendingPlayerAction:
     ld   [wDC78_PlayerPendingActionId], A              ;; 00:03e8 $ea $78 $dc
 .jr_00_03eb:
@@ -602,7 +602,7 @@ call_00_0150_Init:
     call call_00_11c8_BgMap_LoadDirtyRegions           ;; 00:04e9 $cd $c8 $11
     call call_00_0fc8_PlayQueuedSFX                    ;; 00:04ec $cd $c8 $0f
     call call_00_150f_Map_CheckEdgeTransition          ;; 00:04ef $cd $0f $15
-    call call_00_35fa_EntitySpawn_SpawnUntilScanline       ;; 00:04f2 $cd $fa $35
+    call call_00_35fa_EntitySpawn_SpawnUntilScanline   ;; 00:04f2 $cd $fa $35
     call call_00_08f8_StageNextGfxTransfer             ;; 00:04f5 $cd $f8 $08
     jp   .jp_00_0443_MainGameplayLoop                  ;; 00:04f8 $c3 $43 $04
 
@@ -619,10 +619,10 @@ call_00_04fb_ResetAudioAndVideoState:
 ; switching the LCD OFF rather than on - there the screen comes back through the
 ; palette fade in call_00_0f56_SetLCDCAndFadeIn, which gex3 has no equivalent of
     xor  A, A                                          ;; 00:04fb $af
-    ld   [wDE5E_QueuedSoundEffectPriority], A          ;; 00:04fc $ea $5e $de
-    ld   [wDE5F_CurrentSoundEffectPriority], A         ;; 00:04ff $ea $5f $de
+    ld   [wDE5E_QueuedSFXPriority], A                  ;; 00:04fc $ea $5e $de
+    ld   [wDE5F_CurrentSFXPriority], A                 ;; 00:04ff $ea $5f $de
     ld   A, SFX_NONE                                   ;; 00:0502 $3e $ff
-    ld   [wDE5D_QueuedSoundEffect], A                  ;; 00:0504 $ea $5d $de
+    ld   [wDE5D_QueuedSFX], A                          ;; 00:0504 $ea $5d $de
     call call_00_0e3b_ResetVideoState                  ;; 00:0507 $cd $3b $0e
     call call_00_0e62_ClearShadowOamAndResetScroll     ;; 00:050a $cd $62 $0e
     ld   A, LCDC_GAMEPLAY                              ;; 00:050d $3e $e7
@@ -653,15 +653,15 @@ call_00_0513_Screen_PresentAndDrawEntities:
 ;
 ; That flag is gex3's whole transition effect. gex2's
 ; call_00_0521_Screen_PresentAndFadeIn ends with a DMG palette fade instead
-    ld   A, BANK_7F_PLAYER_GFX_INDEX                    ;; 00:0513 $3e $7f
+    ld   A, BANK_7F_PLAYER_GFX_INDEX                   ;; 00:0513 $3e $7f
     call call_00_0eee_SwitchBank                       ;; 00:0515 $cd $ee $0e
     ld   HL, wDB6C_CurrentMapId                        ;; 00:0518 $21 $6c $db
     ld   E, [HL]                                       ;; 00:051b $5e
     ld   D, $00                                        ;; 00:051c $16 $00
-    ld   HL, data_7f_4000_PlayerGfx_SetByMap                              ;; 00:051e $21 $00 $40
+    ld   HL, data_7f_4000_PlayerGfx_SetByMap           ;; 00:051e $21 $00 $40
     add  HL, DE                                        ;; 00:0521 $19
     ld   E, [HL]                                       ;; 00:0522 $5e
-    ld   HL, data_7f_403d_PlayerGfx_SetTable                              ;; 00:0523 $21 $3d $40
+    ld   HL, data_7f_403d_PlayerGfx_SetTable           ;; 00:0523 $21 $3d $40
     add  HL, DE                                        ;; 00:0526 $19
     ld   A, [HL+]                                      ;; 00:0527 $2a
     ld   [wDABF_PlayerGfx_SrcBank], A                  ;; 00:0528 $ea $bf $da
@@ -797,7 +797,7 @@ call_00_05c7_LevelTimer_Tick:
     ret                                                ;; 00:05f0 $c9
 .jr_00_05f1:
     ld   C, ENTITY_FREESTANDING_REMOTE                 ;; 00:05f1 $0e $1c
-    call call_00_29ce_Entity_FindSlotById               ;; 00:05f3 $cd $ce $29
+    call call_00_29ce_Entity_FindSlotById              ;; 00:05f3 $cd $ce $29
     ret  Z                                             ;; 00:05f6 $c8
     ld   HL, wDB6A_WarpFlags                           ;; 00:05f7 $21 $6a $db
     set  WARP_NEW_LEVEL_BIT, [HL]                      ;; 00:05fa $cb $e6
@@ -1273,7 +1273,7 @@ call_00_0835_Text_LoadStringToBuffer:
 ; renderer reads the WRAM copy from here on
     ld   A, BANK_1C_TEXT                               ;; 00:0835 $3e $1c
     call call_00_0eee_SwitchBank                       ;; 00:0837 $cd $ee $0e
-    ld   HL, wDBA7_MenuCmd_SrcPtr             ;; 00:083a $21 $a7 $db
+    ld   HL, wDBA7_MenuCmd_SrcPtr                      ;; 00:083a $21 $a7 $db
     ld   A, [HL+]                                      ;; 00:083d $2a
     ld   D, [HL]                                       ;; 00:083e $56
     ld   E, A                                          ;; 00:083f $5f
@@ -1296,9 +1296,9 @@ call_00_0835_Text_LoadStringToBuffer:
     ld   [DE], A                                       ;; 00:0856 $12
     ld   HL, wDADD_MenuTextBuffer                      ;; 00:0857 $21 $dd $da
     ld   A, L                                          ;; 00:085a $7d
-    ld   [wDBA7_MenuCmd_SrcPtr], A            ;; 00:085b $ea $a7 $db
+    ld   [wDBA7_MenuCmd_SrcPtr], A                     ;; 00:085b $ea $a7 $db
     ld   A, H                                          ;; 00:085e $7c
-    ld   [wDBA8_MenuCmd_SrcPtrHi], A            ;; 00:085f $ea $a8 $db
+    ld   [wDBA8_MenuCmd_SrcPtrHi], A                   ;; 00:085f $ea $a8 $db
     jp   call_00_0f08_RestoreBank                      ;; 00:0862 $c3 $08 $0f
 
 call_00_0865_Text_AppendStringToBuffer:
@@ -1731,9 +1731,9 @@ call_00_0a6a_Hdma_RunConfigEntry:
 data_00_0b01_SecondaryTilesetPtrs:
 ; One bank $1F secondary tileset per map id, read by
 ; call_00_0800_Screen_LoadSecondaryTilesetRow
-    dw   image_01f_00, image_01f_00, image_01f_01, image_01f_02 ;; 00:0b01 .???????
-    dw   image_01f_03, image_01f_04, image_01f_05, image_01f_06 ;; 00:0b09 .???????
-    dw   image_01f_06, image_01f_07, image_01f_08, image_01f_09 ;; 00:0b11 .???????
+    dw   image_01f_00, image_01f_00, image_01f_01, image_01f_02;; 00:0b01 .???????
+    dw   image_01f_03, image_01f_04, image_01f_05, image_01f_06;; 00:0b09 .???????
+    dw   image_01f_06, image_01f_07, image_01f_08, image_01f_09;; 00:0b11 .???????
 
 data_00_0b19_TvUnlockRequirements:
 ; How much progress each tv in the Gex Cave hub wants before it will let the
@@ -1799,10 +1799,10 @@ call_00_0b25_VBlank_Handler:
     ldh  [rWY], A                                      ;; 00:0b5d $e0 $4a
     ld   HL, wDC71_VBlankFrameCounter                  ;; 00:0b5f $21 $71 $dc
     inc  [HL]                                          ;; 00:0b62 $34
-    ld   A, [wDE60_AudioBankCurrent]                   ;; 00:0b63 $fa $60 $de
+    ld   A, [wDE60_CurrentAudioBank]                   ;; 00:0b63 $fa $60 $de
     add  A, BANK_04_AUDIO_CODE_1                       ;; 00:0b66 $c6 $04
     call call_00_0f25_SetMbcBank                       ;; 00:0b68 $cd $25 $0f
-    call call_04_4009                                  ;; 00:0b6b $cd $09 $40
+    call call_04_4009_Audio_Update                     ;; 00:0b6b $cd $09 $40
     ld   A, [wDAD5_CurrentROMBank]                     ;; 00:0b6e $fa $d5 $da
     call call_00_0f25_SetMbcBank                       ;; 00:0b71 $cd $25 $0f
     ld   A, $01                                        ;; 00:0b74 $3e $01
@@ -1866,10 +1866,10 @@ call_00_0b9f_VBlank_UpdateVRAM:
     and  A, $0f                                        ;; 00:0bb0 $e6 $0f
     jr   Z, .jr_00_0bc6                                ;; 00:0bb2 $28 $12
     and  A, $03                                        ;; 00:0bb4 $e6 $03
-    call NZ, call_03_75e3_VRAM_WriteBgMapRow          ;; 00:0bb6 $c4 $e3 $75
+    call NZ, call_03_75e3_VRAM_WriteBgMapRow           ;; 00:0bb6 $c4 $e3 $75
     ld   A, [wDC20_BgMapLoadingFlags]                  ;; 00:0bb9 $fa $20 $dc
     and  A, $0c                                        ;; 00:0bbc $e6 $0c
-    call NZ, call_03_7664_VRAM_WriteBgMapColumn       ;; 00:0bbe $c4 $64 $76
+    call NZ, call_03_7664_VRAM_WriteBgMapColumn        ;; 00:0bbe $c4 $64 $76
     xor  A, A                                          ;; 00:0bc1 $af
     ld   [wDC20_BgMapLoadingFlags], A                  ;; 00:0bc2 $ea $20 $dc
     ret                                                ;; 00:0bc5 $c9
@@ -2729,7 +2729,7 @@ call_00_0fa2_SetupMusic:
 ;
 ; A song id packs two things: the high nibble selects the audio bank, as an
 ; offset from BANK_04_AUDIO_CODE_1, and the low nibble is the track within it.
-; The bank is remembered in wDE60_AudioBankCurrent and stays there until the next
+; The bank is remembered in wDE60_CurrentAudioBank and stays there until the next
 ; song change, which is how sound effects find a bank of their own -
 ; call_00_0b25_VBlank_Handler banks the same one in for the driver's per-frame
 ; tick.
@@ -2747,26 +2747,26 @@ call_00_0fa2_SetupMusic:
     ld   A, [wDE5C_CurrentSong]                        ;; 00:0fae $fa $5c $de
     swap A                                             ;; 00:0fb1 $cb $37
     and  A, $0f                                        ;; 00:0fb3 $e6 $0f
-    ld   [wDE60_AudioBankCurrent], A                   ;; 00:0fb5 $ea $60 $de
+    ld   [wDE60_CurrentAudioBank], A                   ;; 00:0fb5 $ea $60 $de
     add  A, BANK_04_AUDIO_CODE_1                       ;; 00:0fb8 $c6 $04
     call call_00_0eee_SwitchBank                       ;; 00:0fba $cd $ee $0e
     ld   A, [wDE5C_CurrentSong]                        ;; 00:0fbd $fa $5c $de
     and  A, $0f                                        ;; 00:0fc0 $e6 $0f
-    call call_04_4006_Audio                            ;; 00:0fc2 $cd $06 $40
+    call call_04_4006_Audio_PlayMusic                  ;; 00:0fc2 $cd $06 $40
     jp   call_00_0f08_RestoreBank                      ;; 00:0fc5 $c3 $08 $0f
 
 call_00_0fc8_PlayQueuedSFX:
 ; Plays whatever call_00_0ff5_QueueSFX left pending and empties the slot. If
-; nothing was queued it also clears wDE5E_QueuedSoundEffectPriority, so a
+; nothing was queued it also clears wDE5E_QueuedSFXPriority, so a
 ; priority can never outlive the effect it belonged to. Called once per frame
 ; from the outer game loop. gex2's call_00_1138_PlayQueuedSFX
-    ld   HL, wDE5D_QueuedSoundEffect                   ;; 00:0fc8 $21 $5d $de
+    ld   HL, wDE5D_QueuedSFX                           ;; 00:0fc8 $21 $5d $de
     ld   A, [HL]                                       ;; 00:0fcb $7e
     ld   [HL], SFX_NONE                                ;; 00:0fcc $36 $ff
     cp   A, SFX_NONE                                   ;; 00:0fce $fe $ff
     jr   NZ, call_00_0fd7_PlaySFX                      ;; 00:0fd0 $20 $05
     xor  A, A                                          ;; 00:0fd2 $af
-    ld   [wDE5E_QueuedSoundEffectPriority], A          ;; 00:0fd3 $ea $5e $de
+    ld   [wDE5E_QueuedSFXPriority], A                  ;; 00:0fd3 $ea $5e $de
     ret                                                ;; 00:0fd6 $c9
 
 call_00_0fd7_PlaySFX:
@@ -2774,7 +2774,7 @@ call_00_0fd7_PlaySFX:
 ;
 ; The driver is called twice: once with $00, which stops whatever was playing,
 ; and then with the effect id. The queued priority is moved into
-; wDE5F_CurrentSoundEffectPriority and the queued one cleared, so from here on
+; wDE5F_CurrentSFXPriority and the queued one cleared, so from here on
 ; the effect that is actually sounding is the one new requests are weighed
 ; against.
 ;
@@ -2786,25 +2786,25 @@ call_00_0fd7_PlaySFX:
     ld   A, BANK_04_AUDIO_CODE_1                       ;; 00:0fdb $3e $04
     call call_00_0eee_SwitchBank                       ;; 00:0fdd $cd $ee $0e
     ld   A, $00                                        ;; 00:0fe0 $3e $00
-    call call_04_4024_Audio                            ;; 00:0fe2 $cd $24 $40
+    call call_04_4024_Audio_PlaySfx                    ;; 00:0fe2 $cd $24 $40
     pop  AF                                            ;; 00:0fe5 $f1
-    call call_04_4024_Audio                            ;; 00:0fe6 $cd $24 $40
-    ld   HL, wDE5E_QueuedSoundEffectPriority           ;; 00:0fe9 $21 $5e $de
+    call call_04_4024_Audio_PlaySfx                    ;; 00:0fe6 $cd $24 $40
+    ld   HL, wDE5E_QueuedSFXPriority                   ;; 00:0fe9 $21 $5e $de
     ld   A, [HL]                                       ;; 00:0fec $7e
     ld   [HL], $00                                     ;; 00:0fed $36 $00
-    ld   [wDE5F_CurrentSoundEffectPriority], A         ;; 00:0fef $ea $5f $de
+    ld   [wDE5F_CurrentSFXPriority], A                 ;; 00:0fef $ea $5f $de
     jp   call_00_0f08_RestoreBank                      ;; 00:0ff2 $c3 $08 $0f
 
 call_00_0ff5_QueueSFX:
 ; Offers SFX_* id A for the next call_00_0fc8_PlayQueuedSFX, if it outranks what
 ; is already sounding.
 ;
-; The priority comes from .data_00_1037_SFXPriorities. The four channel status
-; bytes at wDF68, wDF6B, wDF6E and wDF71 are ORed together to ask "is anything
-; audible right now"; if so, a lower priority than
-; wDE5F_CurrentSoundEffectPriority is dropped on the spot. A request that gets
-; past that is then weighed against anything already queued this frame, and only
-; replaces it if it is at least as important.
+; The priority comes from .data_00_1037_SFXPriorities. The driver's four sfx track
+; pointers - wDF68_Audio_Ch1_SfxPtrLo and the three like it - are ORed together to ask
+; "is anything audible right now"; if so, a lower priority than
+; wDE5F_CurrentSFXPriority is dropped on the spot. A request that gets past that is then
+; weighed against anything already queued this frame, and only replaces it if it is at
+; least as important.
 ;
 ; gex2's call_00_112f_QueueSFX has no priorities at all - it simply refuses to
 ; overwrite a slot that is already full, so the first request of a frame wins
@@ -2816,39 +2816,39 @@ call_00_0ff5_QueueSFX:
     add  HL, BC                                        ;; 00:0ffe $09
     ld   B, [HL]                                       ;; 00:0fff $46
     xor  A, A                                          ;; 00:1000 $af
-    ld   HL, wDF68                                     ;; 00:1001 $21 $68 $df
+    ld   HL, wDF68_Audio_Ch1_SfxPtrLo                  ;; 00:1001 $21 $68 $df
     or   A, [HL]                                       ;; 00:1004 $b6
     inc  HL                                            ;; 00:1005 $23
     or   A, [HL]                                       ;; 00:1006 $b6
-    ld   HL, wDF6B                                     ;; 00:1007 $21 $6b $df
+    ld   HL, wDF6B_Audio_Ch2_SfxPtrLo                  ;; 00:1007 $21 $6b $df
     or   A, [HL]                                       ;; 00:100a $b6
     inc  HL                                            ;; 00:100b $23
     or   A, [HL]                                       ;; 00:100c $b6
-    ld   HL, wDF6E                                     ;; 00:100d $21 $6e $df
+    ld   HL, wDF6E_Audio_Ch3_SfxPtrLo                  ;; 00:100d $21 $6e $df
     or   A, [HL]                                       ;; 00:1010 $b6
     inc  HL                                            ;; 00:1011 $23
     or   A, [HL]                                       ;; 00:1012 $b6
-    ld   HL, wDF71                                     ;; 00:1013 $21 $71 $df
+    ld   HL, wDF71_Audio_Ch4_SfxPtrLo                  ;; 00:1013 $21 $71 $df
     or   A, [HL]                                       ;; 00:1016 $b6
     inc  HL                                            ;; 00:1017 $23
     or   A, [HL]                                       ;; 00:1018 $b6
     jr   Z, .jr_00_1021                                ;; 00:1019 $28 $06
     ld   A, B                                          ;; 00:101b $78
-    ld   HL, wDE5F_CurrentSoundEffectPriority          ;; 00:101c $21 $5f $de
+    ld   HL, wDE5F_CurrentSFXPriority                  ;; 00:101c $21 $5f $de
     cp   A, [HL]                                       ;; 00:101f $be
     ret  C                                             ;; 00:1020 $d8
 .jr_00_1021:
-    ld   A, [wDE5D_QueuedSoundEffect]                  ;; 00:1021 $fa $5d $de
+    ld   A, [wDE5D_QueuedSFX]                          ;; 00:1021 $fa $5d $de
     cp   A, SFX_NONE                                   ;; 00:1024 $fe $ff
     jr   Z, .jr_00_102e                                ;; 00:1026 $28 $06
     ld   A, B                                          ;; 00:1028 $78
-    ld   HL, wDE5E_QueuedSoundEffectPriority           ;; 00:1029 $21 $5e $de
+    ld   HL, wDE5E_QueuedSFXPriority                   ;; 00:1029 $21 $5e $de
     cp   A, [HL]                                       ;; 00:102c $be
     ret  C                                             ;; 00:102d $d8
 .jr_00_102e:
-    ld   HL, wDE5D_QueuedSoundEffect                   ;; 00:102e $21 $5d $de
+    ld   HL, wDE5D_QueuedSFX                           ;; 00:102e $21 $5d $de
     ld   [HL], C                                       ;; 00:1031 $71
-    ld   HL, wDE5E_QueuedSoundEffectPriority           ;; 00:1032 $21 $5e $de
+    ld   HL, wDE5E_QueuedSFXPriority                   ;; 00:1032 $21 $5e $de
     ld   [HL], B                                       ;; 00:1035 $70
     ret                                                ;; 00:1036 $c9
 .data_00_1037_SFXPriorities:

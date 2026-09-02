@@ -556,7 +556,7 @@ DEF ENTITY_SLOT_STRIDE           EQU $20   ; bytes per entity in wD800_EntityMem
 ; The "GAME BOY COLOR ONLY" screen Init draws on a DMG, straight into VRAM with
 ; the interrupts still off
 DEF DMG_ERROR_TILES_SIZE         EQU $a00
-DEF SFX_PRIORITY_NONE            EQU $00   ; wDE5F_CurrentSoundEffectPriority when nothing is playing
+DEF SFX_PRIORITY_NONE            EQU $00   ; wDE5F_CurrentSFXPriority when nothing is playing
 
 ; Entities
 DEF ENTITY_GEX                                         EQU $00
@@ -1133,6 +1133,148 @@ DEF MENUTEXT_COLLECTED_SUFFIX    EQU $4ac3
 DEF REMOTE_MARKER_TILE_TAKEN     EQU $e4 ; the 2x2 mission marker on the select screen
 DEF REMOTE_MARKER_TILE_MISSING   EQU $e8
 
+; ------------------------------------------------------------------
+; SOUND DRIVER - channel block layout
+;
+; wDF00, wDF18, wDF30 and wDF48 are four copies of this, AUDIO_CH_SIZE bytes each.
+; Offsets $06, $09 and $18 onwards are never touched.
+;
+; NRX1/2/3/4 mean NR11-NR14 on channel 1, NR21-NR24 on channel 2 and so on. The driver
+; keeps shadows rather than reading the registers back, because NRx4's trigger bit reads
+; as something other than what was written
+; ------------------------------------------------------------------
+DEF AUDIO_CH_FLAGS                         EQU $00 ; AUDIO_CHF_*
+DEF AUDIO_CH_NOTE_TIMER                    EQU $01 ; ticks left on the current note
+DEF AUDIO_CH_SEQ_PTR_LO                    EQU $02 ; position in the pattern
+DEF AUDIO_CH_SEQ_PTR_HI                    EQU $03
+DEF AUDIO_CH_NRX4_SHADOW                   EQU $04 ; frequency high bits + AUDIO_NRX4_TRIGGER
+DEF AUDIO_CH_NRX3_SHADOW                   EQU $05 ; frequency low byte
+DEF AUDIO_CH_NRX1_SHADOW                   EQU $07 ; duty / length
+DEF AUDIO_CH_NRX2_SHADOW                   EQU $08 ; volume envelope register
+DEF AUDIO_CH_ENV_TIMER                     EQU $0A ; frames left on this envelope step
+DEF AUDIO_CH_ENV_PTR_LO                    EQU $0B
+DEF AUDIO_CH_ENV_PTR_HI                    EQU $0C
+DEF AUDIO_CH_PITCH_TIMER                   EQU $0D ; frames left on this pitch-slide step
+DEF AUDIO_CH_PITCH_PTR_LO                  EQU $0E
+DEF AUDIO_CH_PITCH_PTR_HI                  EQU $0F
+DEF AUDIO_CH_ARP_TIMER                     EQU $10 ; frames left on this arpeggio step
+DEF AUDIO_CH_ARP_PTR_LO                    EQU $11
+DEF AUDIO_CH_ARP_PTR_HI                    EQU $12
+DEF AUDIO_CH_LOOP_COUNTER                  EQU $13 ; repeats left in the current pattern call
+DEF AUDIO_CH_TRANSPOSE                     EQU $14 ; semitones added to every note
+DEF AUDIO_CH_LOOP_ACTIVE                   EQU $15 ; non-zero once the counter has been loaded
+DEF AUDIO_CH_RETURN_PTR_LO                 EQU $16 ; where AUDIO_CMD_END_PATTERN goes back to
+DEF AUDIO_CH_RETURN_PTR_HI                 EQU $17
+DEF AUDIO_CH_SIZE                          EQU $18
+
+; wDF00_Audio_Ch1_Flags and friends
+DEF AUDIO_CHF_ENABLED                      EQU $01 ; music may write this channel's registers
+DEF AUDIO_CHF_RUNNING                      EQU $02 ; the pattern is still being read
+
+; ------------------------------------------------------------------
+; Pattern bytes - the stream call_04_44d4_Audio_RunSequence walks.
+;
+; Bit 7 is masked off before the note/command test, so every opcode has a $80 twin. On a
+; note that bit means "use instruments 16-31"; on a command it means nothing
+; ------------------------------------------------------------------
+DEF AUDIO_NOTE_INDEX_MASK                  EQU $7F ; bits 0-6 index the frequency tables
+DEF AUDIO_NOTE_INSTRUMENT_BANK             EQU $80 ; bit 7 adds 16 to the instrument number
+DEF AUDIO_NOTE_LAST                        EQU $5E ; highest index into the frequency tables
+
+; second byte of a note
+DEF AUDIO_NOTE_INSTRUMENT_MASK             EQU $F0 ; high nibble - instrument 0-15
+DEF AUDIO_NOTE_LENGTH_MASK                 EQU $0F ; low nibble - index into the note-length table
+
+; commands, dispatched through data_04_461b_AudioCommandTable
+DEF AUDIO_CMD_FIRST                        EQU $60
+DEF AUDIO_CMD_SET_NOTE_LENGTH              EQU $60 ; nn       - rest for note-length nn
+DEF AUDIO_CMD_END                          EQU $61 ;          - stop this channel
+DEF AUDIO_CMD_GOTO                         EQU $62 ; ll hh    - jump to an absolute address
+DEF AUDIO_CMD_SET_NOISE_PERIOD             EQU $63 ; nn       - set rNR43 outright
+DEF AUDIO_CMD_CALL_PATTERN                 EQU $64 ; pp tt rr - pattern pp, transpose tt, rr times
+DEF AUDIO_CMD_END_PATTERN                  EQU $65 ;          - repeat or return
+DEF AUDIO_CMD_SET_MARKER                   EQU $66 ; nn       - store nn; nothing reads it
+DEF AUDIO_CMD_SET_PANNING                  EQU $67 ; nn       - rNR51 for all four channels
+DEF AUDIO_CMD_SET_NOTE_LENGTH_TABLE        EQU $68 ; ll hh    - point note lengths elsewhere
+DEF AUDIO_CMD_SET_TEMPO                    EQU $69 ; nn       - wDF78_Audio_TempoRate
+DEF AUDIO_CMD_SET_PANNING_CH1              EQU $6A ; nn       - rNR51, channel 1's bits only
+DEF AUDIO_CMD_SET_PANNING_CH2              EQU $6B ; nn
+DEF AUDIO_CMD_SET_PANNING_CH3              EQU $6C ; nn
+DEF AUDIO_CMD_SET_PANNING_CH4              EQU $6D ; nn
+DEF AUDIO_CMD_LAST                         EQU $6D
+
+DEF AUDIO_CALL_PATTERN_SIZE                EQU 4  ; opcode + pattern + transpose + repeats
+
+; ------------------------------------------------------------------
+; Instrument records - twelve bytes, reached through
+; data_04_70d1_InstrumentPointers. Instrument $00 is silence: its NRx2 of $02 leaves the
+; volume at zero, which is how the songs write rests that still retrigger
+; ------------------------------------------------------------------
+DEF AUDIO_INS_NRX4_BASE                    EQU $00 ; OR'd onto the note's frequency high bits
+DEF AUDIO_INS_NRX1                         EQU $01 ; duty / length
+DEF AUDIO_INS_NRX2                         EQU $02 ; starting volume envelope
+DEF AUDIO_INS_ENV_TIMER                    EQU $03
+DEF AUDIO_INS_ENV_PTR                      EQU $04
+DEF AUDIO_INS_PITCH_TIMER                  EQU $06
+DEF AUDIO_INS_PITCH_PTR                    EQU $07
+DEF AUDIO_INS_ARP_TIMER                    EQU $09
+DEF AUDIO_INS_ARP_PTR                      EQU $0A
+DEF AUDIO_INS_SIZE                         EQU $0C
+DEF AUDIO_INSTRUMENT_COUNT                 EQU 32 ; 16 per instrument bank
+DEF AUDIO_INSTRUMENT_SILENCE               EQU $00
+
+; A volume envelope is (rNRx2 value, frames) pairs
+DEF AUDIO_ENV_END                          EQU $FF
+
+; A pitch slide is (signed offset, frames) pairs, added to the NRx4:NRx3 shadow pair as
+; one 16-bit number. On channel 4 the same format carries absolute rNR43 values instead
+DEF AUDIO_PITCH_LOOP                       EQU $7D ; ll hh follows
+DEF AUDIO_PITCH_END                        EQU $7E
+
+; An arpeggio is (frames, signed semitones) pairs, retuning the channel relative to the
+; note in wDF7C_Audio_Ch1_CurrentNote and friends
+DEF AUDIO_ARP_LOOP                         EQU $FF ; ll hh follows
+
+; ------------------------------------------------------------------
+; Song records in data_04_7085_SongTable - four starting patterns and a note-length table
+; ------------------------------------------------------------------
+DEF AUDIO_SONG_CH1_PTR                     EQU $00
+DEF AUDIO_SONG_CH2_PTR                     EQU $02
+DEF AUDIO_SONG_CH3_PTR                     EQU $04
+DEF AUDIO_SONG_CH4_PTR                     EQU $06
+DEF AUDIO_SONG_NOTE_LENGTHS_PTR            EQU $08
+DEF AUDIO_SONG_SIZE                        EQU $0A
+DEF AUDIO_NOTE_LENGTH_COUNT                EQU 16
+
+; ------------------------------------------------------------------
+; Sound effects. data_04_4a59_SfxTrackIds is AUDIO_SFX_TRACKS_PER_ID bytes per SFX_* id,
+; and each track is a channel byte followed by AUDIO_SFX_ROW_SIZE-byte register rows
+; ------------------------------------------------------------------
+DEF AUDIO_SFX_TRACKS_PER_ID                EQU 4
+DEF AUDIO_SFX_TRACK_NONE                   EQU $FF ; empty slot in a track-id row
+DEF AUDIO_SFX_ID_COUNT                     EQU 31  ; rows in data_04_4a59_SfxTrackIds
+DEF AUDIO_SFX_TRACK_COUNT                  EQU 54  ; entries in data_04_49ed_SfxTrackPointers
+DEF AUDIO_SFX_ROW_SIZE                     EQU 5   ; frames, NRx1, NRx2, NRx4, NRx3
+DEF AUDIO_SFX_END                          EQU $FF
+DEF AUDIO_SFX_LOOP                         EQU $FE ; ll hh follows
+
+; ------------------------------------------------------------------
+; APU register bits the driver names
+; ------------------------------------------------------------------
+DEF AUDIO_NRX4_TRIGGER                     EQU $80
+
+DEF AUDIO_NR50_VOLUME_RIGHT                EQU $07
+DEF AUDIO_NR50_VIN_RIGHT                   EQU $08
+DEF AUDIO_NR50_VOLUME_LEFT                 EQU $70
+DEF AUDIO_NR50_VIN_LEFT                    EQU $80
+
+DEF AUDIO_NR51_CH1                         EQU $11 ; left and right bits together
+DEF AUDIO_NR51_CH2                         EQU $22
+DEF AUDIO_NR51_CH3                         EQU $44
+DEF AUDIO_NR51_CH4                         EQU $88
+
+DEF AUDIO_NR52_ALL_ON                      EQU $8F ; APU on, all four channels flagged on
+
 ; Sound Effects
 DEF SFX_EMPTY                              EQU $00
 DEF SFX_MENU_SCROLL                        EQU $01
@@ -1175,6 +1317,8 @@ DEF SONG_HOLIDAY_TV                        EQU $02
 DEF SONG_WESTERN_STATION                   EQU $03
 DEF SONG_GEX_CAVE                          EQU $04
 DEF SONG_TUT_TV                            EQU $05
+; $06-$0F would be tracks 6-15 of BANK_04_AUDIO_CODE_1, but its song table only has
+; six rows, so none of these exist
 DEF SONG_UNK06                             EQU $06 ; unused?
 DEF SONG_UNK07                             EQU $07 ; unused?
 DEF SONG_UNK08                             EQU $08 ; unused?

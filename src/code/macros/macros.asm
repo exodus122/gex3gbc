@@ -305,3 +305,164 @@ ENDM
 MACRO player_piece ; Y offset, X offset, OBJ palette
     db   \1, \2, \3, 0
 ENDM
+
+; ------------------------------------------------------------------
+; SOUND DRIVER DATA - banks $04 and $05
+;
+; The shapes the driver in code/audio/bank04_audio1.asm reads. See the AUDIO_* constants
+; for what the individual values mean
+; ------------------------------------------------------------------
+
+; One record of the bank's song table: where each hardware channel starts, then the
+; note-length table the song's notes index
+MACRO audio_song ; channel 1 pattern, channel 2, channel 3, channel 4, note-length table
+    dw   \1, \2, \3, \4, \5
+ENDM
+
+; One note. The instrument number is split across the two bytes: its low four bits are
+; the parameter byte's high nibble, and bit 4 becomes AUDIO_NOTE_INSTRUMENT_BANK on the
+; note byte itself
+MACRO audio_note ; note index, instrument $00-$1F, note-length index $0-$F
+    db   (\1) | (((\2) & $10) << 3), (((\2) & $0F) << 4) | (\3)
+ENDM
+
+; Holds the channel for one note length without retriggering anything - so it keeps
+; whatever pitch and volume the last note left. The only command that ends a channel's
+; turn for the tick
+MACRO audio_rest ; note-length index $0-$F
+    db   AUDIO_CMD_SET_NOTE_LENGTH, \1
+ENDM
+
+MACRO audio_end
+    db   AUDIO_CMD_END
+ENDM
+
+MACRO audio_goto ; address
+    db   AUDIO_CMD_GOTO
+    dw   \1
+ENDM
+
+MACRO audio_noise_period ; rNR43 value
+    db   AUDIO_CMD_SET_NOISE_PERIOD, \1
+ENDM
+
+; Plays a pattern from the bank's pattern table and comes back afterwards. Every song
+; channel is mostly a list of these
+MACRO audio_call ; pattern id, transpose in semitones, repeat count
+    db   AUDIO_CMD_CALL_PATTERN, \1, \2, \3
+ENDM
+
+MACRO audio_end_pattern
+    db   AUDIO_CMD_END_PATTERN
+ENDM
+
+; Stores a byte nothing reads
+MACRO audio_marker ; value
+    db   AUDIO_CMD_SET_MARKER, \1
+ENDM
+
+MACRO audio_panning ; rNR51 value for all four channels
+    db   AUDIO_CMD_SET_PANNING, \1
+ENDM
+
+MACRO audio_panning_ch1 ; AUDIO_NR51_CH1 bits
+    db   AUDIO_CMD_SET_PANNING_CH1, \1
+ENDM
+
+MACRO audio_panning_ch2 ; AUDIO_NR51_CH2 bits
+    db   AUDIO_CMD_SET_PANNING_CH2, \1
+ENDM
+
+MACRO audio_panning_ch3 ; AUDIO_NR51_CH3 bits
+    db   AUDIO_CMD_SET_PANNING_CH3, \1
+ENDM
+
+MACRO audio_panning_ch4 ; AUDIO_NR51_CH4 bits
+    db   AUDIO_CMD_SET_PANNING_CH4, \1
+ENDM
+
+MACRO audio_note_length_table ; address of 16 tick counts
+    db   AUDIO_CMD_SET_NOTE_LENGTH_TABLE
+    dw   \1
+ENDM
+
+MACRO audio_tempo ; amount added to wDF77_Audio_TempoAccumulator each frame
+    db   AUDIO_CMD_SET_TEMPO, \1
+ENDM
+
+; One instrument: the registers a note starts from, then the three sub-sequences that
+; run underneath it. A timer of $00 with a $0000 pointer means that sub-sequence is unused
+MACRO audio_instrument ; NRx4 base, NRx1, NRx2, envelope timer, envelope, pitch timer, pitch slide, arpeggio timer, arpeggio
+    db   \1, \2, \3
+    db   \4
+    dw   \5
+    db   \6
+    dw   \7
+    db   \8
+    dw   \9
+ENDM
+
+MACRO audio_env ; rNRx2 value, frames to hold it
+    db   \1, \2
+ENDM
+
+MACRO audio_env_end
+    db   AUDIO_ENV_END
+ENDM
+
+; Added to the channel's NRx4:NRx3 pair as one 16-bit number, so a large enough slide
+; carries into the register that also holds the trigger bit
+MACRO audio_pitch ; signed offset, frames to hold it
+    db   (\1) & $ff, \2
+ENDM
+
+MACRO audio_pitch_end
+    db   AUDIO_PITCH_END
+ENDM
+
+MACRO audio_pitch_loop ; address
+    db   AUDIO_PITCH_LOOP
+    dw   \1
+ENDM
+
+; Channel 4 reads the same fields as a pitch slide, but its values are absolute rNR43
+; settings rather than offsets
+MACRO audio_noise_step ; rNR43 value, frames to hold it
+    db   \1, \2
+ENDM
+
+; Retunes the channel relative to the note it is playing, without retriggering it
+MACRO audio_arp ; frames, signed semitones
+    db   \1, (\2) & $ff
+ENDM
+
+MACRO audio_arp_loop ; address
+    db   AUDIO_ARP_LOOP
+    dw   \1
+ENDM
+
+; The first byte of a sound-effect track: which hardware channel it takes, 0-3
+MACRO sfx_channel ; 0-3
+    db   \1
+ENDM
+
+; One row of a sound effect. The registers go straight to the hardware in this order -
+; NRx4 before NRx3, so the note is triggered a moment before it is given its own
+; frequency low byte
+MACRO sfx_row ; frames, NRx1, NRx2, NRx4, NRx3
+    db   \1, \2, \3, \4, \5
+ENDM
+
+MACRO sfx_end
+    db   AUDIO_SFX_END
+ENDM
+
+MACRO sfx_loop ; address
+    db   AUDIO_SFX_LOOP
+    dw   \1
+ENDM
+
+; One row of the sfx id table - the tracks one SFX_* id starts together
+MACRO sfx_tracks ; four track ids, AUDIO_SFX_TRACK_NONE where unused
+    db   \1, \2, \3, \4
+ENDM
