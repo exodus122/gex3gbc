@@ -142,23 +142,38 @@ call_01_4b43_MenuText_GetMapTextBlock:
     ld   L, [HL]                                      ;; 01:4b46 $6e
     ld   H, $00                                       ;; 01:4b47 $26 $00
     add  HL, HL                                       ;; 01:4b49 $29
-    ld   DE, .data_01_4b53                            ;; 01:4b4a $11 $53 $4b
+    ld   DE, .data_01_4b53_MapTextBlocks              ;; 01:4b4a $11 $53 $4b
     add  HL, DE                                       ;; 01:4b4d $19
     ld   E, [HL]                                      ;; 01:4b4e $5e
     inc  HL                                           ;; 01:4b4f $23
     ld   H, [HL]                                      ;; 01:4b50 $66
     ld   L, E                                         ;; 01:4b51 $6b
     ret                                               ;; 01:4b52 $c9
-.data_01_4b53:
-    dw   $4ea1                                        ;; 01:4b53 wW
-    dw   $4f69                                        ;; 01:4b55 wW
-    dw   $51f7                                        ;; 01:4b57 wW
-    dw   $54ef                                        ;; 01:4b59 wW
-    dw   $57ba                                        ;; 01:4b5b wW
-    dw   $5a5f                                        ;; 01:4b5d wW
-    dw   $5d89                                        ;; 01:4b5f wW
-    dw   $6006, $614e, $62a4, $64a5                   ;; 01:4b61 ????????
-    dw   $663e                                        ;; 01:4b69 ??
+.data_01_4b53_MapTextBlocks:
+; One text block per level, PROGRESS_FLAG_COUNT entries, indexed by
+; wDB6C_CurrentMapId - which on a menu screen holds the LEVEL id, not a map id, because
+; call_01_4000_MenuLoad swaps it before drawing and puts the real map back afterwards.
+;
+; A block starts with two ten-byte records - the level name, then the TV's name - and
+; the rest is an array of ten-byte mission descriptions. The three accessors above are
+; just +0, +$0A and +$14 into it.
+;
+; THESE ARE BANK $1C ADDRESSES. They are stored as bare words, so the disassembler
+; reads them as bank 1 and any label it invents for them is wrong; the dereference
+; happens with BANK_1C_TEXT paged in. Sorting them shows the blocks laid out in level
+; order with no gaps, which is the check that the table has not been misread
+    dw   $4ea1                                        ; LEVEL_GEX_CAVE
+    dw   $4f69                                        ; LEVEL_HOLIDAY_TV
+    dw   $51f7                                        ; LEVEL_MYSTERY_TV
+    dw   $54ef                                        ; LEVEL_TUT_TV
+    dw   $57ba                                        ; LEVEL_WESTERN_STATION
+    dw   $5a5f                                        ; LEVEL_ANIME_CHANNEL
+    dw   $5d89                                        ; LEVEL_SUPERHERO_SHOW
+    dw   $6006                                        ; LEVEL_GEXTREME_SPORTS
+    dw   $614e                                        ; LEVEL_MARSUPIAL_MADNESS
+    dw   $62a4                                        ; LEVEL_WW_GEX_WRESTLING
+    dw   $64a5                                        ; LEVEL_LIZARD_OF_OZ
+    dw   $663e                                        ; LEVEL_CHANNEL_Z
 
 call_01_4b6b_Menu_TickHideSprites:
 ; Counts down wDBDE_Menu_HideSpritesDelay and, when it expires, erases the sprite

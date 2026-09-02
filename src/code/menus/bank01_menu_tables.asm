@@ -114,140 +114,95 @@ data_01_512e_MenuCmd_Descriptors:
 
 data_01_53c6_MenuTypeRecords:
 ; One record per MENU_* id, MENUTYPE_RECORD_SIZE bytes, of which
-; call_01_4000_MenuLoad copies MENUTYPE_COPY_BYTES:
+; call_01_4000_MenuLoad copies MENUTYPE_COPY_BYTES. This table plus the script each
+; row points at is the whole definition of a menu screen - there is no per-screen code
+; anywhere in the game.
 ;
 ;   +0  dw  the script that builds this screen
 ;   +2      MENU_FLAG_* behaviour bits              -> wDB94_MenuType_Flags
 ;   +3      how many selectable rows                -> wDB95_MenuType_OptionCount
 ;   +4  +5  cursor origin, X then Y                 -> wDB96 / wDB97
 ;   +6  +7  cursor step per column and per row      -> wDB98 / wDB99
-;   +8      an LCDC value. $d3 in all 29 records, and NOTHING READS IT -
+;   +8      MENUTYPE_LCDC_UNREAD in all 29 records, and NOTHING READS IT -
 ;           call_01_43f0_Menu_BuildScreen hardcodes MENU_LCDC instead
 ;   +9      palette set, or MENU_PALETTE_NONE_BIT   -> wDB9B_MenuType_PaletteId
 ;   +$0A dw an optional per-menu callback           -> wDB9C_MenuType_OnSelectionChanged
 ;   +$0C    four dead bytes, never copied
 ;
+; Byte +8 and the four dead bytes are emitted by the menu_type_record macro rather
+; than written out on every row.
+;
+; Reading the flags column tells you how each screen is left. The four pause and
+; confirm menus and the totals page are the interactive ones; everything with
+; MENU_FLAG_HOLD or MENU_FLAG_HOLD_SKIPPABLE is a credit card or interstitial that
+; times out; MENU_FLAG_WAIT_RELEASE is the "press anything" pair; and the handful with
+; no flags at all are screens the caller tears down itself.
+;
 ; Only one record sets a callback: the title screen's, which swaps two OBJ palettes to
 ; highlight the selected option.
 ;
+; The three mission-select rows are the only ones with MENU_PALETTE_NONE_BIT set -
+; they are drawn over the level's own palettes and must not disturb them.
+;
 ; gex2's data_01_5574_MenuTypeRecords
-    dw   data_01_559a_MenuScript_TitleScreen                    ; MENU_TITLE_SCREEN
-    db   $00, $02, $20, $54, $00, $10, $d3, $04       ;; 01:53c8 ........
-    dw   call_01_43c3_Menu_HighlightTitleOption       ;; 01:53d0 pP
-    db   $00, $00, $00, $00                           ;; 01:53d2 ????
-
-    dw   data_01_55c3_MenuScript_EnterPassword                  ; MENU_ENTER_PASSWORD
-    db   $01, $12, $08, $20, $18, $18, $d3, $07       ;; 01:53d8 ........
-    db   $00, $00, $00, $00, $00, $00                 ;; 01:53e0 ..????
-
-    dw   data_01_55ec_MenuScript_SeePassword                    ; MENU_SEE_PASSWORD
-    db   $01, $00, $00, $00, $00, $00, $d3, $07       ;; 01:53e8 ........
-    db   $00, $00, $00, $00, $00, $00                 ;; 01:53f0 ..????
-
-    dw   data_01_55fd_MenuScript_GameOver                       ; MENU_GAME_OVER
-    db   $08, $00, $00, $00, $00, $00, $d3, $01       ;; 01:53f8 ........
-    db   $00, $00, $00, $00, $00, $00                 ;; 01:5400 ..????
-
-    dw   data_01_5606_MenuScript_BadPassword                    ; MENU_BAD_PASSWORD
-    db   $08, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5408 ........
-    db   $00, $00, $00, $00, $00, $00
-    
-    dw   data_01_560f_MenuScript_MissionSelect1Remote           ; MENU_MISSION_SELECT_1_REMOTE
-    db   $00, $01, $00, $50, $00, $18, $d3, $80       ;; 01:5418 ????????
-    db   $00, $00, $00, $00, $00, $00
-    
-    dw   data_01_5648_MenuScript_Unk06                          ; MENU_UNK06
-    db   $00, $02, $00, $40, $00, $20, $d3, $80       ;; 01:5428 ????????
-    db   $00, $00, $00, $00, $00, $00                 ;; 01:5430 ??????
-
-    dw   data_01_5649_MenuScript_MissionSelect3Remotes          ; MENU_MISSION_SELECT_3_REMOTES
-    db   $00, $03, $00, $38, $00, $18, $d3, $80       ;; 01:5438 ........
-    db   $00, $00, $00, $00, $00, $00                 ;; 01:5440 ..????
-
-    dw   data_01_5692_MenuScript_Totals                         ; MENU_TOTALS
-    db   $10, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5448 ........
-    db   $00, $00, $00, $00, $00, $00
-    
-    dw   data_01_571b_MenuScript_CongratulationsGotRemote       ; MENU_CONGRATULATIONS_GOT_REMOTE
-    db   $00, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5458 ????????
-    db   $00, $00, $00, $00, $00, $00
-    
-    dw   data_01_57a4_MenuScript_TimeUp                         ; MENU_TIME_UP
-    db   $00, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5468 ????????
-    db   $00, $00, $00, $00, $00, $00
-    
-    dw   data_01_57ad_MenuScript_PauseInGexCave                 ; MENU_PAUSE_IN_GEX_CAVE
-    db   $00, $04, $08, $20, $00, $10, $d3, $01       ;; 01:5478 ????????
-    db   $00, $00, $00, $00, $00, $00
-    
-    dw   data_01_57be_MenuScript_QuitGame                       ; MENU_QUIT_GAME
-    db   $00, $02, $08, $30, $00, $10, $d3, $01       ;; 01:5488 ????????
-    db   $00, $00, $00, $00, $00, $00                 ;; 01:5490 ??????
-
-    dw   data_01_57d7_MenuScript_PauseInLevel                   ; MENU_PAUSE_IN_LEVEL
-    db   $00, $04, $08, $20, $00, $10, $d3, $01       ;; 01:5498 ........
-    db   $00, $00, $00, $00, $00, $00                 ;; 01:54a0 ..????
-
-    dw   data_01_57e8_MenuScript_GoToMap                        ; MENU_GO_TO_MAP
-    db   $00, $02, $08, $30, $00, $10, $d3, $01       ;; 01:54a8 ........
-    db   $00, $00, $00, $00, $00, $00                 ;; 01:54b0 ..????
-
-    dw   data_01_5801_MenuScript_DavidAPalmer                   ; MENU_DAVID_A_PALMER
-    db   $04, $00, $00, $00, $00, $00, $d3, $02       ;; 01:54b8 ........
-    db   $00, $00, $00, $00, $00, $00
-    
-    dw   data_01_580a_MenuScript_Unk10                          ; MENU_UNK10
-    db   $00, $05, $18, $10, $00, $18, $d3, $03       ;; 01:54c8 ????????
-    db   $00, $00, $00, $00, $00, $00                 ;; 01:54d0 ??????
-
-    ; MENU_OPENING_CREDITS_1
-    dw   data_01_5843_MenuScript_OpeningCredits1                ; MENU_OPENING_CREDITS_1
-    db   $02, $00, $00, $00, $00, $00, $d3, $01       ;; 01:54d8 ........
-    db   $00, $00, $00, $00, $00, $00                 ;; 01:54e0 ..????
-
-    dw   data_01_586c_MenuScript_OpeningCredits2                ; MENU_OPENING_CREDITS_2
-    db   $04, $00, $00, $00, $00, $00, $d3, $01       ;; 01:54e8 ........
-    db   $00, $00, $00, $00, $00, $00                 ;; 01:54f0 ..????
-
-    dw   data_01_588d_MenuScript_OpeningCrystalDynamics         ; MENU_OPENING_CRYSTAL_DYNAMICS
-    db   $04, $00, $00, $00, $00, $00, $d3, $05       ;; 01:54f8 ........
-    db   $00, $00, $00, $00, $00, $00                 ;; 01:5500 ..????
-
-    dw   data_01_5896_MenuScript_EidosInteractive               ; MENU_EIDOS_INTERACTIVE
-    db   $04, $00, $00, $00, $00, $00, $d3, $06       ;; 01:5508 ........
-    db   $00, $00, $00, $00, $00, $00
-    
-    dw   data_01_589f_MenuScript_EndCredits1                    ; MENU_END_CREDITS_1
-    db   $04, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5518 ????????
-    db   $00, $00, $00, $00, $00, $00
-    
-    dw   data_01_58b8_MenuScript_EndCredits2                    ; MENU_END_CREDITS_2
-    db   $04, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5528 ????????
-    db   $00, $00, $00, $00, $00, $00
-    
-    dw   data_01_5929_MenuScript_EndCredits3                    ; MENU_END_CREDITS_3
-    db   $04, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5538 ????????
-    db   $00, $00, $00, $00, $00, $00
-    
-    dw   data_01_59a2_MenuScript_EndCredits4                    ; MENU_END_CREDITS_4
-    db   $04, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5548 ????????
-    db   $00, $00, $00, $00, $00, $00
-    
-    dw   data_01_59c3_MenuScript_EndCredits5                    ; MENU_END_CREDITS_5
-    db   $04, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5558 ????????
-    db   $00, $00, $00, $00, $00, $00
-    
-    dw   data_01_5a14_MenuScript_EndCredits6                    ; MENU_END_CREDITS_6
-    db   $04, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5568 ????????
-    db   $00, $00, $00, $00, $00, $00
-    
-    dw   data_01_5a35_MenuScript_WellDone                       ; MENU_WELL_DONE
-    db   $00, $00, $00, $00, $00, $00, $d3, $01       ;; 01:5578 ????????
-    db   $00, $00, $00, $00, $00, $00
-    
-    dw   data_01_5a3e_MenuScript_Unk1C                              ; menu id $1c - no MENU_* constant
-    db   $04, $00, $20, $54, $00, $10, $d3, $08       ;; 01:5588 ????????
-    db   $00, $00, $00, $00, $00, $00                 ;; 01:5590 ??????
+    ; MENU_TITLE_SCREEN  - the only record with a callback
+    menu_type_record data_01_559a_MenuScript_TitleScreen, $00, $02, $20, $54, $00, $10, $04, call_01_43c3_Menu_HighlightTitleOption
+    ; MENU_ENTER_PASSWORD  - $12 = PASSWORD_CELL_COUNT cells
+    menu_type_record data_01_55c3_MenuScript_EnterPassword, MENU_FLAG_GRID_INPUT, $12, $08, $20, $18, $18, $07, 0
+    ; MENU_SEE_PASSWORD  - the grid again, but nothing to type
+    menu_type_record data_01_55ec_MenuScript_SeePassword, MENU_FLAG_GRID_INPUT, $00, $00, $00, $00, $00, $07, 0
+    ; MENU_GAME_OVER
+    menu_type_record data_01_55fd_MenuScript_GameOver, MENU_FLAG_WAIT_RELEASE, $00, $00, $00, $00, $00, $01, 0
+    ; MENU_BAD_PASSWORD
+    menu_type_record data_01_5606_MenuScript_BadPassword, MENU_FLAG_WAIT_RELEASE, $00, $00, $00, $00, $00, $01, 0
+    ; MENU_MISSION_SELECT_1_REMOTE  - keeps the map palettes
+    menu_type_record data_01_560f_MenuScript_MissionSelect1Remote, $00, $01, $00, $50, $00, $18, 1 << MENU_PALETTE_NONE_BIT, 0
+    ; MENU_UNK06  - script is a bare MENUSCRIPT_END
+    menu_type_record data_01_5648_MenuScript_Unk06, $00, $02, $00, $40, $00, $20, 1 << MENU_PALETTE_NONE_BIT, 0
+    ; MENU_MISSION_SELECT_3_REMOTES  - keeps the map palettes
+    menu_type_record data_01_5649_MenuScript_MissionSelect3Remotes, $00, $03, $00, $38, $00, $18, 1 << MENU_PALETTE_NONE_BIT, 0
+    ; MENU_TOTALS  - left/right page through the levels
+    menu_type_record data_01_5692_MenuScript_Totals, MENU_FLAG_PAGED, $00, $00, $00, $00, $00, $01, 0
+    ; MENU_CONGRATULATIONS_GOT_REMOTE
+    menu_type_record data_01_571b_MenuScript_CongratulationsGotRemote, $00, $00, $00, $00, $00, $00, $01, 0
+    ; MENU_TIME_UP
+    menu_type_record data_01_57a4_MenuScript_TimeUp, $00, $00, $00, $00, $00, $00, $01, 0
+    ; MENU_PAUSE_IN_GEX_CAVE  - four rows: the chained stats script adds three
+    menu_type_record data_01_57ad_MenuScript_PauseInGexCave, $00, $04, $08, $20, $00, $10, $01, 0
+    ; MENU_QUIT_GAME  - yes / no
+    menu_type_record data_01_57be_MenuScript_QuitGame, $00, $02, $08, $30, $00, $10, $01, 0
+    ; MENU_PAUSE_IN_LEVEL  - four rows, same chain
+    menu_type_record data_01_57d7_MenuScript_PauseInLevel, $00, $04, $08, $20, $00, $10, $01, 0
+    ; MENU_GO_TO_MAP  - yes / no
+    menu_type_record data_01_57e8_MenuScript_GoToMap, $00, $02, $08, $30, $00, $10, $01, 0
+    ; MENU_DAVID_A_PALMER
+    menu_type_record data_01_5801_MenuScript_DavidAPalmer, MENU_FLAG_HOLD_SKIPPABLE, $00, $00, $00, $00, $00, $02, 0
+    ; MENU_UNK10  - five rows, and no way in
+    menu_type_record data_01_580a_MenuScript_Unk10, $00, $05, $18, $10, $00, $18, $03, 0
+    ; MENU_OPENING_CREDITS_1  - the only MENU_FLAG_HOLD screen
+    menu_type_record data_01_5843_MenuScript_OpeningCredits1, MENU_FLAG_HOLD, $00, $00, $00, $00, $00, $01, 0
+    ; MENU_OPENING_CREDITS_2
+    menu_type_record data_01_586c_MenuScript_OpeningCredits2, MENU_FLAG_HOLD_SKIPPABLE, $00, $00, $00, $00, $00, $01, 0
+    ; MENU_OPENING_CRYSTAL_DYNAMICS
+    menu_type_record data_01_588d_MenuScript_OpeningCrystalDynamics, MENU_FLAG_HOLD_SKIPPABLE, $00, $00, $00, $00, $00, $05, 0
+    ; MENU_EIDOS_INTERACTIVE
+    menu_type_record data_01_5896_MenuScript_EidosInteractive, MENU_FLAG_HOLD_SKIPPABLE, $00, $00, $00, $00, $00, $06, 0
+    ; MENU_END_CREDITS_1
+    menu_type_record data_01_589f_MenuScript_EndCredits1, MENU_FLAG_HOLD_SKIPPABLE, $00, $00, $00, $00, $00, $01, 0
+    ; MENU_END_CREDITS_2
+    menu_type_record data_01_58b8_MenuScript_EndCredits2, MENU_FLAG_HOLD_SKIPPABLE, $00, $00, $00, $00, $00, $01, 0
+    ; MENU_END_CREDITS_3
+    menu_type_record data_01_5929_MenuScript_EndCredits3, MENU_FLAG_HOLD_SKIPPABLE, $00, $00, $00, $00, $00, $01, 0
+    ; MENU_END_CREDITS_4
+    menu_type_record data_01_59a2_MenuScript_EndCredits4, MENU_FLAG_HOLD_SKIPPABLE, $00, $00, $00, $00, $00, $01, 0
+    ; MENU_END_CREDITS_5
+    menu_type_record data_01_59c3_MenuScript_EndCredits5, MENU_FLAG_HOLD_SKIPPABLE, $00, $00, $00, $00, $00, $01, 0
+    ; MENU_END_CREDITS_6
+    menu_type_record data_01_5a14_MenuScript_EndCredits6, MENU_FLAG_HOLD_SKIPPABLE, $00, $00, $00, $00, $00, $01, 0
+    ; MENU_WELL_DONE  - no flags at all - falls straight through
+    menu_type_record data_01_5a35_MenuScript_WellDone, $00, $00, $00, $00, $00, $00, $01, 0
+    ; menu id $1c - no MENU_* constant  - a cursor base it never uses
+    menu_type_record data_01_5a3e_MenuScript_Unk1C, MENU_FLAG_HOLD_SKIPPABLE, $00, $20, $54, $00, $10, $08, 0
 
 data_01_5596_ChainedScriptTable:
 ; The two scripts a command can queue up behind the current one through

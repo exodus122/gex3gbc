@@ -15,11 +15,20 @@ call_01_43c3_Menu_HighlightTitleOption:
     ld   DE, wDD4A_ObjectPalettes                     ;; 01:43cf $11 $4a $dd
     ld   BC, CGB_PALETTE_SIZE * 2                     ;; 01:43d2 $01 $10 $00
     jp   call_00_076e_MemCopy                         ;; 01:43d5 $c3 $6e $07
+; Three CGB palettes of CGB_PALETTE_SIZE bytes, and the two labels are overlapping
+; windows two palettes wide onto them:
+;
+;   .data_01_43d8 -> bright, dim     row 0 selected
+;   .data_01_43e0 -> dim, bright     row 1 selected
+;
+; So there are only two distinct palettes here, written three times so that one
+; MemCopy of CGB_PALETTE_SIZE * 2 bytes can pick either order without a branch. Both
+; land in wDD4A_ObjectPalettes, which is OBJ palettes 4 and 5
 .data_01_43d8:
-    db   $00, $00, $ff, $7f, $f7, $5e, $ef, $3d       ;; 01:43d8 ........
+    db   $00, $00, $ff, $7f, $f7, $5e, $ef, $3d       ; bright - the selected option
 .data_01_43e0:
-    db   $00, $00, $ef, $3d, $6b, $2d, $e7, $1c       ;; 01:43e0 ........
-    db   $00, $00, $ff, $7f, $f7, $5e, $ef, $3d       ;; 01:43e8 ........
+    db   $00, $00, $ef, $3d, $6b, $2d, $e7, $1c       ; dim    - the other one
+    db   $00, $00, $ff, $7f, $f7, $5e, $ef, $3d       ; bright again
 
 call_01_43f0_Menu_BuildScreen:
 ; Builds one menu screen and returns. Runs once per screen, not once per frame -
@@ -279,27 +288,39 @@ call_01_446b_MenuScript_RunCommand:
     ret  Z                                            ;; 01:4565 $c8
     ld   C, HDMACFG_WRAM_TILES_BANK0                  ;; 01:4566 $0e $09
     jp   call_00_0a6a_Hdma_RunConfigEntry             ;; 01:4568 $c3 $6a $0a
-.data_01_456b_MenuCmd_SubHandlers: ; probably menutype jump table
-; Behavior:
-; List of function pointers (call_01_458d_MenuCmd_StageImage1, call_01_4599_MenuCmd_StageImage2, etc.) for specific menu command handlers.
-; Likely Purpose: Dispatch table for specialized menu drawing or behavior.
-    dw   call_01_458d_MenuCmd_StageImage1             ;; 01:456b ??
-    dw   call_01_4599_MenuCmd_StageImage2             ;; 01:456d pP
-    dw   call_01_45a5_MenuCmd_StageTVScreen           ;; 01:456f pP
-    dw   call_01_466f_MenuCmd_SetLevelText            ;; 01:4571 pP
-    dw   call_01_4675_MenuCmd_SetTVNameText           ;; 01:4573 pP
-    dw   call_01_467b_MenuCmd_SetMissionText          ;; 01:4575 pP
-    dw   call_01_46d4_MenuCmd_DrawCursorSprite        ;; 01:4577 pP
-    dw   call_01_46f9_MenuCmd_EnableSpriteAnimation   ;; 01:4579 pP
-    dw   call_01_470c_MenuCmd_SetCounterText          ;; 01:457b pP
-    dw   call_01_4760_MenuCmd_DrawSpriteGroup         ;; 01:457d pP
-    dw   call_01_477b_MenuCmd_NoOp                    ;; 01:457f ??
-    dw   call_01_477c_MenuCmd_StagePasswordGlyph      ;; 01:4581 pP
-    dw   call_01_47aa_MenuCmd_SetChainedScript        ;; 01:4583 pP
-    dw   call_01_47b1_MenuCmd_LoadFullscreenImage     ;; 01:4585 pP
-    dw   call_01_480c_MenuCmd_SetCollectedCountText
-    dw   call_01_4825_MenuCmd_NoOp2
-    dw   call_01_4826_MenuCmd_DrawRemoteMarker
+.data_01_456b_MenuCmd_SubHandlers:
+; The seventeen sub-handlers a menu command can reach, indexed by
+; opcode - MENUCMD_HANDLER_BASE.
+;
+; A command's source-pointer field is normally the address of a BANK_1C_TEXT string
+; table. call_01_446b_MenuScript_RunCommand tells the two apart by the field's HIGH
+; byte: at or above MENUCMD_HANDLER_BASE it is one of these ids instead, and the LOW
+; byte becomes the handler's argument in wDBA7_MenuCmd_SrcPtr. That is why the table
+; is $E0-based and why bank 1 has no data up there to collide with it.
+;
+; Everything screen-specific in the menu system is one of these. Between them they
+; stage graphics, point the text renderer at a string, declare the cursor, and chain a
+; second script - and nothing else in bank 1 knows which screen is being drawn.
+;
+; gex2's .data_01_4633_MenuCmd_SubHandlers has one more entry and orders the two
+; text-setters the other way round
+    dw   call_01_458d_MenuCmd_StageImage1             ; MENUCMD_SUB_STAGE_IMAGE1
+    dw   call_01_4599_MenuCmd_StageImage2             ; MENUCMD_SUB_STAGE_IMAGE2 - the same routine
+    dw   call_01_45a5_MenuCmd_StageTVScreen           ; MENUCMD_SUB_STAGE_TV_SCREEN
+    dw   call_01_466f_MenuCmd_SetLevelText            ; MENUCMD_SUB_SET_LEVEL_TEXT
+    dw   call_01_4675_MenuCmd_SetTVNameText           ; MENUCMD_SUB_SET_TV_NAME_TEXT
+    dw   call_01_467b_MenuCmd_SetMissionText          ; MENUCMD_SUB_SET_MISSION_TEXT
+    dw   call_01_46d4_MenuCmd_DrawCursorSprite        ; MENUCMD_SUB_DRAW_CURSOR
+    dw   call_01_46f9_MenuCmd_EnableSpriteAnimation   ; MENUCMD_SUB_ENABLE_ANIMATION
+    dw   call_01_470c_MenuCmd_SetCounterText          ; MENUCMD_SUB_SET_COUNTER_TEXT - arg = MENU_COUNTER_*
+    dw   call_01_4760_MenuCmd_DrawSpriteGroup         ; MENUCMD_SUB_DRAW_SPRITE_GROUP - arg = MENU_SPRITE_GROUP_*
+    dw   call_01_477b_MenuCmd_NoOp                    ; MENUCMD_SUB_NOP - a bare ret
+    dw   call_01_477c_MenuCmd_StagePasswordGlyph      ; MENUCMD_SUB_PASSWORD_GLYPH
+    dw   call_01_47aa_MenuCmd_SetChainedScript        ; MENUCMD_SUB_SET_CHAINED_SCRIPT - arg = MENU_CHAINED_*
+    dw   call_01_47b1_MenuCmd_LoadFullscreenImage     ; MENUCMD_SUB_FULLSCREEN_IMAGE - arg = MENU_IMAGE_*
+    dw   call_01_480c_MenuCmd_SetCollectedCountText   ; MENUCMD_SUB_COLLECTED_COUNT
+    dw   call_01_4825_MenuCmd_NoOp2                   ; MENUCMD_SUB_NOP2 - another
+    dw   call_01_4826_MenuCmd_DrawRemoteMarker        ; MENUCMD_SUB_DRAW_REMOTE_MARKER
 
 call_01_458d_MenuCmd_StageImage1:
 ; Sub-handler $E0. Stages one small image from data_01_6f39_ImageTable into the tile
@@ -362,24 +383,35 @@ call_01_45a5_MenuCmd_StageTVScreen:
     ld   DE, $c010                                    ;; 01:45e7 $11 $10 $c0 ; wC000_BgMapTileIds
     ld   A, BANK_1F_SECONDARY_TILESETS                ;; 01:45ea $3e $1f
     jp   call_00_075f_FarMemCopy                      ;; 01:45ec $c3 $5f $07
+; The mission select screen's whole palette state: CGB_PALETTE_RAM_SIZE bytes of BG
+; palettes then the same again of OBJ palettes, copied as one $80-byte run starting at
+; wDCEA_BgPalettes. The four labels in that region are a disassembly artifact - the
+; two palette rams are contiguous, so one MemCopy fills both.
+;
+; BG palettes 4-7 are then immediately overwritten with the current map's own out of
+; BANK_1F_SECONDARY_TILESETS, so the second half of the BG block below is only what
+; the screen shows for the one frame before that lands. Every colour is CGB BGR555,
+; low byte first
 .data_01_45ef:
-    db   $00, $00, $00, $40, $ff, $03, $ff, $7f       ;; 01:45ef ........
-    db   $00, $40, $ff, $03, $73, $02, $29, $01       ;; 01:45f7 ........
-    db   $00, $40, $bf, $1e, $fa, $11, $2d, $11       ;; 01:45ff ........
-    db   $00, $00, $00, $40, $ff, $7f, $80, $03       ;; 01:4607 ........
-    db   $00, $40, $00, $00, $73, $4e, $1f, $00       ;; 01:460f ........
-    db   $00, $40, $00, $00, $1f, $00, $ff, $03       ;; 01:4617 ........
-    db   $00, $40, $00, $00, $60, $02, $9c, $03       ;; 01:461f ........
-    db   $00, $40, $00, $00, $ff, $03, $e0, $03       ;; 01:4627 ........
+    ; BG palettes 0-7 -> wDCEA_BgPalettes
+    db   $00, $00, $00, $40, $ff, $03, $ff, $7f       ; 0
+    db   $00, $40, $ff, $03, $73, $02, $29, $01       ; 1
+    db   $00, $40, $bf, $1e, $fa, $11, $2d, $11       ; 2
+    db   $00, $00, $00, $40, $ff, $7f, $80, $03       ; 3
+    db   $00, $40, $00, $00, $73, $4e, $1f, $00       ; 4  these four are replaced by
+    db   $00, $40, $00, $00, $1f, $00, $ff, $03       ; 5  the map's own palettes as
+    db   $00, $40, $00, $00, $60, $02, $9c, $03       ; 6  soon as the copy below runs
+    db   $00, $40, $00, $00, $ff, $03, $e0, $03       ; 7
 
-    db   $00, $00, $80, $00, $20, $02, $20, $03       ;; 01:462f ........
-    db   $00, $00, $00, $00, $00, $00, $00, $00       ;; 01:4637 ........
-    db   $00, $00, $00, $00, $00, $00, $00, $00       ;; 01:463f ........
-    db   $00, $00, $00, $00, $73, $4e, $1f, $00       ;; 01:4647 ........
-    db   $00, $00, $ef, $3d, $f7, $5e, $ff, $7f       ;; 01:464f ........
-    db   $00, $00, $ef, $01, $f7, $02, $ff, $03       ;; 01:4657 ........
-    db   $00, $00, $00, $00, $20, $03, $bf, $0b       ;; 01:465f ........
-    db   $00, $00, $1f, $00, $ff, $01, $7f, $03       ;; 01:4667 ........
+    ; OBJ palettes 0-7 -> wDD2A_EntityPalettes onwards
+    db   $00, $00, $80, $00, $20, $02, $20, $03       ; 0
+    db   $00, $00, $00, $00, $00, $00, $00, $00       ; 1  unused on this screen
+    db   $00, $00, $00, $00, $00, $00, $00, $00       ; 2  unused on this screen
+    db   $00, $00, $00, $00, $73, $4e, $1f, $00       ; 3
+    db   $00, $00, $ef, $3d, $f7, $5e, $ff, $7f       ; 4  the greys the cursor uses
+    db   $00, $00, $ef, $01, $f7, $02, $ff, $03       ; 5
+    db   $00, $00, $00, $00, $20, $03, $bf, $0b       ; 6
+    db   $00, $00, $1f, $00, $ff, $01, $7f, $03       ; 7
 
 call_01_466f_MenuCmd_SetLevelText:
 ; Sub-handler $E3. Points the text source at record 0 of this map's text block, i.e.
@@ -412,7 +444,7 @@ call_01_467b_MenuCmd_SetMissionText:
     ld   HL, wDBA7_MenuCmd_SrcPtr                     ;; 01:467b $21 $a7 $db
     ld   L, [HL]                                      ;; 01:467e $6e
     ld   H, $00                                       ;; 01:467f $26 $00
-    ld   DE, .data_01_46d1                            ;; 01:4681 $11 $d1 $46
+    ld   DE, .data_01_46d1_MissionRemoteMasks         ;; 01:4681 $11 $d1 $46
     add  HL, DE                                       ;; 01:4684 $19
     ld   C, [HL]                                      ;; 01:4685 $4e
     ld   HL, wDB6C_CurrentMapId                       ;; 01:4686 $21 $6c $db
@@ -453,8 +485,13 @@ call_01_467b_MenuCmd_SetMissionText:
     ld   A, [wDBA7_MenuCmd_SrcPtr]                    ;; 01:46c8 $fa $a7 $db
     call call_01_4b32_MenuText_GetMissionTable        ;; 01:46cb $cd $32 $4b
     jp   call_01_4cfa_Menu_SetScriptSrcPtr            ;; 01:46ce $c3 $fa $4c
-.data_01_46d1:
-    db   $01, $02, $04                                ;; 01:46d1 ...
+.data_01_46d1_MissionRemoteMasks:
+; Mission number -> its bit in wDC5C_ProgressFlags[level]. The low three bits of a
+; progress byte are the three mission remotes; bit PROGRESS_ALL_COLLECTIBLES_BIT and
+; bit PROGRESS_BONUS_COIN_TAKEN_BIT are above them and are not reachable from here.
+;
+; gex2's .data_01_4ecc_MissionRemoteMasks is the same three bytes
+    db   1 << 0, 1 << 1, 1 << 2                       ; missions 0, 1, 2
 
 call_01_46d4_MenuCmd_DrawCursorSprite:
 ; Sub-handler $E6. Declares this screen's selection cursor, once. It stages the cursor
@@ -529,22 +566,31 @@ call_01_4722_MenuCmd_GetCounterValue:
 ;
 ; gex2's call_01_47f6_MenuCmd_GetCounterValue
     ld   A, [wDBA7_MenuCmd_SrcPtr]                    ;; 01:4722 $fa $a7 $db
-    ld   DE, .data_01_472c                            ;; 01:4725 $11 $2c $47
+    ld   DE, .data_01_472c_CounterHandlers            ;; 01:4725 $11 $2c $47
     call call_00_0777_GetPointerFromTable             ;; 01:4728 $cd $77 $07
     jp   HL                                           ;; 01:472b $e9
-.data_01_472c:
-    dw   call_01_4acf_CountCollectedBitsForLevel      ;; 01:472c pP
-    dw   call_01_4b0a_CountHighBitsForLevel           ;; 01:472e pP
-    dw   call_01_4af9_IsLevelBonusCoinTaken           ;; 01:4730 pP
-    dw   .jp_01_4744                                  ;; 01:4732 pP
-    dw   call_01_4ae7_CountLevelsWithBonusCoin        ;; 01:4734 pP
-    dw   .jp_01_4748                                  ;; 01:4736 pP
-    dw   call_01_4ab9_CountAllCollectedObjectives     ;; 01:4738 pP
-    dw   .jp_01_474c                                  ;; 01:473a pP
-    dw   .jp_01_4756                                  ;; 01:473c pP
-    dw   .jp_01_4759                                  ;; 01:473e pP
-    dw   .jp_01_475c                                  ;; 01:4740 pP
-    dw   call_00_2f34_CountLevelCollectibleTotal      ;; 01:4742 ??
+.data_01_472c_CounterHandlers:
+; One routine per MENU_COUNTER_*, jumped to (not called) with the result expected in
+; A. Every entry either returns a number or writes its own text into
+; wDADD_MenuTextBuffer - see call_01_470c_MenuCmd_SetCounterText for how the caller
+; tells which happened.
+;
+; The pairing is what makes the totals screen readable: the scripts use these in
+; numerator/denominator pairs with a "/" string between them, so $00 goes with $07,
+; $01 with $08, $02 with $09 and $03 with $0b. The three constant entries exist only
+; to be those denominators
+    dw   call_01_4acf_CountCollectedBitsForLevel      ; MENU_COUNTER_LEVEL_OBJECTIVES
+    dw   call_01_4b0a_CountHighBitsForLevel           ; MENU_COUNTER_LEVEL_REMOTES
+    dw   call_01_4af9_IsLevelBonusCoinTaken           ; MENU_COUNTER_LEVEL_BONUS_COIN
+    dw   .jp_01_4744                                  ; MENU_COUNTER_COLLECTIBLES
+    dw   call_01_4ae7_CountLevelsWithBonusCoin        ; MENU_COUNTER_BONUS_COINS
+    dw   .jp_01_4748                                  ; MENU_COUNTER_PAW_COINS
+    dw   call_01_4ab9_CountAllCollectedObjectives     ; MENU_COUNTER_ALL_OBJECTIVES
+    dw   .jp_01_474c                                  ; MENU_COUNTER_LEVEL_OBJECTIVE_TOTAL
+    dw   .jp_01_4756                                  ; MENU_COUNTER_CONST_3
+    dw   .jp_01_4759                                  ; MENU_COUNTER_CONST_1
+    dw   .jp_01_475c                                  ; MENU_COUNTER_LIVES
+    dw   call_00_2f34_CountLevelCollectibleTotal      ; MENU_COUNTER_LEVEL_COLLECTIBLE_TOTAL
 .jp_01_4744:
     ld   A, [wDC68_CollectibleAmount]                 ;; 01:4744 $fa $68 $dc
     ret                                               ;; 01:4747 $c9
@@ -654,29 +700,44 @@ call_01_47b1_MenuCmd_LoadFullscreenImage:
 ; this is how the title screen and the credit stills get on screen. gex2's
 ; call_01_491d_MenuCmd_LoadFullscreenImage
     ld   A, [wDBA7_MenuCmd_SrcPtr]                    ;; 01:47b1 $fa $a7 $db
-    ld   DE, .data_01_47c6                            ;; 01:47b4 $11 $c6 $47
+    ld   DE, .data_01_47c6_FullscreenImages           ;; 01:47b4 $11 $c6 $47
     call call_00_0777_GetPointerFromTable             ;; 01:47b7 $cd $77 $07
     ld   DE, wDBB1_ScreenDraw_HasPaletteIdMap         ;; 01:47ba $11 $b1 $db
     ld   BC, $08                                      ;; 01:47bd $01 $08 $00
     call call_00_076e_MemCopy                         ;; 01:47c0 $cd $6e $07
     jp   jp_00_0781_Screen_LoadFullscreenImage        ;; 01:47c3 $c3 $81 $07
-.data_01_47c6:
-    dw   .data_01_47d4, .data_01_47dc, .data_01_47e4, .data_01_47ec ;; 01:47c6 ..??....
+.data_01_47c6_FullscreenImages:
+; One eight-byte record per MENU_IMAGE_*, copied whole into
+; wDBB1_ScreenDraw_HasPaletteIdMap. The fields are named in memory.asm:
+;
+;   +0  MENUIMG_PALETTE_* - what follows the tilemap in ROM
+;   +1  source bank
+;   +2  tilemap:   SCREEN_TILEMAP_BYTES of tile ids
+;   +4  tile data
+;   +6  tile data length in bytes
+;
+; In every record tilemap = tile data + length, so each image is one contiguous blob -
+; graphics, then the screen that indexes them, then whichever palette form byte +0
+; selects. That is a useful check when relabelling: if the two addresses stop
+; differing by the length, the record has been misread.
+;
+; Six of the seven live in bank $06; MENU_IMAGE_UNK1C is alone in bank $11
+    dw   .data_01_47d4, .data_01_47dc, .data_01_47e4, .data_01_47ec
     dw   .data_01_47f4, .data_01_47fc, .data_01_4804
-.data_01_47d4:
-    db   $00, $06, $e0, $45, $00, $40, $e0, $05
-.data_01_47dc:
-    db   $00, $06, $a6, $48, $a6, $47, $00, $01
-.data_01_47e4:
-    db   $01, $06, $fe, $56, $1e, $4a, $e0, $0c
-.data_01_47ec:
-    db   $00, $06, $06, $66, $86, $60, $80, $05
-.data_01_47f4:
-    db   $00, $06, $66, $6b, $c6, $67, $a0, $03
-.data_01_47fc:
-    db   $00, $06, $ce, $5e, $ce, $59, $00, $05
-.data_01_4804:
-    db   $01, $11, $90, $51, $00, $40, $90, $11
+.data_01_47d4: ; MENU_IMAGE_DAVID_A_PALMER
+    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP, $06, $45e0, $4000, $05e0
+.data_01_47dc: ; MENU_IMAGE_UNK10 - only $100 bytes, so 16 tiles
+    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP, $06, $48a6, $47a6, $0100
+.data_01_47e4: ; MENU_IMAGE_TITLE_SCREEN - the biggest, and one of two with a full map
+    menu_fullscreen_image MENUIMG_PALETTE_MAP,    $06, $56fe, $4a1e, $0ce0
+.data_01_47ec: ; MENU_IMAGE_CRYSTAL_DYNAMICS
+    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP, $06, $6606, $6086, $0580
+.data_01_47f4: ; MENU_IMAGE_EIDOS_INTERACTIVE
+    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP, $06, $6b66, $67c6, $03a0
+.data_01_47fc: ; MENU_IMAGE_PASSWORD
+    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP, $06, $5ece, $59ce, $0500
+.data_01_4804: ; MENU_IMAGE_UNK1C - $1190 bytes, so it is split across two HDMA passes
+    menu_fullscreen_image MENUIMG_PALETTE_MAP,    $11, $5190, $4000, $1190
 
 call_01_480c_MenuCmd_SetCollectedCountText:
 ; Sub-handler $EE. Builds a short "n<something>" string: it appends a fixed suffix
@@ -713,7 +774,7 @@ call_01_4826_MenuCmd_DrawRemoteMarker:
     ld   hl,wDBA7_MenuCmd_SrcPtr
     ld   l,[hl]
     ld   h,$00
-    ld   de,.data_01_4871
+    ld   de,.data_01_4871_RemoteMarkerMasks
     add  hl,de
     ld   c,[hl]
     ld   hl,wDB6C_CurrentMapId
@@ -750,5 +811,9 @@ call_01_4826_MenuCmd_DrawRemoteMarker:
     ld   [wDBDB_Menu_OamSlot],a
     ld   bc,$0202
     jp   call_01_4c7e_Menu_WriteSpriteRect
-.data_01_4871:
-    db   $01, $02, $04, $08                           ;; 01:486e ???????
+.data_01_4871_RemoteMarkerMasks:
+; The same idea as .data_01_46d1_MissionRemoteMasks with a fourth entry: the three
+; mission remotes plus PROGRESS_ALL_COLLECTIBLES_BIT. The congratulations screen shows
+; four markers because finishing a level's collectibles counts as a fourth prize
+    db   1 << 0, 1 << 1, 1 << 2                       ; missions 0, 1, 2
+    db   1 << PROGRESS_ALL_COLLECTIBLES_BIT           ; all of the level's collectibles

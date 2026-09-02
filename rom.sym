@@ -631,12 +631,12 @@
 01:4675 call_01_4675_MenuCmd_SetTVNameText
 01:467b call_01_467b_MenuCmd_SetMissionText
 01:4698 call_01_467b_MenuCmd_SetMissionText.jr_01_4698
-01:46d1 call_01_467b_MenuCmd_SetMissionText.data_01_46d1
+01:46d1 call_01_467b_MenuCmd_SetMissionText.data_01_46d1_MissionRemoteMasks
 01:46d4 call_01_46d4_MenuCmd_DrawCursorSprite
 01:46f9 call_01_46f9_MenuCmd_EnableSpriteAnimation
 01:470c call_01_470c_MenuCmd_SetCounterText
 01:4722 call_01_4722_MenuCmd_GetCounterValue
-01:472c call_01_4722_MenuCmd_GetCounterValue.data_01_472c
+01:472c call_01_4722_MenuCmd_GetCounterValue.data_01_472c_CounterHandlers
 01:4744 call_01_4722_MenuCmd_GetCounterValue.jp_01_4744
 01:4748 call_01_4722_MenuCmd_GetCounterValue.jp_01_4748
 01:474c call_01_4722_MenuCmd_GetCounterValue.jp_01_474c
@@ -649,7 +649,7 @@
 01:477c call_01_477c_MenuCmd_StagePasswordGlyph
 01:47aa call_01_47aa_MenuCmd_SetChainedScript
 01:47b1 call_01_47b1_MenuCmd_LoadFullscreenImage
-01:47c6 call_01_47b1_MenuCmd_LoadFullscreenImage.data_01_47c6
+01:47c6 call_01_47b1_MenuCmd_LoadFullscreenImage.data_01_47c6_FullscreenImages
 01:47d4 call_01_47b1_MenuCmd_LoadFullscreenImage.data_01_47d4
 01:47dc call_01_47b1_MenuCmd_LoadFullscreenImage.data_01_47dc
 01:47e4 call_01_47b1_MenuCmd_LoadFullscreenImage.data_01_47e4
@@ -661,7 +661,7 @@
 01:4825 call_01_4825_MenuCmd_NoOp2
 01:4826 call_01_4826_MenuCmd_DrawRemoteMarker
 01:4843 call_01_4826_MenuCmd_DrawRemoteMarker.jr_00_4843
-01:4871 call_01_4826_MenuCmd_DrawRemoteMarker.data_01_4871
+01:4871 call_01_4826_MenuCmd_DrawRemoteMarker.data_01_4871_RemoteMarkerMasks
 01:4875 call_01_4875_Text_Render
 01:488e call_01_4875_Text_Render.jr_01_488e
 01:48ac call_01_4875_Text_Render.jr_01_48ac
@@ -710,7 +710,7 @@
 01:4b2a call_01_4b2a_MenuText_GetTVNameTable
 01:4b32 call_01_4b32_MenuText_GetMissionTable
 01:4b43 call_01_4b43_MenuText_GetMapTextBlock
-01:4b53 call_01_4b43_MenuText_GetMapTextBlock.data_01_4b53
+01:4b53 call_01_4b43_MenuText_GetMapTextBlock.data_01_4b53_MapTextBlocks
 01:4b6b call_01_4b6b_Menu_TickHideSprites
 01:4b79 call_01_4b6b_Menu_TickHideSprites.jr_01_4b79
 01:4b81 call_01_4b6b_Menu_TickHideSprites.jp_01_4b81
@@ -749,7 +749,7 @@
 01:4df4 call_01_4df4_Text_CharToGlyphIndex
 01:4dfd call_01_4df4_Text_CharToGlyphIndex.data_01_4dfd_CharToGlyph
 01:4efd call_01_4efd
-01:4f06 call_01_4efd.data_01_4f06
+01:4f06 call_01_4efd.data_01_4f06_KeyToAscii
 01:4f27 call_01_4f27_Menu_ClearScreenBuffers
 01:4f51 call_01_4f51_Menu_UploadBgAttrMap
 01:4f5c call_01_4f5c_Menu_UploadBgTileMap

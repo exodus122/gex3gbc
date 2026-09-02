@@ -249,6 +249,30 @@ MACRO menu_cmd_sub ; opcode, pen X, pen Y, arg, MENUCMD_SUB_*, handler arg, opti
     db   \7, \8 | MENUCMD_FLAG_LAST_BLOCK
 ENDM
 
+; One record of data_01_53c6_MenuTypeRecords - the whole definition of one MENU_* id.
+; The record is MENUTYPE_RECORD_SIZE bytes but call_01_4000_MenuLoad copies only
+; MENUTYPE_COPY_BYTES of it, so the four trailing bytes are dead and are emitted here
+; rather than written out on all 29 rows.
+;
+; The LCDC byte is baked in for the same reason: it is MENUTYPE_LCDC_UNREAD in every
+; record and nothing reads it - call_01_43f0_Menu_BuildScreen hardcodes MENU_LCDC
+MACRO menu_type_record ; script, MENU_FLAG_*, option count, cursor base X, base Y, step X, step Y, palette, callback (0 = none)
+    dw   \1
+    db   \2, \3, \4, \5, \6, \7, MENUTYPE_LCDC_UNREAD, \8
+    dw   \9
+    db   0, 0, 0, 0
+ENDM
+
+; One record of .data_01_47c6_FullscreenImages, copied verbatim into
+; wDBB1_ScreenDraw_HasPaletteIdMap and consumed by
+; jp_00_0781_Screen_LoadFullscreenImage. The three fields after the bank are the two
+; halves of one contiguous ROM blob and its length: tile data first, then the tilemap
+; immediately after it, so in every record tilemap = tile data + size
+MACRO menu_fullscreen_image ; MENUIMG_PALETTE_MAP_* , source bank, tilemap address, tile data address, tile data bytes
+    db   \1, \2
+    dw   \3, \4, \5
+ENDM
+
 ; The rectangle a menu command opcode occupies, in data_01_512e_MenuCmd_Descriptors.
 ; The two trailing bytes are padding to MENUCMD_DESCRIPTOR_SIZE and are never read
 MACRO menu_cmd_shape ; width, height, dest tile X, dest tile Y, first tile id, attribute

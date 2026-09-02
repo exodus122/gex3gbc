@@ -110,38 +110,65 @@ call_01_4df4_Text_CharToGlyphIndex:
     ld   A, [HL]                                      ;; 01:4dfb $7e
     ret                                               ;; 01:4dfc $c9
 .data_01_4dfd_CharToGlyph:
-    db   $00, $00, $00, $00, $00, $00, $00, $00       ;; 01:4dfd ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00       ;; 01:4e05 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00       ;; 01:4e0d ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00       ;; 01:4e15 ????????
-    db   $00, $3a, $00, $00, $00, $00, $00, $44       ;; 01:4e1d ww??????
-    db   $42, $43, $00, $00, $3f, $40, $3e, $41       ;; 01:4e25 ww??wwww
-    db   $1b, $1c, $1d, $1e, $1f, $20, $21, $22       ;; 01:4e2d wwwwww??
-    db   $23, $24, $00, $00, $00, $00, $00, $39       ;; 01:4e35 ?w??????
-    db   $00, $25, $26, $27, $28, $29, $2a, $2b       ;; 01:4e3d ????????
-    db   $2c, $2d, $2e, $2f, $30, $31, $32, $33       ;; 01:4e45 ????????
-    db   $34, $35, $36, $37, $38, $3b, $3c, $3d       ;; 01:4e4d ????????
-    db   $45, $46, $00, $00, $00, $00, $00, $00       ;; 01:4e55 ww??????
-    db   $00, $01, $02, $03, $04, $05, $06, $07       ;; 01:4e5d wwwwwwww
-    db   $08, $09, $0a, $0b, $0c, $0d, $0e, $0f       ;; 01:4e65 wwwwwwww
-    db   $10, $11, $12, $13, $14, $15, $16, $17       ;; 01:4e6d wwwwwwww
-    db   $18, $19, $1a, $00, $00, $00, $00, $00       ;; 01:4e75 www?????
-    db   $00, $00, $00, $00, $00, $00, $00, $00       ;; 01:4e7d ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00       ;; 01:4e85 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00       ;; 01:4e8d ????????
-    db   $00, $00                                     ;; 01:4e95 ??
-    db   $00, $00, $00, $00, $00, $00, $00, $00       ;; 01:4e97 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00       ;; 01:4e9f ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00       ;; 01:4ea7 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00       ;; 01:4eaf ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00       ;; 01:4eb7 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00       ;; 01:4ebf ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00       ;; 01:4ec7 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00       ;; 01:4ecf ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00       ;; 01:4ed7 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00       ;; 01:4edf ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00       ;; 01:4ee7 ????????
-    db   $00, $00, $00, $00, $00, $00, $00, $00       ;; 01:4eef ????????
+; ASCII code -> glyph index, one entry for all 256 codes, read by
+; call_01_4df4_Text_CharToGlyphIndex. Glyph $00 is the blank, so every unmapped code
+; renders as a space - including a real space ($20), which is why the wrapper has to
+; test for TEXT_SPACE itself rather than looking at the glyph.
+;
+; Reading the mapped entries back gives the font's own layout, and it is not
+; alphabetical:
+;
+;   $00      blank
+;   $01-$1a  lowercase a-z
+;   $1b-$24  digits 0-9
+;   $25-$38  UPPERCASE A-T
+;   $39-$3a  ? !
+;   $3b-$3d  UPPERCASE U V W
+;   $3e-$44  . , - / ( ) '
+;   $45-$46  UPPERCASE X Y
+;
+; So the capitals were laid out as far as T, punctuation was added after them, and
+; U-W and X-Y were bolted on twice more as the text needed them. TEXT_GLYPH_COUNT is
+; $47, exactly one past the last of those.
+;
+; UPPERCASE Z HAS NO GLYPH. Code $5a maps to $00 like an unmapped character, so a
+; capital Z anywhere in the game's text would come out as a blank; no string in the
+; ROM contains one. Lowercase z is fine - it is glyph $1a.
+;
+; gex2's .data_01_4f4c_CharToGlyph is a shorter table biased by $20 and has no
+; lowercase at all
+    db   $00, $00, $00, $00, $00, $00, $00, $00       ; $00-$07 control codes
+    db   $00, $00, $00, $00, $00, $00, $00, $00       ; $08-$0f
+    db   $00, $00, $00, $00, $00, $00, $00, $00       ; $10-$17
+    db   $00, $00, $00, $00, $00, $00, $00, $00       ; $18-$1f
+    db   $00, $3a, $00, $00, $00, $00, $00, $44       ; $20 space ! " # $ % & '
+    db   $42, $43, $00, $00, $3f, $40, $3e, $41       ; $28 ( ) * + , - . /
+    db   $1b, $1c, $1d, $1e, $1f, $20, $21, $22       ; $30 digits 0-7
+    db   $23, $24, $00, $00, $00, $00, $00, $39       ; $38 8 9 : ; < = > ?
+    db   $00, $25, $26, $27, $28, $29, $2a, $2b       ; $40 @, then A-G
+    db   $2c, $2d, $2e, $2f, $30, $31, $32, $33       ; $48 H-O
+    db   $34, $35, $36, $37, $38, $3b, $3c, $3d       ; $50 P-T run out at $38; U V W jump to $3b
+    db   $45, $46, $00, $00, $00, $00, $00, $00       ; $58 X Y, then Z with NO glyph, then [ to _
+    db   $00, $01, $02, $03, $04, $05, $06, $07       ; $60 `, then a-g
+    db   $08, $09, $0a, $0b, $0c, $0d, $0e, $0f       ; $68 h-o
+    db   $10, $11, $12, $13, $14, $15, $16, $17       ; $70 p-w
+    db   $18, $19, $1a, $00, $00, $00, $00, $00       ; $78 x y z, then { | } ~ DEL
+    db   $00, $00, $00, $00, $00, $00, $00, $00       ; $80-$ff are never used as text -
+    db   $00, $00, $00, $00, $00, $00, $00, $00       ; TEXT_TERMINATOR is $80, so a
+    db   $00, $00, $00, $00, $00, $00, $00, $00       ; string ends before it can index
+    db   $00, $00                                     ; this half of the table
+    db   $00, $00, $00, $00, $00, $00, $00, $00
+    db   $00, $00, $00, $00, $00, $00, $00, $00
+    db   $00, $00, $00, $00, $00, $00, $00, $00
+    db   $00, $00, $00, $00, $00, $00, $00, $00
+    db   $00, $00, $00, $00, $00, $00, $00, $00
+    db   $00, $00, $00, $00, $00, $00, $00, $00
+    db   $00, $00, $00, $00, $00, $00, $00, $00
+    db   $00, $00, $00, $00, $00, $00, $00, $00
+    db   $00, $00, $00, $00, $00, $00, $00, $00
+    db   $00, $00, $00, $00, $00, $00, $00, $00
+    db   $00, $00, $00, $00, $00, $00, $00, $00
+    db   $00, $00, $00, $00, $00, $00, $00, $00
     db   $00, $00, $00, $00, $00, $00
 
 call_01_4efd:
@@ -155,16 +182,27 @@ call_01_4efd:
 ; paged in - the collision is a coincidence of layout
     ld   e,a
     ld   d,$00
-    ld   hl,.data_01_4f06
+    ld   hl,.data_01_4f06_KeyToAscii
     add  hl,de
     ld   a,[hl]
     ret  
-.data_01_4f06:
-    db   $20       ;; 01:4eff ????????
-    db   $41, $42, $43, $44, $45, $46, $47, $48       ;; 01:4f07 ????????
-    db   $49, $4a, $4b, $4c, $4d, $4e, $4f, $50       ;; 01:4f0f ????????
-    db   $51, $52, $53, $54, $55, $56, $57, $58       ;; 01:4f17 ????????
-    db   $59, $5a, $30, $31, $32, $33, $34, $35       ;; 01:4f1f ????????
+.data_01_4f06_KeyToAscii:
+; Password key value -> the character it stands for. 33 entries: PASSWORD_KEY_BLANK
+; for an empty cell, then the 26 letters and the six digits 0-5 that make up the
+; PASSWORD_KEY_COLUMNS x PASSWORD_KEY_ROWS keyboard - 32 keys, which is exactly the
+; PASSWORD_BITS_PER_CELL-bit range a cell can hold.
+;
+; It lines up entry for entry with data_01_66f9_PasswordFont, whose 33 glyphs are the
+; blank plus the same 32 keys, so a key value indexes both tables interchangeably.
+;
+; NOTHING CALLS call_01_4efd, so this table is dead in this build: the grid is drawn
+; from the font directly by call_01_477c_MenuCmd_StagePasswordGlyph and never goes via
+; ASCII. It is presumably what a "write the password out as text" path would have used
+    db   PASSWORD_KEY_BLANK                           ; key $00 - an empty cell
+    db   $41, $42, $43, $44, $45, $46, $47, $48       ; A-H
+    db   $49, $4a, $4b, $4c, $4d, $4e, $4f, $50       ; I-P
+    db   $51, $52, $53, $54, $55, $56, $57, $58       ; Q-X
+    db   $59, $5a, $30, $31, $32, $33, $34, $35       ; Y Z, then digits 0-5
 
 call_01_4f27_Menu_ClearScreenBuffers:
 ; Blanks everything a screen build writes into: one tile of the staging buffer, the
@@ -333,10 +371,36 @@ call_01_4f8c_Password_BuildPayload:
     ld   [wDB91_PasswordCompletionFlag], A            ;; 01:500f $ea $91 $db
     ret                                               ;; 01:5012 $c9
 .data_01_5013_LevelProgressMasks:
-    db   $f1, $ff, $ff, $ff, $ff, $ff, $ff, $01       ;; 01:5013 ........
-    db   $01, $01, $01, $01                           ;; 01:501b ....
+; Which bits of each level's wDC5C_ProgressFlags byte are worth saving in a password.
+; One mask per entry, PROGRESS_FLAG_COUNT entries, walked MSB first alongside the
+; progress byte itself.
+;
+; A progress byte is three fields: bits 0-3 are the level's OBJECTIVES_PER_LEVEL
+; objectives (the three mission remotes and PROGRESS_ALL_COLLECTIBLES_BIT), bit
+; PROGRESS_BONUS_COIN_TAKEN_BIT is the bonus coin, and bits 5-7 are the remotes
+; call_01_4b0a_CountHighBitsForLevel counts. The masks say which of those a given
+; level actually has:
+;
+;   $f1  Gex's Cave - one objective, so bits 1-3 are dropped
+;   $ff  the six main TV levels - everything
+;   $01  the bonus and boss levels - a single remote each
+;
+; Add the set bits up and there are 58 of them. The password payload is
+; PASSWORD_TOTAL_BITS bits, of which the first four bytes are the header, and
+; 90 - 32 = 58. The masks are sized to the password, not the other way round: there is
+; no spare room, which is why a level cannot gain a saved flag without one being taken
+; from somewhere else
+;
+; call_01_50b5_Password_ApplyProgress has its own byte-for-byte copy at
+; .data_01_511a_LevelProgressMasks; the two are never compared, so a change here must
+; be made there too or saving and loading will disagree
+    db   $f1, $ff, $ff, $ff, $ff, $ff, $ff, $01       ; levels $00-$07
+    db   $01, $01, $01, $01                           ; levels $08-$0b
 .data_01_501f_BitMaskLut_80to01:
-    db   $80, $40, $20, $10, $08, $04, $02, $01       ;; 01:501f ??.?.???
+; Bit number (0-7, MSB first) -> its mask. Used to set one bit of the encoded buffer
+; at a time: the running bit counter's low three bits index this and the rest of it
+; picks the byte
+    db   $80, $40, $20, $10, $08, $04, $02, $01
 
 call_01_5027_Password_Encode:
 ; Spreads the payload's PASSWORD_TOTAL_BITS bits across the eighteen display cells,
@@ -517,13 +581,34 @@ call_01_50b5_Password_ApplyPayload:
     ld   [wDC4F_PawCoinExtraHealth], A                ;; 01:5116 $ea $4f $dc
     ret                                               ;; 01:5119 $c9
 .data_01_511a_LevelProgressMasks:
-; Description:
-; A static table of bit masks used by call_01_50b5 to control which password checks 
-; to perform for each column. Likely a column mask pattern for map rows.
-    db   $f1, $ff, $ff, $ff, $ff, $ff, $ff, $01       ;; 01:511a ????????
-    db   $01, $01, $01, $01                           ;; 01:5122 ????
+; Which bits of each level's wDC5C_ProgressFlags byte are worth saving in a password.
+; One mask per entry, PROGRESS_FLAG_COUNT entries, walked MSB first alongside the
+; progress byte itself.
+;
+; A progress byte is three fields: bits 0-3 are the level's OBJECTIVES_PER_LEVEL
+; objectives (the three mission remotes and PROGRESS_ALL_COLLECTIBLES_BIT), bit
+; PROGRESS_BONUS_COIN_TAKEN_BIT is the bonus coin, and bits 5-7 are the remotes
+; call_01_4b0a_CountHighBitsForLevel counts. The masks say which of those a given
+; level actually has:
+;
+;   $f1  Gex's Cave - one objective, so bits 1-3 are dropped
+;   $ff  the six main TV levels - everything
+;   $01  the bonus and boss levels - a single remote each
+;
+; Add the set bits up and there are 58 of them. The password payload is
+; PASSWORD_TOTAL_BITS bits, of which the first four bytes are the header, and
+; 90 - 32 = 58. The masks are sized to the password, not the other way round: there is
+; no spare room, which is why a level cannot gain a saved flag without one being taken
+; from somewhere else
+;
+; The decoding half of the pair - identical bytes to
+; .data_01_5013_LevelProgressMasks above, duplicated in ROM rather than shared
+    db   $f1, $ff, $ff, $ff, $ff, $ff, $ff, $01       ; levels $00-$07
+    db   $01, $01, $01, $01                           ; levels $08-$0b
 .data_01_5126_BitMaskLut_80to01:
-; Description:
-; A standard bitmask lookup table for individual bits ($80, $40, $20 … $01). 
-; Used for testing individual tile bits in wDB76_PasswordEncodedBuffer.
-    db   $80, $40, $20, $10, $08, $04, $02, $01       ;; 01:5126 ????????
+; Bit number (0-7, MSB first) -> its mask. Used to set one bit of the encoded buffer
+; at a time: the running bit counter's low three bits index this and the rest of it
+; picks the byte
+; here, to read one bit of the decoded buffer back out. Also a duplicate of
+; .data_01_501f_BitMaskLut_80to01
+    db   $80, $40, $20, $10, $08, $04, $02, $01

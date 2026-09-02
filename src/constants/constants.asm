@@ -1009,6 +1009,16 @@ DEF PASSWORD_VALID                        EQU $20
 DEF MENUTYPE_RECORD_SIZE         EQU $10 ; stride in data_01_53c6_MenuTypeRecords
 DEF MENUTYPE_COPY_BYTES          EQU $0c ; how much of it is copied to wDB92; the last
                                          ; four bytes of every record are dead
+DEF MENUTYPE_LCDC_UNREAD         EQU $d3 ; byte +8 of every record. It looks like an
+                                         ; LCDC value and it is the same one in all 29
+                                         ; records, but nothing reads it -
+                                         ; call_01_43f0_Menu_BuildScreen writes
+                                         ; MENU_LCDC instead
+
+; Byte +0 of a fullscreen image record - what follows the tilemap in ROM. See
+; jp_00_0781_Screen_LoadFullscreenImage
+DEF MENUIMG_PALETTE_LOOKUP       EQU $00 ; a 256-entry tile-id -> palette table
+DEF MENUIMG_PALETTE_MAP          EQU $01 ; a second full-screen block, one entry per tile
 ; wDB94_MenuType_Flags - how the screen behaves once it is built
 DEF MENU_FLAG_GRID_INPUT         EQU $01 ; free 2-D cursor: the password keyboard
 DEF MENU_FLAG_HOLD               EQU $02 ; show for MENU_HOLD_FRAMES, ignore input
@@ -1048,6 +1058,11 @@ DEF MENUCMD_ATTR_TILESET_ROW     EQU $ff ; wDBA3: no constant attribute - pull a
                                          ; the secondary tileset instead
 DEF MENU_CHAINED_NONE            EQU $ff ; wDBDD: no follow-on script
 
+; The argument MENUCMD_SUB_SET_CHAINED_SCRIPT takes - an index into
+; data_01_5596_ChainedScriptTable, which has only these two entries
+DEF MENU_CHAINED_PASSWORD_GRID   EQU $00 ; data_01_5a47_MenuScript_PasswordGrid
+DEF MENU_CHAINED_TOTALS_STATS    EQU $01 ; data_01_5ad8_MenuScript_TotalsStats
+
 ; The sub-handlers a command can reach, indexed as id - MENUCMD_HANDLER_BASE into
 ; data_01_456b_MenuCmd_SubHandlers. Everything screen-specific in the menu system is
 ; one of these seventeen
@@ -1076,6 +1091,45 @@ DEF MENU_ACTION_SEE_PASSWORD     EQU $30 ; encode the save state and show it
 DEF MENU_ACTION_QUIT             EQU $50 ; MENU_QUIT_GAME in the cave, MENU_GO_TO_MAP
                                          ; in a level
 DEF MENU_ACTION_VIEW_TOTALS      EQU $70
+
+; ------------------------------------------------------------------
+; The arguments the three "pick something out of a table" sub-handlers take
+; ------------------------------------------------------------------
+; MENUCMD_SUB_SET_COUNTER_TEXT: which number to print, indexing
+; .data_01_472c_CounterHandlers inside call_01_4722_MenuCmd_GetCounterValue.
+;
+; Only three of the twelve read a stored counter. The rest are computed on the
+; spot - mostly popcounts over wDC5C_ProgressFlags, because the game keeps no
+; "missions done" total anywhere - or are flat constants that exist so a script
+; can print the denominator of an "n / m" pair without a second string
+DEF MENU_COUNTER_LEVEL_OBJECTIVES EQU $00 ; popcount of this level's low nibble
+DEF MENU_COUNTER_LEVEL_REMOTES   EQU $01 ; popcount of its top three bits
+DEF MENU_COUNTER_LEVEL_BONUS_COIN EQU $02 ; 1 or 0
+DEF MENU_COUNTER_COLLECTIBLES    EQU $03 ; wDC68_CollectibleAmount
+DEF MENU_COUNTER_BONUS_COINS     EQU $04 ; how many levels have had theirs taken
+DEF MENU_COUNTER_PAW_COINS       EQU $05 ; wDCAF_PawCoinCounter
+DEF MENU_COUNTER_ALL_OBJECTIVES  EQU $06 ; popcount over every level
+DEF MENU_COUNTER_LEVEL_OBJECTIVE_TOTAL EQU $07 ; 1 in the cave, 4 everywhere else
+DEF MENU_COUNTER_CONST_3         EQU $08 ; the denominator of "remotes n / 3"
+DEF MENU_COUNTER_CONST_1         EQU $09 ; ...and of "bonus coin n / 1"
+DEF MENU_COUNTER_LIVES           EQU $0a ; wDC4E_LivesRemaining
+DEF MENU_COUNTER_LEVEL_COLLECTIBLE_TOTAL EQU $0b ; call_00_2f34_CountLevelCollectibleTotal
+
+; MENUCMD_SUB_FULLSCREEN_IMAGE: which still to load, indexing
+; .data_01_47c6_FullscreenImages inside call_01_47b1_MenuCmd_LoadFullscreenImage
+DEF MENU_IMAGE_DAVID_A_PALMER    EQU $00
+DEF MENU_IMAGE_UNK10             EQU $01 ; the backdrop of the unreachable MENU_UNK10
+DEF MENU_IMAGE_TITLE_SCREEN      EQU $02
+DEF MENU_IMAGE_CRYSTAL_DYNAMICS  EQU $03
+DEF MENU_IMAGE_EIDOS_INTERACTIVE EQU $04
+DEF MENU_IMAGE_PASSWORD          EQU $05 ; shared by entering and viewing a password
+DEF MENU_IMAGE_UNK1C             EQU $06 ; the backdrop of menu id $1c
+
+; MENUCMD_SUB_DRAW_SPRITE_GROUP: which group to emit, indexing
+; data_01_5b61_SpriteScriptTable. Three of the four are the live cursor record in
+; WRAM rather than a ROM script, and only the title banner is really a group
+DEF MENU_SPRITE_GROUP_CURSOR     EQU $00 ; $00-$02 all point at wDBBF_MenuCursor_OamSlot
+DEF MENU_SPRITE_GROUP_TITLE_BANNER EQU $03
 
 ; The two screen planes, wD400_ScreenDraw_TileIds and wD578_ScreenDraw_PaletteIds
 DEF SCREEN_ATTR_PLANE_OFFSET     EQU $178 ; distance between them, = SCREEN_TILEMAP_BYTES
