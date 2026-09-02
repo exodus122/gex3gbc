@@ -38,34 +38,34 @@
 
 data_02_4000_EntityActionJumpTable:
    dw   .data_02_40e4 ; ENTITY_GEX
-   dw   .data_02_42c4 ; ENTITY_BONUS_COIN
-   dw   .data_02_42cc ; ENTITY_FLY_COIN_SPAWN
-   dw   .data_02_42d4 ; ENTITY_PAW_COIN
-   dw   .data_02_42dc ; ENTITY_FLY_1
-   dw   .data_02_42dc ; ENTITY_FLY_2
-   dw   .data_02_42dc ; ENTITY_FLY_3
-   dw   .data_02_42dc ; ENTITY_FLY_4
-   dw   .data_02_42dc ; ENTITY_FLY_5
-   dw   .data_02_42e0 ; ENTITY_GREEN_FLY_TV
-   dw   .data_02_42e0 ; ENTITY_PURPLE_FLY_TV
-   dw   .data_02_42e0 ; ENTITY_UNK_FLY_TV_3
-   dw   .data_02_42e0 ; ENTITY_BLUE_FLY_TV
-   dw   .data_02_42e0 ; ENTITY_UNK_FLY_TV_5
-   dw   .data_02_42f4 ; ENTITY_UNK0E
-   dw   .data_02_42f8 ; ENTITY_UNK0F
-   dw   .data_02_42fc ; ENTITY_UNK10
-   dw   .data_02_4300 ; ENTITY_TV_BUTTON
-   dw   .data_02_4310 ; ENTITY_TV_REMOTE
-   dw   .data_02_4324 ; ENTITY_UNK13
-   dw   .data_02_4328 ; ENTITY_GOAL_COUNTER_1
-   dw   .data_02_432c ; ENTITY_GOAL_COUNTER_2
-   dw   .data_02_4330 ; ENTITY_GOAL_COUNTER_3
-   dw   .data_02_4334 ; ENTITY_GOAL_COUNTER_4
-   dw   .data_02_4338 ; ENTITY_GOAL_COUNTER_5
-   dw   .data_02_433c ; ENTITY_GOAL_COUNTER_6
-   dw   .data_02_4340 ; ENTITY_GOAL_COUNTER_7
-   dw   .data_02_4344 ; ENTITY_BONUS_STAGE_TIMER
-   dw   .data_02_4348 ; ENTITY_FREESTANDING_REMOTE
+   dw   .data_02_42c4_EntityActions_BonusCoin ; ENTITY_BONUS_COIN
+   dw   .data_02_42cc_EntityActions_FlyCoinSpawn ; ENTITY_FLY_COIN_SPAWN
+   dw   .data_02_42d4_EntityActions_PawCoin ; ENTITY_PAW_COIN
+   dw   .data_02_42dc_EntityActions_Fly ; ENTITY_FLY_1
+   dw   .data_02_42dc_EntityActions_Fly ; ENTITY_FLY_2
+   dw   .data_02_42dc_EntityActions_Fly ; ENTITY_FLY_3
+   dw   .data_02_42dc_EntityActions_Fly ; ENTITY_FLY_4
+   dw   .data_02_42dc_EntityActions_Fly ; ENTITY_FLY_5
+   dw   .data_02_42e0_EntityActions_FlyTV ; ENTITY_GREEN_FLY_TV
+   dw   .data_02_42e0_EntityActions_FlyTV ; ENTITY_PURPLE_FLY_TV
+   dw   .data_02_42e0_EntityActions_FlyTV ; ENTITY_UNK_FLY_TV_3
+   dw   .data_02_42e0_EntityActions_FlyTV ; ENTITY_BLUE_FLY_TV
+   dw   .data_02_42e0_EntityActions_FlyTV ; ENTITY_UNK_FLY_TV_5
+   dw   .data_02_42f4_EntityActions_Unk0E ; ENTITY_UNK0E
+   dw   .data_02_42f8_EntityActions_Unk0F ; ENTITY_UNK0F
+   dw   .data_02_42fc_EntityActions_Unk10 ; ENTITY_UNK10
+   dw   .data_02_4300_EntityActions_TVButton ; ENTITY_TV_BUTTON
+   dw   .data_02_4310_EntityActions_TVRemote ; ENTITY_TV_REMOTE
+   dw   .data_02_4324_EntityActions_Unk13 ; ENTITY_UNK13
+   dw   .data_02_4328_EntityActions_GoalCounter1 ; ENTITY_GOAL_COUNTER_1
+   dw   .data_02_432c_EntityActions_GoalCounter2 ; ENTITY_GOAL_COUNTER_2
+   dw   .data_02_4330_EntityActions_GoalCounter3 ; ENTITY_GOAL_COUNTER_3
+   dw   .data_02_4334_EntityActions_GoalCounter4 ; ENTITY_GOAL_COUNTER_4
+   dw   .data_02_4338_EntityActions_GoalCounter5 ; ENTITY_GOAL_COUNTER_5
+   dw   .data_02_433c_EntityActions_GoalCounter6 ; ENTITY_GOAL_COUNTER_6
+   dw   .data_02_4340_EntityActions_GoalCounter7 ; ENTITY_GOAL_COUNTER_7
+   dw   .data_02_4344_EntityActions_BonusStageTimer ; ENTITY_BONUS_STAGE_TIMER
+   dw   .data_02_4348_EntityActions_FreestandingRemote ; ENTITY_FREESTANDING_REMOTE
    dw   .data_02_4354_EntityActions_HolidayTVIceSculpture ; ENTITY_HOLIDAY_TV_ICE_SCULPTURE
    dw   .data_02_4360_EntityActions_HolidayTVEvilSanta ; ENTITY_HOLIDAY_TV_EVIL_SANTA
    dw   .data_02_437c_EntityActions_HolidayTVEvilSantaProjectile ; ENTITY_HOLIDAY_TV_EVIL_SANTA_PROJECTILE
@@ -140,17 +140,17 @@ data_02_4000_EntityActionJumpTable:
    dw   .data_02_46f8_EntityActions_MarsupialMadnessBird ; ENTITY_MARSUPIAL_MADNESS_BIRD
    dw   .data_02_46fc_EntityActions_MarsupialMadnessBirdProjectile ; ENTITY_MARSUPIAL_MADNESS_BIRD_PROJECTILE
    dw   .data_02_4704_EntityActions_WWGexWrestlingRockHard ; ENTITY_WW_GEX_WRESTLING_ROCK_HARD
-   dw   .data_02_4720 ; ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ
-   dw   .data_02_4744 ; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE
-   dw   .data_02_4748 ; ENTITY_LIZARD_OF_OZ_CANNON
-   dw   .data_02_475c ; ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE
-   dw   .data_02_4760 ; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2
-   dw   .data_02_4764 ; ENTITY_CHANNEL_Z_GREEN_BLOCK
-   dw   .data_02_4768 ; ENTITY_CHANNEL_Z_ORANGE_BLOCK
-   dw   .data_02_476c ; ENTITY_CHANNEL_Z_REZ
-   dw   .data_02_479c ; ENTITY_CHANNEL_Z_BLUE_BEAM_BARRIER
-   dw   .data_02_47a0 ; ENTITY_CHANNEL_Z_METEOR
-   dw   .data_02_47ac ; ENTITY_CHANNEL_Z_REZ_PROJECTILE
+   dw   .data_02_4720_EntityActions_LizardOfOzBrainOfOz ; ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ
+   dw   .data_02_4744_EntityActions_LizardOfOzCannonProjectile ; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE
+   dw   .data_02_4748_EntityActions_LizardOfOzCannon ; ENTITY_LIZARD_OF_OZ_CANNON
+   dw   .data_02_475c_EntityActions_LizardOfOzBrainOfOzProjectile ; ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE
+   dw   .data_02_4760_EntityActions_LizardOfOzCannonProjectile2 ; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2
+   dw   .data_02_4764_EntityActions_ChannelZGreenBlock ; ENTITY_CHANNEL_Z_GREEN_BLOCK
+   dw   .data_02_4768_EntityActions_ChannelZOrangeBlock ; ENTITY_CHANNEL_Z_ORANGE_BLOCK
+   dw   .data_02_476c_EntityActions_ChannelZRez ; ENTITY_CHANNEL_Z_REZ
+   dw   .data_02_479c_EntityActions_ChannelZBlueBeamBarrier ; ENTITY_CHANNEL_Z_BLUE_BEAM_BARRIER
+   dw   .data_02_47a0_EntityActions_ChannelZMeteor ; ENTITY_CHANNEL_Z_METEOR
+   dw   .data_02_47ac_EntityActions_ChannelZRezProjectile ; ENTITY_CHANNEL_Z_REZ_PROJECTILE
 .data_02_40e4:
 ; Gex's action table, and the only one here with two halves. Rows $00-$3B are the
 ; side-scrolling actions; rows $3C-$77 are the same 60 actions again for top-down
@@ -280,62 +280,66 @@ data_02_4000_EntityActionJumpTable:
     dw  call_02_48a1_PlayerAction_StandOnTVButton, data_02_757c ; PLAYERACTION_KANGAROO_STAND_ON_TV_BUTTON + PLAYERACTION_TOPDOWN
     dw  call_02_48b0_PlayerAction_EnterTV, data_02_7582 ; PLAYERACTION_KANGAROO_ENTER_TV + PLAYERACTION_TOPDOWN
     dw  call_02_4a25_PlayerAction_DeathInPitAlt, data_02_75bb ; PLAYERACTION_KANGAROO_DEATH_IN_PIT_ALT + PLAYERACTION_TOPDOWN
-.data_02_42c4:
-    dw   call_02_582e_EntityAction_None, data_02_75c8
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_42cc:
-    dw   call_02_582e_EntityAction_None, data_02_75d1
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_42d4:
-    dw   call_02_582e_EntityAction_None, data_02_75dc
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_42dc:
+
+; ------------------------------------------------------------------
+; COLLECTIBLES, FLY TVS AND THE GEX CAVE HUB
+; ------------------------------------------------------------------
+.data_02_42c4_EntityActions_BonusCoin:                            ;; ENTITY_BONUS_COIN
+    dw   call_02_582e_EntityAction_None, data_02_75c8                               ; action $00 - spinning
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $01 - taken
+.data_02_42cc_EntityActions_FlyCoinSpawn:                         ;; ENTITY_FLY_COIN_SPAWN
+    dw   call_02_582e_EntityAction_None, data_02_75d1                               ; action $00 - spinning
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $01 - taken
+.data_02_42d4_EntityActions_PawCoin:                              ;; ENTITY_PAW_COIN
+    dw   call_02_582e_EntityAction_None, data_02_75dc                               ; action $00 - spinning
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $01 - taken
+.data_02_42dc_EntityActions_Fly:                                  ;; ENTITY_FLY_1 .. ENTITY_FLY_5
     dw   call_02_5918_EntityAction_Fly_Update, data_02_75e9
-.data_02_42e0:
-    dw   call_02_582e_EntityAction_None, data_02_75ef
-    dw   call_02_582e_EntityAction_None, data_02_75f5
-    dw   call_02_598f_EntityAction_FlyTV_SpawnFly, data_02_75ef
-    dw   call_02_59aa_EntityAction_FlyTV_Reset, data_02_760b
-    dw   call_02_582e_EntityAction_None, data_02_7611
-.data_02_42f4:
-    dw   call_02_59ed_EntityAction_Unk_unk, data_02_7627
-.data_02_42f8:
-    dw   call_02_59ed_EntityAction_Unk_unk, data_02_762d
-.data_02_42fc:
-    dw   call_02_59ed_EntityAction_Unk_unk, data_02_7633
-.data_02_4300:
-    dw   call_02_5a04_EntityAction_TVButton_unk, data_02_7639
-    dw   call_02_5a1c_EntityAction_TVButton_unk2, data_02_7639
-    dw   call_02_5a75_EntityAction_TVButton_unk3, data_02_763f
-    dw   call_02_5a83_EntityAction_TVButton_unk4, data_02_7639
-.data_02_4310:
-    dw   call_02_5ada_EntityAction_TVRemote_unk, data_02_7645
-    dw   call_02_5ae4_EntityAction_TVRemote_unk2, data_02_764b
-    dw   call_02_5aee_EntityAction_TVRemote_unk3, data_02_7658
-    dw   call_02_5af8_EntityAction_TVRemote_unk4, data_02_7665
+.data_02_42e0_EntityActions_FlyTV:                                ;; ENTITY_GREEN_FLY_TV .. ENTITY_UNK_FLY_TV_5
+    dw   call_02_582e_EntityAction_None, data_02_75ef                               ; action $00 - closed
+    dw   call_02_582e_EntityAction_None, data_02_75f5                               ; action $01 - opening - chains to $02
+    dw   call_02_598f_EntityAction_FlyTV_SpawnFly, data_02_75ef                     ; action $02 - let the fly out, then $03
+    dw   call_02_59aa_EntityAction_FlyTV_Reset, data_02_760b                        ; action $03 - open; closes once the fly has gone
+    dw   call_02_582e_EntityAction_None, data_02_7611                               ; action $04 - closing - chains back to $00
+.data_02_42f4_EntityActions_Unk0E:                                ;; ENTITY_UNK0E
+    dw   call_02_59ed_EntityAction_Unk0E_Drift, data_02_7627
+.data_02_42f8_EntityActions_Unk0F:                                ;; ENTITY_UNK0F
+    dw   call_02_59ed_EntityAction_Unk0E_Drift, data_02_762d
+.data_02_42fc_EntityActions_Unk10:                                ;; ENTITY_UNK10
+    dw   call_02_59ed_EntityAction_Unk0E_Drift, data_02_7633
+.data_02_4300_EntityActions_TVButton:                             ;; ENTITY_TV_BUTTON
+    dw   call_02_5a04_EntityAction_TVButton_Locked, data_02_7639                    ; action $00 - locked
+    dw   call_02_5a1c_EntityAction_TVButton_Unlocked, data_02_7639                  ; action $01 - unlocked: standing on it enters the tv
+    dw   call_02_5a75_EntityAction_TVButton_LoadUnlockedPalette, data_02_763f       ; action $02 - pressed
+    dw   call_02_5a83_EntityAction_TVButton_CheckUnlockRequirement, data_02_7639    ; action $03 - the unlock test
+.data_02_4310_EntityActions_TVRemote:                             ;; ENTITY_TV_REMOTE
+    dw   call_02_5ada_EntityAction_TVRemote_SyncDefault, data_02_7645               ; action $00 - ENTITY_LIST_STATE_DEFAULT
+    dw   call_02_5ae4_EntityAction_TVRemote_SyncButtonOn, data_02_764b              ; action $01 - ENTITY_LIST_STATE_TV_BUTTON_ON
+    dw   call_02_5aee_EntityAction_TVRemote_SyncButtonLit, data_02_7658             ; action $02 - ENTITY_LIST_STATE_TV_BUTTON_LIT
+    dw   call_02_5af8_EntityAction_TVRemote_CheckUnlockRequirement, data_02_7665    ; action $03 - the unlock test, and the remote display
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $04 - ENTITY_LIST_STATE_REMOTE_TAKEN
+.data_02_4324_EntityActions_Unk13:                                ;; ENTITY_UNK13
     dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_4324:
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_4328:
+.data_02_4328_EntityActions_GoalCounter1:                         ;; ENTITY_GOAL_COUNTER_1
     dw   call_02_5b9a_EntityAction_UpdateGoalCounter, data_02_7675
-.data_02_432c:
+.data_02_432c_EntityActions_GoalCounter2:                         ;; ENTITY_GOAL_COUNTER_2
     dw   call_02_5b9a_EntityAction_UpdateGoalCounter, data_02_767b
-.data_02_4330:
+.data_02_4330_EntityActions_GoalCounter3:                         ;; ENTITY_GOAL_COUNTER_3
     dw   call_02_5b9a_EntityAction_UpdateGoalCounter, data_02_7681
-.data_02_4334:
+.data_02_4334_EntityActions_GoalCounter4:                         ;; ENTITY_GOAL_COUNTER_4
     dw   call_02_5b9a_EntityAction_UpdateGoalCounter, data_02_7687
-.data_02_4338:
+.data_02_4338_EntityActions_GoalCounter5:                         ;; ENTITY_GOAL_COUNTER_5
     dw   call_02_5b9a_EntityAction_UpdateGoalCounter, data_02_768d
-.data_02_433c:
+.data_02_433c_EntityActions_GoalCounter6:                         ;; ENTITY_GOAL_COUNTER_6
     dw   call_02_5b9a_EntityAction_UpdateGoalCounter, data_02_7693
-.data_02_4340:
+.data_02_4340_EntityActions_GoalCounter7:                         ;; ENTITY_GOAL_COUNTER_7
     dw   call_02_5b9a_EntityAction_UpdateGoalCounter, data_02_7699
-.data_02_4344:
+.data_02_4344_EntityActions_BonusStageTimer:                      ;; ENTITY_BONUS_STAGE_TIMER
     dw   call_02_5bb3_EntityAction_UpdateBonusStageTimer, data_02_769f
-.data_02_4348:
-    dw   call_02_5bd4_EntityAction_FreestandingRemote_unk0, data_02_76a5
-    dw   call_02_5bef_EntityAction_FreestandingRemote_unk1, data_02_764b
-    dw   call_02_5bfa_EntityAction_FreestandingRemote_unk2, data_02_75c2
+.data_02_4348_EntityActions_FreestandingRemote:                   ;; ENTITY_FREESTANDING_REMOTE
+    dw   call_02_5bd4_EntityAction_FreestandingRemote_WaitToAppear, data_02_76a5    ; action $00 - not there yet
+    dw   call_02_5bef_EntityAction_FreestandingRemote_WaitForPickup, data_02_764b   ; action $01 - visible, waiting to be whipped
+    dw   call_02_5bfa_EntityAction_FreestandingRemote_Collected, data_02_75c2       ; action $02 - collected: save flag, burst and warp
 ; ------------------------------------------------------------------
 ; HOLIDAY TV
 ; ------------------------------------------------------------------
@@ -686,51 +690,59 @@ data_02_4000_EntityActionJumpTable:
     dw   call_02_582e_EntityAction_None, data_02_7db7                               ; action $04 - get up - chains back to $00
     dw   call_02_6d49_EntityAction_RockHard_Collapse, data_02_7dc3                  ; action $05 - collapse
     dw   call_02_6d52_EntityAction_RockHard_Defeated, data_02_7dcd                  ; action $06 - defeated: set the progress flag and warp out
-.data_02_4720:
-    dw   call_02_6d6d_EntityAction_BrainOfOz_Unk0, data_02_7dd5
-    dw   call_02_6d6d_EntityAction_BrainOfOz_Unk0, data_02_7ddb
-    dw   call_02_6d85_EntityAction_BrainOfOz_Unk2, data_02_7de1
-    dw   call_02_6dba_EntityAction_BrainOfOz_Unk3, data_02_7deb
-    dw   call_02_6dda_EntityAction_BrainOfOz_Unk4, data_02_7df9
-    dw   call_02_6ddd_EntityAction_BrainOfOz_Unk5, data_02_7e00
-    dw   call_02_582e_EntityAction_None, data_02_7e09
-    dw   call_02_6dee_EntityAction_BrainOfOz_Unk7, data_02_7e0f
-    dw   call_02_6e09_EntityAction_BrainOfOz_Unk8, data_02_75c2
-.data_02_4744:
+
+; ------------------------------------------------------------------
+; LIZARD OF OZ
+; ------------------------------------------------------------------
+.data_02_4720_EntityActions_LizardOfOzBrainOfOz:                  ;; ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ
+    dw   call_02_6d6d_EntityAction_BrainOfOz_Intro, data_02_7dd5                    ; action $00 - intro - chains to $01
+    dw   call_02_6d6d_EntityAction_BrainOfOz_Intro, data_02_7ddb                    ; action $01 - intro - chains back to $00
+    dw   call_02_6d85_EntityAction_BrainOfOz_ChooseAttack, data_02_7de1             ; action $02 - wait for the cannon, then pick a volley length
+    dw   call_02_6dba_EntityAction_BrainOfOz_Attack, data_02_7deb                   ; action $03 - the volley: a shot every 8 frames
+    dw   call_02_6dda_EntityAction_BrainOfOz_PreFire, data_02_7df9                  ; action $04 - pre-fire - chains to $05
+    dw   call_02_6ddd_EntityAction_BrainOfOz_Fire, data_02_7e00                     ; action $05 - fire - chains back to $03
+    dw   call_02_582e_EntityAction_None, data_02_7e09                               ; action $06 - hit by a cannonball - chains to $02
+    dw   call_02_6dee_EntityAction_BrainOfOz_Fall, data_02_7e0f                     ; action $07 - death: fall to Y $0068
+    dw   call_02_6e09_EntityAction_BrainOfOz_Explode, data_02_75c2                  ; action $08 - explode, set the progress flag and warp
+.data_02_4744_EntityActions_LizardOfOzCannonProjectile:           ;; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE
     dw   call_02_6ec7_EntityAction_CannonProjectile_Update, data_02_7e15
-.data_02_4748:
-    dw   call_02_6e88_EntityAction_Cannon_Unk0, data_02_7e1b
-    dw   call_02_582e_EntityAction_None, data_02_7e21
-    dw   call_02_6ea8_EntityAction_Cannon_Unk2, data_02_7e34
-    dw   call_02_6eb9_EntityAction_Cannon_Unk3, data_02_7e3a
-    dw   call_02_582e_EntityAction_None, data_02_7e40
-.data_02_475c:
+.data_02_4748_EntityActions_LizardOfOzCannon:                     ;; ENTITY_LIZARD_OF_OZ_CANNON
+    dw   call_02_6e88_EntityAction_Cannon_WaitForCue, data_02_7e1b                  ; action $00 - wait for the brain's cue
+    dw   call_02_582e_EntityAction_None, data_02_7e21                               ; action $01 - rolling in - chains to $02
+    dw   call_02_6ea8_EntityAction_Cannon_Loaded, data_02_7e34                      ; action $02 - loaded: whip it to fire
+    dw   call_02_6eb9_EntityAction_Cannon_Fire, data_02_7e3a                        ; action $03 - fire the cannonball
+    dw   call_02_582e_EntityAction_None, data_02_7e40                               ; action $04 - rolling out - chains back to $00
+.data_02_475c_EntityActions_LizardOfOzBrainOfOzProjectile:        ;; ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE
     dw   call_02_6e44_EntityAction_BrainOfOzProjectile_Update, data_02_7e53
-.data_02_4760:
+.data_02_4760_EntityActions_LizardOfOzCannonProjectile2:          ;; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2
     dw   call_02_6f07_EntityAction_CannonProjectile2_Update, data_02_7e5e
-.data_02_4764:
-    dw   call_02_6f0e_EntityAction_Unk_None, data_02_7e67
-.data_02_4768:
-    dw   call_02_6f0e_EntityAction_Unk_None, data_02_7e6d
-.data_02_476c:
-    dw   call_02_6f0f_EntityAction_Rez_Unk0, data_02_7e73
-    dw   call_02_6f0f_EntityAction_Rez_Unk0, data_02_7e79
-    dw   call_02_6f29_EntityAction_Rez_Unk2, data_02_7e7f
-    dw   call_02_6f35_EntityAction_Rez_Unk3, data_02_7e8a
-    dw   call_02_582e_EntityAction_None, data_02_7e95
-    dw   call_02_6f3e_EntityAction_Rez_Unk5, data_02_7e9b
-    dw   call_02_6f54_EntityAction_Rez_Unk6, data_02_7ea4
-    dw   call_02_6f54_EntityAction_Rez_Unk6, data_02_7eaa
-    dw   call_02_6f64_EntityAction_Rez_Unk8, data_02_7eb0
-    dw   call_02_6f9e_EntityAction_Rez_Unk9, data_02_7eb6
-    dw   call_02_6fa1_EntityAction_Rez_Unk10, data_02_7ec2
-    dw   call_02_6faa_EntityAction_Rez_Unk11, data_02_7ecb
-.data_02_479c:
-    dw   call_02_7019_EntityAction_Unk_None, data_02_7ed1
-.data_02_47a0:
-    dw   call_02_582e_EntityAction_None, data_02_7eda
-    dw   call_02_701a_EntityAction_Meteor_Update, data_02_7ee0
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
-.data_02_47ac:
-    dw   call_02_702e_EntityAction_RezProjectile_Update, data_02_7bad
-    dw   call_02_583c_EntityAction_Destroy, data_02_75c2
+
+; ------------------------------------------------------------------
+; CHANNEL Z
+; ------------------------------------------------------------------
+.data_02_4764_EntityActions_ChannelZGreenBlock:                   ;; ENTITY_CHANNEL_Z_GREEN_BLOCK
+    dw   call_02_6f0e_EntityAction_ChannelZBlock_None, data_02_7e67
+.data_02_4768_EntityActions_ChannelZOrangeBlock:                  ;; ENTITY_CHANNEL_Z_ORANGE_BLOCK
+    dw   call_02_6f0e_EntityAction_ChannelZBlock_None, data_02_7e6d
+.data_02_476c_EntityActions_ChannelZRez:                          ;; ENTITY_CHANNEL_Z_REZ
+    dw   call_02_6f0f_EntityAction_Rez_Intro, data_02_7e73                          ; action $00 - intro - chains to $01
+    dw   call_02_6f0f_EntityAction_Rez_Intro, data_02_7e79                          ; action $01 - intro - chains back to $00
+    dw   call_02_6f29_EntityAction_Rez_Bounce, data_02_7e7f                         ; action $02 - hop along the floor
+    dw   call_02_6f35_EntityAction_Rez_Stagger, data_02_7e8a                        ; action $03 - staggered by a multiple-of-three hit
+    dw   call_02_582e_EntityAction_None, data_02_7e95                               ; action $04 - crouch - chains to $05
+    dw   call_02_6f3e_EntityAction_Rez_Ascend, data_02_7e9b                         ; action $05 - rise to the ceiling
+    dw   call_02_6f54_EntityAction_Rez_Gather, data_02_7ea4                         ; action $06 - gather - chains to $07
+    dw   call_02_6f54_EntityAction_Rez_Gather, data_02_7eaa                         ; action $07 - gather - chains back to $06
+    dw   call_02_6f64_EntityAction_Rez_Barrage, data_02_7eb0                        ; action $08 - teleport home and fire six shots
+    dw   call_02_6f9e_EntityAction_Rez_Recoil, data_02_7eb6                         ; action $09 - recoil from any other hit - chains to $02
+    dw   call_02_6fa1_EntityAction_Rez_Death, data_02_7ec2                          ; action $0a - death: fall to the floor
+    dw   call_02_6faa_EntityAction_Rez_Defeated, data_02_7ecb                       ; action $0b - defeated: progress flag and warp
+.data_02_479c_EntityActions_ChannelZBlueBeamBarrier:              ;; ENTITY_CHANNEL_Z_BLUE_BEAM_BARRIER
+    dw   call_02_7019_EntityAction_ChannelZBlueBeamBarrier_None, data_02_7ed1
+.data_02_47a0_EntityActions_ChannelZMeteor:                       ;; ENTITY_CHANNEL_Z_METEOR
+    dw   call_02_582e_EntityAction_None, data_02_7eda                               ; action $00 - parked above the camera
+    dw   call_02_701a_EntityAction_Meteor_Update, data_02_7ee0                      ; action $01 - falling
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $02 - taken
+.data_02_47ac_EntityActions_ChannelZRezProjectile:                ;; ENTITY_CHANNEL_Z_REZ_PROJECTILE
+    dw   call_02_702e_EntityAction_RezProjectile_Update, data_02_7bad               ; action $00 - in flight, on one of eight canned arcs
+    dw   call_02_583c_EntityAction_Destroy, data_02_75c2                            ; action $01 - spent

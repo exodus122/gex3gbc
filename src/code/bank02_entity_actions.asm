@@ -27,55 +27,97 @@
 ; The shared routines come first, then one section per level in ENTITY_* id order
 ; ==================================================================
 
+; ------------------------------------------------------------------
+; SHARED ROUTINES
+;
+; The four at the top of this file are pointed at by rows all over the tables:
+; EntityAction_None is every "this action is pure animation" row, the two Destroy
+; routines are the ends of most enemies, and the two platform movers are the whole
+; behaviour of six different platform types
+; ------------------------------------------------------------------
+
 call_02_582e_EntityAction_None:
-    ret                                                ;; 02:582e $c9
+; The commonest row in the file. Nothing happens here - the action's data block
+; does all the work, and its PENDING_ACTION byte is what moves the entity on when
+; the animation ends
+    ret
 
 call_02_582f_EntityAction_DestroyWithoutParticles:
+; The quiet death, used only by the Western Station cactus. Blanks the collision
+; type immediately so the corpse cannot hurt anyone, and Entity_MarkDefeated is
+; what decides - from ENTITY_ATTR_DEFEAT_FLAGS bit 6 - whether a fly coin is left
+; behind when the animation ends
     call call_00_288a_Entity_SetCollisionTypeNone
     call call_00_2b8b_Entity_MarkDefeated
     call call_00_2a5d_Entity_CheckAnimationEnded
     jp   nz,call_00_2bbe_Entity_TurnIntoFlyCoin
-    ret  
+    ret
 
 call_02_583c_EntityAction_Destroy:
-    call call_00_29f5_Entity_IsFirstFrameOfActionAndClear                                  ;; 02:583c $cd $f5 $29
-    jr   Z, .jr_02_5850                                ;; 02:583f $28 $0f
-    ld   HL, .data_02_5857_ParticlesPalette                             ;; 02:5841 $21 $57 $58
-    call call_00_2c20_Entity_CopyPaletteToBuffer                                  ;; 02:5844 $cd $20 $2c
-    call call_00_288a_Entity_SetCollisionTypeNone                                  ;; 02:5847 $cd $8a $28
-    call call_00_2b8b_Entity_MarkDefeated                                  ;; 02:584a $cd $8b $2b
-    call call_00_2c67_Particle_InitBurst                                  ;; 02:584d $cd $67 $2c
+; The ordinary death, and the last row of most enemy tables. The same three calls
+; as above plus a particle burst, which is driven here rather than by the
+; animation: Particle_UpdateBurst returns Z when the last particle has gone, and
+; only then does the entity turn into its fly coin
+    call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
+    jr   Z, .jr_02_5850
+    ld   HL, .data_02_5857_ParticlesPalette
+    call call_00_2c20_Entity_CopyPaletteToBuffer
+    call call_00_288a_Entity_SetCollisionTypeNone
+    call call_00_2b8b_Entity_MarkDefeated
+    call call_00_2c67_Particle_InitBurst
 .jr_02_5850:
-    call call_00_2c89_Particle_UpdateBurst                                  ;; 02:5850 $cd $89 $2c
-    jp   Z, call_00_2bbe_Entity_TurnIntoFlyCoin                                 ;; 02:5853 $ca $be $2b
-    ret                                                ;; 02:5856 $c9
+    call call_00_2c89_Particle_UpdateBurst
+    jp   Z, call_00_2bbe_Entity_TurnIntoFlyCoin
+    ret
 .data_02_5857_ParticlesPalette:
-    db   $00, $00, $08, $02, $04, $01, $ff, $7f        ;; 02:5857 ........
+    db   $00, $00, $08, $02, $04, $01, $ff, $7f
+
+; ------------------------------------------------------------------
+; THE TWO PLATFORM MOVERS are the same routine on two axes, and between them they
+; are the entire behaviour of the Tut TV rising and sideways platforms, the
+; Western Station and Anime Channel rising platforms and everything else whose
+; table row points here.
+;
+; ENTITY_FIELD_MISC_FLAGS holds two bits and nothing else:
+;
+;   bit 7  paused at one end
+;   bit 6  which way it is travelling
+;
+; and MISC_TIMER is how long is left in the current phase. The first pause lasts
+; TIMER_AMOUNT_240_FRAMES, later ones are the entity's own spawn parameter, and a
+; travelling phase always lasts TIMER_AMOUNT_120_FRAMES - so the spawn parameter
+; sets the dwell, not the distance. `and $7F / xor $40` at the end of a pause
+; clears the pause bit and flips the direction bit in one go.
+;
+; The horizontal one also calls Entity_CarryOrPushPlayerX so Gex rides it; the
+; vertical one does not, because standing on a rising platform is handled by the
+; collision system rather than by the platform
+; ------------------------------------------------------------------
 
 call_02_585f_EntityAction_MovePlatformHorizontally:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_00_586E
     ld   c,$80
-    call call_00_2980_Entity_SetMiscFlags
+    call call_00_2980_Entity_SetMiscFlags              ; start paused, going left
     ld   c,TIMER_AMOUNT_240_FRAMES
     call call_00_290d_Entity_SetMiscTimer
 .jr_00_586E:
     call call_00_298a_Entity_GetMiscFlags
     bit  7,[hl]
-    jr   z,.jr_00_588C
+    jr   z,.jr_00_588C                                 ; moving
     ld   c,$00
-    call call_00_28c8_Entity_SetXVelocity
+    call call_00_28c8_Entity_SetXVelocity              ; paused - report zero speed
     call call_00_2922_Entity_DecrementMiscTimer
     ret  nz
     call call_00_298a_Entity_GetMiscFlags
     and  a,$7F
-    xor  a,$40
+    xor  a,$40                                         ; unpause and turn round
     ld   [hl],a
     call call_00_230f_Entity_GetParameterIntoC
     jp   call_00_290d_Entity_SetMiscTimer
 .jr_00_588C:
     ld   c,$01
-    call call_00_28c8_Entity_SetXVelocity
+    call call_00_28c8_Entity_SetXVelocity              ; so Gex inherits a speed
     call call_00_298a_Entity_GetMiscFlags
     ld   bc,$0001
     bit  6,[hl]
@@ -88,16 +130,18 @@ call_02_585f_EntityAction_MovePlatformHorizontally:
     ldi  [hl],a
     ld   a,b
     adc  [hl]
-    ld   [hl],a
+    ld   [hl],a                                        ; one pixel a frame
     call call_00_26c9_Entity_CarryOrPushPlayerX
     call call_00_2922_Entity_DecrementMiscTimer
     ret  nz
     call call_00_298a_Entity_GetMiscFlags
-    set  7,[hl]
+    set  7,[hl]                                        ; pause at this end
     ld   c,TIMER_AMOUNT_120_FRAMES
     jp   call_00_290d_Entity_SetMiscTimer
 
 call_02_58bd_EntityAction_MovePlatformVertically:
+; The same routine on Y. Note that the travel phase here is 120 frames as well, so
+; a vertical platform covers exactly 120 pixels between its two ends
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_00_58CC
     ld   c,$80
@@ -141,14 +185,40 @@ call_02_58bd_EntityAction_MovePlatformVertically:
     ld   c,TIMER_AMOUNT_120_FRAMES
     jp   call_00_290d_Entity_SetMiscTimer
 
+; ==================================================================
+; COLLECTIBLES, FLY TVS AND THE GEX CAVE HUB
+;
+; The entity ids below ENTITY_HOLIDAY_TV_ICE_SCULPTURE are the ones that appear in
+; every level rather than in one: the coins, the five flies and their TVs, the tv
+; button and remote in the hub, the goal-counter pips and the freestanding remote.
+;
+; Two things distinguish this group. Several of them write SAVE data -
+; wDC5C_ProgressFlags, one byte per level, holding which remotes, paw coins and
+; bonus coins have been taken - and several of them read the entity list state
+; back rather than driving themselves, because a collectible has to come back in
+; the state it was left in. call_00_22b1_Entity_SetListStateAndAction is the
+; routine for that: it compares the saved state against the action id the caller
+; passes in C and, when they differ, jumps the entity to the action the SAVED state
+; names.
+;
+; ENTITY_BONUS_COIN, ENTITY_FLY_COIN_SPAWN and ENTITY_PAW_COIN have no code at all
+; - an idle animation and a Destroy row - and are entirely driven by their
+; collision handlers in bank03_entity_collision.asm
+; ==================================================================
+
 call_02_5918_EntityAction_Fly_Update:
+; The power-up fly's hover, and it is a canned path rather than any kind of
+; physics: the frame counter halved and masked to $0F picks one of sixteen (dx, dy)
+; pairs, which are added to the fly's SPAWN position. So the fly traces the same
+; sixteen-step loop forever and cannot drift, and two flies spawned in the same
+; frame move in lockstep
     ld   a,[wDC71_VBlankFrameCounter]
-    rrca 
+    rrca                                               ; one step per two frames
     and  a,$0F
     ld   l,a
     ld   h,00
     add  hl,hl
-    add  hl,hl
+    add  hl,hl                                         ; four bytes per step
     ld   bc,.data_02_594f
     add  hl,bc
     ld   c,l
@@ -172,287 +242,410 @@ call_02_5918_EntityAction_Fly_Update:
     ld   a,[bc]
     adc  d
     ld   [hl],a
-    ret  
+    ret
 .data_02_594f:
-    db   $00, $00, $de, $ff, $fe, $ff, $dc, $ff        ;; 02:594f ????????
-    db   $fc, $ff, $e0, $ff, $fc, $ff, $e0, $ff        ;; 02:5957 ????????
-    db   $fa, $ff, $e2, $ff, $fc, $ff, $e4, $ff        ;; 02:595f ????????
-    db   $fe, $ff, $e2, $ff, $00, $00, $e4, $ff        ;; 02:5967 ????????
-    db   $00, $00, $e2, $ff, $fe, $ff, $e0, $ff        ;; 02:596f ????????
-    db   $fe, $ff, $de, $ff, $fc, $ff, $dc, $ff        ;; 02:5977 ????????
-    db   $fa, $ff, $da, $ff, $fc, $ff, $d8, $ff        ;; 02:597f ????????
-    db   $fe, $ff, $da, $ff, $00, $00, $dc, $ff        ;; 02:5987 ????????
+; Sixteen signed 16-bit (dx, dy) offsets from the spawn point. Every dy is negative
+; and every dx is zero or a small negative, so the fly hovers up and to the left of
+; where it was placed and loops through a shallow figure
+    db   $00, $00, $de, $ff, $fe, $ff, $dc, $ff
+    db   $fc, $ff, $e0, $ff, $fc, $ff, $e0, $ff
+    db   $fa, $ff, $e2, $ff, $fc, $ff, $e4, $ff
+    db   $fe, $ff, $e2, $ff, $00, $00, $e4, $ff
+    db   $00, $00, $e2, $ff, $fe, $ff, $e0, $ff
+    db   $fe, $ff, $de, $ff, $fc, $ff, $dc, $ff
+    db   $fa, $ff, $da, $ff, $fc, $ff, $d8, $ff
+    db   $fe, $ff, $da, $ff, $00, $00, $dc, $ff
+
+; ------------------------------------------------------------------
+; THE FIVE FLY TVS share one action table, and which fly a given TV holds is
+; decided by its own entity id - see call_02_59d2_FlyTV_GetFlyIds.
+;
+;   $00 -            closed. call_03_4e31_CollisionHandler_FlyTV spends its one hit
+;                    point, and ENTITY_ATTR_DEFEAT_FLAGS $01 sends it to $01
+;   $01 -            opening. Chains to $02
+;   $02 SpawnFly     let the fly out, then go to $03
+;   $03 Reset        open. Closes again after 120 frames once the fly has gone
+;   $04 -            closing. Chains back to $00
+; ------------------------------------------------------------------
 
 call_02_598f_EntityAction_FlyTV_SpawnFly:
-    call call_02_59D2_FlyTV_unk
+; Action $02. B and C come back from the lookup as (spawn-child index, entity id),
+; so the duplicate test uses the entity id and the spawn uses the child index -
+; which is what `ld c,b` in the middle is for
+    call call_02_59d2_FlyTV_GetFlyIds
     push bc
-    call call_00_2b10_Entity_FindDuplicateInstance
+    call call_00_2b10_Entity_FindDuplicateInstance     ; C = ENTITY_FLY_n
     pop  bc
-    ld   c,b
-    call z,call_00_3792_EntitySpawn_SpawnChild
+    ld   c,b                                           ; B = SPAWN_CHILD_ENTITY_FLY_n
+    call z,call_00_3792_EntitySpawn_SpawnChild         ; only if not already out
     ld   a,$03
     jp   call_02_72ac_Entity_SetAction
-    
-    db   $00, $04, $01, $05, $02, $06, $03        ;; 02:599f ????????
+
+; An unlabelled second copy of .data_02_59e3 below, left over and unreferenced
+    db   $00, $04, $01, $05, $02, $06, $03
     db   $07, $04, $08
 
 call_02_59aa_EntityAction_FlyTV_Reset:
+; Action $03 - the TV standing open. Two things have to be true before it closes:
+; the fly it let out must be gone, and its own spawn parameter must be non-zero, so
+; a TV placed with parameter $00 stays open forever.
+;
+; Closing restores DAMAGE_STATE to 1, which is what makes the TV hittable again,
+; and writes list state $00 so a revisit finds it closed
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ld   c,TIMER_AMOUNT_120_FRAMES
     call nz,call_00_290d_Entity_SetMiscTimer
-    call call_02_59D2_FlyTV_unk
+    call call_02_59d2_FlyTV_GetFlyIds
     call call_00_2b10_Entity_FindDuplicateInstance
-    ret  nz
+    ret  nz                                            ; the fly is still out
     call call_00_230f_Entity_GetParameterIntoC
     ld   a,c
     and  a
-    ret  z
+    ret  z                                             ; parameter $00 - never close
     call call_00_2922_Entity_DecrementMiscTimer
     ret  nz
     ld   c,$01
-    call call_00_28aa_Entity_SetDamageState
+    call call_00_28aa_Entity_SetDamageState            ; openable again
     ld   c,$00
     call call_00_2299_Entity_SetListState
     ld   a,$04
-    jp   call_02_72ac_Entity_SetAction
+    jp   call_02_72ac_Entity_SetAction                 ; -> closing
 
-call_02_59D2_FlyTV_unk:
+call_02_59d2_FlyTV_GetFlyIds:
+; Turns the TV's own entity id into the pair of ids for its fly. ENTITY_GREEN_FLY_TV
+; is $09 and the five TVs are consecutive, so (id - $09) indexes the table directly.
+;
+; Returns B = the SPAWN_CHILD_ENTITY_FLY_* index and C = the ENTITY_FLY_* id
     call call_00_293a_Entity_GetId
-    sub  a,$09
+    sub  a,$09                                         ; ENTITY_GREEN_FLY_TV
     ld   l,a
     ld   h,$00
-    add  hl,hl
+    add  hl,hl                                         ; two bytes per TV
     ld   de,.data_02_59e3
     add  hl,de
     ld   b,[hl]
     inc  hl
     ld   c,[hl]
-    ret  
+    ret
 .data_02_59e3:
-    db   $00, $04, $01, $05        ;; 02:59df ????????
+; (spawn-child index, entity id) for the five flies, in TV order
+    db   $00, $04, $01, $05
     db   $02, $06, $03, $07, $04, $08
-    
-call_02_59ed_EntityAction_Unk_unk:
+
+call_02_59ed_EntityAction_Unk0E_Drift:
+; The only action of ENTITY_UNK0E, ENTITY_UNK0F and ENTITY_UNK10 - three ids whose
+; tables are one row each, all pointing here. Their attribute rows are 8x8 with
+; COLLISION_TYPE_NONE, and all three data blocks show the same single sprite $55,
+; so nothing about them says what they were meant to be.
+;
+; The behaviour is one straight line: $30 to the right or $D0 to the left by facing,
+; applied every frame with no bounds test and nothing that ever removes them
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_00_5A00
     call call_00_2976_Entity_GetFacingDirection
     ld   c,$D0
-    and  a,$20
+    and  a,$20                                         ; ENTITY_FACING_LEFT
     jr   nz,.jr_00_59FD
     ld   c,$30
 .jr_00_59FD:
     call call_00_28c8_Entity_SetXVelocity
 .jr_00_5A00:
     call call_00_24c0_Entity_ApplyXVelocity_Subpixel
-    ret  
+    ret
 
-call_02_5a04_EntityAction_TVButton_unk:
-    call call_00_29f5_Entity_IsFirstFrameOfActionAndClear                                  ;; 02:5a04 $cd $f5 $29
-    jr   NZ, call_02_5a83_EntityAction_TVButton_unk4                                ;; 02:5a07 $20 $7a
-    ld   C, $00                                        ;; 02:5a09 $0e $00
-    call call_00_22b1_Entity_SetListStateAndAction                                  ;; 02:5a0b $cd $b1 $22
-    ld   HL, .data_02_5a14                             ;; 02:5a0e $21 $14 $5a
-    jp   call_00_2c20_Entity_CopyPaletteToBuffer                                  ;; 02:5a11 $c3 $20 $2c
-.data_02_5a14:
-    db   $00, $00, $00, $00, $73, $4e, $1f, $00        ;; 02:5a14 ........
+; ------------------------------------------------------------------
+; THE TV BUTTON is the pad in front of each television in the Gex Cave hub, and
+; also the exit pad inside a level - the same entity doing two jobs, told apart by
+; wDC1E_CurrentLevelID being zero or not.
+;
+;   $00 Locked                    the pad is shut
+;   $01 Unlocked                  standing on it enters the television
+;   $02 LoadUnlockedPalette       the pressed pose; also called from $01
+;   $03 CheckUnlockRequirement    the unlock test
+;
+; Actions $00 and $01 both jump straight into CheckUnlockRequirement on their first
+; frame, so the test runs whenever the pad comes on screen and the pad ends up in
+; whichever of $00 or $01 the player's progress deserves. Row $03 exists so it can
+; be reached as an action as well
+; ------------------------------------------------------------------
 
-call_02_5a1c_EntityAction_TVButton_unk2:
-    call call_00_29f5_Entity_IsFirstFrameOfActionAndClear                                  ;; 02:5a1c $cd $f5 $29
-    jr   NZ, call_02_5a83_EntityAction_TVButton_unk4                                ;; 02:5a1f $20 $62
-    call call_02_5a75_EntityAction_TVButton_unk3                                  ;; 02:5a21 $cd $75 $5a
-    ld   A, [wDC7B_Player_EntityStoodOnLo]                                    ;; 02:5a24 $fa $7b $dc
-    ld   HL, wDA00_CurrentEntityAddrLo                                     ;; 02:5a27 $21 $00 $da
-    cp   A, [HL]                                       ;; 02:5a2a $be
-    ret  NZ                                            ;; 02:5a2b $c0
-    ld   A, $02                                        ;; 02:5a2c $3e $02
-    call call_02_72ac_Entity_SetAction                                  ;; 02:5a2e $cd $ac $72
-    ld   A, [wDB6C_CurrentMapId]                                    ;; 02:5a31 $fa $6c $db
-    cp   A, MAP_GEXTREME_SPORTS1                                        ;; 02:5a34 $fe $07
-    ld   A, PLAYERACTION_SNOWBOARDING_STAND_ON_TV_BUTTON                                        ;; 02:5a36 $3e $2c
-    jr   Z, .jr_02_5a45                                ;; 02:5a38 $28 $0b
-    ld   A, [wDB6C_CurrentMapId]                                    ;; 02:5a3a $fa $6c $db
-    cp   A, MAP_MARSUPIAL_MADNESS1                                        ;; 02:5a3d $fe $08
-    ld   A, PLAYERACTION_KANGAROO_STAND_ON_TV_BUTTON                                        ;; 02:5a3f $3e $39
-    jr   Z, .jr_02_5a45                                ;; 02:5a41 $28 $02
-    ld   A, PLAYERACTION_STAND_ON_TV_BUTTON                                        ;; 02:5a43 $3e $0c
-.jr_02_5a45:
-    call call_02_54f9_Player_RequestAction                                  ;; 02:5a45 $cd $f9 $54
-    call call_00_230f_Entity_GetParameterIntoC                                  ;; 02:5a48 $cd $0f $23
-    ld   A, [wDC1E_CurrentLevelID]                                    ;; 02:5a4b $fa $1e $dc
-    and  A, A                                          ;; 02:5a4e $a7
-    jr   Z, .jr_02_5a6a_InGexCave                                ;; 02:5a4f $28 $19
-    push BC                                            ;; 02:5a51 $c5
-    ld   B, $00                                        ;; 02:5a52 $06 $00
-    ld   HL, .data_02_5a71                             ;; 02:5a54 $21 $71 $5a
-    add  HL, BC                                        ;; 02:5a57 $09
-    ld   C, [HL]                                       ;; 02:5a58 $4e
-    ld   HL, wDC1E_CurrentLevelID                                     ;; 02:5a59 $21 $1e $dc
-    ld   L, [HL]                                       ;; 02:5a5c $6e
-    ld   H, $00                                        ;; 02:5a5d $26 $00
-    ld   DE, wDC5C_ProgressFlags                                     ;; 02:5a5f $11 $5c $dc
-    add  HL, DE                                        ;; 02:5a62 $19
-    ld   A, [HL]                                       ;; 02:5a63 $7e
-    or   A, C                                          ;; 02:5a64 $b1
-    ld   [HL], A                                       ;; 02:5a65 $77
-    pop  BC                                            ;; 02:5a66 $c1
-    jp   call_00_2260_Entity_MarkRemoteCollected                                    ;; 02:5a67 $c3 $60 $22
-.jr_02_5a6a_InGexCave:
-    ld   HL, wDC5B_LevelIdFromTVButton                                     ;; 02:5a6a $21 $5b $dc
-    ld   [HL], C                                       ;; 02:5a6d $71
-    jp   call_00_2260_Entity_MarkRemoteCollected                                    ;; 02:5a6e $c3 $60 $22
-.data_02_5a71:
-    db   $00, $01, $02, $04                            ;; 02:5a71 ????
-
-call_02_5a75_EntityAction_TVButton_unk3:
-    ld   HL, .data_02_5a7b                             ;; 02:5a75 $21 $7b $5a
-    jp   call_00_2c20_Entity_CopyPaletteToBuffer                                  ;; 02:5a78 $c3 $20 $2c
-.data_02_5a7b:
-    db   $00, $00, $00, $00, $73, $4e, $e0, $03        ;; 02:5a7b ........
-
-call_02_5a83_EntityAction_TVButton_unk4:
-    ld   A, [wDC1E_CurrentLevelID]                                    ;; 02:5a83 $fa $1e $dc
-    and  A, A                                          ;; 02:5a86 $a7
-    ret  NZ                                            ;; 02:5a87 $c0
-    call call_00_230f_Entity_GetParameterIntoC                                  ;; 02:5a88 $cd $0f $23
-    ld   B, $00                                        ;; 02:5a8b $06 $00
-    ld   HL, data_00_0b19_TvUnlockRequirements                                      ;; 02:5a8d $21 $19 $0b
-    add  HL, BC                                        ;; 02:5a90 $09
-    bit  7, [HL]                                       ;; 02:5a91 $cb $7e
-    jr   Z, .jr_02_5aaa                                ;; 02:5a93 $28 $15
-    push HL                                            ;; 02:5a95 $e5
-    farcall call_01_4ae7_CountLevelsWithBonusCoin
-    pop  HL                                            ;; 02:5aa1 $e1
-    ld   C, [HL]                                       ;; 02:5aa2 $4e
-    res  7, C                                          ;; 02:5aa3 $cb $b9
-    cp   A, C                                          ;; 02:5aa5 $b9
-    jr   C, .jr_02_5aba                                ;; 02:5aa6 $38 $12
-    jr   .jr_02_5aca                                   ;; 02:5aa8 $18 $20
-.jr_02_5aaa:
-    push HL                                            ;; 02:5aaa $e5
-    farcall call_01_4ab9_CountAllCollectedObjectives
-    pop  HL                                            ;; 02:5ab6 $e1
-    cp   A, [HL]                                       ;; 02:5ab7 $be
-    jr   NC, .jr_02_5aca                               ;; 02:5ab8 $30 $10
-.jr_02_5aba:
-    call call_00_2962_Entity_GetActionId                                  ;; 02:5aba $cd $62 $29
-    cp   A, $00                                        ;; 02:5abd $fe $00
-    ret  Z                                             ;; 02:5abf $c8
-    ld   C, $00                                        ;; 02:5ac0 $0e $00
-    call call_00_2299_Entity_SetListState                                  ;; 02:5ac2 $cd $99 $22
-    ld   A, $00                                        ;; 02:5ac5 $3e $00
-    jp   call_02_72ac_Entity_SetAction                                  ;; 02:5ac7 $c3 $ac $72
-.jr_02_5aca:
-    call call_00_2962_Entity_GetActionId                                  ;; 02:5aca $cd $62 $29
-    cp   A, $01                                        ;; 02:5acd $fe $01
-    ret  Z                                             ;; 02:5acf $c8
-    ld   C, $01                                        ;; 02:5ad0 $0e $01
-    call call_00_2299_Entity_SetListState                                  ;; 02:5ad2 $cd $99 $22
-    ld   A, $01                                        ;; 02:5ad5 $3e $01
-    jp   call_02_72ac_Entity_SetAction                                  ;; 02:5ad7 $c3 $ac $72
-
-call_02_5ada_EntityAction_TVRemote_unk:
-    call call_00_29f5_Entity_IsFirstFrameOfActionAndClear                                  ;; 02:5ada $cd $f5 $29
-    jr   NZ, call_02_5af8_EntityAction_TVRemote_unk4                                ;; 02:5add $20 $19
-    ld   C, $00                                        ;; 02:5adf $0e $00
-    jp   call_00_22b1_Entity_SetListStateAndAction                                  ;; 02:5ae1 $c3 $b1 $22
-
-call_02_5ae4_EntityAction_TVRemote_unk2:
-    call call_00_29f5_Entity_IsFirstFrameOfActionAndClear                                  ;; 02:5ae4 $cd $f5 $29
-    jr   NZ, call_02_5af8_EntityAction_TVRemote_unk4                                ;; 02:5ae7 $20 $0f
-    ld   C, $01                                        ;; 02:5ae9 $0e $01
-    jp   call_00_22b1_Entity_SetListStateAndAction         
-
-call_02_5aee_EntityAction_TVRemote_unk3:    ;; 02:5aeb $c3 $b1 $22
+call_02_5a04_EntityAction_TVButton_Locked:
+; Action $00. SetListStateAndAction with C = $00 is the self-correcting half: if
+; the saved list state says something other than $00, the pad jumps to THAT action
+; instead of staying here
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
-    jr   nz,call_02_5af8_EntityAction_TVRemote_unk4
+    jr   NZ, call_02_5a83_EntityAction_TVButton_CheckUnlockRequirement
+    ld   C, $00
+    call call_00_22b1_Entity_SetListStateAndAction
+    ld   HL, .data_02_5a14
+    jp   call_00_2c20_Entity_CopyPaletteToBuffer       ; the dim palette
+.data_02_5a14:
+    db   $00, $00, $00, $00, $73, $4e, $1f, $00
+
+call_02_5a1c_EntityAction_TVButton_Unlocked:
+; Action $01, and the only place the game moves Gex into a television.
+;
+; The player action requested depends on which map the pad is on, because Gex is a
+; different shape in two of them - snowboarding on MAP_GEXTREME_SPORTS1 and a
+; kangaroo on MAP_MARSUPIAL_MADNESS1 - and each has its own
+; PLAYERACTION_*_STAND_ON_TV_BUTTON.
+;
+; What the spawn parameter means also depends on where the pad is. Inside a level
+; it is which of the three remotes this exit awards, through the mask table below;
+; in the hub it is the level id, written to wDC5B_LevelIdFromTVButton for the map
+; loader to pick up
+    call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
+    jr   NZ, call_02_5a83_EntityAction_TVButton_CheckUnlockRequirement
+    call call_02_5a75_EntityAction_TVButton_LoadUnlockedPalette
+    ld   A, [wDC7B_Player_EntityStoodOnLo]
+    ld   HL, wDA00_CurrentEntityAddrLo
+    cp   A, [HL]
+    ret  NZ                                            ; nobody on the pad
+    ld   A, $02
+    call call_02_72ac_Entity_SetAction                 ; -> the pressed pose
+    ld   A, [wDB6C_CurrentMapId]
+    cp   A, MAP_GEXTREME_SPORTS1
+    ld   A, PLAYERACTION_SNOWBOARDING_STAND_ON_TV_BUTTON
+    jr   Z, .jr_02_5a45
+    ld   A, [wDB6C_CurrentMapId]
+    cp   A, MAP_MARSUPIAL_MADNESS1
+    ld   A, PLAYERACTION_KANGAROO_STAND_ON_TV_BUTTON
+    jr   Z, .jr_02_5a45
+    ld   A, PLAYERACTION_STAND_ON_TV_BUTTON
+.jr_02_5a45:
+    call call_02_54f9_Player_RequestAction
+    call call_00_230f_Entity_GetParameterIntoC
+    ld   A, [wDC1E_CurrentLevelID]
+    and  A, A
+    jr   Z, .jr_02_5a6a_InGexCave
+    push BC
+    ld   B, $00
+    ld   HL, .data_02_5a71
+    add  HL, BC
+    ld   C, [HL]
+    ld   HL, wDC1E_CurrentLevelID
+    ld   L, [HL]
+    ld   H, $00
+    ld   DE, wDC5C_ProgressFlags
+    add  HL, DE                                        ; this level's save byte
+    ld   A, [HL]
+    or   A, C
+    ld   [HL], A                                       ; award the remote
+    pop  BC
+    jp   call_00_2260_Entity_MarkRemoteCollected
+.jr_02_5a6a_InGexCave:
+    ld   HL, wDC5B_LevelIdFromTVButton
+    ld   [HL], C                                       ; which level to load
+    jp   call_00_2260_Entity_MarkRemoteCollected
+.data_02_5a71:
+; Which progress bit an exit pad awards, by spawn parameter. Parameter $00 awards
+; nothing; $01 to $03 are the three remotes, bits 0, 1 and 2
+    db   $00, $01, $02, $04
+
+call_02_5a75_EntityAction_TVButton_LoadUnlockedPalette:
+; Action $02, the pressed pose, and also called every frame by action $01
+    ld   HL, .data_02_5a7b
+    jp   call_00_2c20_Entity_CopyPaletteToBuffer
+.data_02_5a7b:
+    db   $00, $00, $00, $00, $73, $4e, $e0, $03
+
+call_02_5a83_EntityAction_TVButton_CheckUnlockRequirement:
+; Action $03, and the first frame of $00 and $01. Only runs in the hub - inside a
+; level an exit pad is always open.
+;
+; data_00_0b19_TvUnlockRequirements holds one byte per television. Bit 7 changes
+; what the low bits mean: set, they are a count of levels whose bonus coin has been
+; taken (call_01_4ae7_CountLevelsWithBonusCoin); clear, they are a plain total of
+; collected objectives (call_01_4ab9_CountAllCollectedObjectives).
+;
+; Both tails end the same way - compare the current action against the one that is
+; wanted, and only write the list state and change action if they differ, so a pad
+; already in the right state costs nothing
+    ld   A, [wDC1E_CurrentLevelID]
+    and  A, A
+    ret  NZ                                            ; not in the hub
+    call call_00_230f_Entity_GetParameterIntoC         ; which television
+    ld   B, $00
+    ld   HL, data_00_0b19_TvUnlockRequirements
+    add  HL, BC
+    bit  7, [HL]
+    jr   Z, .jr_02_5aaa
+    push HL
+    farcall call_01_4ae7_CountLevelsWithBonusCoin
+    pop  HL
+    ld   C, [HL]
+    res  7, C
+    cp   A, C
+    jr   C, .jr_02_5aba                                ; not enough - lock it
+    jr   .jr_02_5aca
+.jr_02_5aaa:
+    push HL
+    farcall call_01_4ab9_CountAllCollectedObjectives
+    pop  HL
+    cp   A, [HL]
+    jr   NC, .jr_02_5aca                               ; enough - unlock it
+.jr_02_5aba:
+    call call_00_2962_Entity_GetActionId
+    cp   A, $00
+    ret  Z                                             ; already locked
+    ld   C, $00
+    call call_00_2299_Entity_SetListState
+    ld   A, $00
+    jp   call_02_72ac_Entity_SetAction
+.jr_02_5aca:
+    call call_00_2962_Entity_GetActionId
+    cp   A, $01
+    ret  Z                                             ; already unlocked
+    ld   C, $01
+    call call_00_2299_Entity_SetListState
+    ld   A, $01
+    jp   call_02_72ac_Entity_SetAction
+
+; ------------------------------------------------------------------
+; THE TV REMOTE is the trophy displayed above each hub television, and its five
+; actions line up with the ENTITY_LIST_STATE_* constants rather than with anything
+; it does:
+;
+;   $00 SyncDefault    ENTITY_LIST_STATE_DEFAULT. Nothing earned here yet
+;   $01 SyncButtonOn   ENTITY_LIST_STATE_TV_BUTTON_ON
+;   $02 SyncButtonLit  ENTITY_LIST_STATE_TV_BUTTON_LIT
+;   $03 CheckUnlockRequirement
+;   $04 Destroy        ENTITY_LIST_STATE_REMOTE_TAKEN - a collected remote
+;                      respawns straight into its own destruction
+;
+; The first three are the same four instructions at three addresses. Each passes
+; its OWN action id to Entity_SetListStateAndAction, which returns if the saved
+; state agrees and otherwise jumps the entity to the action the saved state names -
+; so whichever of them the entity happens to be running, it corrects itself to the
+; one the save data wants. On the frame the action starts, all three divert into
+; the unlock check instead
+; ------------------------------------------------------------------
+
+call_02_5ada_EntityAction_TVRemote_SyncDefault:
+    call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
+    jr   NZ, call_02_5af8_EntityAction_TVRemote_CheckUnlockRequirement
+    ld   C, $00
+    jp   call_00_22b1_Entity_SetListStateAndAction
+
+call_02_5ae4_EntityAction_TVRemote_SyncButtonOn:
+    call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
+    jr   NZ, call_02_5af8_EntityAction_TVRemote_CheckUnlockRequirement
+    ld   C, $01
+    jp   call_00_22b1_Entity_SetListStateAndAction
+
+call_02_5aee_EntityAction_TVRemote_SyncButtonLit:
+    call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
+    jr   nz,call_02_5af8_EntityAction_TVRemote_CheckUnlockRequirement
     ld   c,$02
     jp   call_00_22b1_Entity_SetListStateAndAction
 
-call_02_5af8_EntityAction_TVRemote_unk4:
-    ld   A, [wDC1E_CurrentLevelID]                                    ;; 02:5af8 $fa $1e $dc
-    and  A, A                                          ;; 02:5afb $a7
-    ret  NZ                                            ;; 02:5afc $c0
-    call call_00_230f_Entity_GetParameterIntoC                                  ;; 02:5afd $cd $0f $23
-    ld   B, $00                                        ;; 02:5b00 $06 $00
-    ld   HL, data_00_0b19_TvUnlockRequirements                                      ;; 02:5b02 $21 $19 $0b
-    add  HL, BC                                        ;; 02:5b05 $09
-    bit  7, [HL]                                       ;; 02:5b06 $cb $7e
-    jr   Z, .jr_02_5b1f                                ;; 02:5b08 $28 $15
-    push HL                                            ;; 02:5b0a $e5
+call_02_5af8_EntityAction_TVRemote_CheckUnlockRequirement:
+; Action $03, and the first frame of $00, $01 and $02. The unlock half is the same
+; test call_02_5a83_EntityAction_TVButton_CheckUnlockRequirement makes, against the
+; same data_00_0b19_TvUnlockRequirements table.
+;
+; What is different is the unlocked tail. data_02_7665 declares a single frame but
+; is followed by eleven sprite ids, and this routine indexes them by hand: the
+; spawn parameter picks an entry of .data_02_5b7e, $40 is added, and the result is
+; written straight into ENTITY_FIELD_SPRITE_ID - so each of the twelve televisions
+; shows its own remote. The `xor $0F` walks L from SPRITE_ID to
+; ACTION_STATE_FLAGS to set ACTION_STATE_ID_CHANGED, which is the pulse the sprite
+; builder watches, and it is only done when the id actually changed.
+;
+; Entries below $09 get one palette and the rest another - the two remote colours
+    ld   A, [wDC1E_CurrentLevelID]
+    and  A, A
+    ret  NZ
+    call call_00_230f_Entity_GetParameterIntoC
+    ld   B, $00
+    ld   HL, data_00_0b19_TvUnlockRequirements
+    add  HL, BC
+    bit  7, [HL]
+    jr   Z, .jr_02_5b1f
+    push HL
     farcall call_01_4ae7_CountLevelsWithBonusCoin
-    pop  HL                                            ;; 02:5b16 $e1
-    ld   C, [HL]                                       ;; 02:5b17 $4e
-    res  7, C                                          ;; 02:5b18 $cb $b9
-    cp   A, C                                          ;; 02:5b1a $b9
-    jr   C, .jr_02_5b2f                                ;; 02:5b1b $38 $12
-    jr   .jr_02_5b6e                                   ;; 02:5b1d $18 $4f
+    pop  HL
+    ld   C, [HL]
+    res  7, C
+    cp   A, C
+    jr   C, .jr_02_5b2f                                ; not enough
+    jr   .jr_02_5b6e
 .jr_02_5b1f:
-    push HL                                            ;; 02:5b1f $e5
+    push HL
     farcall call_01_4ab9_CountAllCollectedObjectives
-    pop  HL                                            ;; 02:5b2b $e1
-    cp   A, [HL]                                       ;; 02:5b2c $be
-    jr   NC, .jr_02_5b6e                               ;; 02:5b2d $30 $3f
+    pop  HL
+    cp   A, [HL]
+    jr   NC, .jr_02_5b6e                               ; not enough
 .jr_02_5b2f:
-    call call_00_2962_Entity_GetActionId                                  ;; 02:5b2f $cd $62 $29
-    cp   A, $03                                        ;; 02:5b32 $fe $03
-    jr   Z, .jr_02_5b40                                ;; 02:5b34 $28 $0a
-    ld   C, $03                                        ;; 02:5b36 $0e $03
-    call call_00_2299_Entity_SetListState                                  ;; 02:5b38 $cd $99 $22
-    ld   A, $03                                        ;; 02:5b3b $3e $03
-    call call_02_72ac_Entity_SetAction                                  ;; 02:5b3d $cd $ac $72
+    call call_00_2962_Entity_GetActionId
+    cp   A, $03
+    jr   Z, .jr_02_5b40                                ; already showing
+    ld   C, $03
+    call call_00_2299_Entity_SetListState
+    ld   A, $03
+    call call_02_72ac_Entity_SetAction
 .jr_02_5b40:
-    call call_00_230f_Entity_GetParameterIntoC                                  ;; 02:5b40 $cd $0f $23
-    ld   B, $00                                        ;; 02:5b43 $06 $00
-    ld   HL, .data_02_5b7e                             ;; 02:5b45 $21 $7e $5b
-    add  HL, BC                                        ;; 02:5b48 $09
-    ld   C, [HL]                                       ;; 02:5b49 $4e
+    call call_00_230f_Entity_GetParameterIntoC
+    ld   B, $00
+    ld   HL, .data_02_5b7e
+    add  HL, BC
+    ld   C, [HL]
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_SPRITE_ID
-    ld   A, C                                          ;; 02:5b52 $79
-    add  A, $40                                        ;; 02:5b53 $c6 $40
-    cp   A, [HL]                                       ;; 02:5b55 $be
-    ld   [HL], A                                       ;; 02:5b56 $77
-    jr   Z, .jr_02_5b5f                                ;; 02:5b57 $28 $06
-    ld   A, L                                          ;; 02:5b59 $7d
-    xor  A, $0f                                        ;; 02:5b5a $ee $0f
-    ld   L, A                                          ;; 02:5b5c $6f
-    set  1, [HL]                                       ;; 02:5b5d $cb $ce
+    ld   A, C
+    add  A, $40                                        ; sprites $40..$4a
+    cp   A, [HL]
+    ld   [HL], A
+    jr   Z, .jr_02_5b5f                                ; unchanged
+    ld   A, L
+    xor  A, $0f                                        ; SPRITE_ID -> ACTION_STATE_FLAGS
+    ld   L, A
+    set  1, [HL]                                       ; ACTION_STATE_ID_CHANGED_BIT
 .jr_02_5b5f:
-    ld   HL, .data_02_5b8a                             ;; 02:5b5f $21 $8a $5b
-    ld   A, C                                          ;; 02:5b62 $79
-    cp   A, $09                                        ;; 02:5b63 $fe $09
-    jp   C, call_00_2c20_Entity_CopyPaletteToBuffer                               ;; 02:5b65 $da $20 $2c
-    ld   HL, .data_02_5b92                             ;; 02:5b68 $21 $92 $5b
-    jp   call_00_2c20_Entity_CopyPaletteToBuffer                                  ;; 02:5b6b $c3 $20 $2c
+    ld   HL, .data_02_5b8a
+    ld   A, C
+    cp   A, $09
+    jp   C, call_00_2c20_Entity_CopyPaletteToBuffer
+    ld   HL, .data_02_5b92
+    jp   call_00_2c20_Entity_CopyPaletteToBuffer
 .jr_02_5b6e:
-    call call_00_2962_Entity_GetActionId                                  ;; 02:5b6e $cd $62 $29
-    cp   A, $01                                        ;; 02:5b71 $fe $01
-    ret  Z                                             ;; 02:5b73 $c8
-    ld   C, $01                                        ;; 02:5b74 $0e $01
-    call call_00_2299_Entity_SetListState                                  ;; 02:5b76 $cd $99 $22
-    ld   A, $01                                        ;; 02:5b79 $3e $01
-    jp   call_02_72ac_Entity_SetAction                                  ;; 02:5b7b $c3 $ac $72
+    call call_00_2962_Entity_GetActionId
+    cp   A, $01
+    ret  Z
+    ld   C, $01
+    call call_00_2299_Entity_SetListState
+    ld   A, $01
+    jp   call_02_72ac_Entity_SetAction                 ; locked
 .data_02_5b7e:
-    db   $00, $00, $01, $02, $03, $05, $07, $09        ;; 02:5b7e ?.......
-    db   $0a, $04, $06, $08                            ;; 02:5b86 ....
+; Which remote sprite each of the twelve hub televisions shows, by spawn parameter.
+; Not in order - the first two share $00, and the last three fill in $04, $06, $08
+    db   $00, $00, $01, $02, $03, $05, $07, $09
+    db   $0a, $04, $06, $08
 .data_02_5b8a:
-    db   $00, $00, $00, $00, $ff, $7f, $1f, $00        ;; 02:5b8a ........
+    db   $00, $00, $00, $00, $ff, $7f, $1f, $00
 .data_02_5b92:
-    db   $00, $00, $00, $00, $1f, $00, $ff, $03        ;; 02:5b92 ........
+    db   $00, $00, $00, $00, $1f, $00, $ff, $03
 
 call_02_5b9a_EntityAction_UpdateGoalCounter:
-    call call_00_29f5_Entity_IsFirstFrameOfActionAndClear                                  ;; 02:5b9a $cd $f5 $29
-    jr   Z, .jr_02_5ba9                                ;; 02:5b9d $28 $0a
-    ld   C, $30                                        ;; 02:5b9f $0e $30
-    call call_00_28dc_Entity_SetYVelocity                                  ;; 02:5ba1 $cd $dc $28
-    ld   C, TIMER_AMOUNT_60_FRAMES                                        ;; 02:5ba4 $0e $3c
-    call call_00_290d_Entity_SetMiscTimer                                  ;; 02:5ba6 $cd $0d $29
+; The seven ENTITY_GOAL_COUNTER_* pips, and the only difference between the seven
+; is which sprite their data block shows. Entity_SpawnGoalCounter puts one of these
+; on screen whenever a collection total goes up; it pops upward at $30 and frees
+; its own slot after 60 frames
+    call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
+    jr   Z, .jr_02_5ba9
+    ld   C, $30
+    call call_00_28dc_Entity_SetYVelocity
+    ld   C, TIMER_AMOUNT_60_FRAMES
+    call call_00_290d_Entity_SetMiscTimer
 .jr_02_5ba9:
-    call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped                                  ;; 02:5ba9 $cd $4a $24
-    call call_00_2922_Entity_DecrementMiscTimer                                  ;; 02:5bac $cd $22 $29
-    jp   Z, call_00_2b80_Entity_DeactivateSelf                               ;; 02:5baf $ca $80 $2b
-    ret                                                ;; 02:5bb2 $c9
+    call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
+    call call_00_2922_Entity_DecrementMiscTimer
+    jp   Z, call_00_2b80_Entity_DeactivateSelf
+    ret
 
 call_02_5bb3_EntityAction_UpdateBonusStageTimer:
+; ENTITY_BONUS_STAGE_TIMER, and it does not behave like an entity at all - it pins
+; itself to the CAMERA every frame, at ($50, $08) from the top-left of the view. It
+; is a HUD element that happens to be drawn through the sprite system
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ld   a,[wDBF9_XPositionInMap]
     add  a,$50
@@ -466,62 +659,91 @@ call_02_5bb3_EntityAction_UpdateBonusStageTimer:
     ld   a,[wDBFB_YPositionInMap+1]
     adc  a,$00
     ld   [hl],a
-    ret  
+    ret
 
-call_02_5bd4_EntityAction_FreestandingRemote_unk0:
-    ld   A, [wDC1E_CurrentLevelID]                                    ;; 02:5bd4 $fa $1e $dc
-    and  A, A                                          ;; 02:5bd7 $a7
-    jr   Z, .jr_02_5be4                                ;; 02:5bd8 $28 $0a
-    ld   A, [wDCD2_FreestandingRemoteHitFlags]                                    ;; 02:5bda $fa $d2 $dc
-    and  A, A                                          ;; 02:5bdd $a7
-    ld   A, $01                                        ;; 02:5bde $3e $01
-    jp   NZ, call_02_72ac_Entity_SetAction                              ;; 02:5be0 $c2 $ac $72
-    ret                                                ;; 02:5be3 $c9
+; ------------------------------------------------------------------
+; THE FREESTANDING REMOTE is the reward left in the open once a level's collection
+; goal is met - the seven bells, the five Gextreme elves and so on all end by
+; setting wDCD2_FreestandingRemoteHitFlags, and this is what watches that byte.
+;
+;   $00 WaitToAppear   not there yet
+;   $01 WaitForPickup  visible, waiting to be whipped
+;   $02 Collected      the burst, the save write and the warp
+;
+; call_03_5473_CollisionHandler_FreestandingRemote writes $81 into the same byte
+; when Gex whips it, which is what action $01 is comparing against - so one byte is
+; used for two different signals, "the level goal is met" and "the remote has been
+; taken"
+; ------------------------------------------------------------------
+
+call_02_5bd4_EntityAction_FreestandingRemote_WaitToAppear:
+; Action $00, and the hub is the special case. Inside a level any non-zero value in
+; wDCD2_FreestandingRemoteHitFlags brings the remote out; in the Gex Cave it
+; appears while bit 0 of the hub's own wDC5C_ProgressFlags byte is still CLEAR -
+; that is, until it has been collected once
+    ld   A, [wDC1E_CurrentLevelID]
+    and  A, A
+    jr   Z, .jr_02_5be4
+    ld   A, [wDCD2_FreestandingRemoteHitFlags]
+    and  A, A
+    ld   A, $01
+    jp   NZ, call_02_72ac_Entity_SetAction
+    ret
 .jr_02_5be4:
-    ld   HL, wDC5C_ProgressFlags                                     ;; 02:5be4 $21 $5c $dc
-    bit  0, [HL]                                       ;; 02:5be7 $cb $46
-    ld   A, $01                                        ;; 02:5be9 $3e $01
-    jp   Z, call_02_72ac_Entity_SetAction                               ;; 02:5beb $ca $ac $72
-    ret                                                ;; 02:5bee $c9
+    ld   HL, wDC5C_ProgressFlags
+    bit  0, [HL]
+    ld   A, $01
+    jp   Z, call_02_72ac_Entity_SetAction
+    ret
 
-call_02_5bef_EntityAction_FreestandingRemote_unk1:
-    ld   A, [wDCD2_FreestandingRemoteHitFlags]                                    ;; 02:5bef $fa $d2 $dc
-    cp   A, $81                                        ;; 02:5bf2 $fe $81
-    ld   A, $02                                        ;; 02:5bf4 $3e $02
-    jp   Z, call_02_72ac_Entity_SetAction                               ;; 02:5bf6 $ca $ac $72
-    ret                                                ;; 02:5bf9 $c9
+call_02_5bef_EntityAction_FreestandingRemote_WaitForPickup:
+; Action $01. $81 is exactly what the collision handler writes, so the test is
+; "whipped" rather than "goal met"
+    ld   A, [wDCD2_FreestandingRemoteHitFlags]
+    cp   A, $81
+    ld   A, $02
+    jp   Z, call_02_72ac_Entity_SetAction
+    ret
 
-call_02_5bfa_EntityAction_FreestandingRemote_unk2:
-    call call_00_29f5_Entity_IsFirstFrameOfActionAndClear                                  ;; 02:5bfa $cd $f5 $29
-    jr   Z, .jr_02_5c23                                ;; 02:5bfd $28 $24
-    ld   A, SFX_REMOTE                                        ;; 02:5bff $3e $1e
-    call call_00_0ff5_QueueSFX                                  ;; 02:5c01 $cd $f5 $0f
-    ld   HL, .data_02_5c3b                             ;; 02:5c04 $21 $3b $5c
-    call call_00_2c20_Entity_CopyPaletteToBuffer                                  ;; 02:5c07 $cd $20 $2c
-    call call_00_288a_Entity_SetCollisionTypeNone                                  ;; 02:5c0a $cd $8a $28
-    call call_00_2b8b_Entity_MarkDefeated                                  ;; 02:5c0d $cd $8b $2b
-    call call_00_2c67_Particle_InitBurst                                  ;; 02:5c10 $cd $67 $2c
-    ld   C, TIMER_AMOUNT_60_FRAMES                                        ;; 02:5c13 $0e $3c
-    call call_00_290d_Entity_SetMiscTimer                                  ;; 02:5c15 $cd $0d $29
-    call call_00_230f_Entity_GetParameterIntoC                                  ;; 02:5c18 $cd $0f $23
-    ld   B, $00                                        ;; 02:5c1b $06 $00
-    ld   HL, wDC5C_ProgressFlags                                     ;; 02:5c1d $21 $5c $dc
-    add  HL, BC                                        ;; 02:5c20 $09
-    set  0, [HL]                                       ;; 02:5c21 $cb $c6
+call_02_5bfa_EntityAction_FreestandingRemote_Collected:
+; Action $02. Writes the save flag on the first frame and then waits for BOTH the
+; particle burst and a 60-frame timer before it disappears.
+;
+; The spawn parameter is doing two jobs: it offsets into wDC5C_ProgressFlags to say
+; which level's byte to mark, and a parameter of zero - the Gex Cave - is also what
+; suppresses the warp. Anywhere else, bit 4 of wDB6A_WarpFlags sends Gex out of the
+; level as soon as the remote is his
+    call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
+    jr   Z, .jr_02_5c23
+    ld   A, SFX_REMOTE
+    call call_00_0ff5_QueueSFX
+    ld   HL, .data_02_5c3b
+    call call_00_2c20_Entity_CopyPaletteToBuffer
+    call call_00_288a_Entity_SetCollisionTypeNone
+    call call_00_2b8b_Entity_MarkDefeated
+    call call_00_2c67_Particle_InitBurst
+    ld   C, TIMER_AMOUNT_60_FRAMES
+    call call_00_290d_Entity_SetMiscTimer
+    call call_00_230f_Entity_GetParameterIntoC         ; which level's save byte
+    ld   B, $00
+    ld   HL, wDC5C_ProgressFlags
+    add  HL, BC
+    set  0, [HL]                                       ; remote 1 collected
 .jr_02_5c23:
-    call call_00_2c89_Particle_UpdateBurst                                  ;; 02:5c23 $cd $89 $2c
-    ret  NZ                                            ;; 02:5c26 $c0
-    call call_00_2922_Entity_DecrementMiscTimer                                  ;; 02:5c27 $cd $22 $29
-    ret  NZ                                            ;; 02:5c2a $c0
-    call call_00_230f_Entity_GetParameterIntoC                                  ;; 02:5c2b $cd $0f $23
-    inc  C                                             ;; 02:5c2e $0c
-    dec  C                                             ;; 02:5c2f $0d
-    jp   Z, call_00_2b7a_Entity_DeactivateAndMarkNeverRespawn                                 ;; 02:5c30 $ca $7a $2b
-    ld   HL, wDB6A_WarpFlags                                     ;; 02:5c33 $21 $6a $db
-    set  4, [HL]                                       ;; 02:5c36 $cb $e6
-    jp   call_00_2b7a_Entity_DeactivateAndMarkNeverRespawn                                    ;; 02:5c38 $c3 $7a $2b
+    call call_00_2c89_Particle_UpdateBurst
+    ret  NZ
+    call call_00_2922_Entity_DecrementMiscTimer
+    ret  NZ
+    call call_00_230f_Entity_GetParameterIntoC
+    inc  C
+    dec  C
+    jp   Z, call_00_2b7a_Entity_DeactivateAndMarkNeverRespawn   ; the hub - stay put
+    ld   HL, wDB6A_WarpFlags
+    set  4, [HL]                                       ; leave the level
+    jp   call_00_2b7a_Entity_DeactivateAndMarkNeverRespawn
 .data_02_5c3b:
-    db   $00, $00, $08, $02, $04, $01, $ff, $7f        ;; 02:5c3b ........
+    db   $00, $00, $08, $02, $04, $01, $ff, $7f
+
 
 ; ==================================================================
 ; HOLIDAY TV
@@ -3730,38 +3952,76 @@ call_02_6d52_EntityAction_RockHard_Defeated:
     set  4,[hl]
     jp   call_00_2b7a_Entity_DeactivateAndMarkNeverRespawn
 
-call_02_6d6d_EntityAction_BrainOfOz_Unk0:
+; ==================================================================
+; LIZARD OF OZ
+;
+; Five entity types and one boss fight, and it is the only fight in the game where
+; the killing blow is dealt by one ENTITY to another rather than by Gex.
+;
+; The Brain of Oz floats on the shared arc path
+; (call_00_233e_Entity_MoveAlongArcTable) and cannot be reached. What Gex can reach
+; is the cannon, and the loop is:
+;
+;   the brain's attack routine sets wDCD1_BrainOfOzFlag when it has emptied its
+;   volley - which is the cannon's cue to roll in
+;   call_03_53eb_CollisionHandler_Cannon lets Gex whip the loaded cannon, which
+;   fires a cannonball straight up
+;   call_03_5406_CollisionHandler_BrainOfOz measures the brain against that
+;   cannonball in both axes and, on a hit, spends a hit point and sends the brain
+;   to action $06
+;
+; The brain's own routines never test for a hit. wDCDA_BrainOfOzAndRezCounter is
+; shared with Rez in Channel Z and is used the same way in both - as a small
+; rotating index that picks the next attack's timing
+; ==================================================================
+
+call_02_6d6d_EntityAction_BrainOfOz_Intro:
+; Actions $00 and $01, whose data blocks chain into each other. Each entry bumps
+; MISC_TIMER, so the pair runs ten times before the fight starts - the arc path is
+; what makes that look like the brain drifting in.
+;
+; The `call z` and the write after it are not in an else branch: the counter is set
+; to 2 on every pass, so it is 2 when the fight opens whatever happened
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_00_6D82
     call call_00_2917_Entity_CheckMiscTimerZero
     inc  [hl]
     cp   a,$0A
     ld   a,$02
-    call z,call_02_72ac_Entity_SetAction
+    call z,call_02_72ac_Entity_SetAction               ; ten passes -> ChooseAttack
     ld   a,$02
     ld   [wDCDA_BrainOfOzAndRezCounter],a
 .jr_00_6D82:
     jp   call_00_233e_Entity_MoveAlongArcTable
 
-call_02_6d85_EntityAction_BrainOfOz_Unk2:
+call_02_6d85_EntityAction_BrainOfOz_ChooseAttack:
+; Action $02. Three guards have to pass before the next volley starts, and together
+; they are the whole handshake with the cannon: the cannon must be back in action
+; $00, there must be no cannonball in the air, and wDCD1_BrainOfOzFlag must be
+; clear - the brain sets that flag itself when a volley ends, and the cannon clears
+; it as it rolls in.
+;
+; The counter then walks 2, 1, 0, 2, 1, 0 (`dec` and, on going negative, reload
+; with 2) and picks the volley length out of the table below, so successive volleys
+; get shorter
     call call_00_233e_Entity_MoveAlongArcTable
     ld   c,ENTITY_LIZARD_OF_OZ_CANNON
     call call_00_29b7_Entity_FindSlotByIdAndGetActionId
     ld   a,c
     cp   a,$00
-    ret  nz
+    ret  nz                                            ; the cannon is still busy
     ld   c,ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE
     call call_00_29b7_Entity_FindSlotByIdAndGetActionId
     inc  c
-    ret  nz
+    ret  nz                                            ; $FF+1 = none loaded
     ld   a,[wDCD1_BrainOfOzFlag]
     and  a
-    ret  nz
+    ret  nz                                            ; the cannon has not answered
     ld   hl,wDCDA_BrainOfOzAndRezCounter
     dec  [hl]
     bit  7,[hl]
     jr   z,.jr_00_6DA7
-    ld   [hl],$02
+    ld   [hl],$02                                      ; wrap 2,1,0
 .jr_00_6DA7:
     ld   l,[hl]
     ld   h,$00
@@ -3770,31 +4030,40 @@ call_02_6d85_EntityAction_BrainOfOz_Unk2:
     ld   c,[hl]
     call call_00_290d_Entity_SetMiscTimer
     ld   a,$03
-    jp   call_02_72ac_Entity_SetAction
+    jp   call_02_72ac_Entity_SetAction                 ; -> Attack
 .data_02_6db7:
+; How long each volley lasts, indexed by the rotating counter
     db   TIMER_AMOUNT_BRAINOFOZ1, TIMER_AMOUNT_BRAINOFOZ2, TIMER_AMOUNT_BRAINOFOZ3
 
-call_02_6dba_EntityAction_BrainOfOz_Unk3:
+call_02_6dba_EntityAction_BrainOfOz_Attack:
+; Action $03, the volley. Every eighth frame of the countdown it drops into $04,
+; which chains to $05 - the shot - and $05's own pending action brings it back here,
+; so the firing rhythm is the low three bits of the same timer that ends the volley.
+;
+; When the timer does run out it will not leave until its last shot has expired,
+; and only then raises wDCD1_BrainOfOzFlag - the cannon's cue
     call call_00_233e_Entity_MoveAlongArcTable
     call call_00_2922_Entity_DecrementMiscTimer
     jr   nz,.jr_00_6DD2
     ld   c,ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE
     call call_00_29ce_Entity_FindSlotById
-    ret  z
+    ret  z                                             ; a shot is still in flight
     ld   a,$01
-    ld   [wDCD1_BrainOfOzFlag],a
+    ld   [wDCD1_BrainOfOzFlag],a                       ; the cannon reads this
     ld   a,$02
-    jp   call_02_72ac_Entity_SetAction
+    jp   call_02_72ac_Entity_SetAction                 ; -> ChooseAttack
 .jr_00_6DD2:
     and  a,$07
     ld   a,$04
-    jp   z,call_02_72ac_Entity_SetAction
-    ret  
+    jp   z,call_02_72ac_Entity_SetAction               ; one shot per 8 frames
+    ret
 
-call_02_6dda_EntityAction_BrainOfOz_Unk4:
+call_02_6dda_EntityAction_BrainOfOz_PreFire:
+; Action $04. Nothing but the arc; data_02_7df9's pending action carries it to $05
     jp   call_00_233e_Entity_MoveAlongArcTable
 
-call_02_6ddd_EntityAction_BrainOfOz_Unk5:
+call_02_6ddd_EntityAction_BrainOfOz_Fire:
+; Action $05. One shot on the first frame, and data_02_7e00 chains back to $03
     call call_00_233e_Entity_MoveAlongArcTable
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ret  z
@@ -3803,7 +4072,10 @@ call_02_6ddd_EntityAction_BrainOfOz_Unk5:
     ld   c,SPAWN_CHILD_ENTITY_BRAIN_OF_OZ_PROJECTILE
     jp   call_00_3792_EntitySpawn_SpawnChild
 
-call_02_6dee_EntityAction_BrainOfOz_Unk7:
+call_02_6dee_EntityAction_BrainOfOz_Fall:
+; Action $07, where ENTITY_ATTR_DEFEAT_FLAGS $87 sends the beaten brain. The arc
+; path is abandoned and it simply drops to the literal world line Y $0068 - the
+; same floor line the Superhero Show bombs use
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     ld   de,$0068
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
@@ -3811,14 +4083,17 @@ call_02_6dee_EntityAction_BrainOfOz_Unk7:
     sub  e
     ld   a,[hl]
     sbc  d
-    ret  c
+    ret  c                                             ; still above the floor
     ld   [hl],d
     dec  l
     ld   [hl],e
     ld   a,$08
-    jp   call_02_72ac_Entity_SetAction
+    jp   call_02_72ac_Entity_SetAction                 ; -> Explode
 
-call_02_6e09_EntityAction_BrainOfOz_Unk8:
+call_02_6e09_EntityAction_BrainOfOz_Explode:
+; Action $08, and the end of the level. Waits for the particle burst AND a 60-frame
+; timer, then writes wDC66_ProgressFlags_LizardOfOz and raises the warp bit - the
+; same two writes call_02_6d52_EntityAction_RockHard_Defeated makes
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_00_6E27
     ld   a,SFX_LOUD_BANG
@@ -3844,6 +4119,10 @@ call_02_6e09_EntityAction_BrainOfOz_Unk8:
     db   $00, $00, $08, $02, $04, $01, $ff, $7f
 
 call_02_6e44_EntityAction_BrainOfOzProjectile_Update:
+; The brain's shot, and the only homing projectile in the file - though it only
+; homes sideways. It starts with no horizontal speed at all and then nudges XVEL
+; one step a frame toward Gex, clamped to $10 either way, while gravity does the
+; rest. Reaching world Y $0088 retires it for good
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_00_6E53
     ld   c,$00
@@ -3853,11 +4132,11 @@ call_02_6e44_EntityAction_BrainOfOzProjectile_Update:
 .jr_00_6E53:
     call call_00_2a68_Entity_ComputeXDistanceFromPlayer
     ld   a,[wDA12_EntityDirectionRelativeToPlayer]
-    cp   a,$20
+    cp   a,$20                                         ; ENTITY_RIGHT_OF_GEX
     jr   z,.jr_00_6E67
     call call_00_28be_Entity_GetXVelocity
     cp   a,$10
-    jr   z,.jr_00_6E6F
+    jr   z,.jr_00_6E6F                                 ; already at full speed
     inc  [hl]
     jr   .jr_00_6E6F
 .jr_00_6E67:
@@ -3875,13 +4154,30 @@ call_02_6e44_EntityAction_BrainOfOzProjectile_Update:
     ld   a,[hl]
     sbc  d
     jp   nc,call_00_2b7a_Entity_DeactivateAndMarkNeverRespawn
-    ret  
+    ret
 
-call_02_6e88_EntityAction_Cannon_Unk0:
+; ------------------------------------------------------------------
+; THE CANNON is invulnerable scenery that rolls on when the brain has finished a
+; volley, waits to be whipped, fires, and rolls off again.
+;
+;   $00 WaitForCue  watch wDCD1_BrainOfOzFlag
+;   $01 -           rolling in. Chains to $02
+;   $02 Loaded      the state call_03_53eb_CollisionHandler_Cannon accepts a whip in
+;   $03 Fire        spawn the cannonball
+;   $04 -           rolling out. Chains back to $00
+;
+; TIMER_AMOUNT_CANNON is $FF, so a cannon nobody fires waits about four seconds
+; before it leaves on its own
+; ------------------------------------------------------------------
+
+call_02_6e88_EntityAction_Cannon_WaitForCue:
+; Action $00. Clearing the flag is the other half of the brain's handshake, and the
+; cannon also teleports itself to the fixed world X $0078 - so however it was
+; placed in the level data, it always fires from the same spot
     ld   hl,wDCD1_BrainOfOzFlag
     bit  0,[hl]
     ret  z
-    ld   [hl],$00
+    ld   [hl],$00                                      ; answer the brain
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_X
     ld   de,$0078
     ld   [hl],e
@@ -3890,18 +4186,21 @@ call_02_6e88_EntityAction_Cannon_Unk0:
     ld   c,TIMER_AMOUNT_CANNON
     call call_00_290d_Entity_SetMiscTimer
     ld   a,$01
-    jp   call_02_72ac_Entity_SetAction
+    jp   call_02_72ac_Entity_SetAction                 ; -> rolling in
 
-call_02_6ea8_EntityAction_Cannon_Unk2:
+call_02_6ea8_EntityAction_Cannon_Loaded:
+; Action $02. Sits with a lit fuse until either Gex whips it - the handler moves it
+; to $03 - or the timer runs out and it rolls away unfired
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ld   a,SFX_DOOR2
     call nz,call_00_0ff5_QueueSFX
     call call_00_2922_Entity_DecrementMiscTimer
     ld   a,$04
-    jp   z,call_02_72ac_Entity_SetAction
-    ret  
+    jp   z,call_02_72ac_Entity_SetAction               ; timed out -> roll away
+    ret
 
-call_02_6eb9_EntityAction_Cannon_Unk3:
+call_02_6eb9_EntityAction_Cannon_Fire:
+; Action $03
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ret  z
     ld   c,SPAWN_CHILD_ENTITY_CANNON_PROJECTILE
@@ -3910,29 +4209,39 @@ call_02_6eb9_EntityAction_Cannon_Unk3:
     jp   call_00_0ff5_QueueSFX
 
 call_02_6ec7_EntityAction_CannonProjectile_Update:
+; The cannonball. It flies straight up at $3C and this routine never tests whether
+; it hit anything - call_03_5406_CollisionHandler_BrainOfOz does that, from the
+; brain's side, by measuring the brain against this entity's position.
+;
+; What this routine decides is when the ball is SPENT, and there are two ways:
+; reaching the ceiling line Y $0038, or the brain already being in an action of
+; $06 or more, which is its death sequence. Either way it becomes a puff -
+; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2 - and frees its slot.
+;
+; The `or a,$01` walks L from the brain's slot base to its ENTITY_FIELD_ACTION_ID
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ld   c,$3C
     call nz,call_00_28dc_Entity_SetYVelocity
     ld   c,ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ
     call call_00_29ce_Entity_FindSlotById
-    ret  nz
+    ret  nz                                            ; no brain - just hang there
     ld   a,l
-    or   a,$01
+    or   a,$01                                         ; -> its ACTION_ID
     ld   l,a
     ld   a,[hl]
     cp   a,$06
-    jr   nc,.jr_00_6EFA
+    jr   nc,.jr_00_6EFA                                ; the brain is dying
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     call call_00_28f1_Entity_CheckIfYVelocityIsZero
     bit  7,[hl]
-    ret  z
+    ret  z                                             ; still climbing
     ld   de,$0038
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
     ldi  a,[hl]
     sub  e
     ld   a,[hl]
     sbc  d
-    ret  c
+    ret  c                                             ; not at the ceiling yet
     ld   [hl],d
     dec  l
     ld   [hl],e
@@ -3944,14 +4253,59 @@ call_02_6ec7_EntityAction_CannonProjectile_Update:
     jp   call_00_2b7a_Entity_DeactivateAndMarkNeverRespawn
 
 call_02_6f07_EntityAction_CannonProjectile2_Update:
+; The puff the cannonball leaves. One action, gone when the animation ends
     call call_00_2a5d_Entity_CheckAnimationEnded
     jp   nz,call_00_2b7a_Entity_DeactivateAndMarkNeverRespawn
-    ret  
+    ret
 
-call_02_6f0e_EntityAction_Unk_None:
-    ret  
+; ==================================================================
+; CHANNEL Z
+;
+; The last level, and the last four entity types. Two of them - the green and
+; orange blocks - are single `ret` rows: immovable platforms that exist only as a
+; collision box and a sprite. The blue beam barrier is a third.
+;
+; Rez himself is the game's longest action table, twelve rows, and he shares
+; wDCDA_BrainOfOzAndRezCounter with the Brain of Oz - here it picks which of eight
+; canned arcs each of his shots takes
+; ==================================================================
 
-call_02_6f0f_EntityAction_Rez_Unk0:
+call_02_6f0e_EntityAction_ChannelZBlock_None:
+; ENTITY_CHANNEL_Z_GREEN_BLOCK and ENTITY_CHANNEL_Z_ORANGE_BLOCK, one row each,
+; both pointing here. They are COLLISION_TYPE_PLATFORM | _FLAG_IMMOVABLE, so all
+; the behaviour is in the collision system
+    ret
+
+; ------------------------------------------------------------------
+; REZ, the final boss. Fifteen hit points, twelve actions, and two helper routines
+; that do all of his vertical movement:
+;
+;   call_02_6fd3_Rez_RiseToCeiling  accelerate upward and clamp at world Y $0024
+;   call_02_7002_Rez_FallToFloor    fall and clamp at world Y $0058
+;
+; Both floors are literal world coordinates rather than collision tests, which is
+; why the arena is a fixed-size box.
+;
+;   $00/$01 Intro    ten passes of a ping-ponging pair, then the fight starts
+;   $02 Bounce       hop along the floor
+;   $03 Stagger      the reaction to a multiple-of-three hit; falls, then $04
+;   $04 -            crouch, chains to $05
+;   $05 Ascend       rise to the ceiling, then $06
+;   $06/$07 Gather   another ten-pass ping-pong at the ceiling, then $08
+;   $08 Barrage      teleport home and fire a shot every 64 frames
+;   $09 Recoil       the reaction to any other hit - one rise
+;   $0A Death        ENTITY_ATTR_DEFEAT_FLAGS $8A sends him here
+;   $0B Defeated     three seconds, then the progress flag and the warp
+;
+; call_03_54a8_CollisionHandler_Rez zeroes ENTITY_FIELD_COOLDOWN_TIMER after every
+; hit, undoing the invulnerability window - Rez is the only thing in the game that
+; can be hit again on the very next frame
+; ------------------------------------------------------------------
+
+call_02_6f0f_EntityAction_Rez_Intro:
+; Actions $00 and $01, whose data blocks chain into each other. The same
+; count-to-ten shape as the Brain of Oz intro, and the velocities are set on every
+; pass rather than once
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ret  z
     ld   c,$20
@@ -3962,81 +4316,104 @@ call_02_6f0f_EntityAction_Rez_Unk0:
     inc  [hl]
     cp   a,$0A
     ld   a,$02
-    jp   z,call_02_72ac_Entity_SetAction
-    ret  
+    jp   z,call_02_72ac_Entity_SetAction               ; ten passes -> Bounce
+    ret
 
-call_02_6f29_EntityAction_Rez_Unk2:
+call_02_6f29_EntityAction_Rez_Bounce:
+; Action $02. Paces along the floor, and every time FallToFloor reports a landing
+; it is launched again at $38 - so he crosses the arena in hops rather than walking
     call call_00_251c_Entity_MoveXByFacingMomentum_BoundsChecked
-    call call_02_7002_Rez_unk2
+    call call_02_7002_Rez_FallToFloor
     ld   c,$38
-    jp   nc,call_00_28dc_Entity_SetYVelocity
-    ret  
+    jp   nc,call_00_28dc_Entity_SetYVelocity           ; landed - hop again
+    ret
 
-call_02_6f35_EntityAction_Rez_Unk3:
-    call call_02_7002_Rez_unk2
+call_02_6f35_EntityAction_Rez_Stagger:
+; Action $03, where the collision handler sends him when the health left is a
+; multiple of three. No horizontal movement - he just drops out of the hop
+    call call_02_7002_Rez_FallToFloor
     ld   a,$04
-    jp   nc,call_02_72ac_Entity_SetAction
-    ret  
+    jp   nc,call_02_72ac_Entity_SetAction              ; landed -> crouch
+    ret
 
-call_02_6f3e_EntityAction_Rez_Unk5:
+call_02_6f3e_EntityAction_Rez_Ascend:
+; Action $05, entered from data_02_7e95's pending action. RiseToCeiling returns
+; carry only on the frame it clamps, so `ret nc` is "still climbing"
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ld   c,$00
     call nz,call_00_28dc_Entity_SetYVelocity
-    call call_02_6FD3_Rez_unk
+    call call_02_6fd3_Rez_RiseToCeiling
     ret  nc
     ld   c,TIMER_AMOUNT_0_FRAMES
     call call_00_290d_Entity_SetMiscTimer
     ld   a,$06
-    jp   call_02_72ac_Entity_SetAction
+    jp   call_02_72ac_Entity_SetAction                 ; -> Gather
 
-call_02_6f54_EntityAction_Rez_Unk6:
+call_02_6f54_EntityAction_Rez_Gather:
+; Actions $06 and $07, another ping-pong pair counting to ten. He is pinned at the
+; ceiling here and does not move at all
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ret  z
     call call_00_2917_Entity_CheckMiscTimerZero
     inc  [hl]
     cp   a,$0A
     ld   a,$08
-    jp   z,call_02_72ac_Entity_SetAction
-    ret  
+    jp   z,call_02_72ac_Entity_SetAction               ; -> Barrage
+    ret
 
-call_02_6f64_EntityAction_Rez_Unk8:
+call_02_6f64_EntityAction_Rez_Barrage:
+; Action $08, and the only attack. He snaps back to his SPAWN position on the first
+; frame - so the barrage always comes from the same place however the hopping left
+; him - and then fires one shot every 64 frames for TIMER_AMOUNT_REZ ($06) shots.
+;
+; Which of the two projectile children is spawned alternates on bit 0 of the shared
+; counter, and that same counter is what the projectile itself uses to pick its arc.
+;
+; He will not leave until his last shot has expired, which is what the tail is
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_00_6F74
     call call_00_2826_Entity_ResetToInitialXPos
     call call_00_27e4_Entity_ResetToInitialYPos
     ld   c,TIMER_AMOUNT_REZ
-    call call_00_290d_Entity_SetMiscTimer
+    call call_00_290d_Entity_SetMiscTimer              ; six shots
 .jr_00_6F74:
     call call_00_2917_Entity_CheckMiscTimerZero
-    jr   z,.jr_00_6F93
+    jr   z,.jr_00_6F93                                 ; out of shots
     ld   a,[wDC71_VBlankFrameCounter]
     and  a,$3F
-    ret  nz
+    ret  nz                                            ; one frame in 64
     call call_00_2922_Entity_DecrementMiscTimer
     jr   z,.jr_00_6F93
     ld   a,[wDCDA_BrainOfOzAndRezCounter]
     ld   c,SPAWN_CHILD_ENTITY_REZ_PROJECTILE
     and  a,$01
-    jp   z,call_00_3792_EntitySpawn_SpawnChild
+    jp   z,call_00_3792_EntitySpawn_SpawnChild         ; alternate the two children
     ld   c,SPAWN_CHILD_ENTITY_REZ_PROJECTILE_2
     jp   call_00_3792_EntitySpawn_SpawnChild
 .jr_00_6F93:
     ld   c,ENTITY_CHANNEL_Z_REZ_PROJECTILE
     call call_00_29ce_Entity_FindSlotById
     ld   a,$00
-    jp   nz,call_02_72ac_Entity_SetAction
-    ret  
+    jp   nz,call_02_72ac_Entity_SetAction              ; all clear -> Intro/Bounce
+    ret
 
-call_02_6f9e_EntityAction_Rez_Unk9:
-    jp   call_02_6FD3_Rez_unk
+call_02_6f9e_EntityAction_Rez_Recoil:
+; Action $09, the reaction to a hit that did NOT leave a multiple of three. One
+; rise toward the ceiling and nothing else - data_02_7eb6's pending action puts him
+; back into $02
+    jp   call_02_6fd3_Rez_RiseToCeiling
 
-call_02_6fa1_EntityAction_Rez_Unk10:
-    call call_02_7002_Rez_unk2
+call_02_6fa1_EntityAction_Rez_Death:
+; Action $0A, from ENTITY_ATTR_DEFEAT_FLAGS $8A. Falls to the floor and hands on
+    call call_02_7002_Rez_FallToFloor
     ld   a,$0B
     jp   nc,call_02_72ac_Entity_SetAction
-    ret  
+    ret
 
-call_02_6faa_EntityAction_Rez_Unk11:
+call_02_6faa_EntityAction_Rez_Defeated:
+; Action $0B, and the end of the game's last level. One more $30 hop, three seconds
+; on the floor, then wDC67_ProgressFlags_ChannelZ and the warp bit - the same
+; ending Rock Hard and the Brain of Oz get
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_00_6FBE
     ld   a,SFX_LOUD_BANG
@@ -4046,8 +4423,8 @@ call_02_6faa_EntityAction_Rez_Unk11:
     ld   c,$30
     call call_00_28dc_Entity_SetYVelocity
 .jr_00_6FBE:
-    call call_02_7002_Rez_unk2
-    ret  c
+    call call_02_7002_Rez_FallToFloor
+    ret  c                                             ; still in the air
     call call_00_2922_Entity_DecrementMiscTimer
     ret  nz
     ld   a,$01
@@ -4056,16 +4433,22 @@ call_02_6faa_EntityAction_Rez_Unk11:
     set  4,[hl]
     jp   call_00_2b7a_Entity_DeactivateAndMarkNeverRespawn
 
-call_02_6FD3_Rez_unk:
+call_02_6fd3_Rez_RiseToCeiling:
+; Accelerates upward four units a frame and clamps at world Y $0024. The first half
+; is a one-sided limiter: a velocity that is already positive and $20 or more is
+; pinned at $20, and anything else gains four - so he starts slowly and tops out.
+;
+; Returns CARRY SET on the frame it clamps, which is what every caller tests. The
+; `push af` around the clamp is there to preserve that flag across the two stores
     call call_00_28f1_Entity_CheckIfYVelocityIsZero
     bit  7,a
     jr   nz,.jr_00_6FE0
     cp   a,$20
-    ld   a,$20
+    ld   a,$20                                         ; cap the climb
     jr   nc,.jr_00_6FE3
 .jr_00_6FE0:
     ld   a,[hl]
-    add  a,$04
+    add  a,$04                                         ; speed up
 .jr_00_6FE3:
     ld   [hl],a
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
@@ -4075,7 +4458,7 @@ call_02_6FD3_Rez_unk:
     sub  e
     ld   a,[hl]
     sbc  d
-    ret  nc
+    ret  nc                                            ; still below the ceiling
     push af
     ld   [hl],d
     dec  l
@@ -4083,9 +4466,12 @@ call_02_6FD3_Rez_unk:
     ld   c,$00
     call call_00_28dc_Entity_SetYVelocity
     pop  af
-    ret  
+    ret
 
-call_02_7002_Rez_unk2:
+call_02_7002_Rez_FallToFloor:
+; The mirror: gravity, then clamp at world Y $0058. Returns CARRY SET while he is
+; still above the line and clear on the frame it clamps, so callers land on `ret c`
+; or `jp nc`
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     ld   de,$0058
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
@@ -4093,48 +4479,66 @@ call_02_7002_Rez_unk2:
     sub  e
     ld   a,[hl]
     sbc  d
-    ret  c
+    ret  c                                             ; still falling
     ld   [hl],d
     dec  hl
     ld   [hl],e
-    ret  
+    ret
 
-call_02_7019_EntityAction_Unk_None:
-    ret  
+call_02_7019_EntityAction_ChannelZBlueBeamBarrier_None:
+; ENTITY_CHANNEL_Z_BLUE_BEAM_BARRIER, one row. Unlike the Anime Channel barrier of
+; the same name this one has no trigger and never switches off - it is a
+; COLLISION_TYPE_GENERIC_ENEMY wall $0A wide and $40 tall
+    ret
 
 call_02_701a_EntityAction_Meteor_Update:
+; ENTITY_CHANNEL_Z_METEOR, action $01. Action $00 is the parked meteor waiting
+; above the camera, and call_03_5483_CollisionHandler_Meteor is what drops it -
+; Entity_SetYToAboveCameraTop puts it back at the top of the screen and starts it
+; falling. Landing on its spawn line puts it into its Destroy row
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ld   a,SFX_METEOR
     call nz,call_00_0ff5_QueueSFX
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     call call_00_2766_Entity_ClampYToSpawnFloor
     ld   a,$02
-    jp   nc,call_02_72ac_Entity_SetAction
-    ret  
+    jp   nc,call_02_72ac_Entity_SetAction              ; landed -> Destroy
+    ret
 
 call_02_702e_EntityAction_RezProjectile_Update:
+; Rez's shot, and the last routine in the file.
+;
+; The arc is looked up rather than aimed. wDCDA_BrainOfOzAndRezCounter is
+; post-incremented and masked to $07, giving eight entries of two bytes - and the
+; order is not the obvious one: the FIRST byte becomes the Y velocity and the
+; SECOND the X, negated when the index is odd. So the eight entries are really four
+; arcs, each fired once to the right and once to the left, and the higher the arc
+; the shorter it travels.
+;
+; It only lands once it is descending (bit 7 of the Y velocity) and has reached
+; world Y $0070; then it snaps there and takes its Destroy row
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_00_7056
     ld   hl,wDCDA_BrainOfOzAndRezCounter
     ld   a,[hl]
     inc  [hl]
-    and  a,$07
+    and  a,$07                                         ; eight arcs in rotation
     push af
     ld   l,a
     ld   h,$00
-    add  hl,hl
+    add  hl,hl                                         ; two bytes per arc
     ld   de,.data_02_707f
     add  hl,de
     pop  af
-    ld   c,[hl]
+    ld   c,[hl]                                        ; first byte: Y velocity
     inc  hl
     push bc
-    ld   c,[hl]
+    ld   c,[hl]                                        ; second byte: X velocity
     and  a,$01
     jr   z,.jr_00_704F
     xor  a
     sub  [hl]
-    ld   c,a
+    ld   c,a                                           ; odd index - mirror it
 .jr_00_704F:
     call call_00_28c8_Entity_SetXVelocity
     pop  bc
@@ -4144,21 +4548,24 @@ call_02_702e_EntityAction_RezProjectile_Update:
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     call call_00_28f1_Entity_CheckIfYVelocityIsZero
     bit  7,a
-    ret  z
+    ret  z                                             ; still climbing
     ld   de,$0070
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_WORLD_Y
     ldi  a,[hl]
     sub  e
     ld   a,[hl]
     sbc  d
-    ret  c
+    ret  c                                             ; not down yet
     ld   [hl],d
     dec  hl
     ld   [hl],e
     ld   a,SFX_SMALL_BANG
     call call_00_0ff5_QueueSFX
     ld   a,$01
-    jp   call_02_72ac_Entity_SetAction
+    jp   call_02_72ac_Entity_SetAction                 ; -> Destroy
 .data_02_707f:
-    db   $30, $28, $30, $28, $20, $30, $20, $30        ;; 02:707f ????????
-    db   $40, $10, $40, $10, $50, $08, $50, $08        ;; 02:7087 ????????
+; Eight (Y velocity, X velocity) pairs - four arcs, each used twice. The steeper
+; the climb the smaller the horizontal step, so the four shots land at four
+; different distances
+    db   $30, $28, $30, $28, $20, $30, $20, $30
+    db   $40, $10, $40, $10, $50, $08, $50, $08

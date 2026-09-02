@@ -283,9 +283,15 @@ call_00_2299_Entity_SetListState:
     ret                                               ;; 00:22b0 $c9
 
 call_00_22b1_Entity_SetListStateAndAction:
-; Same lookup, but this one compares first: if the stored state already equals C it
-; returns, and otherwise it does NOT write the nibble at all - it calls
-; call_02_72ac_Entity_SetAction with C and lets the action change speak for itself.
+; Same lookup, but this one only READS. C is the action id the caller believes it
+; is in: if the stored state agrees, it returns and nothing happens. If it does not
+; agree, it calls call_02_72ac_Entity_SetAction with A - which at that point holds
+; the STORED state, not C - so the entity jumps to whatever action the save data
+; says it should be in.
+;
+; That is what makes it a self-correcting sync rather than a setter, and it is why
+; every caller passes its own action id. call_02_5ada_EntityAction_TVRemote_SyncDefault
+; and the two routines after it are the pattern.
 ;
 ; Worth reading twice, because the name the routine had before said it wrote the
 ; flags. It does not; only call_00_2299_Entity_SetListState does that

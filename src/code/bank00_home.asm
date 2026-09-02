@@ -1738,8 +1738,8 @@ data_00_0b01_SecondaryTilesetPtrs:
 data_00_0b19_TvUnlockRequirements:
 ; How much progress each tv in the Gex Cave hub wants before it will let the
 ; player in, indexed by the tv entity's parameter. Read by
-; call_02_5a83_EntityAction_TVButton_unk4 and
-; call_02_5af8_EntityAction_TVRemote_unk4.
+; call_02_5a83_EntityAction_TVButton_CheckUnlockRequirement and
+; call_02_5af8_EntityAction_TVRemote_CheckUnlockRequirement.
 ;
 ; Bit 7 changes what the low bits mean: set, they are a count of levels whose
 ; progress flag 4 is set, compared against
