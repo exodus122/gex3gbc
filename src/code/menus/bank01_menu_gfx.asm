@@ -6,12 +6,19 @@ data_01_5b77_FontDescriptors:
 ;
 ; A glyph's stride is computed rather than stored - height times two bytes per row
 ; times width in tiles - so the bitmap blob has no header and glyph 0 starts at byte
-; zero. The width tables are TEXT_GLYPH_COUNT entries, matching the largest index
-; .data_01_4dfd_CharToGlyph can produce.
+; zero, and a font's height is in PIXELS, not tiles.
 ;
-; Fonts 0 and 1 are the proportional text faces, 7 and 8 pixels tall. Fonts 2 and 3
-; are the password alphabet, small and large; font 3 is the 2x2-tile
-; data_01_66f9_PasswordFont that the grid is drawn from.
+; That is why the four bitmaps below do NOT go through rgbgfx. Font 0's glyphs are
+; seven pixels tall, so its 1008 bytes are 504 rows - not a multiple of 8, and no
+; rgbgfx invocation can describe the file. All four are built by tools/fontgfx.py
+; instead, from one horizontal row of glyphs per font; `make fonts-verify` checks the
+; conversion is reversible and `make check` checks the bytes.
+;
+; Fonts 0 and 1 are the proportional text faces, 7 and 8 pixels tall, and carry the
+; full TEXT_GLYPH_COUNT set - alphabet, digits, punctuation and the accented vowels
+; the five languages in BANK_1C_TEXT need. Fonts 2 and 3 are the much smaller password
+; alphabet at one and four tiles per glyph; font 3 is data_01_66f9_PasswordFont, which
+; the cell grid is drawn from.
 ;
 ; gex2's data_01_65fe_FontDescriptors
     dw   .data_01_5c79, .data_01_5b97
@@ -30,30 +37,44 @@ data_01_5b77_FontDescriptors:
 ; which is more than their 33 glyphs but less than TEXT_GLYPH_COUNT - they are only
 ; ever asked for password characters, so the gap never comes up
 .data_01_5b97: ; font 0 widths - $47 entries
-    INCBIN "gfx/text/image_001_5c79_data.bin"
+    INCBIN "gfx/text/font0_text_small_widths.bin"
 .data_01_5bde: ; font 1 widths - $47 entries
-    INCBIN "gfx/text/image_001_6069_data.bin"
+    INCBIN "gfx/text/font1_text_large_widths.bin"
 .data_01_5c25: ; font 2 widths - $2a entries
-    INCBIN "gfx/text/image_001_64e9_data.bin"
+    INCBIN "gfx/text/font2_password_small_widths.bin"
 .data_01_5c4f: ; font 3 widths - $2a entries, all $10 (it is fixed pitch)
-    INCBIN "gfx/text/image_001_66f9_data.bin"
+    INCBIN "gfx/text/font3_password_large_widths.bin"
 
 ; The glyph bitmaps. A glyph's stride is width in tiles * height in pixels * 2 bytes
 ; per row, computed rather than stored, so these blobs have no header and glyph 0
 ; starts at byte zero. Their sizes are not multiples of TILE_SIZE_BYTES, which is why
 ; rgbgfx cannot round-trip them and they are checked in as raw .bin
 .data_01_5c79: ; font 0 - 8x7, stride $0e, $3f0 bytes = 72 glyphs
-    INCBIN ".gfx/text/image_001_5c79.bin"
+    INCBIN ".gfx/text/font0_text_small.bin"
 .data_01_6069: ; font 1 - 8x8, stride $10, $480 bytes = 72 glyphs
-    INCBIN ".gfx/text/image_001_6069.bin"
+    INCBIN ".gfx/text/font1_text_large.bin"
 .data_01_64e9: ; font 2 - 8x8, stride $10, $210 bytes = 33 glyphs, the small password set
-    INCBIN ".gfx/text/image_001_64e9.bin"
+    INCBIN ".gfx/text/font2_password_small.bin"
 data_01_66f9_PasswordFont:
-; The large password alphabet: 33 glyphs of PASSWORD_GLYPH_BYTES, one blank plus the
-; 32 keys. Read two ways - as font 3 of data_01_5b77_FontDescriptors, and directly by
-; call_01_477c_MenuCmd_StagePasswordGlyph and
-; call_01_4d6e_Password_RefreshCellGfx, which index it by the raw key value
-    INCBIN ".gfx/text/image_001_66f9.bin"
+; The large password alphabet: 33 glyphs of PASSWORD_GLYPH_BYTES. Read two ways - as
+; font 3 of data_01_5b77_FontDescriptors, and directly by
+; call_01_477c_MenuCmd_StagePasswordGlyph and call_01_4d6e_Password_RefreshCellGfx,
+; which index it by the raw cell value.
+;
+; THERE ARE NO VOWELS IN IT. In glyph order it is
+;
+;   $00-$14   B C D F G H J K L M N P Q R S T V W X Y Z   - 21 consonants
+;   $15-$1E   0 1 2 3 4 5 6 7 8 9
+;   $1F       !
+;   $20       ?
+;
+; so a password cannot spell a word, and cannot contain a letter a player might
+; confuse with a digit. $00-$1F is exactly the range a PASSWORD_BITS_PER_CELL-bit cell
+; can hold; the "?" at $20 is a 33rd glyph nothing can select.
+;
+; font2_password_small.png is the same alphabet in the same order at 8x8, used as
+; font 2. Neither of them has a blank glyph
+    INCBIN ".gfx/text/font3_password_large.bin"
 
 data_01_6f39_ImageTable:
 ; Six small images for call_01_4d03_Menu_StageTileData, each a three-byte header -

@@ -1176,8 +1176,10 @@ DEF PASSWORD_KEY_ROWS            EQU $02
 DEF PASSWORD_BITS_PER_CELL       EQU $05
 DEF PASSWORD_TOTAL_BITS          EQU $5a ; PASSWORD_CELL_COUNT * PASSWORD_BITS_PER_CELL
 DEF PASSWORD_CELL_MASK_START     EQU $10 ; the destination walk runs $10 $08 $04 $02 $01
-DEF PASSWORD_KEY_BLANK           EQU $20 ; an empty cell. Shares its value with
-                                         ; PASSWORD_VALID by coincidence only
+DEF PASSWORD_KEY_BLANK           EQU $20 ; ASCII space, in the dead
+                                         ; .data_01_4f06_KeyToAscii only - the live
+                                         ; drawing path has no blank glyph. Shares its
+                                         ; value with PASSWORD_VALID by coincidence
 DEF PASSWORD_PAYLOAD_BYTES       EQU $0c ; wDB72..wDB7D
 DEF PASSWORD_CHECKSUM_BYTES      EQU $0b ; ...all but the checksum byte itself
 DEF PASSWORD_CHECKSUM_XOR        EQU $b6

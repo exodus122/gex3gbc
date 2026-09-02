@@ -190,17 +190,21 @@ call_01_4efd:
     ld   a,[hl]
     ret  
 .data_01_4f06_KeyToAscii:
-; Password key value -> the character it stands for. 33 entries: PASSWORD_KEY_BLANK
-; for an empty cell, then the 26 letters and the six digits 0-5 that make up the
-; PASSWORD_KEY_COLUMNS x PASSWORD_KEY_ROWS keyboard - 32 keys, which is exactly the
-; PASSWORD_BITS_PER_CELL-bit range a cell can hold.
-;
-; It lines up entry for entry with data_01_66f9_PasswordFont, whose 33 glyphs are the
-; blank plus the same 32 keys, so a key value indexes both tables interchangeably.
+; Password value -> an ASCII character, 33 entries: PASSWORD_KEY_BLANK, then the 26
+; letters, then the six digits 0-5. 33 is the same count as
+; data_01_66f9_PasswordFont has glyphs, and $00-$1F is the range a
+; PASSWORD_BITS_PER_CELL-bit cell can hold - but see below, the contents do not
+; match the font.
 ;
 ; NOTHING CALLS call_01_4efd, so this table is dead in this build: the grid is drawn
 ; from the font directly by call_01_477c_MenuCmd_StagePasswordGlyph and never goes via
-; ASCII. It is presumably what a "write the password out as text" path would have used
+; ASCII.
+;
+; It also does not agree with the font. data_01_66f9_PasswordFont holds 21 CONSONANTS
+; then the digits then ! and ?, with no blank and no vowels, so cell value $00 draws a
+; B where this table calls it a space and $01 draws a C where this table says A. One
+; of the two is left over from an earlier encoding; the font is the one the drawing
+; code actually reads, so the font is the one to trust
     db   PASSWORD_KEY_BLANK                           ; key $00 - an empty cell
     db   $41, $42, $43, $44, $45, $46, $47, $48       ; A-H
     db   $49, $4a, $4b, $4c, $4d, $4e, $4f, $50       ; I-P
