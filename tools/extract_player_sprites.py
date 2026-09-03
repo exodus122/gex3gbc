@@ -2,7 +2,7 @@
 """Split banks $62-$7E of Gex 3 GBC into per-bank frame tables and sprite sheets.
 
 Those 29 banks hold Gex's own animation frames and nothing else, currently checked in
-as opaque 16KB blobs (src/data/sprite_data/bank_0XX.bin). Every one of them has the
+as opaque 16KB blobs (src/data/player_sprite_data/bank_0XX.bin). Every one of them has the
 same shape:
 
     $4000              frame records, packed and in sprite-id order
@@ -14,7 +14,7 @@ same shape:
 This script rebuilds that structure from the ROM and writes it back out as
 
     src/gfx/player_sprites/image_0XX_YYYY.png     the tiles, as an editable sheet
-    src/data/sprite_data/bankXX_frames.asm        the records, as macro invocations
+    src/data/player_sprite_data/bankXX_frames.asm        the records, as macro invocations
 
 The layout is not assumed. It is read out of bank $7F's index tables, which give the
 directory of every graphics set, and then checked: records must tile $4000 upwards
@@ -37,7 +37,7 @@ Usage:
                                                            # main.asm / Makefile text
     python3 tools/extract_player_sprites.py --dry-run      # verify only
     python3 tools/extract_player_sprites.py --patch-main --patch-makefile
-    python3 tools/extract_player_sprites.py --no-relink    # leave bank7F.asm alone
+    python3 tools/extract_player_sprites.py --no-relink    # leave bank7f_player_sprite_data.asm alone
     python3 tools/extract_player_sprites.py --preview      # contact sheets to look at
     python3 tools/extract_player_sprites.py --import       # edited sheets -> src/gfx
 """
@@ -74,8 +74,8 @@ BANK_BASE           = 0x4000
 RAMP = [(0xFF, 0xFF, 0xFF), (0xAA, 0xAA, 0xAA), (0x55, 0x55, 0x55), (0x00, 0x00, 0x00)]
 
 GFX_SUBDIR   = os.path.join('src', 'gfx', 'player_sprites')
-DATA_SUBDIR  = os.path.join('src', 'data', 'sprite_data')
-BANK7F       = os.path.join(DATA_SUBDIR, 'bank7F.asm')
+DATA_SUBDIR  = os.path.join('src', 'data', 'player_sprite_data')
+bank7f_player_sprite_data       = os.path.join(DATA_SUBDIR, 'bank7f_player_sprite_data.asm')
 MACROS       = os.path.join('src', 'code', 'macros', 'macros.asm')
 MAIN         = os.path.join('src', 'main.asm')
 MAKEFILE     = 'Makefile'
@@ -84,7 +84,7 @@ MAKEFILE_RULE = 'src/.gfx/player_sprites/%.bin: rgbgfx += --columns'
 
 CONST_TEXT = """
 ; ------------------------------------------------------------------
-; A frame piece's attribute byte - data/sprite_data/bankXX_frames.asm
+; A frame piece's attribute byte - data/player_sprite_data/bankXX_frames.asm
 ; ------------------------------------------------------------------
 ; call_00_2ce2_Player_BuildSprites ORs this byte into wDC53_Player_OamAttributes on its
 ; way into OAM, so a piece can raise any OAM attribute bit. Across all 11005 pieces in
@@ -98,7 +98,7 @@ DEF PLAYER_FRAME_PIECE_TILE_BYTES EQU 32  ; an 8x16 OBJ, so two 16-byte tiles
 
 MACRO_TEXT = """
 ; ------------------------------------------------------------------
-; Gex's animation frames - see data/sprite_data/bankXX_frames.asm
+; Gex's animation frames - see data/player_sprite_data/bankXX_frames.asm
 ; ------------------------------------------------------------------
 ; A frame header. The two middle bytes are stored for every frame in the game and read
 ; by nothing; they are small numbers in the right range for a size but they do not
@@ -669,7 +669,7 @@ def emit_frames_asm(bk, info, set_names):
         '; The sheet is padded with blank tiles to reach a square-ish shape. They sit at',
         "; the end, so main.asm's INCBIN takes a length and leaves them out of the ROM.",
         ';',
-        '; A frame is reached from data/sprite_data/bank7F.asm, which documents the',
+        '; A frame is reached from data/player_sprite_data/bank7f_player_sprite_data.asm, which documents the',
         "; lookup and the format; code/bank00_player_sprites.asm is what walks it.",
         '; ==================================================================',
         '',
@@ -709,7 +709,7 @@ def main_asm_block(banks, sets):
     for bk in sorted(banks):
         info = banks[bk]
         L.append(f'SECTION "bank{bk:02x}", ROMX[$4000], BANK[${bk:02x}]')
-        L.append(f'INCLUDE "data/sprite_data/bank{bk:02x}_frames.asm"')
+        L.append(f'INCLUDE "data/player_sprite_data/bank{bk:02x}_frames.asm"')
         n = len(info['tiles'])
         tail = (f', 0, ${n:04x}{"":<6}; {n // 16} tiles, without the sheet\'s blank '
                 f'padding' if info['pad'] else '')
@@ -719,8 +719,8 @@ def main_asm_block(banks, sets):
 
 # ---------------------------------------------------------------------------
 
-def relink_bank7f(text, banks, sets):
-    """Point bank7F.asm's frame directory rows at the labels this script just made.
+def relink_bank7f_player_sprite_data(text, banks, sets):
+    """Point bank7f_player_sprite_data.asm's frame directory rows at the labels this script just made.
 
     A row only says "this many banks past the base", so the base has to come from the
     directory the row is in. The set table gives directory address -> base bank, and
@@ -839,7 +839,7 @@ def main():
     ap.add_argument('--repo', default='.', help='repo root (default: search upwards)')
     ap.add_argument('--rom', default=None, help='ROM to read (default: <repo>/rom.gb)')
     ap.add_argument('--dry-run', action='store_true', help='verify and report, write nothing')
-    ap.add_argument('--no-relink', action='store_true', help='leave bank7F.asm alone')
+    ap.add_argument('--no-relink', action='store_true', help='leave bank7f_player_sprite_data.asm alone')
     ap.add_argument('--patch-main', action='store_true', help='rewrite the bank $62-$7e section of main.asm')
     ap.add_argument('--patch-makefile', action='store_true', help='add the rgbgfx --columns rule')
     ap.add_argument('--skip-rgbgfx', action='store_true', help='do not round-trip through rgbgfx')
@@ -973,25 +973,25 @@ def main():
             fh.write(MACRO_TEXT)
         print("appended player_frame_header / player_piece to macros.asm")
 
-    # ---- bank7F relink ----
-    b7f = os.path.join(repo, BANK7F)
+    # ---- bank7f_player_sprite_data relink ----
+    b7f = os.path.join(repo, bank7f_player_sprite_data)
     if args.no_relink:
-        print("--no-relink: bank7F.asm untouched")
+        print("--no-relink: bank7f_player_sprite_data.asm untouched")
     elif not os.path.isfile(b7f):
-        print(f"! {BANK7F} not found, skipping the relink")
+        print(f"! {bank7f_player_sprite_data} not found, skipping the relink")
     else:
         text = open(b7f, encoding='utf-8').read()
-        new, n, skipped = relink_bank7f(text, banks, sets)
+        new, n, skipped = relink_bank7f_player_sprite_data(text, banks, sets)
         if skipped:
-            sys.exit(f"bank7F.asm: {skipped} frame rows could not be matched to a "
+            sys.exit(f"bank7f_player_sprite_data.asm: {skipped} frame rows could not be matched to a "
                      f"label - not rewriting the file")
         if n == 0:
-            print("bank7F.asm: no bare-address player_frame rows left to relink")
+            print("bank7f_player_sprite_data.asm: no bare-address player_frame rows left to relink")
         elif args.dry_run:
-            print(f"bank7F.asm: {n} rows would be relinked")
+            print(f"bank7f_player_sprite_data.asm: {n} rows would be relinked")
         else:
             open(b7f, 'w', encoding='utf-8').write(new)
-            print(f"bank7F.asm: {n} frame directory rows now name their frame")
+            print(f"bank7f_player_sprite_data.asm: {n} frame directory rows now name their frame")
 
     # ---- the text the user has to place ----
     block = main_asm_block(banks, sets)
@@ -1044,7 +1044,7 @@ def main():
                     text.replace(anchor, anchor + '\n' + MAKEFILE_RULE, 1))
                 print(f"patched {MAKEFILE}")
 
-    print("\nThe old src/data/sprite_data/bank_062.bin .. bank_07e.bin are now unused "
+    print("\nThe old src/data/player_sprite_data/bank_062.bin .. bank_07e.bin are now unused "
           "and can be deleted once the ROM still builds.")
 
 

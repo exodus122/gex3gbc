@@ -3234,7 +3234,7 @@
 11:4000 image_11_4000
 11:5190 image_11_4000_bgmap_tile_ids
 11:52f8 image_11_4000_palette_ids
-1c:4000 bank_01c_text
+1c:4000 bank1c_text
 1c:4000 Text_TitleGexDeepPocketGecko
 1c:400a Text_TitleGexDeepPocketGecko_Str
 1c:4022 Text_PublishedByEidos

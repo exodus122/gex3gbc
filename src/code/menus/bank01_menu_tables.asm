@@ -177,7 +177,7 @@ data_01_53c6_MenuTypeRecords:
     menu_type_record data_01_57e8_MenuScript_GoToMap, $00, $02, $08, $30, $00, $10, $01, 0
     ; MENU_DAVID_A_PALMER
     menu_type_record data_01_5801_MenuScript_DavidAPalmer, MENU_FLAG_HOLD_SKIPPABLE, $00, $00, $00, $00, $00, $02, 0
-    ; MENU_LANGUAGE_SELECT  - one row per language. See data/bank_01c_text.asm
+    ; MENU_LANGUAGE_SELECT  - one row per language. See code/menus/bank1c_text.asm
     menu_type_record data_01_580a_MenuScript_LanguageSelect, $00, $05, $18, $10, $00, $18, $03, 0
     ; MENU_OPENING_CREDITS_1  - the only MENU_FLAG_HOLD screen
     menu_type_record data_01_5843_MenuScript_OpeningCredits1, MENU_FLAG_HOLD, $00, $00, $00, $00, $00, $01, 0

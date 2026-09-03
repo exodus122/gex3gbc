@@ -473,7 +473,7 @@ DEF CGB_COLOR_UNUSED             EQU $7c1f ; full red + full blue. The marker le
                                            ; appears nowhere else in the ROM
 
 ; ------------------------------------------------------------------
-; Gex's graphics, indexed by bank $7F - see data/sprite_data/bank7F.asm and
+; Gex's graphics, indexed by bank $7F - see data/player_sprite_data/bank7f_player_sprite_data.asm and
 ; code/bank00_player_sprites.asm
 ; ------------------------------------------------------------------
 ; A graphics set is one level theme's worth of Gex: a base bank, a frame directory and
@@ -1111,7 +1111,7 @@ DEF TEXT_GLYPH_COUNT             EQU $47 ; entries in a font's width table, $00.
                                          ; Glyphs $01-$1A are the alphabet and lower
                                          ; case ASCII reaches them; $25 up are accented
                                          ; vowels and symbols reached through UPPER
-                                         ; case. See data/bank_01c_text.asm
+                                         ; case. See code/menus/bank1c_text.asm
 
 ; Save-progress counting - wDC5C_ProgressFlags, one byte per level
 DEF OBJECTIVES_PER_LEVEL         EQU $04 ; the low nibble
@@ -1143,7 +1143,7 @@ DEF PASSWORD_CELL_TILE_BASE      EQU $98 ; VRAM tile id of cell 0
 DEF PASSWORD_GLYPH_BYTES         EQU $40 ; PASSWORD_CELL_TILES * TILE_SIZE_BYTES
 
 ; The two bank $1C text records the code names directly rather than through a menu
-; script are now labels in data/bank_01c_text.asm - Text_CounterStrings and
+; script are now labels in code/menus/bank1c_text.asm - Text_CounterStrings and
 ; Text_XOf4RemotesFound.
 
 DEF REMOTE_MARKER_TILE_TAKEN     EQU $e4 ; the 2x2 mission marker on the select screen
@@ -1892,7 +1892,7 @@ DEF ENTITYACTION_PENGUIN_WALK_OR_RUN             EQU $00
 DEF ENTITYACTION_PENGUIN_JUMP                    EQU $01
 
 ; ------------------------------------------------------------------
-; A frame piece's attribute byte - data/sprite_data/bankXX_frames.asm
+; A frame piece's attribute byte - data/player_sprite_data/bankXX_frames.asm
 ; ------------------------------------------------------------------
 ; call_00_2ce2_Player_BuildSprites ORs this byte into wDC53_Player_OamAttributes on its
 ; way into OAM, so a piece can raise any OAM attribute bit. Across all 11005 pieces in

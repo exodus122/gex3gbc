@@ -8,7 +8,7 @@
 ; The sheet is padded with blank tiles to reach a square-ish shape. They sit at
 ; the end, so main.asm's INCBIN takes a length and leaves them out of the ROM.
 ;
-; A frame is reached from data/sprite_data/bank7F.asm, which documents the
+; A frame is reached from data/player_sprite_data/bank7f_player_sprite_data.asm, which documents the
 ; lookup and the format; code/bank00_player_sprites.asm is what walks it.
 ; ==================================================================
 

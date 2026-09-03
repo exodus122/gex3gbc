@@ -37,24 +37,24 @@ data_01_5b77_FontDescriptors:
 ; which is more than their 33 glyphs but less than TEXT_GLYPH_COUNT - they are only
 ; ever asked for password characters, so the gap never comes up
 .data_01_5b97: ; font 0 widths - $47 entries
-    INCBIN "gfx/text/font0_text_small_widths.bin"
+    INCBIN "gfx/fonts/font0_text_small_widths.bin"
 .data_01_5bde: ; font 1 widths - $47 entries
-    INCBIN "gfx/text/font1_text_large_widths.bin"
+    INCBIN "gfx/fonts/font1_text_large_widths.bin"
 .data_01_5c25: ; font 2 widths - $2a entries
-    INCBIN "gfx/text/font2_password_small_widths.bin"
+    INCBIN "gfx/fonts/font2_password_small_widths.bin"
 .data_01_5c4f: ; font 3 widths - $2a entries, all $10 (it is fixed pitch)
-    INCBIN "gfx/text/font3_password_large_widths.bin"
+    INCBIN "gfx/fonts/font3_password_large_widths.bin"
 
 ; The glyph bitmaps. A glyph's stride is width in tiles * height in pixels * 2 bytes
 ; per row, computed rather than stored, so these blobs have no header and glyph 0
 ; starts at byte zero. Their sizes are not multiples of TILE_SIZE_BYTES, which is why
 ; rgbgfx cannot round-trip them and they are checked in as raw .bin
 .data_01_5c79: ; font 0 - 8x7, stride $0e, $3f0 bytes = 72 glyphs
-    INCBIN ".gfx/text/font0_text_small.bin"
+    INCBIN ".gfx/fonts/font0_text_small.bin"
 .data_01_6069: ; font 1 - 8x8, stride $10, $480 bytes = 72 glyphs
-    INCBIN ".gfx/text/font1_text_large.bin"
+    INCBIN ".gfx/fonts/font1_text_large.bin"
 .data_01_64e9: ; font 2 - 8x8, stride $10, $210 bytes = 33 glyphs, the small password set
-    INCBIN ".gfx/text/font2_password_small.bin"
+    INCBIN ".gfx/fonts/font2_password_small.bin"
 data_01_66f9_PasswordFont:
 ; The large password alphabet: 33 glyphs of PASSWORD_GLYPH_BYTES. Read two ways - as
 ; font 3 of data_01_5b77_FontDescriptors, and directly by
@@ -74,7 +74,7 @@ data_01_66f9_PasswordFont:
 ;
 ; font2_password_small.png is the same alphabet in the same order at 8x8, used as
 ; font 2. Neither of them has a blank glyph
-    INCBIN ".gfx/text/font3_password_large.bin"
+    INCBIN ".gfx/fonts/font3_password_large.bin"
 
 data_01_6f39_ImageTable:
 ; Six small images for call_01_4d03_Menu_StageTileData, each a three-byte header -

@@ -13,7 +13,7 @@ with no special case for index 0, so there is no header and no tile grid.
 
 font0_text_small is the one that rgbgfx cannot describe at all: its glyphs are SEVEN
 pixels tall, so 1008 bytes is 504 rows, which is not a multiple of 8. The old
-src/gfx/text/image_001_5c79.png was an 8px-tall strip that happened to contain the
+src/gfx/fonts/image_001_5c79.png was an 8px-tall strip that happened to contain the
 right 1008 bytes, but every glyph past the first was sliced and shifted down the
 strip - correct data, unreadable picture.
 

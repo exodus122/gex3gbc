@@ -1271,7 +1271,7 @@ call_00_0835_Text_LoadStringToBuffer:
 ; set - which is copied too, as the terminator - and a zero is written after it.
 ; The pointer pair is then overwritten with wDADD_MenuTextBuffer, so the menu
 ; renderer reads the WRAM copy from here on
-    ld   A, BANK(bank_01c_text)                               ;; 00:0835 $3e $1c
+    ld   A, BANK(bank1c_text)                               ;; 00:0835 $3e $1c
     call call_00_0eee_SwitchBank                       ;; 00:0837 $cd $ee $0e
     ld   HL, wDBA7_MenuCmd_SrcPtr                      ;; 00:083a $21 $a7 $db
     ld   A, [HL+]                                      ;; 00:083d $2a
@@ -1310,7 +1310,7 @@ call_00_0865_Text_AppendStringToBuffer:
 ; because the address is one past a label the assembler already had - and then
 ; copies until it has written the new string's own $80
     push de
-    ld   a,BANK(bank_01c_text)
+    ld   a,BANK(bank1c_text)
     call call_00_0eee_SwitchBank
     pop  de
     ld   hl,wDBF8_TextStringIndex

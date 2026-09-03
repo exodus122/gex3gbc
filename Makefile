@@ -53,12 +53,12 @@ src/.gfx/%.bin: src/gfx/%.png
 # through tools/fontgfx.py instead, which also lays them out as one readable row of
 # glyphs. This pattern is more specific than the generic src/.gfx/%.bin rule above,
 # so make prefers it (shorter stem wins).
-src/.gfx/text/font0_text_small.bin:     fontgfx = --cols 1 --height 7
-src/.gfx/text/font1_text_large.bin:     fontgfx = --cols 1 --height 8
-src/.gfx/text/font2_password_small.bin: fontgfx = --cols 1 --height 8
-src/.gfx/text/font3_password_large.bin: fontgfx = --cols 2 --height 16
+src/.gfx/fonts/font0_text_small.bin:     fontgfx = --cols 1 --height 7
+src/.gfx/fonts/font1_text_large.bin:     fontgfx = --cols 1 --height 8
+src/.gfx/fonts/font2_password_small.bin: fontgfx = --cols 1 --height 8
+src/.gfx/fonts/font3_password_large.bin: fontgfx = --cols 2 --height 16
 
-src/.gfx/text/%.bin: src/gfx/text/%.png
+src/.gfx/fonts/%.bin: src/gfx/fonts/%.png
 	@mkdir -p $(dir $@)
 	$(FONTGFX) encode $(fontgfx) -o $@ $<
 

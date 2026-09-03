@@ -161,7 +161,7 @@ call_01_4b43_MenuText_GetMapTextBlock:
 ; THESE ARE BANK $1C ADDRESSES, stored as bare words - the dereference happens with
 ; BANK_1C_TEXT paged in, so the disassembler read them as bank 1 and any label it
 ; invented for them was wrong. They now name the real blocks in
-; data/bank_01c_text.asm, which is also where the block layout is documented
+; code/menus/bank1c_text.asm, which is also where the block layout is documented
     dw   MapText_GexCave                          ; LEVEL_GEX_CAVE
     dw   MapText_HolidayTv                        ; LEVEL_HOLIDAY_TV
     dw   MapText_MysteryTv                        ; LEVEL_MYSTERY_TV

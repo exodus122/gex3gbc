@@ -335,7 +335,7 @@ MACRO sprite_rect ; Y, X, tile, OAM attributes, width in tiles, height in tiles
 ENDM
 
 ; ------------------------------------------------------------------
-; Text records - see data/bank_01c_text.asm
+; Text records - see code/menus/bank1c_text.asm
 ; ------------------------------------------------------------------
 ; One string in five languages. call_00_0835_Text_LoadStringToBuffer indexes this
 ; with wDBF8_TextStringIndex, which nothing ever sets, so entry 0 is the only one
@@ -352,7 +352,7 @@ MACRO text_all_langs ; the one string
 ENDM
 
 ; ------------------------------------------------------------------
-; Bank $7F - the index to Gex's graphics. See data/sprite_data/bank7F.asm
+; Bank $7F - the index to Gex's graphics. See data/player_sprite_data/bank7f_player_sprite_data.asm
 ; ------------------------------------------------------------------
 ; One row of data_7f_4000_PlayerGfx_SetByMap. The byte actually stored is a BYTE
 ; OFFSET into data_7f_403d_PlayerGfx_SetTable, not a set number: all three readers add
@@ -390,7 +390,7 @@ MACRO player_frame_none
 ENDM
 
 ; ------------------------------------------------------------------
-; Gex's animation frames - see data/sprite_data/bankXX_frames.asm
+; Gex's animation frames - see data/player_sprite_data/bankXX_frames.asm
 ; ------------------------------------------------------------------
 ; A frame header. The two middle bytes are stored for every frame in the game and read
 ; by nothing; they are small numbers in the right range for a size but they do not

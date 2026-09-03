@@ -129,7 +129,7 @@ call_01_4df4_Text_CharToGlyphIndex:
 ; THE FONT HAS NO CAPITALS. Its $01-$1a glyphs are drawn as capital letters and lower
 ; case ASCII is what selects them, which leaves the whole upper case range free for
 ; the accented characters the French, German, Spanish and Italian text needs.
-; data/bank_01c_text.asm has the full character-by-character mapping and explains why
+; code/menus/bank1c_text.asm has the full character-by-character mapping and explains why
 ; a string there reads "paVwort".
 ;
 ; Z is the one letter with no entry: $5a maps to $00 like an unmapped code, because no
