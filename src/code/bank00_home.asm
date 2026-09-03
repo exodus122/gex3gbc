@@ -240,7 +240,7 @@ call_00_0150_Init:
     pop  AF                                            ;; 00:0191 $f1
     cp   A, BOOT_A_CGB                                 ;; 00:0192 $fe $11
     jr   Z, .jr_00_01d2                                ;; 00:0194 $28 $3c
-    ld   A, Bank07                                     ;; 00:0196 $3e $07
+    ld   A, BANK(image_007_5b00)                       ;; 00:0196 $3e $07
     ld   [MBC1RomBank], A                              ;; 00:0198 $ea $01 $20
     swap A                                             ;; 00:019b $cb $37
     rrca                                               ;; 00:019d $0f
@@ -296,7 +296,7 @@ call_00_0150_Init:
     jr   Z, .jr_00_01e7                                ;; 00:01fc $28 $e9
     ld   HL, wDAD3_PtrToBankStackPosition              ;; 00:01fe $21 $d3 $da
     ld   DE, wDAC3_BankStack                           ;; 00:0201 $11 $c3 $da
-    ld   A, BANK_01_MENU_CODE                          ;; 00:0204 $3e $01
+    ld   A, BANK(call_01_4000_MenuLoad)                          ;; 00:0204 $3e $01
     ld   [HL], E                                       ;; 00:0206 $73
     inc  HL                                            ;; 00:0207 $23
     ld   [HL], D                                       ;; 00:0208 $72
@@ -322,7 +322,7 @@ call_00_0150_Init:
     ldh  [rSTAT], A                                    ;; 00:022e $e0 $41
     ld   A, IEF_VBLANK | IEF_STAT                      ;; 00:0230 $3e $03
     ldh  [rIE], A                                      ;; 00:0232 $e0 $ff
-    ld   A, BANK_04_AUDIO_CODE_1                       ;; 00:0234 $3e $04
+    ld   A, BANK(call_04_4000_Audio_Init)                       ;; 00:0234 $3e $04
     call call_00_0eee_SwitchBank                       ;; 00:0236 $cd $ee $0e
     call call_04_4000_Audio_Init                       ;; 00:0239 $cd $00 $40
     call call_00_0f08_RestoreBank                      ;; 00:023c $cd $08 $0f
@@ -653,7 +653,7 @@ call_00_0513_Screen_PresentAndDrawEntities:
 ;
 ; That flag is gex3's whole transition effect. gex2's
 ; call_00_0521_Screen_PresentAndFadeIn ends with a DMG palette fade instead
-    ld   A, BANK_7F_PLAYER_GFX_INDEX                   ;; 00:0513 $3e $7f
+    ld   A, BANK(data_7f_4000_PlayerGfx_SetByMap)                   ;; 00:0513 $3e $7f
     call call_00_0eee_SwitchBank                       ;; 00:0515 $cd $ee $0e
     ld   HL, wDB6C_CurrentMapId                        ;; 00:0518 $21 $6c $db
     ld   E, [HL]                                       ;; 00:051b $5e
@@ -1229,7 +1229,7 @@ call_00_0800_Screen_LoadSecondaryTilesetRow:
     push DE                                            ;; 00:0801 $d5
     push BC                                            ;; 00:0802 $c5
     push HL                                            ;; 00:0803 $e5
-    ld   A, BANK_1F_SECONDARY_TILESETS                 ;; 00:0804 $3e $1f
+    ld   A, BANK(image_01f_00)                 ;; 00:0804 $3e $1f
     call call_00_0eee_SwitchBank                       ;; 00:0806 $cd $ee $0e
     ld   A, [wDB6C_CurrentMapId]                       ;; 00:0809 $fa $6c $db
     ld   DE, data_00_0b01_SecondaryTilesetPtrs         ;; 00:080c $11 $01 $0b
@@ -1271,7 +1271,7 @@ call_00_0835_Text_LoadStringToBuffer:
 ; set - which is copied too, as the terminator - and a zero is written after it.
 ; The pointer pair is then overwritten with wDADD_MenuTextBuffer, so the menu
 ; renderer reads the WRAM copy from here on
-    ld   A, BANK_1C_TEXT                               ;; 00:0835 $3e $1c
+    ld   A, BANK(bank_01c_text)                               ;; 00:0835 $3e $1c
     call call_00_0eee_SwitchBank                       ;; 00:0837 $cd $ee $0e
     ld   HL, wDBA7_MenuCmd_SrcPtr                      ;; 00:083a $21 $a7 $db
     ld   A, [HL+]                                      ;; 00:083d $2a
@@ -1310,7 +1310,7 @@ call_00_0865_Text_AppendStringToBuffer:
 ; because the address is one past a label the assembler already had - and then
 ; copies until it has written the new string's own $80
     push de
-    ld   a,BANK_1C_TEXT
+    ld   a,BANK(bank_01c_text)
     call call_00_0eee_SwitchBank
     pop  de
     ld   hl,wDBF8_TextStringIndex
@@ -1356,7 +1356,7 @@ call_00_088a_Menu_RunHdmaAnimations:
     ld   A, [wDBE3_Menu_AnimateFlag]                   ;; 00:088a $fa $e3 $db
     and  A, A                                          ;; 00:088d $a7
     ret  Z                                             ;; 00:088e $c8
-    ld   A, BANK_0A_ENTITY_SPRITES                     ;; 00:088f $3e $0a
+    ld   A, BANK(image_fly_1_fly_2_and_3_more_00a_4000)                     ;; 00:088f $3e $0a
     call call_00_0eee_SwitchBank                       ;; 00:0891 $cd $ee $0e
     ld   HL, wDC72_AnimFrameCounter                    ;; 00:0894 $21 $72 $dc
     inc  [HL]                                          ;; 00:0897 $34
@@ -1501,12 +1501,12 @@ call_00_08f8_StageNextGfxTransfer:
     xor  A, $0a                                        ;; 00:0937 $ee $0a
     ld   L, A                                          ;; 00:0939 $6f
     ld   B, [HL]                                       ;; 00:093a $46
-    ld   HL, .jr_00_096e_RaiseEntityGfxRequest         ;; 00:093b $21 $6e $09
-    ld   DE, $05                                       ;; 00:093e $11 $05 $00
+    ld   HL, .data_00_0973_BigEntityGfx - ENTITY_GFX_BIG_ROW_SIZE ;; 00:093b $21 $6e $09
+    ld   DE, ENTITY_GFX_BIG_ROW_SIZE                   ;; 00:093e $11 $05 $00
 .jr_00_0941:
     add  HL, DE                                        ;; 00:0941 $19
     ld   A, [HL]                                       ;; 00:0942 $7e
-    cp   A, $ff                                        ;; 00:0943 $fe $ff
+    cp   A, ENTITY_GFX_BIG_TABLE_END                   ;; 00:0943 $fe $ff
     ret  Z                                             ;; 00:0945 $c8
     cp   A, B                                          ;; 00:0946 $b8
     jr   NZ, .jr_00_0941                               ;; 00:0947 $20 $f8
@@ -1533,14 +1533,19 @@ call_00_08f8_StageNextGfxTransfer:
     set  GFX_XFER_ENTITY_GFX, [HL]                     ;; 00:096e $cb $ce
     set  GFX_XFER_PENDING, [HL]                        ;; 00:0970 $cb $fe
     ret                                                ;; 00:0972 $c9
-    db   $1e                                           ;; 00:0973 .
-    dw   $0300                                         ;; 00:0974 wW
-    dw   $3d00                                         ;; 00:0976 wW
-    db   $38, $00, $02, $00, $77, $4d, $80, $01        ;; 00:0978 ????????
-    db   $80, $3e, $55, $40, $02, $c0, $3d, $39        ;; 00:0980 ????????
-    db   $80, $01, $80, $3e, $3a, $80, $01, $80        ;; 00:0988 ????????
-    db   $3e, $6e, $80, $03, $80, $3c, $66, $00        ;; 00:0990 ????????
-    db   $02, $00, $3e, $ff                            ;; 00:0998 ????
+.data_00_0973_BigEntityGfx:
+; The eight entities whose artwork does not fit the shared size classes - the bosses
+; and the two cactuses. Walked linearly and matched on entity id, so the order here
+; is free; ENTITY_WESTERN_STATION_CACTUS and its enemy twin share one array
+    entity_gfx_big ENTITY_HOLIDAY_TV_EVIL_SANTA,                  image_holiday_tv_evil_santa_009_4000,          24
+    entity_gfx_big ENTITY_TUT_TV_COFFIN,                          image_tut_tv_coffin_009_7900,                  16
+    entity_gfx_big ENTITY_ANIME_CHANNEL_BIG_SILVER_ROBOT,         image_anime_channel_big_silver_robot_008_4000, 12
+    entity_gfx_big ENTITY_SUPERHERO_SHOW_MAD_BOMBER,              image_superhero_show_mad_bomber_007_4000,      18
+    entity_gfx_big ENTITY_WESTERN_STATION_ENEMY_CACTUS,           image_western_station_enemy_cactus_01d_4000,   12
+    entity_gfx_big ENTITY_WESTERN_STATION_CACTUS,                 image_western_station_enemy_cactus_01d_4000,   12
+    entity_gfx_big ENTITY_CHANNEL_Z_REZ,                          image_channel_z_rez_01e_4000,                  28
+    entity_gfx_big ENTITY_WW_GEX_WRESTLING_ROCK_HARD,             image_ww_gex_wrestling_rock_hard_010_4000,     16
+    db   ENTITY_GFX_BIG_TABLE_END
 .jr_00_099c:
     res  1, [HL]                                       ;; 00:099c $cb $8e
     pop  HL                                            ;; 00:099e $e1
@@ -1574,7 +1579,7 @@ call_00_08f8_StageNextGfxTransfer:
     srl  d
     rr   e
     add  hl,de
-    ld   de,$79E0
+    ld   de, ENTITY_GFX_BASE_3
     add  hl,de
     jr   .jr_00_0a45
 .jr_00_09db:
@@ -1587,7 +1592,7 @@ call_00_08f8_StageNextGfxTransfer:
     srl  d
     rr   e
     add  hl,de
-    ld   de,$7AA0
+    ld   de, ENTITY_GFX_BASE_5
     add  hl,de
     jr   .jr_00_0a45
 .jr_00_09f0:
@@ -1598,7 +1603,7 @@ call_00_08f8_StageNextGfxTransfer:
     srl  D                                             ;; 00:09f6 $cb $3a
     rr   E                                             ;; 00:09f8 $cb $1b
     add  HL, DE                                        ;; 00:09fa $19
-    ld   DE, $4000                                     ;; 00:09fb $11 $00 $40
+    ld   DE, ENTITY_GFX_BASE_6                         ;; 00:09fb $11 $00 $40
     add  HL, DE                                        ;; 00:09fe $19
     jr   .jr_00_0a45                                   ;; 00:09ff $18 $44
 .jr_00_0a01:
@@ -1612,7 +1617,7 @@ call_00_08f8_StageNextGfxTransfer:
     srl  d
     rr   e
     add  hl,de
-    ld   de,$7AA0
+    ld   de, ENTITY_GFX_BASE_7
     add  hl,de
     jr   .jr_00_0a45
 .jr_00_0a17:
@@ -1622,7 +1627,7 @@ call_00_08f8_StageNextGfxTransfer:
     rr   E                                             ;; 00:0a1d $cb $1b
     srl  D                                             ;; 00:0a1f $cb $3a
     rr   E                                             ;; 00:0a21 $cb $1b
-    ld   HL, $4000                                     ;; 00:0a23 $21 $00 $40
+    ld   HL, ENTITY_GFX_BASE_1                         ;; 00:0a23 $21 $00 $40
     add  HL, DE                                        ;; 00:0a26 $19
     jr   .jr_00_0a45                                   ;; 00:0a27 $18 $1c
 .jr_00_0a29:
@@ -1630,17 +1635,17 @@ call_00_08f8_StageNextGfxTransfer:
     rr   E                                             ;; 00:0a2b $cb $1b
     srl  D                                             ;; 00:0a2d $cb $3a
     rr   E                                             ;; 00:0a2f $cb $1b
-    ld   HL, $4aa0                                     ;; 00:0a31 $21 $a0 $4a
+    ld   HL, ENTITY_GFX_BASE_2                         ;; 00:0a31 $21 $a0 $4a
     add  HL, DE                                        ;; 00:0a34 $19
     jr   .jr_00_0a45                                   ;; 00:0a35 $18 $0e
 .jr_00_0a37:
     srl  d
     rr   e
-    ld   hl, $4000
+    ld   hl, ENTITY_GFX_BASE_4
     add  hl,de
     jr   .jr_00_0a45
 .jr_00_0a41:
-    ld   HL, $4000                                     ;; 00:0a41 $21 $00 $40
+    ld   HL, ENTITY_GFX_BASE_8                         ;; 00:0a41 $21 $00 $40
     add  HL, DE                                        ;; 00:0a44 $19
 .jr_00_0a45:
     ld   A, L                                          ;; 00:0a45 $7d
@@ -1716,17 +1721,17 @@ call_00_0a6a_Hdma_RunConfigEntry:
 ; bank 1 for attributes, which is why the bg map is drawn twice over.
 ; HDMACFG_BANK_MAP_TILESET ($ff) in the bank byte means "relocate this against
 ; the map's own tileset"
-    dw   $7800, _VRAM, $03c0, $010c                    ;; 00:0aa9 $78 $00
-    dw   $7c00, _SCRN1, $0040, $010c                   ;; 00:0ab1 $00 $0c
-    dw   $7bc0, _SCRN1, $0040, $000c                   ;; 00:0ab9 $00 $0c
-    dw   $0000, _VRAM+$1000, $0800, $00ff              ;; 00:0ac1 ........
-    dw   $0800, _VRAM+$800, $0800, $00ff               ;; 00:0ac9 ........
-    dw   $1000, _VRAM+$1000, $0800, $01ff              ;; 00:0ad1 ........
-    dw   $1800, _VRAM+$800, $0800, $01ff               ;; 00:0ad9 ........
-    dw   $c000, _SCRN0, $0400, $0101                   ;; 00:0ae1 ........
-    dw   $c000, _SCRN0, $0400, $0001                   ;; 00:0ae9 ........
-    dw   $c000, _VRAM, $1000, $0001                    ;; 00:0af1 ........
-    dw   $c000, _VRAM, $1000, $0101                    ;; 00:0af9 .???????
+    hdma_config image_hud_tiles_00c_7800, _VRAM, image_hud_tilemap_00c_7bc0 - image_hud_tiles_00c_7800, BANK(image_hud_tiles_00c_7800), 1                 ; HDMACFG_HUD_TILES
+    hdma_config image_hud_attributes_00c_7c00, _SCRN1, HUD_WINDOW_BYTES, BANK(image_hud_attributes_00c_7c00), 1                                    ; HDMACFG_HUD_ATTRIBUTES
+    hdma_config image_hud_tilemap_00c_7bc0, _SCRN1, HUD_WINDOW_BYTES, BANK(image_hud_tilemap_00c_7bc0), 0                                       ; HDMACFG_HUD_TILEMAP
+    hdma_config $0000, _VRAM+$1000, $0800, HDMACFG_BANK_MAP_TILESET, 0                                                              ; HDMACFG_TILESET_0
+    hdma_config $0800, _VRAM+$800, $0800, HDMACFG_BANK_MAP_TILESET, 0                                                               ; HDMACFG_TILESET_1
+    hdma_config $1000, _VRAM+$1000, $0800, HDMACFG_BANK_MAP_TILESET, 1                                                              ; HDMACFG_TILESET_2
+    hdma_config $1800, _VRAM+$800, $0800, HDMACFG_BANK_MAP_TILESET, 1                                                               ; HDMACFG_TILESET_3
+    hdma_config wC000_BgMapTileIds, _SCRN0, $0400, $01, 1                                                                           ; HDMACFG_BGMAP_ATTRIBUTES
+    hdma_config wC000_BgMapTileIds, _SCRN0, $0400, $01, 0                                                                           ; HDMACFG_BGMAP_TILE_IDS
+    hdma_config wC000_BgMapTileIds, _VRAM, $1000, $01, 0                                                                            ; HDMACFG_WRAM_TILES_BANK0
+    hdma_config wC000_BgMapTileIds, _VRAM, $1000, $01, 1                                                                            ; HDMACFG_WRAM_TILES_BANK1
 
 data_00_0b01_SecondaryTilesetPtrs:
 ; One bank $1F secondary tileset per map id, read by
@@ -1800,7 +1805,7 @@ call_00_0b25_VBlank_Handler:
     ld   HL, wDC71_VBlankFrameCounter                  ;; 00:0b5f $21 $71 $dc
     inc  [HL]                                          ;; 00:0b62 $34
     ld   A, [wDE60_CurrentAudioBank]                   ;; 00:0b63 $fa $60 $de
-    add  A, BANK_04_AUDIO_CODE_1                       ;; 00:0b66 $c6 $04
+    add  A, BANK(call_04_4000_Audio_Init)                       ;; 00:0b66 $c6 $04
     call call_00_0f25_SetMbcBank                       ;; 00:0b68 $cd $25 $0f
     call call_04_4009_Audio_Update                     ;; 00:0b6b $cd $09 $40
     ld   A, [wDAD5_CurrentROMBank]                     ;; 00:0b6e $fa $d5 $da
@@ -1856,7 +1861,7 @@ call_00_0b9f_VBlank_UpdateVRAM:
 ; gex2's call_00_0ac1_VBlank_UpdateVRAM has the same "exactly one big write per
 ; frame" rule and the same first case, but a longer priority list after it -
 ; block patches and its two tileset animation systems live there too
-    ld   A, BANK_03_COLLISION_AND_GRAPHICS_CODE        ;; 00:0b9f $3e $03
+    ld   A, BANK(call_03_46e0_BgCollision_Update)        ;; 00:0b9f $3e $03
     call call_00_0f25_SetMbcBank                       ;; 00:0ba1 $cd $25 $0f
     ld   HL, wDC20_BgMapLoadingFlags                   ;; 00:0ba4 $21 $20 $dc
     bit  7, [HL]                                       ;; 00:0ba7 $cb $7e
@@ -2748,7 +2753,7 @@ call_00_0fa2_SetupMusic:
     swap A                                             ;; 00:0fb1 $cb $37
     and  A, $0f                                        ;; 00:0fb3 $e6 $0f
     ld   [wDE60_CurrentAudioBank], A                   ;; 00:0fb5 $ea $60 $de
-    add  A, BANK_04_AUDIO_CODE_1                       ;; 00:0fb8 $c6 $04
+    add  A, BANK(call_04_4000_Audio_Init)                       ;; 00:0fb8 $c6 $04
     call call_00_0eee_SwitchBank                       ;; 00:0fba $cd $ee $0e
     ld   A, [wDE5C_CurrentSong]                        ;; 00:0fbd $fa $5c $de
     and  A, $0f                                        ;; 00:0fc0 $e6 $0f
@@ -2783,7 +2788,7 @@ call_00_0fd7_PlaySFX:
     cp   A, SFX_NONE                                   ;; 00:0fd7 $fe $ff
     ret  Z                                             ;; 00:0fd9 $c8
     push AF                                            ;; 00:0fda $f5
-    ld   A, BANK_04_AUDIO_CODE_1                       ;; 00:0fdb $3e $04
+    ld   A, BANK(call_04_4000_Audio_Init)                       ;; 00:0fdb $3e $04
     call call_00_0eee_SwitchBank                       ;; 00:0fdd $cd $ee $0e
     ld   A, $00                                        ;; 00:0fe0 $3e $00
     call call_04_4024_Audio_PlaySfx                    ;; 00:0fe2 $cd $24 $40

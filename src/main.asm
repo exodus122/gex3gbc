@@ -388,9 +388,15 @@ image_slot_stride_gextreme_sports_elf_00c_6300:
     ; $6f00  36x4 tiles - ENTITY_TUT_TV_SNAKE_FACING_RIGHT, ENTITY_TUT_TV_SNAKE_FACING_LEFT
 image_tut_tv_snake_facing_right_and_1_more_00c_6f00:
     INCBIN ".gfx/entity_sprites/image_tut_tv_snake_facing_right_and_1_more_00c_6f00.bin"
-    ; $7800  17x4 tiles - not reachable from any action
-image_unused_00c_7800:
-    INCBIN ".gfx/entity_sprites/image_unused_00c_7800.bin"
+    ; $7800  15x4 tiles - loaded by HDMA, not by any entity
+image_hud_tiles_00c_7800:
+    INCBIN ".gfx/entity_sprites/image_hud_tiles_00c_7800.bin"
+    ; $7bc0  1x4 tiles - loaded by HDMA, not by any entity
+image_hud_tilemap_00c_7bc0:
+    INCBIN "gfx/entity_sprites/image_hud_tilemap_00c_7bc0.bin"
+    ; $7c00  1x4 tiles - loaded by HDMA, not by any entity
+image_hud_attributes_00c_7c00:
+    INCBIN "gfx/entity_sprites/image_hud_attributes_00c_7c00.bin"
 
 SECTION "bank0d", ROMX[$4000], BANK[$0D]
     ; $4000  27x4 tiles - ENTITY_GREEN_FLY_TV, ENTITY_PURPLE_FLY_TV, ENTITY_UNK_FLY_TV_3, ENTITY_BLUE_FLY_TV, ENTITY_UNK_FLY_TV_5

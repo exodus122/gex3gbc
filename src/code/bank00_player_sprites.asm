@@ -117,7 +117,7 @@ call_00_2ce2_Player_BuildSprites:
     ld   HL, wDC7A_PlayerClimbingOrSwimmingRelated    ;; 00:2cea $21 $7a $dc
     or   A, [HL]                                      ;; 00:2ced $b6
     ld   [wDC53_Player_OamAttributes], A              ;; 00:2cee $ea $53 $dc
-    ld   A, BANK_7F_PLAYER_GFX_INDEX                   ;; 00:2cf1 $3e $7f
+    ld   A, BANK(data_7f_4000_PlayerGfx_SetByMap)                   ;; 00:2cf1 $3e $7f
     call call_00_0eee_SwitchBank                      ;; 00:2cf3 $cd $ee $0e
     ld   HL, wDB6C_CurrentMapId                       ;; 00:2cf6 $21 $6c $db
     ld   E, [HL]                                      ;; 00:2cf9 $5e

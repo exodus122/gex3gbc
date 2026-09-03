@@ -60,6 +60,55 @@ ENDM
 ; One cutscene script header: which map the scene is set in, where Gex is
 ; teleported to, the movement command list to walk (or 0), and the animation
 ; script (always 0 - the runner reads the field and discards it)
+; ------------------------------------------------------------------
+; HDMA jobs - see .data_00_0aa9_HdmaConfigTable
+; ------------------------------------------------------------------
+; One canned HDMA transfer, selected by an HDMACFG_* id. A source bank of
+; HDMACFG_BANK_MAP_TILESET means the source is an offset into the current map's
+; tileset rather than a fixed address, and call_00_0a6a_Hdma_RunConfigEntry adds
+; wDC08_TilesetBankOffset to it on the way past
+MACRO hdma_config ; source, destination, bytes, source bank, destination VRAM bank
+    dw   \1, \2, \3
+    db   \4, \5
+ENDM
+
+; ------------------------------------------------------------------
+; Oversized entity graphics - see .data_00_0973_BigEntityGfx
+; ------------------------------------------------------------------
+; One row of the table StageNextGfxTransfer uses for entities too big for the nine
+; shared ENTITY_GFX_BASE_* size classes. Each gets an array to itself, so the row
+; carries its own stride and its own base.
+;
+; The base is stored one stride BELOW the artwork: the reader adds a stride before
+; it tests the loop counter, so frame 0 lands on the first byte of the sheet
+MACRO entity_gfx_big ; ENTITY_*, image label, OBJs per frame
+    db   \1
+    dw   (\3) * OBJ_BYTES
+    dw   \2 - (\3) * OBJ_BYTES
+ENDM
+
+; ------------------------------------------------------------------
+; Entity animation frame ids - see code/bank02_entity_animation_data.asm
+; ------------------------------------------------------------------
+; A frame id is not a frame number: it is an index into the entity's own array of
+; tiles, and call_00_08f8_StageNextGfxTransfer turns it back into an address as
+;
+;     ENTITY_GFX_BASE_n + sprite_id * n * OBJ_BYTES
+;
+; where n is the entity's size in OBJs. Entities of the same size share one array,
+; so an id counts from the start of that shared array rather than from the entity's
+; own artwork - which is why adding a frame to one entity would renumber every
+; entity after it if these were written as bare numbers.
+;
+; Writing them as an offset from the artwork's own label undoes that: the id is
+; computed back from wherever the sheet ended up, so a sprite bank can be re-laid-out
+; and every id that names it follows.
+MACRO entity_frames ; base image label, OBJs per frame, frame offsets...
+    FOR _i, 3, _NARG + 1
+        db   (\1 - ENTITY_GFX_BASE_\2) / (\2 * OBJ_BYTES) + (\<_i>)
+    ENDR
+ENDM
+
 MACRO cutscene_script  ; map id, start X, start Y, movement list, animation script
     db   \1
     dw   \2, \3, \4, \5
@@ -315,17 +364,29 @@ ENDM
 
 ; One record of data_7f_403d_PlayerGfx_SetTable. Record 0 is written out longhand in
 ; the file, because data_7f_4040_PlayerGfx_SetPalettes labels its third byte
-MACRO player_gfx_set ; base bank, frame directory, OBJ palette block
-    db   \1
+MACRO player_gfx_set ; any frame in the base graphics bank, frame directory, OBJ palettes
+    db   BANK(\1)
     dw   \2
     dw   \3
 ENDM
 
-; One entry of a frame directory, indexed by wD80A_Player_SpriteId. The bank offset is
-; added to the set's base bank, which is why a frame can live several banks past it
-MACRO player_frame ; bank offset from the set's base bank, address within that bank
-    db   \1
-    dw   \2
+; One entry of a frame directory, indexed by wD80A_Player_SpriteId. The stored byte is
+; a bank OFFSET, added to the set's base bank, which is why a frame can live several
+; banks past it - a set's artwork runs over up to five consecutive banks.
+;
+; The offset is worked out from the frame's own bank against PLAYER_GFX_SET_BASE,
+; which each directory sets to its own base before its rows, so moving a frame to
+; another bank renumbers it here automatically
+MACRO player_frame ; the frame
+    db   BANK(\1) - PLAYER_GFX_SET_BASE
+    dw   \1
+ENDM
+
+; The directory's row $00. Not a frame: sprite id 0 means "draw nothing", so the row
+; is a null pointer and has no bank to take an offset from
+MACRO player_frame_none
+    db   $00
+    dw   $0000
 ENDM
 
 ; ------------------------------------------------------------------

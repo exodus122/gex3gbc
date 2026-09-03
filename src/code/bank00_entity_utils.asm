@@ -1365,8 +1365,7 @@ call_00_2804_Entity_GetMaxYBound:
 ; DE = the bottom of this entity's Y patrol span, wDA20_EntityBoundingBoxYMax.
 ;
 ; Larger Y is lower on the screen, so this is the FLOOR - which is why the
-; "move down until you stop" helpers all call this one and not its neighbour. The
-; label used to read YMin, purely because this is the first of the pair in memory.
+; "move down until you stop" helpers all call this one and not its neighbour.
 ;
 ; gex2's call_00_34ba_Entity_GetMaxYBound, which has to scale a block coordinate by
 ; 32 and subtract $10 because gex2 stores the bound as a single byte
@@ -2405,7 +2404,7 @@ call_00_2cbf_Entity_LoadMapPalettes:
 ;
 ; gex2's nearest equivalent is call_0b_5f57_Entity_LoadGBCPalette, which loads one
 ; entity's palette on demand rather than the map's whole set up front
-    ld   A, BANK_7F_PLAYER_GFX_INDEX                   ;; 00:2cbf $3e $7f
+    ld   A, BANK(data_7f_4000_PlayerGfx_SetByMap)                   ;; 00:2cbf $3e $7f
     call call_00_0eee_SwitchBank                      ;; 00:2cc1 $cd $ee $0e
     ld   HL, wDB6C_CurrentMapId                       ;; 00:2cc4 $21 $6c $db
     ld   E, [HL]                                      ;; 00:2cc7 $5e

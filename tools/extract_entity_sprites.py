@@ -90,6 +90,11 @@ ADDR_ACTION_JUMP_TABLE = 0x4000        # data_02_4000_EntityActionJumpTable
 NUM_ENTITIES = 114
 ACTION_ROW_SIZE = 4
 
+ADDR_HDMA_CONFIG_TABLE = 0x0AA9        # .data_00_0aa9_HdmaConfigTable
+HDMA_ENTRY_SIZE = 8
+HDMA_BANK_MAP_TILESET = 0xFF           # not a fixed address - relocated per map
+HDMA_NAMES = ["hud_tiles", "hud_attributes", "hud_tilemap"]
+
 ADDR_SPRITE_DESCRIPTORS = 0x58D2       # data_03_58d2_EntitySpriteDescriptors
 ADDR_SPRITE_SHAPE_TABLE = 0x59EA       # data_03_59ea_SpriteShapeTable
 SPRITE_SHAPES_PER_ENTITY = 4
@@ -165,7 +170,7 @@ def label_and_note(owners, entity_names):
     in which way they face - so the label names the first owner or two and counts
     the rest rather than growing a 90-character filename.
     """
-    owners = sorted(owners)
+    owners = sorted(o for o in owners if isinstance(o, int))
     if not owners:
         return "unused", "not reachable from any action"
     full = [entity_names.get(i, f"entity ${i:02x}") for i in owners]
@@ -274,6 +279,32 @@ def read_shape_columns(rom, shape_id):
     return len(set(first_x.values()))
 
 
+def read_hdma_regions(rom):
+    """The fixed ROM sources of .data_00_0aa9_HdmaConfigTable.
+
+    The status bar's tiles, attributes and tilemap live at the end of bank $0c and
+    are pulled straight into VRAM by HDMA, so no entity ever names them - which is
+    why they would otherwise land in the split as image_unused_*. Entries whose bank
+    is HDMA_BANK_MAP_TILESET are relocated against the current map's tileset and
+    entries sourced from WRAM are not in ROM at all; neither is a region here.
+
+    Returns [(bank, start, end, name, is_tile_data)]. A destination in the tilemap
+    area is one byte per tile rather than 2bpp graphics, so it is written out as a
+    plain .bin instead of a sheet.
+    """
+    out = []
+    for i in range(len(HDMA_NAMES)):
+        base = ADDR_HDMA_CONFIG_TABLE + i * HDMA_ENTRY_SIZE
+        src = rom.word(BANK_HOME, base)
+        dest = rom.word(BANK_HOME, base + 2)
+        length = rom.word(BANK_HOME, base + 4)
+        bank = rom.byte(BANK_HOME, base + 6)
+        if bank in (0x00, HDMA_BANK_MAP_TILESET) or src < ROMX_BASE:
+            continue
+        out.append((bank, src, src + length, HDMA_NAMES[i], dest < 0x9800))
+    return out
+
+
 def read_action_tables(rom):
     """entity id -> [animation block address].
 
@@ -335,9 +366,10 @@ def frame_location(eid, block, sprite_id, descriptors, resolvers, unk20):
 class Chunk:
     """One output file: a byte range of one bank plus how to draw it."""
 
-    def __init__(self, bank, start, end, name, rows, note=""):
+    def __init__(self, bank, start, end, name, rows, note="", is_tiles=True):
         self.bank, self.start, self.end = bank, start, end
         self.name, self.rows, self.note = name, rows, note
+        self.is_tiles = is_tiles          # False: one byte per tile, not 2bpp graphics
 
     @property
     def size(self): return self.end - self.start
@@ -389,6 +421,15 @@ def build_chunks(rom, descriptors, entity_names, resolvers, unk20, tables):
     art_rows = {}                                           # eid -> tile rows per frame
     strays = defaultdict(set)
 
+    # the HDMA-sourced regions own their bytes too, and are named for the transfer
+    named = {}                                              # (bank, start) -> (name, is_tiles)
+    for bank, start, end, name, is_tiles in read_hdma_regions(rom):
+        if bank not in owners:
+            continue
+        named[(bank, start)] = (name, is_tiles)
+        for a in range(start, end):
+            owners[bank][a].add(f"hdma:{name}")
+
     for eid, blocks in tables.items():
         for addr in set(blocks):
             block = read_animation_block(rom, addr)
@@ -424,10 +465,18 @@ def build_chunks(rom, descriptors, entity_names, resolvers, unk20, tables):
                 run = [a, a + 1, who]
                 runs.append(run)
         for start, end, who in runs:
+            tag = next((w for w in who if isinstance(w, str)), None)
+            if tag is not None:
+                name, is_tiles = named[(bank, start)]
+                chunks.append(Chunk(bank, start, end, name,
+                                    generic_rows((end - start) // TILE_SIZE),
+                                    "loaded by HDMA, not by any entity",
+                                    is_tiles=is_tiles))
+                continue
             label, note = label_and_note(who, entity_names)
             tiles = (end - start) // TILE_SIZE
             if who:
-                rows = min(art_rows[e] for e in who)
+                rows = min(art_rows[e] for e in who if isinstance(e, int))
                 if tiles % rows:
                     rows = generic_rows(tiles)
             else:
@@ -512,6 +561,8 @@ def write_chunks(rom, chunks, verify):
         pngpath = os.path.join(OUT_ROOT, c.stem + ".png")
         with open(binpath, "wb") as f:
             f.write(raw)
+        if not c.is_tiles:
+            continue                      # checked in as bytes; there is nothing to draw
         run_rgbgfx(["--reverse", str(c.columns), "--columns", "-o", binpath, pngpath])
         os.remove(binpath)
 
@@ -542,7 +593,9 @@ def write_snippet(chunks):
         for c in sorted(by_bank[bank], key=lambda c: c.start):
             lines.append(f"    ; ${c.start:04x}  {c.columns}x{c.rows} tiles - {c.note}")
             lines.append(f"{c.stem}:")
-            lines.append(f'    INCBIN ".gfx/entity_sprites/{c.stem}.bin"')
+            path = (f'.gfx/entity_sprites/{c.stem}.bin' if c.is_tiles
+                    else f'gfx/entity_sprites/{c.stem}.bin')
+            lines.append(f'    INCBIN "{path}"')
         lines.append("")
 
     os.makedirs(OUT_ROOT, exist_ok=True)

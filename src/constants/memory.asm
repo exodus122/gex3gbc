@@ -280,8 +280,7 @@ wDA1A_CameraPos_Bottom:
 ;
 ; Note the Y pair: larger Y is lower on the screen, so wDA20 - the one the "move
 ; down until you stop" helpers clamp against - is the FLOOR and therefore the
-; maximum. It used to be labelled YMin here purely because it comes first in
-; memory; the ordering is XMax, XMin, YMax, YMin, exactly as in gex2's
+; maximum. The ordering is XMax, XMin, YMax, YMin, exactly as in gex2's
 ; wD309_EntityBoundingBoxXMax..wD30C_EntityBoundingBoxYMin
 wDA1C_EntityBoundingBoxXMax:
     ds 2                                               ;; da1c
@@ -1250,9 +1249,6 @@ wDC88_Player_HopYOffset:
 ; the player sprite macro, call_03_550e_Entity_CheckPlayerInteraction, and both
 ; platform handlers in bank 3. call_03_57e6_ResolveCollision_Reset zeroes it on a
 ; landing, which is what ends the hop.
-;
-; Previously named wDC88_CurrentEntity_UnkVerticalOffset, which had the owner
-; wrong - it belongs to the player, not to the entity being processed.
 ;
 ; gex2 has no equivalent; every gex2 map is a sidescroller
     ds 1                                               ;; dc88

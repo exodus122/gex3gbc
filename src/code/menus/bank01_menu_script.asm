@@ -366,7 +366,7 @@ call_01_45a5_MenuCmd_StageTVScreen:
     add  HL, DE                                       ;; 01:45bd $19
     ld   DE, wDD0A_BgPalettes                         ;; 01:45be $11 $0a $dd
     ld   BC, $20                                      ;; 01:45c1 $01 $20 $00
-    ld   A, BANK_1F_SECONDARY_TILESETS                ;; 01:45c4 $3e $1f
+    ld   A, BANK(image_01f_00)                ;; 01:45c4 $3e $1f
     call call_00_075f_FarMemCopy                      ;; 01:45c6 $cd $5f $07
     ld   A, [wDB6C_CurrentMapId]                      ;; 01:45c9 $fa $6c $db
     ld   DE, data_00_0b01_SecondaryTilesetPtrs        ;; 01:45cc $11 $01 $0b
@@ -381,7 +381,7 @@ call_01_45a5_MenuCmd_StageTVScreen:
     call call_01_4ce5_Menu_GetTileDataSize            ;; 01:45e3 $cd $e5 $4c
     pop  HL                                           ;; 01:45e6 $e1
     ld   DE, $c010                                    ;; 01:45e7 $11 $10 $c0 ; wC000_BgMapTileIds
-    ld   A, BANK_1F_SECONDARY_TILESETS                ;; 01:45ea $3e $1f
+    ld   A, BANK(image_01f_00)                ;; 01:45ea $3e $1f
     jp   call_00_075f_FarMemCopy                      ;; 01:45ec $c3 $5f $07
 ; The mission select screen's whole palette state: CGB_PALETTE_RAM_SIZE bytes of BG
 ; palettes then the same again of OBJ palettes, copied as one $80-byte run starting at
@@ -725,19 +725,19 @@ call_01_47b1_MenuCmd_LoadFullscreenImage:
     dw   .data_01_47d4, .data_01_47dc, .data_01_47e4, .data_01_47ec
     dw   .data_01_47f4, .data_01_47fc, .data_01_4804
 .data_01_47d4: ; MENU_IMAGE_DAVID_A_PALMER
-    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP, $06, $45e0, $4000, $05e0
+    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP,    BANK(image_006_4000), image_006_4000_bgmap_tile_ids, image_006_4000, image_006_4000_bgmap_tile_ids - image_006_4000
 .data_01_47dc: ; MENU_IMAGE_LANGUAGE_SELECT - only $100 bytes, so 16 tiles
-    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP, $06, $48a6, $47a6, $0100
+    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP,    BANK(image_006_47a6), image_006_47a6_bgmap_tile_ids, image_006_47a6, image_006_47a6_bgmap_tile_ids - image_006_47a6
 .data_01_47e4: ; MENU_IMAGE_TITLE_SCREEN - the biggest, and one of two with a full map
-    menu_fullscreen_image MENUIMG_PALETTE_MAP,    $06, $56fe, $4a1e, $0ce0
+    menu_fullscreen_image MENUIMG_PALETTE_MAP,       BANK(image_006_4a1e), image_006_4a1e_bgmap_tile_ids, image_006_4a1e, image_006_4a1e_bgmap_tile_ids - image_006_4a1e
 .data_01_47ec: ; MENU_IMAGE_CRYSTAL_DYNAMICS
-    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP, $06, $6606, $6086, $0580
+    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP,    BANK(image_006_6086), image_006_6086_bgmap_tile_ids, image_006_6086, image_006_6086_bgmap_tile_ids - image_006_6086
 .data_01_47f4: ; MENU_IMAGE_EIDOS_INTERACTIVE
-    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP, $06, $6b66, $67c6, $03a0
+    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP,    BANK(image_006_67c6), image_006_67c6_bgmap_tile_ids, image_006_67c6, image_006_67c6_bgmap_tile_ids - image_006_67c6
 .data_01_47fc: ; MENU_IMAGE_PASSWORD
-    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP, $06, $5ece, $59ce, $0500
+    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP,    BANK(image_006_59ce), image_006_59ce_bgmap_tile_ids, image_006_59ce, image_006_59ce_bgmap_tile_ids - image_006_59ce
 .data_01_4804: ; MENU_IMAGE_UNK1C - $1190 bytes, so it is split across two HDMA passes
-    menu_fullscreen_image MENUIMG_PALETTE_MAP,    $11, $5190, $4000, $1190
+    menu_fullscreen_image MENUIMG_PALETTE_MAP,       BANK(image_11_4000), image_11_4000_bgmap_tile_ids, image_11_4000, image_11_4000_bgmap_tile_ids - image_11_4000
 
 call_01_480c_MenuCmd_SetCollectedCountText:
 ; Sub-handler $EE. Builds a short "n<something>" string: it appends a fixed suffix
@@ -763,9 +763,6 @@ call_01_480c_MenuCmd_SetCollectedCountText:
 
 call_01_4825_MenuCmd_NoOp2:
 ; Sub-handler $EF: another bare `ret`.
-;
-; This label used to claim address $480C, which is the routine above it - two top
-; level labels for one address. It is really at $4825
     ret  
 
 call_01_4826_MenuCmd_DrawRemoteMarker:

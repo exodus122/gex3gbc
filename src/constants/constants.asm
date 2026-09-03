@@ -4,78 +4,6 @@ DEF MBC1RomBank         EQU $2001
 DEF MBC1SRamBank        EQU $4001
 DEF MBC1SRamBankingMode EQU $6001
 
-; ROM Banks
-DEF BANK_00_HOME_CODE         EQU $00
-DEF BANK_01_MENU_CODE         EQU $01
-DEF BANK_02_ENTITY_CODE       EQU $02
-DEF BANK_03_COLLISION_AND_GRAPHICS_CODE EQU $03
-DEF BANK_04_AUDIO_CODE_1      EQU $04
-DEF BANK_05_AUDIO_CODE_2      EQU $05
-DEF Bank06                    EQU $06
-DEF Bank07                    EQU $07
-DEF Bank08                    EQU $08
-DEF Bank09                    EQU $09
-DEF BANK_0A_ENTITY_SPRITES    EQU $0a
-DEF Bank0b                    EQU $0b
-DEF Bank0c                    EQU $0c
-DEF Bank0d                    EQU $0d
-DEF Bank0e                    EQU $0e
-DEF Bank0f                    EQU $0f
-DEF Bank10                    EQU $10
-DEF Bank11                    EQU $11
-DEF BANK_1C_TEXT              EQU $1c
-DEF Bank1d                    EQU $1d
-DEF Bank1e                    EQU $1e
-DEF BANK_1F_SECONDARY_TILESETS EQU $1f
-DEF Bank20                    EQU $20 ; unused
-DEF Bank21_BgPalettesAndCollectibleLists EQU $21 ; bg palette data, and collectible lists for each map
-DEF Bank22_EntitySpawnLists   EQU $22 ; entity spawn lists for each map
-DEF Bank23_CollisionBlocksets EQU $23
-DEF Bank24_BlocksetData       EQU $24
-DEF Bank25_BlocksetData       EQU $25
-DEF Bank26_BlocksetData       EQU $26
-DEF Bank27_BlocksetData       EQU $27
-DEF Bank28_BlocksetData       EQU $28
-DEF Bank2e_ExtendedMapData    EQU $2e
-DEF Bank2f_MapData            EQU $2f ; WesternStation, ChannelZ
-DEF Bank30_MapCollision       EQU $30
-DEF Bank31_ExtendedMapData    EQU $31
-DEF Bank32_MapData            EQU $32 ; MysteryTV, HolidayTV, TutTV, GextremeSports
-DEF Bank33_MapCollision       EQU $33
-DEF Bank34_ExtendedMapData    EQU $34
-DEF Bank35_MapData            EQU $35 ; HolidayTV, MarsupialMadness, WWGexWrestling
-DEF Bank36_MapCollision       EQU $36
-DEF Bank37_ExtendedMapData    EQU $37
-DEF Bank38_MapData            EQU $38 ; AnimeChannel, LizardOfOz
-DEF Bank39_MapCollision       EQU $39
-DEF Bank3a_ExtendedMapData    EQU $3a
-DEF Bank3b_MapData            EQU $3b ; SuperheroShow, GextremeSports
-DEF Bank3c_MapCollision       EQU $3c
-DEF Bank3d_ExtendedMapData    EQU $3d
-DEF Bank3e_MapData            EQU $3e ; GexCave, SuperheroShow
-DEF Bank3f_MapCollision       EQU $3f
-DEF Bank40_Tileset            EQU $40 ; AnimeChannel, MarsupialMadness
-DEF Bank41_Tileset            EQU $41 ; WesternStation, AnimeChannel, LizardOfOz
-DEF Bank42_Tileset            EQU $42 ; WesternStation
-DEF Bank43_Tileset            EQU $43 ; HolidayTV, GextremeSports
-DEF Bank44_Tileset            EQU $44 ; MysteryTV
-DEF Bank45_Tileset            EQU $45 ; HolidayTV, MysteryTV
-DEF Bank46_Tileset            EQU $46 ; TutTV
-DEF Bank47_Tileset            EQU $47 ; TutTV, SuperheroShow
-DEF Bank48_Tileset            EQU $48 ; AnimeChannel
-DEF Bank49_Tileset            EQU $49 ; SuperheroShow
-DEF Bank4a_Tileset            EQU $4a ; TutTV, SuperheroShow
-DEF Bank4b_Tileset            EQU $4b ; WesternStation
-DEF Bank4c_Tileset            EQU $4c ; ChannelZ
-DEF Bank4d_Tileset            EQU $4d ; GexCave, AnimeChannel, GextremeSports
-DEF Bank4e_Tileset            EQU $4e ; GexCave
-DEF Bank4f_Tileset            EQU $4f ; WesternStation, WWGexWrestling, ChannelZ
-
-DEF BANK_7F_PLAYER_GFX_INDEX  EQU $7f ; no graphics of its own: the map -> graphics set
-                                      ; -> frame directory index for banks $62-$7e,
-                                      ; and each set's OBJ palettes. See
-                                      ; data/sprite_data/bank7F.asm
-
 ; Inputs (defined in hardware.inc)
 ; DEF PADF_DOWN   EQU $80
 ; DEF PADF_UP     EQU $40
@@ -417,6 +345,32 @@ DEF WARP_TIME_UP_BIT             EQU 5
 ; call_00_0a6a_Hdma_RunConfigEntry. An entry whose bank byte is
 ; HDMACFG_BANK_MAP_TILESET is relocated against the current map's tileset
 ; ------------------------------------------------------------------
+; ---------------------------------------------------------------------------
+; Where each size of entity artwork starts inside its bank.
+;
+; An entity's frame array is addressed as ENTITY_GFX_BASE_n + sprite_id * n *
+; OBJ_BYTES, where n is the entity's size in 8x16 OBJs - byte +1 of its row in
+; data_03_58d2_EntitySpriteDescriptors. Entities of the same size share one array
+; and are told apart by where in it their frames sit, which is why there is a base
+; per size rather than a base per entity.
+;
+; These are bank-RELATIVE: the same base applies in whichever bank the entity's
+; animation block names, so they cannot be labels. Both halves of the scheme read
+; them - the resolvers in .data_00_0a58_EntityVRAMSourceResolvers build the address
+; with them, and the entity_frames macro turns a sheet's label back into an id with
+; them - so re-laying-out a sprite bank is a matter of changing the base here
+DEF OBJ_BYTES                    EQU $20  ; one 8x16 OBJ is two tiles
+DEF ENTITY_GFX_BIG_ROW_SIZE      EQU 5    ; entity id, stride word, base word
+DEF ENTITY_GFX_BIG_TABLE_END     EQU $FF  ; in the entity id position
+DEF ENTITY_GFX_BASE_1            EQU $4000
+DEF ENTITY_GFX_BASE_2            EQU $4AA0
+DEF ENTITY_GFX_BASE_3            EQU $79E0
+DEF ENTITY_GFX_BASE_4            EQU $4000
+DEF ENTITY_GFX_BASE_5            EQU $7AA0
+DEF ENTITY_GFX_BASE_6            EQU $4000
+DEF ENTITY_GFX_BASE_7            EQU $7AA0
+DEF ENTITY_GFX_BASE_8            EQU $4000
+
 DEF HDMACFG_HUD_TILES            EQU 0  ; status bar tile graphics -> $8000, VRAM bank 1
 DEF HDMACFG_HUD_ATTRIBUTES       EQU 1  ; status bar window attributes -> $9C00, VRAM bank 1
 DEF HDMACFG_HUD_TILEMAP          EQU 2  ; status bar window tile ids -> $9C00, VRAM bank 0
@@ -430,6 +384,7 @@ DEF HDMACFG_WRAM_TILES_BANK0     EQU 9  ; wC000_BgMapTileIds -> $8000, VRAM bank
 DEF HDMACFG_WRAM_TILES_BANK1     EQU 10 ; wC000_BgMapTileIds -> $8000, VRAM bank 1
 DEF HDMACFG_ENTRY_SIZE           EQU 8  ; src, dest, length, then bank and VRAM bank
 DEF HDMACFG_BANK_MAP_TILESET     EQU $ff ; use wDC07_TilesetBank + wDC08_TilesetBankOffset
+DEF HUD_WINDOW_BYTES             EQU $40 ; the status bar is two rows of SCRN_VX_B
 DEF HDMA_MAX_BLOCKS              EQU $40 ; rHDMA5 counts 16-byte blocks, 64 at a time
 
 ; ------------------------------------------------------------------
@@ -1189,7 +1144,7 @@ DEF PASSWORD_GLYPH_BYTES         EQU $40 ; PASSWORD_CELL_TILES * TILE_SIZE_BYTES
 
 ; The two bank $1C text records the code names directly rather than through a menu
 ; script are now labels in data/bank_01c_text.asm - Text_CounterStrings and
-; Text_XOf4RemotesFound. The DEFs that used to hold their raw addresses are gone
+; Text_XOf4RemotesFound.
 
 DEF REMOTE_MARKER_TILE_TAKEN     EQU $e4 ; the 2x2 mission marker on the select screen
 DEF REMOTE_MARKER_TILE_MISSING   EQU $e8

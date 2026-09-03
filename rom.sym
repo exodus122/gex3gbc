@@ -85,6 +85,7 @@
 00:0941 call_00_08f8_StageNextGfxTransfer.jr_00_0941
 00:0951 call_00_08f8_StageNextGfxTransfer.jr_00_0951
 00:096e call_00_08f8_StageNextGfxTransfer.jr_00_096e_RaiseEntityGfxRequest
+00:0973 call_00_08f8_StageNextGfxTransfer.data_00_0973_BigEntityGfx
 00:099c call_00_08f8_StageNextGfxTransfer.jr_00_099c
 00:09c6 call_00_08f8_StageNextGfxTransfer.jr_00_09c6
 00:09db call_00_08f8_StageNextGfxTransfer.jr_00_09db
@@ -3204,7 +3205,9 @@
 0c:5200 image_mystery_tv_safari_sam_00c_5200
 0c:6300 image_slot_stride_gextreme_sports_elf_00c_6300
 0c:6f00 image_tut_tv_snake_facing_right_and_1_more_00c_6f00
-0c:7800 image_unused_00c_7800
+0c:7800 image_hud_tiles_00c_7800
+0c:7bc0 image_hud_tilemap_00c_7bc0
+0c:7c00 image_hud_attributes_00c_7c00
 0d:4000 image_green_fly_tv_purple_fly_tv_and_3_more_00d_4000
 0d:46c0 image_mystery_tv_blood_cooler_00d_46c0
 0d:4a80 image_mystery_tv_ghost_knight_00d_4a80
@@ -3231,8 +3234,8 @@
 11:4000 image_11_4000
 11:5190 image_11_4000_bgmap_tile_ids
 11:52f8 image_11_4000_palette_ids
-1c:4000 Text_TitleGexDeepPocketGecko
 1c:4000 bank_01c_text
+1c:4000 Text_TitleGexDeepPocketGecko
 1c:400a Text_TitleGexDeepPocketGecko_Str
 1c:4022 Text_PublishedByEidos
 1c:402c Text_PublishedByEidos_Str

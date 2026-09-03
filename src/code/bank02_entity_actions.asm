@@ -2590,10 +2590,6 @@ call_02_65d7_EntityAction_AnimeRisingPlatform_Update:
 ; while it is set too; what differs is what their COLLISION handlers do to the
 ; trigger, not what these do with it. call_03_50e0_CollisionHandler_OnSwitch sets
 ; the slot, call_03_50ea_CollisionHandler_OffSwitch clears it.
-;
-; The two "unthrown" labels used to carry the address of the routine above them -
-; the on-switch's was named $659d and the off-switch's $6617 - which is how a
-; disassembly copy-and-paste shows up. They are at $6609 and $6625
 ; ------------------------------------------------------------------
 
 call_02_6609_EntityAction_OnSwitch_Unthrown:
