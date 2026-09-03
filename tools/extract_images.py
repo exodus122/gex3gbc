@@ -117,12 +117,12 @@ def extract_bank_06():
     os.system('mkdir -p banks/bank_'+bank+'/')
     
     # extract menu images
-    names = ["", "_bgmap_tile_ids", "_palette_ids", "", "_bgmap_tile_ids", "_palette_ids", 
-             "", "_bgmap_tile_ids", "_palette_ids", "", "_bgmap_tile_ids", "_palette_ids", 
-             "", "_bgmap_tile_ids", "_palette_ids", "", "_bgmap_tile_ids", "_palette_ids"]
-    names2 = ["", "/bgmap_tile_ids", "/palette_ids", "", "/bgmap_tile_ids", "/palette_ids", 
-              "", "/bgmap_tile_ids", "/palette_ids", "", "/bgmap_tile_ids", "/palette_ids",
-              "", "/bgmap_tile_ids", "/palette_ids", "", "/bgmap_tile_ids", "/palette_ids"]
+    names = ["", "_tilemap", "_palette_ids", "", "_tilemap", "_palette_ids", 
+             "", "_tilemap", "_palette_ids", "", "_tilemap", "_palette_ids", 
+             "", "_tilemap", "_palette_ids", "", "_tilemap", "_palette_ids"]
+    names2 = ["", "/menu_tilemaps", "/palette_ids", "", "/menu_tilemaps", "/palette_ids", 
+              "", "/menu_tilemaps", "/palette_ids", "", "/menu_tilemaps", "/palette_ids",
+              "", "/menu_tilemaps", "/palette_ids", "", "/menu_tilemaps", "/palette_ids"]
     sizes = [0x5e0, 0x168, 0x5e, 0x100, 0x168, 0x10, 0xce0, 0x168, 0x168, 
              0x500, 0x168, 0x50, 0x580, 0x168, 0x58, 0x3a0, 0x168, 0x3a]
     widths = [47, 0, 0, 8, 0, 0, 103, 0, 0, 8, 0, 0, 22, 0, 0, 29, 0, 0]
@@ -157,8 +157,8 @@ def extract_bank_11():
     os.system('mkdir -p banks/bank_'+bank+'/')
     
     # extract menu images
-    names = ["", "_bgmap_tile_ids", "_palette_ids"]
-    names2 = ["", "/bgmap_tile_ids", "/palette_ids"]
+    names = ["", "_tilemap", "_palette_ids"]
+    names2 = ["", "/menu_tilemaps", "/palette_ids"]
     sizes = [0x1190, 0x168, 0x168]
     widths = [281, 0, 0]
     image_flags = [True, False, False]

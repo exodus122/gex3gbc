@@ -251,7 +251,7 @@ call_00_0150_Init:
     ld   BC, DMG_ERROR_TILES_SIZE                      ;; 00:01a9 $01 $00 $0a
     call call_00_076e_MemCopy                          ;; 00:01ac $cd $6e $07
     ld   HL, _SCRN0                                    ;; 00:01af $21 $00 $98
-    ld   DE, image_007_5b00_bgmap_tile_ids             ;; 00:01b2 $11 $00 $65
+    ld   DE, image_007_5b00_tilemap                    ;; 00:01b2 $11 $00 $65
     ld   C, SCRN_Y_B                                   ;; 00:01b5 $0e $12
 .jr_00_01b7:
     ld   B, SCRN_X_B                                   ;; 00:01b7 $06 $14
@@ -1729,7 +1729,7 @@ call_00_0a6a_Hdma_RunConfigEntry:
     hdma_config $1000, _VRAM+$1000, $0800, HDMACFG_BANK_MAP_TILESET, 1                                                              ; HDMACFG_TILESET_2
     hdma_config $1800, _VRAM+$800, $0800, HDMACFG_BANK_MAP_TILESET, 1                                                               ; HDMACFG_TILESET_3
     hdma_config wC000_BgMapTileIds, _SCRN0, $0400, $01, 1                                                                           ; HDMACFG_BGMAP_ATTRIBUTES
-    hdma_config wC000_BgMapTileIds, _SCRN0, $0400, $01, 0                                                                           ; HDMACFG_BGMAP_TILE_IDS
+    hdma_config wC000_BgMapTileIds, _SCRN0, $0400, $01, 0                                                                           ; HDMACFG_MENU_TILEMAP
     hdma_config wC000_BgMapTileIds, _VRAM, $1000, $01, 0                                                                            ; HDMACFG_WRAM_TILES_BANK0
     hdma_config wC000_BgMapTileIds, _VRAM, $1000, $01, 1                                                                            ; HDMACFG_WRAM_TILES_BANK1
 

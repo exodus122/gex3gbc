@@ -379,7 +379,7 @@ DEF HDMACFG_TILESET_1            EQU 4  ; map tileset $0800 -> $8800, VRAM bank 
 DEF HDMACFG_TILESET_2            EQU 5  ; map tileset $1000 -> $9000, VRAM bank 1
 DEF HDMACFG_TILESET_3            EQU 6  ; map tileset $1800 -> $8800, VRAM bank 1
 DEF HDMACFG_BGMAP_ATTRIBUTES     EQU 7  ; wC000_BgMapTileIds -> $9800, VRAM bank 1
-DEF HDMACFG_BGMAP_TILE_IDS       EQU 8  ; wC000_BgMapTileIds -> $9800, VRAM bank 0
+DEF HDMACFG_MENU_TILEMAP         EQU 8  ; wC000_BgMapTileIds -> $9800, VRAM bank 0
 DEF HDMACFG_WRAM_TILES_BANK0     EQU 9  ; wC000_BgMapTileIds -> $8000, VRAM bank 0
 DEF HDMACFG_WRAM_TILES_BANK1     EQU 10 ; wC000_BgMapTileIds -> $8000, VRAM bank 1
 DEF HDMACFG_ENTRY_SIZE           EQU 8  ; src, dest, length, then bank and VRAM bank

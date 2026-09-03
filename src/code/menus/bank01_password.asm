@@ -242,11 +242,11 @@ call_01_4f51_Menu_UploadBgAttrMap:
     jp   call_00_0a6a_Hdma_RunConfigEntry             ;; 01:4f59 $c3 $6a $0a
 
 call_01_4f5c_Menu_UploadBgTileMap:
-; The same for the tile-id plane and HDMACFG_BGMAP_TILE_IDS. Called immediately after
+; The same for the tile-id plane and HDMACFG_MENU_TILEMAP. Called immediately after
 ; the attribute upload, so the two planes reach VRAM one after the other
     ld   DE, wD400_ScreenDraw_TileIds                 ;; 01:4f5c $11 $00 $d4
     call call_01_4f67_Menu_StageScreenPlane           ;; 01:4f5f $cd $67 $4f
-    ld   C, HDMACFG_BGMAP_TILE_IDS                    ;; 01:4f62 $0e $08
+    ld   C, HDMACFG_MENU_TILEMAP                    ;; 01:4f62 $0e $08
     jp   call_00_0a6a_Hdma_RunConfigEntry             ;; 01:4f64 $c3 $6a $0a
 
 call_01_4f67_Menu_StageScreenPlane:

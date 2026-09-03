@@ -61,38 +61,38 @@ INCLUDE "code/audio/bank05_audio2.asm"
 SECTION "bank06", ROMX[$4000], BANK[$06]
 image_006_4000:
     INCBIN ".gfx/menus/image_006_4000.bin"
-image_006_4000_bgmap_tile_ids:
-    INCBIN "gfx/menus/bgmap_tile_ids/image_006_4000_bgmap_tile_ids.bin"
+image_006_4000_tilemap:
+    INCBIN "gfx/menus/menu_tilemaps/image_006_4000_tilemap.bin"
 image_006_4000_palette_ids:
     INCBIN "gfx/menus/palette_ids/image_006_4000_palette_ids.bin"
 image_006_47a6:
     INCBIN ".gfx/menus/image_006_47a6.bin"
-image_006_47a6_bgmap_tile_ids:
-    INCBIN "gfx/menus/bgmap_tile_ids/image_006_47a6_bgmap_tile_ids.bin"
+image_006_47a6_tilemap:
+    INCBIN "gfx/menus/menu_tilemaps/image_006_47a6_tilemap.bin"
 image_006_47a6_palette_ids:
     INCBIN "gfx/menus/palette_ids/image_006_47a6_palette_ids.bin"
 image_006_4a1e:
     INCBIN ".gfx/menus/image_006_4a1e.bin"
-image_006_4a1e_bgmap_tile_ids:
-    INCBIN "gfx/menus/bgmap_tile_ids/image_006_4a1e_bgmap_tile_ids.bin"
+image_006_4a1e_tilemap:
+    INCBIN "gfx/menus/menu_tilemaps/image_006_4a1e_tilemap.bin"
 image_006_4a1e_palette_ids:
     INCBIN "gfx/menus/palette_ids/image_006_4a1e_palette_ids.bin"
 image_006_59ce:
     INCBIN ".gfx/menus/image_006_59ce.bin"
-image_006_59ce_bgmap_tile_ids:
-    INCBIN "gfx/menus/bgmap_tile_ids/image_006_59ce_bgmap_tile_ids.bin"
+image_006_59ce_tilemap:
+    INCBIN "gfx/menus/menu_tilemaps/image_006_59ce_tilemap.bin"
 image_006_59ce_palette_ids:
     INCBIN "gfx/menus/palette_ids/image_006_59ce_palette_ids.bin"
 image_006_6086:
     INCBIN ".gfx/menus/image_006_6086.bin"
-image_006_6086_bgmap_tile_ids:
-    INCBIN "gfx/menus/bgmap_tile_ids/image_006_6086_bgmap_tile_ids.bin"
+image_006_6086_tilemap:
+    INCBIN "gfx/menus/menu_tilemaps/image_006_6086_tilemap.bin"
 image_006_6086_palette_ids:
     INCBIN "gfx/menus/palette_ids/image_006_6086_palette_ids.bin"
 image_006_67c6:
     INCBIN ".gfx/menus/image_006_67c6.bin"
-image_006_67c6_bgmap_tile_ids:
-    INCBIN "gfx/menus/bgmap_tile_ids/image_006_67c6_bgmap_tile_ids.bin"
+image_006_67c6_tilemap:
+    INCBIN "gfx/menus/menu_tilemaps/image_006_67c6_tilemap.bin"
 image_006_67c6_palette_ids:
     INCBIN "gfx/menus/palette_ids/image_006_67c6_palette_ids.bin"
 
@@ -109,8 +109,8 @@ image_superhero_show_mad_bomber_007_58c0:
 
 image_007_5b00:
     INCBIN ".gfx/menus/image_007_5b00.bin"
-image_007_5b00_bgmap_tile_ids:
-    INCBIN "gfx/menus/bgmap_tile_ids/image_007_5b00_bgmap_tile_ids.bin"
+image_007_5b00_tilemap:
+    INCBIN "gfx/menus/menu_tilemaps/image_007_5b00_tilemap.bin"
 
 SECTION "bank08", ROMX[$4000], BANK[$08]
     ; $4000  116x6 tiles - ENTITY_ANIME_CHANNEL_BIG_SILVER_ROBOT
@@ -478,8 +478,8 @@ image_ww_gex_wrestling_rock_hard_010_4000:
 SECTION "bank11", ROMX[$4000], BANK[$11]
 image_11_4000:
     INCBIN ".gfx/menus/image_011_4000.bin"
-image_11_4000_bgmap_tile_ids:
-    INCBIN "gfx/menus/bgmap_tile_ids/image_011_4000_bgmap_tile_ids.bin"
+image_11_4000_tilemap:
+    INCBIN "gfx/menus/menu_tilemaps/image_011_4000_tilemap.bin"
 image_11_4000_palette_ids:
     INCBIN "gfx/menus/palette_ids/image_011_4000_palette_ids.bin"
 

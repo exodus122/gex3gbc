@@ -725,19 +725,19 @@ call_01_47b1_MenuCmd_LoadFullscreenImage:
     dw   .data_01_47d4, .data_01_47dc, .data_01_47e4, .data_01_47ec
     dw   .data_01_47f4, .data_01_47fc, .data_01_4804
 .data_01_47d4: ; MENU_IMAGE_DAVID_A_PALMER
-    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP,    BANK(image_006_4000), image_006_4000_bgmap_tile_ids, image_006_4000, image_006_4000_bgmap_tile_ids - image_006_4000
+    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP,    BANK(image_006_4000), image_006_4000_tilemap, image_006_4000, image_006_4000_tilemap - image_006_4000
 .data_01_47dc: ; MENU_IMAGE_LANGUAGE_SELECT - only $100 bytes, so 16 tiles
-    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP,    BANK(image_006_47a6), image_006_47a6_bgmap_tile_ids, image_006_47a6, image_006_47a6_bgmap_tile_ids - image_006_47a6
+    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP,    BANK(image_006_47a6), image_006_47a6_tilemap, image_006_47a6, image_006_47a6_tilemap - image_006_47a6
 .data_01_47e4: ; MENU_IMAGE_TITLE_SCREEN - the biggest, and one of two with a full map
-    menu_fullscreen_image MENUIMG_PALETTE_MAP,       BANK(image_006_4a1e), image_006_4a1e_bgmap_tile_ids, image_006_4a1e, image_006_4a1e_bgmap_tile_ids - image_006_4a1e
+    menu_fullscreen_image MENUIMG_PALETTE_MAP,       BANK(image_006_4a1e), image_006_4a1e_tilemap, image_006_4a1e, image_006_4a1e_tilemap - image_006_4a1e
 .data_01_47ec: ; MENU_IMAGE_CRYSTAL_DYNAMICS
-    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP,    BANK(image_006_6086), image_006_6086_bgmap_tile_ids, image_006_6086, image_006_6086_bgmap_tile_ids - image_006_6086
+    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP,    BANK(image_006_6086), image_006_6086_tilemap, image_006_6086, image_006_6086_tilemap - image_006_6086
 .data_01_47f4: ; MENU_IMAGE_EIDOS_INTERACTIVE
-    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP,    BANK(image_006_67c6), image_006_67c6_bgmap_tile_ids, image_006_67c6, image_006_67c6_bgmap_tile_ids - image_006_67c6
+    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP,    BANK(image_006_67c6), image_006_67c6_tilemap, image_006_67c6, image_006_67c6_tilemap - image_006_67c6
 .data_01_47fc: ; MENU_IMAGE_PASSWORD
-    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP,    BANK(image_006_59ce), image_006_59ce_bgmap_tile_ids, image_006_59ce, image_006_59ce_bgmap_tile_ids - image_006_59ce
+    menu_fullscreen_image MENUIMG_PALETTE_LOOKUP,    BANK(image_006_59ce), image_006_59ce_tilemap, image_006_59ce, image_006_59ce_tilemap - image_006_59ce
 .data_01_4804: ; MENU_IMAGE_UNK1C - $1190 bytes, so it is split across two HDMA passes
-    menu_fullscreen_image MENUIMG_PALETTE_MAP,       BANK(image_11_4000), image_11_4000_bgmap_tile_ids, image_11_4000, image_11_4000_bgmap_tile_ids - image_11_4000
+    menu_fullscreen_image MENUIMG_PALETTE_MAP,       BANK(image_11_4000), image_11_4000_tilemap, image_11_4000, image_11_4000_tilemap - image_11_4000
 
 call_01_480c_MenuCmd_SetCollectedCountText:
 ; Sub-handler $EE. Builds a short "n<something>" string: it appends a fixed suffix
