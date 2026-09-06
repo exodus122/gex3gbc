@@ -1277,14 +1277,14 @@ wDC8A_MapEdgeTouched:
     ds 1                                               ;; dc8a
 
 wDC8B_BgCollision_WallProbeLookahead:
-; @bug Written once a frame by call_03_4708_BgCollision_SidescrollerHandler and never
-; read. The `ld hl,wDC8B_BgCollision_WallProbeLookahead` in that routine is a dead
-; load - HL is overwritten two instructions later without being dereferenced, because
-; the `sub a,[hl]` gex2 has at the same point is missing here. So the description
-; below is what was intended, not what happens: the wall probe starts at a fixed
-; offset and does not scale with the Y velocity at all.
-; How far above his head the wall probe starts, derived from the Y velocity so
-; that a wall is caught on the frame he would enter it rather than after
+; A wall-probe offset derived from the Y velocity, intended to start the probe
+; further above Gex's head the faster he is falling.
+;
+; @bug Write-only. call_03_4708_BgCollision_SidescrollerHandler stores it once a frame
+; and nothing reads it back: the `ld hl,wDC8B_BgCollision_WallProbeLookahead` in that
+; routine is a dead load, since HL is overwritten two instructions later without being
+; dereferenced - the `sub a,[hl]` gex2 has at the same point is missing here. The wall
+; probe therefore starts at a fixed offset and does not scale with the fall speed.
     ds 1                                               ;; dc8b
 
 wDC8C_PlayerYVelocity: ; can freeze to levitate

@@ -1094,16 +1094,9 @@ call_03_51b8_CollisionHandler_SailorToonGirl:
 ;   action $02  the finish: raise her trigger, blank the collision type, reset the
 ;               facing, start a burst and send her to action $07
 ;
-; ENTITY_FACING_RIGHT is passed to Entity_SetCollisionType as well as to
-; Entity_SetFacingDirection - the two constants happen to share the value $00, so
-; the first call is really "make her harmless"
+; The finish blanks her collision type before anything else, which is what makes
+; the body harmless while the burst plays
 ;
-; @bug - wrong constant family. `ld c,ENTITY_FACING_RIGHT` is loaded as the
-; argument to call_00_288c_Entity_SetCollisionType, which wants a COLLISION_TYPE_*
-; value. It only does the right thing because ENTITY_FACING_RIGHT and
-; COLLISION_TYPE_NONE are both $00; the intent is "make her harmless", so the
-; constant should be COLLISION_TYPE_NONE. (The second `ld c,ENTITY_FACING_RIGHT`,
-; feeding Entity_SetFacingDirection, is correct.)
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
@@ -1121,7 +1114,7 @@ call_03_51b8_CollisionHandler_SailorToonGirl:
     ret  
 .jr_00_51E3:
     call call_00_22ef_Entity_SetTriggerActive
-    ld   c,ENTITY_FACING_RIGHT
+    ld   c,COLLISION_TYPE_NONE
     call call_00_288c_Entity_SetCollisionType
     ld   c,ENTITY_FACING_RIGHT
     call call_00_2958_Entity_SetFacingDirection
@@ -1710,11 +1703,6 @@ call_03_550e_Entity_CheckPlayerInteraction:
 ; instructions, at the cost of the operand reading one higher than the value
 ; actually returned
 ;
-; @bug - `ld [HL],$2a` writes a raw literal into wDC8C_PlayerYVelocity as the
-; stomp rebound, where constants.asm already defines the family
-; PLAYER_HIT_BOUNCE_VELOCITY ($1C) and PLAYER_UNK19_BOUNCE_VELOCITY ($30). The
-; stomp bounce has no name of its own, so the one velocity the player feels most
-; often is the one that cannot be found by searching for a constant.
     LOAD_OBJ_FIELD_TO_BC ENTITY_FIELD_COOLDOWN_TIMER
     ld   A, [BC]                                       ;; 03:5516 $0a
     and  A, A                                          ;; 03:5517 $a7
@@ -1847,7 +1835,7 @@ call_03_550e_Entity_CheckPlayerInteraction:
     ld   HL, wDC8C_PlayerYVelocity                                     ;; 03:55e5 $21 $8c $dc
     bit  7, [HL]                                       ;; 03:55e8 $cb $7e
     jr   Z, .jr_03_55f3                                ;; 03:55ea $28 $07
-    ld   [HL], $2a                                     ;; 03:55ec $36 $2a
+    ld   [HL], PLAYER_STOMP_BOUNCE_VELOCITY            ;; 03:55ec $36 $2a
     ld   A, $ff                                        ;; 03:55ee $3e $ff
     add  A, $03                                        ;; 03:55f0 $c6 $03
     ret                                                ;; 03:55f2 $c9

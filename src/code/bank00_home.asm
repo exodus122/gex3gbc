@@ -1158,18 +1158,8 @@ jp_00_0781_Screen_LoadFullscreenImage:
 ; graphics side but generates its tilemap rather than storing one, and reads its
 ; GBC attributes as a plain 20x18 block with no lookup form
 ;
-; @bug - the two halves of one 16-bit subtraction are written inconsistently. The
-; size in BC is compared against SCREEN_TILE_CHUNK_BYTES as
-;     ld   A, C
-;     sub  A, $00                       ; should be LOW(SCREEN_TILE_CHUNK_BYTES)
-;     ld   E, A
-;     ld   A, B
-;     sbc  A, HIGH(SCREEN_TILE_CHUNK_BYTES)
-; - a raw literal on the low byte and a HIGH() expression on the high byte. It is
-; correct today only because SCREEN_TILE_CHUNK_BYTES is $1000 and its low byte
-; happens to be zero; give the constant any value that is not a multiple of $100
-; and the low half of the compare silently stops subtracting while the high half
-; still does, so the chunking loop misjudges when a second pass is needed.
+; The size in BC is compared against SCREEN_TILE_CHUNK_BYTES as a 16-bit sub/sbc
+; pair; a blob larger than one chunk is uploaded in two passes.
     ld   A, [wDBB2_ScreenDraw_Bank]                    ;; 00:0781 $fa $b2 $db
     call call_00_0eee_SwitchBank                       ;; 00:0784 $cd $ee $0e
     ld   HL, wDBB7_ScreenDraw_TileDataSize             ;; 00:0787 $21 $b7 $db
@@ -1181,7 +1171,7 @@ jp_00_0781_Screen_LoadFullscreenImage:
     ld   H, [HL]                                       ;; 00:0791 $66
     ld   L, A                                          ;; 00:0792 $6f
     ld   A, C                                          ;; 00:0793 $79
-    sub  A, $00                                        ;; 00:0794 $d6 $00
+    sub  A, LOW(SCREEN_TILE_CHUNK_BYTES)               ;; 00:0794 $d6 $00
     ld   E, A                                          ;; 00:0796 $5f
     ld   A, B                                          ;; 00:0797 $78
     sbc  A, HIGH(SCREEN_TILE_CHUNK_BYTES)              ;; 00:0798 $de $10
@@ -1330,17 +1320,11 @@ call_00_0865_Text_AppendStringToBuffer:
 ; Same source, different destination: appends string wDBF8_TextStringIndex of the
 ; pointer table at DE onto whatever is already in wDADD_MenuTextBuffer.
 ;
-; It finds the end of the existing text by scanning forward for a byte of $80
-; starting at wDADC_WindowY + 1 - which is wDADD_MenuTextBuffer, reached that way
-; because the address is one past a label the assembler already had - and then
-; copies until it has written the new string's own $80
+; It finds the end of the existing text by scanning forward from the start of
+; wDADD_MenuTextBuffer for a byte of $80, then copies until it has written the new
+; string's own $80. DE is loaded one short of the buffer because the scan loop opens
+; with `inc de`
 ;
-; @bug - the destination is reached as `ld de,wDADC_WindowY` followed by
-; `inc de` inside the scan loop, rather than as `ld de,wDADD_MenuTextBuffer - 1`
-; or an explicit load of the buffer symbol. The routine is really scanning
-; wDADD_MenuTextBuffer, and it only works because wDADC_WindowY happens to sit
-; immediately before it. Inserting or reordering anything between those two
-; symbols in memory.asm silently retargets the append.
     push de
     ld   a,BANK(bank1c_text)
     call call_00_0eee_SwitchBank
@@ -1353,7 +1337,7 @@ call_00_0865_Text_AppendStringToBuffer:
     ldi  a,[hl]
     ld   h,[hl]
     ld   l,a
-    ld   de,wDADC_WindowY
+    ld   de,wDADD_MenuTextBuffer - 1
 .jr_00_087A:
     inc  de
     ld   a,[de]

@@ -567,8 +567,8 @@ call_01_470c_MenuCmd_SetCounterText:
     jp   call_01_4cfa_Menu_SetScriptSrcPtr            ;; 01:471f $c3 $fa $4c
 
 call_01_4722_MenuCmd_GetCounterValue:
-; Returns one of twelve numbers in A, chosen by wDBA7_MenuCmd_SrcPtr. This is a
-; ROUTINE with an embedded table, not a table - the old name read like a data label.
+; Returns one of twelve numbers in A, chosen by wDBA7_MenuCmd_SrcPtr. It is a routine
+; with an embedded table rather than a plain data table.
 ;
 ; The interesting half is that most of the entries are popcounts over
 ; wDC5C_ProgressFlags rather than stored totals: the game does not keep a "missions
@@ -662,7 +662,7 @@ call_01_477c_MenuCmd_StagePasswordGlyph:
 ; PASSWORD_GLYPH_BYTES, so the whole grid can be staged by one script running this
 ; command eighteen times - which is exactly what data_01_5a47_MenuScript_PasswordGrid does.
 ;
-; It draws no number and writes no sprite; the old name was wrong on both. gex2's
+; It draws no number and writes no sprite - it only stages glyph bytes. gex2's
 ; call_01_48fd_MenuCmd_SetPasswordCharText does the same job by pushing one character
 ; through the text renderer instead
     ld   HL, wDBA7_MenuCmd_SrcPtr                     ;; 01:477c $21 $a7 $db

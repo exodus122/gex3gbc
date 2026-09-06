@@ -150,8 +150,7 @@ call_03_7685_VRAM_WriteColumn32Bytes:
 ; beyond as it descends - unlike the row copy, which is pinned to one page. The
 ; tilemap is only $400 bytes so thirty-two rows of $20 land exactly inside it.
 ;
-; The label used to say 16; it copies thirty-two bytes, one for each row of the
-; virtual screen
+; It copies thirty-two bytes, one for each row of the virtual screen
     ld   BC, BGMAP_ROW_STRIDE
     REPT BGMAP_COLUMN_TILES - 1
     ld   A, [DE]

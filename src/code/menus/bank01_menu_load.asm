@@ -557,8 +557,7 @@ call_01_432b_MenuLoad_MissionSelect:
 ; wDC59_NumRemotesOnMissionSelectMenu set to match. Returns immediately in Gex Cave,
 ; which has no missions.
 ;
-; It touches no palette - the old name was wrong. gex2's
-; call_01_4297_MenuLoad_MissionSelect
+; It touches no palette. gex2's counterpart is call_01_4297_MenuLoad_MissionSelect
     ld   A, [wDB6C_CurrentMapId]                      ;; 01:432b $fa $6c $db
     and  A, A                                         ;; 01:432e $a7
     ret  Z                                            ;; 01:432f $c8
@@ -598,8 +597,8 @@ call_01_435e_MenuLoad_AfterLevel:
 ;   the two boss levels          MENU_WELL_DONE
 ;   anything past those          the end credits
 ;
-; So despite the old name, most of this routine is menu dispatch. gex2's
-; call_01_42bd_HandleTVWarp covers the same ground
+; So most of this routine is menu dispatch. gex2's call_01_42bd_HandleTVWarp covers
+; the same ground
     ld   HL, wDB6A_WarpFlags                          ;; 01:435e $21 $6a $db
     res  4, [HL]                                      ;; 01:4361 $cb $a6
     ld   A, [wDC1E_CurrentLevelID]                    ;; 01:4363 $fa $1e $dc

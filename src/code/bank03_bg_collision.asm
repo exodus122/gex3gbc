@@ -139,10 +139,10 @@ call_03_4708_BgCollision_SidescrollerHandler:
 ;      slope-specific code. A nonzero count also counts as grounded.
 ;   3. FLOOR and CEILING, at .jp_03_47f6.
 ;
-; The vertical lookahead is computed once up front: Y velocity minus 2, clamped
-; so a fast fall does not probe absurdly far, then >> 4 into
-; wDC8B_BgCollision_WallProbeLookahead. Wall probing starts that far above his
-; head, so a wall is caught on the frame he would enter it rather than after
+; A vertical lookahead is computed once up front - Y velocity minus 2, clamped so a
+; fast fall does not probe absurdly far, then >> 4 into
+; wDC8B_BgCollision_WallProbeLookahead - but see below: it never reaches the probe,
+; which always starts at a fixed (Y - 9) & $F8.
 ;
 ; @bug (original game) The wall-probe lookahead is computed every frame and never
 ; applied. The block at .jr_03_471c derives it from the Y velocity and stores it in
@@ -151,10 +151,9 @@ call_03_4708_BgCollision_SidescrollerHandler:
 ; is a DEAD LOAD: HL is never dereferenced, because the next three instructions are
 ; `and a,$f8 / ld l,a / ld h,...`, overwriting both halves. gex2's
 ; call_03_4915_BgCollision_SidescrollerHandler has `sub a,[hl]` between the load and
-; the mask; here that instruction is simply missing. The probe therefore always
-; starts at a fixed (Y - 9) & $F8 instead of scaling with fall speed, so the claim in
-; this header - and at wDC8B in constants/memory.asm - that a wall is caught on the
-; frame he would enter it is not what the code does.
+; the mask; here that instruction is simply missing. So the probe does not scale with
+; fall speed, and a wall entered at high speed is caught a frame late rather than on
+; the frame he would enter it.
 ;
 ; @bug (original game) The wall push-out is computed and then thrown away, exactly as
 ; in gex2. On a TILECOLL_SOLID hit the code works out how far Gex must be nudged to

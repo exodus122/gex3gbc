@@ -468,12 +468,9 @@ call_00_11e5_BgMap_LoadRowForVerticalScroll:
 ; registered block patches to the strip before expanding it, and expands each
 ; block into 8 tiles instead of 2 because its blocks are 32x32
 ;
-; @bug - `ld HL, rIE` is being used purely for its numeric value $FFFF, i.e. -1,
-; to name the row above the screen. rIE is the interrupt-enable register and has
-; nothing to do with a tile row; the constant that is meant here is -1 (or a named
-; map-edge constant). The same substitution is made in
-; call_00_1351_BgMap_LoadColumnForHorizontalScroll for the column left of the
-; screen.
+; The row index starts at -1, the row above the screen, so the first pass of the
+; loop lands on row 0. call_00_1351_BgMap_LoadColumnForHorizontalScroll does the
+; same for the column left of the screen.
     ld   HL, wDBFB_YPositionInMap                                     ;; 00:11e5 $21 $fb $db
     ld   A, [HL+]                                      ;; 00:11e8 $2a
     ld   C, A                                          ;; 00:11e9 $4f
@@ -483,7 +480,7 @@ call_00_11e5_BgMap_LoadRowForVerticalScroll:
     ld   A, [wDC20_BgMapLoadingFlags]                                    ;; 00:11ef $fa $20 $dc
     and  A, MAP_SCROLL_DOWN                              ;; 00:11f2 $e6 $02
     jr   NZ, .jr_00_11f9                               ;; 00:11f4 $20 $03
-    ld   HL, rIE                                       ;; 00:11f6 $21 $ff $ff        ; = -1, the row above the screen
+    ld   HL, -1                                        ;; 00:11f6 $21 $ff $ff        ; = -1, the row above the screen
 .jr_00_11f9:
     add  HL, BC                                        ;; 00:11f9 $09
     ld   C, L                                          ;; 00:11fa $4d
@@ -748,9 +745,8 @@ call_00_1351_BgMap_LoadColumnForHorizontalScroll:
 ; gex2's counterpart is call_00_157a_BgMap_LoadColumnForHorizontalScroll, which
 ; steps a fixed $80 bytes per row because its maps are all 128 blocks wide
 ;
-; @bug - see call_00_11e5_BgMap_LoadRowForVerticalScroll. `ld HL, rIE` is the
-; literal $FFFF = -1 for the column left of the screen, not a hardware register
-; reference.
+; The column index starts at -1, the column left of the screen - see
+; call_00_11e5_BgMap_LoadRowForVerticalScroll.
     ld   HL, wDBF9_XPositionInMap                                     ;; 00:1351 $21 $f9 $db
     ld   A, [HL+]                                      ;; 00:1354 $2a
     ld   E, A                                          ;; 00:1355 $5f
@@ -760,7 +756,7 @@ call_00_1351_BgMap_LoadColumnForHorizontalScroll:
     ld   A, [wDC20_BgMapLoadingFlags]                                    ;; 00:135b $fa $20 $dc
     and  A, MAP_SCROLL_RIGHT                            ;; 00:135e $e6 $08
     jr   NZ, .jr_00_1365                               ;; 00:1360 $20 $03
-    ld   HL, rIE                                       ;; 00:1362 $21 $ff $ff        ; = -1, the column left of the screen
+    ld   HL, -1                                        ;; 00:1362 $21 $ff $ff        ; = -1, the column left of the screen
 .jr_00_1365:
     add  HL, DE                                        ;; 00:1365 $19
     ld   E, L                                          ;; 00:1366 $5d
@@ -1722,11 +1718,9 @@ call_00_1bbc_CheckForDoorAndEnter:
 ; wDC69_PlayerSpawnIdInLevel, bit 2 of wDB6A_WarpFlags, and
 ; call_00_1633_Map_LoadWarpDestination finishes the job
 ;
-; @bug - the door X window is built from a raw `add A,$08` even though the very
-; next instruction compares against `MAP_DOOR_X_TOLERANCE * 2`. The $08 IS
-; MAP_DOOR_X_TOLERANCE, so the two halves of one test are written with a named
-; constant on one side and a literal on the other - changing the constant widens
-; the compare without moving the centre, and the window stops being symmetric.
+; The X test is a signed "within tolerance" window: the difference is biased by
+; MAP_DOOR_X_TOLERANCE and then compared against twice it, so the player matches a
+; door anywhere in +/- MAP_DOOR_X_TOLERANCE of its block.
     ld   A, [wDC1E_CurrentLevelID]                                    ;; 00:1bbc $fa $1e $dc
     cp   A, LEVEL_ANIME_CHANNEL                                        ;; 00:1bbf $fe $05
     ret  Z                                             ;; 00:1bc1 $c8
@@ -1774,7 +1768,7 @@ call_00_1bbc_CheckForDoorAndEnter:
     sbc  A, D                                          ;; 00:1c00 $9a
     ld   D, A                                          ;; 00:1c01 $57
     ld   A, E                                          ;; 00:1c02 $7b
-    add  A, $08                                        ;; 00:1c03 $c6 $08
+    add  A, MAP_DOOR_X_TOLERANCE                       ;; 00:1c03 $c6 $08
     ld   E, A                                          ;; 00:1c05 $5f
     ld   A, D                                          ;; 00:1c06 $7a
     adc  A, $00                                        ;; 00:1c07 $ce $00

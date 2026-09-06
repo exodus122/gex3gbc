@@ -1621,6 +1621,7 @@ DEF PLAYER_MAX_FALL_VELOCITY              EQU $C0 ; -$40 as a signed byte
 ; its own for everything else
 DEF PLAYER_JUMP_VELOCITY                  EQU $2A ; same value as gex2
 DEF PLAYER_DOUBLE_JUMP_VELOCITY           EQU $3E ; gex2 uses $36
+DEF PLAYER_STOMP_BOUNCE_VELOCITY          EQU $2A ; the rebound off a stomped enemy; same value as a jump
 DEF PLAYER_HIT_BOUNCE_VELOCITY            EQU $1C ; the recoil from taking a hit
 DEF PLAYER_UNK19_BOUNCE_VELOCITY          EQU $30 ; PLAYERACTION_UNK19, which also costs a hit
 DEF PLAYER_KANGAROO_HOP_VELOCITY          EQU $1E

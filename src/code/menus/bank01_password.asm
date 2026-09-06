@@ -460,9 +460,9 @@ call_01_505a_Password_DecodeAndApply:
 ; of the encoder - the same two mask walks, gathering cell bits back into the payload.
 ; Then recompute the checksum and compare.
 ;
-; On success it calls call_01_50b5_Password_ApplyPayload, so despite the old name this
-; routine COMMITS: by the time it returns PASSWORD_VALID the save state has already
-; been overwritten. gex2's call_01_5271_Password_DecodeAndApply is the same
+; On success it calls call_01_50b5_Password_ApplyPayload, so this routine COMMITS: by
+; the time it returns PASSWORD_VALID the save state has already been overwritten.
+; gex2's call_01_5271_Password_DecodeAndApply is the same
     ld   HL, wDB7E_PasswordValues                     ;; 01:505a $21 $7e $db
     ld   B, PASSWORD_CELL_COUNT                       ;; 01:505d $06 $12
 .jr_01_505f:

@@ -288,17 +288,15 @@ call_02_4e7a_Player_LookupSnowboardSprite:
 ; .data_02_4ea3_SnowboardSprites the rest of the time; note the `- 2` on the second,
 ; which pre-compensates for the `inc hl / inc hl` at the top of the loop
 ;
-; @bug .data_02_4ea3_SnowboardSprites is two bytes shorter than the records it is
-; scanned for, and borrows them from the label below. Its rows are 3 bytes (tile id,
-; sprite facing right, sprite facing left) and it holds 11 of them plus a terminator -
-; 34 bytes - but only 32 are emitted under the label. The 11th row's third byte and the
-; $FF that stops the scan are the FIRST TWO BYTES of
-; .data_02_4ec3_TailSpinSprites ($07 and $ff), which the tail-spin path skips over via
-; the `inc hl / inc hl` it enters the loop with. The ROM is right either way, but the
-; label is placed two bytes early: the two tables cannot be moved or resized
-; independently, which is the one thing the README says the source guarantees. Placing
-; .data_02_4ec3_TailSpinSprites two bytes later and dropping its `ld hl` compensation
-; would make each table self-contained.
+; The two sprite tables OVERLAP by two bytes, so they cannot be moved or resized
+; independently. Rows are 3 bytes (tile id, sprite facing right, sprite facing left);
+; .data_02_4ea3_SnowboardSprites holds 11 of them plus a terminator, which is 34
+; bytes, but only 32 are emitted under its own label - the 11th row's third byte and
+; the $FF that stops the scan are the first two bytes of .data_02_4ec3_TailSpinSprites
+; ($07 and $ff). The tail-spin path steps over them with the `inc hl / inc hl` it
+; enters the loop with, and the snowboard path compensates with the `-2` on its `ld
+; hl`. Splitting them would mean moving .data_02_4ec3_TailSpinSprites two bytes later
+; and dropping that compensation.
     ld   d,$00
     ld   hl,.data_02_4ec3_TailSpinSprites
     ld   a,[wD801_Player_ActionId]

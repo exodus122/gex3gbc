@@ -78,8 +78,8 @@ call_01_4af9_IsLevelBonusCoinTaken:
 
 call_01_4b0a_CountHighBitsForLevel:
 ; Counts the top three bits - 7, 6 and 5 - of the current level's progress byte. The
-; loop rotates LEFT, so despite the old name it is the high bits, not the low ones,
-; and it does not overlap with call_01_4acf_CountCollectedBitsForLevel above
+; loop rotates LEFT, which is what makes it the high bits, so it does not overlap with
+; call_01_4acf_CountCollectedBitsForLevel above
     ld   HL, wDC1E_CurrentLevelID                     ;; 01:4b0a $21 $1e $dc
     ld   L, [HL]                                      ;; 01:4b0d $6e
     ld   H, $00                                       ;; 01:4b0e $26 $00
@@ -183,8 +183,9 @@ call_01_4b6b_Menu_TickHideSprites:
 ; Pressing anything forces the countdown to its last frame, so a "press B to continue"
 ; prompt disappears the moment the player does.
 ;
-; It streams no tile data; the old name was wrong. gex2 splits the same work between
-; call_01_4d25_Menu_TickHideSprites and call_01_4d3b_Menu_EraseSpriteGroup
+; It streams no tile data - it only ticks the countdown and blanks shadow OAM. gex2
+; splits the same work between call_01_4d25_Menu_TickHideSprites and
+; call_01_4d3b_Menu_EraseSpriteGroup
 ;
 ; @bug (original game) The erase loop HALVES the row count where the draw does not,
 ; and on a one-row group that underflows into a 256-iteration run. The record's height
@@ -269,8 +270,8 @@ call_01_4bb8_Menu_DrawCursor:
 ; wDBC7_Menu_CursorSpriteId is MENU_CURSOR_NONE.
 ;
 ; The position is the menu record's cursor base plus its step times the selected row
-; and column - both computed by repeated addition, which is a multiply, not the
-; interpolation the old name suggested. The record built once by
+; and column - both computed by repeated addition, which is a multiply. The record
+; built once by
 ; call_01_46d4_MenuCmd_DrawCursorSprite is then run through
 ; call_01_4c45_Menu_BuildSpriteBlock like any other sprite group.
 ;
@@ -375,8 +376,9 @@ call_01_4c45_Menu_BuildSpriteBlock:
 ; byte is an INDEX into wDAE1_TextBuffer rather than a tile id, which is how one
 ; static script can draw a digit that changes.
 ;
-; It parses no text and fills no text buffer - the old name was wrong twice over.
-; gex2's call_01_4dc8_Menu_BuildSpriteBlock
+; It parses no text and fills no text buffer; wDAE1_TextBuffer is only ever reached
+; through the index flag above. gex2's counterpart is
+; call_01_4dc8_Menu_BuildSpriteBlock
     ld   A, [HL+]                                     ;; 01:4c45 $2a
     cp   A, SPRITE_RECORD_END                         ;; 01:4c46 $fe $ff
     ret  Z                                            ;; 01:4c48 $c8
