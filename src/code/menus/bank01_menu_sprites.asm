@@ -199,6 +199,11 @@ call_01_4b6b_Menu_TickHideSprites:
 ; countdown is never armed: the sole MENUCMD_SUB_DRAW_SPRITE_GROUP command passes a
 ; delay of 0 and nothing else writes wDBDE_Menu_HideSpritesDelay, so the `ret z` at the
 ; top always takes. Dead code, but dead code that would corrupt WRAM if it ran.
+;
+; @bug - ends `jp .jp_01_4b81` with that label on the very next line: three bytes
+; that do what falling through already does. gex2's call_01_4d25_Menu_TickHideSprites
+; has the same fault. (This routine also carries the separate `srl B` bug noted
+; above.)
     ld   HL, wDBDE_Menu_HideSpritesDelay              ;; 01:4b6b $21 $de $db
     ld   A, [HL]                                      ;; 01:4b6e $7e
     and  A, A                                         ;; 01:4b6f $a7
@@ -462,6 +467,9 @@ call_01_4cc3_Menu_GetVramAddrForDestTile:
 ; NOTHING CALLS THIS. It is the pair to
 ; call_01_4cd4_Menu_GetStagingAddrForDestTile below, which is live; the VRAM half is
 ; dead in this build, though gex2's equivalent is used
+;
+; @bug - dead routine. Nothing in the disassembly calls it; every caller that
+; needs a VRAM address for a destination tile computes it inline.
     ld   hl,wDBA2_MenuCmd_FirstTileId
     ld   l,[hl]
     ld   h,$00

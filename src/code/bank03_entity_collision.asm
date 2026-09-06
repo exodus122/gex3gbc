@@ -1654,6 +1654,11 @@ call_03_54f9_InitializeEntityCooldownTimer:
 ;
 ; Nothing calls it. HandleEntityHit writes the same value inline, which is
 ; presumably what this was factored out of
+;
+; @bug - dead routine. Nothing calls it; call_03_5671_HandleEntityHit writes the
+; same TIMER_AMOUNT_60_FRAMES into ENTITY_FIELD_COOLDOWN_TIMER inline instead. It
+; is presumably what that inline write was factored out of before the factoring was
+; abandoned.
     LOAD_OBJ_FIELD_TO_HL_ALT ENTITY_FIELD_COOLDOWN_TIMER
     ld   [hl],TIMER_AMOUNT_60_FRAMES
     ret  

@@ -505,6 +505,18 @@ call_01_46d4_MenuCmd_DrawCursorSprite:
 ; and gex3's base is zero.
 ;
 ; gex2's call_01_47c5_MenuCmd_DrawCursorSprite
+;
+; @bug - the cursor sprite id is computed by two consecutive no-ops:
+;     ld   A, [wDBA7_MenuCmd_SrcPtr]
+;     sub  A, $00
+;     add  A, $00
+;     ld   [wDBC7_Menu_CursorSpriteId], A
+; Neither instruction can change A, so the cursor's sprite id is just the low byte
+; of the text source pointer. gex2's counterpart, call_01_47c5_MenuCmd_DrawCursorSprite,
+; has the same dead `sub A,$00` but the second instruction there is
+; `add A,MENU_CURSOR_ID_BASE` ($10) - so gex3 has lost the base offset that turns
+; that byte into a sprite id at all, and only works because whatever it lands on is
+; tolerated.
     call call_01_4599_MenuCmd_StageImage2             ;; 01:46d4 $cd $99 $45
     xor  A, A                                         ;; 01:46d7 $af
     ld   [wDBBF_MenuCursor_OamSlot], A                ;; 01:46d8 $ea $bf $db

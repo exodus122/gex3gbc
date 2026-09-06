@@ -1157,6 +1157,19 @@ jp_00_0781_Screen_LoadFullscreenImage:
 ; gex2's call_00_084d_Screen_LoadFullscreenImage covers the same ground on the
 ; graphics side but generates its tilemap rather than storing one, and reads its
 ; GBC attributes as a plain 20x18 block with no lookup form
+;
+; @bug - the two halves of one 16-bit subtraction are written inconsistently. The
+; size in BC is compared against SCREEN_TILE_CHUNK_BYTES as
+;     ld   A, C
+;     sub  A, $00                       ; should be LOW(SCREEN_TILE_CHUNK_BYTES)
+;     ld   E, A
+;     ld   A, B
+;     sbc  A, HIGH(SCREEN_TILE_CHUNK_BYTES)
+; - a raw literal on the low byte and a HIGH() expression on the high byte. It is
+; correct today only because SCREEN_TILE_CHUNK_BYTES is $1000 and its low byte
+; happens to be zero; give the constant any value that is not a multiple of $100
+; and the low half of the compare silently stops subtracting while the high half
+; still does, so the chunking loop misjudges when a second pass is needed.
     ld   A, [wDBB2_ScreenDraw_Bank]                    ;; 00:0781 $fa $b2 $db
     call call_00_0eee_SwitchBank                       ;; 00:0784 $cd $ee $0e
     ld   HL, wDBB7_ScreenDraw_TileDataSize             ;; 00:0787 $21 $b7 $db
@@ -2361,6 +2374,10 @@ call_00_0df9_VBlank_RunGfxStream:
 ; Spreading the copy over frames is what lets a menu redraw itself with the
 ; screen still on. gex2's call_00_0d84_VBlank_RunGfxStream is the same routine
 ; over the same layout
+;
+; @bug - `jp .jp_00_0dff` targets the label on the very next line: three bytes and
+; four cycles of nothing, inside the VBlank handler where the budget is tightest.
+; gex2's equivalent, call_00_0d84_VBlank_RunGfxStream, does not have it.
     call call_00_0c6a_VBlank_StartPendingHdma          ;; 00:0df9 $cd $6a $0c
     jp   .jp_00_0dff                                   ;; 00:0dfc $c3 $ff $0d
 .jp_00_0dff:

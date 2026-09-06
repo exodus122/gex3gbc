@@ -138,6 +138,13 @@ call_03_74f5_HUD_DrawNumberOnStatusBar:
 ;
 ; Each digit costs four tile ids: digit*2 on the top row and digit*2+1 below, in
 ; both the left and right columns
+;
+; @bug - three dead `add A,$00` instructions. Each digit is turned into a tile
+; pair with `ld A,C / add A,A / add A,$00 / ld [HL+],A / inc A / ld [DE],A`, and the
+; `add A,$00` is where a base tile id belongs - it adds nothing, so the digit tile
+; base is hardcoded to zero and the instruction is two bytes and two cycles of
+; nothing. The same no-op appears in all three copies of the block (hundreds, tens
+; and ones), which is what a base offset reduced to zero and left in looks like.
     push HL                                           ;; 03:74f5 $e5
     ld   C, HUD_TILE_BLANK_TOP                        ;; 03:74f6 $0e $30
     ld   [HL], C                                      ;; 03:74f8 $71

@@ -455,6 +455,12 @@ call_03_48ad_BgCollision_TopDownHandler:
 ;
 ; BGCOLL_NO_COLLISION_BIT is raised unconditionally, because nothing here ever
 ; corrects a position
+;
+; @bug - the left-input branch ends `jr .jp_03_49ED_AdvanceAlongPath` with that
+; label on the very next line, so the branch is two bytes that do what falling
+; through already does. The three sibling direction branches above it reach the same
+; label by falling through or by a real jump, so this one is written differently for
+; no reason.
     ld   hl,wDABE_CollisionFlags
     ld   a,[hl]
     ld   [hl],00

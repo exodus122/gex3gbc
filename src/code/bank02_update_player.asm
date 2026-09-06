@@ -733,6 +733,11 @@ call_02_5100_Player_ApplyXMovement:
 ;
 ; gex2's call_02_4a77_Player_ApplyXMovement, which has the slope nudge and the
 ; extra-delta sum but no top-down half
+;
+; @bug - `jp call_02_518a_Player_MoveLeft` targets the label on the very next
+; line, so the jump is three bytes of nothing. gex2 has the identical fault in the
+; identical routine (call_02_4a77_Player_ApplyXMovement), which puts it in the
+; shared ancestor of the two engines.
     call call_02_5541_Player_GetActionStates          ;; 02:5100 $cd $41 $55
     and  A, PLAYER_STATE_IN_WATER_MASK | PLAYER_STATE_CLIMBING_MASK ;; 02:5103 $e6 $a0
     jr   NZ, .jr_02_510e                              ;; 02:5105 $20 $07
