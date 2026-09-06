@@ -206,6 +206,11 @@ call_00_0150_Init:
 ; DMG refusal - it records wD59E_OnGBCFlag and every colour-specific piece of the
 ; ROM reads it. gex3 has no such flag anywhere, because there is nothing to
 ; branch on
+;
+; @bug - the DMG-error-screen path at .jr_00_015d below carries the same broken
+; MBC sequence as call_00_0f25_SetMbcBank: `ld [MBC1RomBank],A / swap A / rrca /
+; and A,$00 / ld [MBC1SRamBank],A`. The `and A,$00` discards what the swap and the
+; rotate computed, so the two instructions are dead and $00 is always written.
     di                                                 ;; 00:0150 $f3
     ld   SP, hFFFE                                     ;; 00:0151 $31 $fe $ff
     push AF                                            ;; 00:0154 $f5
@@ -856,6 +861,13 @@ call_00_0624_Player_SwapFlyPowerup:
 ; FLY_POWERUP_SHIELD_1 branch has a bug that leaves the other pair reading
 ; $0101; gex3's three branches are symmetric and count seconds off a shared
 ; frame counter instead
+;
+; @bug wDCAE_FlyPowerup_ActiveIndex is written and never read. All three timed
+; power-up branches below store a FLY_POWERUP_ACTIVE_* value into it, and those three
+; stores are its only references in the source - nothing consumes the byte, so the
+; "record which one is running" step in this header has no reader. (constants.asm
+; documents the value's meaning as well.) The timers themselves, wDCA9/wDCAA/wDCAB,
+; are what everything actually tests.
     ld   hl,wDC51_Player_CurrentFly
     ld   c,[hl]
     ld   [hl],a
@@ -1309,6 +1321,13 @@ call_00_0865_Text_AppendStringToBuffer:
 ; starting at wDADC_WindowY + 1 - which is wDADD_MenuTextBuffer, reached that way
 ; because the address is one past a label the assembler already had - and then
 ; copies until it has written the new string's own $80
+;
+; @bug - the destination is reached as `ld de,wDADC_WindowY` followed by
+; `inc de` inside the scan loop, rather than as `ld de,wDADD_MenuTextBuffer - 1`
+; or an explicit load of the buffer symbol. The routine is really scanning
+; wDADD_MenuTextBuffer, and it only works because wDADC_WindowY happens to sit
+; immediately before it. Inserting or reordering anything between those two
+; symbols in memory.asm silently retargets the append.
     push de
     ld   a,BANK(bank1c_text)
     call call_00_0eee_SwitchBank
@@ -2550,6 +2569,9 @@ call_00_0eee_SwitchBank:
 ; stack update and the register write would corrupt it - which is why
 ; call_00_0b25_VBlank_Handler uses call_00_0f25_SetMbcBank instead.
 ; gex2's call_00_1089_SwitchBank
+;
+; @bug - see call_00_0f25_SetMbcBank. `swap A / rrca / and A,$00` computes the
+; SRAM bank and then discards it; $00 is always written to MBC1SRamBank.
     ld   HL, wDAD3_PtrToBankStackPosition              ;; 00:0eee $21 $d3 $da
     ld   E, [HL]                                       ;; 00:0ef1 $5e
     inc  HL                                            ;; 00:0ef2 $23
@@ -2571,6 +2593,9 @@ call_00_0f08_RestoreBank:
 ; POPS the bank stack and switches back to whatever was underneath, mirroring
 ; call_00_0eee_SwitchBank exactly - `dec DE` here against its `inc DE`. Clobbers
 ; A with the restored bank number. gex2's call_00_10a3_RestoreBank
+;
+; @bug - see call_00_0f25_SetMbcBank. `swap A / rrca / and A,$00` computes the
+; SRAM bank and then discards it; $00 is always written to MBC1SRamBank.
     ld   HL, wDAD3_PtrToBankStackPosition              ;; 00:0f08 $21 $d3 $da
     ld   E, [HL]                                       ;; 00:0f0b $5e
     inc  HL                                            ;; 00:0f0c $23
@@ -2606,6 +2631,13 @@ call_00_0f25_SetMbcBank:
 ;
 ; The `ld a, $03` immediately above the entry point is unreachable - it is the
 ; tail of the previous routine's `jp hl` and nothing branches to it
+;
+; @bug - `and A,$00` throws away the value `swap A / rrca` just computed, so the
+; SRAM bank is always written as $00 and the two instructions above it are dead.
+; gex2's SET_MBC_BANK macro does the same sequence with `and a,$01`, which is what
+; turns bit 5 of the ROM bank number into the SRAM bank. The same three-instruction
+; sequence appears four times in this file - here, in call_00_0eee_SwitchBank,
+; in call_00_0f08_RestoreBank and in call_00_0150_Init - all four with $00.
     ld   [MBC1RomBank], A                              ;; 00:0f25 $ea $01 $20
     swap A                                             ;; 00:0f28 $cb $37
     rrca                                               ;; 00:0f2a $0f

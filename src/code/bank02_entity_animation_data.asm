@@ -1098,6 +1098,12 @@ data_02_7a85:
 ; at all. It is a complete block: the same header as the one above with the next
 ; sprite id, so it reads as a second pose that was cut rather than as stray data
 data_02_7a8b_Orphan:
+;
+; @bug - unreferenced animation block. It is complete and well-formed - the same
+; header as data_02_7a85 above with the next sprite id ($3f) - and it is almost
+; certainly the left-facing mech's pose, but both
+; ENTITY_ANIME_CHANNEL_MECH_FACING_RIGHT and ENTITY_ANIME_CHANNEL_MECH_FACING_LEFT
+; point at data_02_7a85. See call_02_6597_EntityAction_MechLeft_HoldFacingLeft.
     db   $0b, $00, $1a, SPRITE_FRAME_COUNTER_HOLD, $01                      ; one frame, never ticks
     db   $3f
 

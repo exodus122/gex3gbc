@@ -143,6 +143,31 @@ call_03_4708_BgCollision_SidescrollerHandler:
 ; so a fast fall does not probe absurdly far, then >> 4 into
 ; wDC8B_BgCollision_WallProbeLookahead. Wall probing starts that far above his
 ; head, so a wall is caught on the frame he would enter it rather than after
+;
+; @bug (original game) The wall-probe lookahead is computed every frame and never
+; applied. The block at .jr_03_471c derives it from the Y velocity and stores it in
+; wDC8B_BgCollision_WallProbeLookahead, and the only other reference to that byte in
+; the whole source is the `ld hl,wDC8B_BgCollision_WallProbeLookahead` below - which
+; is a DEAD LOAD: HL is never dereferenced, because the next three instructions are
+; `and a,$f8 / ld l,a / ld h,...`, overwriting both halves. gex2's
+; call_03_4915_BgCollision_SidescrollerHandler has `sub a,[hl]` between the load and
+; the mask; here that instruction is simply missing. The probe therefore always
+; starts at a fixed (Y - 9) & $F8 instead of scaling with fall speed, so the claim in
+; this header - and at wDC8B in constants/memory.asm - that a wall is caught on the
+; frame he would enter it is not what the code does.
+;
+; @bug (original game) The wall push-out is computed and then thrown away, exactly as
+; in gex2. On a TILECOLL_SOLID hit the code works out how far Gex must be nudged to
+; sit flush against the tile edge - `ld a,$07 / sub [hl] / and $07` going right,
+; `ld a,[hl] / and $07 / cpl / inc a` going left - and .jr_03_47a1 opens with
+; `xor a,a`, destroying it before it can be stored. The three stores that follow
+; therefore all write $00, so the movement is merely cancelled and he is left wherever
+; the frame had already put him rather than being snapped out of the wall.
+;
+; @bug Dead computation in both wall-probe entry branches: each computes
+; `(X & $07) + E` into A and then reaches .jr_03_4753, whose first instruction is
+; `ld a,e`. A is never read, so the two branches differ only in the sign constant
+; loaded into C. Same vestige as gex2 carries.
     ld   HL, wDABE_CollisionFlags                                     ;; 03:4708 $21 $be $da
     ld   A, [HL]                                       ;; 03:470b $7e
     ld   [HL], $00                                     ;; 03:470c $36 $00
@@ -542,6 +567,15 @@ call_03_48ad_BgCollision_TopDownHandler:
     jp   .jp_03_49ED_AdvanceAlongPath
 .jp_03_496B_CheckMove_UpLeft:
 ; Up-left, mirroring the right-hand diagonals
+;
+; @bug (original game) The two-step probe goes the WRONG WAY along X. The first probe
+; is (C = $FF, B = $FF) - one step up and LEFT - but the second is
+; `ld c,$02 / ld b,$FE`, which is two steps up and RIGHT. It should be $FE in C, to
+; mirror .jp_03_48E6_CheckMove_UpRight's $01 then $02. .data_03_4a1b_TopDownStepOffsets
+; has it right for BGCOLL_DIR_UP_LEFT ($ff,$ff then $fe,$fe), so $FE is certainly what
+; was meant. Consequence: on a top-down map, moving up-left at a speed of 2 or more
+; tests geometry on Gex's right, so he is let through walls to his left and stopped by
+; walls he is moving away from. .jp_03_499F_CheckMove_DownLeft has the identical fault.
     ld   c,$FF
     ld   b,$FF
     call call_03_4b4c_BgCollision_IsPixelSolid
@@ -569,6 +603,11 @@ call_03_48ad_BgCollision_TopDownHandler:
     jr   .jp_03_49ED_AdvanceAlongPath
 .jp_03_499F_CheckMove_DownLeft:
 ; Down-left
+;
+; @bug (original game) Same wrong-way second probe as .jp_03_496B_CheckMove_UpLeft:
+; the first probe is (C = $FF, B = $01), down and left, but the second is
+; `ld c,$02 / ld b,$02`, down and RIGHT. C should be $FE. Both left-hand diagonals
+; carry the bug; both right-hand ones are correct.
     ld   c,$FF
     ld   b,$01
     call call_03_4b4c_BgCollision_IsPixelSolid
@@ -613,6 +652,14 @@ call_03_48ad_BgCollision_TopDownHandler:
 ; counting, and stops at the first solid one. The count replaces
 ; wDC86_PlayerXVelocity, so a partly blocked move becomes a shorter one rather
 ; than no move at all
+;
+; @bug .data_03_4a1b_TopDownStepOffsets holds only TWO offset pairs per direction, but
+; the loop below is bounded by D = wDC86_PlayerXVelocity with no clamp. A speed of 3 or
+; more walks HL straight into the next direction's entry and probes the wrong offsets;
+; from BGCOLL_DIR_UP_LEFT, the last row, it walks off the end of the table entirely into
+; whatever follows. The note under the table records the overrun as a fact; it is a
+; missing bound, and the diagonal handlers' own `cp a,$02` shows speeds above 1 are
+; expected.
     ld   hl,wDC89_BgCollision_TopDownDirection
     ld   l,[hl]
     ld   h,$00
@@ -777,6 +824,14 @@ call_03_4a3f_BgCollision_SwimmingHandler:
 ; anything else. The rest of these bytes are the wreckage of a script that would
 ; have followed - a count of 1 and a stride of $0500 are not a usable header, and
 ; nothing reads them
+;
+; @bug (original game) Diving is never collision checked. The mask byte is $00, so the
+; handler's `and a,[hl]` can never be nonzero and it returns at .jr_03_4a7e's caller
+; before reading an entry - which is the "pressed nothing this script handles" exit,
+; the one that leaves wDC81_Player_EffectiveInputs UNTOUCHED. The movement code then
+; acts on the press with nothing behind it, so a diving Gex swims through solid
+; geometry in every direction. The bytes after the mask are the wreckage of the script
+; that would have followed and are never read.
     db   $00                                           ; input mask - matches nothing
     db   $01, $00, $05, $00, $80, $00, $10, $00, $01   ; never read
 
@@ -961,6 +1016,15 @@ call_03_4bb6_BgCollision_CacheNearbyTileTypes:
 ;
 ; The first four are a straight column, so they walk by COLLISION_MAP_STRIDE with
 ; the usual wrap. Only the last depends on facing
+;
+; @bug Two of the five cached tile types are written every frame and never read.
+; wDC97_TileTypeAboveGexsHead and wDC94_TileTypeBehindGexsFace have exactly one
+; reference each in the whole source - the two stores in this routine. In gex2 the
+; equivalent of wDC94 (wD766) drives the climbable-wall check in
+; call_02_4c4f_Player_CheckTileInteractions; gex3 decides climbing from
+; call_03_4c2e_BgCollision_IsTileClimbable instead and left the cache entry behind.
+; The whole facing-dependent second half of this routine, from `ld c,$09` down, is
+; therefore dead work.
     ld   A, [wD810_PlayerYPosition]                                    ;; 03:4bb6 $fa $10 $d8
     sub  A, PLAYER_FEET_OFFSET                         ;; 03:4bb9 $d6 $10                ; start one tile row above his head
     and  A, $f8                                        ;; 03:4bbb $e6 $f8

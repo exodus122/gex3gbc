@@ -1097,6 +1097,13 @@ call_03_51b8_CollisionHandler_SailorToonGirl:
 ; ENTITY_FACING_RIGHT is passed to Entity_SetCollisionType as well as to
 ; Entity_SetFacingDirection - the two constants happen to share the value $00, so
 ; the first call is really "make her harmless"
+;
+; @bug - wrong constant family. `ld c,ENTITY_FACING_RIGHT` is loaded as the
+; argument to call_00_288c_Entity_SetCollisionType, which wants a COLLISION_TYPE_*
+; value. It only does the right thing because ENTITY_FACING_RIGHT and
+; COLLISION_TYPE_NONE are both $00; the intent is "make her harmless", so the
+; constant should be COLLISION_TYPE_NONE. (The second `ld c,ENTITY_FACING_RIGHT`,
+; feeding Entity_SetFacingDirection, is correct.)
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
@@ -1162,6 +1169,12 @@ call_03_5231_CollisionHandler_Mech:
 ;
 ; The five instructions after the final `jp` are unreachable - a leftover copy of
 ; a plain touch-damage handler
+;
+; @bug - five unreachable instructions. The routine ends with
+; `jp call_00_2c09_Entity_SpawnGoalCounter`, and the
+; CheckPlayerInteraction / PLAYER_TOUCHED_ENTITY / DamagePlayer sequence that
+; follows it has no label and no path into it - it is a leftover copy of a plain
+; touch-damage handler that survived into the ROM as dead bytes.
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
@@ -1545,6 +1558,10 @@ call_03_5473_CollisionHandler_FreestandingRemote:
 ; flags.
 ;
 ; The Entity_GetActionId call above it is dead - A is overwritten on the next line
+;
+; @bug - the `call call_00_2962_Entity_GetActionId` is dead. It returns the
+; action id in A and HL pointing at ENTITY_FIELD_ACTION_ID, and the very next
+; instruction is `ld A,$81`; neither result is used before it is overwritten.
     call call_03_550e_Entity_CheckPlayerInteraction                                  ;; 03:5473 $cd $0e $55
     ret  NC                                            ;; 03:5476 $d0
     cp   A, PLAYER_ATTACKED_ENTITY                                        ;; 03:5477 $fe $01
@@ -1687,6 +1704,12 @@ call_03_550e_Entity_CheckPlayerInteraction:
 ; The `ld A,$FF / add A,n` endings load the result and set carry in two
 ; instructions, at the cost of the operand reading one higher than the value
 ; actually returned
+;
+; @bug - `ld [HL],$2a` writes a raw literal into wDC8C_PlayerYVelocity as the
+; stomp rebound, where constants.asm already defines the family
+; PLAYER_HIT_BOUNCE_VELOCITY ($1C) and PLAYER_UNK19_BOUNCE_VELOCITY ($30). The
+; stomp bounce has no name of its own, so the one velocity the player feels most
+; often is the one that cannot be found by searching for a constant.
     LOAD_OBJ_FIELD_TO_BC ENTITY_FIELD_COOLDOWN_TIMER
     ld   A, [BC]                                       ;; 03:5516 $0a
     and  A, A                                          ;; 03:5517 $a7

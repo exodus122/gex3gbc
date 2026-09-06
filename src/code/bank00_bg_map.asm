@@ -467,6 +467,13 @@ call_00_11e5_BgMap_LoadRowForVerticalScroll:
 ; gex2 also reads 6 blocks instead of 11, applies its alt-blockset mask and any
 ; registered block patches to the strip before expanding it, and expands each
 ; block into 8 tiles instead of 2 because its blocks are 32x32
+;
+; @bug - `ld HL, rIE` is being used purely for its numeric value $FFFF, i.e. -1,
+; to name the row above the screen. rIE is the interrupt-enable register and has
+; nothing to do with a tile row; the constant that is meant here is -1 (or a named
+; map-edge constant). The same substitution is made in
+; call_00_1351_BgMap_LoadColumnForHorizontalScroll for the column left of the
+; screen.
     ld   HL, wDBFB_YPositionInMap                                     ;; 00:11e5 $21 $fb $db
     ld   A, [HL+]                                      ;; 00:11e8 $2a
     ld   C, A                                          ;; 00:11e9 $4f
@@ -740,6 +747,10 @@ call_00_1351_BgMap_LoadColumnForHorizontalScroll:
 ;
 ; gex2's counterpart is call_00_157a_BgMap_LoadColumnForHorizontalScroll, which
 ; steps a fixed $80 bytes per row because its maps are all 128 blocks wide
+;
+; @bug - see call_00_11e5_BgMap_LoadRowForVerticalScroll. `ld HL, rIE` is the
+; literal $FFFF = -1 for the column left of the screen, not a hardware register
+; reference.
     ld   HL, wDBF9_XPositionInMap                                     ;; 00:1351 $21 $f9 $db
     ld   A, [HL+]                                      ;; 00:1354 $2a
     ld   E, A                                          ;; 00:1355 $5f
@@ -1710,6 +1721,12 @@ call_00_1bbc_CheckForDoorAndEnter:
 ; Otherwise it is the same handoff as the edge transition: spawn id to
 ; wDC69_PlayerSpawnIdInLevel, bit 2 of wDB6A_WarpFlags, and
 ; call_00_1633_Map_LoadWarpDestination finishes the job
+;
+; @bug - the door X window is built from a raw `add A,$08` even though the very
+; next instruction compares against `MAP_DOOR_X_TOLERANCE * 2`. The $08 IS
+; MAP_DOOR_X_TOLERANCE, so the two halves of one test are written with a named
+; constant on one side and a literal on the other - changing the constant widens
+; the compare without moving the centre, and the window stops being symmetric.
     ld   A, [wDC1E_CurrentLevelID]                                    ;; 00:1bbc $fa $1e $dc
     cp   A, LEVEL_ANIME_CHANNEL                                        ;; 00:1bbf $fe $05
     ret  Z                                             ;; 00:1bc1 $c8

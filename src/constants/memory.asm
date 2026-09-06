@@ -1277,6 +1277,12 @@ wDC8A_MapEdgeTouched:
     ds 1                                               ;; dc8a
 
 wDC8B_BgCollision_WallProbeLookahead:
+; @bug Written once a frame by call_03_4708_BgCollision_SidescrollerHandler and never
+; read. The `ld hl,wDC8B_BgCollision_WallProbeLookahead` in that routine is a dead
+; load - HL is overwritten two instructions later without being dereferenced, because
+; the `sub a,[hl]` gex2 has at the same point is missing here. So the description
+; below is what was intended, not what happens: the wall probe starts at a fixed
+; offset and does not scale with the Y velocity at all.
 ; How far above his head the wall probe starts, derived from the Y velocity so
 ; that a wall is caught on the frame he would enter it rather than after
     ds 1                                               ;; dc8b
@@ -1330,12 +1336,19 @@ wDC93_TileTypeBehindGexsLowerBody:
 ; one tile row down, his body
     ds 1                                               ;; dc93
 wDC94_TileTypeBehindGexsFace:
+; @bug Written once a frame by call_03_4bb6_BgCollision_CacheNearbyTileTypes and read
+; nowhere - those are its only two references in the source. gex2's equivalent
+; (wD766) drove its climbable-wall check; gex3 uses
+; call_03_4c2e_BgCollision_IsTileClimbable instead and this cache entry was left
+; behind, along with the facing-dependent lookup that fills it.
 ; one row up and one tile ahead in the direction he faces - what he is looking at
     ds 1                                               ;; dc94
 wDC95_FloorTileType:
 ; one row below his body: the tile he is standing on
     ds 2                                               ;; dc95
 wDC97_TileTypeAboveGexsHead:
+; @bug Also write-only: call_03_4bb6_BgCollision_CacheNearbyTileTypes stores it every
+; frame and nothing reads it back.
 ; one tile row above his head, where the column scan starts
     ds 1                                               ;; dc97
 
@@ -1421,6 +1434,10 @@ wDCAD:
     ds 1                                               ;; dcad
 
 wDCAE_FlyPowerup_ActiveIndex:
+; @bug Write-only. The three timed-power-up branches of
+; call_00_0624_Player_SwapFlyPowerup store a FLY_POWERUP_ACTIVE_* value here and
+; nothing ever reads it; everything that cares tests the timers wDCA9/wDCAA/wDCAB
+; directly.
 ; which of the three timed power-ups was armed last, one of FLY_POWERUP_ACTIVE_*
     ds 1                                               ;; dcae
 

@@ -185,6 +185,20 @@ call_01_4b6b_Menu_TickHideSprites:
 ;
 ; It streams no tile data; the old name was wrong. gex2 splits the same work between
 ; call_01_4d25_Menu_TickHideSprites and call_01_4d3b_Menu_EraseSpriteGroup
+;
+; @bug (original game) The erase loop HALVES the row count where the draw does not,
+; and on a one-row group that underflows into a 256-iteration run. The record's height
+; byte is loaded into B and then `srl b`; call_01_4c7e_Menu_WriteSpriteRect, which drew
+; the same record, uses B unchanged. For height 1, `srl b` leaves 0, and the inner
+; `dec b / jr nz` therefore runs 256 times, writing 4 bytes each - 1KB per column,
+; times C columns - starting at the group's slot in wD900_ShadowOAM and running far
+; past the 160 bytes of shadow OAM into the WRAM above it.
+;
+; .data_01_5b69_TitleScreenBanner, the only static group in the game, is two rows of
+; height 1, so this is exactly the case that would fire. It never does only because the
+; countdown is never armed: the sole MENUCMD_SUB_DRAW_SPRITE_GROUP command passes a
+; delay of 0 and nothing else writes wDBDE_Menu_HideSpritesDelay, so the `ret z` at the
+; top always takes. Dead code, but dead code that would corrupt WRAM if it ran.
     ld   HL, wDBDE_Menu_HideSpritesDelay              ;; 01:4b6b $21 $de $db
     ld   A, [HL]                                      ;; 01:4b6e $7e
     and  A, A                                         ;; 01:4b6f $a7

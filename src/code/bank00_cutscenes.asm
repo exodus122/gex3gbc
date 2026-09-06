@@ -118,6 +118,14 @@ call_00_1ea0_Cutscene_LoadAndRun:
 ; loop but no movement update, leaving the objective on screen.
 ;
 ; A press of anything on wDAD7_RawInputs aborts either phase
+;
+; @bug (original game) The script's animation-script pointer is loaded and discarded.
+; At .jr_00_1f72 the field is read into HL, tested with `or a,h`, and the `jr z`
+; branches to .jr_00_1f78 - the very next instruction - so both outcomes execute
+; identically and HL is dropped. gex2 handed a non-zero pointer to its block patch
+; runner here; with that system gone the branch has no other arm. Every script in
+; .data_00_1ff0_CutsceneScriptPointerTable stores 0 in the field anyway, so the +7 word
+; of the cutscene_script macro is pure padding.
     ld   HL, wDC1E_CurrentLevelID                                     ;; 00:1ea0 $21 $1e $dc
     ld   L, [HL]                                       ;; 00:1ea3 $6e
     ld   H, $00                                        ;; 00:1ea4 $26 $00

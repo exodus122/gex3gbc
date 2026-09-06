@@ -272,6 +272,13 @@ call_02_598f_EntityAction_FlyTV_SpawnFly:
 ; Action $02. B and C come back from the lookup as (spawn-child index, entity id),
 ; so the duplicate test uses the entity id and the spawn uses the child index -
 ; which is what `ld c,b` in the middle is for
+;
+; @bug - dead data. The ten bytes immediately after this routine
+;     db   $00, $04, $01, $05, $02, $06, $03
+;     db   $07, $04, $08
+; are a byte-for-byte duplicate of .data_02_59e3 below, with no label and nothing
+; referencing them. call_02_59d2_FlyTV_GetFlyIds reads .data_02_59e3; this copy is
+; ten bytes of ROM that are never touched.
     call call_02_59d2_FlyTV_GetFlyIds
     push bc
     call call_00_2b10_Entity_FindDuplicateInstance     ; C = ENTITY_FLY_n
@@ -2497,6 +2504,16 @@ call_02_6577_EntityAction_FanLift_Blow:
 ; ------------------------------------------------------------------
 
 call_02_6597_EntityAction_MechLeft_HoldFacingLeft:
+;
+; @bug - the left-facing mech is drawn with the right-facing sprite. Both mech
+; action tables in bank02_entity_pointer_tables.asm
+; (.data_02_4560_EntityActions_AnimeChannelMechFacingRight and
+; .data_02_4568_EntityActions_AnimeChannelMechFacingLeft) name the same animation
+; block, data_02_7a85, whose frame is sprite 8 of
+; image_anime_channel_mech_facing_right_and_1_more. The block that was evidently
+; meant for this row - data_02_7a8b_Orphan, the same header with sprite $3f - sits
+; immediately after it and is referenced by nothing. So this routine re-asserts
+; ENTITY_FACING_LEFT every frame while the sprite never changes.
     ld   c,ENTITY_FACING_LEFT
     call call_00_2958_Entity_SetFacingDirection
 call_02_659c_EntityAction_MechRight_Idle:
@@ -3033,6 +3050,16 @@ call_02_688e_Elevator_GetShaftIndex:
 ; Returns in C which of the three shafts this elevator is in, by matching its X
 ; against the list below. There is no bounds check - an elevator placed at any
 ; other X walks off the end of the table
+;
+; @bug - unbounded table scan. The loop walks .data_02_68A9, which holds exactly
+; three shaft X positions, comparing this entity's WORLD_X against each and
+; returning the index in C. There is no terminator and no counter: an elevator
+; placed at any X other than $01A0, $0340 or $05C0 runs straight off the end of the
+; six-byte table and keeps comparing against whatever follows it in ROM, returning
+; an index of 3 or more. Both callers then use that index to address
+; wDCE2_ElevatorEntityUnkData as a two-byte-per-shaft array, so
+; call_02_67c2_EntityAction_Elevator_Update would both read and WRITE past the
+; three words reserved there.
     ld   hl,.data_02_68A9
     LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_WORLD_X
     ld   c,$FF
@@ -3249,6 +3276,15 @@ call_02_697e: ; unreferenced function?
 ; table row either. It copies a four-byte X,Y pair out of .data_02_699f, and the
 ; four entries are three copies of ($0050, $001C) and one of ($0050, $0019), which
 ; looks like an abandoned "put the bomb back in his hand" placement
+;
+; @bug - unreachable code. Nothing in the file, the pointer tables or the
+; collision handlers references this label, and it cannot be an action row either:
+; it is entered with HL already pointing into the entity slot (the opening
+; `ld a,l / xor a,$08 / ld l,a` walks L to another field), which no action
+; dispatch sets up. It copies a four-byte X,Y pair out of .data_02_699f - three
+; copies of ($0050, $001C) and one of ($0050, $0019) - and looks like an abandoned
+; "put the bomb back in his hand" placement. The routine and its sixteen-byte
+; table are both dead.
     ld   a,l
     xor  a,$08
     ld   l,a
@@ -3508,6 +3544,16 @@ call_02_6add_EntityAction_ConvictProjectile_Update:
 call_02_6b03_EntityAction_Spider_Descend:
 ; Action $00. The Z that ends it comes from the `sub a,$02`, so an odd parameter
 ; would step straight past zero and wrap - every spider's parameter is even
+;
+; @bug - the descent counter is stepped with `sub a,$02` but tested only for
+; zero, so an odd spawn parameter never hits the exit. MISC_TIMER is loaded from
+; Entity_GetParameterIntoC and then walked 2 at a time; an odd starting value goes
+; $03, $01, $FF, $FD ... and the spider keeps sinking two pixels a frame for
+; another 128 steps before the count comes back round. The matching climb in
+; call_02_6b20_EntityAction_Spider_Climb counts UP by one and compares against the
+; parameter (`inc a / cp c`), so it does not have the problem. Every spider in the
+; shipped level data happens to carry an even parameter, which is the only reason
+; this never shows.
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_00_6B0E
     call call_00_230f_Entity_GetParameterIntoC         ; how far down

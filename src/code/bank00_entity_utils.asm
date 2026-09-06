@@ -320,6 +320,21 @@ call_00_22d4_Entity_CheckTriggerFlag:
 ;
 ; This one reads: Z if the entity's slot is zero, NZ if it is set. Unlike the three
 ; below it does not range-check the parameter first
+;
+; @bug - missing range guard. This is the only one of the four trigger routines
+; that indexes wDCB1_LevelTriggerBuffer without first checking C. Its three
+; siblings - call_00_22e0_Entity_IncrementTriggerFlag,
+; call_00_22ef_Entity_SetTriggerActive and call_00_22ff_Entity_ClearTriggerFlag -
+; all open with
+;     ld   a,c
+;     cp   a,LEVEL_TRIGGER_COUNT
+;     ret  nc
+; and this one goes straight to `add hl,bc / ld a,[hl]`. An entity whose spawn
+; parameter is >= LEVEL_TRIGGER_COUNT therefore reads whatever WRAM follows the
+; buffer and treats it as its trigger. Every caller in bank02 passes the raw
+; parameter (the fan lift, both switches, the beam barriers, the elevator, the
+; water tower, the disappearing floor), so the guard is exactly as necessary here
+; as in the three routines that have it.
     call call_00_230f_Entity_GetParameterIntoC
     ld   b,$00
     ld   hl,wDCB1_LevelTriggerBuffer
