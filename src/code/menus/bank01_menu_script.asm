@@ -796,9 +796,9 @@ call_01_4826_MenuCmd_DrawRemoteMarker:
     ld   a,[hl]
     and  c
     ld   c,REMOTE_MARKER_TILE_TAKEN
-    jr   nz,.jr_00_4843
+    jr   nz,.jr_01_4843
     ld   c,REMOTE_MARKER_TILE_MISSING
-.jr_00_4843:
+.jr_01_4843:
     ld   a,c
     ld   [wDADF],a
     ld   a,[wDBA1_MenuCmd_DestTileY]

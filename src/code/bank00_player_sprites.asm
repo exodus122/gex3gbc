@@ -33,7 +33,7 @@
 ;          across the game - but they do not match the frame's piece extents, so what
 ;          they described is unknown
 ;   +3 +4  where the frame's tiles live, into wDAC0_PlayerGfx_SrcAddr for the VRAM
-;          copy that call_00_098f_CopyPlayerGfxToVRAM does separately
+;          copy that call_00_0c6a_VBlank_StartPendingHdma does separately
 ;   +5...  PLAYER_FRAME_PIECE_SIZE bytes per piece: Y offset, X offset, attribute bits
 ;          OR'd into wDC53_Player_OamAttributes, and a fourth byte the build steps over
 ;          without reading. That fourth byte is $00 in all 11005 pieces in the game, and

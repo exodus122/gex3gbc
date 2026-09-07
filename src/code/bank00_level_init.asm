@@ -2,7 +2,7 @@
 ; Bank 0. Everything that runs once when a level starts, between the map data being
 ; located and the first frame being drawn.
 ;
-; call_00_0314_LoadNewMap calls two of these back to back, and the death-respawn
+; .jp_00_0314_LoadNewMap calls two of these back to back, and the death-respawn
 ; path calls the same pair again:
 ;
 ;   call_00_2f85_CollectibleList_LoadForCurrentLevel   builds the collectible tables

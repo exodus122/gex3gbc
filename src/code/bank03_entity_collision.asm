@@ -355,20 +355,20 @@ call_03_4d44_CollisionHandler_DamagePlayerUnused:
     ld   a,[wD80E_PlayerXPosition+1]
     sbc  [hl]
     ld   a,$FF
-    jr   c,.jr_00_4D78
+    jr   c,.jr_03_4d78
     ld   a,$01
-.jr_00_4D78:
+.jr_03_4d78:
     ld   [wDC98_Player_DamageKnockbackX],a
     ld   a,[wDB6C_CurrentMapId]
     cp   a,MAP_GEXTREME_SPORTS1
     ld   a,PLAYERACTION_SNOWBOARDING_TAKE_DAMAGE
-    jr   z,.jr_00_4D8F
+    jr   z,.jr_03_4d8f
     ld   a,[wDB6C_CurrentMapId]
     cp   a,MAP_MARSUPIAL_MADNESS1
     ld   a,PLAYERACTION_KANGAROO_TAKE_DAMAGE
-    jr   z,.jr_00_4D8F
+    jr   z,.jr_03_4d8f
     ld   a,PLAYERACTION_TAKE_DAMAGE
-.jr_00_4D8F:
+.jr_03_4d8f:
     farcall call_02_54f9_Player_RequestAction
     ret  
 
@@ -843,7 +843,7 @@ call_03_5028_CollisionHandler_Cactus:
 ; wDCA9_FlyPowerup2_Timer) spends a hit point instead, and only in actions below
 ; $05. So an unpowered tail spin does nothing at all.
 ;
-; WHEN IT SPRINGS. The tail at .jr_00_504C runs whatever happened above: in
+; WHEN IT SPRINGS. The tail at .jr_03_504c runs whatever happened above: in
 ; actions below $04 it measures the distance to Gex and jumps to action $05 the
 ; moment he is within $28. That is the only thing that triggers the cactus, so it
 ; is proximity rather than contact.
@@ -851,24 +851,24 @@ call_03_5028_CollisionHandler_Cactus:
 ; The `ldi a,[hl] / or [hl] / inc hl / or [hl]` idiom is "is any fly power-up
 ; running", and it appears in three handlers in this file
     call call_03_550e_Entity_CheckPlayerInteraction
-    jr   nc,.jr_00_504C
+    jr   nc,.jr_03_504c
     cp   a,PLAYER_TOUCHED_ENTITY
-    jr   z,.jr_00_5044
+    jr   z,.jr_03_5044
     ld   hl,wDCA9_FlyPowerup2_Timer
     ldi  a,[hl]
     or   [hl]
     inc  hl
     or   [hl]
-    jr   z,.jr_00_5044
+    jr   z,.jr_03_5044
     call call_00_2962_Entity_GetActionId
     cp   a,$05
     call c,call_03_5671_HandleEntityHit
-    jr   .jr_00_504C
-.jr_00_5044:
+    jr   .jr_03_504c
+.jr_03_5044:
     call call_00_2962_Entity_GetActionId
     cp   a,$05
     call z,call_03_4cea_CollisionHandler_DamagePlayer
-.jr_00_504C:
+.jr_03_504c:
     call call_00_2962_Entity_GetActionId
     cp   a,$04
     ret  nc
@@ -915,13 +915,13 @@ call_03_5085_CollisionHandler_HardHat:
     jp   nz,call_03_4cea_CollisionHandler_DamagePlayer
     call call_00_2962_Entity_GetActionId
     cp   a,$02
-    jr   z,.jr_00_50A8
+    jr   z,.jr_03_50a8
     cp   a,$01
     jp   z,call_03_5671_HandleEntityHit
     ld   a,$02
     farcall call_02_72ac_Entity_SetAction
     ret  
-.jr_00_50A8:
+.jr_03_50a8:
     ld   a,$01
     farcall call_02_72ac_Entity_SetAction
     ret  
@@ -1023,11 +1023,11 @@ call_03_5116_CollisionHandler_Door:
     ret  nc
     call call_00_230f_Entity_GetParameterIntoC
     inc  c
-    jr   z,.jr_00_5143
+    jr   z,.jr_03_5143
     call call_00_22d4_Entity_CheckTriggerFlag
     ld   a,SFX_DOOR2
     jp   z,call_00_0ff5_QueueSFX
-.jr_00_5143:
+.jr_03_5143:
     ld   a,SFX_DOOR1
     call call_00_0ff5_QueueSFX
     ld   a,$01
@@ -1056,11 +1056,11 @@ call_03_5156_CollisionHandler_Door2:
     ret  nc
     call call_00_230f_Entity_GetParameterIntoC
     inc  c
-    jr   z,.jr_00_5183
+    jr   z,.jr_03_5183
     call call_00_22d4_Entity_CheckTriggerFlag
     ld   a,SFX_DOOR2
     jp   z,call_00_0ff5_QueueSFX
-.jr_00_5183:
+.jr_03_5183:
     ld   a,SFX_DOOR1
     call call_00_0ff5_QueueSFX
     ld   a,$03
@@ -1103,7 +1103,7 @@ call_03_51b8_CollisionHandler_SailorToonGirl:
     jp   nz,call_03_4cea_CollisionHandler_DamagePlayer
     call call_00_2962_Entity_GetActionId
     cp   a,$02
-    jr   z,.jr_00_51E3
+    jr   z,.jr_03_51e3
     call call_03_5671_HandleEntityHit
     call call_00_2962_Entity_GetActionId
     cp   a,$02
@@ -1112,7 +1112,7 @@ call_03_51b8_CollisionHandler_SailorToonGirl:
     ld   a,$03
     farcall call_02_72ac_Entity_SetAction
     ret  
-.jr_00_51E3:
+.jr_03_51e3:
     call call_00_22ef_Entity_SetTriggerActive
     ld   c,COLLISION_TYPE_NONE
     call call_00_288c_Entity_SetCollisionType
@@ -1137,12 +1137,12 @@ call_03_5201_CollisionHandler_BigSilverRobot:
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
-    jr   z,.jr_00_5222
+    jr   z,.jr_03_5222
     call call_03_4cea_CollisionHandler_DamagePlayer
     ld   a,$02
     farcall call_02_72ac_Entity_SetAction
     jp   call_00_2410_Entity_FaceTowardsPlayer
-.jr_00_5222:
+.jr_03_5222:
     call call_00_2410_Entity_FaceTowardsPlayer
     call call_03_5671_HandleEntityHit
     call call_00_2962_Entity_GetActionId
@@ -1185,10 +1185,10 @@ call_03_5231_CollisionHandler_Mech:
     call call_00_22e0_Entity_IncrementTriggerFlag
     ld   a,[wDB6C_CurrentMapId]
     cp   a,MAP_ANIME_CHANNEL2
-    jr   z,.jr_00_5258
+    jr   z,.jr_03_5258
     cp   a,MAP_ANIME_CHANNEL3
     ret  nz
-.jr_00_5258:
+.jr_03_5258:
     ld   hl,wDCCB_MechCounter
     inc  [hl]
     ld   a,[hl]
@@ -1360,11 +1360,11 @@ call_03_532f_CollisionHandler_GextremeSports_Elf:
     ld   hl,wDCD5_ElfHealth1
     ld   b,$05
     xor  a
-.jr_00_536D:
+.jr_03_536d:
     or   [hl]
     inc  hl
     dec  b
-    jr   nz,.jr_00_536D
+    jr   nz,.jr_03_536d
     and  a
     ret  nz
     ld   a,$01
@@ -1398,17 +1398,17 @@ call_03_538e_CollisionHandler_Bell:
     ret  nz
     call call_00_2962_Entity_GetActionId
     cp   a,$00
-    jr   nz,.jr_00_53B0
+    jr   nz,.jr_03_53b0
     ld   hl,wDCCC_BellCounter
     inc  [hl]
     ld   a,[hl]
     call call_00_2c09_Entity_SpawnGoalCounter
     ld   a,[wDCCC_BellCounter]
     cp   a,$07
-    jr   nz,.jr_00_53B0
+    jr   nz,.jr_03_53b0
     ld   a,$01
     ld   [wDCD2_FreestandingRemoteHitFlags],a
-.jr_00_53B0:
+.jr_03_53b0:
     ld   a,$01
     farcall call_02_72ac_Entity_SetAction
     ld   c,$02
@@ -1429,13 +1429,13 @@ call_03_53c2_CollisionHandler_RockHard:
     cp   a,$05
     ret  nc
     cp   a,$03
-    jr   z,.jr_00_53D6
+    jr   z,.jr_03_53d6
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     cp   a,PLAYER_ATTACKED_ENTITY
     jp   z,call_03_5671_HandleEntityHit
     ret  
-.jr_00_53D6:
+.jr_03_53d6:
     ld   a,[wDC88_Player_HopYOffset]
     and  a
     ret  nz
@@ -1618,15 +1618,15 @@ call_03_54a8_CollisionHandler_Rez:
     call call_00_28b4_Entity_GetDamageState
     ld   c,$03
     cp   a,$03
-    jr   z,.jr_00_54E1
+    jr   z,.jr_03_54e1
     cp   a,$06
-    jr   z,.jr_00_54E1
+    jr   z,.jr_03_54e1
     cp   a,$09
-    jr   z,.jr_00_54E1
+    jr   z,.jr_03_54e1
     cp   a,$0C
-    jr   z,.jr_00_54E1
+    jr   z,.jr_03_54e1
     ld   c,$09
-.jr_00_54E1:
+.jr_03_54e1:
     ld   a,c
     farcall call_02_72ac_Entity_SetAction
     ret  
@@ -1642,7 +1642,7 @@ call_03_54ee_CollisionHandler_RaStatueProjectile:
     farcall call_02_72ac_Entity_SetAction
     ret  
 
-call_03_54f9_InitializeEntityCooldownTimer:
+call_03_5503_InitializeEntityCooldownTimer:
 ; Arms the current entity's post-hit invulnerability window by hand.
 ;
 ; Nothing calls it. HandleEntityHit writes the same value inline, which is
@@ -2062,13 +2062,13 @@ call_03_56c1_CollisionHandler_Platform:
 ;
 ; Three outcomes, and every path ends in one of them:
 ;
-;   .jr_00_577C   he is well above the platform: the LANDING test. Inside the full
+;   .jr_03_577c   he is well above the platform: the LANDING test. Inside the full
 ;                 width, the gap between the top edge and his feet under $10, and
 ;                 then predictive - this frame's fall step (Y velocity / 16) added
 ;                 to the gap. Negative means he would pass through the surface
 ;                 before the next frame, under $02 means he is already resting on
 ;                 it, and either counts as standing.
-;   .jr_00_571F   he overlaps it vertically: the SIDE-PUSH test. Work out which
+;   .jr_03_571f   he overlaps it vertically: the SIDE-PUSH test. Work out which
 ;                 side he is on and how far outside the full width he is, reject
 ;                 anything more than 8 pixels away, then ask
 ;                 call_03_58a9_ComputeCollisionOffset whether the platform's step
@@ -2090,9 +2090,9 @@ call_03_56c1_CollisionHandler_Platform:
     ld   e,a
     ld   d,$00
     bit  7,a
-    jr   z,.jr_00_56E3
+    jr   z,.jr_03_56e3
     dec  d
-.jr_00_56E3:
+.jr_03_56e3:
     ld   a,[wD810_PlayerYPosition]
     add  e
     ld   e,a
@@ -2107,7 +2107,7 @@ call_03_56c1_CollisionHandler_Platform:
     ld   a,d
     sbc  [hl]
     ld   d,a
-    jr   c,.jr_00_570D
+    jr   c,.jr_03_570d
     and  a
     jp   nz,call_03_57f8_ClearCollisionForEntity
     inc  l
@@ -2116,8 +2116,8 @@ call_03_56c1_CollisionHandler_Platform:
     add  a,$0F
     cp   e
     jp   c,call_03_57f8_ClearCollisionForEntity
-    jr   .jr_00_571F
-.jr_00_570D:
+    jr   .jr_03_571f
+.jr_03_570d:
     xor  a
     sub  e
     ld   e,a
@@ -2130,8 +2130,8 @@ call_03_56c1_CollisionHandler_Platform:
     ldd  a,[hl]
     add  a,$0F
     cp   e
-    jr   c,.jr_00_577C
-.jr_00_571F:
+    jr   c,.jr_03_577c
+.jr_03_571f:
     ld   c,[hl]
     ld   a,l
     xor  a,$1C
@@ -2149,7 +2149,7 @@ call_03_56c1_CollisionHandler_Platform:
     ld   a,d
     adc  a,$00
     bit  7,a
-    jr   nz,.jr_00_575D
+    jr   nz,.jr_03_575d
     and  a
     jp   nz,call_03_57f8_ClearCollisionForEntity
     ld   a,e
@@ -2169,7 +2169,7 @@ call_03_56c1_CollisionHandler_Platform:
     and  a
     jp   z,call_03_580b_RegisterSecondaryCollision
     jp   call_03_57f8_ClearCollisionForEntity
-.jr_00_575D:
+.jr_03_575d:
     inc  d
     jp   nz,call_03_57f8_ClearCollisionForEntity
     ld   a,e
@@ -2187,7 +2187,7 @@ call_03_56c1_CollisionHandler_Platform:
     and  a
     jp   z,call_03_580b_RegisterSecondaryCollision
     jp   call_03_57f8_ClearCollisionForEntity
-.jr_00_577C:
+.jr_03_577c:
     ldi  a,[hl]
     ld   c,a
     ld   b,[hl]
@@ -2222,9 +2222,9 @@ call_03_56c1_CollisionHandler_Platform:
     ld   e,a
     ld   d,$00
     bit  7,a
-    jr   z,.jr_00_57AE
+    jr   z,.jr_03_57ae
     dec  d
-.jr_00_57AE:
+.jr_03_57ae:
     ld   a,[wD810_PlayerYPosition]
     add  e
     ld   e,a
@@ -2307,9 +2307,9 @@ call_03_580b_RegisterSecondaryCollision:
     ld   a,[wDA00_CurrentEntityAddrLo]
     ld   hl,wDC7B_Player_EntityStoodOnLo
     cp   [hl]
-    jr   nz,.jr_00_5816
+    jr   nz,.jr_03_5816
     ld   [hl],$00
-.jr_00_5816:
+.jr_03_5816:
     ld   [wDC7D_Player_PushedMovingPlatformLo],a
     ret  
 
@@ -2427,11 +2427,11 @@ call_03_58a9_ComputeCollisionOffset:
     dec  l
     dec  l
     bit  7,[hl]
-    jr   z,.jr_00_58BB
+    jr   z,.jr_03_58bb
     xor  a
     sub  b
     ld   b,a
-    .jr_00_58BB:
+    .jr_03_58bb:
     ld   a,[wDC84_PlayerXDeltaExtra]
     ld   d,a
     ld   a,[wDC85_PlayerXDeltaExtra2]

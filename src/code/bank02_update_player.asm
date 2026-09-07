@@ -324,13 +324,13 @@ call_02_4e7a_Player_LookupSnowboardSprite:
     ld   [wDCA4_Player_SnowboardingRelated3],a
     ret  
 .data_02_4ea3_SnowboardSprites:
-    db   $01                                          ;; 02:4e9c ????????
+    db   $01                                          ;; 02:4ea3 ????????
     db   $05, $05, $06, $09, $01, $0d, $09, $01       ;; 02:4ea4 ????????
     db   $05, $01, $09, $0e, $01, $09, $09, $07       ;; 02:4eac ????????
     db   $03, $0a, $07, $03, $0b, $03, $07, $0c       ;; 02:4eb4 ????????
     db   $03, $07, $0f, $03, $07, $10, $03
 .data_02_4ec3_TailSpinSprites:
-    db   $07                                          ;; 02:4ebc ????????
+    db   $07                                          ;; 02:4ec3 ????????
     db   $ff, $01, $0b, $0b, $06, $1b, $13, $0d       ;; 02:4ec4 ????????
     db   $1b, $13, $05, $13, $1b, $0e, $13, $1b       ;; 02:4ecc ????????
     db   $09, $2b, $23, $0a, $2b, $23, $0b, $23       ;; 02:4ed4 ????????

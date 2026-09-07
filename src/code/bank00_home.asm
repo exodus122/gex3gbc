@@ -207,10 +207,9 @@ call_00_0150_Init:
 ; ROM reads it. gex3 has no such flag anywhere, because there is nothing to
 ; branch on
 ;
-; @bug - the DMG-error-screen path at .jr_00_015d below carries the same broken
-; MBC sequence as call_00_0f25_SetMbcBank: `ld [MBC1RomBank],A / swap A / rrca /
-; and A,$00 / ld [MBC1SRamBank],A`. The `and A,$00` discards what the swap and the
-; rotate computed, so the two instructions are dead and $00 is always written.
+; The DMG-error-screen path below carries the same MBC sequence as
+; call_00_0f25_SetMbcBank, `and A,$00` and all - see that routine for why the two
+; instructions before the mask are dead here rather than wrong.
     di                                                 ;; 00:0150 $f3
     ld   SP, hFFFE                                     ;; 00:0151 $31 $fe $ff
     push AF                                            ;; 00:0154 $f5
@@ -2305,7 +2304,7 @@ call_00_0d8b_LcdIsr_LoadHudPalettesA:
     pop  hl
     pop  af
     reti 
-.data_00_0dbe_HudPalettesA
+.data_00_0dbe_HudPalettesA:
     db   $00, $00, $e0, $01, $00, $00, $e0, $01
     
 call_00_0dc6_LcdIsr_LoadHudPalettesB:
@@ -2339,7 +2338,7 @@ call_00_0dc6_LcdIsr_LoadHudPalettesB:
     pop  af
     reti 
 .data_00_0df0_HudPalettesB:
-    db   $ff, $7f, $80, $03, $ff, $03, $ff, $7f        ;; 00:0df3 ?????.
+    db   $ff, $7f, $80, $03, $ff, $03, $ff, $7f        ;; 00:0df0 ????????
 
 data_00_0df8_LcdIsrTemplate_GfxStream:
 ; LCD_ISR_MENU_GFX_STREAM. The handler itself does nothing - menus want no
@@ -2546,15 +2545,16 @@ call_00_0edd_FarCall:
 ; Calls HL in bank A and comes back to the caller's bank. The farcall macro is
 ; what sets up A and HL; this is its body.
 ;
-; Note it loads wDAD6_ReturnBank into A immediately before jumping, so the callee
-; is entered with A holding the bank to return to rather than anything the caller
-; chose - worth knowing before assuming A is a free argument register across a
-; farcall. The callee's return value in A does survive, since it is pushed around
+; A IS a usable argument register across a farcall, despite the bank number passing
+; through it: the macro stashes the caller's A in wDAD6_FarCallArgA before overwriting
+; it with BANK(), and the `ld a,[wDAD6_FarCallArgA]` below puts it back immediately
+; before the jump. That is the whole reason the variable exists - it carries nothing
+; about banks. The callee's return value in A survives too, since it is pushed around
 ; RestoreBank. Identical to gex2's call_00_1078_FarCall
     push HL                                            ;; 00:0edd $e5
     call call_00_0eee_SwitchBank                       ;; 00:0ede $cd $ee $0e
     pop  HL                                            ;; 00:0ee1 $e1
-    ld   A, [wDAD6_ReturnBank]                         ;; 00:0ee2 $fa $d6 $da
+    ld   A, [wDAD6_FarCallArgA]                         ;; 00:0ee2 $fa $d6 $da
     call call_00_0f22_JumpHL                           ;; 00:0ee5 $cd $22 $0f
     push AF                                            ;; 00:0ee8 $f5
     call call_00_0f08_RestoreBank                      ;; 00:0ee9 $cd $08 $0f
@@ -2571,8 +2571,8 @@ call_00_0eee_SwitchBank:
 ; call_00_0b25_VBlank_Handler uses call_00_0f25_SetMbcBank instead.
 ; gex2's call_00_1089_SwitchBank
 ;
-; @bug - see call_00_0f25_SetMbcBank. `swap A / rrca / and A,$00` computes the
-; SRAM bank and then discards it; $00 is always written to MBC1SRamBank.
+; The `swap A / rrca / and A,$00` before the MBC1SRamBank write always stores $00 -
+; see call_00_0f25_SetMbcBank for why those two instructions are dead here.
     ld   HL, wDAD3_PtrToBankStackPosition              ;; 00:0eee $21 $d3 $da
     ld   E, [HL]                                       ;; 00:0ef1 $5e
     inc  HL                                            ;; 00:0ef2 $23
@@ -2595,8 +2595,8 @@ call_00_0f08_RestoreBank:
 ; call_00_0eee_SwitchBank exactly - `dec DE` here against its `inc DE`. Clobbers
 ; A with the restored bank number. gex2's call_00_10a3_RestoreBank
 ;
-; @bug - see call_00_0f25_SetMbcBank. `swap A / rrca / and A,$00` computes the
-; SRAM bank and then discards it; $00 is always written to MBC1SRamBank.
+; The `swap A / rrca / and A,$00` before the MBC1SRamBank write always stores $00 -
+; see call_00_0f25_SetMbcBank for why those two instructions are dead here.
     ld   HL, wDAD3_PtrToBankStackPosition              ;; 00:0f08 $21 $d3 $da
     ld   E, [HL]                                       ;; 00:0f0b $5e
     inc  HL                                            ;; 00:0f0c $23
@@ -2622,23 +2622,28 @@ call_00_0f22_JumpHL:
 
     ld   a, $03                                        ;; 00:0f23 ??
 call_00_0f25_SetMbcBank:
-; Writes bank A to the MBC without touching the bank stack, and moves the SRAM
-; bank register with it - the cartridge is driven as an MBC1 in the upper-bits
-; mode, so the two have to stay in step even though there is no SRAM
-; (CART_SRAM_NONE).
+; Writes bank A to the MBC without touching the bank stack. The bank number goes
+; to $2001; the `swap A / rrca / and A,$00 / ld [MBC1SRamBank],A` that follows
+; always writes $00 to $4001, because the mask discards what the swap and the
+; rotate computed.
+;
+; That is inherited code rather than a live mechanism, and it is also the evidence
+; that this cartridge really is the MBC5 its header declares. gex2 runs the same
+; five instructions with `and a,$01`, which hands bit 5 of the bank number to
+; $4001 - the second bank register an MBC1 needs to reach banks $20-$3F. gex3
+; addresses banks up to $7F while writing $00 there, which no MBC1 could do, so on
+; this board $2001 must be the MBC5's own 8-bit ROM bank register and $4001 the RAM
+; bank register, harmless with CART_SRAM_NONE.
 ;
 ; This is the form interrupt-time code has to use. gex2 has the same thing as the
 ; SET_MBC_BANK macro, expanded inline at each site rather than being a routine.
 ;
 ; The `ld a, $03` immediately above the entry point is unreachable - it is the
-; tail of the previous routine's `jp hl` and nothing branches to it
+; tail of the previous routine's `jp hl` and nothing branches to it.
 ;
-; @bug - `and A,$00` throws away the value `swap A / rrca` just computed, so the
-; SRAM bank is always written as $00 and the two instructions above it are dead.
-; gex2's SET_MBC_BANK macro does the same sequence with `and a,$01`, which is what
-; turns bit 5 of the ROM bank number into the SRAM bank. The same three-instruction
-; sequence appears four times in this file - here, in call_00_0eee_SwitchBank,
-; in call_00_0f08_RestoreBank and in call_00_0150_Init - all four with $00.
+; The same five-instruction sequence appears four times in this file - here, in
+; call_00_0eee_SwitchBank, in call_00_0f08_RestoreBank and in
+; call_00_0150_Init - all four with the $00 mask
     ld   [MBC1RomBank], A                              ;; 00:0f25 $ea $01 $20
     swap A                                             ;; 00:0f28 $cb $37
     rrca                                               ;; 00:0f2a $0f
@@ -2704,6 +2709,17 @@ call_00_0f5e_WaitUntilNoInputPressed:
     jr   NZ, call_00_0f5e_WaitUntilNoInputPressed      ;; 00:0f65 $20 $f7
     ret                                                ;; 00:0f67 $c9
 
+; ------------------------------------------------------------------
+; CheckInput* - "is this button held", returning NZ if it is.
+;
+; These report the button being HELD, not a fresh press; nothing here compares
+; against a previous frame. Code that needs an edge does its own bookkeeping.
+;
+; The four d-pad helpers mask with `and`, so they do not care what else is held.
+; START and SELECT compare with `cp` instead and only report a press when that
+; button is the ONLY one down. The same eight routines, in the same order, as
+; gex2's call_00_10f5_CheckInputLeft onward
+; ------------------------------------------------------------------
 call_00_0f68_CheckInputLeft:
     ld   A, [wDAD7_RawInputs]                          ;; 00:0f68 $fa $d7 $da
     and  A, PADF_LEFT                                  ;; 00:0f6b $e6 $20
@@ -2725,6 +2741,13 @@ call_00_0f7a_CheckInputDown:
     ret                                                ;; 00:0f7f $c9
 
 call_00_0f80_CheckInputStart:
+; NZ if START is held - but note the `cp` rather than `and`: this only reports a
+; press when START is the ONLY button down, so holding it with any direction reads
+; as not pressed.
+;
+; The tail is `xor a / ret` against `and a / ret`, which looks redundant but is
+; not: both paths have to leave the Z flag set from the comparison the caller will
+; test, and the not-pressed path also has to clear A
     ld   A, [wDAD7_RawInputs]                          ;; 00:0f80 $fa $d7 $da
     cp   A, PADF_START                                 ;; 00:0f83 $fe $08
     jr   Z, .jr_00_0f89                                ;; 00:0f85 $28 $02
@@ -2735,12 +2758,11 @@ call_00_0f80_CheckInputStart:
     ret                                                ;; 00:0f8a $c9
 
 call_00_0f8b_CheckInputSelect:
-; Purpose: Tests if the current input state (wDAD7_RawInputs) equals $04. 
-; If so, returns A unchanged; otherwise clears A.
-; Usage: Likely a quick check for a specific button press (e.g., "Right" or a single button).
-; Behavior:
-; A == $04 → returns immediately.
-; Otherwise sets A=0 and returns.
+; NZ if SELECT is held, and only if it is the only button down - the same `cp`
+; form as call_00_0f80_CheckInputStart above. PADF_SELECT is $04.
+;
+; This is what call_00_05fd_Player_CheckEatFlyInput polls, so eating a fly needs
+; SELECT on its own; SELECT plus a direction reads as nothing pressed
     ld   A, [wDAD7_RawInputs]                          ;; 00:0f8b $fa $d7 $da
     cp   A, PADF_SELECT                                ;; 00:0f8e $fe $04
     jr   Z, .jr_00_0f94                                ;; 00:0f90 $28 $02

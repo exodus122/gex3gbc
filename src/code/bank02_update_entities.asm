@@ -257,7 +257,7 @@ call_02_7152_Entities_UpdateAll:
 ; Then the two special entities. Whatever Gex is standing on
 ; (wDC7B_Player_EntityStoodOnLo) has its action function called FIRST, before Gex
 ; and out of slot order, and then his Y is recomputed from the platform's: its YPOS
-; minus $10 minus its ENTITY_FIELD_HEIGHT. Doing it in that order is what stops him
+; minus $10 minus its ENTITY_FIELD_COLLISION_HEIGHT. Doing it in that order is what stops him
 ; visibly lagging a frame behind a platform he is riding. Whatever he is pushing
 ; into (wDC7D_Player_PushedMovingPlatformLo) is run next, and then
 ; call_02_4f32_Player_UpdateMain.

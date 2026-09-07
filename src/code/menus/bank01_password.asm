@@ -398,7 +398,7 @@ call_01_4f8c_Password_BuildPayload:
 ; no spare room, which is why a level cannot gain a saved flag without one being taken
 ; from somewhere else
 ;
-; call_01_50b5_Password_ApplyProgress has its own byte-for-byte copy at
+; call_01_50b5_Password_ApplyPayload has its own byte-for-byte copy at
 ; .data_01_511a_LevelProgressMasks; the two are never compared, so a change here must
 ; be made there too or saving and loading will disagree
     db   $f1, $ff, $ff, $ff, $ff, $ff, $ff, $01       ; levels $00-$07
@@ -525,7 +525,7 @@ call_01_50b5_Password_ApplyPayload:
 ; Expands the decoded payload back into wDC5C_ProgressFlags and the three header
 ; counters - the exact inverse of call_01_4f8c_Password_BuildPayload.
 ;
-; Per level it walks that level's mask from data_01_511a_LevelProgressMasks and, for
+; Per level it walks that level's mask from .data_01_511a_LevelProgressMasks and, for
 ; every set mask bit, pulls the next payload bit into the top of C; rotating C left
 ; once per iteration lands each recovered bit back in the position it was taken from.
 ; Bits the mask does not cover come back as zero

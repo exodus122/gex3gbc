@@ -358,7 +358,7 @@ call_05_412b_Audio_StartSong:
     add  HL, HL                                        ;; 05:4131 $29
     add  HL, HL                                        ;; 05:4132 $29
     add  HL, DE                                        ;; 05:4133 $19
-    ld   DE, data_05_717d_SongTable                    ;; 05:4134 $11 $85 $70
+    ld   DE, data_05_717d_SongTable                    ;; 05:4134 $11 $7d $71
     add  HL, DE                                        ;; 05:4137 $19
     ld   A, [HL+]                                      ;; 05:4138 $2a
     ld   [wDF02_Audio_Ch1_SeqPtrLo], A                 ;; 05:4139 $ea $02 $df
@@ -1068,7 +1068,7 @@ call_05_44d4_Audio_RunSequence:
     srl  A                                             ;; 05:455a $cb $3f
     add  A, D                                          ;; 05:455c $82
     push HL                                            ;; 05:455d $e5
-    ld   HL, data_05_71f1_InstrumentPointers           ;; 05:455e $21 $d1 $70
+    ld   HL, data_05_71f1_InstrumentPointers           ;; 05:455e $21 $f1 $71
     add  A, L                                          ;; 05:4561 $85
     ld   L, A                                          ;; 05:4562 $6f
     jr   NC, .jr_05_4566                               ;; 05:4563 $30 $01
@@ -1392,11 +1392,11 @@ call_05_4695_AudioCmd_CallPattern:
     ld   A, [BC]                                       ;; 05:469e $0a
     sla  A                                             ;; 05:469f $cb $27
     jr   NC, .jr_05_46a9                               ;; 05:46a1 $30 $06
-    ld   DE, data_05_777d_PatternPointers              ;; 05:46a3 $11 $6f $76
+    ld   DE, data_05_777d_PatternPointers              ;; 05:46a3 $11 $7d $77
     inc  D                                             ;; 05:46a6 $14
     jr   .jr_05_46ac                                   ;; 05:46a7 $18 $03
 .jr_05_46a9:
-    ld   DE, data_05_777d_PatternPointers              ;; 05:46a9 $11 $6f $76
+    ld   DE, data_05_777d_PatternPointers              ;; 05:46a9 $11 $7d $77
 .jr_05_46ac:
     add  A, E                                          ;; 05:46ac $83
     ld   E, A                                          ;; 05:46ad $5f

@@ -41,7 +41,7 @@
 ;     Config entries 7 and 8 of .data_00_0aa9_HdmaConfigTable HDMA the
 ;     first two sweeps out to VRAM - attributes to bank 1, tile ids to bank 0.
 ;     The third sweep is collision, and is simply left in wC000_BgMapTileIds,
-;     which is where call_03_4b4c_BgCollision_TestTile reads it for the rest of
+;     which is where call_03_4b4c_BgCollision_IsPixelSolid reads it for the rest of
 ;     the map's life.
 ;
 ;   * call_00_11c8_BgMap_LoadDirtyRegions runs once per frame. The camera
@@ -135,7 +135,7 @@ call_00_1056_BgMap_LoadFull:
 ; Finally it copies image_003_4100_collision_tileset out of bank 03 into
 ; wC400_CollisionTilesetData, transposed - the source is 8 consecutive bytes per
 ; collision tile, the destination is 8 pages of 256 bytes, so that
-; call_03_4b4c_BgCollision_TestTile can pick a row with `(y AND 7) + $C4` and
+; call_03_4b4c_BgCollision_IsPixelSolid can pick a row with `(y AND 7) + $C4` and
 ; index it by tile id in one go. Then it waits a frame, updates the map window
 ; and clears wDC20_BgMapLoadingFlags.
 ;

@@ -1004,7 +1004,7 @@ call_03_4b82_BgCollision_IsPixelSolidNoFeetOffset:
     and  [hl]
     ret
 .data_03_4bae_PixelColumnMasks:
-    db   $80, $40, $20, $10, $08, $04, $02, $01                            ;; 03:4bb2 ????
+    db   $80, $40, $20, $10, $08, $04, $02, $01                            ;; 03:4bae ????
 
 call_03_4bb6_BgCollision_CacheNearbyTileTypes:
 ; Caches the collision tile ids around Gex so the player code in bank 2 can react

@@ -439,7 +439,7 @@ data_03_68f9_EntityPalettes:
     db   $00, $00, $1f, $00, $1f, $02, $ff, $03       ;; 03:6aa9 ???????? ; ENTITY_TUT_TV_RA_STATUE_DIAGONAL_PROJECTILE
     db   $00, $00, $00, $00, $36, $02, $3c, $4f       ;; 03:6ab1 ???????? ; ENTITY_TUT_TV_BREAKABLE_BLOCK
     db   $00, $00, $00, $7c, $d7, $01, $ff, $03       ;; 03:6ab9 ???????? ; ENTITY_TUT_TV_COFFIN
-    db   $00, $00, $00, $00, $20, $03, $ff, $7f       ;; 03:6ac1 ???????? ; ENTITY_WESTERN_STATION_CACTUS
+    db   $00, $00, $00, $00, $20, $03, $ff, $7f       ;; 03:6ac1 ???????? ; ENTITY_WESTERN_STATION_ENEMY_CACTUS
     db   $00, $00, $00, $00, $20, $03, $ff, $7f       ;; 03:6ac9 ???????? ; ENTITY_UNK3A
     db   $00, $00, $00, $00, $4a, $29, $52, $4a       ;; 03:6ad1 ???????? ; ENTITY_WESTERN_STATION_ROCK_PLATFORM
     db   $00, $00, $ff, $03, $00, $00, $52, $4a       ;; 03:6ad9 ???????? ; ENTITY_WESTERN_STATION_HARD_HAT
@@ -489,7 +489,7 @@ data_03_68f9_EntityPalettes:
     db   $00, $00, $00, $00, $08, $21, $10, $06       ;; 03:6c39 ???????? ; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE
     db   $00, $00, $00, $00, $b7, $01, $1f, $1b       ;; 03:6c41 ???????? ; ENTITY_LIZARD_OF_OZ_CANNON
     db   $00, $00, $00, $00, $dc, $08, $1f, $0e       ;; 03:6c49 ???????? ; ENTITY_LIZARD_OF_OZ_BRAIN_OF_OZ_PROJECTILE
-    db   $00, $00, $00, $00, $dc, $00, $1f, $43       ;; 03:6c51 ???????? ; ENTITY_UNK6B
+    db   $00, $00, $00, $00, $dc, $00, $1f, $43       ;; 03:6c51 ???????? ; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2
     db   $00, $00, $00, $02, $2b, $2f, $fa, $47       ;; 03:6c59 ???????? ; ENTITY_UNK6C
     db   $00, $00, $d0, $04, $d6, $09, $fc, $16       ;; 03:6c61 ???????? ; ENTITY_UNK6D
     db   $00, $00, $00, $00, $10, $42, $18, $63       ;; 03:6c69 ???????? ; ENTITY_CHANNEL_Z_REZ

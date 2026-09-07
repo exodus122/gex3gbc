@@ -388,7 +388,11 @@ wDAD3_PtrToBankStackPosition:
     ds 2                                               ;; dad3
 wDAD5_CurrentROMBank:
     ds 1                                               ;; dad5
-wDAD6_ReturnBank:
+wDAD6_FarCallArgA:
+; The A register a farcall was issued with, held across the two `ld a` the macro needs
+; for the bank number and the target address. call_00_0edd_FarCall reloads A from here
+; just before jumping, so a farcalled routine sees the A its caller set up. Nothing
+; else reads or writes it
     ds 1                                               ;; dad6
 
 wDAD7_RawInputs:
@@ -1049,7 +1053,7 @@ wDC52_Player_OamTileId:
 ; The running tile number call_00_2ce2_Player_BuildSprites hands out to Gex's OBJs.
 ; Zeroed at the top of the build and stepped by PLAYER_SPRITE_TILE_STRIDE per piece,
 ; so a frame's pieces always take consecutive tile pairs out of the page
-; call_00_098f_CopyPlayerGfxToVRAM filled. A piece record does not carry a tile
+; call_00_0c6a_VBlank_StartPendingHdma filled. A piece record does not carry a tile
 ; number of its own
     ds 1                                               ;; dc52
 wDC53_Player_OamAttributes:
@@ -1231,10 +1235,10 @@ wDC86_PlayerXVelocity:
 ; call_02_5081_Player_UpdateFacing nudges it one step per frame toward
 ; wDC87_PlayerXMaxVelocity rather than snapping to it, and resets it to zero when
 ; Gex turns around or lets go of the d-pad - so he always accelerates from a
-; standstill after a direction change. gex2's wD75D_PlayerXSpeedPrev
+; standstill after a direction change. gex2's wD75D_Player_XSpeedCurrent
     ds 1                                               ;; dc86
 wDC87_PlayerXMaxVelocity: ; if freeze this, gex can run faster
-; The speed the current action is ramping toward. gex2's wD75E_PlayerXSpeed
+; The speed the current action is ramping toward. gex2's wD75E_Player_XSpeedTarget
     ds 1                                               ;; dc87
 
 wDC88_Player_HopYOffset:

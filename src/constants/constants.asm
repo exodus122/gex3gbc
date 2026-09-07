@@ -418,7 +418,7 @@ DEF PROGRESS_ALL_COLLECTIBLES_BIT EQU 3  ; bit of wDC5C_ProgressFlags[level]
 
 ; ------------------------------------------------------------------
 ; Fly power-ups. Eating a fly with SELECT swaps it in and cashes the old one
-; out - see call_00_0624_Player_SwapFlyPowerup, gex3's
+; out - see call_00_0624_Player_SwapFlyPowerup, gex2's
 ; call_00_0647_Player_SwapFlyPowerup. Three of the five ids arm a timer, and
 ; each has a countdown byte of its own
 ; ------------------------------------------------------------------
@@ -711,11 +711,11 @@ DEF ENTITY_FIELD_X_VELOCITY                 EQU $1B
 DEF ENTITY_FIELD_X_SUBPIXEL                 EQU $1C ; subpixel accumulator: the low nibble carries the
                                                     ; fraction of a pixel XVEL has not paid out yet
 DEF ENTITY_FIELD_Y_VELOCITY                 EQU $1D
-DEF ENTITY_FIELD_Y_SUBPIXEL                 EQU $1E ; the same accumulator for YVEL. Only the facing-based
-                                                    ; mover call_00_25cb_Entity_MoveYByFacingSpeed uses it;
-                                                    ; call_00_24ee_Entity_ApplyYVelocity_Subpixel accumulates
-                                                    ; into $1E's neighbour instead, so most entities leave
-                                                    ; this byte at zero
+DEF ENTITY_FIELD_Y_SUBPIXEL                 EQU $1E ; the same accumulator for YVEL. Both Y movers use it -
+                                                    ; call_00_24ee_Entity_ApplyYVelocity_Subpixel and the
+                                                    ; facing-based call_00_25cb_Entity_MoveYByFacingSpeed -
+                                                    ; but the gravity helpers do not, so an entity that only
+                                                    ; ever falls leaves this byte at zero
 DEF ENTITY_FIELD_PARENT                     EQU $1F ; stores entity list index of this entity's parent (used for projectiles, flies)
 
 ; Entity Spawn Struct
@@ -1021,7 +1021,7 @@ DEF MENU_CHAINED_PASSWORD_GRID   EQU $00 ; data_01_5a47_MenuScript_PasswordGrid
 DEF MENU_CHAINED_TOTALS_STATS    EQU $01 ; data_01_5ad8_MenuScript_TotalsStats
 
 ; The sub-handlers a command can reach, indexed as id - MENUCMD_HANDLER_BASE into
-; data_01_456b_MenuCmd_SubHandlers. Everything screen-specific in the menu system is
+; .data_01_456b_MenuCmd_SubHandlers. Everything screen-specific in the menu system is
 ; one of these seventeen
 DEF MENUCMD_SUB_STAGE_IMAGE1     EQU $e0
 DEF MENUCMD_SUB_STAGE_IMAGE2     EQU $e1 ; the same routine as $e0

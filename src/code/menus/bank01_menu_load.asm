@@ -37,7 +37,7 @@
 ;                       decides what "QUIT" means on this screen
 ;   call a sub-handler  if the block's source-pointer high byte is at or above
 ;                       MENUCMD_HANDLER_BASE it is not a pointer at all: the excess
-;                       indexes data_01_456b_MenuCmd_SubHandlers and the low byte is
+;                       indexes .data_01_456b_MenuCmd_SubHandlers and the low byte is
 ;                       the handler's argument. That is where everything screen-
 ;                       specific lives - the seventeen MenuCmd_* routines below
 ;   draw text           MENUCMD_FLAG_DRAW_TEXT runs the renderer over the block

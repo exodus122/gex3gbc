@@ -535,9 +535,9 @@ call_02_49b3_PlayerAction_Water_Swimming:
     set  GFX_XFER_PLAYER_GFX,[hl]
     ret  
 .data_02_4a15_SwimSpriteBase:
-    db   $7d, $4f, $48, $56, $7d, $56, $48, $4f       ;; 02:4a11 ????????
+    db   $7d, $4f, $48, $56, $7d, $56, $48, $4f       ;; 02:4a15 ????????
 .data_02_4a1d_SwimFacingByDirection:
-    db   $00, $00, $00, $00, $60, $20, $20, $20       ;; 02:4a19 ????????
+    db   $00, $00, $00, $00, $60, $20, $20, $20       ;; 02:4a1d ????????
 
 call_02_4a25_PlayerAction_DeathInPitAlt:
 ; Stops Gex and holds the damage cooldown, and drops into the real pit death only

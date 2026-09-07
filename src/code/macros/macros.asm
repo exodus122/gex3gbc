@@ -1,6 +1,6 @@
 ; Calls a function in a different bank
 MACRO farcall
-    ld   [wDAD6_ReturnBank], a
+    ld   [wDAD6_FarCallArgA], a
 	ld   a, BANK(\1)
 	ld   hl, \1
 	call call_00_0edd_FarCall

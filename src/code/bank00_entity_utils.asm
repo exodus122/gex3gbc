@@ -282,7 +282,7 @@ call_00_2299_Entity_SetListState:
     ld   [HL], A                                      ;; 00:22af $77
     ret                                               ;; 00:22b0 $c9
 
-call_00_22b1_Entity_SetListStateAndAction:
+call_00_22b1_Entity_SyncActionToListState:
 ; Same lookup, but this one only READS. C is the action id the caller believes it
 ; is in: if the stored state agrees, it returns and nothing happens. If it does not
 ; agree, it calls call_02_72ac_Entity_SetAction with A - which at that point holds
@@ -293,8 +293,8 @@ call_00_22b1_Entity_SetListStateAndAction:
 ; every caller passes its own action id. call_02_5ada_EntityAction_TVRemote_SyncDefault
 ; and the two routines after it are the pattern.
 ;
-; Worth reading twice, because the name the routine had before said it wrote the
-; flags. It does not; only call_00_2299_Entity_SetListState does that
+; Worth reading twice: nothing here writes the list state. Only
+; call_00_2299_Entity_SetListState does that
     ld   A, [wDA00_CurrentEntityAddrLo]               ;; 00:22b1 $fa $00 $da
     rlca                                              ;; 00:22b4 $07
     rlca                                              ;; 00:22b5 $07
@@ -324,7 +324,7 @@ call_00_22d4_Entity_CheckTriggerFlag:
 ; @bug - missing range guard. This is the only one of the four trigger routines
 ; that indexes wDCB1_LevelTriggerBuffer without first checking C. Its three
 ; siblings - call_00_22e0_Entity_IncrementTriggerFlag,
-; call_00_22ef_Entity_SetTriggerActive and call_00_22ff_Entity_ClearTriggerFlag -
+; call_00_22ef_Entity_SetTriggerActive and call_00_22ff_Entity_SetTriggerInactive -
 ; all open with
 ;     ld   a,c
 ;     cp   a,LEVEL_TRIGGER_COUNT
@@ -527,7 +527,7 @@ call_00_233e_Entity_MoveAlongArcTable:
 ; $2E (dy, dx) pairs tracing a quarter circle, walked by
 ; call_00_233e_Entity_MoveAlongArcTable and mirrored into the other three quadrants
 ; by the sign rules above. No gex2 equivalent
-    db   $00, $e0                                     ;; 00:23ae ????????
+    db   $00, $e0                                     ;; 00:23b4 ????????
     db   $01, $e0, $02, $e0, $03, $e0, $04, $e0       ;; 00:23b6 ????????
     db   $05, $e0, $06, $e1, $07, $e1, $08, $e1       ;; 00:23be ????????
     db   $09, $e1, $0a, $e2, $0b, $e2, $0c, $e2       ;; 00:23c6 ????????
@@ -634,7 +634,7 @@ call_00_2475_Entity_ApplyGravityMoveY_WithFloorCollision:
 ;   carry CLEAR  just snapped to the floor - it has landed
 ;
 ; That convention is why so many bank 2 hop actions are literally "call this,
-; ret c". gex2's equivalent is call_00_30da_Entity_ApplyGravityMoveY_WithFloorCollision,
+; ret c". gex2's equivalent is call_00_30da_Entity_ApplyGravityMoveY_WithCeilingCollision,
 ; which clamps to Entity_GetMinYBound instead
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_Y_VELOCITY
     ld   a,[hl]
@@ -907,9 +907,8 @@ call_00_25cb_Entity_MoveYByFacingSpeed:
 ; ENTITY_FACING_VERTICAL_FLIP says, accumulating the fraction in
 ; ENTITY_FIELD_Y_SUBPIXEL, and returns the new 16-bit Y in DE.
 ;
-; This is the only routine in the game that uses that accumulator byte, which is
-; why it was long assumed to be unused. The two `xor` walks on L are $0D -> $1D
-; (facing to YVEL) and $1E -> $10 (accumulator to YPOS)
+; The two `xor` walks on L are $0D -> $1D (facing to YVEL) and $1E -> $10
+; (accumulator to YPOS)
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_FACING_DIRECTION
     ld   c,[hl]
     ld   a,l
@@ -2297,9 +2296,9 @@ call_00_2c20_Entity_CopyPaletteToBuffer:
 data_00_2c43_ParticleSlotPointerTable:
 ; PARTICLE_SLOT_COUNT pointers, one particle buffer per entity slot
     dw   wDDC4_ParticleSlot1, wDDD7_ParticleSlot2
-    dw   wDDEA_ParticleSlot3, wDDFD_ParticleSlot4     ;; 00:2c43 ????????
+    dw   wDDEA_ParticleSlot3, wDDFD_ParticleSlot4     ;; 00:2c47 ????????
     dw   wDE10_ParticleSlot5, wDE23_ParticleSlot6
-    dw   wDE36_ParticleSlot7, wDE49_ParticleSlot8     ;; 00:2c51 pP
+    dw   wDE36_ParticleSlot7, wDE49_ParticleSlot8     ;; 00:2c4f pP
 
 call_00_2c53_Particle_GetSlotPtr:
 ; DE = the particle buffer belonging to the current entity, out of
