@@ -437,8 +437,7 @@ call_00_11e5_BgMap_LoadRowForVerticalScroll:
 ;
 ; Which row depends on the direction. MAP_SCROLL_DOWN takes camera Y + $88, the
 ; row just off the bottom of the screen; otherwise camera Y - 1, the row just
-; off the top. `ld HL, rIE` is $FFFF, i.e. -1 - the disassembler picked the
-; hardware register name for the constant.
+; off the top.
 ;
 ; call_00_14e2_BgMap_SetScrollBlockCoords then turns the camera position into
 ; wDC27_BgMap_ScrollBlockX / wDC28_BgMap_ScrollBlockY, and the routine works out
@@ -467,10 +466,6 @@ call_00_11e5_BgMap_LoadRowForVerticalScroll:
 ; gex2 also reads 6 blocks instead of 11, applies its alt-blockset mask and any
 ; registered block patches to the strip before expanding it, and expands each
 ; block into 8 tiles instead of 2 because its blocks are 32x32
-;
-; The row index starts at -1, the row above the screen, so the first pass of the
-; loop lands on row 0. call_00_1351_BgMap_LoadColumnForHorizontalScroll does the
-; same for the column left of the screen.
     ld   HL, wDBFB_YPositionInMap                                     ;; 00:11e5 $21 $fb $db
     ld   A, [HL+]                                      ;; 00:11e8 $2a
     ld   C, A                                          ;; 00:11e9 $4f
@@ -744,9 +739,6 @@ call_00_1351_BgMap_LoadColumnForHorizontalScroll:
 ;
 ; gex2's counterpart is call_00_157a_BgMap_LoadColumnForHorizontalScroll, which
 ; steps a fixed $80 bytes per row because its maps are all 128 blocks wide
-;
-; The column index starts at -1, the column left of the screen - see
-; call_00_11e5_BgMap_LoadRowForVerticalScroll.
     ld   HL, wDBF9_XPositionInMap                                     ;; 00:1351 $21 $f9 $db
     ld   A, [HL+]                                      ;; 00:1354 $2a
     ld   E, A                                          ;; 00:1355 $5f

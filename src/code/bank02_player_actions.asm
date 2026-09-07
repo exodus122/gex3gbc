@@ -96,11 +96,11 @@ call_02_47b4_PlayerAction_Spawn:
     bit  ACTION_STATE_IS_FIRST_FRAME_BIT, [HL]        ;; 02:47b7 $cb $66
     ret  Z                                            ;; 02:47b9 $c8
     xor  A, A                                         ;; 02:47ba $af
-    ld   [wDCA2_Player_SnowboardingRelated], A        ;; 02:47bb $ea $a2 $dc
-    ld   [wDCA3_Player_SnowboardingRelated2], A       ;; 02:47be $ea $a3 $dc
+    ld   [wDCA2_Player_SnowboardPoseIndex], A        ;; 02:47bb $ea $a2 $dc
+    ld   [wDCA3_Player_SnowboardPoseTimer], A       ;; 02:47be $ea $a3 $dc
     ld   [wDC87_PlayerXMaxVelocity], A                ;; 02:47c1 $ea $87 $dc
     ld   A, PLAYER_SNOWBOARD_SPRITE_BASE              ;; 02:47c4 $3e $05
-    ld   [wDCA4_Player_SnowboardingRelated3], A       ;; 02:47c6 $ea $a4 $dc
+    ld   [wDCA4_Player_SnowboardBaseSprite], A       ;; 02:47c6 $ea $a4 $dc
     ld   A, SFX_GEX_SPAWN                             ;; 02:47c9 $3e $0e
     jp   call_00_0ff5_QueueSFX                        ;; 02:47cb $c3 $f5 $0f
 
@@ -111,10 +111,7 @@ call_02_47ce_PlayerAction_Idle:
 ; Every frame: UP alone (and nothing else - the compare is against the whole input
 ; byte) tries the door under him, and call_02_4f11_Player_RequestFallAction checks
 ; whether the ground has gone. Then the idle timer counts down and the idle
-; animation starts when it reaches zero.
-;
-; Note the timer is decremented unconditionally rather than clamped, so it wraps and
-; the animation restarts every 256 frames after the first
+; animation starts when it reaches zero
     ld   HL, wD805_Player_ActionState                 ;; 02:47ce $21 $05 $d8
     bit  ACTION_STATE_IS_FIRST_FRAME_BIT, [HL]        ;; 02:47d1 $cb $66
     jr   Z, .jr_02_47e9                               ;; 02:47d3 $28 $14
@@ -275,15 +272,15 @@ call_02_4889_PlayerAction_DeathSetUpWarp:
     ret                                               ;; 02:48a0 $c9
 
 call_02_48a1_PlayerAction_StandOnTVButton:
-; Plays the button sound on the first frame and then keeps Gex from standing inside
-; the button entity, one pixel a frame, through
-; call_02_4db1_Player_PushOutOfEntity
+; Plays the button sound on the first frame and then walks Gex onto the middle of
+; the button, one pixel a frame, through
+; call_02_4db1_Player_SlideTowardEntityX
     ld   HL, wD805_Player_ActionState                 ;; 02:48a1 $21 $05 $d8
     bit  ACTION_STATE_IS_FIRST_FRAME_BIT, [HL]        ;; 02:48a4 $cb $66
     ld   A, SFX_UNK1D                                 ;; 02:48a6 $3e $1d
     call NZ, call_00_0ff5_QueueSFX                    ;; 02:48a8 $c4 $f5 $0f
     ld   C, ENTITY_TV_BUTTON                          ;; 02:48ab $0e $11
-    jp   call_02_4db1_Player_PushOutOfEntity          ;; 02:48ad $c3 $b1 $4d
+    jp   call_02_4db1_Player_SlideTowardEntityX          ;; 02:48ad $c3 $b1 $4d
 
 call_02_48b0_PlayerAction_EnterTV:
 ; Waits for the animation to finish and then raises WARP_NEW_LEVEL, which takes Gex
@@ -488,14 +485,14 @@ call_02_49b3_PlayerAction_Water_Swimming:
     ld   hl,wDC80_ButtonBlockingFlags
     set  BTN_BLOCK_B_UNTIL_RELEASE_BIT,[hl]
     xor  a
-    ld   [wDC9B_Player_SwimmingRelated3],a
+    ld   [wDC9B_Player_SwimPoseIndex],a
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8D_Player_FloorSnapVelocity],a
     ld   a,PLAYER_SPEED_MINIMUM
     ld   [wDC87_PlayerXMaxVelocity],a
 .jr_02_49ce:
     call call_02_4ee7_Player_GetDPadDirectionIndex
-    ld   hl,wDC9D_Player_SwimmingRelated
+    ld   hl,wDC9D_Player_SwimDirectionIndex
     cp   a,DPAD_DIRECTION_NONE
     jr   z,.jr_02_49d9
     ld   [hl],a
@@ -513,19 +510,19 @@ call_02_49b3_PlayerAction_Water_Swimming:
     ld   hl,.data_02_4a15_SwimSpriteBase
     add  hl,de
     ld   c,[hl]
-    ld   hl,wDC9C_Player_SwimmingRelated2
+    ld   hl,wDC9C_Player_SwimPoseTimer
     dec  [hl]
     bit  7,[hl]
     jr   z,.jr_02_4a05
     ld   [hl],PLAYER_SWIM_FRAME_DELAY
-    ld   hl,wDC9B_Player_SwimmingRelated3
+    ld   hl,wDC9B_Player_SwimPoseIndex
     inc  [hl]
     ld   a,[hl]
     sub  a,PLAYER_SWIM_FRAME_COUNT
     jr   nz,.jr_02_4a05
     ld   [hl],a
 .jr_02_4a05:
-    ld   a,[wDC9B_Player_SwimmingRelated3]
+    ld   a,[wDC9B_Player_SwimPoseIndex]
     add  c
     ld   hl,wD80A_Player_SpriteId
     cp   [hl]
@@ -593,11 +590,12 @@ call_02_4a52_PlayerAction_BlownUpwards:
     ret  
 
 call_02_4a69_PlayerAction_RidingElevator:
-; Keeps Gex from sinking into the elevator he is riding, through
-; call_02_4db1_Player_PushOutOfEntity. Everything else about the ride is the
+; Keeps Gex centred on the elevator he is riding, through
+; call_02_4db1_Player_SlideTowardEntityX - the elevator itself refuses to move
+; unless their X values match exactly. Everything else about the ride is the
 ; elevator entity's own action
     ld   c,ENTITY_ANIME_CHANNEL_ELEVATOR
-    jp   call_02_4db1_Player_PushOutOfEntity
+    jp   call_02_4db1_Player_SlideTowardEntityX
 
 call_02_4a6e_PlayerAction_Water_TailSpin:
 ; The tail spin, underwater. Same first frame as the dry one - sound, block A, set
@@ -638,7 +636,7 @@ call_02_4aa1_PlayerAction_Water_Diving:
     ld   a,$01
     ld   [wDC87_PlayerXMaxVelocity],a
     ld   a,PLAYER_SWIM_DIRECTION_DOWN
-    ld   [wDC9D_Player_SwimmingRelated],a
+    ld   [wDC9D_Player_SwimDirectionIndex],a
     ret  
 
 call_02_4aac_PlayerAction_Climbing:
@@ -655,7 +653,7 @@ call_02_4aac_PlayerAction_Climbing:
     ld   hl,wDC80_ButtonBlockingFlags
     set  BTN_BLOCK_B_UNTIL_RELEASE_BIT,[hl]
     xor  a
-    ld   [wDC9F_Player_ClimbingRelated],a
+    ld   [wDC9F_Player_ClimbPoseIndex],a
     ld   [wDC8C_PlayerYVelocity],a
     ld   [wDC8D_Player_FloorSnapVelocity],a
     ld   a,PLAYER_SPEED_MINIMUM
@@ -665,7 +663,7 @@ call_02_4aac_PlayerAction_Climbing:
 .jr_02_4acc:
     ld   hl,wDC9E_Player_ClimbSubState
     ld   l,[hl]
-    ld   h,00
+    ld   h,$00
     add  hl,hl
     ld   de,data_02_4adb_ClimbSubStateTable
     add  hl,de
@@ -690,13 +688,13 @@ call_02_4adf_PlayerAction_Climbing_Normal:
 ; wall, and A starts the climbing tail spin - which is not an action change but a
 ; switch of wDC9E_Player_ClimbSubState to CLIMB_SUBSTATE_TAIL_SPIN
     call call_02_4ee7_Player_GetDPadDirectionIndex
-    ld   hl,wDCA1_Player_ClimbingRelated4
+    ld   hl,wDCA1_Player_ClimbDirectionIndex
     cp   a,DPAD_DIRECTION_NONE
     jr   z,.jr_02_4aea
     ld   [hl],a
 .jr_02_4aea:
     ld   e,[hl]
-    ld   d,00
+    ld   d,$00
     ld   hl,.data_02_4b5e_ClimbFacingByDirection
     add  hl,de
     ld   a,[hl]
@@ -708,19 +706,19 @@ call_02_4adf_PlayerAction_Climbing_Normal:
     ld   hl,.data_02_4b56_ClimbSpriteBase
     add  hl,de
     ld   c,[hl]
-    ld   hl,wDCA0_Player_ClimbingRelated3
+    ld   hl,wDCA0_Player_ClimbPoseTimer
     dec  [hl]
     bit  7,[hl]
     jr   z,.jr_02_4b16
     ld   [hl],PLAYER_CLIMB_FRAME_DELAY
-    ld   hl,wDC9F_Player_ClimbingRelated
+    ld   hl,wDC9F_Player_ClimbPoseIndex
     inc  [hl]
     ld   a,[hl]
     sub  a,PLAYER_CLIMB_FRAME_COUNT
     jr   nz,.jr_02_4b16
     ld   [hl],a
 .jr_02_4b16:
-    ld   a,[wDC9F_Player_ClimbingRelated]
+    ld   a,[wDC9F_Player_ClimbPoseIndex]
     add  c
     ld   hl,wD80A_Player_SpriteId
     cp   [hl]
@@ -746,7 +744,7 @@ call_02_4adf_PlayerAction_Climbing_Normal:
     ld   a,CLIMB_SUBSTATE_TAIL_SPIN
     ld   [wDC9E_Player_ClimbSubState],a
     xor  a
-    ld   [wDC9F_Player_ClimbingRelated],a
+    ld   [wDC9F_Player_ClimbPoseIndex],a
     ld   a,$01
     ld   [wDC7F_Player_IsAttacking],a
     ret  
@@ -757,31 +755,35 @@ call_02_4adf_PlayerAction_Climbing_Normal:
 .data_02_4b5e_ClimbFacingByDirection:
     db   $00, $00, $00, $00, $60, $20, $20, $20
 
-call_02_4b66_PlayerAction_Climbing_TailSpin: ; unreferenced function?
-; The tail spin performed while hanging on a wall. Long labelled unreferenced,
-; because the only thing that reaches it is the table above.
+call_02_4b66_PlayerAction_Climbing_TailSpin:
+; The tail spin performed while hanging on a wall. Nothing calls it directly - the
+; only thing that reaches it is data_02_4adb_ClimbSubStateTable above.
 ;
 ; Runs a fixed PLAYER_CLIMB_SPIN_FRAME_COUNT-frame cycle from
-; PLAYER_CLIMB_SPIN_SPRITE_BASE, holding the facing straight ahead, and when the
-; count is used up it puts wDC9E_Player_ClimbSubState back to
+; PLAYER_CLIMB_SPIN_SPRITE_BASE, holding the facing straight ahead. The pose
+; actually drawn is (pose counter + wDCA1_Player_ClimbDirectionIndex) masked to
+; PLAYER_CLIMB_SPIN_SPRITE_MASK, so the d-pad only rotates which of the eight poses
+; the spin starts on - the exit test reads the pose counter alone, so the spin
+; always lasts the same eight steps. When the count is used up it puts
+; wDC9E_Player_ClimbSubState back to
 ; CLIMB_SUBSTATE_NORMAL, clears the attacking flag and blocks B - so the climb
 ; resumes without ever having left PLAYERACTION_CLIMBING
     call call_02_4ee7_Player_GetDPadDirectionIndex
-    ld   hl,wDCA1_Player_ClimbingRelated4
+    ld   hl,wDCA1_Player_ClimbDirectionIndex
     cp   a,DPAD_DIRECTION_NONE
     jr   z,.jr_02_4b71
     ld   [hl],a
 .jr_02_4b71:
-    ld   hl,wDCA0_Player_ClimbingRelated3
+    ld   hl,wDCA0_Player_ClimbPoseTimer
     dec  [hl]
     bit  7,[hl]
     jr   z,.jr_02_4b7f
     ld   [hl],PLAYER_CLIMB_SPIN_FRAME_DELAY
-    ld   hl,wDC9F_Player_ClimbingRelated
+    ld   hl,wDC9F_Player_ClimbPoseIndex
     inc  [hl]
 .jr_02_4b7f:
-    ld   a,[wDC9F_Player_ClimbingRelated]
-    ld   hl,wDCA1_Player_ClimbingRelated4
+    ld   a,[wDC9F_Player_ClimbPoseIndex]
+    ld   hl,wDCA1_Player_ClimbDirectionIndex
     add  [hl]
     and  a,PLAYER_CLIMB_SPIN_SPRITE_MASK
     add  a,PLAYER_CLIMB_SPIN_SPRITE_BASE
@@ -795,13 +797,13 @@ call_02_4b66_PlayerAction_Climbing_TailSpin: ; unreferenced function?
     ld   [wDC7A_PlayerClimbingOrSwimmingRelated],a
     ld   hl,wDB66_GfxTransferFlags
     set  GFX_XFER_PLAYER_GFX,[hl]
-    ld   a,[wDC9F_Player_ClimbingRelated]
+    ld   a,[wDC9F_Player_ClimbPoseIndex]
     cp   a,PLAYER_CLIMB_SPIN_FRAME_COUNT
     ret  c
     ld   a,CLIMB_SUBSTATE_NORMAL
     ld   [wDC9E_Player_ClimbSubState],a
     xor  a
-    ld   [wDC9F_Player_ClimbingRelated],a
+    ld   [wDC9F_Player_ClimbPoseIndex],a
     ld   [wDC7F_Player_IsAttacking],a
     ld   hl,wDC80_ButtonBlockingFlags
     set  BTN_BLOCK_B_UNTIL_RELEASE_BIT,[hl]
@@ -815,23 +817,25 @@ call_02_4bb7_PlayerAction_Snowboarding_StandOrWalk:
 ; Every frame: UP tries a door, then
 ; call_02_4e0c_Player_UpdateSnowboardSprite picks the pose from the terrain.
 ;
-; The rest is the launch check. If the terrain sprite the picker chose appears in
-; .data_02_4c17_SnowboardLaunchSprites with a matching facing, Gex is thrown upward
-; at PLAYER_SNOWBOARD_LAUNCH_VELOCITY - that is how a ramp works on this map,
-; without any jump action being involved
+; The rest is the launch check, and it works on the PAIR of tile types the picker
+; recorded. The tile under Gex this frame has to be type $01, and the one from the
+; previous frame has to appear in .data_02_4c17_SnowboardLaunchTiles with a facing
+; that matches his - so it is crossing off a ramp tile onto flat ground, in the
+; right direction, that throws him upward at PLAYER_SNOWBOARD_LAUNCH_VELOCITY. No
+; jump action is involved.
     ld   hl,wD805_Player_ActionState
     bit  ACTION_STATE_IS_FIRST_FRAME_BIT,[hl]
     jr   z,.jr_02_4bdc
     ld   a,PLAYER_SPEED_SNOWBOARD
     ld   [wDC87_PlayerXMaxVelocity],a
     xor  a
-    ld   [wDCA2_Player_SnowboardingRelated],a
-    ld   [wDCA3_Player_SnowboardingRelated2],a
+    ld   [wDCA2_Player_SnowboardPoseIndex],a
+    ld   [wDCA3_Player_SnowboardPoseTimer],a
     ld   a,PLAYER_SNOWBOARD_SPRITE_BASE
-    ld   [wDCA4_Player_SnowboardingRelated3],a
+    ld   [wDCA4_Player_SnowboardBaseSprite],a
     ld   a,$01
-    ld   [wDCA5_Player_SnowboardingRelated4],a
-    ld   [wDCA6_Player_SnowboardingRelated5],a
+    ld   [wDCA5_Player_SnowboardTileType],a
+    ld   [wDCA6_Player_SnowboardTileTypePrev],a
     ld   hl,wDC80_ButtonBlockingFlags
     set  BTN_BLOCK_B_UNTIL_RELEASE_BIT,[hl]
 .jr_02_4bdc:
@@ -839,21 +843,21 @@ call_02_4bb7_PlayerAction_Snowboarding_StandOrWalk:
     bit  PADF_UP_BIT,a
     call nz,call_00_1bbc_CheckForDoorAndEnter
     call call_02_4e0c_Player_UpdateSnowboardSprite
-    ld   a,[wDCA5_Player_SnowboardingRelated4]
+    ld   a,[wDCA5_Player_SnowboardTileType]
     and  a
     jr   z,.jr_02_4c11
-    ld   a,[wDCA6_Player_SnowboardingRelated5]
+    ld   a,[wDCA6_Player_SnowboardTileTypePrev]
     and  a
     jr   z,.jr_02_4c10
     ld   c,a
-    ld   a,[wDCA5_Player_SnowboardingRelated4]
+    ld   a,[wDCA5_Player_SnowboardTileType]
     cp   a,$01
     ret  nz
-    ld   hl,.data_02_4c17_SnowboardLaunchSprites - 1
+    ld   hl,.data_02_4c17_SnowboardLaunchTiles - 1
 .jr_02_4bfd:
     inc  hl
     ldi  a,[hl]
-    cp   a,ACTION_INPUT_END
+    cp   a,$FF                                         ; end of the ramp table
     ret  z
     cp   c
     jr   nz,.jr_02_4bfd
@@ -866,15 +870,16 @@ call_02_4bb7_PlayerAction_Snowboarding_StandOrWalk:
 .jr_02_4c10:
     ret  
 .jr_02_4c11:
-    ld   a,[wDCA6_Player_SnowboardingRelated5]
+    ld   a,[wDCA6_Player_SnowboardTileTypePrev]
     and  a
     ret  z
 .jr_02_4c16:
     ret  
 
-.data_02_4c17_SnowboardLaunchSprites:
-; (sprite id, facing) pairs ending in $FF. The reader above points one byte BEFORE
-; this label because its loop starts with an `inc hl`
+.data_02_4c17_SnowboardLaunchTiles:
+; (tile type, facing) pairs ending in $FF - the ramp tiles Gex can be launched off
+; and the direction he has to be facing to launch. The reader above points one byte
+; BEFORE this label because its loop starts with an `inc hl`
     db   $06, $00, $0d, $00, $09, $00, $0a            ;; 02:4c17 ????????
     db   $00, $05, $20, $0b, $20, $0c, $20, $0e       ;; 02:4c1e ????????
     db   $20, $0f, $20, $10, $20, $ff
@@ -931,11 +936,11 @@ call_02_4c7a_PlayerAction_Snowboarding_TailSpin:
     bit  ACTION_STATE_IS_FIRST_FRAME_BIT,[hl]
     jr   z,.jr_02_4ca1
     xor  a
-    ld   [wDCA2_Player_SnowboardingRelated],a
+    ld   [wDCA2_Player_SnowboardPoseIndex],a
     ld   a,$03
-    ld   [wDCA3_Player_SnowboardingRelated2],a
+    ld   [wDCA3_Player_SnowboardPoseTimer],a
     ld   a,PLAYER_SNOWBOARD_SPIN_SPRITE_BASE
-    ld   [wDCA4_Player_SnowboardingRelated3],a
+    ld   [wDCA4_Player_SnowboardBaseSprite],a
     ld   a,SFX_GEX_TAIL_SPIN
     call call_00_0ff5_QueueSFX
     ld   hl,wDC80_ButtonBlockingFlags

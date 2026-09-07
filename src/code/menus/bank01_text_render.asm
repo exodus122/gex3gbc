@@ -30,7 +30,7 @@ call_01_4875_Text_Render:
     inc  HL                                           ;; 01:4892 $23
     ld   D, [HL]                                      ;; 01:4893 $56
     ld   A, [DE]                                      ;; 01:4894 $1a
-    cp   A, $80                                       ;; 01:4895 $fe $80
+    cp   A, TEXT_TERMINATOR                           ;; 01:4895 $fe $80
     ret  Z                                            ;; 01:4897 $c8
     and  A, A                                         ;; 01:4898 $a7
     ret  Z                                            ;; 01:4899 $c8
@@ -194,7 +194,7 @@ call_01_48cd_Text_DrawGlyph:
     and  A, $0f                                       ;; 01:4978 $e6 $0f
     ld   D, A                                         ;; 01:497a $57
     add  HL, DE                                       ;; 01:497b $19
-    ld   DE, hFFF0                                    ;; 01:497c $11 $f0 $ff
+    ld   DE, -$10                                     ;; 01:497c $11 $f0 $ff
     add  HL, DE                                       ;; 01:497f $19
 .jr_01_4980:
     ld   A, L                                         ;; 01:4980 $7d

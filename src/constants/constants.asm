@@ -173,17 +173,14 @@ DEF TILECOLL_CEILING_BIT         EQU 1   ; bonks the head, zeroing Y velocity
 DEF TILECOLL_CLIMB_BACKING_BIT   EQU 3   ; a climber can hold onto it
 
 ; bits of wDABE_CollisionFlags
-DEF BGCOLL_SLOPE_MASK            EQU $0f ; low nibble: pixels to step up
+DEF BGCOLL_SLOPE_MASK            EQU $0f ; low nibble: pixels of slope to step up,
+                                         ; zero on level ground
 DEF BGCOLL_WALL_BIT              EQU 6   ; ran into a wall this frame
 DEF BGCOLL_NO_COLLISION_BIT      EQU 7   ; grounded, swimming, climbing or otherwise
 
 DEF BGCOLL_WALL_PROBE_ROWS       EQU 4   ; tile rows sampled ahead of him
 DEF BGCOLL_FLOOR_SEARCH_ROWS     EQU 5   ; pixel rows scanned down for floor
 DEF PLAYER_FEET_OFFSET           EQU $10 ; from his origin down to his feet
-
-; wDC1F_CurrentBgCollisionType - which handler a map uses
-DEF BGCOLL_TYPE_SIDESCROLLER     EQU $00
-DEF BGCOLL_TYPE_TOP_DOWN         EQU $01
 
 ; wDC89_BgCollision_TopDownDirection, and the index into
 ; .data_03_4a1b_TopDownStepOffsets. Odd values are the cardinals, which are
@@ -506,7 +503,6 @@ DEF PLAYER_FRAME_PIECE_SIZE          EQU 4    ; Y offset, X offset, attributes, 
 ; tests the same bit before it calls, so the check inside the routine is a second line
 ; of defence rather than the one that fires
 DEF MENU_PALETTE_NONE_BIT        EQU 7
-DEF ENTITY_SLOT_STRIDE           EQU $20   ; bytes per entity in wD800_EntityMemory
 
 ; The "GAME BOY COLOR ONLY" screen Init draws on a DMG, straight into VRAM with
 ; the interrupts still off
@@ -1429,9 +1425,11 @@ DEF COLLISION_TYPE_ROCK_HARD                 EQU $35
 ; gex2 spells the same idea COLLISION_TYPE_PLATFORM ($80), where bit 7 means a
 ; hard stop and clear means a soft one; gex2 does leave it clear on the tv buttons
 ; and push blocks Gex is meant to shove around
+DEF COLLISION_TYPE_FLAG_IMMOVABLE_BIT     EQU 7
 DEF COLLISION_TYPE_FLAG_IMMOVABLE         EQU $80 ; cannot be pushed by the player
 
-; Bg Collision Types
+; wDC1F_CurrentBgCollisionType - which handler a map uses; also the index into
+; data_03_46da_BgCollisionHandlers
 DEF BG_COLLISION_TYPE_SIDESCROLLER  EQU $00
 DEF BG_COLLISION_TYPE_TOPDOWN       EQU $01
 
@@ -1648,7 +1646,8 @@ DEF PLAYER_OFFSCREEN_BOTTOM_Y             EQU $B0
 ; sprite id out of one table and a facing byte out of another, and a counter cycles
 ; the frames on top of it
 DEF PLAYER_SWIM_FRAME_DELAY               EQU $05
-DEF PLAYER_SWIM_DIRECTION_DOWN            EQU $04 ; the index PLAYERACTION_WATER_DIVING forces
+DEF PLAYER_SWIM_DIRECTION_DOWN            EQU $04 ; forced by PLAYERACTION_WATER_DIVING
+                                                  ; and when Gex breaks the surface
 DEF PLAYER_SWIM_FRAME_COUNT               EQU $07
 DEF PLAYER_CLIMB_FRAME_DELAY              EQU $05
 DEF PLAYER_CLIMB_FRAME_COUNT              EQU $0A
@@ -1672,13 +1671,15 @@ DEF PLAYER_SNOWBOARD_SPIN_SPRITE_BASE     EQU $0B ; what the tail spin seeds
 ; OAM build
 ; ------------------------------------------------------------------
 ; wD900_ShadowOAM is $A0 bytes, forty 4-byte entries, and gex3 carves it up by
-; convention rather than by allocation: Gex owns the first two entries and
-; everything else is handed out in order from OAM_ENTITY_FIRST_BYTE through the
-; single write cursor wDC6F_Oam_WriteOffset. Whoever runs out of room first simply
-; stops drawing, so the pass order in call_03_5ec1_OAM_BuildFrame is the whole of
-; the arbitration
+; convention rather than by allocation: entries 0 and 1 take no part in the gameplay
+; pass at all - call_02_7152_Entities_UpdateAll zeroes their Y bytes every frame so
+; they sit off the top of the screen, and only the menu sprite builder in bank 1 ever
+; writes them - while everything else, Gex included, is handed out in order from
+; OAM_ENTITY_FIRST_BYTE through the single write cursor wDC6F_Oam_WriteOffset.
+; Whoever runs out of room first simply stops drawing, so the pass order in
+; call_03_5ec1_OAM_BuildFrame is the whole of the arbitration
 DEF OAM_ENTRY_SIZE               EQU 4
-DEF OAM_ENTITY_FIRST_BYTE        EQU $08 ; entities start after Gex's two entries
+DEF OAM_ENTITY_FIRST_BYTE        EQU $08 ; the pass starts past the two blanked entries
 DEF OAM_LAST_BYTE                EQU $9F ; one past the last usable entry
 DEF OAM_FULL                     EQU $A0 ; the builders stop when the cursor reaches this
 DEF OAM_COLLECTIBLE_LIMIT        EQU $9C ; a collectible needs two entries, so it needs
@@ -1771,8 +1772,8 @@ DEF COLLECTIBLE_CELL_MASK        EQU $0F
 DEF COLLECTIBLE_ORIGIN_X         EQU $10
 DEF COLLECTIBLE_ORIGIN_Y         EQU $18
 DEF COLLECTIBLE_ROWS_ON_SCREEN   EQU $0A
-DEF COLLECTIBLE_TILE_TOP         EQU $3C
-DEF COLLECTIBLE_TILE_BOTTOM      EQU $3E
+DEF COLLECTIBLE_TILE_LEFT        EQU $3C ; the two 8x16 halves of one 16x16 collectible,
+DEF COLLECTIBLE_TILE_RIGHT       EQU $3E ; drawn side by side rather than stacked
 DEF COLLECTIBLE_PICKUP_RANGE     EQU $12 ; the +/- 9 pixel window, biased and compared once
 DEF COLLECTIBLE_PICKUP_BIAS      EQU $09
 DEF COLLECTIBLE_TAKEN            EQU $FF
@@ -1833,10 +1834,6 @@ DEF DPAD_DIRECTION_NONE                   EQU $FF
 ; nibbles, which leaves a 4-bit signed value: bit 3 is its sign
 DEF PLAYER_YDELTA_MASK                    EQU $0F
 DEF PLAYER_YDELTA_SIGN_EXTEND             EQU $F0
-
-; The low nibble of wDABE_CollisionFlags is how far the slope under Gex rises over
-; the step he is about to take; zero means level ground
-DEF BG_COLLISION_SLOPE_MASK               EQU $0F
 
 ; On a map that wraps (wDC2A_MapBoundaryIndex = MAP_WRAP_BOUNDARY_INDEX) there is no
 ; left or right edge to clamp against - the X position's high byte is masked instead

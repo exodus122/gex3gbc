@@ -30,8 +30,8 @@
 ;                 NUMBERS as well
 ;   digits        gex2 loads digit glyphs into VRAM and the sprites point at them.
 ;                 gex3 converts the number to digits in
-;                 call_03_74f5_HUD_DrawNumberOnStatusBar and writes four tilemap
-;                 entries per digit - two rows of two - because a digit is 16x16
+;                 call_03_74f5_HUD_DrawNumberOnStatusBar and writes two tilemap
+;                 entries per digit, one above the other, because a digit is 8x16
 ;   transfers     gex2 copies with MemCopy and a 32-byte VRAM helper. gex3 uses
 ;                 general purpose DMA straight into VRAM bank 1, the same mechanism
 ;                 the tileset loader uses
@@ -127,7 +127,7 @@ call_03_747d_HUD_Update:
     db   $18, $14, $24, $20, $1c, $1c, $1c, $1c       ;; 03:74ed ....???.
 
 call_03_74f5_HUD_DrawNumberOnStatusBar:
-; Writes the number in A into the status bar as up to three 16x16 digits, at the
+; Writes the number in A into the status bar as up to three 8x16 digits, at the
 ; tilemap addresses in HL (top row) and DE (bottom row).
 ;
 ; Blanks the three digit columns first with HUD_TILE_BLANK_TOP and
@@ -136,8 +136,8 @@ call_03_74f5_HUD_DrawNumberOnStatusBar:
 ; hundreds entirely below 100 and the tens below 10, which is what right-aligns the
 ; number without any padding logic.
 ;
-; Each digit costs four tile ids: digit*2 on the top row and digit*2+1 below, in
-; both the left and right columns
+; Each digit costs two tile ids: digit*2 on the top row and digit*2+1 directly below
+; it, which is why the blanking pass above clears three columns on each of two rows
 ;
 ; @bug - three dead `add A,$00` instructions. Each digit is turned into a tile
 ; pair with `ld A,C / add A,A / add A,$00 / ld [HL+],A / inc A / ld [DE],A`, and the
@@ -211,8 +211,9 @@ call_03_753e_AnimateFlyCoinCollectibles:
 ; Two counters: wDC72_AnimFrameCounter divides the frame rate by
 ; HUD_FLY_COIN_FRAME_DELAY, and wDC73_FrameCounter_FlyCoins cycles
 ; HUD_FLY_COIN_FRAME_COUNT frames. The frame number indexes image_003_4400 in
-; $100-byte steps, and a general purpose DMA moves that page into VRAM bank 1 with
-; rVBK switched around the transfer.
+; $40-byte steps - `swap A` then two `add HL, HL`, i.e. frame * 64 - and a general
+; purpose DMA moves those four tiles into VRAM bank 1 at $83C0, with rVBK switched
+; around the transfer.
 ;
 ; Only runs while HUD_DIRTY_FLY_COINS_BIT is set - which here means "this level has
 ; animated coins" rather than "something changed", since nothing ever clears it
@@ -305,7 +306,7 @@ call_03_757e_HUD_AnimateBonusStageTimer:
     ld   DE, _VRAM+$0460                              ;; 03:75bb $11 $60 $84
 
 call_03_75be_HUD_LoadBonusStageTimerSprite:
-; HDMAs one 16x16 glyph - $20 bytes, index C shifted five places into
+; HDMAs one 8x16 glyph - $20 bytes, two tiles, index C shifted five places into
 ; image_003_4580 - into VRAM bank 1 at DE. rVBK is switched to bank 1 and back
 ; around the transfer, because the clock's pixels live in the CGB's second tile bank
     ld   L, C                                         ;; 03:75be $69

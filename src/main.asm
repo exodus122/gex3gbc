@@ -382,7 +382,7 @@ image_mystery_tv_rezling_00c_4000:
     ; $5200  68x4 tiles - ENTITY_MYSTERY_TV_SAFARI_SAM
 image_mystery_tv_safari_sam_00c_5200:
     INCBIN ".gfx/entity_sprites/image_mystery_tv_safari_sam_00c_5200.bin"
-    ; $6300  48x4 tiles - ENTITY_SLOT_STRIDE, ENTITY_GEXTREME_SPORTS_ELF
+    ; $6300  48x4 tiles - ENTITY_SLOT_SIZE, ENTITY_GEXTREME_SPORTS_ELF
 image_slot_stride_gextreme_sports_elf_00c_6300:
     INCBIN ".gfx/entity_sprites/image_slot_stride_gextreme_sports_elf_00c_6300.bin"
     ; $6f00  36x4 tiles - ENTITY_TUT_TV_SNAKE_FACING_RIGHT, ENTITY_TUT_TV_SNAKE_FACING_LEFT

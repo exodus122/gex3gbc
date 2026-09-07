@@ -150,7 +150,7 @@ call_01_4b43_MenuText_GetMapTextBlock:
     ld   L, E                                         ;; 01:4b51 $6b
     ret                                               ;; 01:4b52 $c9
 .data_01_4b53_MapTextBlocks:
-; One text block per level, PROGRESS_FLAG_COUNT entries, indexed by
+; One text block per level, twelve entries, indexed by
 ; wDB6C_CurrentMapId - which on a menu screen holds the LEVEL id, not a map id, because
 ; call_01_4000_MenuLoad swaps it before drawing and puts the real map back afterwards.
 ;
@@ -588,7 +588,7 @@ call_01_4d2c_Menu_WaitForNoInput:
     ld   HL, wDBDC_Menu_BlinkCounter                  ;; 01:4d35 $21 $dc $db
     dec  [HL]                                         ;; 01:4d38 $35
     ld   A, [wDB94_MenuType_Flags]                    ;; 01:4d39 $fa $94 $db
-    and  A, $01                                       ;; 01:4d3c $e6 $01
+    and  A, MENU_FLAG_GRID_INPUT                      ;; 01:4d3c $e6 $01
     ld   A, [wDAD7_RawInputs]                         ;; 01:4d3e $fa $d7 $da
     jr   Z, .jr_01_4d45                               ;; 01:4d41 $28 $02
     and  A, PADF_B | PADF_SELECT | PADF_START | PADF_RIGHT | PADF_LEFT | PADF_UP | PADF_DOWN ;; 01:4d43 $e6 $fe

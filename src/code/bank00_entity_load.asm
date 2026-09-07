@@ -96,7 +96,8 @@ call_00_3252_EntityList_RewindCursor:
 ;   +3  ENTITY_ATTR_COLLISION_TYPE  into ENTITY_FIELD_COLLISION_TYPE
 ;   +4  ENTITY_ATTR_DAMAGE_STATE    health plus one; the spawn decrements it
 ;   +5  ENTITY_ATTR_MISC_FLAGS      $00 in all 114 rows
-;   +6  ENTITY_ATTR_UNUSED          $FF in all 114 rows, never read
+;   +6  ENTITY_ATTR_UNUSED          never read; $FF in every row but ENTITY_GEX's,
+;                                   whose whole record is zero apart from +7
 ;   +7  ENTITY_ATTR_DEFEAT_FLAGS    what the entity leaves behind when it dies
 ;
 ; THREE READERS, AT THREE BASES, one byte apart - see the file header. The spawn
@@ -109,8 +110,8 @@ call_00_3252_EntityList_RewindCursor:
 ;
 ; THE DEFEAT FLAGS are the interesting field. What is certain:
 ;
-;   $FF                     64 rows. Clear the slot and drop nothing - flies,
-;                           projectiles, platforms, doors, scenery
+;   $FF                     64 of the 113 NPC rows. Clear the slot and drop nothing -
+;                           flies, projectiles, platforms, doors, scenery
 ;   bit 7, PARTICLES        35 rows. Spawn a particle burst
 ;   bit 6, DROPS_COLLECTIBLE 20 rows. Counts towards the level total, which is what
 ;                           call_00_2f34_CountLevelCollectibleTotal is adding up when
@@ -816,8 +817,9 @@ call_00_37a0_EntitySpawn_SpawnChildEntity:
 ; two loose bytes and then a second copy of the last eight records, sitting at an
 ; offset no index reaches - dead data at the very end of bank 0.
 ;
-; gex2's .data_0a_7c92_EntityChildSpawnData is the same table without the direction
-; flag: there the parent's facing alone decides the sign
+; gex2's .data_0a_7c92_EntityChildSpawnData carries the same three fields in a
+; different order - the child's id first, then the two offsets, and no direction flag
+; at all, because there the parent's facing alone decides the sign
     EntityChildSpawnData $01, $0000, -$0020, ENTITY_FLY_1                              ; SPAWN_CHILD_ENTITY_FLY_1
     EntityChildSpawnData $01, $0000, -$0020, ENTITY_FLY_2                              ; SPAWN_CHILD_ENTITY_FLY_2
     EntityChildSpawnData $01, $0000, -$0020, ENTITY_FLY_3                              ; SPAWN_CHILD_ENTITY_FLY_3

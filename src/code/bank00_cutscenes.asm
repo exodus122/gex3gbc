@@ -15,7 +15,7 @@
 ;
 ; call_00_1ea0_Cutscene_LoadAndRun is the only entry point, called once from the
 ; level init path in call_00_0150_Init. It takes no arguments: the scene is
-; chosen entirely by wDB6C_CurrentMapId and wDC5A_MissionNumberSelected, so
+; chosen entirely by wDC1E_CurrentLevelID and wDC5A_MissionNumberSelected, so
 ; picking a different mission on the menu is what picks a different preview.
 ;
 ; ------------------------------------------------------------------
@@ -98,9 +98,10 @@
 call_00_1ea0_Cutscene_LoadAndRun:
 ; Plays the mission preview for the current level and mission, if there is one.
 ;
-; wDB6C_CurrentMapId picks a row of .data_00_1fc0_CutsceneIndexLookupTable and
+; wDC1E_CurrentLevelID picks a row of .data_00_1fc0_CutsceneIndexLookupTable and
 ; wDC5A_MissionNumberSelected picks the column; CUTSCENE_NONE there means
-; nothing to play and the routine returns immediately.
+; nothing to play and the routine returns immediately. wDB6C_CurrentMapId is not
+; the key here - it is only saved and reloaded, because the script names its own map.
 ;
 ; Everything that has to survive the scene is pushed before it starts: the map
 ; id, then Gex's X and Y as they are read out of the script header. Those three

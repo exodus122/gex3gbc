@@ -9,7 +9,8 @@
 ; call_02_7152_Entities_UpdateAll is the routine the outer loop calls, and the
 ; order it does things in is the interesting part:
 ;
-;   1. clear the two player X-delta accumulators and the first shadow OAM entry
+;   1. clear the two player X-delta accumulators and the Y bytes of the first two
+;      shadow OAM entries
 ;   2. if wDCA7_Player_UpdateFlag is clear, skip straight to step 6 - this is how
 ;      a cutscene freezes Gex while the rest of the world keeps running
 ;   3. apply whatever the tile Gex is standing in does to him: TILE_TYPE_PUSH_LEFT
@@ -149,7 +150,7 @@ call_02_708f_Entities_InitAndSpawnAll:
     ld   [wDC8D_Player_FloorSnapVelocity], A          ;; 02:70c2 $ea $8d $dc
     ld   [wDC8E_InitialYVelocity], A                  ;; 02:70c5 $ea $8e $dc
     ld   [wDC8F_FallDistanceCounter], A               ;; 02:70c8 $ea $8f $dc
-    ld   [wDC88_Player_HopYOffset], A   ;; 02:70cb $ea $88 $dc
+    ld   [wDC88_Player_HopYOffset], A                 ;; 02:70cb $ea $88 $dc
     ld   [wDC80_ButtonBlockingFlags], A               ;; 02:70ce $ea $80 $dc
 .jr_02_70d1:
     xor  A, A                                         ;; 02:70d1 $af
@@ -170,7 +171,7 @@ call_02_708f_Entities_InitAndSpawnAll:
     xor  A, A                                         ;; 02:70f6 $af
     ld   [wDA00_CurrentEntityAddrLo], A               ;; 02:70f7 $ea $00 $da
     ld   C, SPAWN_CHILD_ENTITY_STAGE_TIMER            ;; 02:70fa $0e $19
-    call call_00_3792_EntitySpawn_SpawnChild      ;; 02:70fc $cd $92 $37
+    call call_00_3792_EntitySpawn_SpawnChild          ;; 02:70fc $cd $92 $37
     ld   C, ENTITY_BONUS_STAGE_TIMER                  ;; 02:70ff $0e $1b
     call call_00_29ce_Entity_FindSlotById             ;; 02:7101 $cd $ce $29
     jr   NZ, .jr_02_7115                              ;; 02:7104 $20 $0f
@@ -178,9 +179,9 @@ call_02_708f_Entities_InitAndSpawnAll:
     ld   [wDA00_CurrentEntityAddrLo], A               ;; 02:7107 $ea $00 $da
     farcall call_02_5bb3_EntityAction_UpdateBonusStageTimer
 .jr_02_7115:
-    call call_00_3252_EntityList_RewindCursor              ;; 02:7115 $cd $52 $32
+    call call_00_3252_EntityList_RewindCursor         ;; 02:7115 $cd $52 $32
 .jr_02_7118:
-    call call_00_360c_EntitySpawn_SpawnNext        ;; 02:7118 $cd $0c $36
+    call call_00_360c_EntitySpawn_SpawnNext           ;; 02:7118 $cd $0c $36
     ld   A, [wDAB8_EntityCounter]                     ;; 02:711b $fa $b8 $da
     cp   A, $01                                       ;; 02:711e $fe $01
     jr   NZ, .jr_02_7118                              ;; 02:7120 $20 $f6
@@ -257,8 +258,8 @@ call_02_7152_Entities_UpdateAll:
 ; Then the two special entities. Whatever Gex is standing on
 ; (wDC7B_Player_EntityStoodOnLo) has its action function called FIRST, before Gex
 ; and out of slot order, and then his Y is recomputed from the platform's: its YPOS
-; minus $10 minus its ENTITY_FIELD_COLLISION_HEIGHT. Doing it in that order is what stops him
-; visibly lagging a frame behind a platform he is riding. Whatever he is pushing
+; minus $10 minus its ENTITY_FIELD_COLLISION_HEIGHT. Doing it in that order is what
+; stops him visibly lagging a frame behind a platform he is riding. Whatever he is pushing
 ; into (wDC7D_Player_PushedMovingPlatformLo) is run next, and then
 ; call_02_4f32_Player_UpdateMain.
 ;
@@ -276,7 +277,7 @@ call_02_7152_Entities_UpdateAll:
     ld   [wDC85_PlayerXDeltaExtra2], A                ;; 02:7153 $ea $85 $dc
     ld   [wDC84_PlayerXDeltaExtra], A                 ;; 02:7156 $ea $84 $dc
     ld   [wD900_ShadowOAM], A                         ;; 02:7159 $ea $00 $d9
-    ld   [wD904], A                                   ;; 02:715c $ea $04 $d9
+    ld   [wD904_ShadowOAM_Sprite1Y], A                ;; 02:715c $ea $04 $d9
     ld   A, [wDCA7_Player_UpdateFlag]                 ;; 02:715f $fa $a7 $dc
     and  A, A                                         ;; 02:7162 $a7
     jp   Z, .jp_02_7200                               ;; 02:7163 $ca $00 $72
@@ -334,10 +335,10 @@ call_02_7152_Entities_UpdateAll:
     ld   H, HIGH(wD800_EntityMemory)                  ;; 02:71c3 $26 $d8
     ld   A, [wDC7B_Player_EntityStoodOnLo]            ;; 02:71c5 $fa $7b $dc
     and  A, ENTITY_SLOT_BASE_MASK                     ;; 02:71c8 $e6 $e0
-    or   A, ENTITY_FIELD_WORLD_Y                         ;; 02:71ca $f6 $10
+    or   A, ENTITY_FIELD_WORLD_Y                      ;; 02:71ca $f6 $10
     ld   L, A                                         ;; 02:71cc $6f
     ld   A, [HL+]                                     ;; 02:71cd $2a
-    sub  A, ENTITY_FIELD_WORLD_Y                         ;; 02:71ce $d6 $10
+    sub  A, $10                                       ;; 02:71ce $d6 $10
     ld   E, A                                         ;; 02:71d0 $5f
     ld   A, [HL]                                      ;; 02:71d1 $7e
     sbc  A, $00                                       ;; 02:71d2 $de $00
@@ -424,8 +425,11 @@ call_02_724d_Entity_TickAction:
 ;                                plays once and sits on its final pose
 ;   otherwise                    restart at frame 0
 ;
-; Either way it then sets ACTION_STATE_ANIM_ENDED and ACTION_STATE_ID_CHANGED and
-; reads the new sprite id out of the ENTITY_FIELD_SPRITE_IDS_PTR list.
+;
+; The last two of those set ACTION_STATE_ANIM_ENDED on the way past; the pending
+; action case jumps out before it. Every frame that advances at all - wrap or not -
+; then sets ACTION_STATE_ID_CHANGED and reads the new sprite id out of the
+; ENTITY_FIELD_SPRITE_IDS_PTR list.
 ;
 ; ACTION_STATE_ID_CHANGED is where gex3 and gex2 part company: gex3 sets the bit
 ; and lets call_00_08f8_StageNextGfxTransfer find it, while gex2 raises the
@@ -530,7 +534,10 @@ call_02_72ac_Entity_SetAction:
 ;   byte 3  -> SPRITE_FRAME_COUNTER_MAX and SPRITE_FRAME_COUNTER, both
 ;   byte 4  -> ENTITY_FIELD_SPRITE_COUNTER_MAX
 ;   byte 5  -> ENTITY_FIELD_SPRITE_ID
-;   the block's own address + 6 -> ENTITY_FIELD_SPRITE_IDS_PTR
+;   block address + 5 -> ENTITY_FIELD_SPRITE_IDS_PTR
+;
+; Byte 5 and the sprite id list are the same byte: the pointer is left aimed at the
+; block's sixth byte, so the id copied into the slot is simply list entry 0.
 ;
 ; ENTITY_FIELD_SPRITE_COUNTER is zeroed on the way past, so the new action always
 ; starts on its first frame. Falls into
@@ -658,10 +665,11 @@ call_02_7337_MapScroll_CheckHorizontal:
 ;
 ; On a map whose wDC2A_MapBoundaryIndex is MAP_WRAP_BOUNDARY_INDEX the last column
 ; joins back onto the first, so the one-column step across that seam looks to the
-; subtraction like a jump across the entire map. Both directions are special-cased:
-; a move that reads as a huge step left, from column 0 to MAP_WRAP_LAST_COLUMN, is
-; a MAP_SCROLL_LEFT, and the mirror of it is a MAP_SCROLL_RIGHT. Everything else
-; falls through to the plain comparison.
+; subtraction like a jump across the entire map, and in the wrong direction. Both
+; sides of the seam are special-cased: MAP_WRAP_LAST_COLUMN to column 0 subtracts
+; as a huge decrease but is really a step right, so it raises MAP_SCROLL_RIGHT, and
+; column 0 to MAP_WRAP_LAST_COLUMN raises MAP_SCROLL_LEFT. Everything else falls
+; through to the plain comparison.
 ;
 ; The two guard tests are why the previous column is kept in BC as well as being
 ; written back - the routine needs both the old and the new value after the store.

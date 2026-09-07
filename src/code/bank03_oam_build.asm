@@ -10,11 +10,13 @@
 ;   $6148  frame end     blank whatever OAM the frame did not use
 ;   $615D  collectibles  the ones near the camera, and picking them up
 ;
-; OAM is carved up by convention rather than allocated. Gex owns the first two
-; entries; everything else is handed out in order from OAM_ENTITY_FIRST_BYTE through
-; the single cursor wDC6F_Oam_WriteOffset, and each builder checks that cursor
-; against its own limit and simply stops drawing when OAM is full. Nothing reserves
-; anything, so the pass order below IS the priority scheme.
+; OAM is carved up by convention rather than allocated. Entries 0 and 1 are not
+; written by anything here - call_02_7152_Entities_UpdateAll zeroes their Y bytes
+; every frame to keep them off screen, and they exist for the menu sprite builder in
+; bank 1 - and everything else, Gex included, is handed out in order from
+; OAM_ENTITY_FIRST_BYTE through the single cursor wDC6F_Oam_WriteOffset. Each builder
+; checks that cursor against its own limit and simply stops drawing when OAM is full.
+; Nothing reserves anything, so the pass order below IS the priority scheme.
 ;
 ; Shapes, not artwork
 ; -------------------
@@ -775,8 +777,8 @@ data_03_59ea_SpriteShapeTable:
 call_03_5ec1_OAM_BuildFrame:
 ; The frame's whole sprite pass, and the collision pass on the end of it.
 ;
-; Seeds wDC6F_Oam_WriteOffset to OAM_ENTITY_FIRST_BYTE - Gex's two entries sit
-; below it - and then takes one of two routes.
+; Seeds wDC6F_Oam_WriteOffset to OAM_ENTITY_FIRST_BYTE - the two entries below it are
+; the ones bank 2 keeps blank - and then takes one of two routes.
 ;
 ; The ordinary route is three sweeps of the eight slots: the entities flagged
 ; SPRITE_DESC_DRAW_FIRST, then Gex through call_00_2ce2_Player_BuildSprites, then
@@ -1359,8 +1361,13 @@ call_03_615d_Collectible_BuildSprites:
     ret                                               ;; 03:61da $c9
 
 call_03_61db_Collectible_WriteOamPair:
-; Writes the two stacked 8x8 sprites that make one collectible, at (B, C) minus the
-; OAM bias, using the fixed tiles COLLECTIBLE_TILE_TOP and COLLECTIBLE_TILE_BOTTOM.
+; Writes the two 8x16 sprites that make one 16x16 collectible. B is its screen X and
+; C its screen Y; the left half goes at X - 8 and the right half at X, both on the
+; same row, with the fixed tiles COLLECTIBLE_TILE_LEFT and COLLECTIBLE_TILE_RIGHT.
+;
+; Note the Y byte is biased by $08 rather than by OAM_Y_BIAS: COLLECTIBLE_ORIGIN_Y
+; already carries $10 of that bias, so only the remaining eight pixels are taken off
+; here - which is why the same OAM_X_BIAS constant appears on both axes.
 ;
 ; Returns without drawing if the cursor has passed OAM_COLLECTIBLE_LIMIT - four
 ; bytes tighter than the entity limit, because it needs two entries rather than one
@@ -1375,7 +1382,7 @@ call_03_61db_Collectible_WriteOamPair:
     ld   A, B                                         ;; 03:61e8 $78
     sub  A, OAM_X_BIAS                                ;; 03:61e9 $d6 $08
     ld   [HL+], A                                     ;; 03:61eb $22
-    ld   A, COLLECTIBLE_TILE_TOP                      ;; 03:61ec $3e $3c
+    ld   A, COLLECTIBLE_TILE_LEFT                      ;; 03:61ec $3e $3c
     ld   [HL+], A                                     ;; 03:61ee $22
     ld   A, OAMF_BANK1                      ;; 03:61ef $3e $08
     ld   [HL+], A                                     ;; 03:61f1 $22
@@ -1384,7 +1391,7 @@ call_03_61db_Collectible_WriteOamPair:
     ld   [HL+], A                                     ;; 03:61f5 $22
     ld   A, B                                         ;; 03:61f6 $78
     ld   [HL+], A                                     ;; 03:61f7 $22
-    ld   A, COLLECTIBLE_TILE_BOTTOM                   ;; 03:61f8 $3e $3e
+    ld   A, COLLECTIBLE_TILE_RIGHT                   ;; 03:61f8 $3e $3e
     ld   [HL+], A                                     ;; 03:61fa $22
     ld   A, OAMF_BANK1                      ;; 03:61fb $3e $08
     ld   [HL+], A                                     ;; 03:61fd $22

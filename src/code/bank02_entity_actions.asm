@@ -43,8 +43,8 @@ call_02_582e_EntityAction_None:
     ret
 
 call_02_582f_EntityAction_DestroyWithoutParticles:
-; The quiet death, used only by the Western Station cactus. Blanks the collision
-; type immediately so the corpse cannot hurt anyone, and Entity_MarkDefeated is
+; The quiet death, used only by ENTITY_WESTERN_STATION_ENEMY_CACTUS. Blanks the
+; collision type immediately so the corpse cannot hurt anyone, and Entity_MarkDefeated is
 ; what decides - from ENTITY_ATTR_DEFEAT_FLAGS bit 6 - whether a fly coin is left
 ; behind when the animation ends
     call call_00_288a_Entity_SetCollisionTypeNone
@@ -84,10 +84,12 @@ call_02_583c_EntityAction_Destroy:
 ;   bit 6  which way it is travelling
 ;
 ; and MISC_TIMER is how long is left in the current phase. The first pause lasts
-; TIMER_AMOUNT_240_FRAMES, later ones are the entity's own spawn parameter, and a
-; travelling phase always lasts TIMER_AMOUNT_120_FRAMES - so the spawn parameter
-; sets the dwell, not the distance. `and $7F / xor $40` at the end of a pause
-; clears the pause bit and flips the direction bit in one go.
+; TIMER_AMOUNT_240_FRAMES and every later one TIMER_AMOUNT_120_FRAMES; a travelling
+; phase lasts the entity's own spawn parameter, read by Entity_GetParameterIntoC at
+; the moment the pause ends. Since the platform moves exactly one pixel a frame,
+; that parameter sets the distance between the two ends, not the dwell.
+; `and $7F / xor $40` at the end of a pause clears the pause bit and flips the
+; direction bit in one go, so the very first travelling phase runs with bit 6 set.
 ;
 ; The horizontal one also calls Entity_CarryOrPushPlayerX so Gex rides it; the
 ; vertical one does not, because standing on a rising platform is handled by the
@@ -98,7 +100,7 @@ call_02_585f_EntityAction_MovePlatformHorizontally:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_02_586e
     ld   c,$80
-    call call_00_2980_Entity_SetMiscFlags              ; start paused, going left
+    call call_00_2980_Entity_SetMiscFlags              ; start paused; unpausing sets bit 6
     ld   c,TIMER_AMOUNT_240_FRAMES
     call call_00_290d_Entity_SetMiscTimer
 .jr_02_586e:
@@ -140,8 +142,8 @@ call_02_585f_EntityAction_MovePlatformHorizontally:
     jp   call_00_290d_Entity_SetMiscTimer
 
 call_02_58bd_EntityAction_MovePlatformVertically:
-; The same routine on Y. Note that the travel phase here is 120 frames as well, so
-; a vertical platform covers exactly 120 pixels between its two ends
+; The same routine on Y, with Entity_SetYVelocity in place of Entity_SetXVelocity
+; and no Entity_CarryOrPushPlayerX
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_02_58cc
     ld   c,$80
@@ -216,7 +218,7 @@ call_02_5918_EntityAction_Fly_Update:
     rrca                                               ; one step per two frames
     and  a,$0F
     ld   l,a
-    ld   h,00
+    ld   h,$00
     add  hl,hl
     add  hl,hl                                         ; four bytes per step
     ld   bc,.data_02_594f
@@ -377,7 +379,7 @@ call_02_59ed_EntityAction_Unk0E_Drift:
 ; ------------------------------------------------------------------
 
 call_02_5a04_EntityAction_TVButton_Locked:
-; Action $00. SetListStateAndAction with C = $00 is the self-correcting half: if
+; Action $00. Entity_SyncActionToListState with C = $00 is the self-correcting half: if
 ; the saved list state says something other than $00, the pad jumps to THAT action
 ; instead of staying here
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
@@ -516,12 +518,13 @@ call_02_5a83_EntityAction_TVButton_CheckUnlockRequirement:
 ;   $00 SyncDefault    ENTITY_LIST_STATE_DEFAULT. Nothing earned here yet
 ;   $01 SyncButtonOn   ENTITY_LIST_STATE_TV_BUTTON_ON
 ;   $02 SyncButtonLit  ENTITY_LIST_STATE_TV_BUTTON_LIT
-;   $03 CheckUnlockRequirement
+;   $03 CheckUnlockRequirement - also written as a list state, and the action that
+;                      actually draws the remote
 ;   $04 Destroy        ENTITY_LIST_STATE_REMOTE_TAKEN - a collected remote
 ;                      respawns straight into its own destruction
 ;
 ; The first three are the same four instructions at three addresses. Each passes
-; its OWN action id to Entity_SetListStateAndAction, which returns if the saved
+; its OWN action id to Entity_SyncActionToListState, which returns if the saved
 ; state agrees and otherwise jumps the entity to the action the saved state names -
 ; so whichever of them the entity happens to be running, it corrects itself to the
 ; one the save data wants. On the frame the action starts, all three divert into
@@ -547,11 +550,15 @@ call_02_5aee_EntityAction_TVRemote_SyncButtonLit:
     jp   call_00_22b1_Entity_SyncActionToListState
 
 call_02_5af8_EntityAction_TVRemote_CheckUnlockRequirement:
-; Action $03, and the first frame of $00, $01 and $02. The unlock half is the same
-; test call_02_5a83_EntityAction_TVButton_CheckUnlockRequirement makes, against the
-; same data_00_0b19_TvUnlockRequirements table.
+; Action $03, and the first frame of $00, $01 and $02. The progress test is the same
+; one call_02_5a83_EntityAction_TVButton_CheckUnlockRequirement makes, against the
+; same data_00_0b19_TvUnlockRequirements table - but the two routines act on
+; opposite answers. The button opens when the player has AT LEAST what the table
+; asks for; the remote draws itself when the player has LESS, and once the
+; requirement is met it drops to action $01 and lets the saved list state say what
+; it should really be.
 ;
-; What is different is the unlocked tail. data_02_7665 declares a single frame but
+; The drawing tail is what makes this routine long. data_02_7665 declares a single frame but
 ; is followed by eleven sprite ids, and this routine indexes them by hand: the
 ; spawn parameter picks an entry of .data_02_5b7e, $40 is added, and the result is
 ; written straight into ENTITY_FIELD_SPRITE_ID - so each of the twelve televisions
@@ -575,14 +582,14 @@ call_02_5af8_EntityAction_TVRemote_CheckUnlockRequirement:
     ld   C, [HL]
     res  7, C
     cp   A, C
-    jr   C, .jr_02_5b2f                                ; not enough
+    jr   C, .jr_02_5b2f                                ; below the requirement - draw it
     jr   .jr_02_5b6e
 .jr_02_5b1f:
     push HL
     farcall call_01_4ab9_CountAllCollectedObjectives
     pop  HL
     cp   A, [HL]
-    jr   NC, .jr_02_5b6e                               ; not enough
+    jr   NC, .jr_02_5b6e                               ; requirement met
 .jr_02_5b2f:
     call call_00_2962_Entity_GetActionId
     cp   A, $03
@@ -621,7 +628,7 @@ call_02_5af8_EntityAction_TVRemote_CheckUnlockRequirement:
     ld   C, $01
     call call_00_2299_Entity_SetListState
     ld   A, $01
-    jp   call_02_72ac_Entity_SetAction                 ; locked
+    jp   call_02_72ac_Entity_SetAction                 ; hand over to the saved state
 .data_02_5b7e:
 ; Which remote sprite each of the twelve hub televisions shows, by spawn parameter.
 ; Not in order - the first two share $00, and the last three fill in $04, $06, $08
@@ -859,7 +866,7 @@ call_02_5c82_EntityAction_EvilSanta_Stand:
 
 call_02_5ca5_EntityAction_EvilSanta_Damaged:
 ; Action $05. Alternates between two palettes on a 16-frame cycle - 12 frames of
-; one, 4 of the other - so the flash is not symmetric. It never leaves this action
+; Palette2 and then 4 of Palette1 - so the flash is not symmetric. It never leaves this action
 ; itself: data_02_76e5 carries pending action $01, and the eight-frame animation
 ; is what times the flash
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
@@ -873,15 +880,16 @@ call_02_5ca5_EntityAction_EvilSanta_Damaged:
     ld   hl,.data_02_5cc0_EvilSantaDamagedPalette1
     jp   call_00_2c20_Entity_CopyPaletteToBuffer
 .data_02_5cc0_EvilSantaDamagedPalette1:
-; Flat red on black - the same palette as the normal one below, which is why the
-; flash reads as a colour dropping out rather than a colour appearing
+; Byte for byte the same as .data_02_5d08_EvilSantaPalette below, so these are the
+; four frames in sixteen where Santa looks normal; the other twelve show Palette2
     db   $00, $00, $00, $00, $1f, $00, $ff, $7f
 .data_02_5cc8_EvilSantaDamagedPalette2:
     db   $00, $00, $84, $10, $08, $21, $8c, $31
 
 call_02_5cd0_EntityAction_EvilSanta_Death:
-; Action $06. Thrown backwards - $F2 (-14) when facing left, $0E when facing right
-; - and $05 upwards, with no floor check, so he simply drifts off. The animation
+; Action $06. Launched the way he is facing - $F2 (-14) when facing left, $0E when
+; facing right - and, since Entity_ApplyYVelocity_Subpixel does not negate, $05
+; DOWNWARD. There is no floor check, so he simply sinks away. The animation
 ; ending is what ends him.
 ;
 ; Entity_PlayRemoteSFX does two jobs despite the name: it plays the fanfare AND
@@ -920,11 +928,14 @@ call_02_5d02_LoadEvilSantaPalette:
 ; ------------------------------------------------------------------
 ; THE SNOWBALL. Seven rows, and only three of them are code - the four rows in the
 ; middle are the same UpdateTrajectory function with four different single-frame
-; sprites, which is how the snowball appears to rotate as it arcs.
+; sprites, which is how the snowball appears to rotate as it travels.
+;
+; Nothing here applies gravity: both velocities are set once and only the two
+; subpixel movers run, so the throw is a straight diagonal rather than an arc.
 ;
 ; The height it is at picks the sprite, and which direction it is travelling picks
-; which set of thresholds is used, so it shows one set of frames on the way up and
-; the reverse on the way down.
+; which set of thresholds is used, so it shows one set of frames on the way down
+; and the reverse on the way back up.
 ;
 ; The interesting part is that this routine is also Santa's damage detector. Gex
 ; whips the snowball, call_03_4e89_CollisionHandler_EvilSantaProjectile negates its
@@ -982,7 +993,7 @@ call_02_5d10_EntityAction_EvilSantaProjectile_Init:
     ld   C, $10
     call call_00_28dc_Entity_SetYVelocity
     ld   A, $01
-    jp   call_02_72ac_Entity_SetAction                 ; -> the arc
+    jp   call_02_72ac_Entity_SetAction                 ; -> the flight
 .data_02_5d57:
 ; Throw speed by distance, indexed by (clamped gap) >> 2. Forty-one entries, which
 ; covers the whole $00-$A0 range. Almost the identity - it climbs by one per step
@@ -998,13 +1009,15 @@ call_02_5d10_EntityAction_EvilSantaProjectile_Init:
     db   $2b
 
 call_02_5d80_EntityAction_EvilSantaProjectile_UpdateTrajectory:
-; Actions $01 through $04, all four rows. Moves the snowball, then decides which of
-; the four it should be showing and switches only if that is not the one it is
-; already in - so a frame where nothing changed costs one compare.
+; Actions $01 through $04, all four rows. Moves the snowball, then switches sprite
+; on the exact frames its height matches one of three thresholds - every other
+; frame falls out of one of the `ret NZ`s having done nothing.
 ;
 ; Y is measured relative to $25, and the two branches use thresholds one apart
 ; ($09/$1D/$3B rising, $0A/$1E/$3C falling) so the same physical height does not
-; flip the sprite twice. Reaching Y $88 is the ground and frees the slot; climbing
+; flip the sprite twice. Rising walks $03 -> $02 -> $01 as it climbs and falling
+; walks $02 -> $03 -> $04, so row $04 is only ever reached on the way down and row
+; $01 only on the way up. Reaching Y $88 is the ground and frees the slot; climbing
 ; above $25 - only possible once Gex has whipped it back - is the hit on Santa
     call call_00_24c0_Entity_ApplyXVelocity_Subpixel
     call call_00_24ee_Entity_ApplyYVelocity_Subpixel
@@ -1390,11 +1403,10 @@ call_02_5f50_EntityAction_SafariSamProjectile_Update:
 ; Two counters in WRAM rather than in the slot, because the knight is despawned and
 ; respawned between posts:
 ;
-;   wDCD3_GhostKnightDamageCounter1  which post it is at, 0-7
-;   wDCD4_GhostKnightDamageCounter2  which of that post's four shots is next
+;   wDCD3_GhostKnightPostIndex    which post it is at, 0-7
+;   wDCD4_GhostKnightShotCounter  which of that post's four shots is next
 ;
-; The names date from before the tables were read - neither has anything to do with
-; damage. The knight's health is the ordinary ENTITY_FIELD_DAMAGE_STATE, $04, and
+; The knight's health is the ordinary ENTITY_FIELD_DAMAGE_STATE, $04, and
 ; call_03_4f98_CollisionHandler_GhostKnight spends it; ENTITY_ATTR_DEFEAT_FLAGS $85
 ; is what sends the dead knight to action $05.
 ;
@@ -1410,8 +1422,8 @@ call_02_5f50_EntityAction_SafariSamProjectile_Update:
 
 call_02_5f69_EntityAction_GhostKnight_Init:
     xor  a
-    ld   [wDCD3_GhostKnightDamageCounter1],a           ; post 0
-    ld   [wDCD4_GhostKnightDamageCounter2],a           ; first shot of the fan
+    ld   [wDCD3_GhostKnightPostIndex],a           ; post 0
+    ld   [wDCD4_GhostKnightShotCounter],a           ; first shot of the fan
     call call_02_5f9b_GhostKnight_MoveToPost
     ld   a,$01
     jp   call_02_72ac_Entity_SetAction                 ; -> Attack
@@ -1437,20 +1449,20 @@ call_02_5f91_EntityAction_GhostKnight_Relocate:
 ; without a compare, and it falls straight into the placement below
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ret  z
-    ld   hl,wDCD3_GhostKnightDamageCounter1
+    ld   hl,wDCD3_GhostKnightPostIndex
     inc  [hl]
     res  3,[hl]                                        ; wrap 0-7
 call_02_5f9b_GhostKnight_MoveToPost:
 ; Two lookups. The post counter indexes .data_02_5fbf, which gives a record number,
 ; and that record number times four indexes .data_02_5fc7, which is copied over
 ; ENTITY_FIELD_WORLD_X and ENTITY_FIELD_WORLD_Y in one four-byte loop
-    ld   hl,wDCD3_GhostKnightDamageCounter1
+    ld   hl,wDCD3_GhostKnightPostIndex
     ld   l,[hl]
-    ld   h,00
+    ld   h,$00
     ld   de,.data_02_5fbf
     add  hl,de
     ld   l,[hl]
-    ld   h,00
+    ld   h,$00
     add  hl,hl
     add  hl,hl                                         ; record * 4
     ld   de,.data_02_5fc7
@@ -1466,8 +1478,9 @@ call_02_5f9b_GhostKnight_MoveToPost:
     ret
 .data_02_5fbf:
 ; The eight posts, as record numbers into the grid below. They are not in order and
-; they do not use consecutive cells - $04, $0E, $1D, $23, $34, $2A, $19, $0A walks
-; down the left of the room and back up the right
+; they do not use consecutive cells - $04, $0E, $1D, $23, $34, $2A, $19, $0A is
+; rows 0,1,3,4,6,5,3,1 by columns 4,6,5,3,4,2,1,2, so it works down the right of
+; the room and back up the left
     db   $04, $0e, $1d, $23, $34
     db   $2a, $19, $0a
 .data_02_5fc7:
@@ -1519,11 +1532,11 @@ call_02_60c7_EntityAction_GhostKnightProjectile_Update:
 ; posts and only its bottom two bits matter
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_02_60f2
-    ld   a,[wDCD3_GhostKnightDamageCounter1]
+    ld   a,[wDCD3_GhostKnightPostIndex]
     add  a
     add  a                                             ; post * 4
     ld   c,a
-    ld   hl,wDCD4_GhostKnightDamageCounter2
+    ld   hl,wDCD4_GhostKnightShotCounter
     ld   a,[hl]
     inc  [hl]
     and  a,$03                                         ; which of the four
@@ -1586,7 +1599,7 @@ call_02_60c7_EntityAction_GhostKnightProjectile_Update:
 ;   $00 Crawl   walk along the sand until it reaches the end of its patrol
 ;   $01 Rise    launch straight up; leave when the rise turns into a fall
 ;   $02 Fall    come back down; leave when it reaches its spawn line
-;   $03 Slam    the impact, and the one frame that can set wDCDC
+;   $03 Slam    the impact, and the one frame that can set wDCDC_HandSlamFlag
 ;   $04 -       no code. data_02_7861 holds for 40 frames and chains back to $00
 ;   $05 Settle  unreachable - nothing selects action $05
 ;
@@ -1634,7 +1647,7 @@ call_02_616f_EntityAction_Hand_Slam:
 ; On the first frame it checks its own world X against a fixed window: the
 ; arithmetic is (X - $01B0) + $0C, required to be positive and below $18, which is
 ; X somewhere in $01A4..$01BB. That is one particular spot in the level, and
-; landing there raises wDCDC_HandEntityUnkFlag - which
+; landing there raises wDCDC_HandSlamFlag - which
 ; call_02_63a8_EntityAction_BreakableBlock_TakeHit reads and clears. So the
 ; breakable blocks are broken by the hand's slam, not by Gex.
 ;
@@ -1663,7 +1676,7 @@ call_02_616f_EntityAction_Hand_Slam:
     cp   a,$18
     jr   nc,.jr_02_61a1                                ; outside $01A4..$01BB
     ld   a,$01
-    ld   [wDCDC_HandEntityUnkFlag],a                   ; the breakable block reads this
+    ld   [wDCDC_HandSlamFlag],a                        ; the breakable block reads this
 .jr_02_61a1:
     call call_00_244a_Entity_ApplyGravityAndMoveY_Clamped
     call call_00_2766_Entity_ClampYToSpawnFloor
@@ -1699,22 +1712,28 @@ call_02_61b8_EntityAction_LostArk_Flash:
     db   $00, $00, $ff, $7f, $b5, $56, $ad, $35
 
 ; ------------------------------------------------------------------
-; THE BEE hovers along its patrol and dive-bombs. The dive is one action function
-; across three rows, and which row it is in is chosen by its own vertical speed:
+; THE BEE hovers along its patrol and dive-bombs. The dive goes DOWNWARD from the
+; hover line and floats back up to it - it is the one entity that uses
+; call_00_2475_Entity_ApplyGravityMoveY_WithSpawnCeiling, where a positive YVEL
+; moves the entity down and the per-frame gravity accelerates it back up.
 ;
-;   $01  |YVEL| large    the launch
-;   $02  YVEL under $08  near the top of the arc
-;   $03  YVEL past $F8   coming down
+; The dive is one action function across three rows, and which row it is in is
+; chosen by its own vertical speed:
 ;
-; and landing puts it back to $00. Each frame it works out which of those it should
-; be and only calls Entity_SetAction when that differs from the action id it is
-; already in, so the sprite swap is free on the frames nothing changed
+;   $01  YVEL $08 or more   dropping fast - the launch
+;   $02  YVEL under $08     the bottom of the arc
+;   $03  YVEL past $F8      climbing back to the hover line
+;
+; and reaching the hover line again puts it back to $00. Each frame it works out
+; which of those it should be and only calls Entity_SetAction when that differs
+; from the action id it is already in, so the sprite swap is free on the frames
+; nothing changed
 ; ------------------------------------------------------------------
 
 call_02_61c6_EntityAction_Bee_Hover:
 ; Action $00. Paces at $04. Dives when it is facing Gex and he is within $30 -
 ; it will not turn round to start one
-    ld   c,04
+    ld   c,$04
     call call_00_28c8_Entity_SetXVelocity
     call call_00_251c_Entity_MoveXByFacingMomentum_BoundsChecked
     call call_00_2a68_Entity_ComputeXDistanceFromPlayer
@@ -1733,22 +1752,23 @@ call_02_61c6_EntityAction_Bee_Hover:
     jp   call_02_72ac_Entity_SetAction
 
 call_02_61ee_EntityAction_Bee_Dive:
-; Actions $01, $02 and $03. Entity_ApplyGravityMoveY_WithFloorCollision returns
-; carry clear on the frame it lands, and that is the only exit
+; Actions $01, $02 and $03. Entity_ApplyGravityMoveY_WithSpawnCeiling returns
+; carry clear on the frame the bee gets back to its hover line, and that is the
+; only exit
     call call_00_251c_Entity_MoveXByFacingMomentum_BoundsChecked
-    call call_00_2475_Entity_ApplyGravityMoveY_WithFloorCollision
+    call call_00_2475_Entity_ApplyGravityMoveY_WithSpawnCeiling
     ld   c,$00
-    jr   nc,.jr_02_620b                                ; landed -> Hover
+    jr   nc,.jr_02_620b                                ; back at the hover line
     call call_00_28d2_Entity_GetYVelocity
     bit  7,a
     jr   nz,.jr_02_6206
     ld   c,$02
     cp   a,$08
-    jr   c,.jr_02_620b                                ; slowing at the top
-    ret                                                ; still climbing hard
+    jr   c,.jr_02_620b                                ; slowing at the bottom
+    ret                                                ; still dropping hard
 .jr_02_6206:
     cp   a,$F8
-    ret  nc                                            ; only just started to drop
+    ret  nc                                            ; only just started to climb
     ld   c,$03
 .jr_02_620b:
     call call_00_2962_Entity_GetActionId
@@ -2035,7 +2055,7 @@ call_02_6399_EntityAction_RaStatue_Fly:
 ; It is not Gex that breaks it. Its collision type is
 ; COLLISION_TYPE_PLATFORM | COLLISION_TYPE_FLAG_IMMOVABLE - solid ground with no
 ; handler of its own - and the only thing that advances it is
-; wDCDC_HandEntityUnkFlag, which call_02_616f_EntityAction_Hand_Slam raises when
+; wDCDC_HandSlamFlag, which call_02_616f_EntityAction_Hand_Slam raises when
 ; the mummy hand slams down in one particular spot. Three slams take the block
 ; through $00, $01, $02 and into $03
 ; ------------------------------------------------------------------
@@ -2048,9 +2068,9 @@ call_02_63a8_EntityAction_BreakableBlock_TakeHit:
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_02_63b1
     xor  a
-    ld   [wDCDC_HandEntityUnkFlag],a
+    ld   [wDCDC_HandSlamFlag],a
 .jr_02_63b1:
-    ld   hl,wDCDC_HandEntityUnkFlag
+    ld   hl,wDCDC_HandSlamFlag
     bit  0,[hl]
     ret  z                                             ; no slam this frame
     ld   [hl],$00                                      ; consume it
@@ -2566,21 +2586,22 @@ call_02_65c9_EntityAction_BlueBeamBarrier_Solid:
     jp   call_02_72ac_Entity_SetAction                 ; beam off
 
 call_02_65d7_EntityAction_AnimeRisingPlatform_Update:
-; The pressure plate, and the only entity in the file that uses MISC_TIMER as a
-; position rather than a countdown: it holds how far the platform has been pushed
-; down, from $00 to $A7.
+; ENTITY_ANIME_CHANNEL_RISING_PLATFORM, and the only entity in the file that uses
+; MISC_TIMER as a position rather than a countdown: it holds how far this platform
+; has been raised, $00 to $A7.
 ;
-; Standing on anything ELSE (or nothing) lets it rise a pixel a frame until the
-; count reaches $A8; standing on THIS platform lets it sink a pixel every fourth
-; frame until the count is back to zero. So Gex's weight pushes it down and it
-; floats back up when he steps off - the timer and the height can never drift
-; apart because both move by one at a time
+; It climbs one pixel a frame, until the count reaches $A8, only while
+; wDC7B_Player_EntityStoodOnLo names an entity that is not this one - that is,
+; while Gex is standing on some OTHER entity. Every other case sinks it back one
+; pixel every fourth frame until the count is zero: Gex on this platform, and Gex
+; on plain ground or in the air, which leave that byte $00. The timer and the
+; height can never drift apart because both move by one at a time
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ld   c,TIMER_AMOUNT_0_FRAMES
     call nz,call_00_290d_Entity_SetMiscTimer
     ld   a,[wDC7B_Player_EntityStoodOnLo]
     and  a
-    jr   z,.jr_02_65f8                                 ; standing on nothing
+    jr   z,.jr_02_65f8                                 ; on the ground or in the air
     ld   hl,wDA00_CurrentEntityAddrLo
     cp   [hl]
     jr   z,.jr_02_65f8                                 ; standing on this one
@@ -2918,7 +2939,7 @@ call_02_679b_EntityAction_SecbotProjectile_Update:
 ;
 ; There are three shafts in the level, at X $01A0, $0340 and $05C0
 ; (.data_02_68A9). call_02_688e_Elevator_GetShaftIndex turns this entity's X into
-; an index 0-2, and the three words at wDCE2_ElevatorEntityUnkData remember each
+; an index 0-2, and the three words at wDCE2_ElevatorShaftHeights remember each
 ; shaft's height - so an elevator that scrolls off screen and respawns comes back
 ; where it was left rather than at its spawn point.
 ;
@@ -2938,7 +2959,7 @@ call_02_67c2_EntityAction_Elevator_Update:
     ld   l,c
     ld   h,$00
     add  hl,hl                                         ; two bytes per shaft
-    ld   de,wDCE2_ElevatorEntityUnkData
+    ld   de,wDCE2_ElevatorShaftHeights
     add  hl,de
     LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_WORLD_Y
     ldi  a,[hl]
@@ -2999,7 +3020,7 @@ call_02_67c2_EntityAction_Elevator_Update:
     ld   l,c
     ld   h,$00
     add  hl,hl
-    ld   de,wDCE2_ElevatorEntityUnkData
+    ld   de,wDCE2_ElevatorShaftHeights
     add  hl,de
     LOAD_OBJ_FIELD_TO_DE ENTITY_FIELD_WORLD_Y
     ld   a,[de]
@@ -3057,7 +3078,7 @@ call_02_688e_Elevator_GetShaftIndex:
 ; placed at any X other than $01A0, $0340 or $05C0 runs straight off the end of the
 ; six-byte table and keeps comparing against whatever follows it in ROM, returning
 ; an index of 3 or more. Both callers then use that index to address
-; wDCE2_ElevatorEntityUnkData as a two-byte-per-shaft array, so
+; wDCE2_ElevatorShaftHeights as a two-byte-per-shaft array, so
 ; call_02_67c2_EntityAction_Elevator_Update would both read and WRITE past the
 ; three words reserved there.
     ld   hl,.data_02_68A9
@@ -3667,6 +3688,14 @@ call_02_6b9b_EntityAction_Rat_Scurry:
 ; ------------------------------------------------------------------
 
 call_02_6ba3_EntityAction_ChomperTV_Descend:
+; Action $00.
+;
+; @bug - the same odd-parameter trap as call_02_6b03_EntityAction_Spider_Descend.
+; MISC_TIMER is loaded from Entity_GetParameterIntoC and then walked down two at a
+; time with `sub a,$02`, but the exit tests only for zero, so an odd spawn
+; parameter steps straight past it and the entity sinks for another 128 steps
+; before the count wraps back round. Only the even parameters in the shipped level
+; data keep it out of sight.
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     jr   z,.jr_02_6bb3
     ld   c,$04
@@ -3902,7 +3931,7 @@ call_02_6cdd_EntityAction_BirdProjectile_Update:
     call call_00_27f3_Entity_GetInitialYPos            ; DE = the perch height
     call call_00_2917_Entity_CheckMiscTimerZero
     ld   l,[hl]
-    ld   h,00
+    ld   h,$00
     add  hl,hl                                         ; two bytes per entry
     ld   bc,.data_02_6d31
     add  hl,bc
@@ -4019,8 +4048,9 @@ call_02_6d52_EntityAction_RockHard_Defeated:
 
 call_02_6d6d_EntityAction_BrainOfOz_Intro:
 ; Actions $00 and $01, whose data blocks chain into each other. Each entry bumps
-; MISC_TIMER, so the pair runs ten times before the fight starts - the arc path is
-; what makes that look like the brain drifting in.
+; MISC_TIMER and the compare is against the value BEFORE the bump, so the pair runs
+; eleven times - the counter walking $00 to $0A - before the fight starts. The arc
+; path is what makes that look like the brain drifting in.
 ;
 ; The `call z` and the write after it are not in an else branch: the counter is set
 ; to 2 on every pass, so it is 2 when the fight opens whatever happened
@@ -4030,7 +4060,7 @@ call_02_6d6d_EntityAction_BrainOfOz_Intro:
     inc  [hl]
     cp   a,$0A
     ld   a,$02
-    call z,call_02_72ac_Entity_SetAction               ; ten passes -> ChooseAttack
+    call z,call_02_72ac_Entity_SetAction               ; the eleventh -> ChooseAttack
     ld   a,$02
     ld   [wDCDA_BrainOfOzAndRezCounter],a
 .jr_02_6d82:
@@ -4043,9 +4073,10 @@ call_02_6d85_EntityAction_BrainOfOz_ChooseAttack:
 ; clear - the brain sets that flag itself when a volley ends, and the cannon clears
 ; it as it rolls in.
 ;
-; The counter then walks 2, 1, 0, 2, 1, 0 (`dec` and, on going negative, reload
-; with 2) and picks the volley length out of the table below, so successive volleys
-; get shorter
+; The counter is decremented BEFORE it is used (`dec` and, on going negative,
+; reload with 2), so starting from the 2 the intro leaves behind it indexes 1, 0, 2,
+; 1, 0, 2 ... and the volley length cycles $39, $49, $29 rather than shortening
+; steadily
     call call_00_233e_Entity_MoveAlongArcTable
     ld   c,ENTITY_LIZARD_OF_OZ_CANNON
     call call_00_29b7_Entity_FindSlotByIdAndGetActionId
@@ -4256,8 +4287,10 @@ call_02_6ec7_EntityAction_CannonProjectile_Update:
 ; brain's side, by measuring the brain against this entity's position.
 ;
 ; What this routine decides is when the ball is SPENT, and there are two ways:
-; reaching the ceiling line Y $0038, or the brain already being in an action of
-; $06 or more, which is its death sequence. Either way it becomes a puff -
+; coming back DOWN to the line Y $0038 - the test is guarded by `bit 7` on YVEL, so
+; the whole climb is never checked and only the descent can end it - or the brain
+; already being in an action of $06 or more, which is its death sequence. Either
+; way it becomes a puff -
 ; ENTITY_LIZARD_OF_OZ_CANNON_PROJECTILE_2 - and frees its slot.
 ;
 ; The `or a,$01` walks L from the brain's slot base to its ENTITY_FIELD_ACTION_ID
@@ -4283,7 +4316,7 @@ call_02_6ec7_EntityAction_CannonProjectile_Update:
     sub  e
     ld   a,[hl]
     sbc  d
-    ret  c                                             ; not at the ceiling yet
+    ret  c                                             ; still above the line
     ld   [hl],d
     dec  l
     ld   [hl],e
@@ -4328,12 +4361,12 @@ call_02_6f0e_EntityAction_ChannelZBlock_None:
 ; Both floors are literal world coordinates rather than collision tests, which is
 ; why the arena is a fixed-size box.
 ;
-;   $00/$01 Intro    ten passes of a ping-ponging pair, then the fight starts
+;   $00/$01 Intro    eleven passes of a ping-ponging pair, then the fight starts
 ;   $02 Bounce       hop along the floor
 ;   $03 Stagger      the reaction to a multiple-of-three hit; falls, then $04
 ;   $04 -            crouch, chains to $05
 ;   $05 Ascend       rise to the ceiling, then $06
-;   $06/$07 Gather   another ten-pass ping-pong at the ceiling, then $08
+;   $06/$07 Gather   another eleven-pass ping-pong at the ceiling, then $08
 ;   $08 Barrage      teleport home and fire a shot every 64 frames
 ;   $09 Recoil       the reaction to any other hit - one rise
 ;   $0A Death        ENTITY_ATTR_DEFEAT_FLAGS $8A sends him here
@@ -4346,8 +4379,9 @@ call_02_6f0e_EntityAction_ChannelZBlock_None:
 
 call_02_6f0f_EntityAction_Rez_Intro:
 ; Actions $00 and $01, whose data blocks chain into each other. The same
-; count-to-ten shape as the Brain of Oz intro, and the velocities are set on every
-; pass rather than once
+; count-to-$0A shape as the Brain of Oz intro - eleven passes, since the compare
+; sees the value before the bump - and the velocities are set on every pass rather
+; than once
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ret  z
     ld   c,$20
@@ -4358,7 +4392,7 @@ call_02_6f0f_EntityAction_Rez_Intro:
     inc  [hl]
     cp   a,$0A
     ld   a,$02
-    jp   z,call_02_72ac_Entity_SetAction               ; ten passes -> Bounce
+    jp   z,call_02_72ac_Entity_SetAction               ; the eleventh -> Bounce
     ret
 
 call_02_6f29_EntityAction_Rez_Bounce:
@@ -4392,8 +4426,8 @@ call_02_6f3e_EntityAction_Rez_Ascend:
     jp   call_02_72ac_Entity_SetAction                 ; -> Gather
 
 call_02_6f54_EntityAction_Rez_Gather:
-; Actions $06 and $07, another ping-pong pair counting to ten. He is pinned at the
-; ceiling here and does not move at all
+; Actions $06 and $07, another ping-pong pair counting to $0A - eleven passes. He
+; is pinned at the ceiling here and does not move at all
     call call_00_29f5_Entity_IsFirstFrameOfActionAndClear
     ret  z
     call call_00_2917_Entity_CheckMiscTimerZero
@@ -4406,7 +4440,9 @@ call_02_6f54_EntityAction_Rez_Gather:
 call_02_6f64_EntityAction_Rez_Barrage:
 ; Action $08, and the only attack. He snaps back to his SPAWN position on the first
 ; frame - so the barrage always comes from the same place however the hopping left
-; him - and then fires one shot every 64 frames for TIMER_AMOUNT_REZ ($06) shots.
+; him - and then fires one shot every 64 frames. MISC_TIMER starts at
+; TIMER_AMOUNT_REZ ($06) and is spent before each shot rather than after, so the
+; pass that takes it to zero fires nothing: five shots, not six.
 ;
 ; Which of the two projectile children is spawned alternates on bit 0 of the shared
 ; counter, and that same counter is what the projectile itself uses to pick its arc.
@@ -4417,7 +4453,7 @@ call_02_6f64_EntityAction_Rez_Barrage:
     call call_00_2826_Entity_ResetToInitialXPos
     call call_00_27e4_Entity_ResetToInitialYPos
     ld   c,TIMER_AMOUNT_REZ
-    call call_00_290d_Entity_SetMiscTimer              ; six shots
+    call call_00_290d_Entity_SetMiscTimer              ; five shots
 .jr_02_6f74:
     call call_00_2917_Entity_CheckMiscTimerZero
     jr   z,.jr_02_6f93                                 ; out of shots

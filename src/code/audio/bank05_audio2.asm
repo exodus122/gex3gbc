@@ -2,10 +2,11 @@
 ; SOUND DRIVER
 ;
 ; Banks $04 and $05 each hold a byte-for-byte identical copy of this driver followed by
-; their own song, instrument and sound effect data. Only three bytes differ between the
-; two copies - the operands of the three instructions that point at this bank's own song
-; table, instrument table and pattern table. A song is addressed as (bank, id) and the
-; bank is switched by wDE60_CurrentAudioBank before any entry point here is called.
+; their own song, instrument and sound effect data. Exactly eight bytes differ between
+; the two copies of the driver: the 16-bit operands of the four instructions that name
+; this bank's own song table, instrument table and pattern table - the pattern table is
+; loaded at two separate sites. A song is addressed as (bank, id) and the bank is
+; switched by wDE60_CurrentAudioBank before any entry point here is called.
 ;
 ; gex2 splits its driver across four banks the same way, but there the whole $4000-$445f
 ; block is identical and every bank-local address is reached through one WRAM pointer -

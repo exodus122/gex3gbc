@@ -195,7 +195,7 @@ call_01_4000_MenuLoad:
     and  A, MENU_FLAG_GRID_INPUT                      ;; 01:4088 $e6 $01
     jp   Z, .jp_01_41cb                               ;; 01:408a $ca $cb $41
     ld   HL, wDAD7_RawInputs                          ;; 01:408d $21 $d7 $da
-    bit  PADF_SELECT_BIT, [HL] ;                      ;; 01:4090 $cb $56
+    bit  PADF_SELECT_BIT, [HL]                        ;; 01:4090 $cb $56
     jr   Z, .jr_01_40ad                               ;; 01:4092 $28 $19
     ld   A, SFX_MENU_SCROLL                           ;; 01:4094 $3e $01
     call call_00_0fd7_PlaySFX                         ;; 01:4096 $cd $d7 $0f
@@ -207,14 +207,14 @@ call_01_4000_MenuLoad:
     ld   A, [wDB95_MenuType_OptionCount]              ;; 01:40ad $fa $95 $db
     and  A, A                                         ;; 01:40b0 $a7
     jr   Z, .jp_01_4078                               ;; 01:40b1 $28 $c5
-    bit  1, [HL]                                      ;; 01:40b3 $cb $4e
+    bit  PADF_B_BIT, [HL]                             ;; 01:40b3 $cb $4e
     jr   NZ, .jr_01_4111                              ;; 01:40b5 $20 $5a
-    bit  0, [HL]                                      ;; 01:40b7 $cb $46
+    bit  PADF_A_BIT, [HL]                             ;; 01:40b7 $cb $46
     jp   NZ, .jp_01_4180                              ;; 01:40b9 $c2 $80 $41
-    bit  3, [HL]                                      ;; 01:40bc $cb $5e
+    bit  PADF_START_BIT, [HL]                         ;; 01:40bc $cb $5e
     jp   NZ, .jp_01_415b                              ;; 01:40be $c2 $5b $41
     ld   A, [HL]                                      ;; 01:40c1 $7e
-    and  A, $f0                                       ;; 01:40c2 $e6 $f0
+    and  A, PADF_RIGHT | PADF_LEFT | PADF_UP | PADF_DOWN;; 01:40c2 $e6 $f0
     jr   Z, .jp_01_4078                               ;; 01:40c4 $28 $b2
     call call_00_0f6e_CheckInputRight                 ;; 01:40c6 $cd $6e $0f
     jr   Z, .jr_01_40d7                               ;; 01:40c9 $28 $0c
@@ -232,7 +232,7 @@ call_01_4000_MenuLoad:
     dec  [HL]                                         ;; 01:40df $35
     bit  7, [HL]                                      ;; 01:40e0 $cb $7e
     jr   Z, .jr_01_4109                               ;; 01:40e2 $28 $25
-    ld   [HL], $0f                                    ;; 01:40e4 $36 $0f
+    ld   [HL], PASSWORD_KEY_COLUMNS - 1               ;; 01:40e4 $36 $0f
     jr   .jr_01_4109                                  ;; 01:40e6 $18 $21
 .jr_01_40e8:
     call call_00_0f7a_CheckInputDown                  ;; 01:40e8 $cd $7a $0f
@@ -251,7 +251,7 @@ call_01_4000_MenuLoad:
     dec  [HL]                                         ;; 01:4102 $35
     bit  7, [HL]                                      ;; 01:4103 $cb $7e
     jr   Z, .jr_01_4109                               ;; 01:4105 $28 $02
-    ld   [HL], $01                                    ;; 01:4107 $36 $01
+    ld   [HL], PASSWORD_KEY_ROWS - 1                  ;; 01:4107 $36 $01
 .jr_01_4109:
     ld   A, SFX_MENU_SCROLL                           ;; 01:4109 $3e $01
     call call_00_0fd7_PlaySFX                         ;; 01:410b $cd $d7 $0f
@@ -339,7 +339,7 @@ call_01_4000_MenuLoad:
     dec  [HL]                                         ;; 01:4199 $35
     bit  7, [HL]                                      ;; 01:419a $cb $7e
     jr   Z, .jr_01_41c3                               ;; 01:419c $28 $25
-    ld   [HL], $05                                    ;; 01:419e $36 $05
+    ld   [HL], PASSWORD_GRID_COLUMNS - 1              ;; 01:419e $36 $05
     jr   .jr_01_41c3                                  ;; 01:41a0 $18 $21
 .jr_01_41a2:
     call call_00_0f7a_CheckInputDown                  ;; 01:41a2 $cd $7a $0f
@@ -358,7 +358,7 @@ call_01_4000_MenuLoad:
     dec  [HL]                                         ;; 01:41bc $35
     bit  7, [HL]                                      ;; 01:41bd $cb $7e
     jr   Z, .jr_01_41c3                               ;; 01:41bf $28 $02
-    ld   [HL], $02                                    ;; 01:41c1 $36 $02
+    ld   [HL], PASSWORD_GRID_ROWS - 1                 ;; 01:41c1 $36 $02
 .jr_01_41c3:
     ld   A, SFX_MENU_SCROLL                           ;; 01:41c3 $3e $01
     call call_00_0fd7_PlaySFX                         ;; 01:41c5 $cd $d7 $0f
@@ -410,7 +410,7 @@ call_01_4000_MenuLoad:
     dec  [HL]                                         ;; 01:421c $35
     bit  7, [HL]                                      ;; 01:421d $cb $7e
     jr   Z, .jr_01_4223                               ;; 01:421f $28 $02
-    ld   [HL], $06                                    ;; 01:4221 $36 $06
+    ld   [HL], MENU_TOTALS_PAGES - 1                  ;; 01:4221 $36 $06
 .jr_01_4223:
     farcall call_03_6c89_MapData_LoadForCurrentMap
     ld   HL, data_01_5692_MenuScript_Totals                             ;; 01:422e $21 $92 $56
@@ -436,19 +436,19 @@ call_01_4000_MenuLoad:
     ld   DE, wDBCB_Menu_OptionActions                 ;; 01:4267 $11 $cb $db
     add  HL, DE                                       ;; 01:426a $19
     ld   A, [HL]                                      ;; 01:426b $7e
-    cp   A, $10                                       ;; 01:426c $fe $10
+    cp   A, MENU_RESULT_START_GAME                    ;; 01:426c $fe $10
     ret  Z                                            ;; 01:426e $c8
-    cp   A, $60                                       ;; 01:426f $fe $60
+    cp   A, MENU_RESULT_CONFIRM_QUIT                  ;; 01:426f $fe $60
     ret  Z                                            ;; 01:4271 $c8
-    cp   A, $20                                       ;; 01:4272 $fe $20
+    cp   A, MENU_RESULT_PASSWORD_ACCEPTED             ;; 01:4272 $fe $20
     jr   Z, .jp_01_42a1                               ;; 01:4274 $28 $2b
-    cp   A, $30                                       ;; 01:4276 $fe $30
+    cp   A, MENU_ACTION_SEE_PASSWORD                  ;; 01:4276 $fe $30
     jr   Z, .jr_01_4290                               ;; 01:4278 $28 $16
-    cp   A, $50                                       ;; 01:427a $fe $50
+    cp   A, MENU_ACTION_QUIT                          ;; 01:427a $fe $50
     jr   Z, .jr_01_42a9                               ;; 01:427c $28 $2b
-    cp   A, $70                                       ;; 01:427e $fe $70
+    cp   A, MENU_ACTION_VIEW_TOTALS                   ;; 01:427e $fe $70
     jr   Z, .jr_01_42b7                               ;; 01:4280 $28 $35
-    cp   A, $40                                       ;; 01:4282 $fe $40
+    cp   A, MENU_RESULT_CONTINUE                      ;; 01:4282 $fe $40
     ret  Z                                            ;; 01:4284 $c8
 .jp_01_4285:
     call call_00_0f5e_WaitUntilNoInputPressed         ;; 01:4285 $cd $5e $0f
@@ -600,7 +600,7 @@ call_01_435e_MenuLoad_AfterLevel:
 ; So most of this routine is menu dispatch. gex2's call_01_42bd_HandleTVWarp covers
 ; the same ground
     ld   HL, wDB6A_WarpFlags                          ;; 01:435e $21 $6a $db
-    res  4, [HL]                                      ;; 01:4361 $cb $a6
+    res  WARP_NEW_LEVEL_BIT, [HL]                     ;; 01:4361 $cb $a6
     ld   A, [wDC1E_CurrentLevelID]                    ;; 01:4363 $fa $1e $dc
     ld   [wDB6C_CurrentMapId], A                      ;; 01:4366 $ea $6c $db
     and  A, A                                         ;; 01:4369 $a7
@@ -608,9 +608,9 @@ call_01_435e_MenuLoad_AfterLevel:
     ld   A, [wDB6D_InBonusStage]                      ;; 01:436c $fa $6d $db
     and  A, A                                         ;; 01:436f $a7
     jr   Z, .jr_01_4390_NotInBonusStage               ;; 01:4370 $28 $1e
-    bit  5, [HL]                                      ;; 01:4372 $cb $6e
+    bit  WARP_TIME_UP_BIT, [HL]                       ;; 01:4372 $cb $6e
     jr   Z, .jr_01_4384                               ;; 01:4374 $28 $0e
-    res  5, [HL]                                      ;; 01:4376 $cb $ae
+    res  WARP_TIME_UP_BIT, [HL]                       ;; 01:4376 $cb $ae
     ld   A, SONG_GAME_OVER_OR_TIME_UP                 ;; 01:4378 $3e $15
     call call_00_0fa2_SetupMusic                      ;; 01:437a $cd $a2 $0f
     ld   A, MENU_TIME_UP                              ;; 01:437d $3e $0a

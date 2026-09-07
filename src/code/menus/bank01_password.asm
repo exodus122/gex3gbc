@@ -29,9 +29,9 @@ call_01_4d6e_Password_RefreshCellGfx:
     ld   DE, data_01_66f9_PasswordFont                ;; 01:4d8f $11 $f9 $66
     add  HL, DE                                       ;; 01:4d92 $19
     ld   A, L                                         ;; 01:4d93 $7d
-    ld   [wDBF2], A                                   ;; 01:4d94 $ea $f2 $db
+    ld   [wDBF2_GfxStream_InlineSrc], A               ;; 01:4d94 $ea $f2 $db
     ld   A, H                                         ;; 01:4d97 $7c
-    ld   [wDBF3], A                                   ;; 01:4d98 $ea $f3 $db
+    ld   [wDBF2_GfxStream_InlineSrc+1], A             ;; 01:4d98 $ea $f3 $db
     call call_01_4de3_Password_GetCellTileIndex       ;; 01:4d9b $cd $e3 $4d
     ld   L, A                                         ;; 01:4d9e $6f
     ld   H, $00                                       ;; 01:4d9f $26 $00
@@ -42,9 +42,9 @@ call_01_4d6e_Password_RefreshCellGfx:
     ld   DE, _VRAM                                    ;; 01:4da5 $11 $00 $80
     add  HL, DE                                       ;; 01:4da8 $19
     ld   A, L                                         ;; 01:4da9 $7d
-    ld   [wDBF4], A                                   ;; 01:4daa $ea $f4 $db
+    ld   [wDBF4_GfxStream_InlineDest], A              ;; 01:4daa $ea $f4 $db
     ld   A, H                                         ;; 01:4dad $7c
-    ld   [wDBF5], A                                   ;; 01:4dae $ea $f5 $db
+    ld   [wDBF4_GfxStream_InlineDest+1], A            ;; 01:4dae $ea $f5 $db
     ld   HL, wDBEF_GfxStream_ChunksRemaining          ;; 01:4db1 $21 $ef $db
     ld   A, [HL+]                                     ;; 01:4db4 $2a
     ld   [wDBEF_GfxStream_ChunksRemaining], A         ;; 01:4db5 $ea $ef $db
@@ -174,8 +174,8 @@ call_01_4df4_Text_CharToGlyphIndex:
     db   $00, $00, $00, $00, $00, $00, $00, $00
     db   $00, $00, $00, $00, $00, $00
 
-call_01_4efd:
-; a small "index into the table below" routine - and then a 33-entry table
+call_01_4efd_Password_KeyToAscii:
+; Password key value in A -> its ASCII character, straight through the 33-entry table
 ; mapping key index to ASCII, blank plus 'A'-'Z' plus '0'-'5', which is the
 ; PASSWORD_KEY_COLUMNS * PASSWORD_KEY_ROWS keyboard's alphabet. Nothing in the
 ; disassembly reaches this.
@@ -196,7 +196,7 @@ call_01_4efd:
 ; PASSWORD_BITS_PER_CELL-bit cell can hold - but see below, the contents do not
 ; match the font.
 ;
-; NOTHING CALLS call_01_4efd, so this table is dead in this build: the grid is drawn
+; NOTHING CALLS call_01_4efd_Password_KeyToAscii, so this table is dead in this build: the grid is drawn
 ; from the font directly by call_01_477c_MenuCmd_StagePasswordGlyph and never goes via
 ; ASCII.
 ;
@@ -292,8 +292,9 @@ call_01_4f8c_Password_BuildPayload:
 ; every surviving bit is appended to a bit stream, most significant first, using
 ; wDB90_PasswordCounter as the running bit position. The masks pass 58 bits in total.
 ;
-; Four header bits plus 58 progress bits is exactly PASSWORD_TOTAL_BITS, which is why
-; PASSWORD_CELL_COUNT cells of PASSWORD_BITS_PER_CELL bits fit with nothing left over.
+; Four header BYTES - 32 bits - plus 58 progress bits is exactly PASSWORD_TOTAL_BITS,
+; which is why PASSWORD_CELL_COUNT cells of PASSWORD_BITS_PER_CELL bits fit with
+; nothing left over.
 ;
 ; The checksum is the sum of the other PASSWORD_CHECKSUM_BYTES bytes XOR
 ; PASSWORD_CHECKSUM_XOR, stored in the first byte. gex2's
@@ -337,7 +338,7 @@ call_01_4f8c_Password_BuildPayload:
     srl  A                                            ;; 01:4fd0 $cb $3f
     ld   E, A                                         ;; 01:4fd2 $5f
     ld   D, $00                                       ;; 01:4fd3 $16 $00
-    ld   HL, wDB76_PasswordEncodedBuffer              ;; 01:4fd5 $21 $76 $db
+    ld   HL, wDB76_PasswordProgressBits              ;; 01:4fd5 $21 $76 $db
     add  HL, DE                                       ;; 01:4fd8 $19
     push HL                                           ;; 01:4fd9 $e5
     ld   A, [wDB90_PasswordCounter]                   ;; 01:4fda $fa $90 $db
@@ -549,7 +550,7 @@ call_01_50b5_Password_ApplyPayload:
     srl  A                                            ;; 01:50d2 $cb $3f
     ld   E, A                                         ;; 01:50d4 $5f
     ld   D, $00                                       ;; 01:50d5 $16 $00
-    ld   HL, wDB76_PasswordEncodedBuffer              ;; 01:50d7 $21 $76 $db
+    ld   HL, wDB76_PasswordProgressBits              ;; 01:50d7 $21 $76 $db
     add  HL, DE                                       ;; 01:50da $19
     push HL                                           ;; 01:50db $e5
     ld   A, [wDB90_PasswordCounter]                   ;; 01:50dc $fa $90 $db
@@ -613,9 +614,8 @@ call_01_50b5_Password_ApplyPayload:
     db   $f1, $ff, $ff, $ff, $ff, $ff, $ff, $01       ; levels $00-$07
     db   $01, $01, $01, $01                           ; levels $08-$0b
 .data_01_5126_BitMaskLut_80to01:
-; Bit number (0-7, MSB first) -> its mask. Used to set one bit of the encoded buffer
-; at a time: the running bit counter's low three bits index this and the rest of it
-; picks the byte
-; here, to read one bit of the decoded buffer back out. Also a duplicate of
-; .data_01_501f_BitMaskLut_80to01
+; Bit number (0-7, MSB first) -> its mask - here used to read one bit of the decoded
+; buffer back out, the running bit counter's low three bits indexing this table and
+; the rest of it picking the byte. Byte for byte the same eight bytes as
+; .data_01_501f_BitMaskLut_80to01 above, duplicated in ROM rather than shared
     db   $80, $40, $20, $10, $08, $04, $02, $01

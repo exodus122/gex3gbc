@@ -92,9 +92,10 @@
 ; They still change pose when their action changes, because SetAction reloads byte
 ; +5 into SPRITE_ID; what they never do is animate within an action.
 ;
-; BLOCKS ARE SHARED FREELY. 82 of them are named by more than one (entity, action)
-; row, covering 237 rows between them, and 19 are shared across different entity
-; types rather than between actions of one type. data_02_75c2 is the extreme case:
+; BLOCKS ARE SHARED FREELY. There are 436 (entity, action) rows and only 314
+; blocks: 70 of them are named by more than one row, covering 192 rows between
+; them. Only six of those cross entity tables rather than joining actions of one
+; type. data_02_75c2 is the extreme case:
 ; 39 entity types point at it, because it is the single frozen frame every
 ; call_02_583c_EntityAction_Destroy row uses. Editing one block therefore changes
 ; every entity that points at it.

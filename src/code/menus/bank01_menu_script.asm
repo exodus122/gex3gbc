@@ -459,22 +459,22 @@ call_01_467b_MenuCmd_SetMissionText:
     ld   C, REMOTE_MARKER_TILE_MISSING                ;; 01:4696 $0e $e8
 .jr_01_4698:
     ld   A, C                                         ;; 01:4698 $79
-    ld   [wDADF], A                                   ;; 01:4699 $ea $df $da
+    ld   [wDADF], A                                   ;; 01:4699 $ea $df $da ; sprite record +2: tile id
     ld   A, [wDBA1_MenuCmd_DestTileY]                 ;; 01:469c $fa $a1 $db
     add  A, $02                                       ;; 01:469f $c6 $02
     add  A, A                                         ;; 01:46a1 $87
     add  A, A                                         ;; 01:46a2 $87
     add  A, A                                         ;; 01:46a3 $87
-    ld   [wDADD_MenuTextBuffer], A                    ;; 01:46a4 $ea $dd $da
+    ld   [wDADD_MenuTextBuffer], A                    ;; 01:46a4 $ea $dd $da ; sprite record +0: screen Y
     ld   A, [wDBA0_MenuCmd_DestTileX]                 ;; 01:46a7 $fa $a0 $db
     inc  A                                            ;; 01:46aa $3c
     sub  A, $02                                       ;; 01:46ab $d6 $02
     add  A, A                                         ;; 01:46ad $87
     add  A, A                                         ;; 01:46ae $87
     add  A, A                                         ;; 01:46af $87
-    ld   [wDADE], A                                   ;; 01:46b0 $ea $de $da
+    ld   [wDADE], A                                   ;; 01:46b0 $ea $de $da ; sprite record +1: screen X
     ld   A, $03                                       ;; 01:46b3 $3e $03
-    ld   [wDAE0], A                                   ;; 01:46b5 $ea $e0 $da
+    ld   [wDAE0], A                                   ;; 01:46b5 $ea $e0 $da ; sprite record +3: OAM attributes
     ld   A, [wDBA7_MenuCmd_SrcPtr]                    ;; 01:46b8 $fa $a7 $db
     add  A, A                                         ;; 01:46bb $87
     add  A, A                                         ;; 01:46bc $87
@@ -779,9 +779,11 @@ call_01_4825_MenuCmd_NoOp2:
 
 call_01_4826_MenuCmd_DrawRemoteMarker:
 ; Sub-handler $F0. The marker half of call_01_467b_MenuCmd_SetMissionText with no
-; text: same collected/missing tile pair, same 2x2 rectangle, but a four-entry bit
-; mask table instead of three and a different OAM attribute. The screen that uses four
-; markers rather than three is what it exists for
+; text: same collected/missing tile pair, same 2x2 rectangle and the same
+; two-rows-down placement, but a four-entry bit mask table instead of three, OAM
+; attribute $01 instead of $03, and the marker sits one column RIGHT of the block
+; rather than one column left - this routine has no `sub a,$02` after its `inc a`.
+; The screen that shows four markers rather than three is what it exists for
     ld   hl,wDBA7_MenuCmd_SrcPtr
     ld   l,[hl]
     ld   h,$00
@@ -800,21 +802,21 @@ call_01_4826_MenuCmd_DrawRemoteMarker:
     ld   c,REMOTE_MARKER_TILE_MISSING
 .jr_01_4843:
     ld   a,c
-    ld   [wDADF],a
+    ld   [wDADF],a                                     ; sprite record +2: tile id
     ld   a,[wDBA1_MenuCmd_DestTileY]
     add  a,$02
     add  a
     add  a
     add  a
-    ld   [wDADD_MenuTextBuffer],a
+    ld   [wDADD_MenuTextBuffer],a                      ; sprite record +0: screen Y
     ld   a,[wDBA0_MenuCmd_DestTileX]
     inc  a
     add  a
     add  a
     add  a
-    ld   [wDADE],a
+    ld   [wDADE],a                                     ; sprite record +1: screen X
     ld   a,$01
-    ld   [wDAE0],a
+    ld   [wDAE0],a                                     ; sprite record +3: OAM attributes
     ld   a,[wDBA7_MenuCmd_SrcPtr]
     add  a
     add  a

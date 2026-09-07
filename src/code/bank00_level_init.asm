@@ -236,7 +236,7 @@ call_00_2ff8_Level_InitEntitiesAndState:
 ;             boss progress
 ;   copy      LEVEL_TRIGGER_COUNT bytes of this level's row from
 ;             .data_00_30ba_LevelTriggerInitialData into wDCB1_LevelTriggerBuffer,
-;             and six bytes of elevator state into wDCE2_ElevatorEntityUnkData
+;             and six bytes of elevator state into wDCE2_ElevatorShaftHeights
 ;   defaults  ELF_HEALTH_MAX into the five skating elves
 ;   bonus     LEVEL_GEXTREME_SPORTS and LEVEL_MARSUPIAL_MADNESS set wDB6D_InBonusStage
 ;             and start the countdown - BONUS_STAGE_SECONDS_GEXTREME or
@@ -302,7 +302,7 @@ call_00_2ff8_Level_InitEntitiesAndState:
     ld   BC, LEVEL_TRIGGER_COUNT                      ;; 00:3063 $01 $10 $00
     call call_00_076e_MemCopy                         ;; 00:3066 $cd $6e $07
     ld   HL, .data_00_317a_ElevatorEntityInitialData  ;; 00:3069 $21 $7a $31
-    ld   DE, wDCE2_ElevatorEntityUnkData              ;; 00:306c $11 $e2 $dc
+    ld   DE, wDCE2_ElevatorShaftHeights               ;; 00:306c $11 $e2 $dc
     ld   BC, $06                                      ;; 00:306f $01 $06 $00
     call call_00_076e_MemCopy                         ;; 00:3072 $cd $6e $07
     ld   A, ELF_HEALTH_MAX                            ;; 00:3075 $3e $02
@@ -465,18 +465,18 @@ call_00_31d9_Level_ClearCollectedBonusCoinFlag:
     jp   call_00_0f08_RestoreBank                     ;; 00:320a $c3 $08 $0f
 
 call_00_320d_Level_ClearCollectedPawCoinFlags:
-; The same for the paw coins, of which a level has up to four.
+; The same for the paw coins, of which a level has three.
 ;
 ; Each ENTITY_PAW_COIN record carries its coin number in ENTITY_SPAWN_RECORD_PARAM,
 ; and .data_00_324e_PawCoinProgressBits turns that number into a bit of the level's
 ; wDC5C_ProgressFlags byte. Any coin whose bit is set has its wD700_EntityFlags entry
 ; zeroed.
 ;
-; The table is $00, $20, $40, $80 - so coin number 0 maps to no bit at all and can
-; never be cleared this way, and only coins 1 to 3 are covered. Whether that is a
-; deliberate 1-based numbering or an off-by-one is not something the code says.
+; The table is $00, $20, $40, $80, so the numbering is 1-based: entry 0 maps to no
+; bit at all and would never be cleared, and every ENTITY_PAW_COIN in the game does
+; carry 1, 2 or 3 - seven levels with three coins each, and no others.
 ;
-; Unlike the bonus coin above this walks the whole list, because all four coins have
+; Unlike the bonus coin above this walks the whole list, because all three coins have
 ; to be checked
     ld   A, [wDC16_EntityListBank]                    ;; 00:320d $fa $16 $dc
     call call_00_0eee_SwitchBank                      ;; 00:3210 $cd $ee $0e

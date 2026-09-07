@@ -42,11 +42,12 @@
 ; Falling
 ; -------
 ; call_00_244a_Entity_ApplyGravityAndMoveY_Clamped and
-; call_00_2475_Entity_ApplyGravityMoveY_WithFloorCollision both subtract
+; call_00_2475_Entity_ApplyGravityMoveY_WithSpawnCeiling both subtract
 ; ENTITY_GRAVITY_PER_FRAME from YVEL and clamp at ENTITY_TERMINAL_YVEL, and then
 ; differ by one `cpl / inc A`: the first negates the result and the second does
-; not, so for the same stored YVEL they move the entity in OPPOSITE directions.
-; gex2 has the same pair, at $30AF and $30DA, with the same trap.
+; not, so for the same stored YVEL they move the entity in OPPOSITE directions -
+; and their spawn-line clamps sit on opposite sides to match. gex2 has the same
+; pair, at $30AF and $30DA, with the same trap.
 ;
 ; Map of this file
 ; ----------------
@@ -453,7 +454,7 @@ call_00_233e_Entity_MoveAlongArcTable:
     inc  l
     ldd  a,[hl]
     ld   l,[hl]
-    ld   h,00
+    ld   h,$00
     add  hl,hl
     ld   de,.data_00_23b4_ArcTable
     add  hl,de
@@ -592,7 +593,7 @@ call_00_244a_Entity_ApplyGravityAndMoveY_Clamped:
 ; down four places into whole pixels and jumps into call_00_250d_Entity_MoveY.
 ;
 ; The negation is the whole difference between this and
-; call_00_2475_Entity_ApplyGravityMoveY_WithFloorCollision below: here a positive
+; call_00_2475_Entity_ApplyGravityMoveY_WithSpawnCeiling below: here a positive
 ; YVEL moves the entity UP the screen. Note also that this one does not touch the
 ; subpixel accumulator - the fraction is simply discarded each frame.
 ;
@@ -620,22 +621,26 @@ call_00_244a_Entity_ApplyGravityAndMoveY_Clamped:
     ld   B, A                                         ;; 00:2471 $47
     jp   call_00_250d_Entity_MoveY                    ;; 00:2472 $c3 $0d $25
 
-call_00_2475_Entity_ApplyGravityMoveY_WithFloorCollision:
+call_00_2475_Entity_ApplyGravityMoveY_WithSpawnCeiling:
 ; The other half of the pair: same gravity, same clamp, but no negation, so a
-; positive YVEL moves the entity DOWN. It also adds the delta to YPOS inline rather
-; than calling the mover, and then does the landing check.
+; positive YVEL moves the entity DOWN and the per-frame `sub` accelerates it
+; upward. It also adds the delta to YPOS inline rather than calling the mover.
 ;
-; The floor is the entity's SPAWN Y (wDA26_EntityInitialYPos), not a bounding-box
-; bound, so this is the helper for things that hop in place and come back to rest
-; where they started. On landing it snaps YPOS to the spawn Y and zeroes YVEL - the
-; `xor $0D` walks L from YPOS+1 ($11) to YVEL ($1D).
+; The limit is the entity's SPAWN Y (wDA26_EntityInitialYPos), not a bounding-box
+; bound, and it is an upper bound rather than a floor: an entity using this dips
+; BELOW its spawn line, slows, and coasts back up to it, at which point YPOS is
+; snapped to the spawn Y and YVEL zeroed - the `xor $0D` walks L from YPOS+1 ($11)
+; to YVEL ($1D). The comparison here is initial - current, the reverse of
+; call_00_2766_Entity_ClampYToSpawnFloor's, which is what puts the clamp on the
+; other side.
 ;
-;   carry SET    still above the floor - airborne this frame
-;   carry CLEAR  just snapped to the floor - it has landed
+;   carry SET    still below the spawn line - the dip is still running
+;   carry CLEAR  just snapped back to the spawn line
 ;
-; That convention is why so many bank 2 hop actions are literally "call this,
-; ret c". gex2's equivalent is call_00_30da_Entity_ApplyGravityMoveY_WithCeilingCollision,
-; which clamps to Entity_GetMinYBound instead
+; Only call_02_61ee_EntityAction_Bee_Dive uses it, which is exactly the shape it
+; describes: the bee drops at Gex and floats back to its hover line. gex2's
+; call_00_30da_Entity_ApplyGravityMoveY_WithCeilingCollision is the same idea with
+; Entity_GetMinYBound as the limit instead of the spawn position
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_Y_VELOCITY
     ld   a,[hl]
     sub  a,ENTITY_GRAVITY_PER_FRAME
@@ -1246,14 +1251,18 @@ call_00_2722_Entity_IsPlayerInsideBounds:
     ret                                               ;; 00:2765 $c9
 
 call_00_2766_Entity_ClampYToSpawnFloor:
-; The landing check on its own, without the gravity: if the entity has risen to or
-; past its spawn Y it is snapped back to it and YVEL is zeroed.
+; The landing check on its own, without the gravity: if the entity has fallen to or
+; past its spawn Y it is snapped back to it and YVEL is zeroed. Paired with
+; call_00_244a_Entity_ApplyGravityAndMoveY_Clamped, this is the floor under every
+; hop in bank 2.
 ;
-;   carry SET    still below the spawn line, moving freely
-;   carry CLEAR  clamped this frame
+;   carry SET    still above the spawn line - airborne this frame
+;   carry CLEAR  landed and clamped this frame
 ;
-; This is the tail of call_00_2475_Entity_ApplyGravityMoveY_WithFloorCollision
-; split out so it can be called after some other mover. gex2's equivalent pair is
+; That convention is why so many bank 2 hop actions are literally "call this,
+; ret c". It is the mirror of the tail inside
+; call_00_2475_Entity_ApplyGravityMoveY_WithSpawnCeiling - same seven instructions,
+; the two operands of the compare the other way round. gex2's equivalent pair is
 ; call_00_3125_Entity_SetYFloorToCurrentPos / call_00_3137_Entity_ClampYToStoredFloor,
 ; which remember a floor in a field instead of using the spawn position
     call call_00_27f3_Entity_GetInitialYPos           ;; 00:2766 $cd $f3 $27
@@ -1561,7 +1570,9 @@ call_00_28e6_Entity_CheckIfXVelocityIsZero:
     ret  
 
 call_00_28f1_Entity_CheckIfYVelocityIsZero:
-; Z when YVEL is zero. gex2's call_00_3345_Entity_CheckIfYVelocityIsZero
+; Z when YVEL is zero. A is left holding YVEL itself, which is what the `bit 7, A`
+; tests in bank 2 read to ask "am I descending yet".
+; gex2's call_00_3345_Entity_CheckIfYVelocityIsZero
     LOAD_OBJ_FIELD_TO_HL ENTITY_FIELD_Y_VELOCITY
     ld   a,[hl]
     and  a
@@ -1922,14 +1933,16 @@ call_00_2a98_Entity_CheckPlayerInHotspotAndSetAction:
 ;
 ; HL comes in pointing at a table of ten-byte hotspot records and this entity's
 ; spawn parameter picks which one (index * 10, built as x2 then x8 plus the x2).
-; Each record is an X centre and half-width, a Y centre and half-width, then five
-; bytes of payload. Both axis tests are the same trick: form the signed difference,
-; add the half-width, and require the result to be positive and below twice the
-; half-width - one compare per axis instead of two.
+; Each record is six bytes of geometry - a 16-bit X centre and a half-width, then a
+; 16-bit Y centre and a half-width - followed by four bytes of payload. Both axis
+; tests are the same trick: form the signed difference, add the half-width, and
+; require the result to be positive and below twice the half-width - one compare per
+; axis instead of two.
 ;
-; On a hit the payload is copied into ENTITY_FIELD_MISC_TIMER onwards and the fifth
-; byte is passed to call_02_72ac_Entity_SetAction, so the table decides both the
-; entity's new state and the action that shows it
+; On a hit the first three payload bytes are spread over ENTITY_FIELD_MISC_TIMER and
+; the four fields after it (two of which are zeroed rather than loaded), and the
+; fourth - the last byte of the record - is passed to call_02_72ac_Entity_SetAction,
+; so the table decides both the entity's new state and the action that shows it
     push de
     call call_00_230f_Entity_GetParameterIntoC
     ld   l,c

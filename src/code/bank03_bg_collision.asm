@@ -114,8 +114,8 @@ call_03_46e0_BgCollision_Update:
     ld   L, A                                          ;; 03:4702 $6f
     jp   HL                                            ;; 03:4703 $e9
 .data_03_4704_BgCollisionTypeHandlers:
-    dw   call_03_4708_BgCollision_SidescrollerHandler  ; BGCOLL_TYPE_SIDESCROLLER
-    dw   call_03_48ad_BgCollision_TopDownHandler       ; BGCOLL_TYPE_TOP_DOWN
+    dw   call_03_4708_BgCollision_SidescrollerHandler  ; BG_COLLISION_TYPE_SIDESCROLLER
+    dw   call_03_48ad_BgCollision_TopDownHandler       ; BG_COLLISION_TYPE_TOPDOWN
 
 call_03_4708_BgCollision_SidescrollerHandler:
 ; Collision for a sidescrolling map: walking, running, jumping, falling. The only
@@ -471,7 +471,7 @@ call_03_48ad_BgCollision_TopDownHandler:
     ret  z
     ld   hl,wDC89_BgCollision_TopDownDirection
     ld   l,[hl]
-    ld   h,00
+    ld   h,$00
     add  hl,hl
     ld   de,.data_03_48cf_TopDownDirectionHandlers
     add  hl,de

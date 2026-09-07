@@ -122,20 +122,20 @@
 ;                  gex2 has
 ; ==================================================================
 
-call_02_4db1_Player_PushOutOfEntity:
-; Shoves Gex clear of a particular entity, by id in C.
+call_02_4db1_Player_SlideTowardEntityX:
+; Slides Gex sideways onto the X of a particular entity, by id in C.
 ;
 ; Finds the slot, compares its X against his, and jumps into whichever of the two
-; horizontal movers pushes him away from it - right if the entity is to his left,
-; left if it is to his right. Exactly aligned does nothing. BC is $0001, so the push
-; is one pixel per frame rather than a teleport.
+; horizontal movers takes him TOWARD it - right when he is to its left, left when he
+; is to its right. Exactly aligned does nothing. BC is $0001, so it is one pixel a
+; frame, which reads as Gex settling onto the middle of the thing he is standing on.
 ;
-; Called by the action functions for the things Gex must not stand inside. No gex2
-; equivalent
+; Called by the two actions that have to keep him centred on something: the TV
+; button pad and the elevator. No gex2 equivalent
     call call_00_29ce_Entity_FindSlotById             ;; 02:4db1 $cd $ce $29
     ret  NZ                                           ;; 02:4db4 $c0
     ld   A, L                                         ;; 02:4db5 $7d
-    or   A, $0e                                       ;; 02:4db6 $f6 $0e
+    or   A, ENTITY_FIELD_WORLD_X                      ;; 02:4db6 $f6 $0e
     ld   L, A                                         ;; 02:4db8 $6f
     ld   BC, $01                                      ;; 02:4db9 $01 $01 $00
     ld   A, [wD80E_PlayerXPosition]                   ;; 02:4dbc $fa $0e $d8
@@ -219,8 +219,8 @@ call_02_4e0c_Player_UpdateSnowboardSprite:
 ; Writes wD80A_Player_SpriteId directly and raises GFX_XFER_PLAYER_GFX itself,
 ; because it is bypassing the normal animation player. It returns early when the
 ; sprite has not changed, so the transfer is only asked for on the frames it matters
-    ld   a,[wDCA5_Player_SnowboardingRelated4]
-    ld   [wDCA6_Player_SnowboardingRelated5],a
+    ld   a,[wDCA5_Player_SnowboardTileType]
+    ld   [wDCA6_Player_SnowboardTileTypePrev],a
     ld   hl,wDC95_FloorTileType
     ld   e,[hl]
     call call_02_4e7a_Player_LookupSnowboardSprite
@@ -231,17 +231,17 @@ call_02_4e0c_Player_UpdateSnowboardSprite:
     ld   e,[hl]
     call call_02_4e7a_Player_LookupSnowboardSprite
 .jr_02_4e24:
-    ld   hl,wDCA5_Player_SnowboardingRelated4
+    ld   hl,wDCA5_Player_SnowboardTileType
     ld   [hl],d
     ld   a,[wD801_Player_ActionId]
     cp   a,PLAYERACTION_SNOWBOARDING_TAIL_SPIN
     jr   nz,.jr_02_4e57
-    ld   hl,wDCA3_Player_SnowboardingRelated2
+    ld   hl,wDCA3_Player_SnowboardPoseTimer
     dec  [hl]
     bit  7,[hl]
     jr   z,.jr_02_4e50
     ld   [hl],$03
-    ld   hl,wDCA2_Player_SnowboardingRelated
+    ld   hl,wDCA2_Player_SnowboardPoseIndex
     inc  [hl]
     ld   a,[hl]
     cp   a,$08
@@ -253,22 +253,22 @@ call_02_4e0c_Player_UpdateSnowboardSprite:
     ld   a,PLAYERACTION_SNOWBOARDING_STAND_OR_WALK
     jp   call_02_54f9_Player_RequestAction
 .jr_02_4e50:
-    ld   a,[wDCA2_Player_SnowboardingRelated]
+    ld   a,[wDCA2_Player_SnowboardPoseIndex]
     and  a,$07
     jr   .jr_02_4e6a
 .jr_02_4e57:
-    ld   hl,wDCA3_Player_SnowboardingRelated2
+    ld   hl,wDCA3_Player_SnowboardPoseTimer
     dec  [hl]
     bit  7,[hl]
     jr   z,.jr_02_4e65
     ld   [hl],$09
-    ld   hl,wDCA2_Player_SnowboardingRelated
+    ld   hl,wDCA2_Player_SnowboardPoseIndex
     inc  [hl]
 .jr_02_4e65:
-    ld   a,[wDCA2_Player_SnowboardingRelated]
+    ld   a,[wDCA2_Player_SnowboardPoseIndex]
     and  a,$01
 .jr_02_4e6a:
-    ld   hl,wDCA4_Player_SnowboardingRelated3
+    ld   hl,wDCA4_Player_SnowboardBaseSprite
     add  [hl]
     ld   hl,wD80A_Player_SpriteId
     cp   [hl]
@@ -280,7 +280,7 @@ call_02_4e0c_Player_UpdateSnowboardSprite:
 
 call_02_4e7a_Player_LookupSnowboardSprite:
 ; Scans one of the two tables for tile type E and leaves the matching sprite id in
-; wDCA4_Player_SnowboardingRelated3, choosing between the entry's two bytes by
+; wDCA4_Player_SnowboardBaseSprite, choosing between the entry's two bytes by
 ; facing direction. D comes back as E on a hit and zero on a miss, which is how the
 ; caller knows to try its second tile.
 ;
@@ -307,7 +307,7 @@ call_02_4e7a_Player_LookupSnowboardSprite:
     inc  hl
     inc  hl
     ldi  a,[hl]
-    cp   a,ENTITY_LIST_TERMINATOR
+    cp   a,$FF                                         ; end of the sprite table
     ret  z
     cp   e
     jr   nz,.jr_02_4e89
@@ -321,7 +321,7 @@ call_02_4e7a_Player_LookupSnowboardSprite:
     jr   z,.jr_02_4e9f
     ld   a,b
 .jr_02_4e9f:
-    ld   [wDCA4_Player_SnowboardingRelated3],a
+    ld   [wDCA4_Player_SnowboardBaseSprite],a
     ret  
 .data_02_4ea3_SnowboardSprites:
     db   $01                                          ;; 02:4ea3 ????????
@@ -519,12 +519,11 @@ call_02_4ffb_Player_DecrementPowerupTimer:
 ; Counts the timer at HL down by one, but only once every TIMER_AMOUNT_60_FRAMES
 ; frames - so the fly power-up timers are in seconds, not frames.
 ;
-; The frame counter wDCA8_FlyPowerup_FrameCounter is shared by all three timers and
-; is decremented by whichever of them happens to be called first, then left alone by
-; the others (they see it is not at its reload value and skip). Returns immediately
-; if the timer is already zero, so an expired power-up does not keep the counter
-; alive. gex2's call_02_4a30_Player_DecrementPowerupTimer counts 16-bit frames
-; instead
+; The frame counter wDCA8_FlyPowerup_FrameCounter is shared by all three timers, and
+; the `ret Z` on the first line is what keeps that safe: an inactive timer leaves the
+; counter alone, and call_00_0624_Player_SwapFlyPowerup zeroes the other two whenever
+; it arms one, so exactly one caller a frame ever reaches the counter. gex2's
+; call_02_4a30_Player_DecrementPowerupTimer counts 16-bit frames instead
     ld   A, [HL]                                      ;; 02:4ffb $7e
     and  A, A                                         ;; 02:4ffc $a7
     ret  Z                                            ;; 02:4ffd $c8
@@ -549,13 +548,13 @@ call_02_500e_Player_MoveByDPad:
     ld   bc,$0002
     call nz,call_02_5033_Player_AddToXPosition
     call call_00_0f68_CheckInputLeft
-    ld   bc,hFFFE
+    ld   bc,-2
     call nz,call_02_5033_Player_AddToXPosition
     call call_00_0f7a_CheckInputDown
     ld   bc,$0002
     call nz,call_02_503d_Player_AddToYPosition
     call call_00_0f74_CheckInputUp
-    ld   bc,hFFFE
+    ld   bc,-2
     call nz,call_02_503d_Player_AddToYPosition
     ret  
 
@@ -670,7 +669,7 @@ call_02_5081_Player_UpdateFacing:
 .jr_02_50b0:
     ld   A, [wDC81_Player_EffectiveInputs]            ;; 02:50b0 $fa $81 $dc
     swap A                                            ;; 02:50b3 $cb $37
-    and  A, PADF_A | PADF_B | PADF_SELECT | PADF_START ;; 02:50b5 $e6 $0f
+    and  A, $0f                                       ;; 02:50b5 $e6 $0f ; the d-pad nibble, swapped down
     ld   L, A                                         ;; 02:50b7 $6f
     ld   H, $00                                       ;; 02:50b8 $26 $00
     ld   DE, .data_02_50f0_TopDownDirectionTable      ;; 02:50ba $11 $f0 $50
@@ -794,7 +793,7 @@ call_02_5100_Player_ApplyXMovement:
     ret  Z                                            ;; 02:516d $c8
     push AF                                           ;; 02:516e $f5
     ld   A, [wDABE_CollisionFlags]                    ;; 02:516f $fa $be $da
-    and  A, BG_COLLISION_SLOPE_MASK                   ;; 02:5172 $e6 $0f
+    and  A, BGCOLL_SLOPE_MASK                         ;; 02:5172 $e6 $0f
     jr   Z, .jr_02_517e                               ;; 02:5174 $28 $08
     cpl                                               ;; 02:5176 $2f
     inc  A                                            ;; 02:5177 $3c
@@ -883,17 +882,18 @@ call_02_51cb_Player_MoveLeftAgainstEntity:
 ; A comes in holding the entity's slot base. If the slot's
 ; ENTITY_FIELD_COLLISION_TYPE carries COLLISION_TYPE_FLAG_IMMOVABLE the entity does
 ; not take part and the move is dropped - which is every platform in the game, so
-; the rest of this routine is dead in practice. Otherwise the ordinary clamped move runs, and afterwards the gap
-; between Gex and the entity is measured and written back into the entity's
-; ENTITY_FIELD_X_VELOCITY pair - which is how a pushed block keeps its distance instead of
-; drifting into him.
+; the rest of this routine is dead in practice. Otherwise the ordinary clamped move
+; runs, and afterwards the entity's own ENTITY_FIELD_WORLD_X is rewritten as Gex's X
+; minus its ENTITY_FIELD_COLLISION_WIDTH - which is how a pushed block stays exactly
+; against him instead of drifting into him.
 ;
-; The `xor $1c` walks L from ENTITY_FIELD_X_VELOCITY ($12 after the two decrements) to
+; The two `dec L`s walk L from ENTITY_FIELD_COLLISION_TYPE ($14) to
+; ENTITY_FIELD_COLLISION_WIDTH ($12), and the `xor $1c` from there to
 ; ENTITY_FIELD_WORLD_X ($0E)
     or   A, ENTITY_FIELD_COLLISION_TYPE               ;; 02:51cb $f6 $14
     ld   L, A                                         ;; 02:51cd $6f
     ld   H, HIGH(wD800_EntityMemory)                  ;; 02:51ce $26 $d8
-    bit  7, [HL]                                      ;; 02:51d0 $cb $7e
+    bit  COLLISION_TYPE_FLAG_IMMOVABLE_BIT, [HL]      ;; 02:51d0 $cb $7e
     ret  NZ                                           ;; 02:51d2 $c0
     dec  L                                            ;; 02:51d3 $2d
     dec  L                                            ;; 02:51d4 $2d
@@ -981,7 +981,7 @@ call_02_5238_Player_MoveRightAgainstEntity:
     or   A, ENTITY_FIELD_COLLISION_TYPE               ;; 02:5238 $f6 $14
     ld   L, A                                         ;; 02:523a $6f
     ld   H, HIGH(wD800_EntityMemory)                  ;; 02:523b $26 $d8
-    bit  7, [HL]                                      ;; 02:523d $cb $7e
+    bit  COLLISION_TYPE_FLAG_IMMOVABLE_BIT, [HL]      ;; 02:523d $cb $7e
     ret  NZ                                           ;; 02:523f $c0
     dec  L                                            ;; 02:5240 $2d
     dec  L                                            ;; 02:5241 $2d
@@ -1085,7 +1085,7 @@ call_02_5267_Player_ApplyYVelocity:
     jp   call_02_53e7_Player_MoveYClampedToMap        ;; 02:52b0 $c3 $e7 $53
 .jr_02_52b3:
     ld   A, [wDABE_CollisionFlags]                    ;; 02:52b3 $fa $be $da
-    and  A, $80                                       ;; 02:52b6 $e6 $80
+    and  A, 1 << BGCOLL_NO_COLLISION_BIT              ;; 02:52b6 $e6 $80
     jr   Z, .jr_02_52cf                               ;; 02:52b8 $28 $15
     ld   A, [wDC8D_Player_FloorSnapVelocity]          ;; 02:52ba $fa $8d $dc
     and  A, A                                         ;; 02:52bd $a7
@@ -1099,7 +1099,7 @@ call_02_5267_Player_ApplyYVelocity:
     jr   .jp_02_5283                                  ;; 02:52cd $18 $b4
 .jr_02_52cf:
     ld   A, [wDABD_CollisionFlagsPrev]                ;; 02:52cf $fa $bd $da
-    and  A, $80                                       ;; 02:52d2 $e6 $80
+    and  A, 1 << BGCOLL_NO_COLLISION_BIT              ;; 02:52d2 $e6 $80
     jr   NZ, .jr_02_52de                              ;; 02:52d4 $20 $08
     ld   A, [wDC8F_FallDistanceCounter]               ;; 02:52d6 $fa $8f $dc
     cp   A, PLAYER_FALL_LONG                          ;; 02:52d9 $fe $10
@@ -1172,7 +1172,7 @@ call_02_5267_Player_ApplyYVelocity:
     jr   Z, .jr_02_5366                               ;; 02:5362 $28 $02
     or   A, PLAYER_YDELTA_SIGN_EXTEND                 ;; 02:5364 $f6 $f0
 .jr_02_5366:
-    ld   HL, wDC88_Player_HopYOffset    ;; 02:5366 $21 $88 $dc
+    ld   HL, wDC88_Player_HopYOffset                  ;; 02:5366 $21 $88 $dc
     add  A, [HL]                                      ;; 02:5369 $86
     bit  7, A                                         ;; 02:536a $cb $7f
     jr   NZ, .jr_02_5372                              ;; 02:536c $20 $04
@@ -1363,7 +1363,7 @@ call_02_5431_Player_CheckTileInteractions:
     ld   A, [wD801_Player_ActionId]                   ;; 02:5463 $fa $01 $d8
     cp   A, PLAYERACTION_WATER_SWIMMING               ;; 02:5466 $fe $19
     jr   Z, .jr_02_546e                               ;; 02:5468 $28 $04
-    cp   A, $1f                                       ;; 02:546a $fe $1f
+    cp   A, PLAYERACTION_WATER_TAIL_SPIN              ;; 02:546a $fe $1f
     jr   NZ, .jr_02_54a7                              ;; 02:546c $20 $39
 .jr_02_546e:
     ld   A, [wDC81_Player_EffectiveInputs]            ;; 02:546e $fa $81 $dc
@@ -1372,8 +1372,8 @@ call_02_5431_Player_CheckTileInteractions:
     ld   A, [wDC92_TileTypeBehindGexsUpperBody]       ;; 02:5475 $fa $92 $dc
     cp   A, TILE_TYPE_WATER_SURFACE                   ;; 02:5478 $fe $36
     jr   NZ, .jr_02_54a7                              ;; 02:547a $20 $2b
-    ld   A, $04                                       ;; 02:547c $3e $04
-    ld   [wDC9D_Player_SwimmingRelated], A            ;; 02:547e $ea $9d $dc
+    ld   A, PLAYER_SWIM_DIRECTION_DOWN                ;; 02:547c $3e $04
+    ld   [wDC9D_Player_SwimDirectionIndex], A         ;; 02:547e $ea $9d $dc
     ld   A, PLAYERACTION_WATER_TREADING               ;; 02:5481 $3e $20
     call call_02_54f9_Player_RequestAction            ;; 02:5483 $cd $f9 $54
     jr   .jr_02_54a7                                  ;; 02:5486 $18 $1f
@@ -1388,8 +1388,8 @@ call_02_5431_Player_CheckTileInteractions:
     ld   A, [wDC92_TileTypeBehindGexsUpperBody]       ;; 02:5496 $fa $92 $dc
     cp   A, TILE_TYPE_WATER_SURFACE                   ;; 02:5499 $fe $36
     jr   NZ, .jr_02_54a7                              ;; 02:549b $20 $0a
-    ld   A, $04                                       ;; 02:549d $3e $04
-    ld   [wDC9D_Player_SwimmingRelated], A            ;; 02:549f $ea $9d $dc
+    ld   A, PLAYER_SWIM_DIRECTION_DOWN                ;; 02:549d $3e $04
+    ld   [wDC9D_Player_SwimDirectionIndex], A         ;; 02:549f $ea $9d $dc
     ld   A, PLAYERACTION_WATER_TREADING               ;; 02:54a2 $3e $20
     call call_02_54f9_Player_RequestAction            ;; 02:54a4 $cd $f9 $54
 .jr_02_54a7:
@@ -1402,7 +1402,7 @@ call_02_5431_Player_CheckTileInteractions:
     farcall call_03_4c2e_BgCollision_IsTileClimbable
     jr   NZ, .jr_02_54d0                              ;; 02:54c0 $20 $0e
     xor  A, A                                         ;; 02:54c2 $af
-    ld   [wDCA1_Player_ClimbingRelated4], A           ;; 02:54c3 $ea $a1 $dc
+    ld   [wDCA1_Player_ClimbDirectionIndex], A        ;; 02:54c3 $ea $a1 $dc
     ld   [wDC86_PlayerXVelocity], A                   ;; 02:54c6 $ea $86 $dc
     ld   [wDC8C_PlayerYVelocity], A                   ;; 02:54c9 $ea $8c $dc
     ld   A, PLAYERACTION_CLIMBING                     ;; 02:54cc $3e $22
@@ -1484,7 +1484,7 @@ call_02_54f9_Player_RequestAction:
     bit  PLAYER_STATE_ACTION_INSTANT, [HL]            ;; 02:5516 $cb $46
     jr   NZ, .jr_02_552e                              ;; 02:5518 $20 $14
     ld   HL, wDC79_Player_QueuedAction                ;; 02:551a $21 $79 $dc
-    bit  7, [HL]                                      ;; 02:551d $cb $7e
+    bit  7, [HL]                                      ;; 02:551d $cb $7e ; set = PLAYERACTION_NONE_PENDING
     jr   Z, .jr_02_5524                               ;; 02:551f $28 $03
     ld   HL, wD801_Player_ActionId                    ;; 02:5521 $21 $01 $d8
 .jr_02_5524:

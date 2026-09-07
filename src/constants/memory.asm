@@ -194,12 +194,19 @@ wD840_EntityMemoryAfterPlayer:
 ; gex2 keeps the same thing at wCC00_ShadowOAM
 ; ------------------------------------------------------------------
 wD900_ShadowOAM:
-; sprite 0 - the first byte the DMA moves, and the one
-; call_00_0e62_ClearShadowOamAndResetScroll seeds when it wipes the list
+; The Y byte of sprite 0 - the first byte the DMA moves, and the one
+; call_00_0e62_ClearShadowOamAndResetScroll seeds before propagating it over the
+; whole list. call_02_7152_Entities_UpdateAll also zeroes it every frame, along with
+; wD904_ShadowOAM_Sprite1Y, so entries 0 and 1 stay off screen during gameplay: the
+; OAM build in bank 3 starts at OAM_ENTITY_FIRST_BYTE and never touches them, and
+; only the menu sprite builder in bank 1 ever uses them
     ds 1                                               ;; d900
-wD901_ShadowOAM_EntitySprites:
+wD901_ShadowOAM_FillDestination:
+; Not a region of its own - just wD900_ShadowOAM + 1, used as the destination of the
+; overlapping MemCopy that propagates the seed byte through the whole list
     ds 3                                               ;; d901
-wD904:
+wD904_ShadowOAM_Sprite1Y:
+; The Y byte of sprite 1, and then the remaining 39 entries
     ds 156                                             ;; d904
 
 ; ------------------------------------------------------------------
@@ -544,6 +551,9 @@ wDB71_CollectibleScreenRelativeYOffset:
 
 ; Menu-related wRAM starts here
 wDB72_PasswordEncodedBuffer:
+; The 12-byte password payload: this checksum byte, the three header bytes below, and
+; then wDB76_PasswordProgressBits. call_01_4f8c_Password_BuildPayload fills it and
+; call_01_5027_Password_Encode spreads it over wDB7E_PasswordValues
     ds 1                                               ;; db72
 wDB73_PasswordLivesRemaining:
     ds 1                                               ;; db73
@@ -551,7 +561,9 @@ wDB74_PasswordPawCoinCounter:
     ds 1                                               ;; db74
 wDB75_PasswordPawCoinExtraHealth:
     ds 1                                               ;; db75
-wDB76_PasswordEncodedBuffer:
+wDB76_PasswordProgressBits:
+; the 58 saved progress bits, packed MSB first - the tail of the payload that starts
+; at wDB72_PasswordEncodedBuffer
     ds 8                                               ;; db76
 wDB7E_PasswordValues:
     ds 18                                              ;; db7e
@@ -766,14 +778,14 @@ wDBF0_GfxStream_RowsPerChunk:
     ds 1                                               ;; dbf0
 wDBF1_GfxStream_SrcBank:
     ds 1                                               ;; dbf1
-wDBF2:
-    ds 1                                               ;; dbf2
-wDBF3:
-    ds 1                                               ;; dbf3
-wDBF4:
-    ds 1                                               ;; dbf4
-wDBF5:
-    ds 1                                               ;; dbf5
+wDBF2_GfxStream_InlineSrc:
+; A one-entry (source, destination) list sitting immediately in front of the cursor
+; below, so a single-chunk transfer can be described without a list in ROM.
+; call_01_4d6e_Password_RefreshCellGfx fills these four bytes and then points
+; wDBF6_GfxStream_ListPtrLo at them
+    ds 2                                               ;; dbf2
+wDBF4_GfxStream_InlineDest:
+    ds 2                                               ;; dbf4
 wDBF6_GfxStream_ListPtrLo:
 ; cursor into the (source, destination) list; advanced by four bytes per chunk
     ds 1                                               ;; dbf6
@@ -1366,11 +1378,17 @@ wDC98_Player_DamageKnockbackX:
 ; Only the first of these three bytes has a known use
     ds 3                                               ;; dc98
 
-wDC9B_Player_SwimmingRelated3:
+; Swimming sprite state. Like the snowboard, the swim poses are chosen here rather
+; than played as an animation, so they need their own counters.
+wDC9B_Player_SwimPoseIndex:
+; which of PLAYER_SWIM_FRAME_COUNT poses is showing, added to the base sprite
     ds 1                                               ;; dc9b
-wDC9C_Player_SwimmingRelated2:
+wDC9C_Player_SwimPoseTimer:
+; frames left on the current pose, reloaded with PLAYER_SWIM_FRAME_DELAY
     ds 1                                               ;; dc9c
-wDC9D_Player_SwimmingRelated:
+wDC9D_Player_SwimDirectionIndex:
+; the last d-pad direction index, kept when nothing is held. Indexes both
+; .data_02_4a15_SwimSpriteBase and .data_02_4a1d_SwimFacingByDirection
     ds 1                                               ;; dc9d
 
 wDC9E_Player_ClimbSubState:
@@ -1378,22 +1396,39 @@ wDC9E_Player_ClimbSubState:
 ; ordinary climb, CLIMB_SUBSTATE_TAIL_SPIN for the spin Gex can do while hanging on.
 ; It indexes data_02_4adb_ClimbSubStateTable, so one action id is really two routines
     ds 1                                               ;; dc9e
-wDC9F_Player_ClimbingRelated:
+wDC9F_Player_ClimbPoseIndex:
+; the climb's counterpart to wDC9B_Player_SwimPoseIndex, and also reset to zero when
+; the climbing tail spin starts
     ds 1                                               ;; dc9f
-wDCA0_Player_ClimbingRelated3:
+wDCA0_Player_ClimbPoseTimer:
+; frames left on the current pose, reloaded with PLAYER_CLIMB_FRAME_DELAY
     ds 1                                               ;; dca0
-wDCA1_Player_ClimbingRelated4:
+wDCA1_Player_ClimbDirectionIndex:
+; the last d-pad direction index, indexing .data_02_4b56_ClimbSpriteBase and
+; .data_02_4b5e_ClimbFacingByDirection
     ds 1                                               ;; dca1
 
-wDCA2_Player_SnowboardingRelated:
+; Snowboard sprite state, all five owned by
+; call_02_4e0c_Player_UpdateSnowboardSprite. The snowboard poses are picked from the
+; terrain rather than played as an animation, so they need their own counters.
+wDCA2_Player_SnowboardPoseIndex:
+; free-running pose counter; masked to $07 during a tail spin and to $01 otherwise,
+; and added to the base sprite below
     ds 1                                               ;; dca2
-wDCA3_Player_SnowboardingRelated2:
+wDCA3_Player_SnowboardPoseTimer:
+; frames left on the current pose. Reloaded with $03 during a tail spin and $09
+; otherwise, so the spin cycles three times faster
     ds 1                                               ;; dca3
-wDCA4_Player_SnowboardingRelated3:
+wDCA4_Player_SnowboardBaseSprite:
+; the sprite id the terrain lookup chose, before the pose counter is added
     ds 1                                               ;; dca4
-wDCA5_Player_SnowboardingRelated4:
+wDCA5_Player_SnowboardTileType:
+; the tile type that matched this frame, or $00 if neither tile under Gex is in the
+; table
     ds 1                                               ;; dca5
-wDCA6_Player_SnowboardingRelated5:
+wDCA6_Player_SnowboardTileTypePrev:
+; the same value from the previous frame. The ramp launch in
+; call_02_4bb7_PlayerAction_Snowboarding_StandOrWalk is the pair (previous, current)
     ds 1                                               ;; dca6
 
 wDCA7_Player_UpdateFlag:
@@ -1498,9 +1533,13 @@ wDCD2_FreestandingRemoteHitFlags:
 ; gets set when a collision occurs with a freestanding remote
 ; the remote entity checks for this flag and sets progressflags
     ds 1                                               ;; dcd2
-wDCD3_GhostKnightDamageCounter1:
+wDCD3_GhostKnightPostIndex:
+; which of the eight posts the ghost knight is standing at, 0-7. Kept here rather
+; than in the slot because the knight is despawned between posts
     ds 1                                               ;; dcd3
-wDCD4_GhostKnightDamageCounter2:
+wDCD4_GhostKnightShotCounter:
+; free-running count of shots fired; only its low two bits are used, to pick one of
+; the current post's four fixed directions
     ds 1                                               ;; dcd4
 wDCD5_ElfHealth1:
     ds 1                                               ;; dcd5
@@ -1516,7 +1555,10 @@ wDCDA_BrainOfOzAndRezCounter:
     ds 1                                               ;; dcda
 wDCDB_EvilSantaHitByProjectileFlag:
     ds 1                                               ;; dcdb
-wDCDC_HandEntityUnkFlag:
+wDCDC_HandSlamFlag:
+; raised for one frame by call_02_616f_EntityAction_Hand_Slam when the mummy hand
+; lands on the breakable blocks, and consumed by
+; call_02_63a8_EntityAction_BreakableBlock_TakeHit
     ds 2                                               ;; dcdc
 
 ; ------------------------------------------------------------------
@@ -1536,8 +1578,11 @@ wDCE1_Cutscene_MoveSubPixel:
 ; each frame and the carry out of the high nibble becomes the whole-pixel step
     ds 1                                               ;; dce1
 
-; Elevator entity data
-wDCE2_ElevatorEntityUnkData:
+wDCE2_ElevatorShaftHeights:
+; The current Y of each of the Anime Channel's three elevator shafts, one 16-bit
+; value each, indexed by call_02_688e_Elevator_GetShaftIndex. Kept out of the
+; entity slots so an elevator that scrolls off and respawns comes back where it was
+; left; seeded from .data_00_317a_ElevatorEntityInitialData at level init
     ds 6                                               ;; dce2
 
 ; Entity spawning related flags
@@ -1578,11 +1623,14 @@ wDD6A_PalettesReadyFlag:
 ; keeps a half-drawn screen from flashing. Raised once the screen is ready
     ds 1                                               ;; dd6a
 
-wDD6B: ; unused except set to 0?
+wDD6B:
+; Written once, with $00, by call_00_0e3b_ResetVideoState and read by nothing.
+; Its neighbour wDD6A_PalettesReadyFlag is cleared in the same run of stores, so
+; this reads as a second flag that was dropped
     ds 1
-    
+
 ; unused section?
-    ds 88                                             ;; dd6b
+    ds 88                                             ;; dd6c
 
 ; Particle buffer
 wDDC4_ParticleSlot1:
@@ -2163,14 +2211,10 @@ hFF80_OamDmaRoutine:
 ; has to run out of HRAM because the CPU can reach nothing else while an OAM
 ; DMA is in progress. gex2 does the same at hFF80_OamDmaRoutine
     ds 112                                             ;; ff80
-hFFF0:
-    ds 12                                              ;; fff0
-hFFFC:
-    ds 1                                               ;; fffc
-hFFFD:
-    ds 1                                               ;; fffd
-hFFFE:
-    ds 1                                               ;; fffe
+
+; $FFF0-$FFFE is unused. Nothing in the game reads or writes it; the stack is set
+; to $FFFE at boot and grows down through WRAM from there
+    ds 15                                              ;; fff0
 
 SECTION "vram", VRAM[$8000]
     ds 8192                                            ;; 8000

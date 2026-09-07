@@ -216,9 +216,10 @@ call_00_2ce2_Player_BuildSprites:
     jp   call_00_0f08_RestoreBank                     ;; 00:2efd $c3 $08 $0f
 
 call_00_2f00_Player_IsDead:
-; Z if Gex is dead. Asks bank 2 for the current action's state flags and keeps
-; PLAYER_STATE_DEAD_MASK, saving every register but A because the OAM build calls it
-; in the middle of walking a frame list with HL and DE loaded
+; NZ if Gex is dead, Z if he is alive - the `and A, PLAYER_STATE_DEAD_MASK` leaves the
+; bit itself in A. Asks bank 2 for the current action's state flags, saving every
+; register but A because the OAM build calls it in the middle of walking a frame list
+; with HL and DE loaded
     push HL                                           ;; 00:2f00 $e5
     push DE                                           ;; 00:2f01 $d5
     push BC                                           ;; 00:2f02 $c5

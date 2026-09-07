@@ -178,7 +178,7 @@ entry:
     db   CART_COMPATIBLE_GBC                           ;; 00:0143
     db   $34, $46                                      ;; 00:0144 ??
     db   CART_INDICATOR_GB                             ;; 00:0146
-    db   CART_ROM_MBC5, CART_ROM_2048KB, CART_SRAM_NONE;; 00:0147
+    db   CART_ROM_MBC5, CART_ROM_2048KB, CART_SRAM_NONE ;; 00:0147
     db   CART_DEST_NON_JAPANESE, $33, $00              ;; 00:014a $01 $33 $00
     ds   $03                                           ;; 00:014d
 
@@ -193,13 +193,14 @@ call_00_0150_Init:
 ; machine and something else on a DMG, and it is consulted twice: once
 ; immediately, to get WRAM bank 1 mapped before anything writes to $D000, and
 ; once after the RAM wipe to decide which of two completely different paths to
-; take. On a DMG the second test jumps to .jr_00_01b7, which draws the
-; "GAME BOY COLOR ONLY" screen out of bank $07 and then spins forever at
-; .jr_00_01d0 with the interrupts still off.
+; take. The second test jumps to .jr_00_01d2 on a colour machine and otherwise
+; falls through into the code at $0196, which draws the "GAME BOY COLOR ONLY"
+; screen out of bank $07 and then spins forever at .jr_00_01d0 with the
+; interrupts still off.
 ;
 ; The CGB path, at .jr_00_01d2, does the real work: upload palettes, install the
-; OAM DMA routine in HRAM, wipe both VRAM banks, seed the bank stack with
-; BANK_01_MENU_CODE, switch to double speed, arm the vblank and LCD STAT
+; OAM DMA routine in HRAM, wipe both VRAM banks, seed the bank stack with the
+; menu bank, switch to double speed, arm the vblank and LCD STAT
 ; interrupts, start the audio driver and turn the LCD on.
 ;
 ; gex2's call_00_0150_Init is the same routine with a DMG branch instead of a
@@ -211,7 +212,7 @@ call_00_0150_Init:
 ; call_00_0f25_SetMbcBank, `and A,$00` and all - see that routine for why the two
 ; instructions before the mask are dead here rather than wrong.
     di                                                 ;; 00:0150 $f3
-    ld   SP, hFFFE                                     ;; 00:0151 $31 $fe $ff
+    ld   SP, $fffe                                     ;; 00:0151 $31 $fe $ff
     push AF                                            ;; 00:0154 $f5
     cp   A, BOOT_A_CGB                                 ;; 00:0155 $fe $11
     jr   NZ, .jr_00_015d                               ;; 00:0157 $20 $04
@@ -300,7 +301,7 @@ call_00_0150_Init:
     jr   Z, .jr_00_01e7                                ;; 00:01fc $28 $e9
     ld   HL, wDAD3_PtrToBankStackPosition              ;; 00:01fe $21 $d3 $da
     ld   DE, wDAC3_BankStack                           ;; 00:0201 $11 $c3 $da
-    ld   A, BANK(call_01_4000_MenuLoad)                          ;; 00:0204 $3e $01
+    ld   A, BANK(call_01_4000_MenuLoad)               ;; 00:0204 $3e $01
     ld   [HL], E                                       ;; 00:0206 $73
     inc  HL                                            ;; 00:0207 $23
     ld   [HL], D                                       ;; 00:0208 $72
@@ -326,7 +327,7 @@ call_00_0150_Init:
     ldh  [rSTAT], A                                    ;; 00:022e $e0 $41
     ld   A, IEF_VBLANK | IEF_STAT                      ;; 00:0230 $3e $03
     ldh  [rIE], A                                      ;; 00:0232 $e0 $ff
-    ld   A, BANK(call_04_4000_Audio_Init)                       ;; 00:0234 $3e $04
+    ld   A, BANK(call_04_4000_Audio_Init)             ;; 00:0234 $3e $04
     call call_00_0eee_SwitchBank                       ;; 00:0236 $cd $ee $0e
     call call_04_4000_Audio_Init                       ;; 00:0239 $cd $00 $40
     call call_00_0f08_RestoreBank                      ;; 00:023c $cd $08 $0f
@@ -460,7 +461,7 @@ call_00_0150_Init:
     ld   [wDC50_Player_Health], A                      ;; 00:0336 $ea $50 $dc
     farcall call_01_432b_MenuLoad_MissionSelect
     call call_00_0e3b_ResetVideoState                  ;; 00:0344 $cd $3b $0e
-    call call_00_2f85_CollectibleList_LoadForCurrentLevel;; 00:0347 $cd $85 $2f
+    call call_00_2f85_CollectibleList_LoadForCurrentLevel ;; 00:0347 $cd $85 $2f
     call call_00_2ff8_Level_InitEntitiesAndState       ;; 00:034a $cd $f8 $2f
     call call_00_0595_PlayMusicBasedOnLevel            ;; 00:034d $cd $95 $05
     call call_00_1ea0_Cutscene_LoadAndRun              ;; 00:0350 $cd $a0 $1e
@@ -482,7 +483,7 @@ call_00_0150_Init:
     ld   A, PLAYERACTION_SPAWN                         ;; 00:0380 $3e $00
     ld   [wDC78_PlayerPendingActionId], A              ;; 00:0382 $ea $78 $dc
     call call_00_0e3b_ResetVideoState                  ;; 00:0385 $cd $3b $0e
-    call call_00_2f85_CollectibleList_LoadForCurrentLevel;; 00:0388 $cd $85 $2f
+    call call_00_2f85_CollectibleList_LoadForCurrentLevel ;; 00:0388 $cd $85 $2f
     call call_00_2ff8_Level_InitEntitiesAndState       ;; 00:038b $cd $f8 $2f
 .jp_00_038e_LoadMap:
     farcall call_03_6c89_MapData_LoadForCurrentMap
@@ -491,24 +492,24 @@ call_00_0150_Init:
     jr   NZ, .jr_00_03b6_NotInGextremeSports           ;; 00:039e $20 $16
     ld   A, [wDC78_PlayerPendingActionId]              ;; 00:03a0 $fa $78 $dc
     cp   A, PLAYERACTION_SPAWN                         ;; 00:03a3 $fe $00
-    ld   A, PLAYERACTION_SNOWBOARDING_SPAWN ; entered gextreme sports level;; 00:03a5 $3e $23
+    ld   A, PLAYERACTION_SNOWBOARDING_SPAWN ; entered gextreme sports level ;; 00:03a5 $3e $23
     jr   Z, .jr_00_03e8_SetPendingPlayerAction         ;; 00:03a7 $28 $3f
     ld   A, [wDB6C_CurrentMapId]                       ;; 00:03a9 $fa $6c $db
     cp   A, MAP_GEXTREME_SPORTS1                       ;; 00:03ac $fe $07
-    ld   A, PLAYERACTION_SNOWBOARDING_STAND_OR_WALK ; left gextreme sports house;; 00:03ae $3e $24
+    ld   A, PLAYERACTION_SNOWBOARDING_STAND_OR_WALK ; left gextreme sports house ;; 00:03ae $3e $24
     jr   Z, .jr_00_03e8_SetPendingPlayerAction         ;; 00:03b0 $28 $36
-    ld   A, PLAYERACTION_IDLE ; entered gextreme sports house;; 00:03b2 $3e $01
+    ld   A, PLAYERACTION_IDLE ; entered gextreme sports house ;; 00:03b2 $3e $01
     jr   .jr_00_03e8_SetPendingPlayerAction            ;; 00:03b4 $18 $32
 .jr_00_03b6_NotInGextremeSports:
     ld   A, [wDC1E_CurrentLevelID]                     ;; 00:03b6 $fa $1e $dc
     cp   A, LEVEL_MARSUPIAL_MADNESS                    ;; 00:03b9 $fe $08
-    ld   A, PLAYERACTION_KANGAROO_SPAWN ; entered marsupial madness;; 00:03bb $3e $2f
+    ld   A, PLAYERACTION_KANGAROO_SPAWN ; entered marsupial madness ;; 00:03bb $3e $2f
     jr   Z, .jr_00_03e8_SetPendingPlayerAction         ;; 00:03bd $28 $29
     ld   A, [wDC1F_CurrentBgCollisionType]             ;; 00:03bf $fa $1f $dc
     cp   A, BG_COLLISION_TYPE_TOPDOWN                  ;; 00:03c2 $fe $01
     jr   Z, .jr_00_03d6_InTopDownCollision             ;; 00:03c4 $28 $10
     ld   A, [wDC78_PlayerPendingActionId]              ;; 00:03c6 $fa $78 $dc
-    cp   A, PLAYERACTION_SPAWN ; entered sidescroller level;; 00:03c9 $fe $00
+    cp   A, PLAYERACTION_SPAWN ; entered sidescroller level ;; 00:03c9 $fe $00
     jr   Z, .jr_00_03e8_SetPendingPlayerAction         ;; 00:03cb $28 $1b
     ld   A, [wD801_Player_ActionId]                    ;; 00:03cd $fa $01 $d8
     sub  A, PLAYERACTION_TOPDOWN                       ;; 00:03d0 $d6 $3c
@@ -517,7 +518,7 @@ call_00_0150_Init:
 .jr_00_03d6_InTopDownCollision:
     ld   A, [wDC78_PlayerPendingActionId]              ;; 00:03d6 $fa $78 $dc
     cp   A, PLAYERACTION_SPAWN                         ;; 00:03d9 $fe $00
-    ld   A, PLAYERACTION_TOPDOWN_SPAWN ; entered topdown collision map;; 00:03db $3e $3c
+    ld   A, PLAYERACTION_TOPDOWN_SPAWN ; entered topdown collision map ;; 00:03db $3e $3c
     jr   Z, .jr_00_03e8_SetPendingPlayerAction         ;; 00:03dd $28 $09
     ld   A, [wD801_Player_ActionId]                    ;; 00:03df $fa $01 $d8
     cp   A, PLAYERACTION_TOPDOWN_SPAWN                 ;; 00:03e2 $fe $3c
@@ -809,8 +810,8 @@ call_00_05c7_LevelTimer_Tick:
 
 call_00_05fd_Player_CheckEatFlyInput:
 ; SELECT eats the fly Gex is carrying. Requires a fly in wDC51_Player_CurrentFly
-; and an action he can interrupt - PLAYERACTION_IDLE or PLAYERACTION_WALK, or one
-; of the two top-down equivalents at $3d/$3e - and then requests
+; and an action he can interrupt - PLAYERACTION_IDLE or
+; PLAYERACTION_IDLE_ANIMATION, or the two top-down equivalents - and then requests
 ; PLAYERACTION_EAT_FLY, whose animation is what eventually calls
 ; call_00_0624_Player_SwapFlyPowerup.
 ;
@@ -828,9 +829,9 @@ call_00_05fd_Player_CheckEatFlyInput:
     ret  C                                             ;; 00:060b $d8
     cp   A, PLAYERACTION_WALK                          ;; 00:060c $fe $03
     jr   C, .jr_00_0616                                ;; 00:060e $38 $06
-    cp   A, $3d                                        ;; 00:0610 $fe $3d
+    cp   A, PLAYERACTION_TOPDOWN_IDLE                  ;; 00:0610 $fe $3d
     ret  C                                             ;; 00:0612 $d8
-    cp   A, $3f                                        ;; 00:0613 $fe $3f
+    cp   A, PLAYERACTION_TOPDOWN_WALK                  ;; 00:0613 $fe $3f
     ret  NC                                            ;; 00:0615 $d0
 .jr_00_0616:
     ld   A, PLAYERACTION_EAT_FLY                       ;; 00:0616 $3e $08
@@ -876,7 +877,7 @@ call_00_0624_Player_SwapFlyPowerup:
     cp   a,FLY_POWERUP_EXTRA_LIFE
     jp   z,call_00_0723_Player_ObtainedCollectible.jr_00_074b_GrantExtraLife
     cp   a,FLY_POWERUP_1
-    jr   z,.jr_00_066C
+    jr   z,.jr_00_066c
     cp   a,FLY_POWERUP_5
     jr   z,.jr_00_0655
     cp   a,FLY_POWERUP_2
@@ -902,7 +903,7 @@ call_00_0624_Player_SwapFlyPowerup:
     ld   a,FLY_POWERUP_ACTIVE_5
     ld   [wDCAE_FlyPowerup_ActiveIndex],a
     ret  
-.jr_00_066C:
+.jr_00_066c:
     xor  a
     ld   [wDCA9_FlyPowerup2_Timer],a
     ld   [wDCAB_FlyPowerup5_Timer],a
@@ -941,7 +942,7 @@ jp_00_0693_Player_Die:
 ; decrements wDC4E_LivesRemaining. gex2's call_00_0696_Player_Die is the other
 ; way round: it deducts the life itself and lets the loop test for zero
     ld   HL, wDABE_CollisionFlags                      ;; 00:0693 $21 $be $da
-    bit  7, [HL]                                       ;; 00:0696 $cb $7e
+    bit  BGCOLL_NO_COLLISION_BIT, [HL]                 ;; 00:0696 $cb $7e
     jr   NZ, .jr_00_06ba                               ;; 00:0698 $20 $20
     ld   A, [wDB6C_CurrentMapId]                       ;; 00:069a $fa $6c $db
     cp   A, MAP_GEXTREME_SPORTS1                       ;; 00:069d $fe $07
@@ -1243,7 +1244,7 @@ call_00_0800_Screen_LoadSecondaryTilesetRow:
     push DE                                            ;; 00:0801 $d5
     push BC                                            ;; 00:0802 $c5
     push HL                                            ;; 00:0803 $e5
-    ld   A, BANK(image_01f_00)                 ;; 00:0804 $3e $1f
+    ld   A, BANK(image_01f_00)                         ;; 00:0804 $3e $1f
     call call_00_0eee_SwitchBank                       ;; 00:0806 $cd $ee $0e
     ld   A, [wDB6C_CurrentMapId]                       ;; 00:0809 $fa $6c $db
     ld   DE, data_00_0b01_SecondaryTilesetPtrs         ;; 00:080c $11 $01 $0b
@@ -1285,7 +1286,7 @@ call_00_0835_Text_LoadStringToBuffer:
 ; set - which is copied too, as the terminator - and a zero is written after it.
 ; The pointer pair is then overwritten with wDADD_MenuTextBuffer, so the menu
 ; renderer reads the WRAM copy from here on
-    ld   A, BANK(bank1c_text)                               ;; 00:0835 $3e $1c
+    ld   A, BANK(bank1c_text)                          ;; 00:0835 $3e $1c
     call call_00_0eee_SwitchBank                       ;; 00:0837 $cd $ee $0e
     ld   HL, wDBA7_MenuCmd_SrcPtr                      ;; 00:083a $21 $a7 $db
     ld   A, [HL+]                                      ;; 00:083d $2a
@@ -1320,8 +1321,8 @@ call_00_0865_Text_AppendStringToBuffer:
 ; pointer table at DE onto whatever is already in wDADD_MenuTextBuffer.
 ;
 ; It finds the end of the existing text by scanning forward from the start of
-; wDADD_MenuTextBuffer for a byte of $80, then copies until it has written the new
-; string's own $80. DE is loaded one short of the buffer because the scan loop opens
+; wDADD_MenuTextBuffer for a TEXT_TERMINATOR byte, then copies until it has written
+; the new string's own. DE is loaded one short of the buffer because the scan loop opens
 ; with `inc de`
 ;
     push de
@@ -1337,16 +1338,16 @@ call_00_0865_Text_AppendStringToBuffer:
     ld   h,[hl]
     ld   l,a
     ld   de,wDADD_MenuTextBuffer - 1
-.jr_00_087A:
+.jr_00_087a:
     inc  de
     ld   a,[de]
-    cp   a,$80
-    jr   nz,.jr_00_087A
+    cp   a,TEXT_TERMINATOR
+    jr   nz,.jr_00_087a
 .jr_00_0880:
     ldi  a,[hl]
     ld   [de],a
     inc  de
-    cp   a,$80
+    cp   a,TEXT_TERMINATOR
     jr   nz,.jr_00_0880
     jp   call_00_0f08_RestoreBank
 
@@ -1359,10 +1360,10 @@ call_00_088a_Menu_RunHdmaAnimations:
 ; only stepped on the tick where it wraps - so all four animations share one
 ; ten-frame cadence. Each entry of .data_00_08dc_MenuHdmaAnimations is seven
 ; bytes: a pointer to that animation's own frame counter in WRAM, its frame
-; count, then the HDMA source and destination. The frame number is scaled by
-; $100 - `swap` plus two `add HL, HL` - so a frame is 256 bytes, and the
-; resulting source is programmed straight into rHDMA1..rHDMA5 as a four-block
-; general purpose DMA.
+; count, then the HDMA source and destination. The frame number is scaled by $40 -
+; `swap` plus two `add HL, HL` - so a frame is 64 bytes, exactly the four 16-byte
+; blocks the transfer moves, and the resulting source is programmed straight into
+; rHDMA1..rHDMA5 as a general purpose DMA.
 ;
 ; This is the closest thing gex3 has to gex2's call_00_0d84_VBlank_RunGfxStream,
 ; but the two are not the same mechanism: gex2 walks a script of explicit
@@ -1371,7 +1372,7 @@ call_00_088a_Menu_RunHdmaAnimations:
     ld   A, [wDBE3_Menu_AnimateFlag]                   ;; 00:088a $fa $e3 $db
     and  A, A                                          ;; 00:088d $a7
     ret  Z                                             ;; 00:088e $c8
-    ld   A, BANK(image_fly_1_fly_2_and_3_more_00a_4000)                     ;; 00:088f $3e $0a
+    ld   A, BANK(image_fly_1_fly_2_and_3_more_00a_4000) ;; 00:088f $3e $0a
     call call_00_0eee_SwitchBank                       ;; 00:0891 $cd $ee $0e
     ld   HL, wDC72_AnimFrameCounter                    ;; 00:0894 $21 $72 $dc
     inc  [HL]                                          ;; 00:0897 $34
@@ -1448,17 +1449,17 @@ call_00_08f8_StageNextGfxTransfer:
 ; It spins while GFX_XFER_PENDING is set, then returns early if a player or
 ; config transfer is already queued - those outrank entity graphics - and only
 ; then walks the entity table from wD840_EntityMemoryAfterPlayer in
-; ENTITY_SLOT_STRIDE steps, looking for a live slot whose
+; ENTITY_SLOT_SIZE steps, looking for a live slot whose
 ; ENTITY_FIELD_ACTION_STATE_FLAGS has bit 1 set, i.e. one whose animation frame
 ; changed.
 ;
 ; What happens next depends on ACTION_STATE_UNK20_BIT of that same byte, and the
 ; two paths are quite different:
 ;
-;   set    the entity's tiles come from a small table built into this routine
-;          (the bytes after .jr_00_096e_RaiseEntityGfxRequest), keyed by the entity's sprite id: five
-;          bytes of (id, stride, base pointer), and the frame number multiplies
-;          the stride
+;   set    the entity's tiles come from .data_00_0973_BigEntityGfx, a short table
+;          built into this routine and matched on ENTITY ID: five bytes of
+;          (id, stride, base pointer), with the base advanced by one stride per
+;          sprite frame
 ;   clear  the entity's type selects one of nine address resolvers through
 ;          .data_00_0a58_EntityVRAMSourceResolvers, each of which is a different
 ;          fixed-point multiply of the frame number by a tile count, added to
@@ -1489,31 +1490,31 @@ call_00_08f8_StageNextGfxTransfer:
     inc  A                                             ;; 00:0911 $3c
     jr   Z, .jr_00_0922                                ;; 00:0912 $28 $0e
     ld   A, L                                          ;; 00:0914 $7d
-    or   A, $05                                        ;; 00:0915 $f6 $05
+    or   A, ENTITY_FIELD_ACTION_STATE_FLAGS            ;; 00:0915 $f6 $05
     ld   L, A                                          ;; 00:0917 $6f
-    bit  1, [HL]                                       ;; 00:0918 $cb $4e
+    bit  ACTION_STATE_ID_CHANGED_BIT, [HL]             ;; 00:0918 $cb $4e
     jr   Z, .jr_00_0922                                ;; 00:091a $28 $06
-    bit  5, [HL]                                       ;; 00:091c $cb $6e
+    bit  ACTION_STATE_UNK20_BIT, [HL]                  ;; 00:091c $cb $6e
     jr   NZ, .jr_00_092a                               ;; 00:091e $20 $0a
     jr   .jr_00_099c                                   ;; 00:0920 $18 $7a
 .jr_00_0922:
     pop  HL                                            ;; 00:0922 $e1
     ld   A, L                                          ;; 00:0923 $7d
-    add  A, ENTITY_SLOT_STRIDE                         ;; 00:0924 $c6 $20
+    add  A, ENTITY_SLOT_SIZE                         ;; 00:0924 $c6 $20
     ld   L, A                                          ;; 00:0926 $6f
     jr   NZ, .jr_00_090f                               ;; 00:0927 $20 $e6
     ret                                                ;; 00:0929 $c9
 .jr_00_092a:
-    res  1, [HL]                                       ;; 00:092a $cb $8e
+    res  ACTION_STATE_ID_CHANGED_BIT, [HL]             ;; 00:092a $cb $8e
     pop  HL                                            ;; 00:092c $e1
     ld   A, L                                          ;; 00:092d $7d
     ld   [wDB61_EntityGfx_SlotOffset], A               ;; 00:092e $ea $61 $db
-    or   A, $0a                                        ;; 00:0931 $f6 $0a
+    or   A, ENTITY_FIELD_SPRITE_ID                     ;; 00:0931 $f6 $0a
     ld   L, A                                          ;; 00:0933 $6f
     ld   C, [HL]                                       ;; 00:0934 $4e
     inc  C                                             ;; 00:0935 $0c
     ld   A, L                                          ;; 00:0936 $7d
-    xor  A, $0a                                        ;; 00:0937 $ee $0a
+    xor  A, ENTITY_FIELD_SPRITE_ID                     ;; 00:0937 $ee $0a
     ld   L, A                                          ;; 00:0939 $6f
     ld   B, [HL]                                       ;; 00:093a $46
     ld   HL, .data_00_0973_BigEntityGfx - ENTITY_GFX_BIG_ROW_SIZE ;; 00:093b $21 $6e $09
@@ -1562,11 +1563,11 @@ call_00_08f8_StageNextGfxTransfer:
     entity_gfx_big ENTITY_WW_GEX_WRESTLING_ROCK_HARD,             image_ww_gex_wrestling_rock_hard_010_4000,     16
     db   ENTITY_GFX_BIG_TABLE_END
 .jr_00_099c:
-    res  1, [HL]                                       ;; 00:099c $cb $8e
+    res  ACTION_STATE_ID_CHANGED_BIT, [HL]             ;; 00:099c $cb $8e
     pop  HL                                            ;; 00:099e $e1
     ld   A, L                                          ;; 00:099f $7d
     ld   [wDB61_EntityGfx_SlotOffset], A               ;; 00:09a0 $ea $61 $db
-    or   A, $0a                                        ;; 00:09a3 $f6 $0a
+    or   A, ENTITY_FIELD_SPRITE_ID                     ;; 00:09a3 $f6 $0a
     ld   L, A                                          ;; 00:09a5 $6f
     ld   A, [HL]                                       ;; 00:09a6 $7e
     push AF                                            ;; 00:09a7 $f5
@@ -1731,9 +1732,16 @@ call_00_0a6a_Hdma_RunConfigEntry:
     ret                                                ;; 00:0aa8 $c9
 .data_00_0aa9_HdmaConfigTable:
 ; Eight bytes per entry: source, destination, length, then the ROM bank and the
-; destination VRAM bank. Indexed by the HDMACFG_* constants, and note the entries
-; come in VRAM-bank pairs - the same bytes are written to bank 0 for tile ids and
-; bank 1 for attributes, which is why the bg map is drawn twice over.
+; destination VRAM bank. Indexed by the HDMACFG_* constants.
+;
+; Several entries come in pairs that write the same VRAM address in the two banks,
+; tile ids into bank 0 and CGB attributes into bank 1: HDMACFG_HUD_TILEMAP with
+; HDMACFG_HUD_ATTRIBUTES, and HDMACFG_MENU_TILEMAP with
+; HDMACFG_BGMAP_ATTRIBUTES - the last pair is byte for byte the same entry apart
+; from the bank, because both passes flush the same wC000_BgMapTileIds staging
+; buffer and the caller refills it in between. HDMACFG_WRAM_TILES_BANK0 and
+; _BANK1 are the same idea for tile data.
+;
 ; HDMACFG_BANK_MAP_TILESET ($ff) in the bank byte means "relocate this against
 ; the map's own tileset"
     hdma_config image_hud_tiles_00c_7800, _VRAM, image_hud_tilemap_00c_7bc0 - image_hud_tiles_00c_7800, BANK(image_hud_tiles_00c_7800), 1                 ; HDMACFG_HUD_TILES
@@ -1751,9 +1759,9 @@ call_00_0a6a_Hdma_RunConfigEntry:
 data_00_0b01_SecondaryTilesetPtrs:
 ; One bank $1F secondary tileset per map id, read by
 ; call_00_0800_Screen_LoadSecondaryTilesetRow
-    dw   image_01f_00, image_01f_00, image_01f_01, image_01f_02;; 00:0b01 .???????
-    dw   image_01f_03, image_01f_04, image_01f_05, image_01f_06;; 00:0b09 .???????
-    dw   image_01f_06, image_01f_07, image_01f_08, image_01f_09;; 00:0b11 .???????
+    dw   image_01f_00, image_01f_00, image_01f_01, image_01f_02 ;; 00:0b01 .???????
+    dw   image_01f_03, image_01f_04, image_01f_05, image_01f_06 ;; 00:0b09 .???????
+    dw   image_01f_06, image_01f_07, image_01f_08, image_01f_09 ;; 00:0b11 .???????
 
 data_00_0b19_TvUnlockRequirements:
 ; How much progress each tv in the Gex Cave hub wants before it will let the
@@ -1838,7 +1846,7 @@ call_00_0b25_VBlank_Handler:
     ld   [wDB67_LcdIsr_ScanlineCounter], A             ;; 00:0b85 $ea $67 $db
 .jr_00_0b88:
     ld   HL, rIF                                       ;; 00:0b88 $21 $0f $ff
-    res  1, [HL]                                       ;; 00:0b8b $cb $8e
+    res  1, [HL]  ; a STAT interrupt raised during vblank;; 00:0b8b $cb $8e
     pop  HL                                            ;; 00:0b8d $e1
     pop  DE                                            ;; 00:0b8e $d1
     pop  BC                                            ;; 00:0b8f $c1
@@ -1879,16 +1887,16 @@ call_00_0b9f_VBlank_UpdateVRAM:
     ld   A, BANK(call_03_46e0_BgCollision_Update)        ;; 00:0b9f $3e $03
     call call_00_0f25_SetMbcBank                       ;; 00:0ba1 $cd $25 $0f
     ld   HL, wDC20_BgMapLoadingFlags                   ;; 00:0ba4 $21 $20 $dc
-    bit  7, [HL]                                       ;; 00:0ba7 $cb $7e
+    bit  MAP_PENDING_VRAM_TRANSFER, [HL]               ;; 00:0ba7 $cb $7e
     jr   Z, .jr_00_0bc6                                ;; 00:0ba9 $28 $1b
-    res  7, [HL]                                       ;; 00:0bab $cb $be
+    res  MAP_PENDING_VRAM_TRANSFER, [HL]               ;; 00:0bab $cb $be
     ld   A, [wDC20_BgMapLoadingFlags]                  ;; 00:0bad $fa $20 $dc
-    and  A, $0f                                        ;; 00:0bb0 $e6 $0f
+    and  A, MAP_SCROLL_UP | MAP_SCROLL_DOWN | MAP_SCROLL_LEFT | MAP_SCROLL_RIGHT;; 00:0bb0 $e6 $0f
     jr   Z, .jr_00_0bc6                                ;; 00:0bb2 $28 $12
-    and  A, $03                                        ;; 00:0bb4 $e6 $03
+    and  A, MAP_SCROLL_UP | MAP_SCROLL_DOWN            ;; 00:0bb4 $e6 $03
     call NZ, call_03_75e3_VRAM_WriteBgMapRow           ;; 00:0bb6 $c4 $e3 $75
     ld   A, [wDC20_BgMapLoadingFlags]                  ;; 00:0bb9 $fa $20 $dc
-    and  A, $0c                                        ;; 00:0bbc $e6 $0c
+    and  A, MAP_SCROLL_LEFT | MAP_SCROLL_RIGHT         ;; 00:0bbc $e6 $0c
     call NZ, call_03_7664_VRAM_WriteBgMapColumn        ;; 00:0bbe $c4 $64 $76
     xor  A, A                                          ;; 00:0bc1 $af
     ld   [wDC20_BgMapLoadingFlags], A                  ;; 00:0bc2 $ea $20 $dc
@@ -2407,9 +2415,9 @@ call_00_0e29_OamDmaRoutine:
     ld   a,HIGH(wD900_ShadowOAM)
     ldh  [rDMA], a
     ld   a,OAM_DMA_WAIT_LOOPS
-.jr_00_0E2F:
+.jr_00_0e2f:
     dec  a
-    jr   nz,.jr_00_0E2F
+    jr   nz,.jr_00_0e2f
     ret                                                ;; 00:0e30 ...
 
 call_00_0e33_SetLCDCAndWait:
@@ -2463,7 +2471,7 @@ call_00_0e62_ClearShadowOamAndResetScroll:
     ld   [wDAD9_BgMap_ScrollXLo], A                    ;; 00:0e6a $ea $d9 $da
     ld   [wDADA_BgMap_ScrollYLo], A                    ;; 00:0e6d $ea $da $da
     ld   HL, wD900_ShadowOAM                           ;; 00:0e70 $21 $00 $d9
-    ld   DE, wD901_ShadowOAM_EntitySprites             ;; 00:0e73 $11 $01 $d9
+    ld   DE, wD901_ShadowOAM_FillDestination             ;; 00:0e73 $11 $01 $d9
     ld   BC, SHADOW_OAM_SIZE - 1                       ;; 00:0e76 $01 $9f $00
     ld   [HL], $00                                     ;; 00:0e79 $36 $00
     call call_00_076e_MemCopy                          ;; 00:0e7b $cd $6e $07
@@ -2745,9 +2753,10 @@ call_00_0f80_CheckInputStart:
 ; press when START is the ONLY button down, so holding it with any direction reads
 ; as not pressed.
 ;
-; The tail is `xor a / ret` against `and a / ret`, which looks redundant but is
-; not: both paths have to leave the Z flag set from the comparison the caller will
-; test, and the not-pressed path also has to clear A
+; The two tails are what set the flag the caller reads: on a press A still holds
+; PADF_START, so `and a` returns NZ, and otherwise `xor a` returns Z with A clear.
+; Neither can just fall out of the `cp`, because that leaves the flags the other
+; way round
     ld   A, [wDAD7_RawInputs]                          ;; 00:0f80 $fa $d7 $da
     cp   A, PADF_START                                 ;; 00:0f83 $fe $08
     jr   Z, .jr_00_0f89                                ;; 00:0f85 $28 $02
@@ -2912,9 +2921,10 @@ call_00_0ff5_QueueSFX:
     ld   [HL], B                                       ;; 00:1035 $70
     ret                                                ;; 00:1036 $c9
 .data_00_1037_SFXPriorities:
-; One priority per SFX_* id, higher wins. Most effects are $01; the loud
-; one-offs - SFX_EMPTY's $11, the two $10s and $0e/$0f - are what can interrupt
-; something already playing
+; One priority per SFX_* id, higher wins. Most effects are $01. The ones that can
+; interrupt something already playing are SFX_EMPTY at $11 - which is how "stop
+; everything" always gets through - SFX_UNK0D and SFX_GEX_SPAWN at $10, the four
+; $08s and the pair of $07s
     db   $11, $01, $08, $08, $01, $01, $01, $01        ;; 00:1037 ??.?.?..
     db   $01, $01, $01, $01, $01, $10, $10, $07        ;; 00:103f .?.??..?
     db   $07, $01, $01, $01, $08, $08, $01, $08        ;; 00:1047 .???????

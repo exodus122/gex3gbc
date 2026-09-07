@@ -407,10 +407,10 @@ call_03_4db3_CollisionHandler_FlyCoin:
     jp   call_03_5671_HandleEntityHit                                    ;; 03:4dbf $c3 $71 $56
 
 call_03_4dc2_CollisionHandler_PawCoin:
-; ENTITY_PAW_COIN. Four per level, and the entity's spawn parameter (0-3) says
-; which one this is: .data_03_4e00 turns it into a bit mask that is OR'd into this
-; level's wDC5C_ProgressFlags byte, so collecting the same paw coin twice cannot
-; count twice across saves.
+; ENTITY_PAW_COIN. Three per level, and the entity's spawn parameter - 1, 2 or 3 -
+; says which one this is: .data_03_4e00 turns it into a bit mask that is OR'd into
+; this level's wDC5C_ProgressFlags byte, so collecting the same paw coin twice cannot
+; count twice across saves. Entry 0 of that table is $00 and no coin uses it.
 ;
 ; wDCAF_PawCoinCounter counts them within the run. Every fourth one raises
 ; wDC4F_PawCoinExtraHealth - a permanent extra health point, capped at four -
@@ -452,9 +452,10 @@ call_03_4dc2_CollisionHandler_PawCoin:
     call call_00_0ff5_QueueSFX                                  ;; 03:4dfa $cd $f5 $0f
     jp   call_03_5671_HandleEntityHit                                    ;; 03:4dfd $c3 $71 $56
 .data_03_4e00:
-; Which bit of wDC5C_ProgressFlags[level] each of the four paw coins owns, indexed
-; by the entity's spawn parameter. Bits 5-7; bits 0-4 belong to the remotes, the
-; all-collectibles flag and the bonus coin
+; Which bit of wDC5C_ProgressFlags[level] each paw coin owns, indexed by the entity's
+; spawn parameter. Bits 5-7; bits 0-4 belong to the remotes, the all-collectibles flag
+; and the bonus coin. The numbering is 1-based, so entry 0 is $00 and unused -
+; call_00_320d_Level_ClearCollectedPawCoinFlags keeps an identical copy
     db   $00, $20, $40, $80
 
 call_03_4e04_CollisionHandler_Fly:
@@ -472,9 +473,9 @@ call_03_4e04_CollisionHandler_Fly:
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     call call_00_293a_Entity_GetId
-    sub  a,04
+    sub  a,ENTITY_FLY_1
     ld   l,a
-    ld   h,00
+    ld   h,$00
     ld   de,.data_03_4e2c
     add  hl,de
     ld   a,[hl]
@@ -995,7 +996,7 @@ call_03_50f4_CollisionHandler_OnSwitch2:
     
 call_03_5116_CollisionHandler_Door:
 ; ENTITY_ANIME_CHANNEL_DOOR. Not a collision so much as a "press up to enter"
-; prompt, and it wants four things at once: the door closed (action $00), Gex
+; prompt, and it wants five things at once: the door closed (action $00), Gex
 ; overlapping it, Gex on the ground (BGCOLL_NO_COLLISION_BIT in
 ; wDABE_CollisionFlags), UP held, and his action between PLAYERACTION_IDLE and
 ; PLAYERACTION_WALK - so he has to be standing still.
@@ -1011,7 +1012,7 @@ call_03_5116_CollisionHandler_Door:
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     ld   hl,wDABE_CollisionFlags
-    bit  7,[hl]
+    bit  BGCOLL_NO_COLLISION_BIT,[hl]
     ret  z
     ld   hl,wDC81_Player_EffectiveInputs
     bit  PADF_UP_BIT,[hl]
@@ -1044,7 +1045,7 @@ call_03_5156_CollisionHandler_Door2:
     call call_03_550e_Entity_CheckPlayerInteraction
     ret  nc
     ld   hl,wDABE_CollisionFlags
-    bit  7,[hl]
+    bit  BGCOLL_NO_COLLISION_BIT,[hl]
     ret  z
     ld   hl,wDC81_Player_EffectiveInputs
     bit  PADF_UP_BIT,[hl]
@@ -1691,7 +1692,7 @@ call_03_550e_Entity_CheckPlayerInteraction:
 ;   7. STOMP, if ENTITY_INTERACT_STOMP is set, Gex is in one of the four jump
 ;      actions (two on foot, two on the snowboard) and his Y velocity is downward.
 ;      This is also where the bounce happens - it rewrites wDC8C_PlayerYVelocity
-;      to PLAYER_JUMP_VELOCITY itself, so no handler has to.
+;      to PLAYER_STOMP_BOUNCE_VELOCITY itself, so no handler has to.
 ;   8. Otherwise TOUCH - but only if Player_IsInvincible says he can be hurt.
 ;      During the flicker after a hit a touch is reported as no contact, which is
 ;      how gex3 stops a handler acting on a hit it did not actually land.

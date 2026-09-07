@@ -62,10 +62,11 @@ call_03_6c89_MapData_LoadForCurrentMap:
 ;
 ; Everything downstream reads the WRAM copy, so this is the single point where "which
 ; map are we on" turns into "where is its data". It is called on every level load,
-; every map change within a level, by the cutscene runner, and by the menus, which
-; borrow the map machinery to draw their backgrounds - the four callers in
-; bank00_home.asm, bank00_cutscenes.asm and bank01_menus.asm all set
-; wDB6C_CurrentMapId first and let this do the rest.
+; every map change within a level, by the cutscene runner, by
+; call_03_647c_Map_SetSpawnPosition when a TV drops Gex back into the cave, and by the
+; menus, which borrow the map machinery to draw their backgrounds. All ten call sites -
+; in bank00_home.asm, bank00_cutscenes.asm, bank03_map_boundaries_and_spawns.asm and
+; menus/bank01_menu_load.asm - set wDB6C_CurrentMapId first and let this do the rest.
 ;
 ; gex2's call_00_2eb0_MapData_GetRecordAddr is the closest thing, but it hands back a
 ; pointer for one accessor to read one field; nothing in gex2 copies a record
