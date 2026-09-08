@@ -6,9 +6,9 @@
 ; rather than by map, so the descriptor is nine farpointers - bank plus address -
 ; followed by four bytes of geometry:
 ;
-;   map                 the blockmap: one byte per 16x16 block, the low byte of a
-;                       block id, rows MAPDATA width bytes apart
-;   map extended        the same grid again, supplying the HIGH byte of the block id.
+;   blockmap            one byte per 16x16 block, the low byte of a block id, rows
+;                       MAPDATA width bytes apart
+;   blockmap hi         the same grid again, supplying the HIGH byte of the block id.
 ;                       Together they let a map address more than 256 distinct blocks
 ;   tileset             the 2bpp graphics
 ;   blockset            8 bytes per block id - four tile ids then four CGB attribute
@@ -23,7 +23,7 @@
 ;                       and BG_COLLISION_TYPE_SIDESCROLLER or _TOPDOWN
 ;
 ; The record is copied as one MAPDATA_RECORD_SIZE-byte block straight into
-; wDC01_MapBank, so the WRAM layout there IS this layout - the two have to be edited
+; wDC01_BlockmapBank, so the WRAM layout there IS this layout - the two have to be edited
 ; together.
 ;
 ; Note the entity and collectible pointers repeat across every map of a level. They
@@ -45,7 +45,7 @@
 ;                 four `add HL,HL` shifts. gex3's is $1F bytes and not a power of two,
 ;                 so it needs a pointer table - .data_03_6ca0_MapDataPointers - and
 ;                 pays two bytes per map to avoid the padding
-;   what is in it gex2 has no extended blockmap (its second plane is a one-bit alt
+;   what is in it gex2 has no blockmap hi plane (its second plane is a one-bit alt
 ;                 blockset selector), no separate collision layer (collision shares
 ;                 the blockset's bank), and no per-map entity or collectible pointer
 ;                 (both are per-level tables in banks $0A and $0B). It does carry
@@ -57,7 +57,7 @@
 ; ==================================================================
 
 call_03_6c89_MapData_LoadForCurrentMap:
-; Copies the current map's descriptor into wDC01_MapBank, and that is the whole
+; Copies the current map's descriptor into wDC01_BlockmapBank, and that is the whole
 ; routine - a table lookup and a MAPDATA_RECORD_SIZE-byte memcpy.
 ;
 ; Everything downstream reads the WRAM copy, so this is the single point where "which
@@ -79,7 +79,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     ld   A, [HL+]                                     ;; 03:6c94 $2a
     ld   H, [HL]                                      ;; 03:6c95 $66
     ld   L, A                                         ;; 03:6c96 $6f
-    ld   DE, wDC01_MapBank                            ;; 03:6c97 $11 $01 $dc
+    ld   DE, wDC01_BlockmapBank                       ;; 03:6c97 $11 $01 $dc
     ld   BC, MAPDATA_RECORD_SIZE                      ;; 03:6c9a $01 $1f $00
     jp   call_00_076e_MemCopy                         ;; 03:6c9d $c3 $6e $07
 .data_03_6ca0_MapDataPointers:
@@ -145,8 +145,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     dw   .data_03_743f_MapData_ChannelZ4            ; MAP_CHANNEL_Z4
     dw   .data_03_745e_MapData_ChannelZ5            ; MAP_CHANNEL_Z5
 .data_03_6d1a_MapData_GexCave1:
-    farpointer GexCave_1_map
-    farpointer GexCave_1_map_extended
+    farpointer GexCave_1_blockmap
+    farpointer GexCave_1_blockmap_hi
     farpointer GexCave_1_tileset
     farpointer GexCave_1_blockset
     farpointer GexCave_1_collision
@@ -156,8 +156,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer GexCave_collectible_list
     map_geometry  30,  17, LEVEL_GEX_CAVE, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_6d39_MapData_GexCave2:
-    farpointer GexCave_2_map
-    farpointer GexCave_2_map_extended
+    farpointer GexCave_2_blockmap
+    farpointer GexCave_2_blockmap_hi
     farpointer GexCave_2_tileset
     farpointer GexCave_2_blockset
     farpointer GexCave_2_collision
@@ -167,8 +167,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer GexCave_collectible_list
     map_geometry  30,  17, LEVEL_GEX_CAVE, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_6d58_MapData_GexCave3:
-    farpointer GexCave_3_map
-    farpointer GexCave_3_map_extended
+    farpointer GexCave_3_blockmap
+    farpointer GexCave_3_blockmap_hi
     farpointer GexCave_3_tileset
     farpointer GexCave_3_blockset
     farpointer GexCave_3_collision
@@ -178,8 +178,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer GexCave_collectible_list
     map_geometry  30,  17, LEVEL_GEX_CAVE, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_6d77_MapData_GexCave4:
-    farpointer GexCave_4_map
-    farpointer GexCave_4_map_extended
+    farpointer GexCave_4_blockmap
+    farpointer GexCave_4_blockmap_hi
     farpointer GexCave_4_tileset
     farpointer GexCave_4_blockset
     farpointer GexCave_4_collision
@@ -189,8 +189,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer GexCave_collectible_list
     map_geometry  30,  17, LEVEL_GEX_CAVE, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_6d96_MapData_HolidayTV1:
-    farpointer HolidayTV_1_map
-    farpointer HolidayTV_1_map_extended
+    farpointer HolidayTV_1_blockmap
+    farpointer HolidayTV_1_blockmap_hi
     farpointer HolidayTV_1_tileset
     farpointer HolidayTV_1_blockset
     farpointer HolidayTV_1_collision
@@ -200,8 +200,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer HolidayTV_collectible_list
     map_geometry 160,  80, LEVEL_HOLIDAY_TV, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_6db5_MapData_HolidayTV2:
-    farpointer HolidayTV_2_map
-    farpointer HolidayTV_2_map_extended
+    farpointer HolidayTV_2_blockmap
+    farpointer HolidayTV_2_blockmap_hi
     farpointer HolidayTV_2_tileset
     farpointer HolidayTV_2_blockset
     farpointer HolidayTV_2_collision
@@ -211,8 +211,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer HolidayTV_collectible_list
     map_geometry  20,  22, LEVEL_HOLIDAY_TV, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_6dd4_MapData_HolidayTV3:
-    farpointer HolidayTV_2_map
-    farpointer HolidayTV_2_map_extended
+    farpointer HolidayTV_2_blockmap
+    farpointer HolidayTV_2_blockmap_hi
     farpointer HolidayTV_2_tileset
     farpointer HolidayTV_2_blockset
     farpointer HolidayTV_2_collision
@@ -222,8 +222,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer HolidayTV_collectible_list
     map_geometry  20,  22, LEVEL_HOLIDAY_TV, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_6df3_MapData_HolidayTV4:
-    farpointer HolidayTV_4_map
-    farpointer HolidayTV_4_map_extended
+    farpointer HolidayTV_4_blockmap
+    farpointer HolidayTV_4_blockmap_hi
     farpointer HolidayTV_4_tileset
     farpointer HolidayTV_4_blockset
     farpointer HolidayTV_4_collision
@@ -233,8 +233,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer HolidayTV_collectible_list
     map_geometry  20,   9, LEVEL_HOLIDAY_TV, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_6e12_MapData_MysteryTV1:
-    farpointer MysteryTV_1_map
-    farpointer MysteryTV_1_map_extended
+    farpointer MysteryTV_1_blockmap
+    farpointer MysteryTV_1_blockmap_hi
     farpointer MysteryTV_1_tileset
     farpointer MysteryTV_1_blockset
     farpointer MysteryTV_1_collision
@@ -244,8 +244,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MysteryTV_collectible_list
     map_geometry  45,  45, LEVEL_MYSTERY_TV, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_6e31_MapData_MysteryTV2:
-    farpointer MysteryTV_2_map
-    farpointer MysteryTV_2_map_extended
+    farpointer MysteryTV_2_blockmap
+    farpointer MysteryTV_2_blockmap_hi
     farpointer MysteryTV_2_tileset
     farpointer MysteryTV_2_blockset
     farpointer MysteryTV_2_collision
@@ -255,8 +255,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MysteryTV_collectible_list
     map_geometry  40,  50, LEVEL_MYSTERY_TV, BG_COLLISION_TYPE_TOPDOWN
 .data_03_6e50_MapData_MysteryTV3:
-    farpointer MysteryTV_3_map
-    farpointer MysteryTV_3_map_extended
+    farpointer MysteryTV_3_blockmap
+    farpointer MysteryTV_3_blockmap_hi
     farpointer MysteryTV_3_tileset
     farpointer MysteryTV_3_blockset
     farpointer MysteryTV_3_collision
@@ -266,8 +266,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MysteryTV_collectible_list
     map_geometry  45,  30, LEVEL_MYSTERY_TV, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_6e6f_MapData_MysteryTV4:
-    farpointer MysteryTV_4_map
-    farpointer MysteryTV_4_map_extended
+    farpointer MysteryTV_4_blockmap
+    farpointer MysteryTV_4_blockmap_hi
     farpointer MysteryTV_4_tileset
     farpointer MysteryTV_4_blockset
     farpointer MysteryTV_4_collision
@@ -277,8 +277,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MysteryTV_collectible_list
     map_geometry  20,  42, LEVEL_MYSTERY_TV, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_6e8e_MapData_MysteryTV5:
-    farpointer MysteryTV_4_map
-    farpointer MysteryTV_4_map_extended
+    farpointer MysteryTV_4_blockmap
+    farpointer MysteryTV_4_blockmap_hi
     farpointer MysteryTV_4_tileset
     farpointer MysteryTV_4_blockset
     farpointer MysteryTV_4_collision
@@ -288,8 +288,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MysteryTV_collectible_list
     map_geometry  20,  42, LEVEL_MYSTERY_TV, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_6ead_MapData_MysteryTV6:
-    farpointer MysteryTV_4_map
-    farpointer MysteryTV_4_map_extended
+    farpointer MysteryTV_4_blockmap
+    farpointer MysteryTV_4_blockmap_hi
     farpointer MysteryTV_4_tileset
     farpointer MysteryTV_4_blockset
     farpointer MysteryTV_4_collision
@@ -299,8 +299,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MysteryTV_collectible_list
     map_geometry  20,  42, LEVEL_MYSTERY_TV, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_6ecc_MapData_MysteryTV7:
-    farpointer MysteryTV_7_map
-    farpointer MysteryTV_7_map_extended
+    farpointer MysteryTV_7_blockmap
+    farpointer MysteryTV_7_blockmap_hi
     farpointer MysteryTV_7_tileset
     farpointer MysteryTV_7_blockset
     farpointer MysteryTV_7_collision
@@ -310,8 +310,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MysteryTV_collectible_list
     map_geometry  10,   8, LEVEL_MYSTERY_TV, BG_COLLISION_TYPE_TOPDOWN
 .data_03_6eeb_MapData_MysteryTV8:
-    farpointer MysteryTV_8_map
-    farpointer MysteryTV_8_map_extended
+    farpointer MysteryTV_8_blockmap
+    farpointer MysteryTV_8_blockmap_hi
     farpointer MysteryTV_8_tileset
     farpointer MysteryTV_8_blockset
     farpointer MysteryTV_8_collision
@@ -321,8 +321,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MysteryTV_collectible_list
     map_geometry  10,   9, LEVEL_MYSTERY_TV, BG_COLLISION_TYPE_TOPDOWN
 .data_03_6f0a_MapData_MysteryTV9:
-    farpointer MysteryTV_4_map
-    farpointer MysteryTV_4_map_extended
+    farpointer MysteryTV_4_blockmap
+    farpointer MysteryTV_4_blockmap_hi
     farpointer MysteryTV_4_tileset
     farpointer MysteryTV_4_blockset
     farpointer MysteryTV_4_collision
@@ -332,8 +332,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MysteryTV_collectible_list
     map_geometry  20,  42, LEVEL_MYSTERY_TV, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_6f29_MapData_MysteryTV10:
-    farpointer MysteryTV_2_map
-    farpointer MysteryTV_2_map_extended
+    farpointer MysteryTV_2_blockmap
+    farpointer MysteryTV_2_blockmap_hi
     farpointer MysteryTV_2_tileset
     farpointer MysteryTV_2_blockset
     farpointer MysteryTV_2_collision
@@ -343,8 +343,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MysteryTV_collectible_list
     map_geometry  40,  50, LEVEL_MYSTERY_TV, BG_COLLISION_TYPE_TOPDOWN
 .data_03_6f48_MapData_TutTV1:
-    farpointer TutTV_1_map
-    farpointer TutTV_1_map_extended
+    farpointer TutTV_1_blockmap
+    farpointer TutTV_1_blockmap_hi
     farpointer TutTV_1_tileset
     farpointer TutTV_1_blockset
     farpointer TutTV_1_collision
@@ -354,8 +354,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer TutTV_collectible_list
     map_geometry  39,  19, LEVEL_TUT_TV, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_6f67_MapData_TutTV2:
-    farpointer TutTV_2_map
-    farpointer TutTV_2_map_extended
+    farpointer TutTV_2_blockmap
+    farpointer TutTV_2_blockmap_hi
     farpointer TutTV_2_tileset
     farpointer TutTV_2_blockset
     farpointer TutTV_2_collision
@@ -365,8 +365,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer TutTV_collectible_list
     map_geometry  52,  51, LEVEL_TUT_TV, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_6f86_MapData_TutTV3:
-    farpointer TutTV_3_map
-    farpointer TutTV_3_map_extended
+    farpointer TutTV_3_blockmap
+    farpointer TutTV_3_blockmap_hi
     farpointer TutTV_3_tileset
     farpointer TutTV_3_blockset
     farpointer TutTV_3_collision
@@ -376,8 +376,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer TutTV_collectible_list
     map_geometry 100,  23, LEVEL_TUT_TV, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_6fa5_MapData_TutTV4:
-    farpointer TutTV_4_map
-    farpointer TutTV_4_map_extended
+    farpointer TutTV_4_blockmap
+    farpointer TutTV_4_blockmap_hi
     farpointer TutTV_4_tileset
     farpointer TutTV_4_blockset
     farpointer TutTV_4_collision
@@ -387,8 +387,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer TutTV_collectible_list
     map_geometry  74,  19, LEVEL_TUT_TV, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_6fc4_MapData_TutTV5:
-    farpointer TutTV_5_map
-    farpointer TutTV_5_map_extended
+    farpointer TutTV_5_blockmap
+    farpointer TutTV_5_blockmap_hi
     farpointer TutTV_5_tileset
     farpointer TutTV_5_blockset
     farpointer TutTV_5_collision
@@ -398,8 +398,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer TutTV_collectible_list
     map_geometry  10,   9, LEVEL_TUT_TV, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_6fe3_MapData_TutTV6:
-    farpointer TutTV_6_map
-    farpointer TutTV_6_map_extended
+    farpointer TutTV_6_blockmap
+    farpointer TutTV_6_blockmap_hi
     farpointer TutTV_6_tileset
     farpointer TutTV_6_blockset
     farpointer TutTV_6_collision
@@ -409,8 +409,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer TutTV_collectible_list
     map_geometry  20,   9, LEVEL_TUT_TV, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_7002_MapData_TutTV7:
-    farpointer TutTV_7_map
-    farpointer TutTV_7_map_extended
+    farpointer TutTV_7_blockmap
+    farpointer TutTV_7_blockmap_hi
     farpointer TutTV_7_tileset
     farpointer TutTV_7_blockset
     farpointer TutTV_7_collision
@@ -420,8 +420,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer TutTV_collectible_list
     map_geometry  50,  25, LEVEL_TUT_TV, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_7021_MapData_WesternStation1:
-    farpointer WesternStation_1_map
-    farpointer WesternStation_1_map_extended
+    farpointer WesternStation_1_blockmap
+    farpointer WesternStation_1_blockmap_hi
     farpointer WesternStation_1_tileset
     farpointer WesternStation_1_blockset
     farpointer WesternStation_1_collision
@@ -431,8 +431,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer WesternStation_collectible_list
     map_geometry  40,  22, LEVEL_WESTERN_STATION, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_7040_MapData_WesternStation2:
-    farpointer WesternStation_2_map
-    farpointer WesternStation_2_map_extended
+    farpointer WesternStation_2_blockmap
+    farpointer WesternStation_2_blockmap_hi
     farpointer WesternStation_2_tileset
     farpointer WesternStation_2_blockset
     farpointer WesternStation_2_collision
@@ -442,8 +442,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer WesternStation_collectible_list
     map_geometry  38,  22, LEVEL_WESTERN_STATION, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_705f_MapData_WesternStation3:
-    farpointer WesternStation_3_map
-    farpointer WesternStation_3_map_extended
+    farpointer WesternStation_3_blockmap
+    farpointer WesternStation_3_blockmap_hi
     farpointer WesternStation_3_tileset
     farpointer WesternStation_3_blockset
     farpointer WesternStation_3_collision
@@ -453,8 +453,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer WesternStation_collectible_list
     map_geometry  20,  11, LEVEL_WESTERN_STATION, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_707e_MapData_WesternStation4:
-    farpointer WesternStation_4_map
-    farpointer WesternStation_4_map_extended
+    farpointer WesternStation_4_blockmap
+    farpointer WesternStation_4_blockmap_hi
     farpointer WesternStation_4_tileset
     farpointer WesternStation_4_blockset
     farpointer WesternStation_4_collision
@@ -464,8 +464,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer WesternStation_collectible_list
     map_geometry  10,  18, LEVEL_WESTERN_STATION, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_709d_MapData_WesternStation5:
-    farpointer WesternStation_5_map
-    farpointer WesternStation_5_map_extended
+    farpointer WesternStation_5_blockmap
+    farpointer WesternStation_5_blockmap_hi
     farpointer WesternStation_5_tileset
     farpointer WesternStation_5_blockset
     farpointer WesternStation_5_collision
@@ -475,8 +475,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer WesternStation_collectible_list
     map_geometry  80,  18, LEVEL_WESTERN_STATION, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_70bc_MapData_WesternStation6:
-    farpointer WesternStation_6_map
-    farpointer WesternStation_6_map_extended
+    farpointer WesternStation_6_blockmap
+    farpointer WesternStation_6_blockmap_hi
     farpointer WesternStation_6_tileset
     farpointer WesternStation_6_blockset
     farpointer WesternStation_6_collision
@@ -486,8 +486,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer WesternStation_collectible_list
     map_geometry 125,  51, LEVEL_WESTERN_STATION, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_70db_MapData_WesternStation7:
-    farpointer WesternStation_4_map
-    farpointer WesternStation_4_map_extended
+    farpointer WesternStation_4_blockmap
+    farpointer WesternStation_4_blockmap_hi
     farpointer WesternStation_4_tileset
     farpointer WesternStation_4_blockset
     farpointer WesternStation_4_collision
@@ -497,8 +497,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer WesternStation_collectible_list
     map_geometry  10,  18, LEVEL_WESTERN_STATION, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_70fa_MapData_WesternStation8:
-    farpointer WesternStation_4_map
-    farpointer WesternStation_4_map_extended
+    farpointer WesternStation_4_blockmap
+    farpointer WesternStation_4_blockmap_hi
     farpointer WesternStation_4_tileset
     farpointer WesternStation_4_blockset
     farpointer WesternStation_4_collision
@@ -508,8 +508,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer WesternStation_collectible_list
     map_geometry  10,  18, LEVEL_WESTERN_STATION, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_7119_MapData_WesternStation9:
-    farpointer WesternStation_4_map
-    farpointer WesternStation_4_map_extended
+    farpointer WesternStation_4_blockmap
+    farpointer WesternStation_4_blockmap_hi
     farpointer WesternStation_4_tileset
     farpointer WesternStation_4_blockset
     farpointer WesternStation_4_collision
@@ -519,8 +519,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer WesternStation_collectible_list
     map_geometry  10,  18, LEVEL_WESTERN_STATION, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_7138_MapData_AnimeChannel1:     
-    farpointer AnimeChannel_1_map
-    farpointer AnimeChannel_1_map_extended
+    farpointer AnimeChannel_1_blockmap
+    farpointer AnimeChannel_1_blockmap_hi
     farpointer AnimeChannel_1_tileset
     farpointer AnimeChannel_1_blockset
     farpointer AnimeChannel_1_collision
@@ -530,8 +530,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer AnimeChannel_collectible_list
     map_geometry  62,  30, LEVEL_ANIME_CHANNEL, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_7157_MapData_AnimeChannel2:
-    farpointer AnimeChannel_2_map
-    farpointer AnimeChannel_2_map_extended
+    farpointer AnimeChannel_2_blockmap
+    farpointer AnimeChannel_2_blockmap_hi
     farpointer AnimeChannel_2_tileset
     farpointer AnimeChannel_2_blockset
     farpointer AnimeChannel_2_collision
@@ -541,8 +541,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer AnimeChannel_collectible_list
     map_geometry  48,  30, LEVEL_ANIME_CHANNEL, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_7176_MapData_AnimeChannel3:
-    farpointer AnimeChannel_3_map
-    farpointer AnimeChannel_3_map_extended
+    farpointer AnimeChannel_3_blockmap
+    farpointer AnimeChannel_3_blockmap_hi
     farpointer AnimeChannel_3_tileset
     farpointer AnimeChannel_3_blockset
     farpointer AnimeChannel_3_collision
@@ -552,8 +552,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer AnimeChannel_collectible_list
     map_geometry  56,  19, LEVEL_ANIME_CHANNEL, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_7195_MapData_AnimeChannel4:
-    farpointer AnimeChannel_4_map
-    farpointer AnimeChannel_4_map_extended
+    farpointer AnimeChannel_4_blockmap
+    farpointer AnimeChannel_4_blockmap_hi
     farpointer AnimeChannel_4_tileset
     farpointer AnimeChannel_4_blockset
     farpointer AnimeChannel_4_collision
@@ -563,8 +563,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer AnimeChannel_collectible_list
     map_geometry  94,  42, LEVEL_ANIME_CHANNEL, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_71b4_MapData_AnimeChannel5:
-    farpointer AnimeChannel_5_map
-    farpointer AnimeChannel_5_map_extended
+    farpointer AnimeChannel_5_blockmap
+    farpointer AnimeChannel_5_blockmap_hi
     farpointer AnimeChannel_5_tileset
     farpointer AnimeChannel_5_blockset
     farpointer AnimeChannel_5_collision
@@ -574,8 +574,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer AnimeChannel_collectible_list
     map_geometry 245,  22, LEVEL_ANIME_CHANNEL, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_71d3_MapData_AnimeChannel6:
-    farpointer AnimeChannel_6_map
-    farpointer AnimeChannel_6_map_extended
+    farpointer AnimeChannel_6_blockmap
+    farpointer AnimeChannel_6_blockmap_hi
     farpointer AnimeChannel_6_tileset
     farpointer AnimeChannel_6_blockset
     farpointer AnimeChannel_6_collision
@@ -585,8 +585,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer AnimeChannel_collectible_list
     map_geometry  30,  51, LEVEL_ANIME_CHANNEL, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_71f2_MapData_AnimeChannel7:
-    farpointer AnimeChannel_6_map
-    farpointer AnimeChannel_6_map_extended
+    farpointer AnimeChannel_6_blockmap
+    farpointer AnimeChannel_6_blockmap_hi
     farpointer AnimeChannel_6_tileset
     farpointer AnimeChannel_6_blockset
     farpointer AnimeChannel_6_collision
@@ -596,8 +596,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer AnimeChannel_collectible_list
     map_geometry  30,  51, LEVEL_ANIME_CHANNEL, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_7211_MapData_AnimeChannel8:
-    farpointer AnimeChannel_6_map
-    farpointer AnimeChannel_6_map_extended
+    farpointer AnimeChannel_6_blockmap
+    farpointer AnimeChannel_6_blockmap_hi
     farpointer AnimeChannel_6_tileset
     farpointer AnimeChannel_6_blockset
     farpointer AnimeChannel_6_collision
@@ -607,8 +607,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer AnimeChannel_collectible_list
     map_geometry  30,  51, LEVEL_ANIME_CHANNEL, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_7230_MapData_AnimeChannel9:
-    farpointer AnimeChannel_5_map
-    farpointer AnimeChannel_5_map_extended
+    farpointer AnimeChannel_5_blockmap
+    farpointer AnimeChannel_5_blockmap_hi
     farpointer AnimeChannel_5_tileset
     farpointer AnimeChannel_5_blockset
     farpointer AnimeChannel_5_collision
@@ -618,8 +618,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer AnimeChannel_collectible_list
     map_geometry 245,  22, LEVEL_ANIME_CHANNEL, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_724f_MapData_SuperheroShow1:
-    farpointer SuperheroShow_1_map
-    farpointer SuperheroShow_1_map_extended
+    farpointer SuperheroShow_1_blockmap
+    farpointer SuperheroShow_1_blockmap_hi
     farpointer SuperheroShow_1_tileset
     farpointer SuperheroShow_1_blockset
     farpointer SuperheroShow_1_collision
@@ -629,8 +629,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer SuperheroShow_collectible_list
     map_geometry 191,  30, LEVEL_SUPERHERO_SHOW, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_726e_MapData_SuperheroShow2:
-    farpointer SuperheroShow_2_map
-    farpointer SuperheroShow_2_map_extended
+    farpointer SuperheroShow_2_blockmap
+    farpointer SuperheroShow_2_blockmap_hi
     farpointer SuperheroShow_2_tileset
     farpointer SuperheroShow_2_blockset
     farpointer SuperheroShow_2_collision
@@ -640,8 +640,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer SuperheroShow_collectible_list
     map_geometry 194,  68, LEVEL_SUPERHERO_SHOW, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_728d_MapData_SuperheroShow3:
-    farpointer SuperheroShow_3_map
-    farpointer SuperheroShow_3_map_extended
+    farpointer SuperheroShow_3_blockmap
+    farpointer SuperheroShow_3_blockmap_hi
     farpointer SuperheroShow_3_tileset
     farpointer SuperheroShow_3_blockset
     farpointer SuperheroShow_3_collision
@@ -651,8 +651,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer SuperheroShow_collectible_list
     map_geometry  67,  30, LEVEL_SUPERHERO_SHOW, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_72ac_MapData_SuperheroShow4:
-    farpointer SuperheroShow_4_map
-    farpointer SuperheroShow_4_map_extended
+    farpointer SuperheroShow_4_blockmap
+    farpointer SuperheroShow_4_blockmap_hi
     farpointer SuperheroShow_4_tileset
     farpointer SuperheroShow_4_blockset
     farpointer SuperheroShow_4_collision
@@ -662,8 +662,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer SuperheroShow_collectible_list
     map_geometry  96,  30, LEVEL_SUPERHERO_SHOW, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_72cb_MapData_SuperheroShow5:
-    farpointer SuperheroShow_5_map
-    farpointer SuperheroShow_5_map_extended
+    farpointer SuperheroShow_5_blockmap
+    farpointer SuperheroShow_5_blockmap_hi
     farpointer SuperheroShow_5_tileset
     farpointer SuperheroShow_5_blockset
     farpointer SuperheroShow_5_collision
@@ -673,8 +673,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer SuperheroShow_collectible_list
     map_geometry  48,  34, LEVEL_SUPERHERO_SHOW, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_72ea_MapData_SuperheroShow6:
-    farpointer SuperheroShow_6_map
-    farpointer SuperheroShow_6_map_extended
+    farpointer SuperheroShow_6_blockmap
+    farpointer SuperheroShow_6_blockmap_hi
     farpointer SuperheroShow_6_tileset
     farpointer SuperheroShow_6_blockset
     farpointer SuperheroShow_6_collision
@@ -684,8 +684,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer SuperheroShow_collectible_list
     map_geometry  10,   8, LEVEL_SUPERHERO_SHOW, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_7309_MapData_GextremeSports1:
-    farpointer GextremeSports_1_map
-    farpointer GextremeSports_1_map_extended
+    farpointer GextremeSports_1_blockmap
+    farpointer GextremeSports_1_blockmap_hi
     farpointer GextremeSports_1_tileset
     farpointer GextremeSports_1_blockset
     farpointer GextremeSports_1_collision
@@ -695,8 +695,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer GextremeSports_collectible_list
     map_geometry  48,  48, LEVEL_GEXTREME_SPORTS, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_7328_MapData_GextremeSports2:
-    farpointer HolidayTV_2_map
-    farpointer HolidayTV_2_map_extended
+    farpointer HolidayTV_2_blockmap
+    farpointer HolidayTV_2_blockmap_hi
     farpointer HolidayTV_2_tileset
     farpointer HolidayTV_2_blockset
     farpointer HolidayTV_2_collision
@@ -706,8 +706,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer GextremeSports_collectible_list
     map_geometry  20,  22, LEVEL_GEXTREME_SPORTS, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_7347_MapData_GextremeSports3:
-    farpointer HolidayTV_2_map
-    farpointer HolidayTV_2_map_extended
+    farpointer HolidayTV_2_blockmap
+    farpointer HolidayTV_2_blockmap_hi
     farpointer HolidayTV_2_tileset
     farpointer HolidayTV_2_blockset
     farpointer HolidayTV_2_collision
@@ -717,8 +717,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer GextremeSports_collectible_list
     map_geometry  20,  22, LEVEL_GEXTREME_SPORTS, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_7366_MapData_GextremeSports4:
-    farpointer HolidayTV_2_map
-    farpointer HolidayTV_2_map_extended
+    farpointer HolidayTV_2_blockmap
+    farpointer HolidayTV_2_blockmap_hi
     farpointer HolidayTV_2_tileset
     farpointer HolidayTV_2_blockset
     farpointer HolidayTV_2_collision
@@ -728,8 +728,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer GextremeSports_collectible_list
     map_geometry  20,  22, LEVEL_GEXTREME_SPORTS, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_7385_MapData_MarsupialMadness1:
-    farpointer MarsupialMadness_1_map
-    farpointer MarsupialMadness_1_map_extended
+    farpointer MarsupialMadness_1_blockmap
+    farpointer MarsupialMadness_1_blockmap_hi
     farpointer MarsupialMadness_1_tileset
     farpointer MarsupialMadness_1_blockset
     farpointer MarsupialMadness_1_collision
@@ -739,8 +739,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MarsupialMadness_collectible_list
     map_geometry  32,  66, LEVEL_MARSUPIAL_MADNESS, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_73a4_MapData_WWGexWrestling1:
-    farpointer WWGexWrestling_1_map
-    farpointer WWGexWrestling_1_map_extended
+    farpointer WWGexWrestling_1_blockmap
+    farpointer WWGexWrestling_1_blockmap_hi
     farpointer WWGexWrestling_1_tileset
     farpointer WWGexWrestling_1_blockset
     farpointer WWGexWrestling_1_collision
@@ -750,8 +750,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer WWGexWrestling_collectible_list
     map_geometry  24,  18, LEVEL_WW_GEX_WRESTLING, BG_COLLISION_TYPE_TOPDOWN
 .data_03_73c3_MapData_LizardOfOz1:
-    farpointer LizardOfOz_1_map
-    farpointer LizardOfOz_1_map_extended
+    farpointer LizardOfOz_1_blockmap
+    farpointer LizardOfOz_1_blockmap_hi
     farpointer LizardOfOz_1_tileset
     farpointer LizardOfOz_1_blockset
     farpointer LizardOfOz_1_collision
@@ -761,8 +761,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer LizardOfOz_collectible_list
     map_geometry  15,   8, LEVEL_LIZARD_OF_OZ, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_73e2_MapData_ChannelZ1:
-    farpointer ChannelZ_1_map
-    farpointer ChannelZ_1_map_extended
+    farpointer ChannelZ_1_blockmap
+    farpointer ChannelZ_1_blockmap_hi
     farpointer ChannelZ_1_tileset
     farpointer ChannelZ_1_blockset
     farpointer ChannelZ_1_collision
@@ -772,8 +772,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer ChannelZ_collectible_list
     map_geometry  40,  56, LEVEL_CHANNEL_Z, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_7401_MapData_ChannelZ2:
-    farpointer ChannelZ_2_map
-    farpointer ChannelZ_2_map_extended
+    farpointer ChannelZ_2_blockmap
+    farpointer ChannelZ_2_blockmap_hi
     farpointer ChannelZ_2_tileset
     farpointer ChannelZ_2_blockset
     farpointer ChannelZ_2_collision
@@ -783,8 +783,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer ChannelZ_collectible_list
     map_geometry  31,  17, LEVEL_CHANNEL_Z, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_7420_MapData_ChannelZ3:
-    farpointer ChannelZ_3_map
-    farpointer ChannelZ_3_map_extended
+    farpointer ChannelZ_3_blockmap
+    farpointer ChannelZ_3_blockmap_hi
     farpointer ChannelZ_3_tileset
     farpointer ChannelZ_3_blockset
     farpointer ChannelZ_3_collision
@@ -794,8 +794,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer ChannelZ_collectible_list
     map_geometry  40,  32, LEVEL_CHANNEL_Z, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_743f_MapData_ChannelZ4:
-    farpointer ChannelZ_4_map
-    farpointer ChannelZ_4_map_extended
+    farpointer ChannelZ_4_blockmap
+    farpointer ChannelZ_4_blockmap_hi
     farpointer ChannelZ_4_tileset
     farpointer ChannelZ_4_blockset
     farpointer ChannelZ_4_collision
@@ -805,8 +805,8 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer ChannelZ_collectible_list
     map_geometry  40,  32, LEVEL_CHANNEL_Z, BG_COLLISION_TYPE_SIDESCROLLER
 .data_03_745e_MapData_ChannelZ5:
-    farpointer ChannelZ_5_map
-    farpointer ChannelZ_5_map_extended
+    farpointer ChannelZ_5_blockmap
+    farpointer ChannelZ_5_blockmap_hi
     farpointer ChannelZ_5_tileset
     farpointer ChannelZ_5_blockset
     farpointer ChannelZ_5_collision

@@ -828,23 +828,23 @@ wDBFF_BgMap_PrevRow:
 ;
 ; gex2 keeps the same idea in wD6F5-wD700, but with far fewer layers: it has a
 ; blockmap, one "alt blockset" flag layer, a combined blockset+collision bank
-; and a tileset. gex3 splits them into six independent streams - map, extended
-; map, blockset, collision map, collision blockset, tileset - which is what lets
-; a gex3 map be any size and use more than 256 distinct blocks.
+; and a tileset. gex3 splits them into six independent streams - blockmap,
+; blockmap hi, blockset, collision map, collision blockset, tileset - which is
+; what lets a gex3 map be any size and use more than 256 distinct blocks.
 ; ------------------------------------------------------------------
-wDC01_MapBank:
+wDC01_BlockmapBank:
 ; Blockmap: one byte per 16x16 block, rows are wDC1C_CurrentMapWidthAndHeightInBlocks
 ; bytes apart. Supplies the LOW byte of the block id
     ds 1                                               ;; dc01
-wDC02_MapBankOffset:
+wDC02_BlockmapBankOffset:
     ds 2                                               ;; dc02
-wDC04_MapExtendedBank:
-; Extended blockmap, laid out exactly like the blockmap above and read in the
-; same sweep. Supplies the HIGH byte of the block id, so a map can address more
-; than 256 blocks. gex2 has a same-shaped second layer but uses it as a one-bit
-; "alt blockset" selector instead
+wDC04_BlockmapHiBank:
+; The blockmap's high plane, laid out exactly like the blockmap above and read in
+; the same sweep. Supplies the HIGH byte of the block id, so a map can address
+; more than 256 blocks. gex2 has a same-shaped second layer but uses it as a
+; one-bit "alt blockset" selector instead - see alt_blockset_flags there
     ds 1                                               ;; dc04
-wDC05_MapExtendedBankOffset:
+wDC05_BlockmapHiBankOffset:
     ds 2                                               ;; dc05
 wDC07_TilesetBank:
     ds 1                                               ;; dc07

@@ -206,10 +206,10 @@ def remove_trailing_zeros(my_bytes):
     return my_bytes
 
 # enum for level_data
-MAP_BANK = 0
-MAP_BANK_OFFSET = 1
-EXTENDED_MAP_BANK = 2
-EXTENDED_MAP_BANK_OFFSET = 3
+BLOCKMAP_BANK = 0
+BLOCKMAP_BANK_OFFSET = 1
+BLOCKMAP_HI_BANK = 2
+BLOCKMAP_HI_BANK_OFFSET = 3
 TILESET_BANK = 4
 TILESET_BANK_OFFSET = 5
 BLOCKSET_AND_PALETTE_IDS_BANK = 6
@@ -244,7 +244,7 @@ level_data_pointers = struct.unpack("<"+"H"*61, bank03_data[0x2ca0:0x2d1a])
 
 # loop through the pointers and get data for each
 blockset_offsets = [] # list of banks and offsets in the blockset banks
-map_offsets = []
+blockmap_offsets = []
 tileset_offsets = []
 collectible_list_offsets = []
 entity_list_offsets = []
@@ -255,8 +255,8 @@ for level_counter in range(0, len(level_data_pointers)):
     level_data = struct.unpack("<BHBHBHBHBHBHBHBHBHBBBB", bank03_data[p-0x4000:p-0x4000+0x1F])
     if [level_data[BLOCKSET_AND_PALETTE_IDS_BANK], level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]] not in blockset_offsets:
         blockset_offsets.append([level_data[BLOCKSET_AND_PALETTE_IDS_BANK], level_data[BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET]])
-    if [level_data[MAP_BANK], level_data[MAP_BANK_OFFSET]] not in map_offsets:
-        map_offsets.append([level_data[MAP_BANK], level_data[MAP_BANK_OFFSET]])
+    if [level_data[BLOCKMAP_BANK], level_data[BLOCKMAP_BANK_OFFSET]] not in blockmap_offsets:
+        blockmap_offsets.append([level_data[BLOCKMAP_BANK], level_data[BLOCKMAP_BANK_OFFSET]])
     if [level_data[TILESET_BANK], level_data[TILESET_BANK_OFFSET]] not in tileset_offsets:
         tileset_offsets.append([level_data[TILESET_BANK], level_data[TILESET_BANK_OFFSET]])
     if [level_data[COLLECTIBLE_LIST_BANK], level_data[COLLECTIBLE_LIST_BANK_OFFSET]] not in collectible_list_offsets:
@@ -272,8 +272,8 @@ sorted_blockset_offsets = sorted(blockset_offsets, key=lambda x: (x[0], x[1]))
 #    print(f"{b[0]:0{2}x}"+": "+f"{b[1]:0{4}x}")
 
 #print("\nMap Offsets:")
-sorted_map_offsets = sorted(map_offsets, key=lambda x: (x[0], x[1]))
-#for b in sorted_map_offsets:
+sorted_blockmap_offsets = sorted(blockmap_offsets, key=lambda x: (x[0], x[1]))
+#for b in sorted_blockmap_offsets:
 #    print(f"{b[0]:0{2}x}"+": "+f"{b[1]:0{4}x}")
 
 #print("\nTileset Offsets:")
@@ -356,10 +356,10 @@ if split_map_data:
         height = level_data[MAP_HEIGHT]
         level_id = level_data[LEVEL_ID]
         unknown = level_data[UNKNOWN]
-        offset = level_data[MAP_BANK_OFFSET]
+        offset = level_data[BLOCKMAP_BANK_OFFSET]
 
-        map_file = "../banks/bank_0"+f"{level_data[MAP_BANK]:x}"+".bin"
-        map_data = open(map_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
+        blockmap_file = "../banks/bank_0"+f"{level_data[BLOCKMAP_BANK]:x}"+".bin"
+        blockmap_data = open(blockmap_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
 
         palette_file = "../banks/bank_0"+f"{level_data[BG_PALETTE_BANK]:x}"+".bin"
         palette_data = open(palette_file, 'rb').read()[level_data[BG_PALETTE_BANK_OFFSET]-0x4000:level_data[BG_PALETTE_BANK_OFFSET]-0x4000+0x40]
@@ -369,8 +369,8 @@ if split_map_data:
         channel_map_number = str(level_numbers[level_data[LEVEL_ID]])
 
         print("Starting: "+level_name+str(level_numbers[level_data[LEVEL_ID]]))
-        '''if map_data not in maps:
-            maps.append(map_data)'''
+        '''if blockmap_data not in maps:
+            maps.append(blockmap_data)'''
             
         os.system('mkdir -p extracted_map_data/'+level_name)
         os.system('mkdir -p extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number)
@@ -403,19 +403,19 @@ if split_map_data:
         out2.write(level_name+'_'+channel_map_number+'_blockset:\n    INCBIN \"data/maps/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_blockset.bin\"\n')
         out2.close()
 
-        # map
-        out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_map.bin', "wb")
-        out.write(map_data)
+        # blockmap
+        out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_blockmap.bin', "wb")
+        out.write(blockmap_data)
         out.close()
         out2 = open('extracted_map_data/maps.txt', "a")
-        out2.write(level_name+'_'+channel_map_number+'_map:\n    INCBIN \"data/maps/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_map.bin\"\n')
+        out2.write(level_name+'_'+channel_map_number+'_blockmap:\n    INCBIN \"data/maps/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_blockmap.bin\"\n')
         out2.close()
 
-        # extended map
-        extended_map_file = "../banks/bank_0"+f"{level_data[EXTENDED_MAP_BANK]:x}"+".bin"
-        extended_map_data = open(extended_map_file, "rb").read()[level_data[EXTENDED_MAP_BANK_OFFSET]-0x4000:offset-0x4000+width*height]
-        out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_extended.bin', "wb")
-        out.write(extended_map_data)
+        # blockmap hi
+        blockmap_hi_file = "../banks/bank_0"+f"{level_data[BLOCKMAP_HI_BANK]:x}"+".bin"
+        blockmap_hi_data = open(blockmap_hi_file, "rb").read()[level_data[BLOCKMAP_HI_BANK_OFFSET]-0x4000:offset-0x4000+width*height]
+        out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_blockmap_hi.bin', "wb")
+        out.write(blockmap_hi_data)
         out.close()
 
         # map collision
@@ -484,10 +484,10 @@ if split_map_data:
         # create map metadata file
         out2 = open('extracted_map_data/map_metadata.txt', "a")
         out2.write('.data_03_9999_LevelData'+level_name+channel_map_number+':\n')
-        out2.write('    db   BANK('+level_name+'_'+channel_map_number+'_map)\n')
-        out2.write('    dw   '+level_name+'_'+channel_map_number+'_map\n')
-        out2.write('    db   BANK('+level_name+'_'+channel_map_number+'_map_extended)\n')
-        out2.write('    dw   '+level_name+'_'+channel_map_number+'_map_extended\n')
+        out2.write('    db   BANK('+level_name+'_'+channel_map_number+'_blockmap)\n')
+        out2.write('    dw   '+level_name+'_'+channel_map_number+'_blockmap\n')
+        out2.write('    db   BANK('+level_name+'_'+channel_map_number+'_blockmap_hi)\n')
+        out2.write('    dw   '+level_name+'_'+channel_map_number+'_blockmap_hi\n')
         out2.write('    db   BANK('+level_name+'_'+channel_map_number+'_tileset)\n')
         out2.write('    dw   '+level_name+'_'+channel_map_number+'_tileset\n')
         out2.write('    db   BANK('+level_name+'_'+channel_map_number+'_blockset)\n')
@@ -525,12 +525,12 @@ if generate_regular_maps:
 
         width = level_data[MAP_WIDTH]
         height = level_data[MAP_HEIGHT]
-        offset = level_data[MAP_BANK_OFFSET]
+        offset = level_data[BLOCKMAP_BANK_OFFSET]
 
         level_name = level_names[level_data[LEVEL_ID]]
 
-        map_file = "../banks/bank_0"+f"{level_data[MAP_BANK]:x}"+".bin"
-        map_data = open(map_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
+        blockmap_file = "../banks/bank_0"+f"{level_data[BLOCKMAP_BANK]:x}"+".bin"
+        blockmap_data = open(blockmap_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
 
         palette_file = "../banks/bank_0"+f"{level_data[BG_PALETTE_BANK]:x}"+".bin"
         palette_data = open(palette_file, 'rb').read()[level_data[BG_PALETTE_BANK_OFFSET]-0x4000:level_data[BG_PALETTE_BANK_OFFSET]-0x4000+0x40]
@@ -594,7 +594,7 @@ if generate_regular_maps:
         # build map from map data and blockset
         width = level_data[MAP_WIDTH]
         height = level_data[MAP_HEIGHT]
-        offset = level_data[MAP_BANK_OFFSET]
+        offset = level_data[BLOCKMAP_BANK_OFFSET]
 
         os.system('mkdir -p map_images')
         os.system('mkdir -p map_images/'+level_name)
@@ -605,20 +605,20 @@ if generate_regular_maps:
         if draw_entities_and_collectibles:
             map_image_path = "./map_images_with_entities/"
 
-        map_file = "../banks/bank_0"+f"{level_data[MAP_BANK]:x}"+".bin"
-        map_data = open(map_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
+        blockmap_file = "../banks/bank_0"+f"{level_data[BLOCKMAP_BANK]:x}"+".bin"
+        blockmap_data = open(blockmap_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
         
-        extended_map_file = "../banks/bank_0"+f"{level_data[EXTENDED_MAP_BANK]:x}"+".bin"
-        extended_map_data = open(extended_map_file, "rb").read()[level_data[EXTENDED_MAP_BANK_OFFSET]-0x4000:]
+        blockmap_hi_file = "../banks/bank_0"+f"{level_data[BLOCKMAP_HI_BANK]:x}"+".bin"
+        blockmap_hi_data = open(blockmap_hi_file, "rb").read()[level_data[BLOCKMAP_HI_BANK_OFFSET]-0x4000:]
 
         count = 0
         img = PIL.Image.new("RGB", (16*width, 16*height))
         draw = PIL.ImageDraw.Draw(img)
         for y in range(0, height):
             for x in range(0, width):
-                #draw.rectangle(((x*16,y*16), ((x+1)*16,(y+1)*16)), map_data[count],3)
+                #draw.rectangle(((x*16,y*16), ((x+1)*16,(y+1)*16)), blockmap_data[count],3)
                 
-                img.paste(blocks[map_data[count] + 0x100 * extended_map_data[count]], (x*16, y*16))
+                img.paste(blocks[blockmap_data[count] + 0x100 * blockmap_hi_data[count]], (x*16, y*16))
                 
                 count = count+1
 
@@ -760,7 +760,7 @@ if generate_collision_maps:
         # build map from map data and blockset
         width = level_data[MAP_WIDTH]
         height = level_data[MAP_HEIGHT]
-        offset = level_data[MAP_BANK_OFFSET]
+        offset = level_data[BLOCKMAP_BANK_OFFSET]
 
         os.system('mkdir -p map_collision_images')
         os.system('mkdir -p map_collision_images/'+level_name)
@@ -775,7 +775,7 @@ if generate_collision_maps:
         draw = PIL.ImageDraw.Draw(img)
         for y in range(0, height):
             for x in range(0, width):
-                #draw.rectangle(((x*16,y*16), ((x+1)*16,(y+1)*16)), map_data[count],3)
+                #draw.rectangle(((x*16,y*16), ((x+1)*16,(y+1)*16)), blockmap_data[count],3)
                 
                 #print(count)
                 img.paste(blocks[map_collision_data[count]], (x*16, y*16))

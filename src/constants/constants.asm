@@ -1437,8 +1437,9 @@ DEF BG_COLLISION_TYPE_TOPDOWN       EQU $01
 ; Map descriptors and boundaries - code/bank03_map_init_data.asm and
 ; code/bank03_map_boundaries_and_spawns.asm
 ; ------------------------------------------------------------------
-; One descriptor per map, copied wholesale into wDC01_MapBank..wDC1F on a map load:
-; nine farpointers naming where the map's data lives, then four bytes of geometry
+; One descriptor per map, copied wholesale into wDC01_BlockmapBank..wDC1F on a map
+; load: nine farpointers naming where the map's data lives, then four bytes of
+; geometry
 DEF MAPDATA_RECORD_SIZE          EQU $1F
 
 ; A map's boundary record gives the CAMERA's travel. The player is allowed a little

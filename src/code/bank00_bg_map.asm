@@ -15,18 +15,18 @@
 ; a block as rowOffsetTable[block Y] + block X.
 ;
 ; Six ROM streams describe the map, each with its own bank and offset in the
-; wDC01_MapBank .. wDC11_CollisionBlocksetOffset block of WRAM:
+; wDC01_BlockmapBank .. wDC11_CollisionBlocksetOffset block of WRAM:
 ;
-;   map                 one byte per block - LOW byte of the block id
-;   extended map        one byte per block - HIGH byte of the block id
+;   blockmap            one byte per block - LOW byte of the block id
+;   blockmap hi         one byte per block - HIGH byte of the block id
 ;   blockset            8 bytes per block id: 4 tile ids, then the 4 matching
 ;                       GBC attribute bytes (palette, flips, VRAM bank)
 ;   collision map       one byte per block - which collision block sits there
 ;   collision blockset  4 bytes per collision block id: 4 collision tile ids
 ;   tileset             the tile graphics themselves
 ;
-; The map and extended map are two halves of one 16-bit block id, which is what
-; lets a single map use more than 256 distinct blocks. Collision is its own
+; The blockmap and blockmap hi are two halves of one 16-bit block id, which is
+; what lets a single map use more than 256 distinct blocks. Collision is its own
 ; parallel pair of layers rather than a property of the graphics, so the same
 ; scenery block can be solid in one place and passable in another.
 ;
@@ -448,8 +448,8 @@ call_00_11e5_BgMap_LoadRowForVerticalScroll:
 ;                                   (camera Y AND 8) ? 2 : 0
 ;
 ; Then it makes five passes, switching banks each time:
-;   1. map bank            11 block-id low bytes  -> scratch, stride 2
-;   2. extended map bank   11 block-id high bytes -> scratch, interleaved
+;   1. blockmap bank       11 block-id low bytes  -> scratch, stride 2
+;   2. blockmap hi bank    11 block-id high bytes -> scratch, interleaved
 ;   3. collision map bank  11 collision block ids -> wC000_BgMapTileIds
 ;   4. blockset bank       expand each 16-bit block id: tile ids overwrite the
 ;                          scratch entry in place, attribute bytes go to the
@@ -509,8 +509,8 @@ call_00_11e5_BgMap_LoadRowForVerticalScroll:
     ld   D, $00                                        ;; 00:1226 $16 $00
     push DE                                            ;; 00:1228 $d5                ; E = (camera Y AND 8) ? 2 : 0
     push DE                                            ;; 00:1229 $d5                ; popped again by passes 4 and 5
-    ; --- pass 1: block id low bytes from the map ---
-    ld   A, [wDC01_MapBank]                                    ;; 00:122a $fa $01 $dc
+    ; --- pass 1: block id low bytes from the blockmap ---
+    ld   A, [wDC01_BlockmapBank]                               ;; 00:122a $fa $01 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:122d $cd $ee $0e
     ld   HL, wDC28_BgMap_ScrollBlockY                                     ;; 00:1230 $21 $28 $dc
     ld   L, [HL]                                       ;; 00:1233 $6e
@@ -518,7 +518,7 @@ call_00_11e5_BgMap_LoadRowForVerticalScroll:
     ld   E, [HL]                                       ;; 00:1236 $5e
     inc  H                                             ;; 00:1237 $24
     ld   D, [HL]                                       ;; 00:1238 $56
-    ld   HL, wDC02_MapBankOffset                                     ;; 00:1239 $21 $02 $dc
+    ld   HL, wDC02_BlockmapBankOffset                                ;; 00:1239 $21 $02 $dc
     ld   A, [HL+]                                      ;; 00:123c $2a
     add  A, E                                          ;; 00:123d $83
     ld   E, A                                          ;; 00:123e $5f
@@ -544,8 +544,8 @@ call_00_11e5_BgMap_LoadRowForVerticalScroll:
     dec  B                                             ;; 00:1259 $05
     jr   NZ, .jr_00_1253                               ;; 00:125a $20 $f7
     call call_00_0f08_RestoreBank                                  ;; 00:125c $cd $08 $0f
-    ; --- pass 2: block id high bytes from the extended map, interleaved ---
-    ld   A, [wDC04_MapExtendedBank]                                    ;; 00:125f $fa $04 $dc
+    ; --- pass 2: block id high bytes from the blockmap hi plane, interleaved ---
+    ld   A, [wDC04_BlockmapHiBank]                                     ;; 00:125f $fa $04 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:1262 $cd $ee $0e
     ld   HL, wDC28_BgMap_ScrollBlockY                                     ;; 00:1265 $21 $28 $dc
     ld   L, [HL]                                       ;; 00:1268 $6e
@@ -553,7 +553,7 @@ call_00_11e5_BgMap_LoadRowForVerticalScroll:
     ld   E, [HL]                                       ;; 00:126b $5e
     inc  H                                             ;; 00:126c $24
     ld   D, [HL]                                       ;; 00:126d $56
-    ld   HL, wDC05_MapExtendedBankOffset                                     ;; 00:126e $21 $05 $dc
+    ld   HL, wDC05_BlockmapHiBankOffset                                      ;; 00:126e $21 $05 $dc
     ld   A, [HL+]                                      ;; 00:1271 $2a
     add  A, E                                          ;; 00:1272 $83
     ld   E, A                                          ;; 00:1273 $5f
@@ -788,7 +788,7 @@ call_00_1351_BgMap_LoadColumnForHorizontalScroll:
     push DE                                            ;; 00:139a $d5                ; E = (camera X AND 8) ? 1 : 0
     push DE                                            ;; 00:139b $d5                ; popped again by passes 4 and 5
     ; --- pass 1: block id low bytes from the map, one map row apart ---
-    ld   A, [wDC01_MapBank]                                    ;; 00:139c $fa $01 $dc
+    ld   A, [wDC01_BlockmapBank]                               ;; 00:139c $fa $01 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:139f $cd $ee $0e
     ld   HL, wDC28_BgMap_ScrollBlockY                                     ;; 00:13a2 $21 $28 $dc
     ld   L, [HL]                                       ;; 00:13a5 $6e
@@ -796,7 +796,7 @@ call_00_1351_BgMap_LoadColumnForHorizontalScroll:
     ld   E, [HL]                                       ;; 00:13a8 $5e
     inc  H                                             ;; 00:13a9 $24
     ld   D, [HL]                                       ;; 00:13aa $56
-    ld   HL, wDC02_MapBankOffset                                     ;; 00:13ab $21 $02 $dc
+    ld   HL, wDC02_BlockmapBankOffset                                ;; 00:13ab $21 $02 $dc
     ld   A, [HL+]                                      ;; 00:13ae $2a
     add  A, E                                          ;; 00:13af $83
     ld   E, A                                          ;; 00:13b0 $5f
@@ -828,8 +828,8 @@ call_00_1351_BgMap_LoadColumnForHorizontalScroll:
     dec  A                                             ;; 00:13d4 $3d
     jr   NZ, .jr_00_13cb                               ;; 00:13d5 $20 $f4
     call call_00_0f08_RestoreBank                                  ;; 00:13d7 $cd $08 $0f
-    ; --- pass 2: block id high bytes from the extended map, interleaved ---
-    ld   A, [wDC04_MapExtendedBank]                                    ;; 00:13da $fa $04 $dc
+    ; --- pass 2: block id high bytes from the blockmap hi plane, interleaved ---
+    ld   A, [wDC04_BlockmapHiBank]                                     ;; 00:13da $fa $04 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:13dd $cd $ee $0e
     ld   HL, wDC28_BgMap_ScrollBlockY                                     ;; 00:13e0 $21 $28 $dc
     ld   L, [HL]                                       ;; 00:13e3 $6e
@@ -837,7 +837,7 @@ call_00_1351_BgMap_LoadColumnForHorizontalScroll:
     ld   E, [HL]                                       ;; 00:13e6 $5e
     inc  H                                             ;; 00:13e7 $24
     ld   D, [HL]                                       ;; 00:13e8 $56
-    ld   HL, wDC05_MapExtendedBankOffset                                     ;; 00:13e9 $21 $05 $dc
+    ld   HL, wDC05_BlockmapHiBankOffset                                      ;; 00:13e9 $21 $05 $dc
     ld   A, [HL+]                                      ;; 00:13ec $2a
     add  A, E                                          ;; 00:13ed $83
     ld   E, A                                          ;; 00:13ee $5f
@@ -1347,7 +1347,7 @@ call_00_1a46_BgMap_LoadInitialRow:
     ld   A, [wDC33_BgMap_InitialLoadPass]                                    ;; 00:1a85 $fa $33 $dc
     bit  7, A                                          ;; 00:1a88 $cb $7f                ; BGMAP_PASS_COLLISION?
     jp   NZ, .jp_00_1b40                               ;; 00:1a8a $c2 $40 $1b
-    ld   A, [wDC01_MapBank]                                    ;; 00:1a8d $fa $01 $dc
+    ld   A, [wDC01_BlockmapBank]                               ;; 00:1a8d $fa $01 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:1a90 $cd $ee $0e
     ld   HL, wDC28_BgMap_ScrollBlockY                                     ;; 00:1a93 $21 $28 $dc
     ld   L, [HL]                                       ;; 00:1a96 $6e
@@ -1355,7 +1355,7 @@ call_00_1a46_BgMap_LoadInitialRow:
     ld   E, [HL]                                       ;; 00:1a99 $5e
     inc  H                                             ;; 00:1a9a $24
     ld   D, [HL]                                       ;; 00:1a9b $56
-    ld   HL, wDC02_MapBankOffset                                     ;; 00:1a9c $21 $02 $dc
+    ld   HL, wDC02_BlockmapBankOffset                                ;; 00:1a9c $21 $02 $dc
     ld   A, [HL+]                                      ;; 00:1a9f $2a
     add  A, E                                          ;; 00:1aa0 $83
     ld   E, A                                          ;; 00:1aa1 $5f
@@ -1381,7 +1381,7 @@ call_00_1a46_BgMap_LoadInitialRow:
     dec  B                                             ;; 00:1abc $05
     jr   NZ, .jr_00_1ab6                               ;; 00:1abd $20 $f7
     call call_00_0f08_RestoreBank                                  ;; 00:1abf $cd $08 $0f
-    ld   A, [wDC04_MapExtendedBank]                                    ;; 00:1ac2 $fa $04 $dc
+    ld   A, [wDC04_BlockmapHiBank]                                     ;; 00:1ac2 $fa $04 $dc
     call call_00_0eee_SwitchBank                                  ;; 00:1ac5 $cd $ee $0e
     ld   HL, wDC28_BgMap_ScrollBlockY                                     ;; 00:1ac8 $21 $28 $dc
     ld   L, [HL]                                       ;; 00:1acb $6e
@@ -1389,7 +1389,7 @@ call_00_1a46_BgMap_LoadInitialRow:
     ld   E, [HL]                                       ;; 00:1ace $5e
     inc  H                                             ;; 00:1acf $24
     ld   D, [HL]                                       ;; 00:1ad0 $56
-    ld   HL, wDC05_MapExtendedBankOffset                                     ;; 00:1ad1 $21 $05 $dc
+    ld   HL, wDC05_BlockmapHiBankOffset                                      ;; 00:1ad1 $21 $05 $dc
     ld   A, [HL+]                                      ;; 00:1ad4 $2a
     add  A, E                                          ;; 00:1ad5 $83
     ld   E, A                                          ;; 00:1ad6 $5f
