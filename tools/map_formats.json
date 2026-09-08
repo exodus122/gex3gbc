@@ -57,6 +57,11 @@
         "ENTITY_SPAWN_BOUNDINGBOX_YMIN_OFFSET / _YMAX_OFFSET appear swapped. Renaming",
         "those two constants is cosmetic and would leave `make check` passing."
       ],
+      "editor": {
+        "_doc": "Positions are world pixels. One list serves a whole level, so the editor shows only the records whose map_id is the map being edited.",
+        "x": "x", "y": "y", "units": "pixels",
+        "label": "id", "scope": "level", "map_field": "map_id", "colour": "#ff5f5f"
+      },
       "glob": "src/data/maps/*/*_entity_list.bin",
       "record_size": 16,
       "record_size_constant": "ENTITY_SPAWN_RECORD_SIZE",
@@ -85,6 +90,39 @@
       ]
     },
 
+    "collectible_list": {
+      "doc": [
+        "One level's collectibles, in 16x16-pixel grid cells. The third byte is the map",
+        "id - a gex3 level is many maps, which is the whole difference from gex2's",
+        "two-byte record.",
+        "",
+        "call_00_2f85_CollectibleList_LoadForCurrentLevel builds the same per-column",
+        "index tables gex2 does, and call_00_2f34_CountLevelCollectibleTotal walks this",
+        "list for the HUD denominator - counting until a record whose X is zero, then",
+        "adding the entities whose type drops a collectible when defeated.",
+        "",
+        "The terminating record is $00 $00 COLLECTIBLE_LIST_END; anything after it is",
+        "padding."
+      ],
+      "glob": "src/data/maps/*/*_collectible_list.bin",
+      "record_size": 3,
+      "record_size_constant": "COLLECTIBLE_RECORD_SIZE",
+      "terminator": { "value": 0 },
+      "index_comment": true,
+      "editor": {
+        "_doc": "Grid cells, not pixels. One list serves a level, so the editor shows only the records whose map id is the map being edited.",
+        "x": "grid_x", "y": "grid_y", "scale": 16,
+        "scope": "level", "map_field": "map_id", "colour": "#ffe14d"
+      },
+      "lines": [
+        { "emit": "db", "comment": "grid x, grid y, then the map it belongs to", "fields": [
+          { "at": 0, "name": "grid_x", "type": "u8" },
+          { "at": 1, "name": "grid_y", "type": "u8" },
+          { "at": 2, "name": "map_id", "type": "u8", "enum": "MAP_ID" }
+        ] }
+      ]
+    },
+
     "level_spawn_list": {
       "doc": [
         "One level's spawn points, indexed by spawn id. A door, a map edge or a checkpoint",
@@ -99,6 +137,11 @@
         "",
         "There is no terminator: nothing walks these lists, they are only indexed."
       ],
+      "editor": {
+        "_doc": "A level's spawn points. Each names the map it lands on, so the editor shows the ones belonging to the map being edited.",
+        "x": "x", "y": "y", "units": "pixels",
+        "label": "map_id", "scope": "level", "map_field": "map_id", "colour": "#ffd75f"
+      },
       "glob": ["src/data/maps/*/*_spawns.bin", "src/data/maps/spawns_none_stub.bin"],
       "record_size": 8,
       "record_size_constant": "MAP_SPAWN_ENTRY_SIZE",
@@ -131,6 +174,11 @@
         "",
         "Positions are world pixels. The list ends in MAP_DOOR_LIST_END."
       ],
+      "editor": {
+        "_doc": "One list per map, positions in world pixels. A door names the spawn id it warps to rather than a destination, so there is no link to draw.",
+        "x": "x", "y": "y", "units": "pixels",
+        "label": "spawn_id", "scope": "map", "colour": "#5fd7ff"
+      },
       "glob": "src/data/maps/*/*_doors.bin",
       "record_size": 6,
       "record_size_constant": "MAP_DOOR_ENTRY_SIZE",

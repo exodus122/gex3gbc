@@ -300,7 +300,9 @@ def render(data, asset, enums, bin_rel, asset_name, schema):
         out.append("")
 
     if trailing:
-        out.append(pad("db   " + term["constant"], None))
+        # a terminator only gets a name when the game has one for it
+        out.append(pad("db   " + (term.get("constant") or "$%02x" % term["value"]),
+                       None))
         if len(trailing) > 1:
             out.append(pad("db   " + ", ".join("$%02x" % b for b in trailing[1:]),
                            "unreachable, past the terminator"))

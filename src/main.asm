@@ -683,29 +683,29 @@ ChannelZ_4_palette:
 ChannelZ_5_palette:
     INCBIN "data/maps/ChannelZ/ChannelZ_5/ChannelZ_5_palette.bin"
 GexCave_collectible_list:
-    INCBIN "data/maps/GexCave/GexCave_collectible_list.bin"
+    INCLUDE "data/maps/GexCave/GexCave_collectible_list.asm"
 HolidayTV_collectible_list:
-    INCBIN "data/maps/HolidayTV/HolidayTV_collectible_list.bin"
+    INCLUDE "data/maps/HolidayTV/HolidayTV_collectible_list.asm"
 MysteryTV_collectible_list:
-    INCBIN "data/maps/MysteryTV/MysteryTV_collectible_list.bin"
+    INCLUDE "data/maps/MysteryTV/MysteryTV_collectible_list.asm"
 TutTV_collectible_list:
-    INCBIN "data/maps/TutTV/TutTV_collectible_list.bin"
+    INCLUDE "data/maps/TutTV/TutTV_collectible_list.asm"
 WesternStation_collectible_list:
-    INCBIN "data/maps/WesternStation/WesternStation_collectible_list.bin"
+    INCLUDE "data/maps/WesternStation/WesternStation_collectible_list.asm"
 AnimeChannel_collectible_list:
-    INCBIN "data/maps/AnimeChannel/AnimeChannel_collectible_list.bin"
+    INCLUDE "data/maps/AnimeChannel/AnimeChannel_collectible_list.asm"
 SuperheroShow_collectible_list:
-    INCBIN "data/maps/SuperheroShow/SuperheroShow_collectible_list.bin"
+    INCLUDE "data/maps/SuperheroShow/SuperheroShow_collectible_list.asm"
 GextremeSports_collectible_list:
-    INCBIN "data/maps/GextremeSports/GextremeSports_collectible_list.bin"
+    INCLUDE "data/maps/GextremeSports/GextremeSports_collectible_list.asm"
 MarsupialMadness_collectible_list:
-    INCBIN "data/maps/MarsupialMadness/MarsupialMadness_collectible_list.bin"
+    INCLUDE "data/maps/MarsupialMadness/MarsupialMadness_collectible_list.asm"
 WWGexWrestling_collectible_list:
-    INCBIN "data/maps/WWGexWrestling/WWGexWrestling_collectible_list.bin"
+    INCLUDE "data/maps/WWGexWrestling/WWGexWrestling_collectible_list.asm"
 LizardOfOz_collectible_list:
-    INCBIN "data/maps/LizardOfOz/LizardOfOz_collectible_list.bin"
+    INCLUDE "data/maps/LizardOfOz/LizardOfOz_collectible_list.asm"
 ChannelZ_collectible_list:
-    INCBIN "data/maps/ChannelZ/ChannelZ_collectible_list.bin"
+    INCLUDE "data/maps/ChannelZ/ChannelZ_collectible_list.asm"
 
 SECTION "bank22", ROMX[$4000], BANK[$22]
 GexCave_entity_list:
