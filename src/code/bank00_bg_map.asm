@@ -1105,42 +1105,7 @@ call_00_150f_Map_CheckEdgeTransition:
     set  2, [HL]                                       ;; 00:153c $cb $d6                ; request the warp
     ret                                                ;; 00:153e $c9
 .data_00_153f_MapEdgeSpawnIds:
-; 61 maps x 4 bytes, one byte per edge in MAP_EDGE_TOP, MAP_EDGE_BOTTOM,
-; MAP_EDGE_LEFT, MAP_EDGE_RIGHT order. Each byte is the spawn id the player
-; arrives at when leaving by that edge, or MAP_EDGE_SPAWN_NONE /
-; MAP_EDGE_SPAWN_CONDITIONAL. Rows run MAP_GEX_CAVE1 ($00) through
-; MAP_CHANNEL_Z5 ($3C); two rows are listed per line below
-    db   $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff        ; MAP_GEX_CAVE1 / MAP_HOLIDAY_TV1
-    db   $ff, $ff, $ff, $ff, $ff, $ff, $ff, $00        ; MAP_MYSTERY_TV1 / MAP_TUT_TV1
-    db   $ff, $ff, $ff, $0a, $ff, $ff, $ff, $ff        ; MAP_WESTERN_STATION1 / MAP_ANIME_CHANNEL1
-    db   $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff        ; MAP_SUPERHERO_SHOW1 / MAP_GEXTREME_SPORTS1
-    db   $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff        ; MAP_MARSUPIAL_MADNESS1 / MAP_WW_GEX_WRESTLING1
-    db   $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff        ; MAP_LIZARD_OF_OZ1 / MAP_CHANNEL_Z1
-    db   $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff        ; MAP_GEX_CAVE2 / MAP_GEX_CAVE3
-    db   $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff        ; MAP_GEX_CAVE4 / MAP_HOLIDAY_TV2
-    db   $ff, $ff, $ff, $ff, $ff, $ff, $ff, $05        ; MAP_HOLIDAY_TV3 / MAP_HOLIDAY_TV4
-    db   $08, $06, $07, $12, $ff, $ff, $ff, $ff        ; MAP_MYSTERY_TV2 / MAP_MYSTERY_TV3
-    db   $14, $ff, $ff, $ff, $ff, $ff, $ff, $ff        ; MAP_MYSTERY_TV4 / MAP_MYSTERY_TV5
-    db   $ff, $ff, $ff, $ff, $fe, $0f, $ff, $ff        ; MAP_MYSTERY_TV6 / MAP_MYSTERY_TV7
-    db   $ff, $11, $ff, $ff, $ff, $15, $ff, $ff        ; MAP_MYSTERY_TV8 / MAP_MYSTERY_TV9
-    db   $ff, $ff, $13, $ff, $ff, $02, $05, $03        ; MAP_MYSTERY_TV10 / MAP_TUT_TV2
-    db   $ff, $ff, $04, $09, $06, $ff, $ff, $ff        ; MAP_TUT_TV3 / MAP_TUT_TV4
-    db   $ff, $ff, $08, $ff, $ff, $ff, $0a, $ff        ; MAP_TUT_TV5 / MAP_TUT_TV6
-    db   $ff, $ff, $0c, $ff, $ff, $ff, $0b, $ff        ; MAP_TUT_TV7 / MAP_WESTERN_STATION2
-    db   $ff, $0e, $ff, $ff, $ff, $ff, $ff, $ff        ; MAP_WESTERN_STATION3 / MAP_WESTERN_STATION4
-    db   $ff, $ff, $0d, $ff, $10, $ff, $ff, $0c        ; MAP_WESTERN_STATION5 / MAP_WESTERN_STATION6
-    db   $ff, $ff, $ff, $ff, $ff, $0f, $ff, $ff        ; MAP_WESTERN_STATION7 / MAP_WESTERN_STATION8
-    db   $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff        ; MAP_WESTERN_STATION9 / MAP_ANIME_CHANNEL2
-    db   $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff        ; MAP_ANIME_CHANNEL3 / MAP_ANIME_CHANNEL4
-    db   $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff        ; MAP_ANIME_CHANNEL5 / MAP_ANIME_CHANNEL6
-    db   $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff        ; MAP_ANIME_CHANNEL7 / MAP_ANIME_CHANNEL8
-    db   $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff        ; MAP_ANIME_CHANNEL9 / MAP_SUPERHERO_SHOW2
-    db   $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff        ; MAP_SUPERHERO_SHOW3 / MAP_SUPERHERO_SHOW4
-    db   $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff        ; MAP_SUPERHERO_SHOW5 / MAP_SUPERHERO_SHOW6
-    db   $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff        ; MAP_GEXTREME_SPORTS2 / MAP_GEXTREME_SPORTS3
-    db   $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff        ; MAP_GEXTREME_SPORTS4 / MAP_CHANNEL_Z2
-    db   $ff, $ff, $ff, $ff, $ff, $ff, $ff, $ff        ; MAP_CHANNEL_Z3 / MAP_CHANNEL_Z4
-    db   $ff, $ff, $ff, $ff                            ; MAP_CHANNEL_Z5
+    INCLUDE "data/maps/map_edge_spawn_ids.asm"
 
 call_00_1633_Map_LoadWarpDestination:
 ; Resolves the pending warp: takes wDC69_PlayerSpawnIdInLevel - set by
@@ -1239,14 +1204,11 @@ call_00_1633_Map_LoadWarpDestination:
     ld   [HL], D                                       ;; 00:16a0 $72
     ret                                                ;; 00:16a1 $c9
 .data_00_16a2_LevelSpawnTables:
-; One pointer per level to that level's list of spawn points. Each entry of a
-; list is MAP_SPAWN_ENTRY_SIZE bytes:
-;   +0  db  destination map id
-;   +1  dw  destination X
-;   +3  dw  destination Y
-;   +5  db  linked spawn id, or MAP_SPAWN_LINK_ABSOLUTE for a fixed position
-;   +6      2 spare bytes
-; The three bonus/boss levels that are a single map each share one empty stub
+; One pointer per level to that level's list of spawn points. The lists themselves are
+; the .bin files under src/data/maps/*/*_spawns.bin; the INCLUDEd .asm is generated from
+; them by tools/render_map_asm.py, and the record layout lives in
+; tools/map_formats.json. The three bonus/boss levels that are a single map each share
+; one empty stub
     dw   .spawns_gex_cave                              ; LEVEL_GEX_CAVE
     dw   .spawns_holiday_tv                            ; LEVEL_HOLIDAY_TV
     dw   .spawns_mystery_tv                            ; LEVEL_MYSTERY_TV
@@ -1260,125 +1222,34 @@ call_00_1633_Map_LoadWarpDestination:
     dw   .spawns_none                                  ; LEVEL_LIZARD_OF_OZ - single map
     dw   .spawns_channel_z                             ; LEVEL_CHANNEL_Z
 .spawns_none:
-; Shared empty stub for the levels that are one map and never warp
-    db   $00, $00, $00, $00, $00, $00, $00, $00   ; never read
+    INCLUDE "data/maps/spawns_none_stub.asm"
+
 .spawns_gex_cave:
-    db   $00, $b0, $01, $f0, $00, $ff, $00, $00   ; spawn $00: MAP_GEX_CAVE1 at $01b0,$00f0, absolute
-    db   $00, $50, $00, $70, $00, $ff, $00, $00   ; spawn $01: MAP_GEX_CAVE1 at $0050,$0070, absolute
-    db   $00, $50, $01, $40, $00, $ff, $00, $00   ; spawn $02: MAP_GEX_CAVE1 at $0150,$0040, absolute
-    db   $0c, $f0, $00, $80, $00, $ff, $00, $00   ; spawn $03: MAP_GEX_CAVE2 at $00f0,$0080, absolute
-    db   $0d, $f0, $00, $f0, $00, $ff, $00, $00   ; spawn $04: MAP_GEX_CAVE3 at $00f0,$00f0, absolute
-    db   $0e, $30, $00, $30, $00, $ff, $00, $00   ; spawn $05: MAP_GEX_CAVE4 at $0030,$0030, absolute
+    INCLUDE "data/maps/GexCave/GexCave_spawns.asm"
+
 .spawns_holiday_tv:
-    db   $0f, $20, $01, $80, $00, $ff, $00, $00   ; spawn $00: MAP_HOLIDAY_TV2 at $0120,$0080, absolute
-    db   $10, $20, $00, $30, $01, $ff, $00, $00   ; spawn $01: MAP_HOLIDAY_TV3 at $0020,$0130, absolute
-    db   $11, $30, $01, $60, $00, $ff, $00, $00   ; spawn $02: MAP_HOLIDAY_TV4 at $0130,$0060, absolute
-    db   $01, $60, $09, $00, $04, $ff, $00, $00   ; spawn $03: MAP_HOLIDAY_TV1 at $0960,$0400, absolute
-    db   $01, $a0, $07, $00, $01, $ff, $00, $00   ; spawn $04: MAP_HOLIDAY_TV1 at $07a0,$0100, absolute
-    db   $01, $c8, $02, $80, $00, $ff, $00, $00   ; spawn $05: MAP_HOLIDAY_TV1 at $02c8,$0080, absolute
+    INCLUDE "data/maps/HolidayTV/HolidayTV_spawns.asm"
+
 .spawns_mystery_tv:
-    db   $12, $c0, $00, $60, $02, $ff, $00, $00   ; spawn $00: MAP_MYSTERY_TV2 at $00c0,$0260, absolute
-    db   $14, $20, $00, $80, $00, $ff, $00, $00   ; spawn $01: MAP_MYSTERY_TV4 at $0020,$0080, absolute
-    db   $15, $20, $01, $30, $01, $ff, $00, $00   ; spawn $02: MAP_MYSTERY_TV5 at $0120,$0130, absolute
-    db   $16, $20, $00, $e0, $01, $ff, $00, $00   ; spawn $03: MAP_MYSTERY_TV6 at $0020,$01e0, absolute
-    db   $16, $20, $01, $e0, $01, $ff, $00, $00   ; spawn $04: MAP_MYSTERY_TV6 at $0120,$01e0, absolute
-    db   $17, $48, $00, $60, $00, $ff, $00, $00   ; spawn $05: MAP_MYSTERY_TV7 at $0048,$0060, absolute
-    db   $02, $98, $02, $b0, $02, $ff, $00, $00   ; spawn $06: MAP_MYSTERY_TV1 at $0298,$02b0, absolute
-    db   $13, $18, $00, $68, $00, $ff, $00, $00   ; spawn $07: MAP_MYSTERY_TV3 at $0018,$0068, absolute
-    db   $13, $b8, $02, $68, $00, $ff, $00, $00   ; spawn $08: MAP_MYSTERY_TV3 at $02b8,$0068, absolute
-    db   $12, $10, $00, $cc, $00, $ff, $00, $00   ; spawn $09: MAP_MYSTERY_TV2 at $0010,$00cc, absolute
-    db   $12, $38, $02, $10, $00, $ff, $00, $00   ; spawn $0a: MAP_MYSTERY_TV2 at $0238,$0010, absolute
-    db   $02, $28, $02, $b0, $02, $ff, $00, $00   ; spawn $0b: MAP_MYSTERY_TV1 at $0228,$02b0, absolute
-    db   $02, $68, $02, $d0, $01, $ff, $00, $00   ; spawn $0c: MAP_MYSTERY_TV1 at $0268,$01d0, absolute
-    db   $02, $d8, $00, $40, $01, $ff, $00, $00   ; spawn $0d: MAP_MYSTERY_TV1 at $00d8,$0140, absolute
-    db   $02, $f8, $01, $80, $00, $ff, $00, $00   ; spawn $0e: MAP_MYSTERY_TV1 at $01f8,$0080, absolute
-    db   $02, $28, $00, $50, $00, $ff, $00, $00   ; spawn $0f: MAP_MYSTERY_TV1 at $0028,$0050, absolute
-    db   $18, $50, $00, $70, $00, $ff, $00, $00   ; spawn $10: MAP_MYSTERY_TV8 at $0050,$0070, absolute
-    db   $17, $50, $00, $10, $00, $ff, $00, $00   ; spawn $11: MAP_MYSTERY_TV7 at $0050,$0010, absolute
-    db   $1a, $10, $00, $d8, $02, $ff, $00, $00   ; spawn $12: MAP_MYSTERY_TV10 at $0010,$02d8, absolute
-    db   $12, $70, $02, $2c, $02, $ff, $00, $00   ; spawn $13: MAP_MYSTERY_TV2 at $0270,$022c, absolute
-    db   $19, $a0, $00, $80, $02, $ff, $00, $00   ; spawn $14: MAP_MYSTERY_TV9 at $00a0,$0280, absolute
-    db   $14, $a0, $00, $10, $00, $ff, $00, $00   ; spawn $15: MAP_MYSTERY_TV4 at $00a0,$0010, absolute
-    db   $02, $08, $01, $50, $02, $ff, $00, $00   ; spawn $16: MAP_MYSTERY_TV1 at $0108,$0250, absolute
-    db   $02, $a8, $02, $d0, $01, $ff, $00, $00   ; spawn $17: MAP_MYSTERY_TV1 at $02a8,$01d0, absolute
+    INCLUDE "data/maps/MysteryTV/MysteryTV_spawns.asm"
+
 .spawns_tut_tv:
-    db   $1b, $10, $00, $00, $03, $05, $00, $00   ; spawn $00: MAP_TUT_TV2 at $0010,$0300, linked to spawn $05
-    db   $1d, $54, $04, $10, $00, $ff, $00, $00   ; spawn $01: MAP_TUT_TV4 at $0454,$0010, absolute
-    db   $1d, $54, $04, $10, $00, $ff, $00, $00   ; spawn $02: MAP_TUT_TV4 at $0454,$0010, absolute
-    db   $1c, $10, $00, $40, $01, $04, $00, $00   ; spawn $03: MAP_TUT_TV3 at $0010,$0140, linked to spawn $04
-    db   $1b, $30, $03, $00, $03, $03, $00, $00   ; spawn $04: MAP_TUT_TV2 at $0330,$0300, linked to spawn $03
-    db   $03, $60, $02, $d0, $00, $00, $00, $00   ; spawn $05: MAP_TUT_TV1 at $0260,$00d0, linked to spawn $00
-    db   $03, $48, $00, $10, $01, $ff, $00, $00   ; spawn $06: MAP_TUT_TV1 at $0048,$0110, absolute
-    db   $1e, $10, $00, $78, $00, $ff, $00, $00   ; spawn $07: MAP_TUT_TV5 at $0010,$0078, absolute
-    db   $1b, $ec, $00, $60, $02, $ff, $00, $00   ; spawn $08: MAP_TUT_TV2 at $00ec,$0260, absolute
-    db   $1f, $08, $00, $70, $00, $0a, $00, $00   ; spawn $09: MAP_TUT_TV6 at $0008,$0070, linked to spawn $0a
-    db   $1c, $30, $06, $40, $01, $09, $00, $00   ; spawn $0a: MAP_TUT_TV3 at $0630,$0140, linked to spawn $09
-    db   $20, $10, $00, $60, $01, $ff, $00, $00   ; spawn $0b: MAP_TUT_TV7 at $0010,$0160, absolute
-    db   $1b, $7c, $02, $60, $02, $ff, $00, $00   ; spawn $0c: MAP_TUT_TV2 at $027c,$0260, absolute
+    INCLUDE "data/maps/TutTV/TutTV_spawns.asm"
+
 .spawns_western_station:
-    db   $23, $10, $00, $70, $00, $ff, $00, $00   ; spawn $00: MAP_WESTERN_STATION4 at $0010,$0070, absolute
-    db   $04, $c0, $00, $50, $01, $ff, $00, $00   ; spawn $01: MAP_WESTERN_STATION1 at $00c0,$0150, absolute
-    db   $26, $10, $00, $70, $00, $ff, $00, $00   ; spawn $02: MAP_WESTERN_STATION7 at $0010,$0070, absolute
-    db   $04, $10, $01, $50, $01, $ff, $00, $00   ; spawn $03: MAP_WESTERN_STATION1 at $0110,$0150, absolute
-    db   $27, $10, $00, $00, $01, $ff, $00, $00   ; spawn $04: MAP_WESTERN_STATION8 at $0010,$0100, absolute
-    db   $04, $98, $01, $a0, $00, $ff, $00, $00   ; spawn $05: MAP_WESTERN_STATION1 at $0198,$00a0, absolute
-    db   $28, $10, $00, $70, $00, $ff, $00, $00   ; spawn $06: MAP_WESTERN_STATION9 at $0010,$0070, absolute
-    db   $04, $f0, $01, $50, $01, $ff, $00, $00   ; spawn $07: MAP_WESTERN_STATION1 at $01f0,$0150, absolute
-    db   $22, $30, $01, $90, $00, $ff, $00, $00   ; spawn $08: MAP_WESTERN_STATION3 at $0130,$0090, absolute
-    db   $21, $aa, $01, $98, $00, $ff, $00, $00   ; spawn $09: MAP_WESTERN_STATION2 at $01aa,$0098, absolute
-    db   $21, $10, $00, $40, $01, $0b, $00, $00   ; spawn $0a: MAP_WESTERN_STATION2 at $0010,$0140, linked to spawn $0b
-    db   $04, $70, $02, $50, $01, $0a, $00, $00   ; spawn $0b: MAP_WESTERN_STATION1 at $0270,$0150, linked to spawn $0a
-    db   $24, $10, $00, $00, $01, $0d, $00, $00   ; spawn $0c: MAP_WESTERN_STATION5 at $0010,$0100, linked to spawn $0d
-    db   $25, $c0, $07, $48, $02, $0c, $00, $00   ; spawn $0d: MAP_WESTERN_STATION6 at $07c0,$0248, linked to spawn $0c
-    db   $25, $28, $00, $10, $00, $ff, $00, $00   ; spawn $0e: MAP_WESTERN_STATION6 at $0028,$0010, absolute
-    db   $25, $68, $03, $10, $00, $ff, $00, $00   ; spawn $0f: MAP_WESTERN_STATION6 at $0368,$0010, absolute
-    db   $27, $60, $00, $10, $01, $ff, $00, $00   ; spawn $10: MAP_WESTERN_STATION8 at $0060,$0110, absolute
+    INCLUDE "data/maps/WesternStation/WesternStation_spawns.asm"
+
 .spawns_anime_channel:
-    db   $2b, $30, $00, $80, $02, $ff, $00, $00   ; spawn $00: MAP_ANIME_CHANNEL4 at $0030,$0280, absolute
-    db   $2c, $a0, $09, $80, $00, $ff, $00, $00   ; spawn $01: MAP_ANIME_CHANNEL5 at $09a0,$0080, absolute
-    db   $29, $30, $00, $c0, $01, $ff, $00, $00   ; spawn $02: MAP_ANIME_CHANNEL2 at $0030,$01c0, absolute
-    db   $05, $c0, $00, $c0, $01, $ff, $00, $00   ; spawn $03: MAP_ANIME_CHANNEL1 at $00c0,$01c0, absolute
-    db   $05, $f0, $01, $c0, $01, $ff, $00, $00   ; spawn $04: MAP_ANIME_CHANNEL1 at $01f0,$01c0, absolute
-    db   $05, $20, $03, $c0, $01, $ff, $00, $00   ; spawn $05: MAP_ANIME_CHANNEL1 at $0320,$01c0, absolute
-    db   $29, $20, $00, $00, $01, $ff, $00, $00   ; spawn $06: MAP_ANIME_CHANNEL2 at $0020,$0100, absolute
-    db   $29, $e0, $02, $00, $01, $ff, $00, $00   ; spawn $07: MAP_ANIME_CHANNEL2 at $02e0,$0100, absolute
-    db   $2a, $c0, $01, $80, $00, $ff, $00, $00   ; spawn $08: MAP_ANIME_CHANNEL3 at $01c0,$0080, absolute
-    db   $2a, $c0, $01, $80, $00, $ff, $00, $00   ; spawn $09: MAP_ANIME_CHANNEL3 at $01c0,$0080, absolute
-    db   $2c, $e0, $03, $40, $01, $ff, $00, $00   ; spawn $0a: MAP_ANIME_CHANNEL5 at $03e0,$0140, absolute
-    db   $30, $b0, $03, $40, $01, $ff, $00, $00   ; spawn $0b: MAP_ANIME_CHANNEL9 at $03b0,$0140, absolute
-    db   $30, $70, $01, $a0, $00, $ff, $00, $00   ; spawn $0c: MAP_ANIME_CHANNEL9 at $0170,$00a0, absolute
-    db   $30, $50, $02, $30, $00, $ff, $00, $00   ; spawn $0d: MAP_ANIME_CHANNEL9 at $0250,$0030, absolute
-    db   $30, $30, $03, $a0, $00, $ff, $00, $00   ; spawn $0e: MAP_ANIME_CHANNEL9 at $0330,$00a0, absolute
-    db   $2d, $a0, $01, $f0, $00, $ff, $00, $00   ; spawn $0f: MAP_ANIME_CHANNEL6 at $01a0,$00f0, absolute
-    db   $2e, $f0, $00, $00, $02, $ff, $00, $00   ; spawn $10: MAP_ANIME_CHANNEL7 at $00f0,$0200, absolute
-    db   $2f, $50, $00, $10, $03, $ff, $00, $00   ; spawn $11: MAP_ANIME_CHANNEL8 at $0050,$0310, absolute
+    INCLUDE "data/maps/AnimeChannel/AnimeChannel_spawns.asm"
+
 .spawns_superhero_show:
-    db   $31, $c0, $0b, $a0, $02, $ff, $00, $00   ; spawn $00: MAP_SUPERHERO_SHOW2 at $0bc0,$02a0, absolute
-    db   $06, $70, $00, $b0, $00, $ff, $00, $00   ; spawn $01: MAP_SUPERHERO_SHOW1 at $0070,$00b0, absolute
-    db   $32, $60, $00, $80, $00, $ff, $00, $00   ; spawn $02: MAP_SUPERHERO_SHOW3 at $0060,$0080, absolute
-    db   $06, $70, $00, $00, $01, $ff, $00, $00   ; spawn $03: MAP_SUPERHERO_SHOW1 at $0070,$0100, absolute
-    db   $33, $e0, $00, $a0, $01, $ff, $00, $00   ; spawn $04: MAP_SUPERHERO_SHOW4 at $00e0,$01a0, absolute
-    db   $31, $80, $00, $20, $03, $ff, $00, $00   ; spawn $05: MAP_SUPERHERO_SHOW2 at $0080,$0320, absolute
-    db   $34, $a0, $02, $c0, $01, $ff, $00, $00   ; spawn $06: MAP_SUPERHERO_SHOW5 at $02a0,$01c0, absolute
-    db   $31, $40, $04, $00, $01, $ff, $00, $00   ; spawn $07: MAP_SUPERHERO_SHOW2 at $0440,$0100, absolute
-    db   $35, $50, $00, $60, $00, $ff, $00, $00   ; spawn $08: MAP_SUPERHERO_SHOW6 at $0050,$0060, absolute
-    db   $34, $a0, $02, $80, $00, $ff, $00, $00   ; spawn $09: MAP_SUPERHERO_SHOW5 at $02a0,$0080, absolute
+    INCLUDE "data/maps/SuperheroShow/SuperheroShow_spawns.asm"
+
 .spawns_gextreme_sports:
-    db   $36, $20, $00, $30, $01, $ff, $00, $00   ; spawn $00: MAP_GEXTREME_SPORTS2 at $0020,$0130, absolute
-    db   $37, $20, $00, $30, $01, $ff, $00, $00   ; spawn $01: MAP_GEXTREME_SPORTS3 at $0020,$0130, absolute
-    db   $38, $20, $00, $30, $01, $ff, $00, $00   ; spawn $02: MAP_GEXTREME_SPORTS4 at $0020,$0130, absolute
-    db   $07, $7c, $02, $b8, $02, $ff, $00, $00   ; spawn $03: MAP_GEXTREME_SPORTS1 at $027c,$02b8, absolute
-    db   $07, $fc, $01, $b8, $01, $ff, $00, $00   ; spawn $04: MAP_GEXTREME_SPORTS1 at $01fc,$01b8, absolute
-    db   $07, $8c, $01, $f8, $00, $ff, $00, $00   ; spawn $05: MAP_GEXTREME_SPORTS1 at $018c,$00f8, absolute
+    INCLUDE "data/maps/GextremeSports/GextremeSports_spawns.asm"
+
 .spawns_channel_z:
-    db   $39, $00, $01, $b0, $00, $ff, $00, $00   ; spawn $00: MAP_CHANNEL_Z2 at $0100,$00b0, absolute
-    db   $39, $30, $00, $f0, $00, $ff, $00, $00   ; spawn $01: MAP_CHANNEL_Z2 at $0030,$00f0, absolute
-    db   $39, $c0, $01, $f0, $00, $ff, $00, $00   ; spawn $02: MAP_CHANNEL_Z2 at $01c0,$00f0, absolute
-    db   $39, $00, $01, $20, $00, $ff, $00, $00   ; spawn $03: MAP_CHANNEL_Z2 at $0100,$0020, absolute
-    db   $0b, $60, $02, $c0, $00, $ff, $00, $00   ; spawn $04: MAP_CHANNEL_Z1 at $0260,$00c0, absolute
-    db   $3a, $38, $01, $80, $01, $ff, $00, $00   ; spawn $05: MAP_CHANNEL_Z3 at $0138,$0180, absolute
-    db   $3b, $38, $01, $80, $01, $ff, $00, $00   ; spawn $06: MAP_CHANNEL_Z4 at $0138,$0180, absolute
-    db   $3c, $78, $00, $68, $00, $ff, $00, $00   ; spawn $07: MAP_CHANNEL_Z5 at $0078,$0068, absolute
+    INCLUDE "data/maps/ChannelZ/ChannelZ_spawns.asm"
 
 call_00_1a22_BgMap_LoadAllRowsForPass:
 ; Draws the whole visible area once, for one layer. Called three times by
@@ -1791,9 +1662,9 @@ call_00_1bbc_CheckForDoorAndEnter:
     set  2, [HL]                                       ;; 00:1c30 $cb $d6
     ret                                                ;; 00:1c32 $c9
 .data_00_1c33_DoorLocationsByMap:
-; One pointer per map to that map's list of doors, or $0000 when the map has
-; none. Each list is MAP_DOOR_ENTRY_SIZE-byte records ended by MAP_DOOR_LIST_END:
-;   db spawn id, db required trigger index, dw door X, dw door Y
+; One pointer per map to that map's list of doors, or $0000 when the map has none. The
+; lists are the .bin files under src/data/maps/*/*_doors.bin; the INCLUDEd .asm is
+; generated from them, and the record layout lives in tools/map_formats.json
     dw   .doors_gex_cave1            ; MAP_GEX_CAVE1
     dw   .doors_holiday_tv1            ; MAP_HOLIDAY_TV1
     dw   .doors_mystery_tv1            ; MAP_MYSTERY_TV1
@@ -1856,164 +1727,130 @@ call_00_1bbc_CheckForDoorAndEnter:
     dw   .doors_channel_z4            ; MAP_CHANNEL_Z4
     dw   $0000                    ; MAP_CHANNEL_Z5 - no doors
 .doors_gex_cave1:
-    db   $03, $ff, $b0, $01, $f0, $00         ; spawn $03 at $01b0,$00f0, no trigger
-    db   $04, $ff, $50, $00, $70, $00         ; spawn $04 at $0050,$0070, no trigger
-    db   $05, $ff, $50, $01, $40, $00         ; spawn $05 at $0150,$0040, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/GexCave/GexCave_1_doors.asm"
+
 .doors_gex_cave2:
-    db   $00, $ff, $f0, $00, $80, $00         ; spawn $00 at $00f0,$0080, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/GexCave/GexCave_2_doors.asm"
+
 .doors_gex_cave3:
-    db   $01, $ff, $f0, $00, $f0, $00         ; spawn $01 at $00f0,$00f0, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/GexCave/GexCave_3_doors.asm"
+
 .doors_gex_cave4:
-    db   $02, $ff, $30, $00, $30, $00         ; spawn $02 at $0030,$0030, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/GexCave/GexCave_4_doors.asm"
+
 .doors_holiday_tv1:
-    db   $00, $ff, $60, $09, $00, $04         ; spawn $00 at $0960,$0400, no trigger
-    db   $01, $ff, $a0, $07, $00, $01         ; spawn $01 at $07a0,$0100, no trigger
-    db   $02, $ff, $c8, $02, $80, $00         ; spawn $02 at $02c8,$0080, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/HolidayTV/HolidayTV_1_doors.asm"
+
 .doors_holiday_tv2:
-    db   $03, $ff, $20, $01, $80, $00         ; spawn $03 at $0120,$0080, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/HolidayTV/HolidayTV_2_doors.asm"
+
 .doors_holiday_tv3:
-    db   $04, $ff, $20, $00, $30, $01         ; spawn $04 at $0020,$0130, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/HolidayTV/HolidayTV_3_doors.asm"
+
 .doors_mystery_tv1:
-    db   $00, $ff, $98, $02, $b0, $02         ; spawn $00 at $0298,$02b0, no trigger
-    db   $01, $ff, $28, $02, $b0, $02         ; spawn $01 at $0228,$02b0, no trigger
-    db   $02, $ff, $68, $02, $d0, $01         ; spawn $02 at $0268,$01d0, no trigger
-    db   $03, $ff, $d8, $00, $40, $01         ; spawn $03 at $00d8,$0140, no trigger
-    db   $04, $ff, $f8, $01, $80, $00         ; spawn $04 at $01f8,$0080, no trigger
-    db   $05, $ff, $28, $00, $50, $00         ; spawn $05 at $0028,$0050, no trigger
-    db   $17, $ff, $08, $01, $50, $02         ; spawn $17 at $0108,$0250, no trigger
-    db   $16, $ff, $a8, $02, $d0, $01         ; spawn $16 at $02a8,$01d0, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/MysteryTV/MysteryTV_1_doors.asm"
+
 .doors_mystery_tv3:
-    db   $09, $ff, $18, $00, $68, $00         ; spawn $09 at $0018,$0068, no trigger
-    db   $0a, $ff, $b8, $02, $68, $00         ; spawn $0a at $02b8,$0068, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/MysteryTV/MysteryTV_3_doors.asm"
+
 .doors_mystery_tv4:
-    db   $0b, $ff, $20, $00, $80, $00         ; spawn $0b at $0020,$0080, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/MysteryTV/MysteryTV_4_doors.asm"
+
 .doors_mystery_tv5:
-    db   $0c, $ff, $20, $01, $30, $01         ; spawn $0c at $0120,$0130, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/MysteryTV/MysteryTV_5_doors.asm"
+
 .doors_mystery_tv6:
-    db   $0d, $ff, $20, $00, $e0, $01         ; spawn $0d at $0020,$01e0, no trigger
-    db   $0e, $ff, $20, $01, $e0, $01         ; spawn $0e at $0120,$01e0, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/MysteryTV/MysteryTV_6_doors.asm"
+
 .doors_tut_tv2:
-    db   $07, $00, $ec, $00, $60, $02         ; spawn $07 at $00ec,$0260, needs trigger $00
-    db   $0b, $01, $7c, $02, $60, $02         ; spawn $0b at $027c,$0260, needs trigger $01
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/TutTV/TutTV_2_doors.asm"
+
 .doors_western_station1:
-    db   $00, $ff, $c0, $00, $50, $01         ; spawn $00 at $00c0,$0150, no trigger
-    db   $02, $ff, $10, $01, $50, $01         ; spawn $02 at $0110,$0150, no trigger
-    db   $04, $ff, $98, $01, $a0, $00         ; spawn $04 at $0198,$00a0, no trigger
-    db   $06, $ff, $f0, $01, $50, $01         ; spawn $06 at $01f0,$0150, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/WesternStation/WesternStation_1_doors.asm"
+
 .doors_western_station2:
-    db   $08, $ff, $aa, $01, $98, $00         ; spawn $08 at $01aa,$0098, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/WesternStation/WesternStation_2_doors.asm"
+
 .doors_western_station3:
-    db   $09, $ff, $30, $01, $90, $00         ; spawn $09 at $0130,$0090, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/WesternStation/WesternStation_3_doors.asm"
+
 .doors_western_station4:
-    db   $01, $ff, $10, $00, $70, $00         ; spawn $01 at $0010,$0070, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/WesternStation/WesternStation_4_doors.asm"
+
 .doors_western_station7:
-    db   $03, $ff, $10, $00, $70, $00         ; spawn $03 at $0010,$0070, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/WesternStation/WesternStation_7_doors.asm"
+
 .doors_western_station8:
-    db   $05, $ff, $10, $00, $00, $01         ; spawn $05 at $0010,$0100, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/WesternStation/WesternStation_8_doors.asm"
+
 .doors_western_station9:
-    db   $07, $ff, $10, $00, $70, $00         ; spawn $07 at $0010,$0070, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/WesternStation/WesternStation_9_doors.asm"
+
 .doors_anime_channel1:
-    db   $00, $ff, $c0, $00, $c0, $01         ; spawn $00 at $00c0,$01c0, no trigger
-    db   $01, $ff, $f0, $01, $c0, $01         ; spawn $01 at $01f0,$01c0, no trigger
-    db   $02, $ff, $20, $03, $c0, $01         ; spawn $02 at $0320,$01c0, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/AnimeChannel/AnimeChannel_1_doors.asm"
+
 .doors_anime_channel2:
-    db   $05, $ff, $30, $00, $c0, $01         ; spawn $05 at $0030,$01c0, no trigger
-    db   $09, $ff, $e0, $02, $00, $01         ; spawn $09 at $02e0,$0100, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/AnimeChannel/AnimeChannel_2_doors.asm"
+
 .doors_anime_channel3:
-    db   $07, $ff, $c0, $01, $80, $00         ; spawn $07 at $01c0,$0080, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/AnimeChannel/AnimeChannel_3_doors.asm"
+
 .doors_anime_channel4:
-    db   $03, $ff, $30, $00, $80, $02         ; spawn $03 at $0030,$0280, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/AnimeChannel/AnimeChannel_4_doors.asm"
+
 .doors_anime_channel5:
-    db   $04, $ff, $a0, $09, $80, $00         ; spawn $04 at $09a0,$0080, no trigger
-    db   $0b, $05, $e0, $03, $40, $01         ; spawn $0b at $03e0,$0140, needs trigger $05
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/AnimeChannel/AnimeChannel_5_doors.asm"
+
 .doors_anime_channel6:
-    db   $0c, $ff, $a0, $01, $f0, $00         ; spawn $0c at $01a0,$00f0, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/AnimeChannel/AnimeChannel_6_doors.asm"
+
 .doors_anime_channel7:
-    db   $0d, $ff, $f0, $00, $00, $02         ; spawn $0d at $00f0,$0200, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/AnimeChannel/AnimeChannel_7_doors.asm"
+
 .doors_anime_channel8:
-    db   $0e, $ff, $50, $00, $10, $03         ; spawn $0e at $0050,$0310, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/AnimeChannel/AnimeChannel_8_doors.asm"
+
 .doors_anime_channel9:
-    db   $0a, $0d, $b0, $03, $40, $01         ; spawn $0a at $03b0,$0140, needs trigger $0d
-    db   $0f, $0a, $70, $01, $a0, $00         ; spawn $0f at $0170,$00a0, needs trigger $0a
-    db   $10, $0b, $50, $02, $30, $00         ; spawn $10 at $0250,$0030, needs trigger $0b
-    db   $11, $0c, $30, $03, $a0, $00         ; spawn $11 at $0330,$00a0, needs trigger $0c
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/AnimeChannel/AnimeChannel_9_doors.asm"
+
 .doors_superhero_show1:
-    db   $00, $ff, $70, $00, $b0, $00         ; spawn $00 at $0070,$00b0, no trigger
-    db   $02, $ff, $70, $00, $00, $01         ; spawn $02 at $0070,$0100, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/SuperheroShow/SuperheroShow_1_doors.asm"
+
 .doors_superhero_show2:
-    db   $01, $ff, $c0, $0b, $a0, $02         ; spawn $01 at $0bc0,$02a0, no trigger
-    db   $04, $ff, $80, $00, $20, $03         ; spawn $04 at $0080,$0320, no trigger
-    db   $06, $ff, $40, $04, $00, $01         ; spawn $06 at $0440,$0100, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/SuperheroShow/SuperheroShow_2_doors.asm"
+
 .doors_superhero_show3:
-    db   $03, $ff, $60, $00, $80, $00         ; spawn $03 at $0060,$0080, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/SuperheroShow/SuperheroShow_3_doors.asm"
+
 .doors_superhero_show4:
-    db   $05, $ff, $e0, $00, $a0, $01         ; spawn $05 at $00e0,$01a0, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/SuperheroShow/SuperheroShow_4_doors.asm"
+
 .doors_superhero_show5:
-    db   $07, $ff, $a0, $02, $c0, $01         ; spawn $07 at $02a0,$01c0, no trigger
-    db   $08, $ff, $a0, $02, $80, $00         ; spawn $08 at $02a0,$0080, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/SuperheroShow/SuperheroShow_5_doors.asm"
+
 .doors_superhero_show6:
-    db   $09, $ff, $50, $00, $60, $00         ; spawn $09 at $0050,$0060, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/SuperheroShow/SuperheroShow_6_doors.asm"
+
 .doors_gextreme_sports1:
-    db   $00, $ff, $7c, $02, $b8, $02         ; spawn $00 at $027c,$02b8, no trigger
-    db   $01, $ff, $fc, $01, $b8, $01         ; spawn $01 at $01fc,$01b8, no trigger
-    db   $02, $ff, $8c, $01, $f8, $00         ; spawn $02 at $018c,$00f8, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/GextremeSports/GextremeSports_1_doors.asm"
+
 .doors_gextreme_sports2:
-    db   $03, $ff, $20, $00, $30, $01         ; spawn $03 at $0020,$0130, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/GextremeSports/GextremeSports_2_doors.asm"
+
 .doors_gextreme_sports3:
-    db   $04, $ff, $20, $00, $30, $01         ; spawn $04 at $0020,$0130, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/GextremeSports/GextremeSports_3_doors.asm"
+
 .doors_gextreme_sports4:
-    db   $05, $ff, $20, $00, $30, $01         ; spawn $05 at $0020,$0130, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/GextremeSports/GextremeSports_4_doors.asm"
+
 .doors_channel_z1:
-    db   $00, $00, $60, $02, $c0, $00         ; spawn $00 at $0260,$00c0, needs trigger $00
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/ChannelZ/ChannelZ_1_doors.asm"
+
 .doors_channel_z2:
-    db   $05, $ff, $30, $00, $f0, $00         ; spawn $05 at $0030,$00f0, no trigger
-    db   $04, $ff, $00, $01, $b0, $00         ; spawn $04 at $0100,$00b0, no trigger
-    db   $06, $01, $c0, $01, $f0, $00         ; spawn $06 at $01c0,$00f0, needs trigger $01
-    db   $07, $02, $00, $01, $20, $00         ; spawn $07 at $0100,$0020, needs trigger $02
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/ChannelZ/ChannelZ_2_doors.asm"
+
 .doors_channel_z3:
-    db   $01, $ff, $38, $01, $80, $01         ; spawn $01 at $0138,$0180, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/ChannelZ/ChannelZ_3_doors.asm"
+
 .doors_channel_z4:
-    db   $02, $ff, $38, $01, $80, $01         ; spawn $02 at $0138,$0180, no trigger
-    db   $ff                                ; MAP_DOOR_LIST_END
+    INCLUDE "data/maps/ChannelZ/ChannelZ_4_doors.asm"

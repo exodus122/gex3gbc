@@ -83,76 +83,7 @@ call_03_6203_MapBounds_LoadForCurrentMap:
     ld   C, [HL]                                      ;; 03:620d $4e
     jr   .jr_03_624d                                  ;; 03:620e $18 $3d
 .data_03_6210_MapBoundaryIndices:
-; Which boundary record each map uses, one byte per MAP_* id. Several maps share a
-; record - every Gex Cave map is the same rectangle, and so is every unused slot -
-; which is why there are 59 records for 61 maps.
-;
-; Record MAP_WRAP_BOUNDARY_INDEX is the odd one out: a map pointed at it wraps
-; horizontally, and call_02_7337_MapScroll_CheckHorizontal treats the step across the
-; seam as an ordinary one-column scroll. No map here uses it - every entry is 1 or
-; more - so the wrap path is reachable only if wDC2A_MapBoundaryIndex is set from
-; somewhere else
-    db   $01                                ; MAP_GEX_CAVE1
-    db   $02                                ; MAP_HOLIDAY_TV1
-    db   $06                                ; MAP_MYSTERY_TV1
-    db   $10                                ; MAP_TUT_TV1
-    db   $17                                ; MAP_WESTERN_STATION1
-    db   $20                                ; MAP_ANIME_CHANNEL1
-    db   $29                                ; MAP_SUPERHERO_SHOW1
-    db   $2f                                ; MAP_GEXTREME_SPORTS1
-    db   $33                                ; MAP_MARSUPIAL_MADNESS1
-    db   $34                                ; MAP_WW_GEX_WRESTLING1
-    db   $35                                ; MAP_LIZARD_OF_OZ1
-    db   $36                                ; MAP_CHANNEL_Z1
-    db   $01                                ; MAP_GEX_CAVE2
-    db   $01                                ; MAP_GEX_CAVE3
-    db   $01                                ; MAP_GEX_CAVE4
-    db   $03                                ; MAP_HOLIDAY_TV2
-    db   $04                                ; MAP_HOLIDAY_TV3
-    db   $05                                ; MAP_HOLIDAY_TV4
-    db   $07                                ; MAP_MYSTERY_TV2
-    db   $08                                ; MAP_MYSTERY_TV3
-    db   $09                                ; MAP_MYSTERY_TV4
-    db   $0a                                ; MAP_MYSTERY_TV5
-    db   $0b                                ; MAP_MYSTERY_TV6
-    db   $0c                                ; MAP_MYSTERY_TV7
-    db   $0d                                ; MAP_MYSTERY_TV8
-    db   $0e                                ; MAP_MYSTERY_TV9
-    db   $0f                                ; MAP_MYSTERY_TV10
-    db   $11                                ; MAP_TUT_TV2
-    db   $12                                ; MAP_TUT_TV3
-    db   $13                                ; MAP_TUT_TV4
-    db   $14                                ; MAP_TUT_TV5
-    db   $15                                ; MAP_TUT_TV6
-    db   $16                                ; MAP_TUT_TV7
-    db   $18                                ; MAP_WESTERN_STATION2
-    db   $19                                ; MAP_WESTERN_STATION3
-    db   $1a                                ; MAP_WESTERN_STATION4
-    db   $1b                                ; MAP_WESTERN_STATION5
-    db   $1c                                ; MAP_WESTERN_STATION6
-    db   $1d                                ; MAP_WESTERN_STATION7
-    db   $1e                                ; MAP_WESTERN_STATION8
-    db   $1f                                ; MAP_WESTERN_STATION9
-    db   $21                                ; MAP_ANIME_CHANNEL2
-    db   $22                                ; MAP_ANIME_CHANNEL3
-    db   $23                                ; MAP_ANIME_CHANNEL4
-    db   $24                                ; MAP_ANIME_CHANNEL5
-    db   $25                                ; MAP_ANIME_CHANNEL6
-    db   $26                                ; MAP_ANIME_CHANNEL7
-    db   $27                                ; MAP_ANIME_CHANNEL8
-    db   $28                                ; MAP_ANIME_CHANNEL9
-    db   $2a                                ; MAP_SUPERHERO_SHOW2
-    db   $2b                                ; MAP_SUPERHERO_SHOW3
-    db   $2c                                ; MAP_SUPERHERO_SHOW4
-    db   $2d                                ; MAP_SUPERHERO_SHOW5
-    db   $2e                                ; MAP_SUPERHERO_SHOW6
-    db   $30                                ; MAP_GEXTREME_SPORTS2
-    db   $31                                ; MAP_GEXTREME_SPORTS3
-    db   $32                                ; MAP_GEXTREME_SPORTS4
-    db   $37                                ; MAP_CHANNEL_Z2
-    db   $38                                ; MAP_CHANNEL_Z3
-    db   $39                                ; MAP_CHANNEL_Z4
-    db   $3a                                ; MAP_CHANNEL_Z5
+    INCLUDE "data/maps/map_boundary_indices.asm"
 
 .jr_03_624d:
     ld   HL, wDC2A_MapBoundaryIndex                   ;; 03:624d $21 $2a $dc
@@ -198,78 +129,7 @@ call_03_6203_MapBounds_LoadForCurrentMap:
     ld   [wDC43_PlayerBoundaryYMaxHi], A              ;; 03:62a0 $ea $43 $dc
     ret                                               ;; 03:62a3 $c9
 .data_03_62a4_MapBoundaryRecords:
-; The map rectangles themselves, eight bytes each, in world pixels:
-;
-;   +0  dw  X min      +2  dw  X max
-;   +4  dw  Y min      +6  dw  Y max
-;
-; The values as stored are the CAMERA's travel, and go into
-; wDC34_MapBoundaryXMinLo... The loader also adds the four PLAYER_BOUNDARY_*_INSET
-; offsets and writes that wider rectangle into wDC3C_PlayerBoundaryXMinLo.., which is
-; how far GEX may walk - further than the camera, because the camera stops when its
-; own corner reaches the limit while Gex has most of a screen left to cross.
-;
-; Record 0 is never selected by any map - see the index table above - and it is not a
-; real rectangle either: X min and X max are both $0000, so it has no width at all
-    map_bounds $0000, $0000, $0204, $0373    ; unused
-    map_bounds $0000, $0140, $0000, $0090    ; MAP_GEX_CAVE1, MAP_GEX_CAVE2 +2 more
-    map_bounds $0000, $0960, $0001, $047f    ; MAP_HOLIDAY_TV1
-    map_bounds $0000, $00a0, $0001, $002f    ; MAP_HOLIDAY_TV2
-    map_bounds $0000, $00a0, $00b1, $00df    ; MAP_HOLIDAY_TV3
-    map_bounds $0000, $00a0, $0000, $0000    ; MAP_HOLIDAY_TV4
-    map_bounds $0000, $0230, $0001, $024f    ; MAP_MYSTERY_TV1
-    map_bounds $0000, $01e0, $0001, $01ef    ; MAP_MYSTERY_TV2
-    map_bounds $0000, $0230, $0001, $015f    ; MAP_MYSTERY_TV3
-    map_bounds $0000, $00a0, $0001, $002f    ; MAP_MYSTERY_TV4
-    map_bounds $0000, $00a0, $00b1, $00df    ; MAP_MYSTERY_TV5
-    map_bounds $0000, $00a0, $0161, $018f    ; MAP_MYSTERY_TV6
-    map_bounds $0000, $0000, $0000, $0000    ; MAP_MYSTERY_TV7
-    map_bounds $0000, $0000, $0000, $0000    ; MAP_MYSTERY_TV8
-    map_bounds $0000, $00a0, $0211, $021f    ; MAP_MYSTERY_TV9
-    map_bounds $0000, $01e0, $0290, $02a0    ; MAP_MYSTERY_TV10
-    map_bounds $0000, $01d0, $0000, $00b0    ; MAP_TUT_TV1
-    map_bounds $0000, $02a0, $0000, $02b0    ; MAP_TUT_TV2
-    map_bounds $0000, $05a0, $0000, $00f0    ; MAP_TUT_TV3
-    map_bounds $0000, $0400, $0000, $00b0    ; MAP_TUT_TV4
-    map_bounds $0000, $0000, $0001, $000f    ; MAP_TUT_TV5
-    map_bounds $0000, $00a0, $0000, $0010    ; MAP_TUT_TV6
-    map_bounds $0000, $0280, $0000, $0110    ; MAP_TUT_TV7
-    map_bounds $0000, $01e0, $0000, $00f0    ; MAP_WESTERN_STATION1
-    map_bounds $0000, $01c0, $0000, $00e0    ; MAP_WESTERN_STATION2
-    map_bounds $0000, $00a0, $0000, $0030    ; MAP_WESTERN_STATION3
-    map_bounds $0000, $0000, $0000, $0010    ; MAP_WESTERN_STATION4
-    map_bounds $0000, $0460, $0000, $00a0    ; MAP_WESTERN_STATION5
-    map_bounds $0000, $0730, $0000, $02b0    ; MAP_WESTERN_STATION6
-    map_bounds $0000, $0000, $0000, $0010    ; MAP_WESTERN_STATION7
-    map_bounds $0000, $0000, $0090, $00a0    ; MAP_WESTERN_STATION8
-    map_bounds $0000, $0000, $0000, $0010    ; MAP_WESTERN_STATION9
-    map_bounds $0000, $0340, $0000, $0160    ; MAP_ANIME_CHANNEL1
-    map_bounds $0000, $0260, $0000, $0160    ; MAP_ANIME_CHANNEL2
-    map_bounds $0000, $02e0, $0000, $00b0    ; MAP_ANIME_CHANNEL3
-    map_bounds $0000, $0540, $0000, $0220    ; MAP_ANIME_CHANNEL4
-    map_bounds $03c0, $0eb0, $0000, $00e0    ; MAP_ANIME_CHANNEL5
-    map_bounds $0000, $0140, $0000, $0090    ; MAP_ANIME_CHANNEL6
-    map_bounds $0000, $0140, $0110, $01a0    ; MAP_ANIME_CHANNEL7
-    map_bounds $0000, $0140, $0220, $02b0    ; MAP_ANIME_CHANNEL8
-    map_bounds $0100, $0330, $0000, $00e0    ; MAP_ANIME_CHANNEL9
-    map_bounds $0000, $0b50, $0000, $0160    ; MAP_SUPERHERO_SHOW1
-    map_bounds $0000, $0b80, $0000, $03c0    ; MAP_SUPERHERO_SHOW2
-    map_bounds $0000, $0390, $0000, $0160    ; MAP_SUPERHERO_SHOW3
-    map_bounds $0000, $0560, $0000, $0160    ; MAP_SUPERHERO_SHOW4
-    map_bounds $0000, $0260, $0000, $01a0    ; MAP_SUPERHERO_SHOW5
-    map_bounds $0000, $0000, $0000, $0000    ; MAP_SUPERHERO_SHOW6
-    map_bounds $0000, $0260, $0000, $0280    ; MAP_GEXTREME_SPORTS1
-    map_bounds $0000, $00a0, $00b0, $00e0    ; MAP_GEXTREME_SPORTS2
-    map_bounds $0000, $00a0, $00b0, $00e0    ; MAP_GEXTREME_SPORTS3
-    map_bounds $0000, $00a0, $00b0, $00e0    ; MAP_GEXTREME_SPORTS4
-    map_bounds $0000, $0160, $0000, $03a0    ; MAP_MARSUPIAL_MADNESS1
-    map_bounds $0000, $00e0, $0000, $00a0    ; MAP_WW_GEX_WRESTLING1
-    map_bounds $0028, $0028, $0000, $0000    ; MAP_LIZARD_OF_OZ1
-    map_bounds $0000, $01e0, $0000, $0300    ; MAP_CHANNEL_Z1
-    map_bounds $0000, $0150, $0000, $0090    ; MAP_CHANNEL_Z2
-    map_bounds $0000, $01e0, $0000, $0180    ; MAP_CHANNEL_Z3
-    map_bounds $0000, $01e0, $0000, $0180    ; MAP_CHANNEL_Z4
-    map_bounds $0028, $0028, $0000, $0000    ; MAP_CHANNEL_Z5
+    INCLUDE "data/maps/map_boundary_records.asm"
 
 call_03_647c_Map_SetSpawnPosition:
 ; Puts Gex where he belongs for the map about to be shown, then loads that map's
@@ -347,53 +207,10 @@ call_03_647c_Map_SetSpawnPosition:
     ld   [wD810_PlayerYPosition+1], A                 ;; 03:64f6 $ea $11 $d8
     jr   .jr_03_64c6                                  ;; 03:64f9 $18 $cb
 .data_03_64fb_GexCaveSpawnPoints:
-; Where Gex stands in the cave after coming back out of a TV, one record per level,
-; indexed by wDC5B_LevelIdFromTVButton. Paired with the map ids below: that table says
-; WHICH cave map, this one says where on it
-    spawn_pos $0100, $00f0            ; LEVEL_GEX_CAVE
-    spawn_pos $01b0, $0050            ; LEVEL_HOLIDAY_TV
-    spawn_pos $0030, $0050            ; LEVEL_MYSTERY_TV
-    spawn_pos $0060, $00f0            ; LEVEL_TUT_TV
-    spawn_pos $0180, $00f0            ; LEVEL_WESTERN_STATION
-    spawn_pos $00f0, $0080            ; LEVEL_ANIME_CHANNEL
-    spawn_pos $0100, $0040            ; LEVEL_SUPERHERO_SHOW
-    spawn_pos $0030, $0030            ; LEVEL_GEXTREME_SPORTS
-    spawn_pos $0050, $00f0            ; LEVEL_MARSUPIAL_MADNESS
-    spawn_pos $01b0, $0030            ; LEVEL_WW_GEX_WRESTLING
-    spawn_pos $0114, $00f0            ; LEVEL_LIZARD_OF_OZ
-    spawn_pos $01b0, $0030            ; LEVEL_CHANNEL_Z
+    INCLUDE "data/maps/gex_cave_spawn_points.asm"
 
 .data_03_652b_GexCaveSpawnMapIds:
-; Which cave map each level's TV sits on. Level 0 is the cave itself and maps to
-; MAP_GEX_CAVE1; the rest are spread over the three later cave maps
-    db   MAP_GEX_CAVE1                     ; LEVEL_GEX_CAVE
-    db   MAP_GEX_CAVE2                     ; LEVEL_HOLIDAY_TV
-    db   MAP_GEX_CAVE2                     ; LEVEL_MYSTERY_TV
-    db   MAP_GEX_CAVE3                     ; LEVEL_TUT_TV
-    db   MAP_GEX_CAVE3                     ; LEVEL_WESTERN_STATION
-    db   MAP_GEX_CAVE3                     ; LEVEL_ANIME_CHANNEL
-    db   MAP_GEX_CAVE4                     ; LEVEL_SUPERHERO_SHOW
-    db   MAP_GEX_CAVE3                     ; LEVEL_GEXTREME_SPORTS
-    db   MAP_GEX_CAVE2                     ; LEVEL_MARSUPIAL_MADNESS
-    db   MAP_GEX_CAVE3                     ; LEVEL_WW_GEX_WRESTLING
-    db   MAP_GEX_CAVE4                     ; LEVEL_LIZARD_OF_OZ
-    db   MAP_GEX_CAVE4                     ; LEVEL_CHANNEL_Z
+    INCLUDE "data/maps/gex_cave_spawn_map_ids.asm"
 
 .data_03_6537_LevelStartSpawnPoints:
-; Where Gex starts a level, one record per level. Indexed by wDB6C_CurrentMapId,
-; which at this point in a level load holds the LEVEL id - home.asm copies
-; wDC1E_CurrentLevelID into it just before calling - and the first map of every level
-; happens to have the same id as the level. So the twelve records cover every entry
-; the index can produce, and a real map id above $0B never reaches here
-    spawn_pos $0100, $00f0            ; LEVEL_GEX_CAVE
-    spawn_pos $0050, $04c0            ; LEVEL_HOLIDAY_TV
-    spawn_pos $0048, $02b0            ; LEVEL_MYSTERY_TV
-    spawn_pos $00f0, $0110            ; LEVEL_TUT_TV
-    spawn_pos $0038, $0150            ; LEVEL_WESTERN_STATION
-    spawn_pos $01f0, $0080            ; LEVEL_ANIME_CHANNEL
-    spawn_pos $0ad8, $0120            ; LEVEL_SUPERHERO_SHOW
-    spawn_pos $0298, $02b8            ; LEVEL_GEXTREME_SPORTS
-    spawn_pos $01a8, $03f8            ; LEVEL_MARSUPIAL_MADNESS
-    spawn_pos $00c0, $0080            ; LEVEL_WW_GEX_WRESTLING
-    spawn_pos $0078, $0060            ; LEVEL_LIZARD_OF_OZ
-    spawn_pos $00c8, $0320            ; LEVEL_CHANNEL_Z
+    INCLUDE "data/maps/level_start_spawn_points.asm"

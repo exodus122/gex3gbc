@@ -17,6 +17,9 @@ within a bank and everything that points at it follows automatically.
 make          # assemble and link, producing rom.gb
 make check    # build, then verify rom.gb against the original's md5
 make clean    # remove build output and generated graphics
+
+make maps-docs    # regenerate the map .asm from the .bin files
+make maps-verify  # fail if a generated .asm is stale or does not match its .bin
 ```
 
 If `rgbasm` and friends are not on your `PATH`: `make RGBDS=/path/to/rgbds/`
@@ -26,11 +29,45 @@ If `rgbasm` and friends are not on your `PATH`: `make RGBDS=/path/to/rgbds/`
 ```
 src/main.asm      section map - every bank, in order
 src/code/         disassembled code, one file per bank or subsystem
-src/data/         map entity lists, Gex's sprite frames, audio
+src/data/maps/    map data as .bin, plus the .asm generated from it (see below)
+src/data/         Gex's sprite frames, audio
 src/gfx/          graphics as PNGs, converted at build time
 src/constants/    hardware, memory map and game constants
 tools/            extraction and conversion scripts
+tools/map_formats.json   record layouts for everything under src/data/maps/
 ```
+
+## Map data
+
+The map assets under `src/data/maps/` — entity lists, door lists, spawn tables, map edge
+transitions, boundary rectangles — are `.bin` files, so `tools/map_editor` can read and
+write them directly. Beside each one is an `.asm` that is **generated** from it by
+`tools/render_map_asm.py`, and it is the `.asm` that gets assembled: `db ENTITY_TV_BUTTON`
+rather than `$11`, `MAP_DOOR_NO_TRIGGER` rather than `$ff`, one record per line, with each
+map and level id named.
+
+Some of the annotation is computed rather than stored, so it cannot go stale: each
+boundary rectangle is labelled with the maps that select it, read back out of
+`map_boundary_indices.bin`, which is how "59 records for 61 maps" stays legible after a
+map is repointed.
+
+That gives the data one source of truth and the documentation no way to drift. `grep`
+finds every map an entity appears in and the answer is current by construction; a binary
+edit made in the map editor becomes a reviewable `git diff` after `make maps-docs`; and
+because the generated file is what the ROM is built from, a generator bug fails
+`make check` rather than quietly producing a wrong document.
+
+`tools/map_formats.json` is where the record layouts live, and it is the file to edit when
+you work out what a byte means — name it once and every generated `.asm` improves. Nothing
+in the generator knows a ROM address, so unlike `tools/extract_*.py` (one-shot scripts
+that read the original ROM) it is safe to re-run on edited data. `render_map_asm.py` is
+the same file as gex2gbc's; only the schema differs.
+
+Pointer tables stay hand-written asm, because they hold `dw` of labels and binning them
+would put absolute addresses back in the source.
+
+Do not hand-edit a generated `.asm`; the next build overwrites it. Edit the `.bin`, or the
+schema, then `make maps-docs`.
 
 ## Shiftability
 

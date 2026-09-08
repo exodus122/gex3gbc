@@ -1,0 +1,293 @@
+{
+  "_doc": [
+    "Record layouts for the binary map assets under src/data/maps/.",
+    "",
+    "This file is the schema, and it is the point of the whole arrangement: the .bin",
+    "files are the source of truth for the BYTES, and this file is the source of truth",
+    "for what those bytes MEAN. tools/render_map_asm.py reads both and emits the",
+    "annotated .asm that the ROM is actually assembled from.",
+    "",
+    "So documenting a newly-understood field is an edit HERE, not a code change, and not",
+    "one edit per map: name the field once and every generated .asm improves. The same",
+    "schema is what tools/map_editor should read, so a record layout is not defined",
+    "separately in Python, in JS and in an asm comment.",
+    "",
+    "Kept deliberately close to gex2gbc/tools/map_formats.json - the generator is the",
+    "same file in both repos - even though almost every record differs. gex3 stores world",
+    "pixels where gex2 stores blocks, resolves doors in bank00 rather than bank0B, and",
+    "carries a destination map id inside a spawn record.",
+    "",
+    "JSON rather than TOML only because tomllib needs Python 3.11. Comments live in _doc."
+  ],
+
+  "enums": {
+    "ENTITY_ID": {
+      "doc": "Entity type ids. Scoped by a from/to symbol span rather than an ENTITY_ prefix match, because constants.asm reuses that prefix for ENTITY_SPAWN_RECORD_*, ENTITY_LIST_FLAG_*, ENTITY_GFX_* and more, whose values would collide.",
+      "source": "src/constants/constants.asm",
+      "from": "ENTITY_GEX",
+      "to": "ENTITY_LIST_TERMINATOR"
+    },
+    "MAP_ID": {
+      "doc": "The 61 map ids. Same span trick: MAP_ is also used for the edge indices, the scroll bits, MAP_SPAWN_*, MAP_DOOR_* and the wrap constants.",
+      "source": "src/constants/constants.asm",
+      "from": "MAP_GEX_CAVE1",
+      "to": "MAP_CHANNEL_Z5"
+    },
+    "LEVEL_ID": {
+      "doc": "The 12 levels. LEVEL_ is also used for the trigger constants, hence the span.",
+      "source": "src/constants/constants.asm",
+      "from": "LEVEL_GEX_CAVE",
+      "to": "LEVEL_CHANNEL_Z"
+    }
+  },
+
+  "assets": {
+    "entity_list": {
+      "doc": [
+        "One record per placed object, one list per LEVEL rather than per map - which is",
+        "why every record carries the map id it belongs to at +15, a field gex2 has no",
+        "equivalent of.",
+        "",
+        "Offsets are the ENTITY_SPAWN_RECORD_* / ENTITY_SPAWN_*_OFFSET constants in",
+        "src/constants/constants.asm.",
+        "",
+        "NOTE: as in gex2, the two Y bound offsets look named the wrong way round in",
+        "constants.asm. Every record has the value at +9 above the value at +11, matching",
+        "+5 above +7 on the X axis, so both axes store max then min and",
+        "ENTITY_SPAWN_BOUNDINGBOX_YMIN_OFFSET / _YMAX_OFFSET appear swapped. Renaming",
+        "those two constants is cosmetic and would leave `make check` passing."
+      ],
+      "glob": "src/data/maps/*/*_entity_list.bin",
+      "record_size": 16,
+      "record_size_constant": "ENTITY_SPAWN_RECORD_SIZE",
+      "terminator": { "value": 255, "constant": "ENTITY_LIST_TERMINATOR" },
+      "index_comment": true,
+      "lines": [
+        { "emit": "db", "fields": [
+          { "at": 0, "name": "id", "type": "u8", "enum": "ENTITY_ID" }
+        ] },
+        { "emit": "dw", "comment": "world position", "fields": [
+          { "at": 1, "name": "x", "type": "u16" },
+          { "at": 3, "name": "y", "type": "u16" }
+        ] },
+        { "emit": "dw", "comment": "room rectangle, each axis max then min", "fields": [
+          { "at": 5,  "name": "bounds_x_max", "type": "u16" },
+          { "at": 7,  "name": "bounds_x_min", "type": "u16" },
+          { "at": 9,  "name": "bounds_y_max", "type": "u16" },
+          { "at": 11, "name": "bounds_y_min", "type": "u16" }
+        ] },
+        { "emit": "dw", "comment": "free parameter - collectible id, sometimes a timer", "fields": [
+          { "at": 13, "name": "param", "type": "u16" }
+        ] },
+        { "emit": "db", "comment": "which map of the level this object is on", "fields": [
+          { "at": 15, "name": "map_id", "type": "u8", "enum": "MAP_ID" }
+        ] }
+      ]
+    },
+
+    "level_spawn_list": {
+      "doc": [
+        "One level's spawn points, indexed by spawn id. A door, a map edge or a checkpoint",
+        "names a spawn id; call_00_1633_Map_LoadWarpDestination turns it into a map and a",
+        "position, and by the time bank03's Map_SetSpawnPosition runs the answer is already",
+        "in wDC6A_WarpDestinationX / wDC6C_WarpDestinationY.",
+        "",
+        "That is the big structural difference from gex2, which searches a door list at",
+        "spawn time in bank0B and can fail to match. Here the lookup already happened.",
+        "",
+        "Positions are world pixels, not blocks - no conversion anywhere.",
+        "",
+        "There is no terminator: nothing walks these lists, they are only indexed."
+      ],
+      "glob": ["src/data/maps/*/*_spawns.bin", "src/data/maps/spawns_none_stub.bin"],
+      "record_size": 8,
+      "record_size_constant": "MAP_SPAWN_ENTRY_SIZE",
+      "index_comment": true,
+      "lines": [
+        { "emit": "db", "comment": "destination map", "fields": [
+          { "at": 0, "name": "map_id", "type": "u8", "enum": "MAP_ID" }
+        ] },
+        { "emit": "dw", "comment": "destination position, world pixels", "fields": [
+          { "at": 1, "name": "x", "type": "u16" },
+          { "at": 3, "name": "y", "type": "u16" }
+        ] },
+        { "emit": "db", "comment": "linked spawn id, or the sentinel for a fixed position, then 2 spare", "fields": [
+          { "at": 5, "name": "link", "type": "u8",
+            "sentinels": { "255": "MAP_SPAWN_LINK_ABSOLUTE" } },
+          { "at": 6, "name": "spare0", "type": "u8" },
+          { "at": 7, "name": "spare1", "type": "u8" }
+        ] }
+      ]
+    },
+
+    "door_list": {
+      "doc": [
+        "One map's doors. Each names the spawn id to warp to, so a door here is a pointer",
+        "into its level's spawn list rather than gex2's self-contained from/to block pair.",
+        "",
+        "A door fires when the player is within MAP_DOOR_X_TOLERANCE of its X, and its",
+        "trigger byte - when it is not MAP_DOOR_NO_TRIGGER - gates it on a",
+        "wDCB1_LevelTriggerBuffer flag, which gex2 has no equivalent of at all.",
+        "",
+        "Positions are world pixels. The list ends in MAP_DOOR_LIST_END."
+      ],
+      "glob": "src/data/maps/*/*_doors.bin",
+      "record_size": 6,
+      "record_size_constant": "MAP_DOOR_ENTRY_SIZE",
+      "terminator": { "value": 255, "constant": "MAP_DOOR_LIST_END" },
+      "index_comment": true,
+      "lines": [
+        { "emit": "db", "comment": "spawn id to warp to, then the trigger that gates it", "fields": [
+          { "at": 0, "name": "spawn_id", "type": "u8" },
+          { "at": 1, "name": "trigger", "type": "u8",
+            "sentinels": { "255": "MAP_DOOR_NO_TRIGGER" } }
+        ] },
+        { "emit": "dw", "comment": "door position, world pixels", "fields": [
+          { "at": 2, "name": "x", "type": "u16" },
+          { "at": 4, "name": "y", "type": "u16" }
+        ] }
+      ]
+    },
+
+    "map_edge_spawn_ids": {
+      "doc": [
+        "Four bytes per map, one per edge in MAP_EDGE_TOP, MAP_EDGE_BOTTOM, MAP_EDGE_LEFT,",
+        "MAP_EDGE_RIGHT order: the spawn id the player arrives at when they leave by that",
+        "edge. This is how gex3 stitches a level's maps together without a door - walk off",
+        "the side and the next map loads.",
+        "",
+        "MAP_EDGE_SPAWN_NONE means that edge leads nowhere; MAP_EDGE_SPAWN_CONDITIONAL",
+        "means spawn $10, but only if wDCB1_LevelTriggerBuffer[0] is set."
+      ],
+      "glob": "src/data/maps/map_edge_spawn_ids.bin",
+      "record_size": 4,
+      "index_comment": true,
+      "index_enum": "MAP_ID",
+      "lines": [
+        { "emit": "db", "comment": "top, bottom, left, right", "fields": [
+          { "at": 0, "name": "top",    "type": "u8",
+            "sentinels": { "255": "MAP_EDGE_SPAWN_NONE", "254": "MAP_EDGE_SPAWN_CONDITIONAL" } },
+          { "at": 1, "name": "bottom", "type": "u8",
+            "sentinels": { "255": "MAP_EDGE_SPAWN_NONE", "254": "MAP_EDGE_SPAWN_CONDITIONAL" } },
+          { "at": 2, "name": "left",   "type": "u8",
+            "sentinels": { "255": "MAP_EDGE_SPAWN_NONE", "254": "MAP_EDGE_SPAWN_CONDITIONAL" } },
+          { "at": 3, "name": "right",  "type": "u8",
+            "sentinels": { "255": "MAP_EDGE_SPAWN_NONE", "254": "MAP_EDGE_SPAWN_CONDITIONAL" } }
+        ] }
+      ]
+    },
+
+    "map_boundary_indices": {
+      "doc": [
+        "Which boundary record each map uses, one byte per map id. Several maps share a",
+        "record - every Gex Cave map is the same rectangle, and so is every unused slot -",
+        "which is why there are 59 records for 61 maps.",
+        "",
+        "Record MAP_WRAP_BOUNDARY_INDEX is the odd one out: a map pointed at it wraps",
+        "horizontally. No map here uses it, so that path is reachable only if",
+        "wDC2A_MapBoundaryIndex is set from somewhere else.",
+        "",
+        "gex2 has no equivalent of any of this - every gex2 map is the same size, so its",
+        "camera clamps against constants baked into the code."
+      ],
+      "glob": "src/data/maps/map_boundary_indices.bin",
+      "record_size": 1,
+      "index_comment": true,
+      "index_enum": "MAP_ID",
+      "lines": [
+        { "emit": "db", "comment": "boundary record number", "fields": [
+          { "at": 0, "name": "record", "type": "u8" }
+        ] }
+      ]
+    },
+
+    "map_boundary_records": {
+      "doc": [
+        "The map rectangles, in world pixels. The stored values are the CAMERA's travel and",
+        "go into wDC34_MapBoundaryXMinLo..; the loader also adds the four",
+        "PLAYER_BOUNDARY_*_INSET offsets and writes that wider rectangle into",
+        "wDC3C_PlayerBoundaryXMinLo.., which is how far Gex may walk. The player rectangle",
+        "is wider because the camera stops when its own corner reaches the limit while Gex",
+        "still has most of a screen to cross.",
+        "",
+        "Record 0 is selected by no map, and is not a real rectangle either: X min and X max",
+        "are both $0000, so it has no width."
+      ],
+      "glob": "src/data/maps/map_boundary_records.bin",
+      "record_size": 8,
+      "index_comment": true,
+      "annotate": { "kind": "reverse_index", "index_asset": "map_boundary_indices",
+                    "enum": "MAP_ID", "max_names": 2 },
+      "lines": [
+        { "emit": "map_bounds", "macro": true, "comment": "X min, X max, Y min, Y max", "fields": [
+          { "at": 0, "name": "x_min", "type": "u16" },
+          { "at": 2, "name": "x_max", "type": "u16" },
+          { "at": 4, "name": "y_min", "type": "u16" },
+          { "at": 6, "name": "y_max", "type": "u16" }
+        ] }
+      ]
+    },
+
+    "gex_cave_spawn_points": {
+      "doc": [
+        "Where Gex stands in the cave after coming back out of a TV, one record per level,",
+        "indexed by wDC5B_LevelIdFromTVButton. Paired with gex_cave_spawn_map_ids: that",
+        "table says which cave map, this one says where on it.",
+        "",
+        "gex2's equivalent is one table, because its hub is a single map; gex3 needs two",
+        "because the cave is four."
+      ],
+      "glob": "src/data/maps/gex_cave_spawn_points.bin",
+      "record_size": 4,
+      "index_comment": true,
+      "index_enum": "LEVEL_ID",
+      "lines": [
+        { "emit": "spawn_pos", "macro": true, "comment": "world X, world Y", "fields": [
+          { "at": 0, "name": "x", "type": "u16" },
+          { "at": 2, "name": "y", "type": "u16" }
+        ] }
+      ]
+    },
+
+    "gex_cave_spawn_map_ids": {
+      "doc": [
+        "Which cave map each level's TV sits on. Level 0 is the cave itself and maps to",
+        "MAP_GEX_CAVE1; the rest are spread over the three later cave maps."
+      ],
+      "glob": "src/data/maps/gex_cave_spawn_map_ids.bin",
+      "record_size": 1,
+      "index_comment": true,
+      "index_enum": "LEVEL_ID",
+      "lines": [
+        { "emit": "db", "fields": [
+          { "at": 0, "name": "map_id", "type": "u8", "enum": "MAP_ID" }
+        ] }
+      ]
+    },
+
+    "level_start_spawn_points": {
+      "doc": [
+        "Where Gex starts a level, one record per level. Indexed by wDB6C_CurrentMapId,",
+        "which at this point in a level load holds the LEVEL id - home.asm copies",
+        "wDC1E_CurrentLevelID into it just before calling - and the first map of every level",
+        "happens to share its level's id. So twelve records cover every index this can",
+        "produce, and a real map id above $0B never reaches here.",
+        "",
+        "gex2 stores several checkpoints per level here; gex3 stores one start and handles",
+        "checkpoints through the warp path instead."
+      ],
+      "glob": "src/data/maps/level_start_spawn_points.bin",
+      "record_size": 4,
+      "index_comment": true,
+      "index_enum": "LEVEL_ID",
+      "lines": [
+        { "emit": "spawn_pos", "macro": true, "comment": "world X, world Y", "fields": [
+          { "at": 0, "name": "x", "type": "u16" },
+          { "at": 2, "name": "y", "type": "u16" }
+        ] }
+      ]
+    }
+  },
+
+  "decoders": {}
+}
