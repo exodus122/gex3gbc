@@ -21,7 +21,7 @@
 ;   blockmap hi         one byte per block - HIGH byte of the block id
 ;   blockset            8 bytes per block id: 4 tile ids, then the 4 matching
 ;                       GBC attribute bytes (palette, flips, VRAM bank)
-;   collision map       one byte per block - which collision block sits there
+;   collision blockmap  one byte per block - which collision block sits there
 ;   collision blockset  4 bytes per collision block id: 4 collision tile ids
 ;   tileset             the tile graphics themselves
 ;
@@ -103,7 +103,7 @@
 ;                 streaming system; gex3 spends the same layer on the high byte
 ;                 of a 16-bit block id and has no secondary tilesets at all
 ;   collision     gex2 reads it out of the blockset bank; gex3 has a separate
-;                 collision map and collision blockset, expanded into
+;                 collision blockmap and collision blockset, expanded into
 ;                 wC000_BgMapTileIds
 ;   VRAM          gex2 writes tiles into VRAM inside the loader, toggling
 ;                 GBC banks with `set 3, H`; gex3 stages into wCF00 and defers
@@ -450,7 +450,7 @@ call_00_11e5_BgMap_LoadRowForVerticalScroll:
 ; Then it makes five passes, switching banks each time:
 ;   1. blockmap bank       11 block-id low bytes  -> scratch, stride 2
 ;   2. blockmap hi bank    11 block-id high bytes -> scratch, interleaved
-;   3. collision map bank  11 collision block ids -> wC000_BgMapTileIds
+;   3. collision blockmap  11 collision block ids -> wC000_BgMapTileIds
 ;   4. blockset bank       expand each 16-bit block id: tile ids overwrite the
 ;                          scratch entry in place, attribute bytes go to the
 ;                          +$80 half (wCF80_BgMap_TempScratchRowAttributes)
@@ -581,7 +581,7 @@ call_00_11e5_BgMap_LoadRowForVerticalScroll:
     jr   NZ, .jr_00_1289                               ;; 00:1290 $20 $f7
     call call_00_0f08_RestoreBank                                  ;; 00:1292 $cd $08 $0f
     ; --- pass 3: collision block ids, staged in wC000_BgMapTileIds ---
-    ld   A, [wDC0D_MapCollisionBank]                                    ;; 00:1295 $fa $0d $dc
+    ld   A, [wDC0D_CollisionBlockmapBank]                               ;; 00:1295 $fa $0d $dc
     call call_00_0eee_SwitchBank                                  ;; 00:1298 $cd $ee $0e
     ld   HL, wDC28_BgMap_ScrollBlockY                                     ;; 00:129b $21 $28 $dc
     ld   L, [HL]                                       ;; 00:129e $6e
@@ -589,7 +589,7 @@ call_00_11e5_BgMap_LoadRowForVerticalScroll:
     ld   E, [HL]                                       ;; 00:12a1 $5e
     inc  H                                             ;; 00:12a2 $24
     ld   D, [HL]                                       ;; 00:12a3 $56
-    ld   HL, wDC0E_MapCollisionBankOffset                                     ;; 00:12a4 $21 $0e $dc
+    ld   HL, wDC0E_CollisionBlockmapBankOffset                                ;; 00:12a4 $21 $0e $dc
     ld   A, [HL+]                                      ;; 00:12a7 $2a
     add  A, E                                          ;; 00:12a8 $83
     ld   E, A                                          ;; 00:12a9 $5f
@@ -871,7 +871,7 @@ call_00_1351_BgMap_LoadColumnForHorizontalScroll:
     jr   NZ, .jr_00_140a                               ;; 00:1414 $20 $f4
     call call_00_0f08_RestoreBank                                  ;; 00:1416 $cd $08 $0f
     ; --- pass 3: collision block ids, staged in wC000_BgMapTileIds ---
-    ld   A, [wDC0D_MapCollisionBank]                                    ;; 00:1419 $fa $0d $dc
+    ld   A, [wDC0D_CollisionBlockmapBank]                               ;; 00:1419 $fa $0d $dc
     call call_00_0eee_SwitchBank                                  ;; 00:141c $cd $ee $0e
     ld   HL, wDC28_BgMap_ScrollBlockY                                     ;; 00:141f $21 $28 $dc
     ld   L, [HL]                                       ;; 00:1422 $6e
@@ -879,7 +879,7 @@ call_00_1351_BgMap_LoadColumnForHorizontalScroll:
     ld   E, [HL]                                       ;; 00:1425 $5e
     inc  H                                             ;; 00:1426 $24
     ld   D, [HL]                                       ;; 00:1427 $56
-    ld   HL, wDC0E_MapCollisionBankOffset                                     ;; 00:1428 $21 $0e $dc
+    ld   HL, wDC0E_CollisionBlockmapBankOffset                                ;; 00:1428 $21 $0e $dc
     ld   A, [HL+]                                      ;; 00:142b $2a
     add  A, E                                          ;; 00:142c $83
     ld   E, A                                          ;; 00:142d $5f
@@ -1299,7 +1299,7 @@ call_00_1a46_BgMap_LoadInitialRow:
 ; time in vblank.
 ;
 ; wDC33_BgMap_InitialLoadPass decides which layer, in two ways at once. Bit 7
-; branches to the collision path at .jp_00_1b40, which reads the collision map
+; branches to the collision path at .jp_00_1b40, which reads the collision blockmap
 ; and expands it through the collision blockset. The low bits are OR'd into the
 ; byte offset used inside each 8-byte blockset entry, on top of the
 ; (camera Y AND 8) ? 2 : 0 that picks the top or bottom tile row of the block -
@@ -1468,9 +1468,9 @@ call_00_1a46_BgMap_LoadInitialRow:
     jr   NZ, .jr_00_1b1b                               ;; 00:1b3b $20 $de
     jp   call_00_0f08_RestoreBank                                  ;; 00:1b3d $c3 $08 $0f
 .jp_00_1b40:
-    ; BGMAP_PASS_COLLISION: collision map -> collision blockset -> wC000_BgMapTileIds,
+    ; BGMAP_PASS_COLLISION: collision blockmap -> collision blockset -> wC000_BgMapTileIds,
     ; where it stays for the rest of the map's life as the collision layer
-    ld   A, [wDC0D_MapCollisionBank]                                    ;; 00:1b40 $fa $0d $dc
+    ld   A, [wDC0D_CollisionBlockmapBank]                               ;; 00:1b40 $fa $0d $dc
     call call_00_0eee_SwitchBank                                  ;; 00:1b43 $cd $ee $0e
     ld   HL, wDC28_BgMap_ScrollBlockY                                     ;; 00:1b46 $21 $28 $dc
     ld   L, [HL]                                       ;; 00:1b49 $6e
@@ -1478,7 +1478,7 @@ call_00_1a46_BgMap_LoadInitialRow:
     ld   E, [HL]                                       ;; 00:1b4c $5e
     inc  H                                             ;; 00:1b4d $24
     ld   D, [HL]                                       ;; 00:1b4e $56
-    ld   HL, wDC0E_MapCollisionBankOffset                                     ;; 00:1b4f $21 $0e $dc
+    ld   HL, wDC0E_CollisionBlockmapBankOffset                                ;; 00:1b4f $21 $0e $dc
     ld   A, [HL+]                                      ;; 00:1b52 $2a
     add  A, E                                          ;; 00:1b53 $83
     ld   E, A                                          ;; 00:1b54 $5f

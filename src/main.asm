@@ -992,30 +992,30 @@ WesternStation_6_blockmap:
     INCBIN "data/maps/WesternStation/WesternStation_6/WesternStation_6_blockmap.bin"
 
 SECTION "bank30", ROMX[$4000], BANK[$30]
-ChannelZ_1_collision:
-    INCBIN "data/maps/ChannelZ/ChannelZ_1/ChannelZ_1_collision.bin"
-ChannelZ_2_collision:
-    INCBIN "data/maps/ChannelZ/ChannelZ_2/ChannelZ_2_collision.bin"
-ChannelZ_3_collision:
-    INCBIN "data/maps/ChannelZ/ChannelZ_3/ChannelZ_3_collision.bin"
-ChannelZ_4_collision:
-    INCBIN "data/maps/ChannelZ/ChannelZ_4/ChannelZ_4_collision.bin"
-ChannelZ_5_collision:
-    INCBIN "data/maps/ChannelZ/ChannelZ_5/ChannelZ_5_collision.bin"
-WesternStation_1_collision:
-    INCBIN "data/maps/WesternStation/WesternStation_1/WesternStation_1_collision.bin"
+ChannelZ_1_collision_blockmap:
+    INCBIN "data/maps/ChannelZ/ChannelZ_1/ChannelZ_1_collision_blockmap.bin"
+ChannelZ_2_collision_blockmap:
+    INCBIN "data/maps/ChannelZ/ChannelZ_2/ChannelZ_2_collision_blockmap.bin"
+ChannelZ_3_collision_blockmap:
+    INCBIN "data/maps/ChannelZ/ChannelZ_3/ChannelZ_3_collision_blockmap.bin"
+ChannelZ_4_collision_blockmap:
+    INCBIN "data/maps/ChannelZ/ChannelZ_4/ChannelZ_4_collision_blockmap.bin"
+ChannelZ_5_collision_blockmap:
+    INCBIN "data/maps/ChannelZ/ChannelZ_5/ChannelZ_5_collision_blockmap.bin"
+WesternStation_1_collision_blockmap:
+    INCBIN "data/maps/WesternStation/WesternStation_1/WesternStation_1_collision_blockmap.bin"
 junk_collision_data:
     INCBIN "data/maps/WesternStation/junk_collision_data.bin"
-WesternStation_2_collision:
-    INCBIN "data/maps/WesternStation/WesternStation_2/WesternStation_2_collision.bin"
-WesternStation_3_collision:
-    INCBIN "data/maps/WesternStation/WesternStation_3/WesternStation_3_collision.bin"
-WesternStation_4_collision:
-    INCBIN "data/maps/WesternStation/WesternStation_4/WesternStation_4_collision.bin"
-WesternStation_5_collision:
-    INCBIN "data/maps/WesternStation/WesternStation_5/WesternStation_5_collision.bin"
-WesternStation_6_collision:
-    INCBIN "data/maps/WesternStation/WesternStation_6/WesternStation_6_collision.bin"
+WesternStation_2_collision_blockmap:
+    INCBIN "data/maps/WesternStation/WesternStation_2/WesternStation_2_collision_blockmap.bin"
+WesternStation_3_collision_blockmap:
+    INCBIN "data/maps/WesternStation/WesternStation_3/WesternStation_3_collision_blockmap.bin"
+WesternStation_4_collision_blockmap:
+    INCBIN "data/maps/WesternStation/WesternStation_4/WesternStation_4_collision_blockmap.bin"
+WesternStation_5_collision_blockmap:
+    INCBIN "data/maps/WesternStation/WesternStation_5/WesternStation_5_collision_blockmap.bin"
+WesternStation_6_collision_blockmap:
+    INCBIN "data/maps/WesternStation/WesternStation_6/WesternStation_6_collision_blockmap.bin"
 
 SECTION "bank31", ROMX[$4000], BANK[$31]
 MysteryTV_1_blockmap_hi:
@@ -1078,34 +1078,34 @@ HolidayTV_2_blockmap:
     INCBIN "data/maps/HolidayTV/HolidayTV_2/HolidayTV_2_blockmap.bin"
 
 SECTION "bank33", ROMX[$4000], BANK[$33]
-MysteryTV_1_collision:
-    INCBIN "data/maps/MysteryTV/MysteryTV_1/MysteryTV_1_collision.bin"
-MysteryTV_2_collision:
-    INCBIN "data/maps/MysteryTV/MysteryTV_2/MysteryTV_2_collision.bin"
-MysteryTV_3_collision:
-    INCBIN "data/maps/MysteryTV/MysteryTV_3/MysteryTV_3_collision.bin"
-MysteryTV_4_collision:
-    INCBIN "data/maps/MysteryTV/MysteryTV_4/MysteryTV_4_collision.bin"
-MysteryTV_7_collision:
-    INCBIN "data/maps/MysteryTV/MysteryTV_7/MysteryTV_7_collision.bin"
-MysteryTV_8_collision:
-    INCBIN "data/maps/MysteryTV/MysteryTV_8/MysteryTV_8_collision.bin"
-TutTV_1_collision:
-    INCBIN "data/maps/TutTV/TutTV_1/TutTV_1_collision.bin"
-TutTV_2_collision:
-    INCBIN "data/maps/TutTV/TutTV_2/TutTV_2_collision.bin"
-TutTV_3_collision:
-    INCBIN "data/maps/TutTV/TutTV_3/TutTV_3_collision.bin"
-TutTV_4_collision:
-    INCBIN "data/maps/TutTV/TutTV_4/TutTV_4_collision.bin"
-TutTV_5_collision:
-    INCBIN "data/maps/TutTV/TutTV_5/TutTV_5_collision.bin"
-TutTV_6_collision:
-    INCBIN "data/maps/TutTV/TutTV_6/TutTV_6_collision.bin"
-TutTV_7_collision:
-    INCBIN "data/maps/TutTV/TutTV_7/TutTV_7_collision.bin"	
-HolidayTV_2_collision:
-    INCBIN "data/maps/HolidayTV/HolidayTV_2/HolidayTV_2_collision.bin"
+MysteryTV_1_collision_blockmap:
+    INCBIN "data/maps/MysteryTV/MysteryTV_1/MysteryTV_1_collision_blockmap.bin"
+MysteryTV_2_collision_blockmap:
+    INCBIN "data/maps/MysteryTV/MysteryTV_2/MysteryTV_2_collision_blockmap.bin"
+MysteryTV_3_collision_blockmap:
+    INCBIN "data/maps/MysteryTV/MysteryTV_3/MysteryTV_3_collision_blockmap.bin"
+MysteryTV_4_collision_blockmap:
+    INCBIN "data/maps/MysteryTV/MysteryTV_4/MysteryTV_4_collision_blockmap.bin"
+MysteryTV_7_collision_blockmap:
+    INCBIN "data/maps/MysteryTV/MysteryTV_7/MysteryTV_7_collision_blockmap.bin"
+MysteryTV_8_collision_blockmap:
+    INCBIN "data/maps/MysteryTV/MysteryTV_8/MysteryTV_8_collision_blockmap.bin"
+TutTV_1_collision_blockmap:
+    INCBIN "data/maps/TutTV/TutTV_1/TutTV_1_collision_blockmap.bin"
+TutTV_2_collision_blockmap:
+    INCBIN "data/maps/TutTV/TutTV_2/TutTV_2_collision_blockmap.bin"
+TutTV_3_collision_blockmap:
+    INCBIN "data/maps/TutTV/TutTV_3/TutTV_3_collision_blockmap.bin"
+TutTV_4_collision_blockmap:
+    INCBIN "data/maps/TutTV/TutTV_4/TutTV_4_collision_blockmap.bin"
+TutTV_5_collision_blockmap:
+    INCBIN "data/maps/TutTV/TutTV_5/TutTV_5_collision_blockmap.bin"
+TutTV_6_collision_blockmap:
+    INCBIN "data/maps/TutTV/TutTV_6/TutTV_6_collision_blockmap.bin"
+TutTV_7_collision_blockmap:
+    INCBIN "data/maps/TutTV/TutTV_7/TutTV_7_collision_blockmap.bin"	
+HolidayTV_2_collision_blockmap:
+    INCBIN "data/maps/HolidayTV/HolidayTV_2/HolidayTV_2_collision_blockmap.bin"
 
 SECTION "bank34", ROMX[$4000], BANK[$34]
 HolidayTV_1_blockmap_hi:
@@ -1128,14 +1128,14 @@ WWGexWrestling_1_blockmap:
     INCBIN "data/maps/WWGexWrestling/WWGexWrestling_1/WWGexWrestling_1_blockmap.bin"
 
 SECTION "bank36", ROMX[$4000], BANK[$36]
-HolidayTV_1_collision:
-    INCBIN "data/maps/HolidayTV/HolidayTV_1/HolidayTV_1_collision.bin"
-HolidayTV_4_collision:
-    INCBIN "data/maps/HolidayTV/HolidayTV_4/HolidayTV_4_collision.bin"
-MarsupialMadness_1_collision:
-    INCBIN "data/maps/MarsupialMadness/MarsupialMadness_1/MarsupialMadness_1_collision.bin"
-WWGexWrestling_1_collision:
-    INCBIN "data/maps/WWGexWrestling/WWGexWrestling_1/WWGexWrestling_1_collision.bin"
+HolidayTV_1_collision_blockmap:
+    INCBIN "data/maps/HolidayTV/HolidayTV_1/HolidayTV_1_collision_blockmap.bin"
+HolidayTV_4_collision_blockmap:
+    INCBIN "data/maps/HolidayTV/HolidayTV_4/HolidayTV_4_collision_blockmap.bin"
+MarsupialMadness_1_collision_blockmap:
+    INCBIN "data/maps/MarsupialMadness/MarsupialMadness_1/MarsupialMadness_1_collision_blockmap.bin"
+WWGexWrestling_1_collision_blockmap:
+    INCBIN "data/maps/WWGexWrestling/WWGexWrestling_1/WWGexWrestling_1_collision_blockmap.bin"
 
 SECTION "bank37", ROMX[$4000], BANK[$37]
 AnimeChannel_1_blockmap_hi:
@@ -1170,20 +1170,20 @@ LizardOfOz_1_blockmap:
     INCBIN "data/maps/LizardOfOz/LizardOfOz_1/LizardOfOz_1_blockmap.bin"
 
 SECTION "bank39", ROMX[$4000], BANK[$39]
-AnimeChannel_1_collision:
-    INCBIN "data/maps/AnimeChannel/AnimeChannel_1/AnimeChannel_1_collision.bin"
-AnimeChannel_2_collision:
-    INCBIN "data/maps/AnimeChannel/AnimeChannel_2/AnimeChannel_2_collision.bin"
-AnimeChannel_3_collision:
-    INCBIN "data/maps/AnimeChannel/AnimeChannel_3/AnimeChannel_3_collision.bin"
-AnimeChannel_4_collision:
-    INCBIN "data/maps/AnimeChannel/AnimeChannel_4/AnimeChannel_4_collision.bin"
-AnimeChannel_5_collision:
-    INCBIN "data/maps/AnimeChannel/AnimeChannel_5/AnimeChannel_5_collision.bin"
-AnimeChannel_6_collision:
-    INCBIN "data/maps/AnimeChannel/AnimeChannel_6/AnimeChannel_6_collision.bin"
-LizardOfOz_1_collision:
-    INCBIN "data/maps/LizardOfOz/LizardOfOz_1/LizardOfOz_1_collision.bin"
+AnimeChannel_1_collision_blockmap:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_1/AnimeChannel_1_collision_blockmap.bin"
+AnimeChannel_2_collision_blockmap:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_2/AnimeChannel_2_collision_blockmap.bin"
+AnimeChannel_3_collision_blockmap:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_3/AnimeChannel_3_collision_blockmap.bin"
+AnimeChannel_4_collision_blockmap:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_4/AnimeChannel_4_collision_blockmap.bin"
+AnimeChannel_5_collision_blockmap:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_5/AnimeChannel_5_collision_blockmap.bin"
+AnimeChannel_6_collision_blockmap:
+    INCBIN "data/maps/AnimeChannel/AnimeChannel_6/AnimeChannel_6_collision_blockmap.bin"
+LizardOfOz_1_collision_blockmap:
+    INCBIN "data/maps/LizardOfOz/LizardOfOz_1/LizardOfOz_1_collision_blockmap.bin"
 
 SECTION "bank3a", ROMX[$4000], BANK[$3a]
 SuperheroShow_2_blockmap_hi:
@@ -1198,10 +1198,10 @@ GextremeSports_1_blockmap:
     INCBIN "data/maps/GextremeSports/GextremeSports_1/GextremeSports_1_blockmap.bin"
 
 SECTION "bank3c", ROMX[$4000], BANK[$3c]
-SuperheroShow_2_collision:
-    INCBIN "data/maps/SuperheroShow/SuperheroShow_2/SuperheroShow_2_collision.bin"
-GextremeSports_1_collision:
-    INCBIN "data/maps/GextremeSports/GextremeSports_1/GextremeSports_1_collision.bin"
+SuperheroShow_2_collision_blockmap:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_2/SuperheroShow_2_collision_blockmap.bin"
+GextremeSports_1_collision_blockmap:
+    INCBIN "data/maps/GextremeSports/GextremeSports_1/GextremeSports_1_collision_blockmap.bin"
 
 SECTION "bank3d", ROMX[$4000], BANK[$3d]
 SuperheroShow_1_blockmap_hi:
@@ -1244,24 +1244,24 @@ GexCave_4_blockmap:
     INCBIN "data/maps/GexCave/GexCave_4/GexCave_4_blockmap.bin"
 
 SECTION "bank3f", ROMX[$4000], BANK[$3f]
-SuperheroShow_1_collision:
-    INCBIN "data/maps/SuperheroShow/SuperheroShow_1/SuperheroShow_1_collision.bin"
-SuperheroShow_3_collision:
-    INCBIN "data/maps/SuperheroShow/SuperheroShow_3/SuperheroShow_3_collision.bin"
-SuperheroShow_4_collision:
-    INCBIN "data/maps/SuperheroShow/SuperheroShow_4/SuperheroShow_4_collision.bin"
-SuperheroShow_5_collision:
-    INCBIN "data/maps/SuperheroShow/SuperheroShow_5/SuperheroShow_5_collision.bin"
-SuperheroShow_6_collision:
-    INCBIN "data/maps/SuperheroShow/SuperheroShow_6/SuperheroShow_6_collision.bin"
-GexCave_1_collision:
-    INCBIN "data/maps/GexCave/GexCave_1/GexCave_1_collision.bin"
-GexCave_2_collision:
-    INCBIN "data/maps/GexCave/GexCave_2/GexCave_2_collision.bin"
-GexCave_3_collision:
-    INCBIN "data/maps/GexCave/GexCave_3/GexCave_3_collision.bin"
-GexCave_4_collision:
-    INCBIN "data/maps/GexCave/GexCave_4/GexCave_4_collision.bin"
+SuperheroShow_1_collision_blockmap:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_1/SuperheroShow_1_collision_blockmap.bin"
+SuperheroShow_3_collision_blockmap:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_3/SuperheroShow_3_collision_blockmap.bin"
+SuperheroShow_4_collision_blockmap:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_4/SuperheroShow_4_collision_blockmap.bin"
+SuperheroShow_5_collision_blockmap:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_5/SuperheroShow_5_collision_blockmap.bin"
+SuperheroShow_6_collision_blockmap:
+    INCBIN "data/maps/SuperheroShow/SuperheroShow_6/SuperheroShow_6_collision_blockmap.bin"
+GexCave_1_collision_blockmap:
+    INCBIN "data/maps/GexCave/GexCave_1/GexCave_1_collision_blockmap.bin"
+GexCave_2_collision_blockmap:
+    INCBIN "data/maps/GexCave/GexCave_2/GexCave_2_collision_blockmap.bin"
+GexCave_3_collision_blockmap:
+    INCBIN "data/maps/GexCave/GexCave_3/GexCave_3_collision_blockmap.bin"
+GexCave_4_collision_blockmap:
+    INCBIN "data/maps/GexCave/GexCave_4/GexCave_4_collision_blockmap.bin"
 
 SECTION "bank40", ROMX[$4000], BANK[$40]
 AnimeChannel_1_tileset:

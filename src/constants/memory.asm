@@ -829,8 +829,8 @@ wDBFF_BgMap_PrevRow:
 ; gex2 keeps the same idea in wD6F5-wD700, but with far fewer layers: it has a
 ; blockmap, one "alt blockset" flag layer, a combined blockset+collision bank
 ; and a tileset. gex3 splits them into six independent streams - blockmap,
-; blockmap hi, blockset, collision map, collision blockset, tileset - which is
-; what lets a gex3 map be any size and use more than 256 distinct blocks.
+; blockmap hi, blockset, collision blockmap, collision blockset, tileset -
+; which is what lets a gex3 map be any size and use more than 256 distinct blocks.
 ; ------------------------------------------------------------------
 wDC01_BlockmapBank:
 ; Blockmap: one byte per 16x16 block, rows are wDC1C_CurrentMapWidthAndHeightInBlocks
@@ -858,12 +858,12 @@ wDC0A_BlocksetBank:
     ds 1                                               ;; dc0a
 wDC0B_BlocksetBankOffset:
     ds 2                                               ;; dc0b
-wDC0D_MapCollisionBank:
-; Collision map: a third layer over the same block grid, one byte per block,
+wDC0D_CollisionBlockmapBank:
+; Collision blockmap: a third grid over the same blocks, one byte per block,
 ; naming the collision block to use there. gex2 has no separate layer - its
 ; collision lives in the same bank as the blockset
     ds 1                                               ;; dc0d
-wDC0E_MapCollisionBankOffset:
+wDC0E_CollisionBlockmapBankOffset:
     ds 2                                               ;; dc0e
 wDC10_CollisionBlockset:
 ; Collision blockset: 4 bytes per collision block id, the four collision tile

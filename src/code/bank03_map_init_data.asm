@@ -13,7 +13,7 @@
 ;   tileset             the 2bpp graphics
 ;   blockset            8 bytes per block id - four tile ids then four CGB attribute
 ;                       bytes - which is what turns a block id into four tiles
-;   collision           a third grid over the same blocks, naming a collision block
+;   collision blockmap  a third grid over the same blocks, naming a collision block
 ;   collision blockset  4 bytes per collision block id, its four collision tiles
 ;   palette             the map's CGB background palettes
 ;   entity list         shared by every map in the level, see bank00_entity_load
@@ -149,7 +149,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer GexCave_1_blockmap_hi
     farpointer GexCave_1_tileset
     farpointer GexCave_1_blockset
-    farpointer GexCave_1_collision
+    farpointer GexCave_1_collision_blockmap
     farpointer GexCave_1_collision_blockset
     farpointer GexCave_1_palette
     farpointer GexCave_entity_list
@@ -160,7 +160,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer GexCave_2_blockmap_hi
     farpointer GexCave_2_tileset
     farpointer GexCave_2_blockset
-    farpointer GexCave_2_collision
+    farpointer GexCave_2_collision_blockmap
     farpointer GexCave_2_collision_blockset
     farpointer GexCave_2_palette
     farpointer GexCave_entity_list
@@ -171,7 +171,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer GexCave_3_blockmap_hi
     farpointer GexCave_3_tileset
     farpointer GexCave_3_blockset
-    farpointer GexCave_3_collision
+    farpointer GexCave_3_collision_blockmap
     farpointer GexCave_3_collision_blockset
     farpointer GexCave_3_palette
     farpointer GexCave_entity_list
@@ -182,7 +182,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer GexCave_4_blockmap_hi
     farpointer GexCave_4_tileset
     farpointer GexCave_4_blockset
-    farpointer GexCave_4_collision
+    farpointer GexCave_4_collision_blockmap
     farpointer GexCave_4_collision_blockset
     farpointer GexCave_4_palette
     farpointer GexCave_entity_list
@@ -193,7 +193,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer HolidayTV_1_blockmap_hi
     farpointer HolidayTV_1_tileset
     farpointer HolidayTV_1_blockset
-    farpointer HolidayTV_1_collision
+    farpointer HolidayTV_1_collision_blockmap
     farpointer HolidayTV_1_collision_blockset
     farpointer HolidayTV_1_palette
     farpointer HolidayTV_entity_list
@@ -204,7 +204,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer HolidayTV_2_blockmap_hi
     farpointer HolidayTV_2_tileset
     farpointer HolidayTV_2_blockset
-    farpointer HolidayTV_2_collision
+    farpointer HolidayTV_2_collision_blockmap
     farpointer HolidayTV_2_collision_blockset
     farpointer HolidayTV_2_palette
     farpointer HolidayTV_entity_list
@@ -215,7 +215,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer HolidayTV_2_blockmap_hi
     farpointer HolidayTV_2_tileset
     farpointer HolidayTV_2_blockset
-    farpointer HolidayTV_2_collision
+    farpointer HolidayTV_2_collision_blockmap
     farpointer HolidayTV_2_collision_blockset
     farpointer HolidayTV_3_palette_4180
     farpointer HolidayTV_entity_list
@@ -226,7 +226,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer HolidayTV_4_blockmap_hi
     farpointer HolidayTV_4_tileset
     farpointer HolidayTV_4_blockset
-    farpointer HolidayTV_4_collision
+    farpointer HolidayTV_4_collision_blockmap
     farpointer HolidayTV_4_collision_blockset
     farpointer HolidayTV_4_palette
     farpointer HolidayTV_entity_list
@@ -237,7 +237,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MysteryTV_1_blockmap_hi
     farpointer MysteryTV_1_tileset
     farpointer MysteryTV_1_blockset
-    farpointer MysteryTV_1_collision
+    farpointer MysteryTV_1_collision_blockmap
     farpointer MysteryTV_1_collision_blockset
     farpointer MysteryTV_1_palette
     farpointer MysteryTV_entity_list
@@ -248,7 +248,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MysteryTV_2_blockmap_hi
     farpointer MysteryTV_2_tileset
     farpointer MysteryTV_2_blockset
-    farpointer MysteryTV_2_collision
+    farpointer MysteryTV_2_collision_blockmap
     farpointer MysteryTV_2_collision_blockset
     farpointer MysteryTV_2_palette
     farpointer MysteryTV_entity_list
@@ -259,7 +259,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MysteryTV_3_blockmap_hi
     farpointer MysteryTV_3_tileset
     farpointer MysteryTV_3_blockset
-    farpointer MysteryTV_3_collision
+    farpointer MysteryTV_3_collision_blockmap
     farpointer MysteryTV_3_collision_blockset
     farpointer MysteryTV_3_palette
     farpointer MysteryTV_entity_list
@@ -270,7 +270,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MysteryTV_4_blockmap_hi
     farpointer MysteryTV_4_tileset
     farpointer MysteryTV_4_blockset
-    farpointer MysteryTV_4_collision
+    farpointer MysteryTV_4_collision_blockmap
     farpointer MysteryTV_4_collision_blockset
     farpointer MysteryTV_4_palette
     farpointer MysteryTV_entity_list
@@ -281,7 +281,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MysteryTV_4_blockmap_hi
     farpointer MysteryTV_4_tileset
     farpointer MysteryTV_4_blockset
-    farpointer MysteryTV_4_collision
+    farpointer MysteryTV_4_collision_blockmap
     farpointer MysteryTV_4_collision_blockset
     farpointer MysteryTV_5_palette_4300
     farpointer MysteryTV_entity_list
@@ -292,7 +292,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MysteryTV_4_blockmap_hi
     farpointer MysteryTV_4_tileset
     farpointer MysteryTV_4_blockset
-    farpointer MysteryTV_4_collision
+    farpointer MysteryTV_4_collision_blockmap
     farpointer MysteryTV_4_collision_blockset
     farpointer MysteryTV_6_palette_4340
     farpointer MysteryTV_entity_list
@@ -303,7 +303,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MysteryTV_7_blockmap_hi
     farpointer MysteryTV_7_tileset
     farpointer MysteryTV_7_blockset
-    farpointer MysteryTV_7_collision
+    farpointer MysteryTV_7_collision_blockmap
     farpointer MysteryTV_7_collision_blockset
     farpointer MysteryTV_7_palette
     farpointer MysteryTV_entity_list
@@ -314,7 +314,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MysteryTV_8_blockmap_hi
     farpointer MysteryTV_8_tileset
     farpointer MysteryTV_8_blockset
-    farpointer MysteryTV_8_collision
+    farpointer MysteryTV_8_collision_blockmap
     farpointer MysteryTV_8_collision_blockset
     farpointer MysteryTV_8_palette
     farpointer MysteryTV_entity_list
@@ -325,7 +325,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MysteryTV_4_blockmap_hi
     farpointer MysteryTV_4_tileset
     farpointer MysteryTV_4_blockset
-    farpointer MysteryTV_4_collision
+    farpointer MysteryTV_4_collision_blockmap
     farpointer MysteryTV_4_collision_blockset
     farpointer MysteryTV_4_palette
     farpointer MysteryTV_entity_list
@@ -336,7 +336,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MysteryTV_2_blockmap_hi
     farpointer MysteryTV_2_tileset
     farpointer MysteryTV_2_blockset
-    farpointer MysteryTV_2_collision
+    farpointer MysteryTV_2_collision_blockmap
     farpointer MysteryTV_2_collision_blockset
     farpointer MysteryTV_2_palette
     farpointer MysteryTV_entity_list
@@ -347,7 +347,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer TutTV_1_blockmap_hi
     farpointer TutTV_1_tileset
     farpointer TutTV_1_blockset
-    farpointer TutTV_1_collision
+    farpointer TutTV_1_collision_blockmap
     farpointer TutTV_1_collision_blockset
     farpointer TutTV_1_palette
     farpointer TutTV_entity_list
@@ -358,7 +358,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer TutTV_2_blockmap_hi
     farpointer TutTV_2_tileset
     farpointer TutTV_2_blockset
-    farpointer TutTV_2_collision
+    farpointer TutTV_2_collision_blockmap
     farpointer TutTV_2_collision_blockset
     farpointer TutTV_2_palette
     farpointer TutTV_entity_list
@@ -369,7 +369,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer TutTV_3_blockmap_hi
     farpointer TutTV_3_tileset
     farpointer TutTV_3_blockset
-    farpointer TutTV_3_collision
+    farpointer TutTV_3_collision_blockmap
     farpointer TutTV_3_collision_blockset
     farpointer TutTV_3_palette
     farpointer TutTV_entity_list
@@ -380,7 +380,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer TutTV_4_blockmap_hi
     farpointer TutTV_4_tileset
     farpointer TutTV_4_blockset
-    farpointer TutTV_4_collision
+    farpointer TutTV_4_collision_blockmap
     farpointer TutTV_4_collision_blockset
     farpointer TutTV_4_palette
     farpointer TutTV_entity_list
@@ -391,7 +391,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer TutTV_5_blockmap_hi
     farpointer TutTV_5_tileset
     farpointer TutTV_5_blockset
-    farpointer TutTV_5_collision
+    farpointer TutTV_5_collision_blockmap
     farpointer TutTV_5_collision_blockset
     farpointer TutTV_5_palette
     farpointer TutTV_entity_list
@@ -402,7 +402,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer TutTV_6_blockmap_hi
     farpointer TutTV_6_tileset
     farpointer TutTV_6_blockset
-    farpointer TutTV_6_collision
+    farpointer TutTV_6_collision_blockmap
     farpointer TutTV_6_collision_blockset
     farpointer TutTV_6_palette
     farpointer TutTV_entity_list
@@ -413,7 +413,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer TutTV_7_blockmap_hi
     farpointer TutTV_7_tileset
     farpointer TutTV_7_blockset
-    farpointer TutTV_7_collision
+    farpointer TutTV_7_collision_blockmap
     farpointer TutTV_7_collision_blockset
     farpointer TutTV_7_palette
     farpointer TutTV_entity_list
@@ -424,7 +424,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer WesternStation_1_blockmap_hi
     farpointer WesternStation_1_tileset
     farpointer WesternStation_1_blockset
-    farpointer WesternStation_1_collision
+    farpointer WesternStation_1_collision_blockmap
     farpointer WesternStation_1_collision_blockset
     farpointer WesternStation_1_palette
     farpointer WesternStation_entity_list
@@ -435,7 +435,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer WesternStation_2_blockmap_hi
     farpointer WesternStation_2_tileset
     farpointer WesternStation_2_blockset
-    farpointer WesternStation_2_collision
+    farpointer WesternStation_2_collision_blockmap
     farpointer WesternStation_2_collision_blockset
     farpointer WesternStation_2_palette
     farpointer WesternStation_entity_list
@@ -446,7 +446,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer WesternStation_3_blockmap_hi
     farpointer WesternStation_3_tileset
     farpointer WesternStation_3_blockset
-    farpointer WesternStation_3_collision
+    farpointer WesternStation_3_collision_blockmap
     farpointer WesternStation_3_collision_blockset
     farpointer WesternStation_3_palette
     farpointer WesternStation_entity_list
@@ -457,7 +457,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer WesternStation_4_blockmap_hi
     farpointer WesternStation_4_tileset
     farpointer WesternStation_4_blockset
-    farpointer WesternStation_4_collision
+    farpointer WesternStation_4_collision_blockmap
     farpointer WesternStation_4_collision_blockset
     farpointer WesternStation_4_palette
     farpointer WesternStation_entity_list
@@ -468,7 +468,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer WesternStation_5_blockmap_hi
     farpointer WesternStation_5_tileset
     farpointer WesternStation_5_blockset
-    farpointer WesternStation_5_collision
+    farpointer WesternStation_5_collision_blockmap
     farpointer WesternStation_5_collision_blockset
     farpointer WesternStation_5_palette
     farpointer WesternStation_entity_list
@@ -479,7 +479,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer WesternStation_6_blockmap_hi
     farpointer WesternStation_6_tileset
     farpointer WesternStation_6_blockset
-    farpointer WesternStation_6_collision
+    farpointer WesternStation_6_collision_blockmap
     farpointer WesternStation_6_collision_blockset
     farpointer WesternStation_6_palette
     farpointer WesternStation_entity_list
@@ -490,7 +490,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer WesternStation_4_blockmap_hi
     farpointer WesternStation_4_tileset
     farpointer WesternStation_4_blockset
-    farpointer WesternStation_4_collision
+    farpointer WesternStation_4_collision_blockmap
     farpointer WesternStation_4_collision_blockset
     farpointer WesternStation_4_palette
     farpointer WesternStation_entity_list
@@ -501,7 +501,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer WesternStation_4_blockmap_hi
     farpointer WesternStation_4_tileset
     farpointer WesternStation_4_blockset
-    farpointer WesternStation_4_collision
+    farpointer WesternStation_4_collision_blockmap
     farpointer WesternStation_4_collision_blockset
     farpointer WesternStation_4_palette
     farpointer WesternStation_entity_list
@@ -512,7 +512,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer WesternStation_4_blockmap_hi
     farpointer WesternStation_4_tileset
     farpointer WesternStation_4_blockset
-    farpointer WesternStation_4_collision
+    farpointer WesternStation_4_collision_blockmap
     farpointer WesternStation_4_collision_blockset
     farpointer WesternStation_4_palette
     farpointer WesternStation_entity_list
@@ -523,7 +523,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer AnimeChannel_1_blockmap_hi
     farpointer AnimeChannel_1_tileset
     farpointer AnimeChannel_1_blockset
-    farpointer AnimeChannel_1_collision
+    farpointer AnimeChannel_1_collision_blockmap
     farpointer AnimeChannel_1_collision_blockset
     farpointer AnimeChannel_1_palette
     farpointer AnimeChannel_entity_list
@@ -534,7 +534,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer AnimeChannel_2_blockmap_hi
     farpointer AnimeChannel_2_tileset
     farpointer AnimeChannel_2_blockset
-    farpointer AnimeChannel_2_collision
+    farpointer AnimeChannel_2_collision_blockmap
     farpointer AnimeChannel_2_collision_blockset
     farpointer AnimeChannel_2_palette
     farpointer AnimeChannel_entity_list
@@ -545,7 +545,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer AnimeChannel_3_blockmap_hi
     farpointer AnimeChannel_3_tileset
     farpointer AnimeChannel_3_blockset
-    farpointer AnimeChannel_3_collision
+    farpointer AnimeChannel_3_collision_blockmap
     farpointer AnimeChannel_3_collision_blockset
     farpointer AnimeChannel_3_palette
     farpointer AnimeChannel_entity_list
@@ -556,7 +556,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer AnimeChannel_4_blockmap_hi
     farpointer AnimeChannel_4_tileset
     farpointer AnimeChannel_4_blockset
-    farpointer AnimeChannel_4_collision
+    farpointer AnimeChannel_4_collision_blockmap
     farpointer AnimeChannel_4_collision_blockset
     farpointer AnimeChannel_4_palette
     farpointer AnimeChannel_entity_list
@@ -567,7 +567,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer AnimeChannel_5_blockmap_hi
     farpointer AnimeChannel_5_tileset
     farpointer AnimeChannel_5_blockset
-    farpointer AnimeChannel_5_collision
+    farpointer AnimeChannel_5_collision_blockmap
     farpointer AnimeChannel_5_collision_blockset
     farpointer AnimeChannel_5_palette
     farpointer AnimeChannel_entity_list
@@ -578,7 +578,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer AnimeChannel_6_blockmap_hi
     farpointer AnimeChannel_6_tileset
     farpointer AnimeChannel_6_blockset
-    farpointer AnimeChannel_6_collision
+    farpointer AnimeChannel_6_collision_blockmap
     farpointer AnimeChannel_6_collision_blockset
     farpointer AnimeChannel_6_palette
     farpointer AnimeChannel_entity_list
@@ -589,7 +589,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer AnimeChannel_6_blockmap_hi
     farpointer AnimeChannel_6_tileset
     farpointer AnimeChannel_6_blockset
-    farpointer AnimeChannel_6_collision
+    farpointer AnimeChannel_6_collision_blockmap
     farpointer AnimeChannel_6_collision_blockset
     farpointer AnimeChannel_6_palette
     farpointer AnimeChannel_entity_list
@@ -600,7 +600,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer AnimeChannel_6_blockmap_hi
     farpointer AnimeChannel_6_tileset
     farpointer AnimeChannel_6_blockset
-    farpointer AnimeChannel_6_collision
+    farpointer AnimeChannel_6_collision_blockmap
     farpointer AnimeChannel_6_collision_blockset
     farpointer AnimeChannel_6_palette
     farpointer AnimeChannel_entity_list
@@ -611,7 +611,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer AnimeChannel_5_blockmap_hi
     farpointer AnimeChannel_5_tileset
     farpointer AnimeChannel_5_blockset
-    farpointer AnimeChannel_5_collision
+    farpointer AnimeChannel_5_collision_blockmap
     farpointer AnimeChannel_5_collision_blockset
     farpointer AnimeChannel_5_palette
     farpointer AnimeChannel_entity_list
@@ -622,7 +622,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer SuperheroShow_1_blockmap_hi
     farpointer SuperheroShow_1_tileset
     farpointer SuperheroShow_1_blockset
-    farpointer SuperheroShow_1_collision
+    farpointer SuperheroShow_1_collision_blockmap
     farpointer SuperheroShow_1_collision_blockset
     farpointer SuperheroShow_1_palette
     farpointer SuperheroShow_entity_list
@@ -633,7 +633,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer SuperheroShow_2_blockmap_hi
     farpointer SuperheroShow_2_tileset
     farpointer SuperheroShow_2_blockset
-    farpointer SuperheroShow_2_collision
+    farpointer SuperheroShow_2_collision_blockmap
     farpointer SuperheroShow_2_collision_blockset
     farpointer SuperheroShow_2_palette
     farpointer SuperheroShow_entity_list
@@ -644,7 +644,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer SuperheroShow_3_blockmap_hi
     farpointer SuperheroShow_3_tileset
     farpointer SuperheroShow_3_blockset
-    farpointer SuperheroShow_3_collision
+    farpointer SuperheroShow_3_collision_blockmap
     farpointer SuperheroShow_3_collision_blockset
     farpointer SuperheroShow_3_palette
     farpointer SuperheroShow_entity_list
@@ -655,7 +655,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer SuperheroShow_4_blockmap_hi
     farpointer SuperheroShow_4_tileset
     farpointer SuperheroShow_4_blockset
-    farpointer SuperheroShow_4_collision
+    farpointer SuperheroShow_4_collision_blockmap
     farpointer SuperheroShow_4_collision_blockset
     farpointer SuperheroShow_4_palette
     farpointer SuperheroShow_entity_list
@@ -666,7 +666,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer SuperheroShow_5_blockmap_hi
     farpointer SuperheroShow_5_tileset
     farpointer SuperheroShow_5_blockset
-    farpointer SuperheroShow_5_collision
+    farpointer SuperheroShow_5_collision_blockmap
     farpointer SuperheroShow_5_collision_blockset
     farpointer SuperheroShow_5_palette
     farpointer SuperheroShow_entity_list
@@ -677,7 +677,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer SuperheroShow_6_blockmap_hi
     farpointer SuperheroShow_6_tileset
     farpointer SuperheroShow_6_blockset
-    farpointer SuperheroShow_6_collision
+    farpointer SuperheroShow_6_collision_blockmap
     farpointer SuperheroShow_6_collision_blockset
     farpointer SuperheroShow_6_palette
     farpointer SuperheroShow_entity_list
@@ -688,7 +688,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer GextremeSports_1_blockmap_hi
     farpointer GextremeSports_1_tileset
     farpointer GextremeSports_1_blockset
-    farpointer GextremeSports_1_collision
+    farpointer GextremeSports_1_collision_blockmap
     farpointer GextremeSports_1_collision_blockset
     farpointer GextremeSports_1_palette
     farpointer GextremeSports_entity_list
@@ -699,7 +699,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer HolidayTV_2_blockmap_hi
     farpointer HolidayTV_2_tileset
     farpointer HolidayTV_2_blockset
-    farpointer HolidayTV_2_collision
+    farpointer HolidayTV_2_collision_blockmap
     farpointer HolidayTV_2_collision_blockset
     farpointer HolidayTV_3_palette_4180
     farpointer GextremeSports_entity_list
@@ -710,7 +710,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer HolidayTV_2_blockmap_hi
     farpointer HolidayTV_2_tileset
     farpointer HolidayTV_2_blockset
-    farpointer HolidayTV_2_collision
+    farpointer HolidayTV_2_collision_blockmap
     farpointer HolidayTV_2_collision_blockset
     farpointer HolidayTV_3_palette_4180
     farpointer GextremeSports_entity_list
@@ -721,7 +721,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer HolidayTV_2_blockmap_hi
     farpointer HolidayTV_2_tileset
     farpointer HolidayTV_2_blockset
-    farpointer HolidayTV_2_collision
+    farpointer HolidayTV_2_collision_blockmap
     farpointer HolidayTV_2_collision_blockset
     farpointer HolidayTV_3_palette_4180
     farpointer GextremeSports_entity_list
@@ -732,7 +732,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer MarsupialMadness_1_blockmap_hi
     farpointer MarsupialMadness_1_tileset
     farpointer MarsupialMadness_1_blockset
-    farpointer MarsupialMadness_1_collision
+    farpointer MarsupialMadness_1_collision_blockmap
     farpointer MarsupialMadness_1_collision_blockset
     farpointer MarsupialMadness_1_palette
     farpointer MarsupialMadness_entity_list
@@ -743,7 +743,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer WWGexWrestling_1_blockmap_hi
     farpointer WWGexWrestling_1_tileset
     farpointer WWGexWrestling_1_blockset
-    farpointer WWGexWrestling_1_collision
+    farpointer WWGexWrestling_1_collision_blockmap
     farpointer WWGexWrestling_1_collision_blockset
     farpointer WWGexWrestling_1_palette
     farpointer WWGexWrestling_entity_list
@@ -754,7 +754,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer LizardOfOz_1_blockmap_hi
     farpointer LizardOfOz_1_tileset
     farpointer LizardOfOz_1_blockset
-    farpointer LizardOfOz_1_collision
+    farpointer LizardOfOz_1_collision_blockmap
     farpointer LizardOfOz_1_collision_blockset
     farpointer LizardOfOz_1_palette
     farpointer LizardOfOz_entity_list
@@ -765,7 +765,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer ChannelZ_1_blockmap_hi
     farpointer ChannelZ_1_tileset
     farpointer ChannelZ_1_blockset
-    farpointer ChannelZ_1_collision
+    farpointer ChannelZ_1_collision_blockmap
     farpointer ChannelZ_1_collision_blockset
     farpointer ChannelZ_1_palette
     farpointer ChannelZ_entity_list
@@ -776,7 +776,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer ChannelZ_2_blockmap_hi
     farpointer ChannelZ_2_tileset
     farpointer ChannelZ_2_blockset
-    farpointer ChannelZ_2_collision
+    farpointer ChannelZ_2_collision_blockmap
     farpointer ChannelZ_2_collision_blockset
     farpointer ChannelZ_2_palette
     farpointer ChannelZ_entity_list
@@ -787,7 +787,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer ChannelZ_3_blockmap_hi
     farpointer ChannelZ_3_tileset
     farpointer ChannelZ_3_blockset
-    farpointer ChannelZ_3_collision
+    farpointer ChannelZ_3_collision_blockmap
     farpointer ChannelZ_3_collision_blockset
     farpointer ChannelZ_3_palette
     farpointer ChannelZ_entity_list
@@ -798,7 +798,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer ChannelZ_4_blockmap_hi
     farpointer ChannelZ_4_tileset
     farpointer ChannelZ_4_blockset
-    farpointer ChannelZ_4_collision
+    farpointer ChannelZ_4_collision_blockmap
     farpointer ChannelZ_4_collision_blockset
     farpointer ChannelZ_4_palette
     farpointer ChannelZ_entity_list
@@ -809,7 +809,7 @@ call_03_6c89_MapData_LoadForCurrentMap:
     farpointer ChannelZ_5_blockmap_hi
     farpointer ChannelZ_5_tileset
     farpointer ChannelZ_5_blockset
-    farpointer ChannelZ_5_collision
+    farpointer ChannelZ_5_collision_blockmap
     farpointer ChannelZ_5_collision_blockset
     farpointer ChannelZ_5_palette
     farpointer ChannelZ_entity_list

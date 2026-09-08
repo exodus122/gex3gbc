@@ -214,8 +214,8 @@ TILESET_BANK = 4
 TILESET_BANK_OFFSET = 5
 BLOCKSET_AND_PALETTE_IDS_BANK = 6
 BLOCKSET_AND_PALETTE_IDS_BANK_OFFSET = 7
-MAP_COLLISION_BANK = 8
-MAP_COLLISION_BANK_OFFSET = 9
+COLLISION_BLOCKMAP_BANK = 8
+COLLISION_BLOCKMAP_BANK_OFFSET = 9
 COLLISION_BLOCKSET_BANK = 10
 COLLISION_BLOCKSET_BANK_OFFSET = 11
 BG_PALETTE_BANK = 12
@@ -418,11 +418,11 @@ if split_map_data:
         out.write(blockmap_hi_data)
         out.close()
 
-        # map collision
-        map_collision_file = "../banks/bank_0"+f"{level_data[MAP_COLLISION_BANK]:x}"+".bin"
-        map_collision_data = open(map_collision_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
-        out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_collision.bin', "wb")
-        out.write(map_collision_data)
+        # collision blockmap
+        collision_blockmap_file = "../banks/bank_0"+f"{level_data[COLLISION_BLOCKMAP_BANK]:x}"+".bin"
+        collision_blockmap_data = open(collision_blockmap_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
+        out = open('extracted_map_data/'+level_name+'/'+level_name+'_'+channel_map_number+'/'+level_name+'_'+channel_map_number+'_collision_blockmap.bin', "wb")
+        out.write(collision_blockmap_data)
         out.close()
 
         # collectible list
@@ -767,8 +767,8 @@ if generate_collision_maps:
 
         map_image_path = "./map_collision_images/"
 
-        map_collision_file = "../banks/bank_0"+f"{level_data[MAP_COLLISION_BANK]:x}"+".bin"
-        map_collision_data = open(map_collision_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
+        collision_blockmap_file = "../banks/bank_0"+f"{level_data[COLLISION_BLOCKMAP_BANK]:x}"+".bin"
+        collision_blockmap_data = open(collision_blockmap_file, "rb").read()[offset-0x4000:offset-0x4000+width*height]
 
         count = 0
         img = PIL.Image.new("RGB", (16*width, 16*height))
@@ -778,7 +778,7 @@ if generate_collision_maps:
                 #draw.rectangle(((x*16,y*16), ((x+1)*16,(y+1)*16)), blockmap_data[count],3)
                 
                 #print(count)
-                img.paste(blocks[map_collision_data[count]], (x*16, y*16))
+                img.paste(blocks[collision_blockmap_data[count]], (x*16, y*16))
                 
                 count = count+1
         
